@@ -180,17 +180,20 @@ not `1`. The whole stored value, including a spaced or attached unit, must
 match, and the characters on either side must not extend it. An extending
 character is an ASCII letter or digit, a Unicode letter, µ, or °, or a
 dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
-`1,000`. A space, thin space, or narrow no-break space in an unsigned
-digit run is typography. The first group is one to three digits and each
-group after it is exactly three, so `1 550` is 1550. The run starts at
-the beginning of the text or after whitespace or punctuation, and a letter
-does not precede it, so `SiO2 100` is formula `SiO2` and the number 100,
-not `SiO2100`. The run is not an
-exponent, a sign, or a decimal fraction, so `1e0 001`, `12 34`,
-`1.5 000`, and `1 550e3` are not one number. A formula or species label
-does not apply this fold. A comma is not this separator, so a cell
-`1,000` is not 1000.
-The same grouped spelling in a numeric cell is that number. The token must
+`1,000`. A thin space (U+2009), narrow no-break space (U+202F), or
+no-break space (U+00A0) in an unsigned digit run is typography. An
+ordinary ASCII space is not: `1 100` certifies 1 and certifies 100 and
+does not certify 1100. The first group is one to three digits and each
+group after it is exactly three, so `1 650` and `1 650` are 1650. The
+run starts at the beginning of the text or after whitespace or
+punctuation, and a letter does not precede it, so `SiO2 100` is formula
+`SiO2` and the number 100, not `SiO2100`. The run is not an exponent, a
+sign, or a decimal fraction, so `1e0 001`, `12 34`, `1.5 000`, and
+`1 550e3` are not one number. A formula or species label does not apply
+this fold. A comma is not this separator, so a cell `1,000` is not 1000.
+The same typographic grouped spelling in a numeric cell is that number.
+An ASCII space in a cell does not join, so a cell `1 550` is not 1550.
+The token must
 appear in the cited `line_range` when one is set,
 otherwise in the opened text. A CSV or TSV source is not searched that way:
 the complete table is parsed first, honouring quoted multi-line cells, and
@@ -206,10 +209,15 @@ position of one cell, header rows included. `table_row_number` and
 `table_column_number` are the same indexes. Both axes are required. The
 validator parses that complete table, expanding `rowspan` and `colspan`,
 and the stored number or ordinary string must be that whole trimmed cell.
-A cell that contains a superscript does not certify a plain number. It
-certifies a float equal to that power, so `10<sup>3</sup>` certifies
-`1e3`, and a string that spells the same power (`1e3`, `10^3`,
-`1×10^3`). `103` and `1000` are `superscript_in_cell`. A value printed
+A cell that contains a superscript certifies only when the cell is a
+complete power and nothing else: an optional sign, a base number, an
+optional × or x or ·, then 10 and the superscript exponent, or the base
+raised to that exponent. `10<sup>3</sup>` certifies `1e3`.
+`1.5×10<sup>3</sup>` certifies 1500 / `1.5e3`. `10<sup>3</sup>2` and any
+other leading or trailing content are `superscript_in_cell`. A plain
+number is also `superscript_in_cell`, so `103` and `1000` do not
+certify. A string certifies only as a spelling of that power (`1e3`,
+`10^3`, `1×10^3`). A value printed
 in another row of the same line does not certify. A cited
 `line_range`, or the opened text when `line_range` is absent, that
 includes a line of an HTML `<table>` and has no `table_row` or
@@ -232,7 +240,11 @@ does not certify `H2O2`, and `$SiO_{2} 100$` certifies `SiO2` and does
 not certify `SiO2100`. A caret is a superscript. A whitespace token that
 contains `^` does not certify as a plain formula or a plain number, so
 `$O^{2-}$` does not certify `O2`, `$Fe^{2+}$` does not certify `Fe2`,
-and `$SiO^{2}$` does not certify `SiO2`. A token with no internal space is the
+and `$SiO^{2}$` does not certify `SiO2`. A subscript digit inside a
+formula token is not a number. `SiO_{2}` and `SiO₂` do not certify 2.
+`Fe_{2}O_{3}` does not certify 2 or 3. A neighbouring measurement still
+certifies, so `SiO_{2} 100` certifies 100 and `6.98 Fe_{2}O_{3}`
+certifies 6.98. A token with no internal space is the
 `printed_formula` conversion, so
 `${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$` certifies `Al2O3`. A layout
 space is removed only between an element symbol or a closing parenthesis

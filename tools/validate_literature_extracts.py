@@ -54,10 +54,13 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   line of an HTML table and has no ``table_row`` or ``table_column``
   refuses with ``html_table_requires_cell_address``. A value on a prose
   line in that span still certifies. A value present only in the table
-  does not. A cell whose text contains a
-  superscript never certifies a plain number: it certifies only an
-  explicit power (``1e3``, ``10^3``, ``1×10^3``) equal to that power,
-  and any other value is ``superscript_in_cell``. A value in another row
+  does not. A superscript cell certifies only when that cell is a
+  complete power and nothing else: an optional sign, a base number, an
+  optional × or x or ·, then 10 and the superscript exponent, or the
+  base raised to that exponent. ``10<sup>3</sup>`` certifies ``1e3``.
+  ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``. ``10<sup>3</sup>2``
+  and any other leading or trailing content are ``superscript_in_cell``,
+  as is a plain number. A value in another row
   does not certify. Formula and species labels are normalized before every
   comparison, including a label with no ASCII digit. Markup folds
   inside each whitespace token and does not delete a separator. ``_{n}``,
@@ -68,6 +71,9 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   A caret is a superscript. A token that contains ``^`` is not unwrapped
   and does not certify as a plain formula or a plain number, so
   ``$O^{2-}$`` is not ``O2`` and ``$SiO^{2}$`` is not ``SiO2``.
+  A subscript digit inside a formula token is not a number: ``SiO_{2}``
+  and ``SiO₂`` do not certify 2, and ``Fe_{2}O_{3}`` does not certify 2.
+  ``SiO_{2} 100`` still certifies 100.
   A token with no internal space, including
   ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``, goes through
   ``printed_formula``. A layout space is removed
@@ -75,12 +81,14 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   count that follows it. ``SiO 2`` is ``SiO2``. A space after a count
   stays, so ``H2 O2``, ``SiO2 Al2O3``, and ``Fe 2 O 3`` (folded to
   ``Fe2 O3``) stay separate tokens. ``CO`` is not ``CO₂`` and ``SiO₂`` is
-  not ``SiO₂₂``. A space, thin space, or narrow no-break space in an
-  unsigned digit run is typography: the first group is one to three
-  digits and each group after it is exactly three. The run starts at
-  the beginning of the text or after whitespace or punctuation, never
-  after a letter, so ``SiO2 100`` stays ``SiO2`` and ``100``. ``1 550``
-  is ``1550``. ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are
+  not ``SiO₂₂``. A thin space (U+2009), narrow no-break space (U+202F),
+  or no-break space (U+00A0) in an unsigned digit run is typography.
+  An ASCII space is not, so ``1 100`` certifies 1 and 100 and does not
+  certify 1100. The first group is one to three digits and each group
+  after it is exactly three, so ``1 650`` and ``1 650`` are 1650. The
+  run starts at the beginning of the text or after whitespace or
+  punctuation, never after a letter, so ``SiO2 100`` stays ``SiO2``
+  and ``100``. ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are
   not one number. The formula-label path does not apply this fold.
   A comma is
   not that separator. A numeric leaf does not match a formula by the
@@ -336,8 +344,8 @@ _TOKEN_LOOKBEHIND_CLASS = "A-Za-z0-9_." + "+" + _DISTINCT_NUMERIC_SIGNS + "-"
 # decimal: ".24" is a number. Without that alternative the string ".91"
 # is not a measured leaf, and the non-numeric substring path treats ".24"
 # as text inside "-.24". Callers scan text only through
-# ``_citation_token_matches``, which folds Unicode signs and digit-group
-# spaces first and drops
+# ``_citation_token_matches``, which folds Unicode signs and typographic
+# digit groups first and drops
 # any span ``_span_is_complete_printed_value`` rejects. The grammar is not
 # the boundary: a comma is not a hard edge here, and a yielded match is
 # still not a token of ``1,000``. A period is not a hard edge either.
@@ -366,9 +374,10 @@ def _fold_numeric_signs(text: str) -> str:
     return text.translate(_NUMERIC_SIGN_FOLD)
 
 
-# Ordinary space, thin space, and narrow no-break space. One separator
-# between groups. A comma is not this separator: ``1,000`` stays ``1,000``.
-_DIGIT_GROUP_SEPARATORS = " \u2009\u202f"
+# Thin space, narrow no-break space, and no-break space. One separator
+# between groups. An ASCII space is two measurements: ``1 100`` stays
+# ``1 100``. A comma is not this separator: ``1,000`` stays ``1,000``.
+_DIGIT_GROUP_SEPARATORS = "\u2009\u202f\u00a0"
 # A letter cannot precede the run. ``SiO2 100`` must not start at the
 # formula's count. Digits, a decimal point, an exponent marker, and a
 # sign stay excluded so ``1.5 000``, ``1e0 001``, and ``-1 550`` stay apart.
@@ -395,15 +404,19 @@ def _digit_run_may_start(text: str, start: int) -> bool:
 
 
 def _fold_digit_groups(text: str) -> str:
-    """Join one unsigned digit run. A second call keeps the same spans.
+    """Join one unsigned digit run on a typographic separator.
 
-    The run starts at the beginning of the text or after whitespace or
-    punctuation, never after a letter, so ``SiO2 100`` stays ``SiO2 100``.
-    The first group is one to three digits. Each following group is exactly
-    three. A decimal point may follow the run, so ``1 550.25`` is
-    ``1550.25``. ``1 550`` is ``1550``. ``12 345`` is ``12345``. ``12 34``,
-    ``1e0 001``, ``1.5 000``, ``1 550e3``, and a signed run stay apart.
+    A thin space, narrow no-break space, or no-break space joins groups.
+    An ASCII space does not, so ``1 100`` stays ``1 100``. The run starts
+    at the beginning of the text or after whitespace or punctuation, never
+    after a letter, so ``SiO2 100`` stays ``SiO2 100``. The first group is
+    one to three digits. Each following group is exactly three. A decimal
+    point may follow the run. ``12 34``, ``1e0 001``, ``1.5 000``,
+    ``1 550e3``, and a signed run stay apart. A second call keeps the
+    same spans. Text with none of those separators is returned unchanged.
     """
+    if not any(separator in text for separator in _DIGIT_GROUP_SEPARATORS):
+        return text
     pieces: list[str] = []
     cursor = 0
     while True:
@@ -435,9 +448,11 @@ def _citation_token_matches(text: str) -> list[re.Match[str]]:
     Spelling equality and string alignment read this list. A sign cannot
     be dropped on one of those paths and kept on another. A match whose
     span fails ``_span_is_complete_printed_value`` is not a token, so
-    ``1`` is not a token of ``1,000``. Digit groups of one number are
-    joined first, so ``1 550`` is the token ``1550`` and ``12 34`` is
-    two tokens. A second fold does not move those spans. This grammar is
+    ``1`` is not a token of ``1,000``. Typographic digit groups of one
+    number are joined first, so ``1 650`` is the token ``1650``. An ASCII
+    space is not joined, so ``1 100`` is the tokens ``1`` and ``100``,
+    and ``12 34`` is two tokens. A second fold does not move those spans.
+    This grammar is
     not the coverage membership test: a string that contains a digit is
     a measured leaf even when this list is empty.
     """
@@ -517,12 +532,17 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     ``1,000,000``. ``1`` is not ``-1`` or ``1µ``. ``1`` is ``the value is 1.``
     A whitespace token that contains ``^`` holds a superscript. No span
     inside that token certifies a plain formula or a plain number.
+    A formula subscript count is not a measurement: ``_{n}`` and a bare
+    ``_`` digit do not certify as that number, so ``SiO_{2}`` does not
+    certify 2. ``SiO_{2} 100`` still certifies 100.
     This predicate is the prose boundary only. A CSV or TSV source does
     not call it. The table is parsed first, and the whole cell is compared.
     """
     if not (0 <= start < end <= len(text)):
         return False
     if _token_holds_superscript(text, start, end):
+        return False
+    if _span_is_formula_subscript(text, start):
         return False
     if start > 0 and _extends_printed_value(
         text, start - 1, text[start], sign_attaches=True
@@ -536,6 +556,21 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     ):
         return False
     return True
+
+
+def _span_is_formula_subscript(text: str, start: int) -> bool:
+    """True when a numeric span opens a formula subscript count.
+
+    ``_{12}`` and ``_12`` are the formula's count. Those digits are not
+    a measurement. A later token still is, so ``SiO_{2} 100`` keeps
+    ``100``. A Unicode subscript digit is not an ASCII number, so it is
+    not this span.
+    """
+    if start <= 0:
+        return False
+    if text[start - 1] == "_":
+        return True
+    return start >= 2 and text[start - 1] == "{" and text[start - 2] == "_"
 
 
 def _token_holds_superscript(text: str, start: int, end: int) -> bool:
@@ -561,7 +596,9 @@ def _printed_value_carried(
     ``_span_is_complete_printed_value`` on that span. ``0.91Pa`` is not
     ``10.91Pa`` or ``0.91Pascal``, ``91.`` is not ``91.0``, ``1 K`` is not
     ``1 KPa``, ``1,000`` is not ``1,000,000``, and ``12 34`` is not ``1234``.
-    ``1 550`` is ``1550``. ``SiO2 100`` is not ``SiO2100``.
+    A thin space, narrow no-break space, or no-break space joins an
+    unsigned digit run, so ``1 650`` is ``1650``. An ASCII space does not,
+    so ``1 100`` is not ``1100``. ``SiO2 100`` is not ``SiO2100``.
     """
     leaf = _fold_numeric_signs(leaf)
     text = _fold_numeric_signs(text)
@@ -698,8 +735,10 @@ def _whole_cell_number(cell: str) -> Decimal | None:
     ``Decimal``, never a float conversion: ``0.9100`` is ``0.91``,
     ``1e-999`` is not ``0``, and ``9007199254740993`` is not
     ``9007199254740992``. ``1/2``, ``1,000``, and ``0.91Pa`` do not parse.
-    A digit-group space does: ``1 550`` is ``1550``, and ``12 34`` is not
-    ``1234``. NaN, Infinity, and an exponent Decimal rejects are refusals.
+    A typographic digit group does: a thin space or a no-break space makes
+    1650, and an ASCII space does not, so ``1 550`` is not ``1550`` and
+    ``12 34`` is not ``1234``. NaN, Infinity, and an exponent Decimal
+    rejects are refusals.
     This is not a list of spellings of a stored leaf.
     """
     folded = _fold_digit_groups(_fold_numeric_signs(cell.strip()))
@@ -831,6 +870,14 @@ _EXPLICIT_CARET_RE = re.compile(
 _EXPLICIT_TIMES_RE = re.compile(
     r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\s*×\s*10\s*\^\s*([+\-]?\d+)"
 )
+# × U+00D7, ASCII x, · U+00B7. The optional group is mantissa times 10.
+# Without it the prefix is the base of base**exponent.
+_SUPERSCRIPT_TIMES = "\u00d7x\u00b7"
+_SUPERSCRIPT_CELL_RE = re.compile(
+    r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))(?:\s*(["
+    + _SUPERSCRIPT_TIMES
+    + r"])\s*10)?"
+)
 
 
 def _power_product(base: Decimal, exponent: int) -> Decimal | None:
@@ -880,24 +927,45 @@ def _explicit_power_decimal(text: str) -> Decimal | None:
 def _superscript_power_decimal(
     text: str, spans: tuple[tuple[int, int], ...]
 ) -> Decimal | None:
-    """``base ** exponent`` for one numeric superscript span.
+    """One complete power cell, or None.
 
-    ``10<sup>3</sup>`` is ``10**3``, which is ``1e3``. A missing span, more
-    than one span, or a non-numeric piece is not a power.
+    The cell is an optional sign, a base number, an optional × or x or
+    middle dot, then 10, and one superscript exponent. Or that base raised
+    to the exponent. Nothing else may sit in the cell. ``10<sup>3</sup>``
+    is ``10**3``, which is ``1e3``. ``1.5×10<sup>3</sup>`` is
+    ``1.5 * 10**3``. A trailing or leading extra, including
+    ``10<sup>3</sup>2``, is not a power.
     """
     if len(spans) != 1:
         return None
     start, end = spans[0]
     if not (0 <= start < end <= len(text)):
         return None
+    if text[end:].strip():
+        return None
     exponent = _fold_numeric_signs(text[start:end].strip())
-    base_text = _fold_numeric_signs((text[:start] + text[end:]).strip())
     if not re.fullmatch(r"[+\-]?\d+", exponent):
         return None
-    base = _finite_decimal(base_text)
+    prefix = _fold_numeric_signs(text[:start].strip())
+    parsed = _SUPERSCRIPT_CELL_RE.fullmatch(prefix)
+    if parsed is None:
+        return None
+    base = _finite_decimal(parsed.group(1))
     if base is None:
         return None
-    return _power_product(base, int(exponent))
+    power = int(exponent)
+    if parsed.group(2) is None:
+        return _power_product(base, power)
+    factor = _power_product(Decimal(10), power)
+    if factor is None:
+        return None
+    try:
+        value = base * factor
+    except (ArithmeticError, DecimalException):
+        return None
+    if not value.is_finite():
+        return None
+    return value
 
 
 def _superscript_leaf_certifies(
@@ -905,10 +973,11 @@ def _superscript_leaf_certifies(
 ) -> bool:
     """True when ``leaf`` spells the cell's power and equals it.
 
-    An int is a plain number, so ``103`` and ``1000`` do not certify.
-    A float certifies when it is that power, so ``1e3`` certifies
-    ``10<sup>3</sup>``. A string certifies only as ``1e3``, ``10^3``,
-    or ``1×10^3`` (the same value).
+    An int is a plain number, so ``103``, ``1000``, and ``1500`` do not
+    certify. A float certifies when it is that power, so ``1e3`` certifies
+    ``10<sup>3</sup>`` and ``1.5e3`` certifies ``1.5×10<sup>3</sup>``.
+    A string certifies only as ``1e3``, ``10^3``, or ``1×10^3`` (the same
+    value). Extra characters in the cell are not a power.
     """
     power = _superscript_power_decimal(text, spans)
     if power is None:
@@ -3120,9 +3189,11 @@ def _spelling_is_complete_token(spelling: str, text: str) -> bool:
     """True when ``spelling`` is one whole numeric token in ``text``.
 
     The span has to pass ``_span_is_complete_printed_value`` and equal a
-    citation token. ``1`` is not a token of ``1,000``.
+    citation token. ``1`` is not a token of ``1,000``. A canonical
+    spelling has no digit-group separator, so this path does not join
+    groups. The text join lives with the token scan.
     """
-    folded = _fold_digit_groups(_fold_numeric_signs(spelling))
+    folded = _fold_numeric_signs(spelling)
     if not _printed_value_carried(folded, text):
         return False
     return any(match.group(0) == folded for match in _citation_token_matches(text))
@@ -3139,12 +3210,16 @@ def _string_leaf_in_text(leaf: str, text: str) -> bool:
     to be the same complete token, so ``0.24`` is not ``-0.24`` or
     ``0.24e-5``. A leading decimal is a number, so ``.24`` is not ``-.24``
     or ``10.24``. Unicode signs are folded before either string is
-    searched, so ``−0.24`` is ``-0.24``.
+    searched, so ``−0.24`` is ``-0.24``. A digitless leaf does not join
+    digit groups. A digit-bearing leaf does, so its token spans stay
+    aligned with the citation scan.
     """
-    leaf = _fold_digit_groups(_fold_numeric_signs(leaf))
-    text = _fold_digit_groups(_fold_numeric_signs(text))
+    leaf = _fold_numeric_signs(leaf)
+    text = _fold_numeric_signs(text)
     if not _string_has_ascii_digit(leaf):
         return leaf in text
+    leaf = _fold_digit_groups(leaf)
+    text = _fold_digit_groups(text)
     if not _printed_value_carried(leaf, text):
         return False
     if not _parser_reads_every_digit(leaf):
@@ -3485,7 +3560,7 @@ def _locator_source_blind_reason(
                         )
                         candidate_reasons.append(
                             "superscript_in_cell: a superscript cell certifies "
-                            f"only an explicit power ({rendered})"
+                            f"only a complete explicit power ({rendered})"
                         )
                         candidate_reason_codes.add("superscript_in_cell")
                         break
@@ -3625,6 +3700,9 @@ def fidelity_source_warnings(
     inside ``$...$`` stays a separator, so ``$H_{2} O_{2}$`` is not
     ``H2O2``. A token that contains ``^`` holds a superscript and does
     not certify as a plain formula or a plain number.
+    A subscript digit inside a formula token is not a number, so
+    ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
+    measurement still does.
     ``printed_formula`` unwraps one token, including a
     ``\\mathrm`` / ``\\text`` / ``\\rm`` command, so
     ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` is ``Al2O3``. A layout
@@ -3633,14 +3711,17 @@ def fidelity_source_warnings(
     comparison. ``SiO 2`` is ``SiO2``. A space after a count stays, so
     ``Fe 2 O 3`` is ``Fe2 O3`` and does not certify ``Fe2O3``. A digitless
     label is a complete token, a preceding number is not joined, and two
-    formulas stay two tokens. A superscript cell certifies only an explicit
-    power equal to that power (``1e3``, ``10^3``, ``1×10^3``); a plain
-    number is ``superscript_in_cell``. An unsigned digit run whose first
-    group is one to three
-    digits, then groups of three, is that number when it starts at the
+    formulas stay two tokens. A superscript cell certifies only when it
+    is a complete power and nothing else. ``10<sup>3</sup>`` certifies
+    ``1e3``. ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``.
+    ``10<sup>3</sup>2`` and a plain number are ``superscript_in_cell``.
+    An unsigned digit run joins on a thin space, narrow no-break space,
+    or no-break space. An ASCII space does not. The first group is one
+    to three digits, then groups of three, and the run starts at the
     beginning of the text or after whitespace or punctuation, never after
-    a letter. ``1 550`` is ``1550``. ``SiO2 100`` is not ``SiO2100``.
-    ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are not. The
+    a letter. ``1 650`` and ``1 650`` are ``1650``. ``1 100`` is 1 and
+    100, not ``1100``. ``SiO2 100`` is not ``SiO2100``. ``1e0 001``,
+    ``12 34``, ``1.5 000``, and ``1 550e3`` are not one number. The
     formula-label path does not apply this fold. A comma is not that
     separator. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.

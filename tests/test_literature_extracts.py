@@ -8185,15 +8185,22 @@ _TOKEN_CASES = (
     # certify per cell; here the comma is not a delimiter.
     ("prose_adjacent_decimals", 0.91, "0.91,0.92\n", False),
     ("prose_adjacent_decimals_second", 0.92, "0.91,0.92\n", False),
-    # Digit groups of one unsigned number. The first group is 1-3 digits.
-    # Each group after it is exactly three. Not an exponent or a fraction.
-    ("digit_group_space", 1550, "from 1 550 °C to\n", True),
+    # Digit groups join only on U+2009, U+202F, or U+00A0. An ASCII space
+    # is two measurements. The first group is 1-3 digits. Each group after
+    # it is exactly three. Not an exponent or a fraction.
+    ("digit_group_space", 1550, "from 1 550 °C to\n", False),
+    ("digit_group_ascii_head", 1, "from 1 100 °C to\n", True),
+    ("digit_group_ascii_tail", 100, "from 1 100 °C to\n", True),
+    ("digit_group_ascii_joined", 1100, "from 1 100 °C to\n", False),
     ("digit_group_thin", 1550, "from 1\u2009550 °C to\n", True),
     ("digit_group_narrow", 1550, "from 1\u202f550 °C to\n", True),
-    ("digit_group_longer_head", 12345, "12 345\n", True),
+    ("digit_group_nbsp", 1650, "from 1\u00a0650 °C to\n", True),
+    ("digit_group_thin_1650", 1650, "from 1\u2009650 °C to\n", True),
+    ("digit_group_longer_head", 12345, "12\u2009345\n", True),
+    ("digit_group_ascii_longer", 12345, "12 345\n", False),
     ("digit_group_not_two_numbers", 1234, "12 34\n", False),
     ("digit_group_short_tail", 155, "1 55\n", False),
-    ("digit_group_not_the_head", 1, "from 1 550 °C to\n", False),
+    ("digit_group_ascii_own_token", 1, "from 1 550 °C to\n", True),
     ("digit_group_decimal_stays", 6.98, "6.98 100\n", True),
     ("digit_group_exponent", 10, "1e0 001\n", False),
     ("digit_group_fraction", 15000, "1.5 000\n", False),
@@ -10272,6 +10279,37 @@ def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
             "source_blind_pin" not in joined or "superscript_in_cell" not in joined
         ):
             failures.append(f"power refuse {pin!r}: {errors}")
+    structured = (
+        ("<table><tr><td>10<sup>3</sup>2</td></tr></table>\n", 1e3, False),
+        ("<table><tr><td>2 10<sup>3</sup></td></tr></table>\n", 1e3, False),
+        ("<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n", 1.5e3, True),
+        ("<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n", "1.5e3", True),
+        (
+            "<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n",
+            "1.5\u00d710^3",
+            True,
+        ),
+        ("<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n", 1500, False),
+        ("<table><tr><td>1.5x10<sup>3</sup></td></tr></table>\n", 1.5e3, True),
+        ("<table><tr><td>1.5\u00b710<sup>3</sup></td></tr></table>\n", 1.5e3, True),
+    )
+    for cell, pin, accepts in structured:
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            cell,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"power-struct-{pin!r}", artifact_root=tmp_path
+        )
+        joined = "\n".join(errors)
+        if accepts and errors:
+            failures.append(f"power structure accept {pin!r}: {errors}")
+        if not accepts and (
+            "source_blind_pin" not in joined or "superscript_in_cell" not in joined
+        ):
+            failures.append(f"power structure refuse {pin!r}: {errors}")
     assert failures == []
 
 
@@ -10298,7 +10336,7 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     assert vle._formula_label_in_text("SiO2", "SiO2 100") is True
     assert vle._formula_label_in_text("SiO2100", "SiO2 100") is False
     assert vle._leaf_in_text(100, "SiO2 100") is True
-    assert vle._leaf_in_text(1550, "1 550") is True
+    assert vle._leaf_in_text(1550, "1 550") is False
     assert vle._fold_digit_groups("SiO2 100") == "SiO2 100"
     text_source = inspect.getsource(vle._pinned_leaf_in_text)
     cell_source = inspect.getsource(vle._pinned_leaf_in_cells)
@@ -10503,6 +10541,17 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         ("formula", "Al2O3", r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$", True),
         ("formula", "Fe2O3", "6.98 Fe_{2}O_{3}", True),
         ("alpha", 6.98, "6.98 Fe_{2}O_{3}", True),
+        ("alpha", 2, "6.98 Fe_{2}O_{3}", False),
+        ("alpha", "2", "SiO_{2}", False),
+        ("alpha", 2, "SiO_{2}", False),
+        ("alpha", 2, "Fe_{2}O_{3}", False),
+        ("alpha", "2", "Fe_{2}O_{3}", False),
+        ("alpha", 3, "Fe_{2}O_{3}", False),
+        ("alpha", 2, "SiO₂", False),
+        ("alpha", "2", "SiO₂", False),
+        ("alpha", 100, "SiO_{2} 100", True),
+        ("alpha", 2, "SiO_{2} 100", False),
+        ("alpha", 2, "SiO 2", True),
         ("formula", "Al2O3", "10 Al_{2}O_{3}", True),
         ("alpha", 10, "10 Al_{2}O_{3}", True),
         ("formula", "H2O", "0.5 H_{2}O", True),
@@ -10659,7 +10708,9 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     inside each token. For every wrapper and every pair, ``W(A) W(B)``
     and ``W(A B)`` certify A and certify B and do not certify AB.
     A token that contains ``^`` does not certify as that plain formula
-    or as a plain number. A neighbour token still certifies.
+    or as a plain number. A neighbour token still certifies. A subscript
+    digit inside a formula token does not certify as a number, for every
+    wrapper. A separate number token still certifies.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -10695,6 +10746,23 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                         failures.append(
                             f"accept {key} {pin!r} {where}: {errors}"
                         )
+                    if re.fullmatch(r"\d+(?:\.\d+)?", token):
+                        continue
+                    for count in re.findall(r"\d+", token):
+                        for pin in (int(count), count):
+                            doc = _html_source_document(
+                                tmp_path, pin, source + "\n", key="alpha"
+                            )
+                            errors = vle.certify_extract_source_fidelity(
+                                doc,
+                                label=f"count-{kind}-{layout}-{count}",
+                                artifact_root=tmp_path,
+                            )
+                            joined = "\n".join(errors)
+                            if not errors or "source_blind_pin" not in joined:
+                                failures.append(
+                                    f"count {pin!r} {where}: {errors}"
+                                )
                 glued = left + right
                 doc = _html_source_document(
                     tmp_path, glued, source + "\n", key="formula"
@@ -10735,18 +10803,26 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
 
 
 def test_digit_group_spacing_is_one_number(tmp_path: Path):
-    """A grouped spelling of one number certifies that number.
+    """A typographic digit group is one number. An ASCII space is not.
 
-    ``1 550`` is 1550 in prose and in a numeric cell. ``12 34`` is not
-    1234. Thin space and narrow no-break space are the same separator.
-    ``1,000`` stays a comma group.
+    ``1 100`` certifies 1 and 100 and does not certify 1100. Thin space,
+    narrow no-break space, and no-break space join, so ``1\\u2009650`` and
+    ``1\\u00a0650`` are 1650. ``12 34`` is not 1234. ``1,000`` stays a
+    comma group. A canonical spelling and a digitless leaf do not join
+    groups. A formula label does not use this fold.
     """
-    assert vle._fold_digit_groups("1 550") == "1550"
+    assert vle._fold_digit_groups("1 550") == "1 550"
+    assert vle._fold_digit_groups("1 100") == "1 100"
     assert vle._fold_digit_groups("SiO2 100") == "SiO2 100"
-    assert vle._fold_digit_groups("(1 550)") == "(1550)"
+    assert vle._fold_digit_groups("SiO2\u2009100") == "SiO2\u2009100"
+    assert vle._fold_digit_groups("(1 550)") == "(1 550)"
+    assert vle._fold_digit_groups("(1\u2009550)") == "(1550)"
     assert vle._fold_digit_groups("1\u2009550") == "1550"
     assert vle._fold_digit_groups("1\u202f550") == "1550"
-    assert vle._fold_digit_groups("12 345") == "12345"
+    assert vle._fold_digit_groups("1\u2009650") == "1650"
+    assert vle._fold_digit_groups("1\u00a0650") == "1650"
+    assert vle._fold_digit_groups("12 345") == "12 345"
+    assert vle._fold_digit_groups("12\u2009345") == "12345"
     assert vle._fold_digit_groups("12 34") == "12 34"
     assert vle._fold_digit_groups("1 55") == "1 55"
     assert vle._fold_digit_groups("6.98 100") == "6.98 100"
@@ -10754,29 +10830,57 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
     assert vle._fold_digit_groups("1e0 001") == "1e0 001"
     assert vle._fold_digit_groups("1.5 000") == "1.5 000"
     assert vle._fold_digit_groups("-1 550") == "-1 550"
-    assert vle._fold_digit_groups("1 550.25") == "1550.25"
+    assert vle._fold_digit_groups("-1\u2009550") == "-1\u2009550"
+    assert vle._fold_digit_groups("1 550.25") == "1 550.25"
+    assert vle._fold_digit_groups("1\u2009550.25") == "1550.25"
     assert vle._fold_digit_groups("1 550e3") == "1 550e3"
+    assert vle._fold_digit_groups("1\u2009550e3") == "1\u2009550e3"
     assert vle._fold_digit_groups("1 550E3") == "1 550E3"
-    assert vle._fold_digit_groups("1 550") == vle._fold_digit_groups(
-        vle._fold_digit_groups("1 550")
+    assert vle._fold_digit_groups("1\u2009550") == vle._fold_digit_groups(
+        vle._fold_digit_groups("1\u2009550")
     )
+    assert vle._leaf_in_text(1, "1 100") is True
+    assert vle._leaf_in_text(100, "1 100") is True
+    assert vle._leaf_in_text(1100, "1 100") is False
+    assert vle._leaf_in_text(1650, "1\u2009650") is True
+    assert vle._leaf_in_text(1650, "1\u00a0650") is True
+    assert "_fold_digit_groups" not in inspect.getsource(vle._spelling_is_complete_token)
+    string_leaf = inspect.getsource(vle._string_leaf_in_text)
+    assert string_leaf.index("_string_has_ascii_digit") < string_leaf.index(
+        "_fold_digit_groups"
+    )
+    assert "_fold_digit_groups" in inspect.getsource(vle._citation_token_matches)
+    assert "_fold_digit_groups" in inspect.getsource(vle._whole_cell_number)
     failures: list[str] = []
     prose = (
-        (1550, "from 1 550 °C to\n", True),
-        (1550, "(1 550)\n", True),
+        (1550, "from 1 550 °C to\n", False),
+        (1, "from 1 550 °C to\n", True),
+        (550, "from 1 550 °C to\n", True),
+        (1550, "(1 550)\n", False),
+        (1, "(1 550)\n", True),
+        (550, "(1 550)\n", True),
         (100, "SiO2 100\n", True),
         (1550, "from 1\u2009550 °C to\n", True),
         (1550, "from 1\u202f550 °C to\n", True),
-        (12345, "12 345\n", True),
+        (1650, "from 1\u2009650 °C to\n", True),
+        (1650, "1\u00a0650\n", True),
+        (1, "1 100\n", True),
+        (100, "1 100\n", True),
+        (1100, "1 100\n", False),
+        (12345, "12 345\n", False),
+        (12345, "12\u2009345\n", True),
         (1234, "12 34\n", False),
         (155, "1 55\n", False),
-        (1, "from 1 550 °C to\n", False),
         (10, "1e0 001\n", False),
         (15000, "1.5 000\n", False),
         (1.5, "1.5 000\n", True),
-        ("1550", "from 1 550 °C to\n", True),
+        ("1550", "from 1 550 °C to\n", False),
+        ("1650", "1\u2009650\n", True),
+        ("1650", "1\u00a0650\n", True),
         (1550000, "1 550e3\n", False),
         (1550, "1 550e3\n", False),
+        (1550000, "1\u2009550e3\n", False),
+        (1550, "1\u2009550e3\n", False),
     )
     for pin, source, accepts in prose:
         doc = _literal_source_document(tmp_path, pin, source)
@@ -10790,20 +10894,27 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
         ):
             failures.append(f"prose refuse {pin!r} ~ {source!r}: {errors}")
     cells = (
-        ("csv", "1 550\n", 1550, True),
+        ("csv", "1 550\n", 1550, False),
+        ("csv", "1 550\n", 1, False),
         ("csv", "1\u2009550\n", 1550, True),
+        ("csv", "1\u2009650\n", 1650, True),
+        ("csv", "1\u00a0650\n", 1650, True),
         ("csv", "12 34\n", 1234, False),
         ("csv", "1e0 001\n", 10, False),
         ("csv", "1.5 000\n", 1.5, False),
         ("csv", "1.5 000\n", 15000, False),
         ("csv", '"1,000"\n', 1000, False),
-        ("html", "1 550", 1550, True),
+        ("html", "1 550", 1550, False),
+        ("html", "1 550", 1, False),
         ("html", "1\u202f550", 1550, True),
+        ("html", "1\u00a0650", 1650, True),
+        ("html", "1\u2009650", 1650, True),
         ("html", "12 34", 1234, False),
         ("html", "1e0 001", 10, False),
         ("html", "1.5 000", 1.5, False),
         ("html", "1 550e3", 1550000, False),
         ("html", "1 550e3", 1550, False),
+        ("html", "1\u2009550e3", 1550, False),
     )
     for kind, source, pin, accepts in cells:
         if kind == "csv":
