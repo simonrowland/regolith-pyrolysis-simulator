@@ -65,7 +65,8 @@ Minimum content:
 | `observable` and/or `observation_id` | Locates the observation |
 | `value` | Exact stored value (scalar or structure) the reviewer read |
 | `locator` | Page/table/figure/paragraph (or OCR artifact pointer) — **required** |
-| `T_K` / `index` | When pinning a series point |
+| `reviewed_by` / `reviewed_on` | Required to certify the extract. Missing values are a counted `unattested_sample` warning, not a schema failure |
+| `T_K` / `index` | When pinning a series point. A bare integer observation index does not cover that observation |
 | `field` | When pinning one key inside `values` |
 
 Path-based samples (`path` + `value` + locator/note) remain valid for
@@ -75,9 +76,31 @@ paths.
 
 ### How many
 
-At least **one** sample per extract with observations. Prefer **N ≥ 1 per
-major observation family** present (e.g. one α pin + one P_sat pin when both
-exist). More samples catch more drift classes; one is the hard floor.
+Every scored observation needs samples that name its observation id and pin
+every measured leaf address under `values` (a repeated pin of one address
+does not cover a sibling with the same number; an equipment field does not
+cover), and each pin matches the stored value. A measured string leaf is
+any value that contains a digit [0-9], including a printed measurement the
+numeric grammar does not read (`0.91Pa`, `0.0614K`). A label with no digit
+does not cover that measurement. One sample per file is not coverage.
+Until the corpus is re-audited, missing coverage, missing
+reviewer/date/locator,
+auto-migrated pilot notes, and attestation-complete pins whose locator was
+not opened are typed counted warnings (`uncovered_observation`,
+`unattested_sample`, `auto_migrated_pilot_pin`, `source_blind_pin`). They do
+not reject a draft. Setting `review_status: reviewed` refuses while any
+warning remains. Certification opens a source artifact at the locator
+(paper, OCR, or quotes — not this extract and not program source) and
+requires each pinned number as a complete token, sign and exponent included.
+The whole stored value, including a spaced or attached unit, must match, and
+neither neighbour may extend it: `1 K` is not `1 KPa`, and `1` is not `1,000`.
+A CSV or TSV quotes file is parsed as a complete table first. A cell
+certifies a value only when the whole trimmed cell is that value, never a
+substring (`1/2` is not `1`, and `1,000` is not `1`). A line range that cuts
+through a quoted cell is source-blind and is not re-parsed from the fragment.
+A digit-bearing string the parser cannot read is uncovered unless that
+printed value occurs whole in the opened source.
+Do not stamp reviewers or copy pins to clear them.
 
 ### Tranche review obligation
 

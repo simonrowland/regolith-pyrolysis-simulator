@@ -61,12 +61,16 @@ fidelity_samples:
     # Optional series pin: T_K: 1750.0  OR  index: 0
     field: alpha                         # optional key inside values
     value: 0.02
-    locator: { page: 12, figure: "3" }   # required on structured samples
+    reviewed_by: "reviewer-id"           # required source attestation
+    reviewed_on: "2026-08-01"             # required ISO date
+    locator: { page: 12, figure: "3" }   # required artifact locator
   # Path-based form (pilot DRAFT migrations; still accepted):
   # - path: species.Fe.observations[costa_jacobson_2015_fe_olivine_kems].values.alpha
   #   value: 0.02
   #   note: "DRAFT alpha-kinetics Costa Fe KEMS pin"
   #   locator: { record: costa_jacobson_2015_fe_olivine_kems }
+  #   reviewed_by: "reviewer-id"
+  #   reviewed_on: "2026-08-01"
 species: {}                              # map: canonical U0 / manifest id → species block
 ```
 
@@ -87,10 +91,62 @@ is absent.
 
 ### `fidelity_samples` (t-510 gate)
 
-Each sample is a **reviewer-verified** line item checked against the source /
-OCR artifact: the stored value still matches what the reviewer read at the
-locator. Samples are the extraction-drift fuse — a bad regeneration or silent
-rewrite of a pinned field turns the checked-in match test RED.
+Each sample is a line item that can be checked against the source / OCR
+artifact. Reviewer, date, and artifact locator are necessary for
+**certification** and are not enough by themselves. They are not schema
+errors on a draft: the stored corpus is not rejected while those fields are
+missing. `validate_extract_document` counts four warnings —
+`uncovered_observation`, `unattested_sample`, `auto_migrated_pilot_pin`, and
+`source_blind_pin` — and every fidelity consumer prints the counts.
+`review_status: reviewed` is a promotion. Validation, extract load (including
+when schema validation is skipped), fidelity-policy graduation, MinerU emit,
+the extract gate, and the literature index all call
+`certify_extract_source_fidelity` and refuse while any count is non-zero.
+
+Coverage is by leaf address. A measured leaf is a finite int or float
+(not a boolean), or a string that contains any digit [0-9]. A quantity
+name, a unit on its own, or another label with no digit is not a leaf.
+The evidence tree is the observation's `values` plus each scored numeric
+condition the temperature payload copies beside it: `T_range_K`, `T_K`,
+`T_C`, `temperature_C`, `temp_C`, and `point_conditions`. A `locator`
+inside a condition is provenance, not a leaf. A matching sample covers a
+leaf only when the sample names the observation id and the sample's
+address is that leaf or an ancestor of it. Repeating a pin of one address
+does not cover a sibling address, even when the stored numbers are equal,
+and a `values` pin does not cover a sibling condition. A descriptive label
+such as `quantity: pressure` is not a measured leaf and does not cover a
+sibling measurement, including a printed value such as `0.91Pa` that the
+numeric grammar does not read. Two samples may pin different addresses of
+the same observation. Evidence with no measured leaf is covered by a pin
+of that evidence only when the evidence also contains no digit. Zero
+recognised leaves in a block that still contains a digit is not coverage.
+An equipment pin does not contribute.
+A bare integer bracket such as `observations[0]` is a list position, not
+an id, so it does not contribute. Structured samples address `values`
+only; a condition is pinned by a path.
+Matching pins still detect later extraction drift; a mismatch does not cover
+and blocks certification. Certification opens the locator's text artifact
+(`source_path`, `quotes_path`, or a `record` that is a repository-relative
+file under a source-evidence root: `raw/`, `corpus/`, `text/`, `tables/`,
+`supporting/`, or `docs/references/`). The extract document and program
+source are not source artifacts, including a copy parked on a source root.
+A numeric pin matches only a complete token: the sign and the exponent
+belong to the token, so `0.24` is not `-0.24` or `0.24e-5`, and `1.0` is
+not `1`. The whole stored value, including a spaced or attached unit, must
+match, and the characters on either side must not extend it. An extending
+character is an ASCII letter or digit, a Unicode letter, µ, or °, or a
+dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
+`1,000`. The token must appear in the cited `line_range` when one is set,
+otherwise in the opened text. A CSV or TSV source is not searched that way:
+the complete table is parsed first, honouring quoted multi-line cells, and
+the locator then selects records that lie entirely inside the cited lines.
+A cell certifies a stored value only when the whole trimmed, unquoted cell
+is a spelling of that number or equals the stored string. A substring does
+not certify: a cell `1/2` is not `1`, and a cell `1,000` is not `1`. A
+`line_range` that cuts through a quoted cell is source-blind and is not
+re-parsed from the sliced lines. A page or table number alone is not an open.
+A PDF is not opened as text. Do not backfill reviewer fields from the
+extract's own value.
 
 #### Sample shapes
 
@@ -101,7 +157,9 @@ rewrite of a pinned field turns the checked-in match test RED.
 | `species` | yes | Canonical species id under `species:` |
 | `observable` and/or `observation_id` | yes (≥1) | Observation type and/or id |
 | `value` / `draft_value` | yes | Expected value (scalar or structure) |
-| `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR this was checked |
+| `reviewed_by` | to certify | Person who checked the sample against the source/OCR artifact |
+| `reviewed_on` | to certify | ISO `YYYY-MM-DD` date of that source check |
+| `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR artifact this was checked |
 | `T_K` / `T` or `index` | no | Pin a series point by temperature or list index |
 | `field` / `value_key` | no | Key inside `values` (or the series point) |
 | `rel_tol` | no | Finite numeric magnitude tolerance, `0 <= rel_tol < 1`; never changes type matching |
@@ -112,13 +170,17 @@ rewrite of a pinned field turns the checked-in match test RED.
 |-------|----------|---------|
 | `path` / `field_path` | yes | Dot path into the extract (supports `[observation_id]`) |
 | `value` / `draft_value` | yes | Expected / stored value |
-| `locator` / `source_locator` or `note` | yes | Where in the source this was checked; locator aliases are mutually exclusive and any supplied locator must be valid |
+| `reviewed_by` | to certify | Person who checked the sample against the source/OCR artifact |
+| `reviewed_on` | to certify | ISO `YYYY-MM-DD` date of that source check |
+| `locator` / `source_locator` | yes (exactly 1) | Where in the source/OCR artifact this was checked |
 
 A sample uses **exactly one** addressing mode. Path keys cannot be combined
 with structured selector keys as decoration; the resolver rejects such mixed
 samples as ambiguous. On new (non-allowlisted) extracts, every present path
 must identify observation evidence under
-`species.*.observations[id].(values|equipment)...`, regardless of any other
+`species.*.observations[id].(values|equipment|<condition>)...`, where
+`<condition>` is a scored numeric condition (`T_range_K`, `T_K`, `T_C`,
+`temperature_C`, `temp_C`, or `point_conditions`), regardless of any other
 keys in the sample.
 
 Aliases within a mode are also exclusive: use one of `field`/`value_key`, one
@@ -126,6 +188,13 @@ of `T_K`/`T`, one of `value`/`draft_value`, one of
 `locator`/`source_locator`, and either `index` or a temperature selector. When
 both `observation_id` and `observable` are supplied, the selected observation's
 type must equal `observable`; no null or contradictory alias may be decorative.
+
+The pre-policy allowlist only grandfathers sample presence in the general
+extract validator. Source fidelity is a counted warning, not a corpus reject.
+`tools/extract_gate.py` prints those warnings and refuses certification while
+any remain. Migration-generated samples have no reviewer attestation. Do not
+backfill attestation from the extract's own value. Until the existing pilot
+samples are re-audited, the validator reports `auto_migrated_pilot_pin`.
 
 A structured sample addresses one observation-shaped row, whether it lives in
 `observations[]` or in the sibling `context[]` container (d-032): the resolver
