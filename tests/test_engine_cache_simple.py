@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sqlite3
@@ -512,6 +513,30 @@ def test_alphamelts_rejects_invalid_raw_python_model_before_cache_projection() -
             "alphamelts",
             {"transport": "python_api", "raw_model_name": " pMELTS "},
         )
+
+
+def test_internal_analytical_runtime_identity_hashes_backend_source_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module_name = "engine_cache_identity_test_backend"
+    source = tmp_path / "backend.py"
+    bytecode = tmp_path / "backend.pyc"
+    source.write_text("class Backend: pass\n", encoding="utf-8")
+    bytecode.write_bytes(b"bytecode artifact")
+    backend_type = type("Backend", (), {"__module__": module_name})
+    module = SimpleNamespace(__file__=str(bytecode))
+    monkeypatch.setitem(sys.modules, module_name, module)
+    monkeypatch.setitem(
+        engine_cache._RUNTIME_BACKENDS,
+        "internal-analytical",
+        SimpleNamespace(_core=backend_type()),
+    )
+
+    identity = engine_cache._internal_analytical_identity()
+
+    expected = hashlib.sha256(source.read_bytes()).hexdigest()
+    assert identity == f"source-sha256:{expected}"
 
 
 def test_legacy_battery_payload_is_a_miss_after_layout_key_change(
