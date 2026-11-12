@@ -32,6 +32,7 @@ import sys
 
 sys.dont_write_bytecode = True
 
+from contextlib import contextmanager
 import os
 import platform
 import shutil
@@ -219,46 +220,107 @@ def brew_deps() -> None:
         _record(f"{formula}: installed")
 
 
+@contextmanager
+def _magemin_git_environment():
+    overrides = {
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_CONFIG_GLOBAL": os.devnull,
+    }
+    previous = {key: os.environ.get(key) for key in overrides}
+    os.environ.update(overrides)
+    try:
+        yield
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+
 def _apply_magemin_patches(src: Path, patch_names: tuple[str, ...]) -> None:
     patch_dir = ROOT / "patches" / "magemin"
-    patch_env = os.environ.copy()
-    patch_env["GIT_CONFIG_NOSYSTEM"] = "1"
-    patch_env["GIT_CONFIG_GLOBAL"] = os.devnull
-    for patch_name in patch_names:
-        if not patch_name or Path(patch_name).name != patch_name:
-            raise ValueError(f"invalid MAGEMin patch name: {patch_name!r}")
-        patch_file = patch_dir / f"{patch_name}.patch"
-        if not patch_file.is_file():
-            raise FileNotFoundError(f"locked MAGEMin patch is missing: {patch_file}")
+    with _magemin_git_environment():
+        patch_env = os.environ.copy()
+        for patch_name in patch_names:
+            if not patch_name or Path(patch_name).name != patch_name:
+                raise ValueError(f"invalid MAGEMin patch name: {patch_name!r}")
+            patch_file = patch_dir / f"{patch_name}.patch"
+            if not patch_file.is_file():
+                raise FileNotFoundError(f"locked MAGEMin patch is missing: {patch_file}")
 
-        applied = subprocess.run(
-            [
-                "git", "-C", str(src), "apply", "--apply", "--no-3way",
-                "--whitespace=nowarn", "--", str(patch_file),
-            ],
-            capture_output=True,
-            text=True,
-            check=False,
-            env=patch_env,
-        )
-        if applied.returncode != 0:
-            detail = applied.stderr.strip() or applied.stdout.strip() or (
-                f"git apply exited with status {applied.returncode}"
+            applied = subprocess.run(
+                [
+                    "git", "-C", str(src), "apply", "--apply", "--no-3way",
+                    "--whitespace=nowarn", "--", str(patch_file),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=patch_env,
             )
-            raise RuntimeError(f"cannot apply locked MAGEMin patch {patch_file.name}: {detail}")
-        _record(f"MAGEMin: applied {patch_file.name}")
+            if applied.returncode != 0:
+                detail = applied.stderr.strip() or applied.stdout.strip() or (
+                    f"git apply exited with status {applied.returncode}"
+                )
+                raise RuntimeError(
+                    f"cannot apply locked MAGEMin patch {patch_file.name}: {detail}"
+                )
+
+            checked = subprocess.run(
+                [
+                    "git", "-C", str(src), "apply", "--reverse", "--check",
+                    "--no-3way", "--whitespace=nowarn", "--", str(patch_file),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+                env=patch_env,
+            )
+            if checked.returncode != 0:
+                detail = "\n".join(
+                    output for output in (
+                        applied.stdout.strip(),
+                        checked.stderr.strip(),
+                        checked.stdout.strip(),
+                    ) if output
+                ) or f"git apply --reverse --check exited with status {checked.returncode}"
+                raise RuntimeError(
+                    f"cannot verify locked MAGEMin patch {patch_file.name} after apply: {detail}"
+                )
+            _record(f"MAGEMin: applied {patch_file.name}")
 
 
 def build_magemin(lock: EngineLock, root: Path) -> None:
     _hdr("Compiling MAGEMin (C library + executable)")
     pin = lock.engines["magemin"]
     src = engine_install_path(lock, root, "magemin")
-    if not checkout_matches_pin(pin, src):
-        _record(f"MAGEMin: SKIPPED - source is not at locked commit {pin.pin}")
-        return
-    _run(["git", "checkout", "--force", "--detach", pin.pin], cwd=src)
-    _run(["git", "clean", "-fdx"], cwd=src)
-    _apply_magemin_patches(src, pin.patches)
+    with _magemin_git_environment():
+        source_root = src.resolve()
+        repository = subprocess.run(
+            ["git", "-C", str(src), "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=False,
+            env=os.environ.copy(),
+        )
+        resolved_root = repository.stdout.strip()
+        resolved_root_path = Path(resolved_root).resolve() if resolved_root else None
+        if repository.returncode != 0 or resolved_root_path != source_root:
+            root_label = str(resolved_root_path) if resolved_root_path else "<no Git repository>"
+            detail = repository.stderr.strip() or repository.stdout.strip()
+            suffix = f": {detail}" if detail else ""
+            raise RuntimeError(
+                f"MAGEMin source {source_root} is not its own Git repository root; "
+                f"Git resolved {root_label}{suffix}"
+            )
+
+        if not checkout_matches_pin(pin, src):
+            _record(f"MAGEMin: SKIPPED - source is not at locked commit {pin.pin}")
+            return
+        _run(["git", "checkout", "--force", "--detach", pin.pin], cwd=src)
+        _run(["git", "clean", "-fdx"], cwd=src)
+        _apply_magemin_patches(src, pin.patches)
     try:
         for command in pin.build_commands:
             _run(list(command), cwd=src, extra_env=dict(pin.build_env))
