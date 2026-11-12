@@ -17,10 +17,12 @@ with the same JSON settings as ``dumps_residual_line``.
 
 from __future__ import annotations
 
+import ast
 import json
 import math
 import sys
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 
@@ -661,3 +663,67 @@ def test_dimension_mismatch_drops_the_band_and_refuses_if_forced(
         "band_unit": "kJ_per_declared_mol_basis",
         "operation": "absolute",
     }
+
+
+_MOVED_NAMES = (
+    "QUANTITY_METRIC",
+    "_UNIT_DIMENSION",
+    "_phase_component_reference_wt_percent",
+    "_reference_from_metric",
+    "_residual_metric_operation",
+    "band_dimension_matches",
+    "compute_metric",
+    "decision_band_for",
+    "match_status",
+    "metric_operation",
+    "metric_operation_for_identity",
+    "populate_numeric",
+    "unit_dimension",
+)
+
+_METRICS_IMPORT_MODULES = frozenset({
+    "__future__",
+    "math",
+    "decimal",
+    "typing",
+    "simulator.battery.enums",
+    "simulator.battery.identity",
+    "simulator.battery.records",
+})
+
+
+def test_score_metrics_owns_the_block_and_imports_no_scorer() -> None:
+    """The metric module is the owner, and score.py only re-exports it.
+
+    Allowed imports are the stdlib plus records, enums, and identity.
+    score.py, score_report, migrate, and the engines stay out.
+    """
+
+    import simulator.battery.score as score
+    import simulator.battery.score_metrics as metrics
+
+    root = Path(metrics.__file__).resolve().parent
+    metrics_tree = ast.parse((root / "score_metrics.py").read_text(encoding="utf-8"))
+    for node in ast.walk(metrics_tree):
+        if isinstance(node, ast.ImportFrom):
+            assert node.level == 0
+            assert node.module in _METRICS_IMPORT_MODULES, node.module
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                assert alias.name in _METRICS_IMPORT_MODULES, alias.name
+
+    score_tree = ast.parse((root / "score.py").read_text(encoding="utf-8"))
+    imported: list[str] = []
+    defined: list[str] = []
+    for node in score_tree.body:
+        if isinstance(node, ast.ImportFrom) and node.module == "simulator.battery.score_metrics":
+            imported.extend(alias.name for alias in node.names)
+        if isinstance(node, ast.FunctionDef) and node.name in _MOVED_NAMES:
+            defined.append(node.name)
+        target = getattr(node, "target", None)
+        if isinstance(node, ast.AnnAssign) and getattr(target, "id", None) in _MOVED_NAMES:
+            defined.append(target.id)
+    assert defined == []
+    assert set(imported) == set(_MOVED_NAMES)
+    for name in _MOVED_NAMES:
+        assert getattr(score, name) is getattr(metrics, name)
