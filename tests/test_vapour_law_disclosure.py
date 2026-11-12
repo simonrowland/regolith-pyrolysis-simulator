@@ -40,8 +40,10 @@ the law; it
 re-registers the disclosures stored with that computation, and evaluation
 counts add. An empty disclosure is a measured zero only when the computation
 recorded one. Attribution is per computation, never the ambient run registry.
-Typed-carrier notices stay a list: distinct notices are kept, exact duplicates
-are dropped. Bare-float helpers do not carry notices.
+A lone published extrapolation_notice is a dict, the green provenance
+shape. Every other notice key on a typed carrier stays a list. Distinct
+notices are kept; exact duplicates are dropped. Bare-float helpers do not
+carry notices.
 
 The Fe pseudo law is ``log10(P/Pa) = A - B / (T + C)`` with
 A=9.408547, B=23312.312336, C=1000. At the 1750 K anchor, T+C=2750 and
@@ -2848,11 +2850,81 @@ def test_publishers_keep_measured_disclosures_over_overrides(
     )
 
 
+def test_public_notice_copy_pickles_nested_mapping_proxy() -> None:
+    """A frozen notice is plain data, and one extrapolation notice is a dict.
+
+    The gate pickled a MappingProxyType inside certified_band and inside
+    comparators. A list of one extrapolation notice also moves the green
+    provenance digest. Other notice keys stay a list.
+    """
+
+    import copy
+    import pickle
+    from types import MappingProxyType
+
+    from simulator.vapour_rail.instrumentation import (
+        merge_public_notice,
+        public_carrier_notices,
+    )
+
+    notice = MappingProxyType({
+        "reason": "pO2_outside_evaluator_band",
+        "certified_band": MappingProxyType({
+            "pO2_bar": (1e-12, 100.0),
+        }),
+        "comparators": MappingProxyType({
+            "rail_pressure_Pa": 1.0,
+            "gap_dex_law_vs_rail": 0.5,
+            "vaporock_pressure_Pa": 0.4,
+            "gap_dex_law_vs_vaporock": 0.6,
+        }),
+    })
+    target: dict = {}
+    merge_public_notice(target, "extrapolation_notice", notice)
+    published = target["extrapolation_notice"]
+    assert isinstance(published, dict)
+    assert published["certified_band"]["pO2_bar"] == (1e-12, 100.0)
+    assert isinstance(published["certified_band"]["pO2_bar"], tuple)
+    assert isinstance(published["comparators"], dict)
+    assert not isinstance(published["comparators"], MappingProxyType)
+    copy.deepcopy(published)
+    pickle.dumps(published)
+    merge_public_notice(target, "extrapolation_notice", dict(published))
+    assert isinstance(target["extrapolation_notice"], dict)
+    merge_public_notice(
+        target,
+        "extrapolation_notice",
+        {"reason": "distinct_sibling"},
+    )
+    assert isinstance(target["extrapolation_notice"], list)
+    assert len(target["extrapolation_notice"]) == 2
+
+    other: dict = {}
+    merge_public_notice(
+        other,
+        "diagnostic_admission_notice",
+        {"reason": "only"},
+    )
+    assert isinstance(other["diagnostic_admission_notice"], list)
+    collected = public_carrier_notices(
+        {"extra": {"extrapolation_notice": notice}}
+    )
+    body = collected["extrapolation_notice"][0]
+    assert body["certified_band"]["pO2_bar"] == (1e-12, 100.0)
+    copy.deepcopy(body)
+    pickle.dumps(body)
+
+
 def test_pt0_entries_are_private() -> None:
-    """The raw PT0 dict is not a public attribute."""
+    """The public reader is a snapshot. It is not the live cache."""
 
     store = PT0DeterminismStore("capture")
-    assert not hasattr(store, "entries")
+    snapshot = store.entries
+    assert snapshot == {}
+    assert snapshot is not store._entries
+    snapshot["mutated"] = {"payload": {}}
+    assert "mutated" not in store._entries
+    assert store.entries == {}
     assert isinstance(store._entries, dict)
 
 

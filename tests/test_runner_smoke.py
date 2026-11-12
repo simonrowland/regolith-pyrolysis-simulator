@@ -1062,6 +1062,10 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "metal_phase_stratification",
     "condensation_refusals_by_species",
     "high_t_melt_activity",
+    # Optional on a per-hour row and on run_metadata when a law executed.
+    # Not a top-level runner payload key. The hourly simulation_tick omits
+    # it: the cumulative registry would grow the socket payload.
+    "law_disclosures",
 })
 
 VAPOR_PRESSURE_SOURCE_REPORT_KEYS = frozenset({
@@ -3697,6 +3701,12 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
     # class, so it is asserted as a whitelist member rather than helper-driven.
     assert "reduced_real_cache_state" in PER_HOUR_OPTIONAL_KEYS
     assert "reduced_real_cache_state" not in PER_HOUR_KEYS
+
+    # law_disclosures is stamped by SimSession.advance when the run registry
+    # is non-empty. It is optional per-hour metadata, not a top-level key.
+    assert "law_disclosures" in PER_HOUR_OPTIONAL_KEYS
+    assert "law_disclosures" not in PER_HOUR_KEYS
+    assert "law_disclosures" not in TOP_LEVEL_KEYS
 
 
 @pytest.mark.parametrize(

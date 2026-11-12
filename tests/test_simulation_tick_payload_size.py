@@ -180,6 +180,34 @@ def test_hourly_payload_gate_rejects_smallest_sustained_growth_and_allows_jitter
     )
 
 
+def test_simulation_tick_omits_cumulative_law_disclosures() -> None:
+    """The stored per-hour row keeps the registry. The tick does not.
+
+    Re-sending the cumulative registry on every simulation_tick grew the
+    socket payload by about 212 bytes/hour.
+    """
+
+    disclosure = [
+        {"law_id": "SiO:standard_reaction_term", "evaluation_count": 3},
+    ]
+    delta = {"hour": 4, "law_disclosures": list(disclosure), "T_C": 1200.0}
+    tick = {
+        "hour": 4,
+        "law_disclosures": list(disclosure),
+        "per_hour_summary_delta": delta,
+    }
+    emitted = web_events._browser_socket_payload("simulation_tick", tick)
+    assert "law_disclosures" not in emitted
+    assert "law_disclosures" not in emitted["per_hour_summary_delta"]
+    assert emitted["per_hour_summary_delta"]["T_C"] == 1200.0
+    assert delta["law_disclosures"] == disclosure
+    summary = web_events._browser_socket_payload(
+        "per_hour_summary",
+        {"hour": 4, "law_disclosures": disclosure, "T_C": 1200.0},
+    )
+    assert summary["law_disclosures"] == disclosure
+
+
 def test_advisory_js_fetches_on_demand_full_records() -> None:
     source = (_ROOT / "web/static/js/simulator-advisory.js").read_text(
         encoding="utf-8"

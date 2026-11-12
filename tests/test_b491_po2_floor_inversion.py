@@ -34,6 +34,16 @@ _ACCOUNT = {"FeO": 0.30, "MgO": 0.20, "SiO2": 0.50, "Na2O": 0.02}
 _T_K = 1700.0
 
 
+def _published_bodies(published: object) -> list[dict]:
+    """One extrapolation notice is a dict. Two or more are a list."""
+
+    if isinstance(published, dict):
+        return [published]
+    if isinstance(published, (list, tuple)):
+        return [item for item in published if isinstance(item, dict)]
+    return []
+
+
 def _yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
 
@@ -92,10 +102,9 @@ def test_b984_sio_uses_actual_oxygen_beyond_evaluator_band(observation):
         provenance = answer.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
         published = provenance.get("extrapolation_notice")
         if oxygen in (1e-31, 1000.0):
-            assert isinstance(published, list)
             notice = next(
                 item
-                for item in published
+                for item in _published_bodies(published)
                 if item["reason"] == "pO2_outside_evaluator_band"
             )
             assert notice["pO2_bar_used"] == oxygen
@@ -268,8 +277,8 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
     assert result.status == "ok"
     assert diagnostic["vapor_pressures_Pa"]["Si"] > 0.0
     published_floor = provenance["extrapolation_notice"]
-    assert isinstance(published_floor, list)
-    assert notice in published_floor
+    floor_bodies = _published_bodies(published_floor)
+    assert notice in floor_bodies
     assert notice["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
     assert notice["authority_level"] == "extrapolated"
     assert notice["certified_band"]["pO2_bar"] == (
@@ -277,15 +286,14 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
         MELT_DISSOCIATION_PO2_MAX_BAR,
     )
 
-    # Provenance publishes the floor disclosure as a list. A distinct sibling
-    # on the same key stays. Pareto reads that list, not a replaced dict.
-    evaluation_extra = {
-        "extrapolation_notice": [dict(item) for item in published_floor],
-    }
-    copied_floor = next(
-        item
-        for item in evaluation_extra["extrapolation_notice"]
-        if item["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    # One floor notice is a dict. A distinct sibling on the same key stays
+    # in a list. Pareto still publishes a list under its own field name.
+    copied_floor = dict(
+        next(
+            item
+            for item in floor_bodies
+            if item["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+        )
     )
     assert copied_floor["certified_band"]["pO2_bar"] == (
         MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
@@ -320,10 +328,9 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
     assert answer.pressure.pa > 0.0
     assert answer.is_flux_active
     carrier_notices = answer.extra["extrapolation_notice"]
-    assert isinstance(carrier_notices, list)
     carrier_notice = next(
         item
-        for item in carrier_notices
+        for item in _published_bodies(carrier_notices)
         if item["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
     )
     assert carrier_notice["authority_level"] == "extrapolated"

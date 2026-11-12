@@ -430,8 +430,31 @@ def _singular_notice_key(key: object) -> str | None:
     return None
 
 
+def _plain_public_value(value: Any) -> Any:
+    """Plain data. Nested mapping proxies pickle and deepcopy as dicts.
+
+    Tuples stay tuples. Certified-band endpoints compare equal to
+    ``(low, high)``. This is not the authority-record copier: that one
+    turns tuples into lists.
+    """
+
+    if isinstance(value, Mapping):
+        return {
+            key: _plain_public_value(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, tuple):
+        return tuple(_plain_public_value(item) for item in value)
+    if isinstance(value, list):
+        return [_plain_public_value(item) for item in value]
+    return value
+
+
 def _copy_public_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
-    return copy.deepcopy(dict(notice))
+    # ``dict(notice)`` is shallow. A frozen carrier leaves MappingProxyType
+    # values inside, and deepcopy then fails with
+    # ``TypeError: cannot pickle 'mappingproxy' object``.
+    return _plain_public_value(notice)
 
 
 def _iter_notice_mappings(value: Any) -> tuple[dict[str, Any], ...]:
@@ -527,8 +550,8 @@ def notice_attribute(
     """One dict when a carrier has one notice, otherwise the distinct list.
 
     Evaluation attributes keep the single-notice dict so existing readers of
-    that slot stay valid. Publication goes through ``apply_public_carrier_notices``
-    and is always a list.
+    that slot stay valid. Publication of ``extrapolation_notice`` uses the
+    same rule. Every other notice key stays a list.
     """
 
     copied = _dedupe_notices(tuple(items or ()))
@@ -544,18 +567,30 @@ def merge_public_notice(
     key: str,
     notice: Mapping[str, Any],
 ) -> None:
-    """Append one disclosure. An exact duplicate is dropped; a distinct one is kept."""
+    """Append one disclosure. An exact duplicate is dropped; a distinct one is kept.
+
+    A lone ``extrapolation_notice`` stays a dict. That is the green provenance
+    shape: a list moves the physics metadata digest and makes a golden
+    comparator try to hash a dict. Two or more distinct notices on that key
+    stay a list. Every other notice key stays a list even when it holds one
+    notice.
+    """
 
     if not isinstance(notice, Mapping) or not notice:
         return
     existing = target.get(key)
     current = list(_iter_notice_mappings(existing))
-    target[key] = list(_dedupe_notices((*current, notice)))
+    merged = _dedupe_notices((*current, notice))
+    if key == "extrapolation_notice" and len(merged) == 1:
+        target[key] = merged[0]
+        return
+    target[key] = list(merged)
 
 
 def apply_public_carrier_notices(target: dict[str, Any], carrier: Any) -> None:
-    """Copy every carrier notice onto ``target`` as a list.
+    """Copy every carrier notice onto ``target``.
 
+    A lone ``extrapolation_notice`` is a dict. Every other key is a list.
     Distinct disclosures under one key are both kept. Exact duplicates
     collapse. Nothing is dropped by ``setdefault``.
     """

@@ -328,7 +328,8 @@ def _attach_pO2_floor_inversion_notices(
         # existing field. Do not replace a temperature-range notice the
         # collector already sees on that key.
         if "extrapolation_notice" not in public_carrier_notices(provenance):
-            provenance["extrapolation_notice"] = [dict(notice)]
+            # One floor notice. A list would move the green provenance digest.
+            provenance["extrapolation_notice"] = dict(notice)
         vapor_pressure_provenance[str(species)] = provenance
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):

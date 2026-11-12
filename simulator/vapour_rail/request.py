@@ -1517,6 +1517,7 @@ def refusal_closure(
                 # is left in place.
                 from simulator.vapour_rail.instrumentation import (
                     apply_public_carrier_notices,
+                    notice_attribute,
                 )
 
                 apply_public_carrier_notices(evaluation_extra, provenance)
@@ -1535,8 +1536,9 @@ def refusal_closure(
                         ]
                     else:
                         floor_items = []
-                    if floor_items:
-                        evaluation_extra["extrapolation_notice"] = floor_items
+                    published_floor = notice_attribute(floor_items)
+                    if published_floor is not None:
+                        evaluation_extra["extrapolation_notice"] = published_floor
                 apply_public_carrier_notices(evaluation_extra, evaluation)
                 if _unit_activity_note is not None:
                     from simulator.silent_zero import merge_notes_into_mapping

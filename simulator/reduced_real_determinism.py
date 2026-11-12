@@ -457,6 +457,16 @@ class PT0DeterminismStore:
         return self._control_quantization
 
     @property
+    def entries(self) -> dict[str, dict[str, Any]]:
+        """Snapshot of the capture table for readers that compare or pickle it.
+
+        The live cache stays on ``_entries``. Mutating the snapshot does not
+        write the store.
+        """
+
+        return copy.deepcopy(self._entries)
+
+    @property
     def capture_enabled(self) -> bool:
         return self.mode == "capture"
 

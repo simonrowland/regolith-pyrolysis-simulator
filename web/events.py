@@ -744,6 +744,15 @@ def _browser_socket_payload(event: str, payload):
         # This whole-train report is also included in simulation_complete. It
         # is not consumed from hourly ticks and grows as product is captured.
         emitted.pop('stage_purity_report', None)
+        # The cumulative law registry is stored on the per-hour row and on
+        # run_metadata. Re-sending it on every tick grows the socket payload
+        # past the 100 bytes/hour bound. The per_hour_summary event keeps it.
+        emitted.pop('law_disclosures', None)
+        delta = emitted.get('per_hour_summary_delta')
+        if isinstance(delta, Mapping):
+            delta_copy = dict(delta)
+            delta_copy.pop('law_disclosures', None)
+            emitted['per_hour_summary_delta'] = delta_copy
         vapour_rail = emitted.get('vapour_rail_instrumentation_panel')
         if isinstance(vapour_rail, Mapping):
             channels = vapour_rail.get('channels_by_species')

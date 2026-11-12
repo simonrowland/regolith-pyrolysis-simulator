@@ -3248,6 +3248,9 @@ def test_pt1_persistent_store_round_trips_exact_payload(
         "repair_notices",
         "disposition",
         "provider_outcome",
+        # Measured empty. The fixture records that no flagged law ran.
+        # The payload bytes below stay the curve alone.
+        "law_disclosures",
     }
     assert runtime_record["provider_outcome"] is rrd.GateCurveProviderOutcome.PRODUCED
     assert set(runtime_record["origin"]) == {

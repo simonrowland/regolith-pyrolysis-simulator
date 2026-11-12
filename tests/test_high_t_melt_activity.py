@@ -267,7 +267,12 @@ def _physics_metadata_payload(
         # their existing authority, reason, status and acquisition fields.
         # b-813 adds certified_band; project that key out while preserving
         # every notice field that was already present on green.
+        # b-119 adds diagnostic_admission_notice on FeO_association_gas.
+        # Leaf diff against green 5de5948b2: pressures, activities, sources,
+        # warnings, and every other provenance leaf match. That one key is
+        # the disclosure. The green digest is the provenance without it.
         for record in provenance.values():
+            record.pop("diagnostic_admission_notice", None)
             notice = record.get("extrapolation_notice")
             if isinstance(notice, dict):
                 bodies = [notice]
