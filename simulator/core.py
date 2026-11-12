@@ -8283,6 +8283,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         feot_wt = self._feot_equivalent_wt_pct(comp)
         if T_K <= 0.0 or feot_wt <= 0.0:
+            # The tap that emptied the oxide iron already wrote the
+            # partition diagnostic. The no-iron payload still has to
+            # carry it: this is the snapshot the Fe-drain evidence reads.
             return {
                 **base,
                 'status': 'no_iron',
@@ -8294,6 +8297,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'fe2o3_equiv_wt_pct': 0.0,
                 'feo_equiv_wt_pct': 0.0,
                 'source': 'none:no_iron',
+                **self._native_fe_partition_snapshot_fields(),
             }
 
         split = self._fe_redox_split_inline_kress91(
@@ -8420,14 +8424,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'authoritative': bool(split.get('authoritative', False)),
             'extrapolation': bool(split.get('extrapolation', False)),
             'high_uncertainty': bool(split.get('high_uncertainty', False)),
-            **(
-                {'native_fe_partition': dict(
-                    getattr(self, '_last_native_fe_partition_diagnostic', {})
-                    or {}
-                )}
-                if getattr(self, '_last_native_fe_partition_diagnostic', {})
-                else {}
-            ),
+            **self._native_fe_partition_snapshot_fields(),
             # Surface the native-Fe saturation event (deferred /
             # below-threshold / partitioned) so the live HourSnapshot and
             # runner output show WHY there is (or is not) a partition this
@@ -8441,6 +8438,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else {}
             ),
         }
+
+    def _native_fe_partition_snapshot_fields(self) -> Dict[str, Any]:
+        """Copy this hour's partition diagnostic onto the redox snapshot.
+
+        One attachment for the Kress payload and the no-iron return.
+        The diagnostic is cleared at the next hour's start, so the
+        snapshot taken after the tap is the only copy the evidence sees.
+        """
+
+        diagnostic = dict(
+            getattr(self, '_last_native_fe_partition_diagnostic', {}) or {}
+        )
+        if not diagnostic:
+            return {}
+        return {'native_fe_partition': diagnostic}
 
     def _native_fe_saturation_state(
         self,
