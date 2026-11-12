@@ -8,7 +8,6 @@ import json
 import logging
 import os
 import shutil
-import socket
 import sqlite3
 import threading
 import time
@@ -61,12 +60,10 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "magemin": {
         "identity": "sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28",
         "date": "2026-11-08",
-        "stat": {"size": 38281864, "mtime_ns": 1788656204474898883},
     },
     "alphamelts": {
         "identity": "sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85",
         "date": "2026-11-08",
-        "stat": {"size": 3227431, "mtime_ns": 1778385997000000000},
     },
     "thermoengine": {
         "identity": "version:1.2.0;record-sha256:462a81b3fda92acf74a1e9e38f260dac65232d855340f72307e05a65219c1b27",
@@ -84,7 +81,14 @@ _CONNECTION_PID: int | None = None
 _CONNECTION_ROOT: Path | None = None
 _CONNECTION_READONLY = False
 _COUNTERS: dict[str, dict[str, int]] = {}
-_COUNTER_NAMES = ("hits", "misses", "stores", "store_error", "read_error")
+_COUNTER_NAMES = (
+    "hits",
+    "misses",
+    "stores",
+    "store_error",
+    "read_error",
+    "conflicts",
+)
 _MISSING_SETTING = object()
 _MEMORY_CACHE_MAXSIZE = 4096
 _MEMORY_CACHE: OrderedDict[tuple[str, bytes, bool], Any] = OrderedDict()
@@ -445,18 +449,6 @@ def _native_binary_identity(engine_id: str) -> str:
         return "unavailable"
     path = Path(binary)
     try:
-        stat = path.stat()
-        recorded = ENGINE_CHEMISTRY_VERSION_IDENTITY_AT[engine_id]
-        recorded_stat = recorded.get("stat")
-        if (
-            isinstance(recorded_stat, Mapping)
-            and recorded_stat.get("size") == stat.st_size
-            and recorded_stat.get("mtime_ns") == stat.st_mtime_ns
-            and str(recorded["identity"]).startswith("sha256:")
-        ):
-            return str(recorded["identity"])
-        # Hash only when the recorded stat fingerprint changed. This runs at
-        # engine open and is memoized for the process, never on request lookup.
         digest = _file_sha256(path)
     except OSError:
         return "unavailable"
@@ -722,7 +714,7 @@ def _is_refusal(result: Any) -> bool:
 
 
 def _source_box() -> str:
-    return os.environ.get("REGOLITH_ENGINE_CACHE_BOX") or socket.gethostname().split(".", 1)[0]
+    return os.environ.get("REGOLITH_ENGINE_CACHE_BOX", "")
 
 
 def _next_row_sequence(connection: sqlite3.Connection, source_box: str) -> int:
@@ -731,6 +723,42 @@ def _next_row_sequence(connection: sqlite3.Connection, source_box: str) -> int:
         (source_box,),
     ).fetchone()
     return int(row[0])
+
+
+def _insert_cache_row_if_absent(
+    connection: sqlite3.Connection,
+    digest: bytes,
+    value: bytes,
+    engine: str,
+    chem_version: str,
+    source_box: str,
+    row_seq: int | None = None,
+) -> tuple[bool, bool]:
+    """Insert one output only when absent; report whether existing bytes conflict."""
+    row = connection.execute(
+        f"SELECT value FROM {_TABLE} WHERE key=?", (digest,)
+    ).fetchone()
+    if row is not None:
+        existing_value = row[0]
+        if isinstance(existing_value, str):
+            existing_value = existing_value.encode("ascii")
+        return False, bytes(existing_value) != bytes(value)
+    if row_seq is None:
+        row_seq = _next_row_sequence(connection, source_box)
+    connection.execute(
+        f"INSERT INTO {_TABLE} "
+        "(key, value, engine, chem_version, source_box, row_seq) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (
+            digest,
+            sqlite3.Binary(value),
+            engine,
+            chem_version,
+            source_box,
+            row_seq,
+        ),
+    )
+    return True, False
 
 
 def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
@@ -806,22 +834,20 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     try:
         with _LOCK:
             connection.execute("BEGIN IMMEDIATE")
-            row_seq = _next_row_sequence(connection, source_box)
-            connection.execute(
-                f"INSERT OR REPLACE INTO {_TABLE} "
-                "(key, value, engine, chem_version, source_box, row_seq) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
-                (
-                    cache_key,
-                    sqlite3.Binary(hot_value),
-                    engine_id,
-                    str(chem_version),
-                    source_box,
-                    row_seq,
-                ),
+            inserted, conflict = _insert_cache_row_if_absent(
+                connection,
+                cache_key,
+                hot_value,
+                engine_id,
+                str(chem_version),
+                source_box,
             )
             connection.commit()
-            _counter_bucket(engine_id)["stores"] += 1
+            counts = _counter_bucket(engine_id)
+            if inserted:
+                counts["stores"] += 1
+            if conflict:
+                counts["conflicts"] += 1
     except Exception:
         with _LOCK:
             try:
@@ -880,12 +906,29 @@ def load_cache_rows(
             )
         )
     before = connection.total_changes
-    connection.executemany(
-        f"INSERT OR IGNORE INTO {_TABLE} "
-        "(key, value, engine, chem_version, source_box, row_seq) VALUES (?, ?, ?, ?, ?, ?)",
-        values,
-    )
-    connection.commit()
+    conflicts: dict[str, int] = {}
+    connection.execute("BEGIN IMMEDIATE")
+    try:
+        for digest, value, engine, version, source_box, row_seq in values:
+            _, conflict = _insert_cache_row_if_absent(
+                connection,
+                digest,
+                value,
+                engine,
+                version,
+                source_box,
+                row_seq,
+            )
+            if conflict:
+                conflicts[engine] = conflicts.get(engine, 0) + 1
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    if conflicts:
+        _record_engine_cache_counters(
+            {engine: {"conflicts": count} for engine, count in conflicts.items()}
+        )
     return connection.total_changes - before
 
 
