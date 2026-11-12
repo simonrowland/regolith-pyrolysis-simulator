@@ -111,6 +111,7 @@ from simulator.physical_constants import (
     BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT_10SIG,
+    STANDARD_ATMOSPHERE_PA,
 )
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
@@ -1858,7 +1859,7 @@ def _chapman_enskog_d_ab_m2_s(
     M_ab_reduced = 2.0 / (1.0 / M_a + 1.0 / M_b)    # g/mol
     T_star = T_K / eps_ab
     omega_d = _neufeld_collision_integral_omega_d(T_star)
-    pressure_atm = pressure_pa / 101325.0
+    pressure_atm = pressure_pa / STANDARD_ATMOSPHERE_PA
     if pressure_atm <= 0.0:
         return 0.0
     # cm²/s by the reduced-mass BSL form, then convert to m²/s (1 cm² = 1e-4 m²)

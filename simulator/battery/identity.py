@@ -120,10 +120,10 @@ from simulator.battery.records import (
     phase_token,
 )
 from simulator.physical_constants import (
+    ATM_PA_DECIMAL,
     BAR_PA_DECIMAL,
     CELSIUS_TO_KELVIN_OFFSET,
     GAS_CONSTANT_DECIMAL,
-    STANDARD_ATMOSPHERE_PA,
 )
 from simulator.reference_data.janaf import formula_composition
 
@@ -152,7 +152,7 @@ THERMOCHEMICAL_CALORIE_J = Decimal("4.184")
 # 298 K per mol of gas — inside the 1 kJ/mol independent band, noted, not
 # silently corrected by identity_equal.
 PA_PER_BAR_DEC = BAR_PA_DECIMAL
-PA_PER_ATM_DEC = Decimal(str(int(STANDARD_ATMOSPHERE_PA)))
+PA_PER_ATM_DEC = ATM_PA_DECIMAL
 CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 
 # R as used for ΔfG ↔ log10 Kf in *cross-source* identity. CODATA / SI 2019

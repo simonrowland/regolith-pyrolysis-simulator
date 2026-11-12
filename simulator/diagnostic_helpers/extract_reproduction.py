@@ -57,7 +57,11 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity,
     melt_oxide_activity_coefficient,
 )
-from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR
+from simulator.physical_constants import (
+    GAS_CONSTANT_10SIG,
+    PA_PER_BAR,
+    STANDARD_ATMOSPHERE_PA,
+)
 from simulator.state import MOLAR_MASS
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
@@ -89,8 +93,7 @@ TARGET_TYPES = frozenset(
     }
 )
 KEMS_SOURCE_PREFIX = "kems-"
-# Dual of tests/test_physics_ground_truth.py: P_sat(T_b) = 101325 Pa.
-STANDARD_ATMOSPHERE_PA = 101325.0
+# Dual of tests/test_physics_ground_truth.py: P_sat(T_b) = 1 atm.
 # JANAF construction boiling temperatures are 1-bar (fugacity = 1), not 1 atm.
 STANDARD_BAR_PA = PA_PER_BAR
 
@@ -890,8 +893,8 @@ def _literature_pressure_points(
                 ("P_mmHg", 133.322368, "Pa"),
                 ("p_torr", 133.322368, "Pa"),
                 ("P_torr", 133.322368, "Pa"),
-                ("p_atm", 101325.0, "Pa"),
-                ("P_atm", 101325.0, "Pa"),
+                ("p_atm", STANDARD_ATMOSPHERE_PA, "Pa"),
+                ("P_atm", STANDARD_ATMOSPHERE_PA, "Pa"),
                 ("log10_P_Pa", None, "Pa"),
             ):
                 if key not in pt:

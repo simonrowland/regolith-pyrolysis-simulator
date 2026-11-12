@@ -123,7 +123,7 @@ from simulator.battery.input_provenance import (
     printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
 )
-from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
+from simulator.physical_constants import ATM_PA_DECIMAL, GAS_CONSTANT, PA_PER_BAR
 from simulator.battery.migrate import (
     REPO_ROOT,
     _COMPOSITION_COMPONENTS,
@@ -8474,7 +8474,7 @@ def _fe_redox_pressure(
     elif observation.source_id == "borisov-2018-compilation":
         # The cited compilation is explicitly a 1-atm dataset.
         pressure_bar = 1.01325
-        pressure_pa = State.of(Decimal("101325"))
+        pressure_pa = State.of(ATM_PA_DECIMAL)
     else:
         return _FeRedoxRefusal(
             RefusalReason.IDENTITY_INCOMPLETE,

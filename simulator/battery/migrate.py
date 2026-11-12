@@ -248,7 +248,6 @@ from simulator.battery.validate import (
     validate_corpus,
 )
 from simulator.chemistry.fo2_buffers import evaluate_buffer, match_printed_calibration
-from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
 from simulator.battery.phase_field import (
     OUTSIDE_SINGLE_LIQUID_FIELD,
     PhaseFieldRecords,
@@ -341,7 +340,7 @@ CORPUS_REPO_DEFAULT = "regolith-corpus"
 # Algebra: P_Pa = P_Torr × 101325 / 760.
 # Unit check: Torr × (Pa/Torr) = Pa.
 # Sanity: 760 Torr = 101325 Pa; 1 Torr = 101325/760 ≈ 133.322368421 Pa.
-PA_PER_TORR = Decimal(str(int(STANDARD_ATMOSPHERE_PA))) / Decimal("760")
+PA_PER_TORR = PA_PER_ATM_DEC / Decimal("760")
 PA_PER_MMHG = PA_PER_TORR  # millimetre of mercury is identified with Torr here
 
 DOI_URL_RE = re.compile(
@@ -4945,7 +4944,7 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "Torr",
     ),
     "atm_to_Pa": (
-        Decimal(str(int(STANDARD_ATMOSPHERE_PA))),
+        PA_PER_ATM_DEC,
         "P_Pa = P_atm × 101325",
         "Pa",
         "atm",
@@ -9640,9 +9639,9 @@ def _convert_printed_amount(amount: Decimal, unit: str) -> tuple[Decimal, str] |
         if normalized == "C/min":
             return amount / Decimal(60), "C_per_min_to_K_per_s"
         if normalized == "Torr":
-            return amount * Decimal(101325) / Decimal(760), "Torr_to_Pa"
+            return amount * PA_PER_TORR, "Torr_to_Pa"
         if normalized == "atm":
-            return amount * Decimal(101325), "atm_to_Pa"
+            return amount * PA_PER_ATM_DEC, "atm_to_Pa"
         if normalized == "bar":
             return amount * PA_PER_BAR_DEC, "bar_to_Pa"
         if normalized == "mbar":
@@ -23383,7 +23382,7 @@ def compilation_source_basis(
 # ---------------------------------------------------------------------------
 
 
-_AMBIENT_PRESSURE_TOTAL_PA = Decimal("101325")
+_AMBIENT_PRESSURE_TOTAL_PA = PA_PER_ATM_DEC
 # The band is an input uncertainty on total pressure. Quantities whose model
 # value depends on absolute P through the kinetic series resistance carry it;
 # equilibrium condensed-phase quantities, where P enters only through V dP,
@@ -26130,7 +26129,7 @@ class Migrator:
             measured.gibbs_reference_pressures += 1
             if p_std == PA_PER_BAR_DEC:
                 measured.gibbs_reference_100000 += 1
-            elif p_std == Decimal("101325") or p_std == Decimal("101325.0"):
+            elif p_std == PA_PER_ATM_DEC:
                 measured.gibbs_reference_101325 += 1
 
         method_class = values.get("method_class")

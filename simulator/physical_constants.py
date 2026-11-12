@@ -47,6 +47,10 @@ J_PER_KJ = 1000.0
 ANGSTROM_PER_M = 1e10
 M2_PER_CM2 = 1e4
 STANDARD_ATMOSPHERE_PA = 101325.0
+# Same object as STANDARD_ATMOSPHERE_PA. The brief's name for 1 atm.
+ATM_PA = STANDARD_ATMOSPHERE_PA
+# Exact decimal. 101325 is an integer below 2^53, so the float is exact.
+ATM_PA_DECIMAL = Decimal(101325)
 
 # Printed-precision table self-check floor shared by battery validity and
 # compilation diagnostics. This is a policy scalar, not a physical constant.
@@ -74,6 +78,8 @@ CATALOG_PHYSICAL_PRESSURE_CEILING_PA = 1.0e9
 
 __all__ = (
     "ANGSTROM_PER_M",
+    "ATM_PA",
+    "ATM_PA_DECIMAL",
     "AVOGADRO",
     "BAR_PA",
     "BAR_PA_DECIMAL",
