@@ -176,11 +176,6 @@ def battery_evaluations(
     )
 
 
-def test_battery_evaluations_are_built_once_per_worker(battery_evaluations) -> None:
-    assert isinstance(battery_evaluations, tuple)
-    assert _BATTERY_EVALUATION_BUILD_COUNT == 1
-
-
 @pytest.fixture(scope="module")
 def residual_baselines() -> dict:
     raw = yaml.safe_load(BASELINES_PATH.read_text(encoding="utf-8"))
@@ -1378,6 +1373,9 @@ def test_pinned_residuals_cover_all_live_comparable_points(
     residual_baselines,
 ) -> None:
     """Baseline file and live battery must agree on the comparable set."""
+
+    assert isinstance(battery_evaluations, tuple)
+    assert _BATTERY_EVALUATION_BUILD_COUNT == 1
 
     def assert_residual_coverage(evaluations) -> None:
         live_keys = {
