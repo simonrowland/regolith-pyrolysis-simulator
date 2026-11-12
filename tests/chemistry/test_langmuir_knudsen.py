@@ -304,3 +304,20 @@ def test_validation_observations_live_in_literature_sidecar():
         assert source.get("doi") or source.get("url")
         assert source["extraction_note"]
         assert row["measured_langmuir_to_effusion_flux_ratio"]
+
+
+def test_series_interface_coefficient_is_the_owner():
+    """The publisher's k_HK is ``hertz_knudsen_k_kg_s_m2_pa``, not a second sqrt."""
+
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+
+    probed = _series_resistance_evaporation_flux_kg_m2_s(
+        species="Ca",
+        P_eq_pa=10.0,
+        P_bulk_pa=0.0,
+        T_surface_K=2000.0,
+        molar_mass_kg_mol=0.040,
+        alpha_i=1.0,
+        gas_resistance_enabled=False,
+    )
+    assert probed.k_hk_kg_s_m2_pa == hertz_knudsen_k_kg_s_m2_pa(2000.0, 0.040)

@@ -792,9 +792,11 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         )
 
     delta_p_pa = max(0.0, P_eq - P_bulk)
-    k_hk_kg_s_m2_pa = math.sqrt(
-        M_kg_mol / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * T_surface)
-    )
+    # Owner is ``hertz_knudsen_k_kg_s_m2_pa``. The surface root divides
+    # that same coefficient by M. A local sqrt would let the two drift.
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+
+    k_hk_kg_s_m2_pa = hertz_knudsen_k_kg_s_m2_pa(T_surface, M_kg_mol)
     r_interface = 1.0 / (alpha_intrinsic * k_hk_kg_s_m2_pa)
     if delta_p_pa <= 0.0:
         return _zero_series_evaporation_flux(
@@ -1598,10 +1600,10 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 controls.get("hkl_upper_bound_transport_species", ()) or ()
             )
         )
-        from simulator.condensation import (
-            GAS_CONSTANT_J_MOL_K,
-            _knudsen_number as _kn_eval,
+        from simulator.chemistry.langmuir_knudsen import (
+            hertz_knudsen_k_kg_s_m2_pa,
         )
+        from simulator.condensation import _knudsen_number as _kn_eval
 
         alpha_by_species = _coerce_alpha_by_species(controls.get("alpha"))
         alpha_envelope_by_species = _coerce_alpha_envelope_by_species(
@@ -1673,10 +1675,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     M_kg_mol = molar_mass_g_mol / 1000.0
                 hkl_upper_bound_rate_kg_hr = (
                     alpha
-                    * math.sqrt(
-                        M_kg_mol
-                        / (2.0 * math.pi * GAS_CONSTANT_J_MOL_K * T_K)
-                    )
+                    * hertz_knudsen_k_kg_s_m2_pa(T_K, M_kg_mol)
                     * delta_p_Pa
                     * melt_surface_area_m2
                     * 3600.0

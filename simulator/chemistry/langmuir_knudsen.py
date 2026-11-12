@@ -135,14 +135,11 @@ def knudsen_effusion_molar_flux(
     measurement reduction, not this surface-flux model.
     """
     delta_p = max(0.0, float(p_eq_pa) - float(p_bulk_pa))
-    denominator = math.sqrt(
-        2.0
-        * math.pi
-        * molar_mass_kg_mol
-        * GAS_CONSTANT_J_MOL_K
-        * T_surface_K
-    )
-    return delta_p / denominator
+    # Same coefficient as ``hertz_knudsen_k_kg_s_m2_pa``. Molar flux is
+    # ``delta_p * k_HK / M``, which is ``delta_p / sqrt(2*pi*M*R*T)``.
+    # A second sqrt would let this orifice law drift from the mass law.
+    k_hk = hertz_knudsen_k_kg_s_m2_pa(T_surface_K, molar_mass_kg_mol)
+    return delta_p * k_hk / molar_mass_kg_mol
 
 
 def langmuir_molar_flux(

@@ -1090,11 +1090,13 @@ _BRACKET_TOP_OVERHEAD_MBAR = 1000.0
 def _oracle_melt_surface_participants(compiled, diagnostic, published) -> dict[str, float]:
     """Melt-surface participants from the catalog. Not the production classifier.
 
-    A participant has a positive published pressure, a negative catalog
-    exponent, and a reference pO2. An intrinsic-melt channel uses the
-    source-reaction fO2, which is the pO2 the mass-action law solved
-    at. Transport-headspace and SiO are not participants. A
-    non-negative exponent (CaO_gas is 0) is not a participant.
+    This oracle is the gate-opening set only: a positive published
+    pressure, a negative catalog exponent, and a reference pO2.
+    ``n > 0`` is not in this set and is not neutral. The closed-or-
+    refused test below covers that sign. An intrinsic-melt channel
+    uses the source-reaction fO2, which is the pO2 the mass-action law
+    solved at. Transport-headspace and SiO are not participants.
+    ``n == 0`` (CaO_gas) is not a participant.
     """
 
     source = diagnostic.get("source_reaction_fO2_bar")
@@ -1302,12 +1304,12 @@ def _catalog_alpha(legacy, species: str, temperature_K: float) -> float:
 
 
 def _ideal_molar_k(alpha: float, molar_mass: float, temperature_K: float) -> float:
-    """``alpha / sqrt(2*pi*M*R*T)``, mol s^-1 m^-2 Pa^-1. Not the solver."""
+    """``alpha * k_HK / M``. The owner's coefficient, not the solver."""
 
-    from simulator.physical_constants import GAS_CONSTANT
-
-    return alpha / math.sqrt(
-        2.0 * math.pi * GAS_CONSTANT * temperature_K * molar_mass
+    return (
+        alpha
+        * hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_mass)
+        / molar_mass
     )
 
 
@@ -3974,3 +3976,236 @@ def test_persisted_headspace_vector_sets_transport_on_every_path(case: tuple) ->
 
     _name, pairs, entry = case
     _assert_persisted_headspace(pairs, entry)
+
+
+# Open-gate carriers. ``n`` is the mass-action exponent. Oxygen weight
+# is ``2*n``. Ca is the congruent metal (n = -1/2 from 2 Ca + O2).
+# AlO2, CrO2 and CrO3 are the catalog's positive exponents. TiO2_gas
+# is n = 0. SiO is transport. NotAGas does not parse. Ar has no oxygen,
+# so its parent demand is negative.
+_N_SIGN_ROWS = (
+    ("metal", "Ca", 1000.0, -0.5, 1.0e-9),
+    ("positive", "AlO2", 100.0, 0.25, 1.0e-9),
+    ("positive", "CrO2", 80.0, 0.25, 1.0e-9),
+    ("positive", "CrO3", 40.0, 0.75, 1.0e-9),
+    ("neutral", "TiO2_gas", 50.0, 0.0, 1.0e-9),
+    ("transport", "SiO", 25.0, -0.5, 1.0e-6),
+    ("unparsed", "NotAGas", 10.0, 0.25, 1.0e-9),
+    ("negative_demand", "Ar", 12.0, 0.25, 1.0e-9),
+)
+_N_SIGN_BY_SPECIES = {row[1]: row for row in _N_SIGN_ROWS}
+_N_SIGN_T_K = 2473.15
+_N_SIGN_P_REF = 1.0e-9
+
+
+def _n_sign_provenance(role: str, exponent: float, p_ref: float) -> dict:
+    if role == "metal":
+        return {
+            "pressure_rail": "gas_fugacity",
+            "pO2_bar": p_ref,
+            "activity_factor": 0.2,
+        }
+    if role == "transport":
+        return {
+            "oxygen_fugacity_channel": "transport_headspace",
+            "pO2_bar": p_ref,
+            "pO2_exponent": exponent,
+        }
+    return {"pO2_bar": p_ref, "pO2_exponent": exponent}
+
+
+def _oracle_closed_surface() -> tuple[float, dict[str, float]]:
+    """Root of ``sum 2*n*J = 0`` with ``J = P`` (k = 1, bulk = 0).
+
+    Written from the oxygen weight. It does not call the surface
+    solver, the pressure law, or the conductance owner. Entrants are
+    the metal and the positive-exponent carriers, plus synthetic O2
+    at ``n = +1``. The bracket is log10(pO2/bar) on [-30, 0].
+    """
+
+    from scipy.optimize import brentq
+
+    entrants = [
+        row for row in _N_SIGN_ROWS if row[0] in ("metal", "positive")
+    ]
+
+    def residual(logp: float) -> float:
+        surface = 10.0 ** logp
+        total = 0.0
+        for _role, _species, pressure, exponent, p_ref in entrants:
+            solved = pressure * (surface / p_ref) ** exponent
+            total += 2.0 * exponent * solved
+        total += 2.0 * surface * PA_PER_BAR
+        return total
+
+    low = residual(-30.0)
+    high = residual(0.0)
+    assert low < 0.0
+    assert high > 0.0
+    log_root = float(brentq(residual, -30.0, 0.0, xtol=1.0e-12, rtol=1.0e-12))
+    assert -30.0 < log_root < 0.0
+    surface = 10.0 ** log_root
+    pressures = {
+        species: pressure * (surface / p_ref) ** exponent
+        for _role, species, pressure, exponent, p_ref in entrants
+    }
+    assert abs(residual(log_root)) / max(abs(low), abs(high)) < 1.0e-8
+    return surface, pressures
+
+
+@functools.lru_cache(maxsize=2)
+def _n_sign_surface(mode: str):
+    """One real ``apply_langmuir_surface_oxygen`` call per mode."""
+
+    from simulator.langmuir_surface_oxygen import apply_langmuir_surface_oxygen
+
+    pressures = {}
+    provenance = {}
+    for role, species, pressure, exponent, p_ref in _N_SIGN_ROWS:
+        pressures[species] = pressure
+        provenance[species] = _n_sign_provenance(role, exponent, p_ref)
+    if mode == "closed":
+        conductance = {
+            species: 1.0
+            for role, species, *_rest in _N_SIGN_ROWS
+            if role in ("metal", "positive")
+        }
+        conductance["O2"] = 1.0
+    elif mode == "refused":
+        # A negative override raises inside the chokepoint after the
+        # channel loop has classified every carrier. A 1 bar O2
+        # overhead does not: n > 0 still supplies oxygen, so that
+        # residual can change sign. The pure-CaO overhead failure is
+        # the other test.
+        conductance = {"O2": -1.0}
+    else:
+        raise AssertionError(mode)
+    return apply_langmuir_surface_oxygen(
+        pressures,
+        temperature_K=_N_SIGN_T_K,
+        provenance_by_species=provenance,
+        source_reaction_fO2_bar=_N_SIGN_P_REF,
+        legacy_catalog=None,
+        compiled_catalog=None,
+        melt_redox_capacity_mol_per_ln_fO2=0.0,
+        conductance_mol_s_m2_Pa=conductance,
+        allow_unmeasured_alpha_fallback=True,
+    )
+
+
+def _rule_outcome(role: str, published: float, oracle_pressure: float | None, mode: str):
+    """Independent expectation. Not the production classifier.
+
+    An open gate rewrites every n != 0 carrier that can enter the sum,
+    and refuses every other n != 0 carrier. n == 0 and transport stay
+    at the published pressure. A failed solve refuses the whole n != 0
+    set, both signs. The old defect treated n >= 0 as published.
+    """
+
+    if role in ("neutral", "transport"):
+        return ("published", published)
+    if mode == "refused" or role in ("unparsed", "negative_demand"):
+        return ("refused", None)
+    assert oracle_pressure is not None
+    return ("pressure", oracle_pressure)
+
+
+def _bug_outcome(role: str, published: float, oracle_pressure: float | None, mode: str):
+    """The defect: n >= 0 stays at the published pressure.
+
+    n < 0 still follows the rule. Neutral and transport agree with
+    the rule, so they do not distinguish the bug.
+    """
+
+    if role in ("positive", "unparsed", "negative_demand"):
+        return ("published", published)
+    return _rule_outcome(role, published, oracle_pressure, mode)
+
+
+@pytest.mark.parametrize("mode", ["closed", "refused"])
+@pytest.mark.parametrize("species", [row[1] for row in _N_SIGN_ROWS])
+def test_open_gate_closes_or_refuses_every_nonzero_exponent(mode: str, species: str) -> None:
+    """n != 0 is the closed surface law or a typed refusal. n > 0 is not neutral.
+
+    Invariant, one chokepoint (``apply_langmuir_surface_oxygen``): once
+    the d-376 gate is open, every non-transport carrier with n != 0,
+    a reference pO2, and a positive pressure is rewritten to the shared
+    surface law or removed with a typed refusal. It is never left at
+    the unclosed published pressure. n == 0 and transport stay
+    published. An unparsable formula and a negative oxygen demand
+    refuse on both the closed root and the failed solve.
+
+    The mutation is a predicate that keeps every n >= 0 pressure
+    published. Positive, unparsed, and negative-demand rows disagree
+    with that predicate. Neutral and transport agree with it.
+    """
+
+    role, _species, published, exponent, _p_ref = _N_SIGN_BY_SPECIES[species]
+    result = _n_sign_surface(mode)
+    surface, oracle_pressures = _oracle_closed_surface()
+    oracle_pressure = oracle_pressures.get(species)
+    outcome = _rule_outcome(role, published, oracle_pressure, mode)
+    bug = _bug_outcome(role, published, oracle_pressure, mode)
+    assert result.applied is True
+    if mode == "closed":
+        assert result.surface_pO2_bar == pytest.approx(surface, rel=1.0e-8)
+        assert result.relative_residual is not None
+        assert result.relative_residual < 1.0e-6
+    else:
+        assert result.surface_pO2_bar is None
+    if outcome[0] == "published":
+        assert result.pressures_Pa[species] == published
+        assert species not in result.refused_species
+    elif outcome[0] == "refused":
+        assert species not in result.pressures_Pa
+        reason = result.refused_species[species]
+        assert reason
+        assert "0.0" not in reason
+        if role == "unparsed":
+            assert "formula unresolved" in reason
+        if role == "negative_demand":
+            assert "oxygen demand is negative" in reason
+    else:
+        assert oracle_pressure is not None
+        assert result.pressures_Pa[species] == pytest.approx(
+            oracle_pressure, rel=1.0e-8
+        )
+        assert result.pressures_Pa[species] != pytest.approx(published, rel=1.0e-3)
+        assert species not in result.refused_species
+    if role in ("positive", "unparsed", "negative_demand"):
+        assert outcome != bug
+    else:
+        assert outcome == bug
+    if role == "positive" and mode == "closed":
+        assert exponent > 0.0
+
+
+def test_vapour_debit_floor_is_the_publisher_threshold() -> None:
+    """Melt debit and the publisher share one threshold object."""
+
+    from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
+    from simulator.evaporation import _vapour_debit_floor_kg_hr
+
+    assert _vapour_debit_floor_kg_hr() is _NONTRIVIAL_FLUX_KG_HR
+
+
+def test_hertz_knudsen_sqrt_has_one_owner() -> None:
+    """Surface and publisher call the Knudsen coefficient. They do not re-derive it."""
+
+    from simulator.langmuir_surface_oxygen import _ideal_molar_conductance
+
+    root = Path(__file__).resolve().parents[1]
+    surface = (root / "simulator/langmuir_surface_oxygen.py").read_text()
+    publisher = (root / "engines/builtin/evaporation_flux.py").read_text()
+    owner = (root / "simulator/chemistry/langmuir_knudsen.py").read_text()
+    assert "2.0 * math.pi" not in surface
+    assert "2.0 * math.pi" not in publisher
+    assert owner.count("math.sqrt(") == 1
+    alpha = 0.37
+    molar_mass = 0.055845
+    temperature_K = 2100.0
+    assert _ideal_molar_conductance(alpha, molar_mass, temperature_K) == (
+        alpha
+        * hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_mass)
+        / molar_mass
+    )

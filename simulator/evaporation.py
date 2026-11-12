@@ -120,11 +120,22 @@ def evaporation_flux_refusal_from_configuration_error(
     )
 
 
-# Melt debit, ledger totals, and ``species_kg_hr`` omit a vapour rate at or
-# below this floor. The publisher's ``_NONTRIVIAL_FLUX_KG_HR`` is the same
-# number. Wall-supply accounting does not use it: the integral keeps the
-# computed rate, and booking applies ledger resolution.
-_VAPOUR_DEBIT_FLOOR_KG_HR = 1e-12
+def _vapour_debit_floor_kg_hr() -> float:
+    """Publisher nontrivial-flux threshold, the melt-debit floor.
+
+    Melt debit, ledger totals, and ``species_kg_hr`` omit a vapour rate
+    at or below this value. Wall-supply accounting does not: the integral
+    keeps the computed rate, and booking applies ledger resolution.
+
+    Imported inside the call. ``evaporation`` is imported while
+    ``engines.builtin`` is still initialising, and a module-level import
+    of ``evaporation_flux`` re-enters ``_common`` before that package
+    finishes. The returned object is ``_NONTRIVIAL_FLUX_KG_HR``.
+    """
+
+    from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
+
+    return _NONTRIVIAL_FLUX_KG_HR
 
 
 class ProjectedVapourRates(NamedTuple):
@@ -183,7 +194,7 @@ def project_publisher_vapour_rates(
     def _store(species: str, gated: float, *, debit_eligible: bool) -> None:
         if math.isfinite(gated) and gated >= 0.0:
             supply[species] = gated
-        if debit_eligible and gated > _VAPOUR_DEBIT_FLOOR_KG_HR:
+        if debit_eligible and gated > _vapour_debit_floor_kg_hr():
             debit[species] = gated
 
     def _cap_fe(species: str, gated: float, *, record: bool) -> float:
@@ -4967,7 +4978,7 @@ class EvaporationMixin:
                 for species, status in (
                     evap_flux.alpha_authority_status_by_species.items()
                 )
-                if float(effective_rates.get(species, 0.0)) > 1.0e-12
+                if float(effective_rates.get(species, 0.0)) > _vapour_debit_floor_kg_hr()
             },
             # Canonical serialized answers are treated as immutable evidence;
             # depletion changes rates only and can safely share the records.
@@ -5366,7 +5377,9 @@ class EvaporationMixin:
                 for species, status in (
                     evap_flux.alpha_authority_status_by_species.items()
                 )
-                if float(residual_species_kg_hr.get(species, 0.0)) > 1.0e-12
+                if float(residual_species_kg_hr.get(species, 0.0)) > (
+                    _vapour_debit_floor_kg_hr()
+                )
             },
             carrier_authority_by_species=(
                 evap_flux.carrier_authority_by_species

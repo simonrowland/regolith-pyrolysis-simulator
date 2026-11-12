@@ -35,10 +35,12 @@ of a root that owns the drive. Free-molecular
 The exit check compares the solved surface with the caller's partial,
 not with a bulk a branch already discarded.
 
-A failed root refuses every melt-surface participant. Below-band and
-in-band carriers are the same defect once the gate is open: the
-persisted evaluation pressure was not a closed balance. Transport
-and neutral carriers stay published. Nothing is written as 0.
+A failed root refuses every residual participant. Below-band and
+in-band carriers are the same defect once the gate is open, and so
+are positive exponents: AlO2, CrO2 and CrO3 have ``n > 0`` and oxygen
+weight ``2*n``, so they are not neutral. The persisted evaluation
+pressure was not a closed balance. Transport channels and ``n == 0``
+carriers stay published. Nothing is written as 0.
 
 Invariant. ``apply_langmuir_surface_oxygen`` is the only writer of the
 flux map, and every caller (live evaporation and each finite-capacity
@@ -57,8 +59,9 @@ three outcomes: the published pressure (closure closed,
 transport-headspace channel, or no melt-surface law), the single
 surface-pO2 law below, or a typed refusal. A required solve that
 does not close is the refusal, including an in-band carrier whose
-reference pO2 is above the certified minimum. Refusing only the
-below-band set would publish that unclosed pressure. The published surface is
+reference pO2 is above the certified minimum and a positive-exponent
+carrier in the same residual. Refusing only the below-band set, or
+only ``n < 0``, would publish that unclosed pressure. The published surface is
 the root of ``sum (nO_i - dO_i) J_i = 0`` where ``J_i`` is that
 species' publisher net flux at those partials, and the reported
 residual is that root's residual. The alpha in ``J_i`` and the
@@ -138,11 +141,14 @@ O2 molecule, so ``J_Ca = 2*J_O2``:
 ``P_Ca/sqrt(M_Ca) = 2*P_O2/sqrt(M_O2)``, with ``P_O2 = p*1e5`` and
 ``P_Ca`` proportional to ``p^(-1/2)``. Neutral oxide gas (``n = 0``, for
 example CaO(g)) has weight 0, does not move the root, and keeps its
-published pressure. Atomic O(g) is not added. The ordinary catalog often
+published pressure. A positive exponent is not that case. AlO2
+(``n = +1/4``), CrO2 (``n = +1/4``) and CrO3 (``n = +3/4``) have
+weight ``2*n`` and sit in the residual. A failed root refuses them
+with the metals. Atomic O(g) is not added. The ordinary catalog often
 omits it, so this root sits slightly off a pure-oxide congruent solution
 that carries O. Positive-exponent carriers that the provider dropped below
 its reporting threshold are the same omission: they are not invented back
-into the balance.
+into the balance. Ones the provider did publish are.
 """
 
 from __future__ import annotations
@@ -245,22 +251,47 @@ class _Carrier:
     cap_psat_Pa: float | None = None
 
 
-def _needs_surface_balance(carrier: _Carrier) -> bool:
-    """True when this carrier is a melt-surface participant.
+def _residual_participant(carrier: _Carrier) -> bool:
+    """True when oxygen weight ``2*n`` is nonzero.
 
-    Opening the solve is a separate gate (physical floor or the
-    reservoir no-buffer test). Transport-channel pressures are not
-    participants: they do not open the solve and are not rewritten.
-    A capped metal still participates. Its reaction exponent stays
-    negative even though the published pressure is flat.
+    d-376 amendment 1. The residual is ``sum 2*n*J``. ``n < 0`` (Ca,
+    Al) and ``n > 0`` (AlO2, CrO2, CrO3) both move it. ``n == 0``
+    (CaO(g)) does not, and stays published. Transport channels are
+    priced at the headspace potential and stay out. A missing
+    reference cannot be rescaled onto the solved surface. A failed
+    solve refuses this whole set. Leaving an ``n > 0`` pressure
+    published is the same unclosed value as leaving Ca. The gate
+    still opens only on ``n < 0``: a positive exponent alone does not
+    demand a congruent metal root.
     """
 
+    exponent = carrier.reaction_exponent
     return (
         not carrier.transport_channel
-        and carrier.reaction_exponent is not None
-        and carrier.reaction_exponent < 0.0
+        and exponent is not None
+        and exponent != 0.0
         and carrier.p_ref_bar is not None
         and carrier.pressure_Pa > 0.0
+    )
+
+
+def _needs_surface_balance(carrier: _Carrier) -> bool:
+    """True when this carrier can open the congruent solve.
+
+    Opening the solve is a separate gate (physical floor or the
+    reservoir no-buffer test). Only a negative exponent opens it.
+    ``n > 0`` is still a residual participant once the gate is open;
+    ``_residual_participant`` is that set. Transport-channel pressures
+    do not open the solve and are not rewritten. A capped metal still
+    participates. Its reaction exponent stays negative even though the
+    published pressure is flat.
+    """
+
+    exponent = carrier.reaction_exponent
+    return (
+        _residual_participant(carrier)
+        and exponent is not None
+        and exponent < 0.0
     )
 
 
@@ -357,10 +388,10 @@ def apply_langmuir_surface_oxygen(
     The root already includes overhead backpressure and the publisher
     gas resistance, so the surface is not clamped to the overhead
     partial afterwards. While O2 is net-leaving that root is not below
-    the overhead pO2. A failed root refuses every melt-surface
-    participant, below-band and in-band, and names the reason.
-    Transport and neutral carriers stay published. Neither path
-    writes a silent 0.
+    the overhead pO2. A failed root refuses every residual
+    participant, below-band and in-band, ``n < 0`` and ``n > 0``,
+    and names the reason. Transport channels and ``n == 0`` carriers
+    stay published. Neither path writes a silent 0.
     """
 
     provenance_by_species = provenance_by_species or {}
@@ -879,16 +910,21 @@ def _ideal_molar_conductance(
     molar_mass_kg_per_mol: float,
     temperature_K: float,
 ) -> float:
-    """``alpha / sqrt(2*pi*M*R*T)``, mol s^-1 m^-2 Pa^-1.
+    """``alpha * k_HK / M``, mol s^-1 m^-2 Pa^-1.
 
-    This is the free-molecular Hertz-Knudsen conductance. Multiplying
+    ``k_HK`` is ``hertz_knudsen_k_kg_s_m2_pa``, the mass coefficient
+    the flux publisher uses. Dividing by molar mass is the molar
+    Hertz-Knudsen conductance ``alpha / sqrt(2*pi*M*R*T)``. A local
+    sqrt would let this root drift from that publisher. Multiplying
     by a driving pressure in Pa yields mol m^-2 s^-1.
     """
 
-    from simulator.physical_constants import GAS_CONSTANT
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
 
-    return alpha / math.sqrt(
-        2.0 * math.pi * GAS_CONSTANT * temperature_K * molar_mass_kg_per_mol
+    return (
+        alpha
+        * hertz_knudsen_k_kg_s_m2_pa(temperature_K, molar_mass_kg_per_mol)
+        / molar_mass_kg_per_mol
     )
 
 
@@ -1109,12 +1145,19 @@ def _solve_net_surface_balance(
             "vacuum oxygen balance has no root in the declared pO2 bracket"
         )
     else:
+        # 1e-14, not 1e-12. A clipped drive (metal bulk above P_eq,
+        # O2 just above its overhead) has gross flux ~1e-13 mol m^-2
+        # s^-1, and the O2 kink is steep. xtol 1e-12 stops while
+        # |O-D|/max(O,D) is still ~1e-2, above _RESIDUAL_CLOSE_MAX,
+        # so a closed overhead root is refused. n == 0 is not in this
+        # sum and does not inflate that scale. 1e-14 puts the root
+        # under the check; float precision stops near 1e-5 relative.
         root = float(brentq(
             lambda value: parts(value)[0],
             low,
             high,
-            xtol=1.0e-12,
-            rtol=1.0e-12,
+            xtol=1.0e-14,
+            rtol=1.0e-14,
             maxiter=200,
         ))
         bracket = None
@@ -1173,24 +1216,24 @@ def _solve_or_refuse(
     channels: list[Any] = []
     coupled: list[_Carrier] = []
     for carrier in carriers:
-        # Transport-channel flux stays at the published pressure. It is
-        # not refused and it does not enter this melt-surface residual.
-        if carrier.transport_channel:
+        # Transport and n == 0 stay at the published pressure. They are
+        # not in this residual. Every other carrier is a term in the
+        # sum or a typed refusal. Sign does not pick a third path.
+        if carrier.transport_channel or not (
+            carrier.reaction_exponent not in (None, 0.0)
+            and carrier.pressure_Pa > 0.0
+        ):
             continue
-        if carrier.reaction_exponent is None or carrier.p_ref_bar is None:
-            if carrier.inverted:
-                refused[carrier.species] = (
-                    "missing pO2 exponent or reference; inverted pressure omitted"
-                )
-            continue
-        if carrier.species in refused:
+        if carrier.p_ref_bar is None:
+            refused[carrier.species] = (
+                "missing pO2 reference; surface pressure omitted"
+            )
             continue
         formula = _species_formula(carrier.species, registry)
         if formula is None:
-            if carrier.inverted:
-                refused[carrier.species] = (
-                    "formula unresolved; inverted pressure omitted"
-                )
+            refused[carrier.species] = (
+                "formula unresolved; surface pressure omitted"
+            )
             continue
         alpha, alpha_source = _flux_alpha(
             carrier.species,
@@ -1202,10 +1245,9 @@ def _solve_or_refuse(
             ),
         )
         if alpha is None:
-            if carrier.inverted:
-                refused[carrier.species] = (
-                    "no numeric evaporation alpha; inverted pressure omitted"
-                )
+            # The publisher refuses an unmeasured alpha when a parent
+            # mass is present. Keep the published pressure so that
+            # refusal still fires. The carrier is not in the sum.
             continue
         if alpha == 0.0:
             continue
@@ -1216,10 +1258,9 @@ def _solve_or_refuse(
             oxygen_atoms, carrier.reaction_exponent
         )
         if demand < 0.0:
-            if carrier.inverted:
-                refused[carrier.species] = (
-                    "oxygen demand is negative; inverted pressure omitted"
-                )
+            refused[carrier.species] = (
+                "oxygen demand is negative; surface pressure omitted"
+            )
             continue
         channels.append(
             _VacuumOxygenChannel(
@@ -1401,8 +1442,9 @@ def _refuse_unclosed_surface(
     drive identically zero on the log-p bracket ``[-30, 0]`` while Ca
     demand stays positive. The bracket then has no root. Refusing only
     the below-band set would return the unclosed Ca pressure.
-    Transport and neutral (exponent >= 0) carriers stay published.
-    Nothing is written as 0.
+    Transport channels and neutral carriers (``n == 0``) stay published.
+    ``n > 0`` is not neutral: its oxygen weight is ``2*n``. Nothing is
+    written as 0.
     """
 
     refused = {
@@ -1411,7 +1453,7 @@ def _refuse_unclosed_surface(
             + detail
         )
         for carrier in carriers
-        if carrier.inverted or _needs_surface_balance(carrier)
+        if _residual_participant(carrier)
     }
     if extra_refused:
         refused.update(dict(extra_refused))
