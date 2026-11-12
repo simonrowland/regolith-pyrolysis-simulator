@@ -173,9 +173,10 @@ def test_three_titanium_carriers_share_one_parent_debit_and_o2_overhead(
     tio2_terms = sim._evaporative_redox_source_terms_from_transition(
         transitions["evaporate_TiO2_gas"]
     )
-    assert "redox_source:evaporative_metal_loss" not in ti_terms
-    assert ti_terms["redox_source:evaporative_oxygen_loss"] < 0.0
-    assert tio_terms["redox_source:evaporative_oxygen_loss"] < 0.0
+    # TiO2(l) -> Ti(g) + O2 and TiO2(l) -> TiO(g) + 1/2 O2 are congruent.
+    # TiO2(g) carries its own oxygen and releases none. None is a redox term.
+    assert ti_terms == {}
+    assert tio_terms == {}
     assert tio2_terms == {}
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5e-12
 

@@ -2267,6 +2267,9 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    # Pin the reference to this melt temperature so a temperature
+    # re-reference is a no-op. A congruent SiO row must not move ln fO2.
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
     sim._sync_oxygen_reservoir_mirror()
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
@@ -2306,13 +2309,16 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
     snapshot = sim._make_snapshot()
     summary = build_per_hour_summary(sim, snapshot)
 
+    # SiO2(l) -> SiO(g) + 1/2 O2(g) is congruent: the O2 is credited to
+    # the gas and ln fO2 does not move.
     assert credited_condensed_kg == pytest.approx(0.0)
     assert transition.name == "evaporate_SiO"
     assert o2_mol > 0.0
-    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
-        -o2_mol
+    assert sim._evaporative_redox_source_terms_from_transition(transition) == {}
+    assert label not in breakdown.get("terms_mol_o2_equiv_by_label", {})
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        before_fO2
     )
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2", 0.0
     ) == pytest.approx(before_overhead_o2_mol + o2_mol)
@@ -2325,22 +2331,22 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
     assert sim.melt.oxygen_reservoir.exchange_direction.split("|")[0] == (
         exchange_direction
     )
-    assert label in summary["redox_source_breakdown"][
-        "terms_mol_o2_equiv_by_label"
-    ]
-    assert summary["redox_source_breakdown"]["ferric_divergence"][
-        "warning_threshold_abs"
-    ] == pytest.approx(FERRIC_DIVERGENCE_WARNING_THRESHOLD)
+    assert label not in summary.get("redox_source_breakdown", {}).get(
+        "terms_mol_o2_equiv_by_label", {}
+    )
 
 
 @pytest.mark.parametrize("species", ["Na", "K", "Fe", "Mg"])
-def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
+def test_elemental_evaporation_is_congruent_and_leaves_ln_fo2_unchanged(
     species,
 ) -> None:
+    """MO_x(l) -> M(g) + (x/2) O2(g) credits the gas and does not move fO2."""
+
     sim = _make_sim()
     sim.melt.p_total_mbar = 10.0  # Unsaturated source case; routing has its own regression.
     sim.melt.temperature_C = 1600.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     sp_data = sim.vapor_pressures["metals"][species]
@@ -2358,7 +2364,6 @@ def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
     sim._credit_evaporation_transition(species, rate_kg_hr, rate_kg_hr, sp_data)
 
     transition = sim.atom_ledger.transitions[-1]
-    label = "redox_source:evaporative_metal_loss"
     parent_oxide_o2_equiv_mol = _transition_account_o2_equiv_mol(
         sim,
         transition,
@@ -2380,17 +2385,94 @@ def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
         account="reservoir.fo2_buffer",
         species="O2",
     )
-    breakdown = sim._redox_source_breakdown_diagnostic()
 
     assert rate_kg_hr > 0.0
     assert transition.name == f"evaporate_{species}"
     assert parent_oxide_o2_equiv_mol > 0.0
-    assert overhead_o2_mol == pytest.approx(0.0)
-    assert buffer_o2_mol == pytest.approx(parent_oxide_o2_equiv_mol)
-    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
-        parent_oxide_o2_equiv_mol
+    assert overhead_o2_mol == pytest.approx(
+        parent_oxide_o2_equiv_mol, rel=1e-9, abs=1e-15
     )
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log > before_fO2
+    assert buffer_o2_mol == pytest.approx(0.0, abs=1e-15)
+    assert sim._evaporative_redox_source_terms_from_transition(transition) == {}
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        before_fO2
+    )
+
+
+def test_nonstoichiometric_evaporation_residual_is_the_only_redox_term() -> None:
+    """Oxygen that stays, or extra gas O2, is the residual. Congruent is not.
+
+    The Na row below is the committed congruent transition. Dropping its
+    gas O2 is metal leaving while its oxygen stays. Doubling it is O2
+    leaving beyond the oxide stoichiometry.
+    """
+
+    from simulator.accounting import LedgerTransition, MaterialLot
+
+    sim = _make_sim()
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.temperature_C = 1600.0
+    sp_data = sim.vapor_pressures["metals"]["Na"]
+    sim._credit_evaporation_transition("Na", 0.001, 0.001, sp_data)
+    transition = sim.atom_ledger.transitions[-1]
+    overhead_o2_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account="process.overhead_gas",
+        species="O2",
+    )
+    assert overhead_o2_mol > 0.0
+    assert sim._evaporative_redox_source_terms_from_transition(transition) == {}
+
+    def _rewritten(species_kg_map):
+        credits = []
+        for lot in transition.credits:
+            species_kg = species_kg_map(dict(lot.species_kg))
+            if not species_kg:
+                continue
+            credits.append(
+                MaterialLot(
+                    lot.account,
+                    species_kg,
+                    source=lot.source,
+                    material_origin=lot.material_origin,
+                )
+            )
+        return LedgerTransition(
+            name=transition.name,
+            debits=transition.debits,
+            credits=tuple(credits),
+        )
+
+    def _drop_o2(species_kg):
+        species_kg.pop("O2", None)
+        return {name: kg for name, kg in species_kg.items() if kg > 0.0}
+
+    def _double_o2(species_kg):
+        if "O2" in species_kg:
+            species_kg["O2"] *= 2.0
+        return species_kg
+
+    stayed = sim._evaporative_redox_source_terms_from_transition(
+        _rewritten(_drop_o2)
+    )
+    extra = sim._evaporative_redox_source_terms_from_transition(
+        _rewritten(_double_o2)
+    )
+    assert stayed == pytest.approx(
+        {"redox_source:evaporative_metal_loss": overhead_o2_mol}
+    )
+    assert extra == pytest.approx(
+        {"redox_source:evaporative_oxygen_loss": -overhead_o2_mol}
+    )
+    assert sim._evaporative_redox_source_terms_from_transition(
+        LedgerTransition(
+            name="c3_na_shuttle_reduction",
+            debits=transition.debits,
+            credits=transition.credits,
+        )
+    ) == {}
 
 
 def test_isochemical_temperature_ramp_references_fO2_on_kress91_curve() -> None:

@@ -3162,12 +3162,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         prefix = 'evaporate_'
         if not transition.name.startswith(prefix):
             return {}
-        vapor_species = transition.name[len(prefix):]
-        vapor_formula = resolve_species_formula(
-            vapor_species,
-            self.species_formula_registry,
-        )
-        vapor_oxygen_atoms = float(vapor_formula.elements.get('O', 0.0) or 0.0)
         overhead_o2_credit_mol = self._transition_species_mol(
             transition,
             side='credits',
@@ -3181,42 +3175,82 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species=OXYGEN_SPECIES,
         )
         net_overhead_o2_mol = overhead_o2_credit_mol - overhead_o2_debit_mol
-        # Actual ledger destination outranks carrier class. Premise: when a
-        # channel credits/debits O2 in process.overhead_gas, that physical O2
-        # transfer is the redox source even if the vapor itself is elemental
-        # (Ti is explicitly co-routed with TiO/TiO2). Algebra uses
-        # source=-net_overhead_O2 so release is reducing (negative) and uptake
-        # is oxidising (positive). Units remain mol O2 equivalent. Sanity:
-        # legacy Na/K buffer-routed channels have net=0 and retain the metal-loss
-        # branch; TiO2(g) has net=0 and no spurious source.
-        if abs(net_overhead_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
-            return {'redox_source:evaporative_oxygen_loss': -net_overhead_o2_mol}
-        if vapor_oxygen_atoms > 0.0:
-            return {}
-
-        # Elemental vapor classes (Na/K/Fe/Mg/Ca in current data) are
-        # ledger-balanced as parent oxide -> metal vapor + O2.  The metal
-        # loss leaves the debited oxide oxygen behind in the melt redox
-        # couple, so the fO2 source is positive and derives from the actual
-        # cleaned-melt debit.  If a future provider debits a reduced metal
-        # species directly, this term naturally falls to zero.
-        cleaned_melt_debit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+        melt_debit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
             transition,
             side='debits',
             account='process.cleaned_melt',
         )
-        cleaned_melt_credit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+        melt_credit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
             transition,
             side='credits',
             account='process.cleaned_melt',
         )
-        metal_loss_o2_equiv_mol = (
-            cleaned_melt_debit_o2_equiv_mol
-            - cleaned_melt_credit_o2_equiv_mol
+        # Premise: MO_x(l) -> M(g) + (x/2) O2(g). The metal and its oxygen
+        # leave together, so every oxide that stays has the same M:O ratio
+        # and the melt redox state is unchanged. Example:
+        # NaO0.5(l) -> Na(g) + 1/4 O2(g). The gas O2 is that coproduct.
+        #
+        # Stoichiometric free O2 (mol) =
+        #   (O-atom mol removed from process.cleaned_melt
+        #    - O-atom mol carried inside non-O2 vapour credits) / 2.
+        # _transition_account_o2_equiv_mol already returns that half.
+        # O2 itself is the free-gas leg, not vapour-carried oxygen.
+        #
+        # residual = n_overhead_O2 - n_stoich. Both legs are mol O2.
+        # Limit: a congruent row has residual 0 inside the kg<->mol
+        # roundoff band, and the term is {}. residual > 0 is O2 that
+        # left while its metal stayed: evaporative_oxygen_loss = -residual.
+        # residual < 0 is metal that left while its oxygen stayed,
+        # including oxygen parked on the redox buffer:
+        # evaporative_metal_loss = -residual.
+        # The integrator owns the C_m bound (dln = n/C_m, refused at the
+        # noop floor). This function does not divide.
+        vapour_carried_o2_equiv_mol = 0.0
+        seen_accounts: set[str] = set()
+        for lot in transition.credits:
+            account = str(lot.account)
+            if account == 'process.cleaned_melt' or account in seen_accounts:
+                continue
+            seen_accounts.add(account)
+            account_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+                transition,
+                side='credits',
+                account=account,
+            )
+            free_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+                transition,
+                side='credits',
+                account=account,
+                species_filter={OXYGEN_SPECIES},
+            )
+            vapour_carried_o2_equiv_mol += (
+                account_o2_equiv_mol - free_o2_equiv_mol
+            )
+        stoich_free_o2_mol = (
+            melt_debit_o2_equiv_mol
+            - melt_credit_o2_equiv_mol
+            - vapour_carried_o2_equiv_mol
         )
-        if abs(metal_loss_o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+        residual_o2_mol = net_overhead_o2_mol - stoich_free_o2_mol
+        gross_o2_traffic_mol = (
+            abs(overhead_o2_credit_mol)
+            + abs(overhead_o2_debit_mol)
+            + abs(melt_debit_o2_equiv_mol)
+            + abs(melt_credit_o2_equiv_mol)
+            + abs(vapour_carried_o2_equiv_mol)
+        )
+        if self._o2_equivalent_residual_is_roundoff(
+            residual_o2_mol,
+            gross_o2_traffic_mol,
+        ):
             return {}
-        return {'redox_source:evaporative_metal_loss': metal_loss_o2_equiv_mol}
+        if residual_o2_mol > 0.0:
+            return {
+                'redox_source:evaporative_oxygen_loss': -residual_o2_mol,
+            }
+        return {
+            'redox_source:evaporative_metal_loss': -residual_o2_mol,
+        }
 
     def _apply_evaporative_redox_source_terms(
         self,
