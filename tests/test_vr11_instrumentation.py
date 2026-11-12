@@ -1457,6 +1457,7 @@ def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
         DESIGNATED_STAGE,
         METAL_PHASE_DESTINATIONS,
     )
+    from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
     from simulator.config import load_config_bundle
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -1520,6 +1521,7 @@ def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
         "process.condensation_retained_holdup",
         "process.wall_deposit",
         "terminal.offgas",
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
         *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     }
     by_account = sim.atom_ledger.account_species_kg()
