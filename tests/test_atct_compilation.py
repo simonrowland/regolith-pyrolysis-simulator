@@ -18,7 +18,7 @@ from tests.helpers.named_manifests import assert_named_rows
 @pytest.fixture(scope="module")
 def corpus():
     manifest = yaml.safe_load((ATCT_ROOT / "manifest.yaml").read_text())
-    return manifest, list(load_records()), (ATCT_ROOT / "source" / SOURCE_NAME).read_bytes()
+    return manifest, (ATCT_ROOT / "source" / SOURCE_NAME).read_bytes()
 
 
 def published(fragment):
@@ -26,7 +26,7 @@ def published(fragment):
 
 
 def test_every_source_row_round_trips(corpus):
-    manifest, records, payload = corpus
+    manifest, payload = corpus
     original = payload.decode("utf-8")
     parsed_records = parse_source(payload)
     actual_ids = [record["record_id"] for record in parsed_records]
@@ -38,6 +38,7 @@ def test_every_source_row_round_trips(corpus):
         {record_id: None for record_id in expected_ids},
         label="ATcT source record IDs",
     )
+    records = list(load_records())
     # Count the value cells independently of the harvester's row selector.
     assert original.count('<td class="bkgDHf298">') == len(records) == 3442
     assert len(manifest["entries"]) == len(records)
@@ -78,7 +79,8 @@ def test_every_source_row_round_trips(corpus):
 
 
 def test_source_gaps_and_native_states_are_explicit(corpus):
-    manifest, records, _ = corpus
+    manifest, _ = corpus
+    records = list(load_records())
     assert manifest["corpus_status"]["claimed_species_count"] == 3444
     assert manifest["corpus_status"]["ambiguities"] == [
         "page claims 3444 species; supplied HTML contains 3442 species rows"
@@ -101,7 +103,8 @@ def test_source_gaps_and_native_states_are_explicit(corpus):
 
 
 def test_feedstock_element_coverage(corpus):
-    manifest, records, _ = corpus
+    manifest, _ = corpus
+    records = list(load_records())
     coverage = feedstock_coverage(records)
     assert set(coverage) == set("Ag Al As Au B Ba Bi Br C Ca Cd Ce Cl Co Cr Cs Cu Dy Er Eu F Fe Ga Gd Ge H Hf Ho I In Ir K La Li Lu Mg Mn Mo N Na Nb Nd Ni O Os P Pb Pr Pt Rb S Sb Sc Se Si Sm Sn Sr Tb Te Th Ti Tm U V W Y Yb Zn Zr".split())
     assert {element for element, count in coverage.items() if count} == set("B Br C Cl F H I N O Pt S Si".split())
