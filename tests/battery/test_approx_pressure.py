@@ -30,6 +30,7 @@ from simulator.battery.identity import (
     identity_equal,
     profile_for,
 )
+from simulator.battery.migrate import _identity_from_plain, to_plain
 from simulator.battery.records import (
     ApproxPressure,
     ApproxPressureRefusal,
@@ -38,6 +39,7 @@ from simulator.battery.records import (
     Species,
     State,
     Value,
+    approx_pressure_from_mapping,
     approximate_pressure_from_printed_point,
     as_decimal,
 )
@@ -418,3 +420,95 @@ def test_knudsen_residue_omits_the_band_and_ordinary_equality_does_not() -> None
     assert "total_pressure_Pa" in ordinary.fields
     omitted = _same_row_knudsen_residue_identity_equal(measured, other)
     assert omitted.kind is IdentityEqualKind.EQUAL
+
+
+def _viscosity_pressure(value: object) -> dict[str, object]:
+    return {
+        "quantity": {"tag": "value", "value": "viscosity"},
+        "total_pressure_Pa": {"tag": "value", "value": value},
+    }
+
+
+def test_stored_decimal_pressure_stays_a_decimal() -> None:
+    """Old rows have no band. Reading one must not invent one."""
+
+    loaded = _identity_from_plain(
+        _viscosity_pressure("0.01333223684210526315789473684")
+    )
+    assert loaded.total_pressure_Pa is not None
+    assert type(loaded.total_pressure_Pa.value) is Decimal
+    assert loaded.total_pressure_Pa.value == _HASHIMOTO_PA
+
+    integer = _identity_from_plain(_viscosity_pressure(101325))
+    assert integer.total_pressure_Pa is not None
+    assert type(integer.total_pressure_Pa.value) is Decimal
+    assert integer.total_pressure_Pa.value == Decimal("101325")
+
+    written = Identity(
+        quantity=Quantity.VISCOSITY,
+        species=None,
+        total_pressure_Pa=State.of(Decimal("101325")),
+    )
+    plain = to_plain(written)
+    assert plain["total_pressure_Pa"]["value"] == "101325"
+    again = _identity_from_plain(plain)
+    assert again.total_pressure_Pa is not None
+    assert type(again.total_pressure_Pa.value) is Decimal
+    assert again.total_pressure_Pa.value == Decimal("101325")
+
+
+def test_band_mapping_round_trips_and_a_bad_mapping_refuses() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(_HASHIMOTO_PA, approximate=True)
+    )
+    written = Identity(
+        quantity=Quantity.VISCOSITY,
+        species=None,
+        total_pressure_Pa=State.of(band),
+    )
+    plain = to_plain(written)
+    stored = plain["total_pressure_Pa"]["value"]
+    assert stored["kind"] == "approximate_pressure"
+    assert stored["band_basis"] == "half_decade_order_of_magnitude"
+    assert Decimal(stored["point"]) == _HASHIMOTO_PA
+    assert Decimal(stored["low"]) == band.low
+    assert Decimal(stored["high"]) == band.high
+
+    reloaded = _identity_from_plain(plain)
+    assert reloaded.total_pressure_Pa is not None
+    assert reloaded.total_pressure_Pa.value == band
+
+    without_kind = {key: value for key, value in stored.items() if key != "kind"}
+    with pytest.raises(ApproxPressureRefusal) as missing:
+        _identity_from_plain(_viscosity_pressure(without_kind))
+    assert missing.value.reason == "missing_field"
+
+    # The dataclass default must not fill the hole the codec just refused.
+    with pytest.raises(ApproxPressureRefusal) as owner:
+        approx_pressure_from_mapping(without_kind)
+    assert owner.value.reason == "missing_field"
+
+    extra = dict(stored)
+    extra["approximate"] = True
+    with pytest.raises(ApproxPressureRefusal) as unknown:
+        _identity_from_plain(_viscosity_pressure(extra))
+    assert unknown.value.reason == "unknown_field"
+
+    point_condition = {"kind": "point", "point": "1", "approximate": True}
+    with pytest.raises(ApproxPressureRefusal) as wrong_kind:
+        _identity_from_plain(_viscosity_pressure(point_condition))
+    assert wrong_kind.value.reason == "not_approximate_pressure"
+
+
+def test_band_mapping_on_temperature_is_still_the_decimal_cast() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(_HASHIMOTO_PA, approximate=True)
+    )
+    stored = to_plain(band)
+    with pytest.raises(TypeError):
+        _identity_from_plain(
+            {
+                "quantity": {"tag": "value", "value": "viscosity"},
+                "temperature_K": {"tag": "value", "value": stored},
+            }
+        )
