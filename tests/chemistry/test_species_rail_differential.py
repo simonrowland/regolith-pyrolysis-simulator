@@ -1308,6 +1308,33 @@ def test_psat_evaluator_exception_is_distinct_from_missing_row() -> None:
     assert failure != 1.0
 
 
+def test_psat_evaluator_exception_is_not_scored_as_a_missing_row(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.diagnostic_helpers.species_rail_differential as differential
+
+    def fail_evaluate(*_args, **_kwargs):
+        raise RuntimeError("evaluator exploded")
+
+    evaluator = SimpleNamespace(
+        pressure_observable=(
+            differential.PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE
+        ),
+        activity_exponent=0.0,
+        evaluate=fail_evaluate,
+    )
+    catalog = SimpleNamespace(
+        species={"Na": SimpleNamespace(formula="Na", evaluator=evaluator)}
+    )
+    monkeypatch.setattr(differential, "_legacy_species_row", lambda _sid: {})
+
+    scored = differential.score_psat_nbp_sanity(derive_species_rail(), catalog)
+    sodium = next(point for point in scored if point.score.species == "Na")
+
+    assert sodium.score.skip_reason == f"{TYPED_REFUSAL_PREFIX}rail_evaluator_failed"
+    assert "RuntimeError" in sodium.score.note
+
+
 def test_psat_channel_refuses_missing_gas_or_condensed_or_rail() -> None:
     rail = derive_species_rail()
     gas = KeyedTablePoint(
