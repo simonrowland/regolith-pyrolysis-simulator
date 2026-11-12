@@ -1156,7 +1156,10 @@ def profile_for(identity: Identity) -> QuantityProfile:
         else:
             na("composition")
         na("fO2_Pa")
-    elif q is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+    elif q in {
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Quantity.ELEMENT_RETENTION_RATIO,
+    }:
         req(
             "temperature_K",
             "subtype",

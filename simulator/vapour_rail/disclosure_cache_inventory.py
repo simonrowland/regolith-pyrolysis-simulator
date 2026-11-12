@@ -918,6 +918,14 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Local scratch for rates, equilibrium constants, metadata, or validation. It does not store a vapour-law disclosure.',
     },
+    'store:simulator/melt_backend/magemin.py:_MAGEMIN_ENGINE_VERSION_CACHE': {
+        "path": 'simulator/melt_backend/magemin.py',
+        "line": 188,
+        "kind": 'store',
+        "name": '_MAGEMIN_ENGINE_VERSION_CACHE',
+        "carries_disclosure": False,
+        "how": 'MAGEMin --version string keyed by binary inode, size, and mtime. Not a vapour-law result.',
+    },
     'store:simulator/melt_backend/vaporock.py:_SESSION_BACKEND_CACHE': {
         "path": 'simulator/melt_backend/vaporock.py',
         "line": 1270,

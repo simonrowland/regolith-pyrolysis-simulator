@@ -5258,6 +5258,18 @@ def _write_delegating_magemin_launcher(tmp_path):
     return target_file, launcher
 
 
+def _advance_delegating_magemin_launcher_mtime(launcher):
+    launcher_stat = launcher.stat()
+    # One second is 1,000,000,000 ns; this guarantees a distinct mtime.
+    os.utime(
+        launcher,
+        ns=(
+            launcher_stat.st_atime_ns,
+            launcher_stat.st_mtime_ns + 1_000_000_000,
+        ),
+    )
+
+
 def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
     monkeypatch,
     tmp_path,
@@ -5301,6 +5313,7 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version(
         )
         provider._backend = backend
         target_file.write_text(f'{binary}\n')
+        _advance_delegating_magemin_launcher_mtime(launcher)
         return sim, backend
 
     producer, producer_backend = build_sim(runtime_binaries[0])
@@ -5386,6 +5399,7 @@ def test_gate_curve_memo_origin_rejects_changed_magemin_runtime_version_on_one_i
             else '\n'
         )
         target_file.write_text(f'{runtime_binaries[0]}{reported_version}')
+        _advance_delegating_magemin_launcher_mtime(launcher)
         return sim, backend
 
     producer, producer_backend = build_sim(change_reported_version=False)

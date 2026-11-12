@@ -57,6 +57,7 @@ from simulator.vapour_rail.catalog import (
 )
 from simulator.vapour_rail.request import (
     REFUSAL_ABSENT_SOURCE_ATOM,
+    REFUSAL_ACTIVITY_LOWER_BOUND_NOT_UPPER,
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_MISSING_OUTCOME_STATE,
     REFUSAL_NO_COMPLETE_BUNDLE_SOURCE,
@@ -1440,6 +1441,87 @@ def test_missing_activity_is_refusal_or_declared_henrian_upper_bound() -> None:
     assert serialize_vapour_answer(bounded)["activity_bound"] == "bound-not-point"
     assert bounded.verdict_status == "status_bearing_non_authoritative"
     assert bounded.certification_ceiling == "never"
+
+
+@pytest.mark.parametrize(
+    (
+        "species_id",
+        "parent_oxide",
+        "component_id",
+        "o2_stoichiometry",
+        "inventory",
+    ),
+    (
+        # X above 1/gamma so the true activity exceeds 1 while the unity-gamma
+        # stand-in stays below it. Cation counts: Cr2O3=2, TiO2=1, MnO=1.
+        # O2 stoichiometry is the atom balance of MO_x -> M + (x/2) O2.
+        ("Cr", "Cr2O3", "CrO1.5", 0.75, {"Cr2O3": 0.05, "SiO2": 0.95}),
+        ("Ti", "TiO2", "TiO2", 1.0, {"TiO2": 0.70, "SiO2": 0.30}),
+        ("Mn", "MnO", "MnO", 0.5, {"MnO": 0.60, "SiO2": 0.40}),
+    ),
+)
+def test_gamma_above_unity_henrian_bound_is_not_a_pressure_upper_bound(
+    species_id: str,
+    parent_oxide: str,
+    component_id: str,
+    o2_stoichiometry: float,
+    inventory: dict[str, float],
+) -> None:
+    """b-122: gamma>1 makes a=X a lower bound. Do not label P(a=X) UpperBound.
+
+    Sossi & Fegley 2018 Table 2 anchors are gamma_CrO1.5=31.1, gamma_TiO2=1.60,
+    gamma_MnO=1.90. With a positive activity exponent, P(a=X) understates the
+    true pressure. Reporting that number as PressureUpperBound is the
+    non-conservative direction.
+    """
+
+    payload = _minimal_family(species_id, parent_oxide=parent_oxide)
+    family = payload["families"][f"{species_id.lower()}_test_family"]
+    species = family["physical_properties"]["species"][species_id]
+    reaction = species["source_reactions"][0]
+    reaction["id"] = f"{component_id.lower()}_to_{species_id.lower()}"
+    reaction["reactants"] = [{"formula": component_id, "stoichiometry": 1.0}]
+    reaction["products"][0]["formula"] = species_id
+    reaction["products"][1]["stoichiometry"] = o2_stoichiometry
+    reaction["activity_input"]["component_id"] = component_id
+    reaction["activity_input"]["allow_henrian_upper_bound"] = True
+    model = species["pressure_models"][0]
+    model["source_reaction_id"] = reaction["id"]
+    model["activity_exponent"] = 1.0
+    # p_V ∝ a^(q/nu) * pO2^(-n/nu); q=nu=1, n=o2_stoichiometry.
+    model["pO2_exponent"] = -o2_stoichiometry
+    catalog = compile_vapour_rail_catalog(
+        payload, u0_manifest=_u0_stub(species_id)
+    )
+    answer = catalog.resolve_batch(
+        {"process.cleaned_melt": inventory},
+        VapourResolveState(
+            temperature_K=1800.0,
+            source_reaction_fO2_bar=1.0e-8,
+        ),
+        flux_activation_context=_pre_rg_activation_context(),
+    ).channel(species_id)
+
+    activity = answer.source_reaction_activity
+    assert activity is not None
+    assert activity.verdict is ActivityVerdictKind.LOWER_BOUND
+    assert activity.bound_direction is not None
+    assert activity.bound_direction.value == "lower"
+    assert activity.derivation["gamma_property"] == "gamma>1"
+    assert activity.derivation["gamma_anchor"] > 1.0
+    # The pressure channel must not publish that lower bound as an upper bound.
+    assert not isinstance(answer.pressure, PressureUpperBound)
+    assert not isinstance(answer.flux, FluxDiagnosticUpperBound)
+    assert isinstance(answer.pressure, PressureRefusal)
+    assert isinstance(answer.flux, FluxRefusal)
+    assert answer.pressure.code == REFUSAL_ACTIVITY_LOWER_BOUND_NOT_UPPER
+    assert answer.refusal_code == answer.pressure.code
+    assert not answer.is_flux_active
+    rendered = serialize_vapour_answer(answer)
+    assert rendered["pressure"]["kind"] == "refusal"
+    assert rendered["pressure"].get("pa") is None
+    assert rendered["source_reaction_activity"]["verdict"] == "LowerBound"
+    assert rendered["source_reaction_activity"]["bound_direction"] == "lower"
 
 
 def test_out_of_domain_gamma_status_stays_numeric_and_flux_driving() -> None:

@@ -46,6 +46,7 @@ import hashlib
 import inspect
 import json
 import re
+import tempfile
 import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field, fields, is_dataclass, replace
@@ -2315,6 +2316,9 @@ def _composition_from_plain(
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
     closure_result: _MassPercentClosureResult | None = None,
+    projection_notice_sink: list[Notice] | None = None,
+    projection_quantity: Quantity | None = None,
+    projection_origin: str | None = None,
 ) -> Composition:
     assert isinstance(payload, Mapping)
     components = payload.get("components") or ()
@@ -2357,10 +2361,33 @@ def _composition_from_plain(
                 "mass-percent composition is not usable: "
             )
             raise ValueError(detail)
-        return replace(
+        composition = replace(
             result.composition,
             **metadata,
         )
+        if projection_notice_sink is not None and result.dropped_components:
+            derivation = _mass_percent_composition_derivation(
+                _oxide_mass_percent_components(wt),
+                None,
+                closure_result=result,
+            )
+            notice = _composition_projection_notice(
+                Located(State.of(composition), inference=derivation),
+                quantity=projection_quantity,
+                origin=projection_origin or "",
+            )
+            if notice is None:
+                details = ", ".join(
+                    f"{name}={amount} wt%"
+                    for name, amount in result.dropped_components
+                )
+                raise ValueError(
+                    "mass-percent conversion dropped numeric component(s) but "
+                    f"could not attach a projection notice: {details}"
+                )
+            if notice not in projection_notice_sink:
+                projection_notice_sink.append(notice)
+        return composition
     elif amount_basis is AmountBasis.MOLE_PERCENT:
         mole_percent = _mole_percent_components(payload)
         if mole_percent is None:
@@ -2405,12 +2432,19 @@ def _composition_state_from_plain(
     payload: object,
     *,
     declared_component_map: Mapping[str, Any] | None,
+    projection_notice_sink: list[Notice] | None = None,
+    projection_quantity: Quantity | None = None,
+    projection_origin: str | None = None,
 ) -> State[Composition]:
     try:
         return _state_from_plain(
             payload,
             lambda value: _composition_from_plain(
-                value, declared_component_map=declared_component_map
+                value,
+                declared_component_map=declared_component_map,
+                projection_notice_sink=projection_notice_sink,
+                projection_quantity=projection_quantity,
+                projection_origin=projection_origin,
             ),
         )
     except (ArithmeticError, ValueError) as exc:
@@ -2534,10 +2568,16 @@ def _standard_state_from_extract_text(
     )
 
 
-def _identity_from_plain(payload: object) -> Identity:
+def _identity_from_plain(
+    payload: object,
+    *,
+    projection_notice_sink: list[Notice] | None = None,
+    projection_origin: str | None = None,
+) -> Identity:
     assert isinstance(payload, Mapping)
+    quantity = _state_from_plain(payload["quantity"], lambda v: Quantity(str(v)))
     kwargs: dict[str, Any] = {
-        "quantity": _state_from_plain(payload["quantity"], lambda v: Quantity(str(v))),
+        "quantity": quantity,
         "species": (
             None
             if payload.get("species") is None
@@ -2583,6 +2623,9 @@ def _identity_from_plain(payload: object) -> Identity:
             declared_component_map=_declared_printed_composition_map(
                 composition_payload
             ),
+            projection_notice_sink=projection_notice_sink,
+            projection_quantity=(quantity.value if quantity.is_value else None),
+            projection_origin=projection_origin,
         )
     if payload.get("fO2_Pa") is not None:
         kwargs["fO2_Pa"] = _state_from_plain(payload["fO2_Pa"], as_decimal)
@@ -3540,7 +3583,15 @@ def observation_from_plain(payload: object) -> Observation:
     assert isinstance(payload, Mapping)
     notices = tuple(_notice_from_plain(n) for n in (payload.get("notices") or ()))
     observation_id = str(payload["observation_id"])
-    identity = _identity_from_plain(payload["identity"])
+    projection_notices: list[Notice] = []
+    identity = _identity_from_plain(
+        payload["identity"],
+        projection_notice_sink=projection_notices,
+        projection_origin=observation_id,
+    )
+    notices += tuple(
+        notice for notice in projection_notices if notice not in notices
+    )
     value = _value_from_plain(payload["value"])
     admission = _admission_from_plain(payload["admission"], value=value)
     admission_notice = _admission_default_notice(
@@ -4520,7 +4571,7 @@ _PRINTED_COMPOSITION_MISSING_MARKERS = frozenset(
     {"-", "–", "—", "n.d.", "nd", "bdl", "--", "n/a", "not reported"}
 )
 # Accept kept mass from 95 through 105 wt%; totals above 102 are renormalized
-# to 100 wt%, and no more than 0.5 wt% of dropped traces are tolerated.
+# to 100 wt%, and up to 0.5 wt% of dropped components are projected with notice.
 _MASS_PERCENT_MINIMUM_KEPT_SUM = Decimal("95")
 _MASS_PERCENT_RENORMALIZE_ABOVE = Decimal("102")
 _MASS_PERCENT_MAXIMUM_KEPT_SUM = Decimal("105")
@@ -5024,7 +5075,7 @@ def _mass_percent_composition_derivation(
     dropped_mass = closure_result.dropped_mass
     if (
         dropped
-        and Decimal("0") < dropped_mass <= _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
+        and dropped_mass <= _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
     ):
         printed_total = closure_result.printed_analysis_total
         if printed_total is not None and printed_total > 0:
@@ -6007,20 +6058,28 @@ def _wt_percent_conversion_or_raise(
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
 ) -> Composition:
-    converted, refusal = _wt_percent_conversion_or_refusal(
+    result = _wt_percent_conversion_or_refusal(
         wt,
         closure_context=closure_context,
         declared_component_map=declared_component_map,
     )
-    if converted is None:
+    if result.composition is None:
         reason = (
-            refusal.reason
-            if refusal is not None
+            result.refusal.reason
+            if result.refusal is not None
             else "mass-percent composition is not usable"
         )
         detail = reason.removeprefix("mass-percent composition is not usable: ")
         raise ValueError(detail)
-    return converted
+    if result.dropped_components:
+        details = ", ".join(
+            f"{name}={amount} wt%" for name, amount in result.dropped_components
+        )
+        raise ValueError(
+            "mass-percent conversion dropped numeric component(s) without a "
+            f"notice channel: {details}"
+        )
+    return result.composition
 
 
 def _wt_percent_conversion_state(
@@ -27886,6 +27945,62 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     write_report(result, battery / "migration-report.md")
 
 
+def _store_output_file_bytes(root: Path) -> dict[str, bytes]:
+    """Read the files owned by the migrator, excluding audit sidecars."""
+
+    literature = root / "data" / "literature"
+    battery = root / "data" / "battery"
+    paths = [
+        *iter_work_store_paths(literature / "works"),
+        *(literature / "extracts-v2").glob("*.yaml"),
+        *iter_observation_store_paths(literature / "observations-v2"),
+        battery / "migration-queue.yaml",
+        battery / "migration-report.md",
+    ]
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in paths
+        if path.is_file()
+    }
+
+
+def _store_regeneration_differences(
+    root: Path, result: MigrationResult
+) -> list[str]:
+    """Return paths whose committed bytes differ from a fresh store write."""
+
+    root = root.resolve()
+    with tempfile.TemporaryDirectory(prefix="battery-migrate-check-") as temporary:
+        generated_root = Path(temporary)
+
+        # The writer updates existing zero-observation extract siblings in
+        # place, so seed their names before writing into this fresh directory.
+        generated_extracts = generated_root / "data" / "literature" / "extracts-v2"
+        existing_extracts = (
+            root / "data" / "literature" / "extracts-v2"
+        ).glob("*.yaml")
+        for existing in existing_extracts:
+            generated_extracts.mkdir(parents=True, exist_ok=True)
+            (generated_extracts / existing.name).touch()
+
+        # Discovery of zero-observation extracts also depends on the input
+        # filenames, but their contents are not read by write_outputs.
+        for source in discover_extracts(root / "data" / "literature" / "extracts"):
+            placeholder = generated_root / source.relative_to(root)
+            placeholder.parent.mkdir(parents=True, exist_ok=True)
+            placeholder.touch()
+
+        write_outputs(result, generated_root)
+        actual = _store_output_file_bytes(root)
+        regenerated = _store_output_file_bytes(generated_root)
+
+    return sorted(
+        path
+        for path in actual.keys() | regenerated.keys()
+        if actual.get(path) != regenerated.get(path)
+    )
+
+
 def write_report(result: MigrationResult, path: Path) -> None:
     measured = result.measured
     hard = 0 if result.validation is None else len(result.validation.hard_issues)
@@ -28107,15 +28222,16 @@ def main(argv: list[str] | None = None) -> int:
     migration-queue.yaml, and migration-report.md. Does not rewrite extract
     sources, generate residuals, or touch pins.
 
-    The process exits 1 whenever hard_issues is non-zero, including on a
-    healthy run against the long-standing baseline. Assert the printed
-    hard_issues count against that baseline, not the exit status.
+    A completed write exits 0; hard_issues remain visible in the report and
+    summary. Use --check-store to compare regenerated output with the current
+    derived store without writing it.
 
-    Landing a store change is three steps:
+    Landing a store change is four steps:
 
     1. .venv/bin/python scripts/battery_migrate.py
     2. .venv/bin/python data/literature/build_index.py --write-store-summary
-    3. the battery gate
+    3. .venv/bin/python scripts/battery_migrate.py --check-store
+    4. the battery gate
     """
 
     import argparse
@@ -28135,8 +28251,15 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="run the lift without writing outputs",
     )
+    parser.add_argument(
+        "--check-store",
+        action="store_true",
+        help="regenerate in a temporary directory and fail if store bytes differ",
+    )
     args = parser.parse_args(argv)
-    result = migrate(args.root, write=not args.dry_run)
+    if args.dry_run and args.check_store:
+        parser.error("--dry-run and --check-store cannot be combined")
+    result = migrate(args.root, write=not (args.dry_run or args.check_store))
     hard = 0 if result.validation is None else len(result.validation.hard_issues)
     print(
         f"rows_in={sum(c.rows_in for c in result.source_counts.values())} "
@@ -28144,7 +28267,17 @@ def main(argv: list[str] | None = None) -> int:
         f"experiments={len(result.experiments)} queue={len(result.queue)} "
         f"hard_issues={hard}"
     )
-    return 0 if hard == 0 else 1
+    if args.check_store:
+        differences = _store_regeneration_differences(args.root, result)
+        if differences:
+            print(f"STORE DRIFT: {len(differences)} derived-store file(s) differ")
+            for path in differences[:20]:
+                print(f"  {path}")
+            if len(differences) > 20:
+                print(f"  ... and {len(differences) - 20} more")
+            return 1
+        print("OK: regenerated derived store is byte-identical")
+    return 0
 
 
 if __name__ == "__main__":

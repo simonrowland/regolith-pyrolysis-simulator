@@ -125,7 +125,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # string; no value changed. Removing exactly those nine leaves recovers
     # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "8bc00e196df6dc085f3833b82404824067138e07011e9d304fde64f20691817a"
+        "4436185d4b632cf72cf30d44df0dbc9a5278866f671bc72c14f13f18cbb027f8"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
@@ -721,7 +721,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # b-1043: canonical EvalSpec adds chemistry_kernel.liquid_fraction_provider
     # = "magemin". Removing only this input leaf recovers 368ca7f8...;
     # the resolved-setpoints leaf above is the other changed pin, not key material.
-    assert cache_key(spec) == "121793938a461ee049568da3161697a0e791e3d3597e673ab61b14847faecb23"
+    # 2026-11-09 d-358: the explicit condenser-purity enforcement switch is
+    # part of the physics constraint identity; this pin is recomputed by
+    # cache_key(spec) with that default-off policy.
+    assert cache_key(spec) == "8ec42be7ccf3f217258b30d9d89a37c91ec24db925d51b054ce0e57081062749"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

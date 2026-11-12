@@ -3325,7 +3325,10 @@ def _sossi_reference(experiment_id: str):
         source_id="kems-012-sossi-2019",
         locator={"table": "1"},
         read_from="b119-sossi-disclosure",
-        identity=SimpleNamespace(species=SimpleNamespace(formula="Mn")),
+        identity=SimpleNamespace(
+            species=SimpleNamespace(formula="Mn"),
+            quantity=None,
+        ),
     )
 
 
