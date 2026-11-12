@@ -3324,6 +3324,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         temperature_C: float,
         pressure_kbar: float,
         fO2_log: float,
+        pure_phase_probe: bool = False,
     ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
         """Build the canonical MAGEMin argv and resolved buffer values."""
         if self._binary_path is None:
@@ -3335,17 +3336,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         args = [
             str(binary_path),
-            '--Verb=0',
+            '--Verb=1' if pure_phase_probe else '--Verb=0',
             f'--db={self._effective_database()}',
             f'--Temp={temperature_C:.6f}',
             f'--Pres={pressure_kbar:.6f}',
             '--sys_in=wt',
             '--Bulk=' + ','.join(
-                f'{value:.6f}' for value in bulk_projection.vector
+                f'{value:.8g}' if pure_phase_probe else f'{value:.6f}'
+                for value in bulk_projection.vector
             ),
             f'--buffer={buffer_name}',
             f'--buffer_n={buffer_n:.6f}',
         ]
+        if pure_phase_probe:
+            args.append('--out_matlab=1')
         return args, buffer_name, buffer_n, tuple(buffer_warnings)
 
     def _call_magemin_subprocess(
@@ -4044,34 +4048,32 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     ) -> Tuple[str, str, List[str]]:
         """Run the binary at Verb=1 + out_matlab=1 for one stoich bulk.
 
-        Returns (stdout, matlab_output_text, buffer_warnings). Same slot
-        lock, buffer translation, and TemporaryDirectory discipline as
-        ``_call_magemin_subprocess``; only the verbosity/output flags and the
-        parsed payload differ.
+        Returns (stdout, matlab_output_text, buffer_warnings). Uses the
+        shared argv builder while preserving the probe's eight-significant-
+        digit bulk input and MATLAB output flags.
         """
         if self._binary_path is None:
             raise PurePhaseAccessError('MAGEMin binary path not resolved')
-        binary_path = self._binary_path.resolve()
 
         database = self._effective_database()
         order = self._DB_BULK_ORDERS[database]
         vector = [float(bulk_wt_ig.get(name, 0.0)) for name in order]
-        buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
-            temperature_C=temperature_C,
-            fO2_log=-9.0,
+        projection = _MAGEMinBulkProjection(
+            database=database,
+            order=tuple(order),
+            vector=tuple(vector),
+            composition_wt_pct=dict(zip(order, vector)),
+            warnings=(),
         )
-        args = [
-            str(binary_path),
-            '--Verb=1',
-            f'--db={database}',
-            f'--Temp={temperature_C:.6f}',
-            f'--Pres={pressure_kbar:.6f}',
-            '--sys_in=wt',
-            '--Bulk=' + ','.join(f'{value:.8g}' for value in vector),
-            f'--buffer={buffer_name}',
-            f'--buffer_n={buffer_n:.6f}',
-            '--out_matlab=1',
-        ]
+        args, _buffer_name, _buffer_n, buffer_warnings = (
+            self._build_magemin_subprocess_args(
+                bulk_projection=projection,
+                temperature_C=temperature_C,
+                pressure_kbar=pressure_kbar,
+                fO2_log=-9.0,
+                pure_phase_probe=True,
+            )
+        )
         timeout_s = float(self._config.get('timeout_s', 60.0))
         try:
             with _magemin_subprocess_slot(timeout_s):
@@ -4110,7 +4112,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'MAGEMin produced no output/_matlab_output.txt '
                 '(out_matlab=1); cannot verify the bulk echo'
             )
-        return completed.stdout or '', matlab_text, buffer_warnings
+        return completed.stdout or '', matlab_text, list(buffer_warnings)
 
     # ------------------------------------------------------------------
     # Composition projection / result parsing
