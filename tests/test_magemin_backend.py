@@ -1645,21 +1645,29 @@ def _renormalised_mode_notice(result):
 _VERB0_MASS_RESIDUAL_1E5 = 'Mass residual      : +1.20000e-05\n'
 
 
-def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
-    monkeypatch,
-):
-    """A lone liq token of 1.00003 is renormalised. Green refuses it."""
+def _install_fake_magemin_subprocess_with_qfm_readback(monkeypatch, stdout):
+    """Give Mode-parser tests valid native redox control evidence."""
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_read_subprocess_fo2',
+        staticmethod(lambda *_args: (-8.0, True)),
+    )
     monkeypatch.setattr(
         'simulator.melt_backend.magemin.subprocess.run',
         lambda args, **_kwargs: subprocess.CompletedProcess(
-            args,
-            0,
-            stdout=(
-                f'{_VERB0_MASS_RESIDUAL_1E5}'
-                'Phase: liq\nMode: 1.00003\n'
-            ),
-            stderr='',
+            args, 0, stdout=stdout, stderr='',
         ),
+    )
+
+
+def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
+    monkeypatch,
+):
+    """A lone liq token of 1.00003 is renormalised with a notice."""
+    _install_fake_magemin_subprocess_with_qfm_readback(
+        monkeypatch,
+        f'{_VERB0_MASS_RESIDUAL_1E5}'
+        'Phase: liq\nMode: 1.00003\n',
     )
     backend = MAGEMinBackend()
     backend._available = True
@@ -1696,17 +1704,10 @@ def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
     residual is recorded and does not decide the class. d-367 forbids
     refusing the row into an unphysical miss.
     """
-    monkeypatch.setattr(
-        'simulator.melt_backend.magemin.subprocess.run',
-        lambda args, **_kwargs: subprocess.CompletedProcess(
-            args,
-            0,
-            stdout=(
-                f'{_VERB0_MASS_RESIDUAL_1E5}'
-                'Phase: liq ol\nMode: 1.00003 0.00008\n'
-            ),
-            stderr='',
-        ),
+    _install_fake_magemin_subprocess_with_qfm_readback(
+        monkeypatch,
+        f'{_VERB0_MASS_RESIDUAL_1E5}'
+        'Phase: liq ol\nMode: 1.00003 0.00008\n',
     )
     backend = MAGEMinBackend()
     backend._available = True
