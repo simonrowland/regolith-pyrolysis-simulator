@@ -20492,20 +20492,21 @@ def _printed_relative_oxygen(
 
 
 def _printed_buffer_calibration(
-    raw_item: object, buffer_text: str | None
+    raw_item: object,
+    buffer_text: str | None,
+    point_conditions: Mapping[str, Any] | None = None,
 ) -> str | None:
-    if not isinstance(raw_item, Mapping):
-        return None
     # Calibration provenance is read from existing printed control fields;
     # migration does not add a calibration-specific extract schema key.
-    for key in ("oxygen_buffer_as_published", "fO2_control_as_published"):
-        raw = raw_item.get(key)
-        if isinstance(raw, Mapping):
-            raw = raw.get("value")
-        if not isinstance(raw, str):
-            continue
-        if re.search(r"\b(?:19|20)\d{2}\b", raw):
-            return raw.strip()
+    for mapping in _buffer_mappings(raw_item, point_conditions):
+        for key in (
+            "oxygen_buffer_as_published",
+            "fO2_control_as_published",
+            "fO2_control",
+        ):
+            raw = _condition_payload(mapping.get(key))
+            if isinstance(raw, str) and re.search(r"\b(?:19|20)\d{2}\b", raw):
+                return raw.strip()
     if buffer_text and re.search(r"\b(?:19|20)\d{2}\b", buffer_text):
         return buffer_text.strip()
     return None
@@ -20745,7 +20746,10 @@ def _gate8_notice_from_calibration(
         flags.append("phase_boundary_extrapolation_above_1650_K_FeO_melting")
     if buffer == "IW" and float(temperature_K) > 1811.0:
         flags.append("phase_boundary_extrapolation_above_1811_K_Fe_melting")
-    if band is not None:
+    if calibration_id == "oneill_pownceby_1993_iw_fe_feo" and band is not None:
+        band_text = f"±{band:.6g} dex"
+        band_basis = "O'Neill and Pownceby 1993 Fe-'FeO' muO2 uncertainty"
+    elif band is not None:
         band_text = f"±{band:.6g} dex"
         band_basis = "absolute canonical-to-Frost 1991 spread"
     elif calibration_text:
@@ -20754,6 +20758,13 @@ def _gate8_notice_from_calibration(
     else:
         band_text = "not available (no independent cited comparison calibration)"
         band_basis = "no independent cited comparison calibration"
+    pressure_correction = (
+        "none; O'Neill and Pownceby 1993 equation is evaluated at its 1 bar reference"
+        if calibration_id == "oneill_pownceby_1993_iw_fe_feo"
+        else "Frost 1991 molar-volume ΔV term"
+        if pressure_bar > 1
+        else "none at or below 1 bar"
+    )
     reason = (
         f"buffer_relative_fO2_converted: buffer={buffer}; "
         f"offset_as_printed={offset_as_printed}; calibration={calibration_id}; "
@@ -20761,8 +20772,7 @@ def _gate8_notice_from_calibration(
         f"calibration_range={lo:g}–{hi:g} K; band={band_text}; "
         f"band_basis={band_basis}; "
         f"pressure={pressure_bar} bar; "
-        "pressure correction="
-        f"{'Frost 1991 molar-volume ΔV term' if pressure_bar > 1 else 'none at or below 1 bar'}"
+        f"pressure correction={pressure_correction}"
     )
     if method_notice:
         reason += f"; relative_definition_notice={method_notice}"
@@ -20818,7 +20828,9 @@ def _relative_oxygen_decision(
         if pressure_bar is not None and pressure_bar.is_finite() and pressure_bar > 0
         else Decimal(1)
     )
-    calibration_text = _printed_buffer_calibration(raw_item, buffer_text)
+    calibration_text = _printed_buffer_calibration(
+        raw_item, buffer_text, point_conditions
+    )
     calibrated = _relative_buffer_calibration(
         buffer,
         float(temperature_K),
@@ -21004,7 +21016,7 @@ def _positive_pressure_pa(state: object) -> Decimal | None:
 def _point_total_pressure_pa(
     point_conditions: Mapping[str, Any] | None,
 ) -> Decimal | None:
-    """Pascal total already stored on the point. A kbar node is not pascals."""
+    """Return only an exact, located point-condition total pressure in pascals."""
 
     located = (point_conditions or {}).get("total_pressure_Pa")
     if isinstance(located, Mapping):
@@ -21016,6 +21028,8 @@ def _point_total_pressure_pa(
             units = str(nested.get("units") or nested.get("unit") or units).strip().casefold()
             if units and units not in {"pa", "pascal", "pascals"}:
                 return None
+    if isinstance(located, Located):
+        return _printed_source_point_condition_pressure(located)
     return _positive_pressure_pa(located)
 
 
@@ -21177,7 +21191,13 @@ def _buffer_request_from_row(
         if isinstance(raw_buffer, str) and raw_buffer.strip():
             oxygen_text.append(raw_buffer.strip())
             family, offset, printed, is_prose = _classify_buffer_phrase(raw_buffer.strip())
-            if not family and not is_prose and offset is None and not _BUFFER_TOKEN_RE.search(raw_buffer):
+            if (
+                not family
+                and not is_prose
+                and offset is None
+                and not _BUFFER_TOKEN_RE.search(raw_buffer)
+                and _printed_buffer_calibration(mapping, raw_buffer) is None
+            ):
                 unknown.append(raw_buffer.strip())
             elif is_prose:
                 prose.append((family, raw_buffer.strip()))
@@ -21279,7 +21299,10 @@ def _buffer_request_from_row(
             unmatched_calibration=unmatched,
             ideal_ratio=ideal and family == "IW",
             temperature_K=temperature_K,
-            calibration_text="\n".join(calibration_bits) or None,
+            calibration_text=(
+                "\n".join(calibration_bits)
+                or _printed_buffer_calibration(raw_item, source, point_conditions)
+            ),
         )
     if unknown:
         return _BUFFER_RELATIVE_FO2_REASON.format(buffer=unknown[0])
@@ -21320,10 +21343,45 @@ def _uses_gate8_central(request: _BufferRequest) -> bool:
 
 
 def _decision_for_buffer(
-    request: _BufferRequest, total_pressure_pa: Decimal | None
+    request: _BufferRequest,
+    total_pressure_pa: Decimal | None,
+    *,
+    run_pressure_bar: Decimal | None = None,
 ) -> PrintedOxygenDecision:
-    pressure_bar = None if total_pressure_pa is None else total_pressure_pa / _BAR_PA
-    use_gate8 = _uses_gate8_central(request)
+    if (
+        request.source_id == _KEMS_137_SOURCE_ID
+        and request.calibration_id is None
+        and request.calibration_text is None
+    ):
+        return PrintedOxygenDecision(
+            "refusal",
+            State.unknown(
+                "Bischof ΔIW has no cited buffer calibration; no fO2_Pa assigned"
+            ),
+        )
+    pressure_bar = (
+        total_pressure_pa / _BAR_PA
+        if total_pressure_pa is not None
+        else run_pressure_bar
+    )
+    gate_pressure = (
+        pressure_bar
+        if pressure_bar is not None and pressure_bar > 0
+        else Decimal(1)
+    )
+    printed_calibration = (
+        _relative_buffer_calibration(
+            request.buffer,
+            float(request.temperature_K),
+            float(gate_pressure),
+            request.calibration_text,
+        )
+        if request.calibration_text
+        else None
+    )
+    use_gate8 = (
+        _uses_gate8_central(request) or printed_calibration is not None
+    )
     evaluation = evaluate_buffer(
         request.buffer,
         request.temperature_K,
@@ -21333,22 +21391,19 @@ def _decision_for_buffer(
     gate_notice: tuple[str, NoticeKind, str] | None = None
     reported_id = evaluation.calibration_id
     if use_gate8:
-        gate_pressure = (
-            pressure_bar
-            if pressure_bar is not None and pressure_bar > 0
-            else Decimal(1)
-        )
-        printed = request.calibration_text if request.calibration_id else None
-        calibrated = _relative_buffer_calibration(
-            request.buffer,
-            float(request.temperature_K),
-            float(gate_pressure),
-            printed,
-        )
+        calibrated = printed_calibration
+        printed = request.calibration_text if calibrated is not None else None
         if calibrated is None:
-            raise RuntimeError(
-                f"gate-8 central curve missing for {request.buffer}"
+            calibrated = _relative_buffer_calibration(
+                request.buffer,
+                float(request.temperature_K),
+                float(gate_pressure),
+                None,
             )
+            if calibrated is None:
+                raise RuntimeError(
+                    f"gate-8 central curve missing for {request.buffer}"
+                )
         # Same Decimal(str(float)) path as the pre-merge printed-row converter.
         log_value = Decimal(str(calibrated[0])) + request.offset
         reported_id = calibrated[1]
@@ -21439,6 +21494,10 @@ def _decision_for_buffer(
     notice_band = None
     if gate_notice is not None:
         notice_reason, notice_kind, notice_band = gate_notice
+    else:
+        notice_reason = reason
+        notice_kind = kind
+        notice_band = band
     return PrintedOxygenDecision(
         "buffer",
         State.of(_log_fO2_to_pa(log_value, _BAR_PA)),
@@ -21457,6 +21516,7 @@ def _buffer_relative_decision(
     *,
     run_temperature_K: Decimal | None,
     total_pressure_pa: Decimal | None,
+    run_pressure_bar: Decimal | None = None,
     source_id: str | None = None,
 ) -> PrintedOxygenDecision | None:
     outcome = _buffer_request_from_row(raw_item, point_conditions, run_temperature_K)
@@ -21468,7 +21528,9 @@ def _buffer_relative_decision(
     resolved = _point_total_pressure_pa(point_conditions)
     if resolved is None:
         resolved = total_pressure_pa
-    return _decision_for_buffer(outcome, resolved)
+    return _decision_for_buffer(
+        outcome, resolved, run_pressure_bar=run_pressure_bar
+    )
 
 
 def _refresh_buffer_decision(
@@ -21576,6 +21638,7 @@ def printed_oxygen_decision(
             point_conditions,
             run_temperature_K=run_temperature_K,
             total_pressure_pa=total_pressure_pa,
+            run_pressure_bar=run_pressure_bar,
             source_id=source_id,
         )
         if buffer_decision is not None:
