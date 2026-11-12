@@ -102,7 +102,7 @@ import argparse
 import csv
 import hashlib
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal, DecimalException
 from functools import lru_cache
 import math
@@ -1772,6 +1772,23 @@ class _LocatorSourceBlindReason:
     reason_codes: frozenset[str] = frozenset()
 
 
+@dataclass
+class CorpusMountTally:
+    """Corpus pins observed while counting fidelity warnings for one walk.
+
+    ``verified_opens`` are attestation-complete pins whose top-level prefix
+    directory exists and which opened with a matching digest and token.
+    ``unverified_pins`` are pins whose only source-blind reason is
+    ``corpus_prefix_unmounted``. ``unverified_by_prefix`` counts those pins
+    by the missing directory. Every other source-blind reason stays on the
+    warning list.
+    """
+
+    verified_opens: int = 0
+    unverified_pins: int = 0
+    unverified_by_prefix: dict[str, int] = field(default_factory=dict)
+
+
 def _note_reason(reasons: list[str], extra: list[int], text: str) -> None:
     if len(reasons) < _FIDELITY_DETAIL_CAP:
         reasons.append(text)
@@ -2323,6 +2340,14 @@ def _source_artifact_path_refusal(path: Path, root: Path) -> str | None:
     return None
 
 
+def _corpus_top_prefix(relative: str) -> str:
+    """First directory of a corpus-relative artifact path, or empty."""
+    parts = Path(relative).parts
+    if not parts or parts[0] in {".", ".."}:
+        return ""
+    return parts[0]
+
+
 def _open_source_artifact(
     raw: str,
     *,
@@ -2355,6 +2380,7 @@ def _open_source_artifact(
 
     is_corpus = False
     resolved = repository_path
+    corpus_root_resolved: Path | None = None
     if not repository_path.is_file():
         if corpus_root is None:
             return None, None, None, "corpus_root_unset"
@@ -2366,6 +2392,12 @@ def _open_source_artifact(
         resolved = corpus_path
         is_corpus = True
     if not resolved.is_file():
+        if is_corpus and corpus_root_resolved is not None:
+            prefix = _corpus_top_prefix(relative)
+            # A sparse mount has no directory for this prefix. The pin is
+            # unverified here; a later mount of the directory verifies it.
+            if prefix and not (corpus_root_resolved / prefix).is_dir():
+                return None, None, None, "corpus_prefix_unmounted"
         return (
             None,
             None,
@@ -2605,6 +2637,7 @@ def _locator_source_blind_reason(
     artifact_root: Path,
     corpus_root: Path | None,
     doc: Mapping[str, Any] | None = None,
+    corpus_mount: CorpusMountTally | None = None,
 ) -> _LocatorSourceBlindReason | None:
     """Return a source-blind reason when the locator evidence is inadequate.
 
@@ -2649,6 +2682,21 @@ def _locator_source_blind_reason(
         return _LocatorSourceBlindReason(leaf_error)
     reasons: list[str] = []
     reason_codes: set[str] = set()
+    unmounted_prefixes: list[str] = []
+
+    def note_corpus_mount(opened_corpus: bool, codes: frozenset[str]) -> None:
+        if corpus_mount is None:
+            return
+        if opened_corpus and not codes:
+            corpus_mount.verified_opens += 1
+            return
+        if codes != frozenset({"corpus_prefix_unmounted"}):
+            return
+        corpus_mount.unverified_pins += 1
+        for prefix in sorted(set(unmounted_prefixes)):
+            corpus_mount.unverified_by_prefix[prefix] = (
+                corpus_mount.unverified_by_prefix.get(prefix, 0) + 1
+            )
     resolved_corpus_root = (
         corpus_root.expanduser().resolve() if corpus_root is not None else None
     )
@@ -2678,6 +2726,10 @@ def _locator_source_blind_reason(
             ):
                 resolved_to_corpus = True
             if open_refusal:
+                if open_refusal == "corpus_prefix_unmounted":
+                    prefix = _corpus_top_prefix(raw)
+                    if prefix:
+                        unmounted_prefixes.append(prefix)
                 candidate_reasons.append(
                     f"locator was not opened: {open_refusal} ({raw})"
                 )
@@ -2743,6 +2795,7 @@ def _locator_source_blind_reason(
         if resolved_to_corpus:
             corpus_artifact_keys += 1
             if corpus_artifact_keys > 1:
+                note_corpus_mount(False, frozenset({"multiple_corpus_artifacts"}))
                 return _LocatorSourceBlindReason(
                     "locator source-blind: multiple_corpus_artifacts",
                     frozenset({"multiple_corpus_artifacts"}),
@@ -2751,10 +2804,13 @@ def _locator_source_blind_reason(
             reasons.extend(candidate_reasons)
             reason_codes.update(candidate_reason_codes)
     if reasons:
+        codes = frozenset(reason_codes)
+        note_corpus_mount(False, codes)
         return _LocatorSourceBlindReason(
             "locator source-blind: " + "; ".join(reasons),
-            frozenset(reason_codes),
+            codes,
         )
+    note_corpus_mount(corpus_artifact_keys > 0, frozenset())
     return None
 
 
@@ -2763,6 +2819,7 @@ def fidelity_source_warnings(
     *,
     label: str = "<document>",
     artifact_root: Path | None = None,
+    corpus_mount: CorpusMountTally | None = None,
 ) -> list[FidelityWarning]:
     """Count source-fidelity holes. Empty means the certification invariant holds.
 
@@ -2908,6 +2965,7 @@ def fidelity_source_warnings(
                 artifact_root=root,
                 corpus_root=corpus_root,
                 doc=doc,
+                corpus_mount=corpus_mount,
             )
             if blind:
                 source_blind += 1

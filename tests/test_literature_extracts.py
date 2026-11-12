@@ -5210,13 +5210,15 @@ def _fidelity_extract_documents():
             yield path.stem, doc
 
 
-def _fidelity_warning_totals(documents):
+def _fidelity_warning_totals(documents, corpus_mount=None):
     totals = Counter()
     extract_counts = Counter()
     mount_dependent_pins = 0
     details = []
     for label, doc in documents:
-        warnings = vle.fidelity_source_warnings(doc, label=label)
+        warnings = vle.fidelity_source_warnings(
+            doc, label=label, corpus_mount=corpus_mount
+        )
         for warning in warnings:
             totals[warning.kind] += warning.count
             extract_counts[warning.kind] += 1
@@ -5240,11 +5242,38 @@ def _require_fidelity_corpus_root(root: str | None, mount_dependent_pins: int) -
     return corpus_root
 
 
-def _assert_corpus_pins_open(documents):
-    totals, _extract_counts, _mount_dependent_pins, details = (
-        _fidelity_warning_totals(documents)
+def _format_unverified_prefixes(tally: vle.CorpusMountTally) -> str:
+    if not tally.unverified_by_prefix:
+        return "none"
+    return ", ".join(
+        f"{prefix}={count}"
+        for prefix, count in sorted(tally.unverified_by_prefix.items())
     )
-    assert totals["source_blind_pin"] == 0, "\n".join(details)
+
+
+def _assert_corpus_pins_open(documents) -> vle.CorpusMountTally:
+    """Fail verified corpus pins. Skip when every corpus pin is unverified.
+
+    A pin whose top-level prefix directory is absent is counted, not failed.
+    A pin whose prefix directory exists fails on a missing file, a wrong
+    digest, or an absent token. The returned tally is the count line.
+    """
+    tally = vle.CorpusMountTally()
+    totals, _extract_counts, _mount_dependent_pins, details = (
+        _fidelity_warning_totals(documents, corpus_mount=tally)
+    )
+    failures = totals["source_blind_pin"] - tally.unverified_pins
+    rendered = _format_unverified_prefixes(tally)
+    if failures:
+        raise AssertionError(
+            f"unverified corpus prefixes: {rendered}\n" + "\n".join(details)
+        )
+    if tally.unverified_pins and tally.verified_opens == 0:
+        pytest.skip(
+            "every corpus pin is unverified on this mount: "
+            f"{rendered}"
+        )
+    return tally
 
 
 def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property):
@@ -5296,7 +5325,7 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     assert non_finite <= _NON_FINITE_EVIDENCE_CEILING, non_finite
 
 
-def test_fidelity_corpus_pins_open(monkeypatch):
+def test_fidelity_corpus_pins_open(monkeypatch, record_property):
     root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
     if not root or not Path(root).expanduser().is_dir():
         monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
@@ -5305,7 +5334,9 @@ def test_fidelity_corpus_pins_open(monkeypatch):
         )
         _require_fidelity_corpus_root(root or None, mount_dependent_pins)
     _require_fidelity_corpus_root(root, 0)
-    _assert_corpus_pins_open(list(_fidelity_extract_documents()))
+    tally = _assert_corpus_pins_open(list(_fidelity_extract_documents()))
+    record_property("verified_corpus_opens", tally.verified_opens)
+    record_property("unverified_corpus_prefixes", _format_unverified_prefixes(tally))
 
 
 def test_auto_migrated_pilot_pin_counts_each_sample():
@@ -5971,6 +6002,48 @@ def test_fidelity_corpus_pin_ratchets_only_when_mounted(tmp_path, monkeypatch):
     locator["source_sha256"] = "0" * 64
     with pytest.raises(AssertionError, match="artifact_digest_mismatch"):
         _assert_corpus_pins_open(documents)
+
+
+def test_partial_corpus_mount_verifies_present_prefix_only(tmp_path, monkeypatch):
+    """tables/ is checked. An absent text/ prefix is unverified, not a failure.
+
+    The text pin carries a wrong digest on purpose. A sparse mount must not
+    turn that into artifact_digest_mismatch, and must not skip the tables pin.
+    """
+    corpus_root = tmp_path / "corpus"
+    tables_doc = _corpus_pin_document(corpus_root, source_path="tables/paper.txt")
+    text_file = corpus_root / "text" / "paper.txt"
+    blob = text_file.read_bytes()
+    tables_file = corpus_root / "tables" / "paper.txt"
+    tables_file.parent.mkdir(parents=True)
+    tables_file.write_bytes(blob)
+    text_file.unlink()
+    text_file.parent.rmdir()
+    digest = hashlib.sha256(blob).hexdigest()
+    tables_locator = tables_doc["fidelity_samples"][0]["locator"]
+    tables_locator["source_sha256"] = digest
+    text_doc = copy.deepcopy(tables_doc)
+    text_locator = text_doc["fidelity_samples"][0]["locator"]
+    text_locator["source_path"] = "text/paper.txt"
+    text_locator["source_sha256"] = "0" * 64
+    documents = [("tables-pin", tables_doc), ("text-pin", text_doc)]
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    text_warning = _source_blind_warning(text_doc)
+    assert text_warning.reason_codes_by_pin == (
+        frozenset({"corpus_prefix_unmounted"}),
+    )
+    tally = _assert_corpus_pins_open(documents)
+    assert tally.verified_opens == 1
+    assert tally.unverified_pins == 1
+    assert tally.unverified_by_prefix == {"text": 1}
+
+    tables_locator["source_sha256"] = "0" * 64
+    with pytest.raises(AssertionError, match="artifact_digest_mismatch"):
+        _assert_corpus_pins_open(documents)
+
+    with pytest.raises(pytest.skip.Exception, match=r"text=1"):
+        _assert_corpus_pins_open([("text-pin", text_doc)])
 
 
 def test_repository_override_missing_artifact_refuses_without_corpus_root(

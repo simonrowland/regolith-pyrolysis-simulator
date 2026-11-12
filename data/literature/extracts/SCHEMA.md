@@ -146,7 +146,12 @@ If a path is absent there, it resolves under the offline corpus mount set by
 `REGOLITH_CORPUS_ROOT` (for example, `~/Repos/regolith-corpus`). The root is a
 lookup location, not a policy switch. An unset root refuses with
 `corpus_root_unset`; a missing file refuses with `corpus_artifact_missing`,
-and a path outside the mount refuses with `corpus_path_outside_root`. Each
+and a path outside the mount refuses with `corpus_path_outside_root`. A
+top-level prefix directory that is not on the mount (`text/`, `tables/`,
+`raw/`, and the other source prefixes) leaves pins under that prefix
+unverified (`corpus_prefix_unmounted`). Those pins are not opened and are
+not missing files. A pin whose prefix directory is present is opened in
+full: a missing file, a wrong digest, or an absent token fails. Each
 corpus-resolved locator must include `source_sha256`, the lowercase
 64-character SHA-256 of the exact bytes opened. A missing digest refuses with
 `artifact_digest_missing`; a mismatch refuses with
@@ -160,7 +165,8 @@ The extract document and program source are not source artifacts, including
 a copy parked on a source root.
 CI without a corpus mount verifies coverage and source-attestation shape;
 token fidelity for corpus-resolved pins is verified in jobs that mount the
-corpus.
+corpus. A sparse mount verifies only the prefixes whose directories it
+contains. If every corpus pin is unverified, that check is skipped.
 A numeric pin matches only a complete token: the sign and the exponent
 belong to the token, so `0.24` is not `-0.24` or `0.24e-5`, and `1.0` is
 not `1`. The whole stored value, including a spaced or attached unit, must
