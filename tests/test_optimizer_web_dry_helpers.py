@@ -27,12 +27,13 @@ PROFILE = {"objectives": [{"metric": "yield", "sense": "maximize", "units": "kg"
     ("value", "web_expected", "optimizer_expected"),
     [
         (None, None, None),
-        ("", None, False),
+        ("", False, None),
         ("true", True, True),
         ("false", False, False),
         (0, False, False),
         (1, True, True),
-        ("garbage", None, False),
+        ("garbage", False, None),
+        ("yes", False, True),
     ],
 )
 def test_optional_bool_current_input_table(
@@ -132,7 +133,7 @@ def test_tell_current_state_after_fixed_sequence(strategy_type) -> None:
             trial.state.name,
             trial.user_attrs[_CANDIDATE_ID_ATTR],
             trial.user_attrs[_INFEASIBLE_ATTR],
-            trial.user_attrs[_UNSCOREABLE_OBJECTIVES_ATTR],
+            trial.user_attrs.get(_UNSCOREABLE_OBJECTIVES_ATTR, False),
         )
         for trial in trials
-    ] == [("FAIL", candidate.id, True, True) for candidate in candidates]
+    ] == [("COMPLETE", candidate.id, True, False) for candidate in candidates]
