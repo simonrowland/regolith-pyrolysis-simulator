@@ -1,0 +1,141 @@
+schema_version: literature_extract.v1
+source_id: mao-2005-thesis-aluminosilicate
+source:
+  citation: >-
+    Mao, Huahai (2005). Thermodynamic modelling and assessment of some
+    alumino-silicate systems. Doctoral Dissertation, Department of Materials
+    Science and Engineering, Royal Institute of Technology (KTH), Stockholm.
+    ISBN 91-7178-087-4. ISRN KTH/MSE--05/52--SE+THERM/AVH. Public defence
+    7 June 2005. This PDF is the kappa (cover essay) only; the five appended
+    papers listed in the Preface are not included in the 44-page file.
+  year: 2005
+  corpus_asset: raw/mao-2005-thesis-aluminosilicate/mao-2005-thesis-aluminosilicate.pdf
+  corpus_sha256: 62739997abe893b8210fd4db39513e5b42ed72e25ed331ec10605893e09ae673
+extraction:
+  method: >-
+    Manual review of the 44-page KTH kappa PDF. Pages were rendered at 200 dpi
+    and read as images; the born-digital pdftotext -layout layer was used as a
+    cross-check. The file contains the abstract, preface, chapters 1–6,
+    acknowledgements and bibliography (printed pp. v–34). The Contents line
+    "Appended papers" is present, but papers I–V are not in this PDF (the
+    file ends at the bibliography). There are no data tables and no figures
+    in this kappa. Printed model formulae, coordination-number statements,
+    and the bibliographic identities of papers I–V are retained in context.
+    No assessed parameters, invariant points, or experimental tables were
+    printed here, and none were taken from the missing appended papers.
+  date: '2026-11-12'
+  worker: empirical-b15-2026-11-12
+  provenance_path: raw/mao-2005-thesis-aluminosilicate/
+review_status: draft
+species:
+  alumino_silicate_systems:
+    observations: []
+    context:
+    - observation_id: mao_2005_kappa_scope_and_appended_papers
+      type: method
+      locator:
+        pdf_page_index: 7
+        published_page: vii
+        section: Preface
+      units: as printed
+      values:
+        quantity: thesis_contents_and_appended_papers
+        method_class: method_only
+        kappa_only_as_printed: true
+        appended_papers_present_in_this_pdf: false
+        last_printed_page_in_this_pdf: 34
+        isbn_as_printed: 91-7178-087-4
+        isrn_as_printed: KTH/MSE--05/52--SE+THERM/AVH
+        defence_as_printed: "tisdagen den 7 juni 2005, kl. 14.00 i salongen, KTHB, Osquars backe 31, KTH, Stockholm"
+        papers:
+        - id: I
+          title_as_printed: Phase equilibria and thermodynamics in the Al2O3-SiO2 System -- Modelling of mullite and liquid
+          authors_as_printed: Huahai Mao, Malin Selleby and Bo Sundman
+          venue_as_printed: Journal of the American Ceramic Society, (accepted, 2005)
+        - id: II
+          title_as_printed: A reevalution of the liquid phases in the CaO-Al2O3 and MgO-Al2O3 systems
+          authors_as_printed: Huahai Mao, Malin Selleby and Bo Sundman
+          venue_as_printed: "Calphad : Computer Coupling of Phase Diagrams and Thermochemistry, Vol. 28, pp. 307-312 (2004)"
+          title_spelling_as_printed: reevalution
+        - id: III
+          title_as_printed: Thermodynamic assessment of the CaO-Al2O3-SiO2 system
+          authors_as_printed: Huahai Mao, Mats Hillert, Malin Selleby and Bo Sundman
+          venue_as_printed: Journal of the American Ceramic Society, (accepted, 2005)
+        - id: IV
+          title_as_printed: Thermodynamic assessment of the MgO-Al2O3-SiO2 system
+          authors_as_printed: Huahai Mao, Olga Fabrichnaya, Malin Selleby and Bo Sundman
+          venue_as_printed: Journal of Materials Research, Vol. 20, pp. 975-986 (2005)
+        - id: V
+          title_as_printed: Thermodynamic assessment of the Y2O3-Al2O3-SiO2 system and its subsystems
+          authors_as_printed: Huahai Mao, Malin Selleby and Olga Fabrichnaya
+          venue_as_printed: (Manuscript, 2005)
+        note: >-
+          Paper II's title is printed "reevalution" (one 'a') in both the
+          Preface and Chapter 4 heading. The assessed datasets live in the
+          appended papers, which are not in this PDF.
+    - observation_id: mao_2005_liquid_model_formulae
+      type: textual_fact
+      locator:
+        pdf_page_index: 5
+        published_page: v
+        section: Abstract
+      units: as printed
+      values:
+        quantity: ionic_two_sublattice_liquid_model_formulae
+        method_class: model_derived
+        evidence_class: model_derived
+        new_species_as_printed: AlO2-1
+        purpose_as_printed: a new species, AlO2-1, is introduced to model liquid Al2O3
+        ternary_formula_as_printed: (Al+3,M+m)P (AlO2-1,O-2, SiO4-4,SiO20)Q
+        M_as_printed: M+m stands for Ca+2, Mg+2 or Y+3
+        paper_I_binary_liquid_as_printed: (Al+3)P(AlO2-1,SiO20)Q
+        paper_I_extended_formula_as_printed: (Al+3)P(AlO2-1,O-2,SiO4-4, SiO20)Q
+        paper_I_locator: {pdf_page_index: 30, published_page: '21', section: 'Chapter 4, Paper I'}
+        paper_II_CAO_formula_as_printed: (Al+3,Ca+2)P(AlO2-1,O-2)Q
+        paper_II_MAO_formula_as_printed: (Al+3,Mg+2)P(AlO2-1,O-2)Q
+        paper_III_CAS_formula_as_printed: (Al+3,Ca+2)P(AlO2-1, O-2,SiO4-4,SiO20)Q
+        paper_IV_MAS_formula_as_printed: (Al+3,Mg+2)P (AlO2-1,O-2,SiO4-4,SiO20)Q
+        paper_V_YAS_formula_as_printed: (Al+3,Y+3)P(AlO2-1,O-2,SiO4-4,SiO20)Q
+        paper_V_YAM_formula_as_printed: (Y+3)4(Al+3,Si+4)2(O-2,Va)(O-2)9
+        liquid_alumina_as_printed: the modelling of liquid Al2O3 as (Al+3)1(AlO2-1)3
+        liquid_alumina_locator: {pdf_page_index: 34, published_page: '25', section: 'Chapter 5'}
+        prior_alumina_models_as_printed: either (Al+3)2(O-2)3 or AlO3/2
+        coordination_as_printed: >-
+          The species Al+3 describes Al atoms as network modifiers, and
+          indicates the coordination number of six (CN=6). While the species
+          AlO3/2 describes Al atoms as network formers, and indicates CN=3.
+          ... the present model describes a dominant coordination number of
+          four for the Al atoms
+        mullite_as_printed: >-
+          The composition could vary from sillimanite to a hypothetical state
+          of alumina. ... the stability range of mullite extending to higher
+          SiO2 contents than represented by the composition 3Al2O3·2SiO2.
+        systems_assessed_as_printed:
+        - CaO-Al2O3-SiO2 (CAS)
+        - MgO-Al2O3-SiO2 (MAS)
+        - Y2O3-Al2O3-SiO2 (YAS)
+        - binary subsystems including Al2O3-SiO2, CaO-Al2O3, MgO-Al2O3, Y2O3-Al2O3, Y2O3-SiO2
+        note: >-
+          These are model-identity statements printed in the kappa. No
+          numerical Gibbs-energy coefficients, invariant temperatures, or
+          assessed end-member values are printed in this PDF.
+    - observation_id: mao_2005_no_tabulated_assessment_in_kappa
+      type: assessment
+      locator:
+        pdf_page_index: 30
+        published_page: '21'
+        section: Chapter 4
+      units: as printed
+      values:
+        quantity: tabulated_assessed_or_experimental_data
+        method_class: method_only
+        tables_in_this_pdf: 0
+        figures_in_this_pdf: 0
+        printed_numeric_experimental_or_assessed_values: none
+        disposition: context_only_kappa_without_appended_papers
+        note: >-
+          Chapter 4 summarises papers I–V in prose (miscibility-gap
+          behaviour, viscosity and capacity discussion, YAM SiO2
+          solubility modelling) without reprinting their tables or
+          calculated diagrams. Those values cannot be carried from this
+          file.
