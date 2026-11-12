@@ -10292,6 +10292,18 @@ def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
         ("<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n", 1500, False),
         ("<table><tr><td>1.5x10<sup>3</sup></td></tr></table>\n", 1.5e3, True),
         ("<table><tr><td>1.5\u00b710<sup>3</sup></td></tr></table>\n", 1.5e3, True),
+        ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", -100.0, True),
+        ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", 100.0, False),
+        (
+            "<table><tr><td>-1.5\u00d710<sup>3</sup></td></tr></table>\n",
+            -1500.0,
+            True,
+        ),
+        (
+            "<table><tr><td>-1.5\u00d710<sup>3</sup></td></tr></table>\n",
+            1500.0,
+            False,
+        ),
     )
     for cell, pin, accepts in structured:
         doc = _html_source_document(
@@ -10657,6 +10669,25 @@ _FORMULA_COMPOUNDS = (
     ("Fe2(SO4)3", ("SO4",)),
     ("CaO\u00b7SiO2", ("SiO2",)),
 )
+# A superscript immediately after a run is the charge, not the bare label.
+# The bare side refuses. The charged side certifies for every wrapper.
+_SUPERSCRIPT_SUFFIX_PAIRS = (
+    ("Fe", "Fe^{2+}"),
+    ("SiO2", "SiO2^{2+}"),
+    ("O2", "O^{2-}"),
+)
+_SUPERSCRIPT_SUFFIX_WRAPPERS = (
+    "plain",
+    "dollar",
+    "mathrm",
+    "nested",
+    "unicode",
+    "sup",
+)
+_SUPERSCRIPT_CHARGE_MARK = str.maketrans(
+    "0123456789+-",
+    "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u207a\u207b",
+)
 _FORMULA_UNICODE_DIGITS = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
 
@@ -10697,6 +10728,23 @@ def _formula_pair_text(left: str, right: str, kind: str, layout: str) -> str:
     )
 
 
+def _superscript_suffix_source(charged: str, kind: str) -> str:
+    """Wrap a charged formula. The charge is ``^``, Unicode, or ``<sup>``."""
+    if kind == "unicode":
+        return re.sub(
+            r"\^\{([^{}]*)\}",
+            lambda match: match.group(1).translate(_SUPERSCRIPT_CHARGE_MARK),
+            charged,
+        )
+    if kind == "sup":
+        return re.sub(
+            r"\^\{([^{}]*)\}",
+            lambda match: "<sup>" + match.group(1) + "</sup>",
+            charged,
+        )
+    return _formula_wrap_body(charged, kind)
+
+
 def _formula_citation(token: str) -> tuple[str, object]:
     """Formula key for a formula. A plain number certifies as a number."""
     if re.fullmatch(r"\d+", token):
@@ -10719,7 +10767,10 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     digit inside a formula token does not certify as a number, for every
     wrapper. A separate number token still certifies. A sub-formula inside
     a compound is not the compound: ``SO4`` is not ``Fe2(SO4)3``, and
-    ``SiO2`` is not ``CaO·SiO2``.
+    ``SiO2`` is not ``CaO·SiO2``. A run immediately followed by a
+    superscript is a charged species. ``Fe`` is not ``Fe^{2+}``,
+    ``SiO2`` is not ``SiO2^{2+}``, and ``O2`` is not ``O^{2-}``. The
+    charged label certifies for every wrapper.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -10844,6 +10895,35 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                 joined = "\n".join(errors)
                 if not errors or "source_blind_pin" not in joined:
                     failures.append(f"compound refuse {part!r} {where}: {errors}")
+    assert vle._formula_label_in_text("SiO2", "$SiO2^{2+}$") is False
+    assert vle._formula_label_in_text("Fe", "$Fe^{2+}$") is False
+    assert vle._formula_label_in_text("O2", "$O^{2-}$") is False
+    assert vle._formula_label_in_text("Fe^{2+}", "$Fe^{2+}$") is True
+    assert vle._formula_label_in_text("SiO2^{2+}", "$SiO2^{2+}$") is True
+    assert vle._formula_label_in_text("O^{2-}", "$O^{2-}$") is True
+    for kind in _SUPERSCRIPT_SUFFIX_WRAPPERS:
+        for bare, charged in _SUPERSCRIPT_SUFFIX_PAIRS:
+            source = _superscript_suffix_source(charged, kind)
+            where = f"suffix {kind} {source!r}"
+            doc = _html_source_document(
+                tmp_path, bare, source + "\n", key="formula"
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"suffix-bare-{kind}-{bare}", artifact_root=tmp_path
+            )
+            joined = "\n".join(errors)
+            if not errors or "source_blind_pin" not in joined:
+                failures.append(f"suffix refuse {bare!r} {where}: {errors}")
+            doc = _html_source_document(
+                tmp_path, charged, source + "\n", key="formula"
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc,
+                label=f"suffix-charged-{kind}-{charged}",
+                artifact_root=tmp_path,
+            )
+            if errors:
+                failures.append(f"suffix accept {charged!r} {where}: {errors}")
     assert failures == []
 
 
@@ -10852,7 +10932,9 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
 
     ``1 100`` certifies 1 and 100 and does not certify 1100. Thin space,
     narrow no-break space, and no-break space join, so ``1\\u2009650`` and
-    ``1\\u00a0650`` are 1650. ``12 34`` is not 1234. ``1,000`` stays a
+    ``1\\u00a0650`` are 1650. ``12 34`` is not 1234. A short group leaves
+    the separated run unjoined, so ``12\\u200934\\u2009567`` is not 34567
+    and ``1\\u2009650\\u20091`` is not 1650. ``1,000`` stays a
     comma group. A canonical spelling and a digitless leaf do not join
     groups. A formula label does not use this fold.
     """
@@ -10868,6 +10950,9 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
     assert vle._fold_digit_groups("1\u00a0650") == "1650"
     assert vle._fold_digit_groups("12 345") == "12 345"
     assert vle._fold_digit_groups("12\u2009345") == "12345"
+    assert vle._fold_digit_groups("12\u200934\u2009567") == "12\u200934\u2009567"
+    assert vle._fold_digit_groups("1\u2009650\u20091") == "1\u2009650\u20091"
+    assert vle._fold_digit_groups("1\u2009234\u2009567") == "1234567"
     assert vle._fold_digit_groups("12 34") == "12 34"
     assert vle._fold_digit_groups("1 55") == "1 55"
     assert vle._fold_digit_groups("6.98 100") == "6.98 100"
@@ -10914,6 +10999,10 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
         (1100, "1 100\n", False),
         (12345, "12 345\n", False),
         (12345, "12\u2009345\n", True),
+        (34567, "12\u200934\u2009567\n", False),
+        (1234567, "12\u200934\u2009567\n", False),
+        (1650, "1\u2009650\u20091\n", False),
+        (1234567, "1\u2009234\u2009567\n", True),
         (1234, "12 34\n", False),
         (155, "1 55\n", False),
         (10, "1e0 001\n", False),
@@ -10954,6 +11043,10 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
         ("html", "1\u202f550", 1550, True),
         ("html", "1\u00a0650", 1650, True),
         ("html", "1\u2009650", 1650, True),
+        ("html", "12\u200934\u2009567", 34567, False),
+        ("html", "1\u2009650\u20091", 1650, False),
+        ("csv", "12\u200934\u2009567\n", 34567, False),
+        ("csv", "1\u2009650\u20091\n", 1650, False),
         ("html", "12 34", 1234, False),
         ("html", "1e0 001", 10, False),
         ("html", "1.5 000", 1.5, False),

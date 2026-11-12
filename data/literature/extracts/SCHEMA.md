@@ -184,7 +184,10 @@ dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
 no-break space (U+00A0) in an unsigned digit run is typography. An
 ordinary ASCII space is not: `1 100` certifies 1 and certifies 100 and
 does not certify 1100. The first group is one to three digits and each
-group after it is exactly three, so `1 650` and `1 650` are 1650. The
+group after it is exactly three, so `1 650` and `1 650` are 1650. A
+separated run joins only as a whole. A short group is not deleted, and
+a well-formed piece of that same run is not joined on its own, so
+`12 34 567` is not 34567 and `1 650 1` is not 1650. The
 run starts at the beginning of the text or after whitespace or
 punctuation, and a letter does not precede it, so `SiO2 100` is formula
 `SiO2` and the number 100, not `SiO2100`. The run is not an exponent, a
@@ -213,7 +216,9 @@ A cell that contains a superscript certifies only when the cell is a
 complete power and nothing else: an optional sign, a base number, an
 optional × or x or ·, then 10 and the superscript exponent, or the base
 raised to that exponent. `10<sup>3</sup>` certifies `1e3`.
-`1.5×10<sup>3</sup>` certifies 1500 / `1.5e3`. `10<sup>3</sup>2` and any
+`1.5×10<sup>3</sup>` certifies 1500 / `1.5e3`. A leading minus applies
+to the whole power, so `-10<sup>2</sup>` is -100 and `-1.5×10<sup>3</sup>`
+is -1500. The positive value does not certify. `10<sup>3</sup>2` and any
 other leading or trailing content are `superscript_in_cell`. A plain
 number is also `superscript_in_cell`, so `103` and `1000` do not
 certify. A string certifies only as a spelling of that power (`1e3`,
@@ -240,7 +245,11 @@ does not certify `H2O2`, and `$SiO_{2} 100$` certifies `SiO2` and does
 not certify `SiO2100`. A caret is a superscript. A whitespace token that
 contains `^` does not certify as a plain formula or a plain number, so
 `$O^{2-}$` does not certify `O2`, `$Fe^{2+}$` does not certify `Fe2`,
-and `$SiO^{2}$` does not certify `SiO2`. A subscript digit inside a
+and `$SiO^{2}$` does not certify `SiO2`. A formula run immediately
+followed by `^`, `<sup>`, or a Unicode superscript is a charged or
+powered species. It certifies only a stored label that includes that
+same charge or power, so `Fe` does not certify `Fe^{2+}`, `SiO2` does
+not certify `SiO2^{2+}`, and `O2` does not certify `O^{2-}`. A subscript digit inside a
 formula token is not a number. `SiO_{2}` and `SiO₂` do not certify 2.
 `Fe_{2}O_{3}` does not certify 2 or 3. A neighbouring measurement still
 certifies, so `SiO_{2} 100` certifies 100 and `6.98 Fe_{2}O_{3}`

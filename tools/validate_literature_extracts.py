@@ -58,7 +58,9 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   complete power and nothing else: an optional sign, a base number, an
   optional × or x or ·, then 10 and the superscript exponent, or the
   base raised to that exponent. ``10<sup>3</sup>`` certifies ``1e3``.
-  ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``. ``10<sup>3</sup>2``
+  ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``. A leading minus
+  applies to the whole power, so ``-10<sup>2</sup>`` is ``-100`` and
+  not ``100``. ``10<sup>3</sup>2``
   and any other leading or trailing content are ``superscript_in_cell``,
   as is a plain number. A value in another row
   does not certify. Formula and species labels are normalized before every
@@ -71,6 +73,9 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   A caret is a superscript. A token that contains ``^`` is not unwrapped
   and does not certify as a plain formula or a plain number, so
   ``$O^{2-}$`` is not ``O2`` and ``$SiO^{2}$`` is not ``SiO2``.
+  A run immediately followed by ``^``, ``<sup>``, or a Unicode
+  superscript certifies only a label that includes that same charge, so
+  ``Fe`` is not ``Fe^{2+}``.
   A subscript digit inside a formula token is not a number: ``SiO_{2}``
   and ``SiO₂`` do not certify 2, and ``Fe_{2}O_{3}`` does not certify 2.
   ``SiO_{2} 100`` still certifies 100. A formula label matches one whole
@@ -92,7 +97,9 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   run starts at the beginning of the text or after whitespace or
   punctuation, never after a letter, so ``SiO2 100`` stays ``SiO2``
   and ``100``. ``1e0 001``, ``12 34``, ``1.5 000``, and ``1 550e3`` are
-  not one number. The formula-label path does not apply this fold.
+  not one number. A short group leaves the separated run unjoined, so
+  ``12\\u200934\\u2009567`` is not ``34567`` and ``1\\u2009650\\u20091``
+  is not ``1650``. The formula-label path does not apply this fold.
   A comma is
   not that separator. A numeric leaf does not match a formula by the
   formula fold.
@@ -381,13 +388,14 @@ def _fold_numeric_signs(text: str) -> str:
 # between groups. An ASCII space is two measurements: ``1 100`` stays
 # ``1 100``. A comma is not this separator: ``1,000`` stays ``1,000``.
 _DIGIT_GROUP_SEPARATORS = "\u2009\u202f\u00a0"
-# A letter cannot precede the run. ``SiO2 100`` must not start at the
-# formula's count. Digits, a decimal point, an exponent marker, and a
-# sign stay excluded so ``1.5 000``, ``1e0 001``, and ``-1 550`` stay apart.
-_DIGIT_GROUP_RE = re.compile(
-    r"(?<![0-9.eE+\-A-Za-z])"
-    r"(\d{1,3}(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d{3})+)"
-    r"(?![0-9eE])"
+# The whole separated run, including a short group. A well-formed prefix
+# is not deleted while a later separator remains.
+_DIGIT_GROUP_RUN_RE = re.compile(
+    r"\d+(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d+)+"
+)
+# First group is 1–3 digits. Every group after it is exactly three.
+_DIGIT_GROUP_WELL_FORMED_RE = re.compile(
+    r"\d{1,3}(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d{3})+"
 )
 
 
@@ -413,36 +421,34 @@ def _fold_digit_groups(text: str) -> str:
     An ASCII space does not, so ``1 100`` stays ``1 100``. The run starts
     at the beginning of the text or after whitespace or punctuation, never
     after a letter, so ``SiO2 100`` stays ``SiO2 100``. The first group is
-    one to three digits. Each following group is exactly three. A decimal
-    point may follow the run. ``12 34``, ``1e0 001``, ``1.5 000``,
-    ``1 550e3``, and a signed run stay apart. A second call keeps the
-    same spans. Text with none of those separators is returned unchanged.
+    one to three digits. Each following group is exactly three. The whole
+    separated run must be that shape. A short group is not deleted, and a
+    well-formed piece of the same run is not joined on its own, so
+    ``12\\u200934\\u2009567`` stays and is not ``34567``, and
+    ``1\\u2009650\\u20091`` is not ``1650``. A decimal point may follow the
+    run. ``12 34``, ``1e0 001``, ``1.5 000``, ``1 550e3``, and a signed
+    run stay apart. A second call keeps the same spans. Text with none of
+    those separators is returned unchanged.
     """
     if not any(separator in text for separator in _DIGIT_GROUP_SEPARATORS):
         return text
     pieces: list[str] = []
     cursor = 0
-    while True:
-        match = _DIGIT_GROUP_RE.search(text, cursor)
-        if match is None:
-            pieces.append(text[cursor:])
-            return "".join(pieces)
-        if not _digit_run_may_start(text, match.start()):
-            previous = text[match.start() - 1]
-            # A letter is the same refusal as the lookbehind: skip that one
-            # digit so a later measurement can still group. Any other
-            # refused prefix keeps the whole run, so the groups inside it
-            # are not joined on their own.
-            end = match.start() + 1 if previous.isalpha() else match.end()
-            pieces.append(text[cursor:end])
-            cursor = end
+    for match in _DIGIT_GROUP_RUN_RE.finditer(text):
+        if match.end() < len(text) and text[match.end()] in "eE":
             continue
-        pieces.append(text[cursor:match.start()])
+        if not _digit_run_may_start(text, match.start()):
+            continue
         grouped = match.group(0)
+        if _DIGIT_GROUP_WELL_FORMED_RE.fullmatch(grouped) is None:
+            continue
+        pieces.append(text[cursor : match.start()])
         for separator in _DIGIT_GROUP_SEPARATORS:
             grouped = grouped.replace(separator, "")
         pieces.append(grouped)
         cursor = match.end()
+    pieces.append(text[cursor:])
+    return "".join(pieces)
 
 
 def _citation_token_matches(text: str) -> list[re.Match[str]]:
@@ -929,10 +935,11 @@ def _superscript_power_decimal(
 
     The cell is an optional sign, a base number, an optional × or x or
     middle dot, then 10, and one superscript exponent. Or that base raised
-    to the exponent. Nothing else may sit in the cell. ``10<sup>3</sup>``
-    is ``10**3``, which is ``1e3``. ``1.5×10<sup>3</sup>`` is
-    ``1.5 * 10**3``. A trailing or leading extra, including
-    ``10<sup>3</sup>2``, is not a power.
+    to the exponent. The sign applies to the whole printed value, so
+    ``-10<sup>2</sup>`` is ``-100`` and ``-1.5×10<sup>3</sup>`` is
+    ``-1500``. ``10<sup>3</sup>`` is ``10**3``, which is ``1e3``.
+    ``1.5×10<sup>3</sup>`` is ``1.5 * 10**3``. A trailing or leading extra,
+    including ``10<sup>3</sup>2``, is not a power.
     """
     if len(spans) != 1:
         return None
@@ -945,6 +952,11 @@ def _superscript_power_decimal(
     if not re.fullmatch(r"[+\-]?\d+", exponent):
         return None
     prefix = _fold_numeric_signs(text[:start].strip())
+    sign = Decimal(1)
+    if prefix[:1] in "+-":
+        if prefix[0] == "-":
+            sign = Decimal(-1)
+        prefix = prefix[1:].strip()
     parsed = _SUPERSCRIPT_CELL_RE.fullmatch(prefix)
     if parsed is None:
         return None
@@ -953,14 +965,19 @@ def _superscript_power_decimal(
         return None
     power = int(exponent)
     if parsed.group(2) is None:
-        return _power_product(base, power)
-    factor = _power_product(Decimal(10), power)
-    if factor is None:
+        value = _power_product(base, power)
+    else:
+        factor = _power_product(Decimal(10), power)
+        if factor is None:
+            return None
+        try:
+            value = base * factor
+        except (ArithmeticError, DecimalException):
+            return None
+    if value is None or not value.is_finite():
         return None
-    try:
-        value = base * factor
-    except (ArithmeticError, DecimalException):
-        return None
+    if sign < 0:
+        value = -value
     if not value.is_finite():
         return None
     return value
@@ -3340,6 +3357,70 @@ def _formula_run_char(ch: str) -> bool:
     return (ch.isascii() and ch.isalnum()) or ch in _FORMULA_RUN_MARKS
 
 
+# Superscript digits and signs. A run followed by one of these, by ``^``,
+# or by ``<sup>`` is a charged or powered species, not the bare formula.
+_UNICODE_SUPERSCRIPTS = (
+    "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u207a\u207b"
+)
+_UNICODE_SUPERSCRIPT_FOLD = str.maketrans(
+    _UNICODE_SUPERSCRIPTS, "0123456789+-"
+)
+
+
+def _superscript_suffix_at(text: str, index: int) -> tuple[str, int] | None:
+    """Canonical ``^{body}`` and the index after it, or None.
+
+    The marker is ``^``, a ``<sup>`` element, or a Unicode superscript.
+    ``^{2+}``, ``<sup>2+</sup>``, and ``²⁺`` share one body. The bare run
+    in front of the marker is not the label.
+    """
+    if index >= len(text):
+        return None
+    if text[index] == "^":
+        if index + 1 < len(text) and text[index + 1] == "{":
+            close = text.find("}", index + 2)
+            if close < 0:
+                return "^{", index + 2
+            body = text[index + 2 : close].translate(_UNICODE_SUPERSCRIPT_FOLD)
+            return "^{" + body + "}", close + 1
+        return "^{", index + 1
+    if text[index] == "<" and text[index : index + 5].lower() == "<sup>":
+        tail = text[index:]
+        close = tail.lower().find("</sup>")
+        if close < 0:
+            return "^{", index + 5
+        body = tail[5:close].translate(_UNICODE_SUPERSCRIPT_FOLD)
+        return "^{" + body + "}", index + close + 6
+    if text[index] in _UNICODE_SUPERSCRIPTS:
+        end = index + 1
+        while end < len(text) and text[end] in _UNICODE_SUPERSCRIPTS:
+            end += 1
+        body = text[index:end].translate(_UNICODE_SUPERSCRIPT_FOLD)
+        return "^{" + body + "}", end
+    return None
+
+
+def _canonical_formula_unit(text: str) -> str:
+    """One run plus its superscript suffix, or ``text`` when it is not one.
+
+    ``Fe^{2+}``, ``Fe<sup>2+</sup>``, and ``Fe²⁺`` are ``Fe^{2+}``. A
+    compound with no superscript is unchanged.
+    """
+    if not text or not _formula_run_char(text[0]):
+        return text
+    end = 1
+    limit = len(text)
+    while end < limit and _formula_run_char(text[end]):
+        end += 1
+    suffix = _superscript_suffix_at(text, end)
+    if suffix is None:
+        return text
+    canonical, suffix_end = suffix
+    if suffix_end != limit:
+        return text
+    return text[:end] + canonical
+
+
 def _formula_label_in_text(leaf: str, text: str) -> bool:
     """True when the folded label equals one whole formula run.
 
@@ -3347,15 +3428,20 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
     square brackets, and the charge marks ·, +, and -. Whitespace, either
     end of the text, or any other character delimits it. The stored label
     matches only that whole run. ``SO4`` is not ``Fe2(SO4)3``. ``SiO2``
-    is not ``CaO·SiO2``. ``CO`` is not ``CO2``. A numeric string does not
-    match here. This path does not fold digit groups, so ``SiO2 100`` is
-    ``SiO2`` and is not ``SiO2100``.
+    is not ``CaO·SiO2``. ``CO`` is not ``CO2``. A run immediately followed
+    by ``^``, ``<sup>``, or a Unicode superscript is a charged or powered
+    species. It certifies only a label that includes that same charge or
+    power, so ``Fe`` is not ``Fe^{2+}``, ``SiO2`` is not ``SiO2^{2+}``,
+    and ``O2`` is not ``O^{2-}``. A numeric string does not match here.
+    This path does not fold digit groups, so ``SiO2 100`` is ``SiO2``
+    and is not ``SiO2100``.
     """
     if _string_is_plain_number(leaf):
         return False
     normalized = _normalize_formula_label(leaf)
     if not normalized.strip():
         return False
+    label_unit = _canonical_formula_unit(normalized)
     folded = _normalize_formula_label(text)
     start = 0
     limit = len(folded)
@@ -3366,7 +3452,14 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
         end = start + 1
         while end < limit and _formula_run_char(folded[end]):
             end += 1
-        if folded[start:end] == normalized:
+        suffix = _superscript_suffix_at(folded, end)
+        if suffix is not None:
+            canonical, suffix_end = suffix
+            if folded[start:end] + canonical == label_unit:
+                return True
+            start = suffix_end
+            continue
+        if folded[start:end] == label_unit:
             return True
         start = end
     return False
@@ -3720,7 +3813,9 @@ def fidelity_source_warnings(
     and species labels fold markup inside each whitespace token. A space
     inside ``$...$`` stays a separator, so ``$H_{2} O_{2}$`` is not
     ``H2O2``. A token that contains ``^`` holds a superscript and does
-    not certify as a plain formula or a plain number.
+    not certify as a plain formula or a plain number. A run immediately
+    followed by ``^``, ``<sup>``, or a Unicode superscript certifies
+    only a label with that same charge.
     A subscript digit inside a formula token is not a number, so
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
     measurement still does. A formula label equals one whole run of
@@ -3738,6 +3833,8 @@ def fidelity_source_warnings(
     formulas stay two tokens. A superscript cell certifies only when it
     is a complete power and nothing else. ``10<sup>3</sup>`` certifies
     ``1e3``. ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``.
+    A leading minus applies to the whole power, so ``-10<sup>2</sup>``
+    is ``-100``.
     ``10<sup>3</sup>2`` and a plain number are ``superscript_in_cell``.
     An unsigned digit run joins on a thin space, narrow no-break space,
     or no-break space. An ASCII space does not. The first group is one
@@ -3745,7 +3842,9 @@ def fidelity_source_warnings(
     beginning of the text or after whitespace or punctuation, never after
     a letter. ``1 650`` and ``1 650`` are ``1650``. ``1 100`` is 1 and
     100, not ``1100``. ``SiO2 100`` is not ``SiO2100``. ``1e0 001``,
-    ``12 34``, ``1.5 000``, and ``1 550e3`` are not one number. The
+    ``12 34``, ``1.5 000``, and ``1 550e3`` are not one number. A short
+    group leaves the separated run unjoined, so ``12\\u200934\\u2009567``
+    is not ``34567`` and ``1\\u2009650\\u20091`` is not ``1650``. The
     formula-label path does not apply this fold. A comma is not that
     separator. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
