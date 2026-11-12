@@ -210,6 +210,39 @@ FIXED_VALENCE_ELEMENTS = frozenset(
 # remains required. In the limiting case ΔP → 0, Δlog10(a) → 0. Re-derive if
 # the scored activity store gains a lower T.
 _MELT_ACTIVITY_PRESSURE_LIMIT_PA = Decimal("999726.4829")
+# |ΔV| bound in the derivation above. The dex reported for an approximate
+# pressure uses this same bound. It is not a second volume.
+_MELT_ACTIVITY_DV_BOUND_M3_PER_MOL = Decimal("3e-5")
+
+
+def melt_activity_log10_pressure_bound(
+    delta_pressure_pa: Decimal, temperature_K: Decimal
+) -> Decimal:
+    """|Δlog10(a)| = |ΔV|·ΔP / (R T ln 10).
+
+    |ΔV| is the bound that derived the activity pressure limit. ΔP is the
+    band width. A non-finite input or a non-positive temperature refuses.
+    It does not become a zero shift.
+    """
+
+    if (
+        not isinstance(delta_pressure_pa, Decimal)
+        or not isinstance(temperature_K, Decimal)
+        or not delta_pressure_pa.is_finite()
+        or not temperature_K.is_finite()
+        or delta_pressure_pa < 0
+        or temperature_K <= 0
+    ):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_IDENTITY,
+            "total_pressure_Pa",
+            "activity dex bound needs a non-negative finite ΔP and a positive finite T",
+        )
+    return (
+        _MELT_ACTIVITY_DV_BOUND_M3_PER_MOL
+        * delta_pressure_pa
+        / (R_J_PER_MOL_K * temperature_K * LN10)
+    )
 
 # Per-mol-O2 rescaling.
 # Premise: Ellingham / mol-O2 tables report ΔG for the reaction written on
