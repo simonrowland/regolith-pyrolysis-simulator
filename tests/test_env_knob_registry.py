@@ -323,7 +323,7 @@ def _scan_source(
         if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)):
             continue
         target = function_nodes.get(node.func.id)
-        if target is None or not node.args:
+        if target is None:
             continue
         caller = functions.get(id(node))
         caller_bindings = initial_bindings.get(id(caller), {}) if caller else {}
@@ -336,12 +336,23 @@ def _scan_source(
             )
             for name, values in caller_bindings.items()
         }
-        resolved_args = [
-            _literal(arg, {**constants, **caller_names})
-            for arg in node.args
-        ]
+        parameter_names = [arg.arg for arg in target.args.args]
+        resolved_args: list[object | None] = [None] * len(parameter_names)
+        for index, arg in enumerate(node.args[:len(parameter_names)]):
+            resolved_args[index] = _literal(arg, {**constants, **caller_names})
+        for keyword in node.keywords:
+            if keyword.arg in parameter_names:
+                index = parameter_names.index(keyword.arg)
+                resolved_args[index] = _literal(
+                    keyword.value,
+                    {**constants, **caller_names},
+                )
         unresolved_key_indexes = key_parameter_indexes.get(node.func.id, set()) & {
-            index for index, value in enumerate(resolved_args) if value is None
+            index
+            for index, value in enumerate(resolved_args)
+            if value is None and (index < len(node.args) or parameter_names[index] in {
+                keyword.arg for keyword in node.keywords
+            })
         }
         if unresolved_key_indexes:
             param_index = min(unresolved_key_indexes)
@@ -350,15 +361,17 @@ def _scan_source(
                 f"{source_path}:{node.lineno}: unresolved environment key argument "
                 f"{param_name!r} supplied to {node.func.id}"
             )
-        if any(value is None for value in resolved_args):
-            continue
         previous = call_bindings.get(node.func.id)
         if previous is None:
             call_bindings[node.func.id] = resolved_args
         else:
             for index, value in enumerate(resolved_args):
+                if value is None:
+                    continue
                 if index >= len(previous):
                     previous.append(value)
+                elif previous[index] is None:
+                    previous[index] = value
                 else:
                     left = previous[index]
                     previous[index] = tuple(
@@ -610,6 +623,28 @@ read(dynamic_name)
         assert "unresolved environment key argument 'key'" in str(exc)
     else:
         raise AssertionError("dynamic helper key escaped the scan")
+
+
+def test_wrapper_key_survives_unresolved_non_key_argument(tmp_path):
+    source = '''
+import os
+def read(key, mode):
+    return os.environ.get(key)
+read("SEEN", "ok")
+read("NEW_KNOB", dynamic)
+'''
+    assert _scratch_scan(tmp_path, source) == {"SEEN", "NEW_KNOB"}
+
+
+def test_wrapper_keyword_key_is_bound_after_positional_call(tmp_path):
+    source = '''
+import os
+def read(key):
+    return os.environ.get(key)
+read("SEEN")
+read(key="NEW_KNOB")
+'''
+    assert _scratch_scan(tmp_path, source) == {"SEEN", "NEW_KNOB"}
 
 
 def test_registry_rejects_added_stale_and_conflicting_names():
