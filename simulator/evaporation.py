@@ -78,6 +78,57 @@ _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
 })
 
 
+PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
+EVAPORATIVE_OXYGEN_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
+
+
+class EvaporativeOxygenDestinationError(AccountingError):
+    """A vapour row tried to park parent-oxide oxygen in the melt buffer."""
+
+
+def evaporative_oxygen_credit_account(
+    *,
+    oxygen_destination: str,
+    vapor_oxygen_atoms: float,
+) -> str:
+    """Account that receives the O2 leg of an evaporation row.
+
+    d-394: elemental-metal evaporation releases O2 into the gas, the same
+    account Ti already names. The melt ``fo2_buffer`` changes only by
+    redox and the rate-limited k_O exchange, so an explicit buffer
+    destination is a typed refusal. Oxide vapours credit the gas side
+    too. ``vapor_oxygen_atoms`` stays in the signature so the provider
+    and the overhead-source projection share one predicate; a negative
+    count is not a real vapour.
+
+    The return is always ``process.overhead_gas``. Callers must not keep
+    a second destination branch.
+    """
+
+    try:
+        oxygen_atoms = float(vapor_oxygen_atoms)
+    except (TypeError, ValueError) as exc:
+        raise EvaporativeOxygenDestinationError(
+            "vapor oxygen atom count must be numeric"
+        ) from exc
+    if not math.isfinite(oxygen_atoms) or oxygen_atoms < 0.0:
+        raise EvaporativeOxygenDestinationError(
+            "vapor oxygen atom count must be finite and non-negative; "
+            f"got {vapor_oxygen_atoms!r}"
+        )
+    destination = str(oxygen_destination or "")
+    if destination == EVAPORATIVE_OXYGEN_BUFFER_ACCOUNT:
+        raise EvaporativeOxygenDestinationError(
+            "elemental evaporation must not credit O2 to "
+            "reservoir.fo2_buffer; released oxygen is a gas product"
+        )
+    if destination and destination != PROCESS_OVERHEAD_GAS_ACCOUNT:
+        raise EvaporativeOxygenDestinationError(
+            f"unsupported oxygen_destination {destination!r}"
+        )
+    return PROCESS_OVERHEAD_GAS_ACCOUNT
+
+
 class EvaporationFluxRefusal(ProviderUnavailableError):
     """Typed terminal refusal for unavailable authoritative flux inputs."""
 
@@ -3953,21 +4004,21 @@ class EvaporationMixin:
             o2_kg_hr = rate_kg_hr * float(
                 stoich.get('O2_per_product_kg') or 0.0
             )
-            oxygen_destination = str(
-                stoich.get('oxygen_destination') or ''
+            if o2_kg_hr == 0.0:
+                continue
+            # Same account the transition credits. Elemental O2 is a gas
+            # product, so the overhead source includes it. A zero leg does
+            # not open an O2 key.
+            evaporative_oxygen_credit_account(
+                oxygen_destination=str(stoich.get('oxygen_destination') or ''),
+                vapor_oxygen_atoms=float(
+                    formula.elements.get('O', 0.0) or 0.0
+                ),
             )
-            vapor_oxygen_atoms = float(
-                formula.elements.get('O', 0.0) or 0.0
+            source_mol_hr['O2'] = (
+                source_mol_hr.get('O2', 0.0)
+                + o2_kg_hr / o2_molar_mass
             )
-            if (
-                o2_kg_hr < 0.0
-                or vapor_oxygen_atoms > 0.0
-                or oxygen_destination == 'process.overhead_gas'
-            ):
-                source_mol_hr['O2'] = (
-                    source_mol_hr.get('O2', 0.0)
-                    + o2_kg_hr / o2_molar_mass
-                )
         return source_mol_hr
 
     def _apply_analytic_evaporation_depletion(
@@ -4136,8 +4187,9 @@ class EvaporationMixin:
         temperature is well below the species' condensation temperature.
 
         For elemental-metal evaporation from a parent oxide, the oxygen
-        coproduct is credited to ``reservoir.fo2_buffer``. That redox buffer is
-        not a terminal stored-oxygen product account.
+        coproduct is credited to ``process.overhead_gas``
+        (:func:`evaporative_oxygen_credit_account`). The melt redox buffer
+        is not that account.
 
         CONDENSATION_ROUTE intent -- kernel-authoritative.
 
@@ -4151,9 +4203,9 @@ class EvaporationMixin:
         committed through the kernel. The flow per species is:
 
         1. EVAPORATION_TRANSITION dispatched with ``remaining=rate`` --
-           ALL vapor routed to ``process.overhead_gas``; elemental-metal
-           parent-oxide oxygen stays in ``reservoir.fo2_buffer``. No
-           condensation_train credit from that intent.
+           ALL vapor routed to ``process.overhead_gas``, and the parent-oxide
+           oxygen coproduct with it. No condensation_train credit from that
+           intent.
         2. CONDENSATION_ROUTE dispatched with the analytically smoothed
            per-species condensed_kg derived from
            ``route_result.remaining_by_species`` -- debits

@@ -49,18 +49,17 @@ validation runs both at dispatch time (in ``validate_atom_balance``) and
 again at commit time (re-validated by ``commit_batch``).
 
 Account declaration: ``process.cleaned_melt``, ``process.overhead_gas``,
-``process.condensation_train``, ``reservoir.fo2_buffer``. The legacy
-:meth:`_credit_evaporation_transition` builds a single
-:class:`LedgerTransition` with these accounts on its debit/credit
-sides; the provider must declare every account the proposal touches
-(``validate_proposal_accounts`` enforces this with
+``process.condensation_train``. The provider must declare every account
+the proposal touches (``validate_proposal_accounts`` enforces this with
 :class:`AccountFilterViolation`). The cleaned-melt is the debit; the
 condensation_train is credited with the condensed fraction (in mol if
 the species disproportionates, in kg otherwise -- the kernel's
 proposal layer is mol-native, so the provider converts); the overhead_gas
-is credited with uncondensed vapor and oxide-vapor O2; elemental metal
-evaporation parks parent-oxide oxygen in ``reservoir.fo2_buffer`` for the
-same-tick Fe redox re-speciation chain.
+is credited with uncondensed vapor and with the O2 coproduct.
+:func:`simulator.evaporation.evaporative_oxygen_credit_account` owns
+that destination. Parent-oxide oxygen is a gas product, including
+elemental-metal rows. ``reservoir.fo2_buffer`` is not an evaporation
+account.
 """
 
 from __future__ import annotations
@@ -105,7 +104,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         "process.cleaned_melt",
         "process.overhead_gas",
         "process.condensation_train",
-        "reservoir.fo2_buffer",
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -182,19 +180,14 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         sp_data = dict(controls.get("sp_data") or {})
         available_kg = float(controls.get("available_kg") or 0.0)
         oxygen_destination = str(sp_data.get("oxygen_destination") or "")
-        if oxygen_destination and oxygen_destination not in {
-            "process.overhead_gas",
-            "reservoir.fo2_buffer",
-        }:
-            return IntentResult(
-                intent=ChemistryIntent.EVAPORATION_TRANSITION,
-                status="unsupported",
-                control_audit=control_audit,
-                diagnostic={
-                    "reason": (
-                        f"unsupported oxygen_destination {oxygen_destination!r}"
-                    ),
-                },
+        if oxygen_destination:
+            from simulator.evaporation import evaporative_oxygen_credit_account
+
+            # Validates the catalog destination. The O2 leg below uses the
+            # same function; a buffer destination is a typed refusal.
+            evaporative_oxygen_credit_account(
+                oxygen_destination=oxygen_destination,
+                vapor_oxygen_atoms=0.0,
             )
 
         # Negative dt_hr or species the caller flagged should never reach
@@ -311,7 +304,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         #   debits:  process.cleaned_melt -> {parent_oxide: mol}
         #   credits: process.condensation_train -> {product: mol, ...}
         #            process.overhead_gas        -> {species: mol, O2: mol}
-        #            reservoir.fo2_buffer        -> {O2: mol}
         # ------------------------------------------------------------------
         debits: dict[str, dict[str, float]] = {}
         credits: dict[str, dict[str, float]] = {}
@@ -333,18 +325,15 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
                 remaining_kg / vapor_formula.molar_mass_kg_per_mol()
             )
         if O2_kg > 0.0:
+            from simulator.evaporation import evaporative_oxygen_credit_account
+
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
-            if (
-                oxygen_destination == "reservoir.fo2_buffer"
-                or (
-                    not oxygen_destination
-                    and vapor_oxygen_atoms <= 0.0
-                )
-            ):
-                credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
-            else:
-                overhead_credit["O2"] = o2_mol
+            evaporative_oxygen_credit_account(
+                oxygen_destination=oxygen_destination,
+                vapor_oxygen_atoms=vapor_oxygen_atoms,
+            )
+            overhead_credit["O2"] = o2_mol
         if overhead_credit:
             credits["process.overhead_gas"] = overhead_credit
         if O2_kg < 0.0:

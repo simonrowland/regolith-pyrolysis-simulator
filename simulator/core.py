@@ -2875,7 +2875,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             temperature_C=float(self.melt.temperature_C),
             strict=False,
         )
+        self._assert_fo2_buffer_inventory()
         return transition
+
+    def _assert_fo2_buffer_inventory(self) -> None:
+        """Wiring: the buffer ceiling lives in the ledger module."""
+
+        from simulator.accounting.ledger import (
+            assert_fo2_buffer_within_reducible_cation_capacity,
+        )
+
+        assert_fo2_buffer_within_reducible_cation_capacity(
+            buffer_o2_mol=float(
+                self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                    OXYGEN_SPECIES, 0.0,
+                ) or 0.0
+            ),
+            melt_species_mol=self.atom_ledger.mol_by_account(
+                'process.cleaned_melt'
+            ),
+            registry=self.species_formula_registry,
+        )
 
     def _observe_reagent_provenance_transition(
         self,
@@ -10729,6 +10749,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ChemistryIntent.BACKEND_EQUILIBRIUM,
                 transition,
             )
+            self._assert_fo2_buffer_inventory()
             self._observe_reagent_provenance_transition(
                 transition,
                 balances_before,

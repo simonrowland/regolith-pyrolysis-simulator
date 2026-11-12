@@ -115,6 +115,90 @@ KNOWN_LEDGER_ACCOUNT_PREFIXES: tuple[str, ...] = (
     "reservoir.reagent.",
 )
 
+# Cations whose oxides can still take the buffer's O2 back to metal.
+# Fe3+ and Fe2+ are one pool: n_O/2 is the O2 released by reduction all
+# the way to Fe0, so the Fe3+→Fe2+ half-step is not added again. Cr, Ti
+# and Mn are in this inventory ceiling and are not part of the Fe-only
+# melt capacity C_m.
+_REDUCIBLE_CATION_ELEMENTS = frozenset({"Fe", "Cr", "Ti", "Mn"})
+FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
+CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
+
+
+def reducible_cation_o2_capacity_mol(
+    species_mol: Mapping[str, float],
+    registry: Mapping[str, Any],
+) -> float:
+    """O2 the cleaned-melt reducible oxides can still release to metal.
+
+    Premise: ``reservoir.fo2_buffer`` holds oxygen that redox can put back
+    into Fe, Cr, Ti, and Mn oxides. It is not a parking account for
+    evaporative O2. Algebra, per species whose cations are a non-empty
+    subset of {Fe, Cr, Ti, Mn}::
+
+        n_O2 = n_species * n_O / 2
+
+    Unit check: mol species times a dimensionless atom count is mol O2.
+    Limit: no such oxide leaves capacity 0, so an empty buffer is the
+    only legal inventory. All-ferrous FeO is 0.5 mol O2 per mol FeO.
+    One mole of Fe2O3 is 1.5 mol O2, which already includes the
+    Fe3+→Fe2+ step; do not add that half-step on top.
+    """
+
+    total = 0.0
+    for species, raw_mol in species_mol.items():
+        amount = float(raw_mol)
+        if not math.isfinite(amount) or amount <= 0.0:
+            continue
+        formula = resolve_species_formula(str(species), registry)
+        cations = {
+            element
+            for element in formula.elements
+            if element != "O"
+        }
+        if not cations or not cations <= _REDUCIBLE_CATION_ELEMENTS:
+            continue
+        oxygen_atoms = float(formula.elements.get("O", 0.0) or 0.0)
+        if oxygen_atoms <= 0.0:
+            continue
+        total += amount * oxygen_atoms / 2.0
+    return total
+
+
+def assert_fo2_buffer_within_reducible_cation_capacity(
+    *,
+    buffer_o2_mol: float,
+    melt_species_mol: Mapping[str, float],
+    registry: Mapping[str, Any],
+) -> None:
+    """Refuse a buffer inventory redox cannot take back into the melt.
+
+    Slack is the ledger's atom tolerance: 1e-6 mol, or 1e-9 of the
+    larger of the buffer and the capacity. A kg↔mol round trip on a
+    legal inventory stays inside that band. The check does not clamp
+    or drop atoms.
+    """
+
+    buffer = float(buffer_o2_mol)
+    if not math.isfinite(buffer):
+        raise AccountingError(
+            "reservoir.fo2_buffer O2 inventory must be finite; "
+            f"got {buffer_o2_mol!r}"
+        )
+    if buffer <= 0.0:
+        return
+    capacity = reducible_cation_o2_capacity_mol(melt_species_mol, registry)
+    slack = max(
+        DEFAULT_ATOM_TOLERANCE_MOL,
+        DEFAULT_RELATIVE_TOLERANCE * max(capacity, buffer),
+    )
+    if buffer > capacity + slack:
+        raise AccountingError(
+            "reservoir.fo2_buffer O2 inventory exceeds reducible-cation "
+            f"capacity: buffer_o2_mol={buffer:.6g}, "
+            f"capacity_o2_mol={capacity:.6g}, slack_mol={slack:.6g}"
+        )
+
 
 @dataclass(frozen=True)
 class AccountPolicy:
