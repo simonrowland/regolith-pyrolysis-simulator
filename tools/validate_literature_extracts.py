@@ -60,8 +60,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   and any other value is ``superscript_in_cell``. A value in another row
   does not certify. Formula and species labels are normalized before every
   comparison, including a label with no ASCII digit. ``_{n}``, a bare
-  ``_`` digit, Unicode subscript digits, and a ``$`` or ``\\mathrm{}``
-  that touches a subscript become plain digits. A layout space is removed
+  ``_`` digit, and Unicode subscript digits become plain digits. A
+  ``$...$`` formula and a ``\\mathrm`` / ``\\text`` / ``\\rm`` command,
+  including ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``, go through
+  ``printed_formula``. A layout space is removed
   only between an element symbol or a closing parenthesis and the digit
   count that follows it. ``SiO 2`` is ``SiO2``. A space after a count
   stays, so ``H2 O2``, ``SiO2 Al2O3``, and ``Fe 2 O 3`` (folded to
@@ -166,7 +168,13 @@ from simulator.battery.extract_context import (
 )
 from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.state_types import StateTag
-from tools.mineru_table_draft import Cell, TableGeometryError, parse_table_html
+from tools.mineru_table_draft import (
+    Cell,
+    TableGeometryError,
+    parse_table_html,
+    printed_formula,
+    printed_formula_spans,
+)
 
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
@@ -755,7 +763,6 @@ _FORMULA_LABEL_KEYS = frozenset({"formula", "species"})
 _FORMULA_BRACE_SUBSCRIPT_RE = re.compile(r"_\{(\d+)\}")
 _FORMULA_BARE_SUBSCRIPT_RE = re.compile(r"_(\d+)")
 # Math that wraps only the subscript. The letters stay outside the dollars.
-_FORMULA_MATHRM_RE = re.compile(r"\\mathrm\{([^{}]*)\}")
 _FORMULA_MATH_BRACE_SUBSCRIPT_RE = re.compile(r"\$\s*_\{(\d+)\}\s*\$")
 _FORMULA_MATH_BARE_SUBSCRIPT_RE = re.compile(r"\$\s*_(\d+)\s*\$")
 # Spaces inside one formula token. A newline is not one of them, and a
@@ -3184,16 +3191,25 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
 def _normalize_formula_label(text: str) -> str:
     """Fold formula markup onto plain digits, inside the formula token.
 
-    ``\\mathrm{}`` and a ``$...$`` pair are removed only when they wrap a
-    subscript. ``_{n}``, a bare ``_`` digit, and Unicode subscript digits
-    become plain digits. A space is removed only between an element symbol
-    or a closing parenthesis and the digit count that follows it.
-    ``SiO 2`` becomes ``SiO2``. ``(OH) 2`` becomes ``(OH)2``. A space after
-    a count stays, so ``Fe 2 O 3`` becomes ``Fe2 O3``, and ``H2 O2`` and
-    ``SiO2 Al2O3`` stay two tokens. ``6.98 Fe_{2}O_{3}`` stays
-    ``6.98 Fe2O3``. ``page 2`` stays ``page 2``.
+    ``printed_formula`` unwraps a ``$...$`` formula and a ``\\mathrm``,
+    ``\\text``, or ``\\rm`` command, including
+    ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``. ``_{n}``, a bare ``_``
+    digit, and Unicode subscript digits become plain digits. A space is
+    removed only between an element symbol or a closing parenthesis and
+    the digit count that follows it. ``SiO 2`` becomes ``SiO2``.
+    ``(OH) 2`` becomes ``(OH)2``. A space after a count stays, so
+    ``Fe 2 O 3`` becomes ``Fe2 O3``, and ``H2 O2`` and ``SiO2 Al2O3``
+    stay two tokens. ``6.98 Fe_{2}O_{3}`` stays ``6.98 Fe2O3``.
+    ``page 2`` stays ``page 2``.
     """
-    normalized = _FORMULA_MATHRM_RE.sub(r"\1", text)
+    parts: list[str] = []
+    cursor = 0
+    for start, end in printed_formula_spans(text):
+        parts.append(text[cursor:start])
+        parts.append(printed_formula(text[start:end]))
+        cursor = end
+    parts.append(text[cursor:])
+    normalized = "".join(parts)
     normalized = _FORMULA_MATH_BRACE_SUBSCRIPT_RE.sub(r"\1", normalized)
     normalized = _FORMULA_MATH_BARE_SUBSCRIPT_RE.sub(r"\1", normalized)
     normalized = _FORMULA_BRACE_SUBSCRIPT_RE.sub(r"\1", normalized)
@@ -3593,8 +3609,10 @@ def fidelity_source_warnings(
     neither address refuses with ``html_table_requires_cell_address``.
     A value on a prose line in that span still certifies. A value in
     another row is source-blind. Formula
-    and species labels fold subscript markup, a ``$`` or ``\\mathrm{}``
-    that touches a subscript, and a layout space only between an element
+    and species labels fold subscript markup. ``printed_formula`` unwraps
+    a ``$...$`` formula and a ``\\mathrm`` / ``\\text`` / ``\\rm`` command,
+    so ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` is ``Al2O3``. A layout
+    space is removed only between an element
     or a closing parenthesis and the count that follows it, before every
     comparison. ``SiO 2`` is ``SiO2``. A space after a count stays, so
     ``Fe 2 O 3`` is ``Fe2 O3`` and does not certify ``Fe2O3``. A digitless

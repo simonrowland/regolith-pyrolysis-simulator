@@ -222,8 +222,10 @@ grid is source-blind. `line_range` still chooses which complete table is
 cited.
 Formula-bearing label keys are `formula` and `species` only. The label is
 normalized before every comparison, including a label with no ASCII digit.
-`_{n}`, a bare `_` followed by digits, Unicode subscript digits, and a `$`
-or `\mathrm{}` wrapped around a subscript become plain digits. A layout
+`_{n}`, a bare `_` followed by digits, and Unicode subscript digits
+become plain digits. A `$...$` formula and a `\mathrm`, `\text`, or
+`\rm` command are the `printed_formula` conversion, so
+`${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$` certifies `Al2O3`. A layout
 space is removed only between an element symbol or a closing parenthesis
 and the digit count that follows it. `SiO 2` is `SiO2`. `(OH) 2` is
 `(OH)2`. A space after a count is not removed, so `H2 O2` does not

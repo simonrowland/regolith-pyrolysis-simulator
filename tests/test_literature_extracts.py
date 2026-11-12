@@ -9868,6 +9868,7 @@ _FORMULA_MARKUPS = (
     ("Fe2O3", "Fe₂O₃"),
     ("SiO2", "$SiO_{2}$"),
     ("SiO2", " $SiO_{2}$ "),
+    ("Al2O3", r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$"),
 )
 _SUBSCRIPT_DIGITS = "₀₁₂₃₄₅₆₇₈₉"
 
@@ -10472,6 +10473,8 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         "SiO $_2$": "SiO2",
         "CaO/SiO $_{2}$ ratio": "CaO/SiO2 ratio",
         "\\mathrm{SiO}_{2}": "SiO2",
+        r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$": "Al2O3",
+        r"{\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}": "Al2O3",
         "6.98 Fe_{2}O_{3}": "6.98 Fe2O3",
         "10 Al_{2}O_{3}": "10 Al2O3",
         "0.5 H_{2}O": "0.5 H2O",
@@ -10496,6 +10499,7 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         ("formula", "SiO2", "SiO $_2$", True),
         ("formula", "SiO2", "CaO/SiO $_{2}$ ratio", True),
         ("formula", "SiO2", "\\mathrm{SiO}_{2}", True),
+        ("formula", "Al2O3", r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$", True),
         ("formula", "Fe2O3", "6.98 Fe_{2}O_{3}", True),
         ("alpha", 6.98, "6.98 Fe_{2}O_{3}", True),
         ("formula", "Al2O3", "10 Al_{2}O_{3}", True),
@@ -10540,6 +10544,7 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         ("formula", "SiO2", "SiO $_{2}$", True),
         ("formula", "SiO2", "SiO $_2$", True),
         ("formula", "SiO2", "\\mathrm{SiO}_{2}", True),
+        ("formula", "Al2O3", r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$", True),
         ("species", "CO", "CO₂", False),
         ("formula", "SiO₂", "SiO₂₂", False),
         ("formula", "SiO2", "SiO₂₂", False),

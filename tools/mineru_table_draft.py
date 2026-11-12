@@ -1794,6 +1794,11 @@ def _blank_or_dash(text: str) -> bool:
     return token == "" or token in _DASH_TEXT
 
 
+# One LaTeX-formula command list. ``printed_formula`` is the only unwrap.
+_PRINTED_FORMULA_COMMAND_RE = re.compile(r"\\(?:mathrm|text|rm)\b")
+_PRINTED_FORMULA_MARKUP_RE = re.compile(r"[\\{}_^]")
+
+
 def printed_formula(text: str) -> str:
     """Unwrap a printed species cell to its formula letters and digits.
 
@@ -1804,8 +1809,111 @@ def printed_formula(text: str) -> str:
     token = text.strip()
     if len(token) >= 2 and token[0] == "$" and token[-1] == "$":
         token = token[1:-1].strip()
-    token = re.sub(r"\\(?:mathrm|text|rm)\b", "", token)
+    token = _PRINTED_FORMULA_COMMAND_RE.sub("", token)
     return re.sub(r"[{}_^\\\s]", "", token)
+
+
+def _closing_brace(text: str, open_at: int) -> int | None:
+    """Index after the ``}`` that closes the brace at ``open_at``."""
+    if open_at >= len(text) or text[open_at] != "{":
+        return None
+    depth = 0
+    for index in range(open_at, len(text)):
+        char = text[index]
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return index + 1
+    return None
+
+
+def _command_span_end(text: str, start: int) -> int | None:
+    """End of a ``\\mathrm`` / ``\\text`` / ``\\rm`` command and its groups."""
+    match = _PRINTED_FORMULA_COMMAND_RE.match(text, start)
+    if match is None:
+        return None
+    index = match.end()
+    if index >= len(text) or text[index] != "{":
+        return None
+    while index < len(text) and text[index] == "{":
+        end = _closing_brace(text, index)
+        if end is None:
+            return None
+        index = end
+    return index
+
+
+def _brace_chain_span_end(text: str, start: int) -> int | None:
+    """A brace that holds a formula command, plus the subscripts chained to it."""
+    end = _closing_brace(text, start)
+    if end is None or _PRINTED_FORMULA_COMMAND_RE.search(text, start, end) is None:
+        return None
+    index = end
+    while index < len(text):
+        if text.startswith("_{", index):
+            brace = _closing_brace(text, index + 1)
+            if brace is None:
+                break
+            index = brace
+            continue
+        if (
+            text[index] == "_"
+            and index + 1 < len(text)
+            and text[index + 1].isdigit()
+        ):
+            index += 2
+            while index < len(text) and text[index].isdigit():
+                index += 1
+            continue
+        if text[index] == "{":
+            brace = _closing_brace(text, index)
+            if (
+                brace is None
+                or _PRINTED_FORMULA_COMMAND_RE.search(text, index, brace) is None
+            ):
+                break
+            index = brace
+            continue
+        break
+    return index
+
+
+def printed_formula_spans(text: str) -> list[tuple[int, int]]:
+    """Spans of ``text`` that ``printed_formula`` unwraps.
+
+    A ``$...$`` pair is one span when its interior has formula markup.
+    A command with brace groups is one span. A brace that contains a
+    command, and the ``_{n}`` groups chained after it, is one span.
+    Characters outside those spans stay with the caller.
+    """
+    spans: list[tuple[int, int]] = []
+    index = 0
+    length = len(text)
+    while index < length:
+        if text[index] == "$":
+            close = text.find("$", index + 1)
+            if close != -1 and _PRINTED_FORMULA_MARKUP_RE.search(
+                text, index + 1, close
+            ):
+                spans.append((index, close + 1))
+                index = close + 1
+                continue
+        if text[index] == "\\":
+            end = _command_span_end(text, index)
+            if end is not None:
+                spans.append((index, end))
+                index = end
+                continue
+        if text[index] == "{":
+            end = _brace_chain_span_end(text, index)
+            if end is not None:
+                spans.append((index, end))
+                index = end
+                continue
+        index += 1
+    return spans
 
 
 def _stacked_values(text: str) -> bool:
