@@ -243,9 +243,19 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
                 # The full mass-percent vector above pins retained Fe. Compare
                 # the oxide subsystem's proportions separately; this converter
                 # intentionally does not apply elemental phase vocabulary.
-                expected_oxide_moles = wt_pct_to_mole_fraction(printed_components)
+                printed_oxides = {
+                    name: amount
+                    for name, amount in printed_components.items()
+                    if name != "Fe"
+                }
+                actual_oxides = {
+                    name: amount
+                    for name, amount in observation.identity.composition.value.as_map().items()
+                    if name != "Fe"
+                }
+                expected_oxide_moles = wt_pct_to_mole_fraction(printed_oxides)
                 actual_oxide_moles = wt_pct_to_mole_fraction(
-                    observation.identity.composition.value.as_map()
+                    actual_oxides
                 )
                 assert set(actual_oxide_moles.as_map()) == set(
                     expected_oxide_moles.as_map()
