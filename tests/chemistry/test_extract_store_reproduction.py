@@ -85,6 +85,8 @@ BASELINES_PATH = (
 )
 # Escape hatch: write the committed rollup section (off by default).
 REGEN_ENV = "RPS_T512_REGEN_ROLLUP"
+_COLLECTED_ADOPTED_OBSERVATIONS: tuple[AdoptedObservation, ...] | None = None
+_COLLECTED_ADOPTED_OBSERVATIONS_ERROR: SystemExit | None = None
 
 
 def test_melt_observation_oxygen_admission_and_exact_cache(vapor_pressure_data, monkeypatch):
@@ -126,8 +128,11 @@ def vapor_pressure_data() -> dict:
 
 
 @pytest.fixture(scope="module")
-def adopted_observations() -> list[AdoptedObservation]:
-    return load_adopted_observations()
+def adopted_observations() -> tuple[AdoptedObservation, ...]:
+    if _COLLECTED_ADOPTED_OBSERVATIONS_ERROR is not None:
+        raise _COLLECTED_ADOPTED_OBSERVATIONS_ERROR
+    assert _COLLECTED_ADOPTED_OBSERVATIONS is not None
+    return deepcopy(_COLLECTED_ADOPTED_OBSERVATIONS)
 
 
 def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeypatch) -> None:
@@ -829,10 +834,12 @@ def test_coverage_primary_prefers_typed_refusal_over_point_drop() -> None:
     assert coverage["skip_reasons"] == {evaluation.skip_reason: 1}
 
 
-def test_wetzel_stale_duplicate_hits_system_class_and_form_gate() -> None:
+def test_wetzel_stale_duplicate_hits_system_class_and_form_gate(
+    adopted_observations,
+) -> None:
     observation = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.source_id == "wetzel-gail-2013-sio-arrhenius"
         and row.observation_id == "wetzel_gail_2013_sio_arrhenius"
     )
@@ -1185,23 +1192,29 @@ def test_point_level_drops_emit_gap_records_not_silent() -> None:
 
 
 def _observation_params() -> list[pytest.ParameterSet]:
+    global _COLLECTED_ADOPTED_OBSERVATIONS, _COLLECTED_ADOPTED_OBSERVATIONS_ERROR
     try:
-        observations = load_adopted_observations()
+        _COLLECTED_ADOPTED_OBSERVATIONS = tuple(load_adopted_observations())
     except SystemExit as exc:
+        _COLLECTED_ADOPTED_OBSERVATIONS = ()
+        _COLLECTED_ADOPTED_OBSERVATIONS_ERROR = exc
         return [
             pytest.param(
                 None,
                 id=f"store-load-failed:{exc}",
             )
         ]
-    if not observations:
+    if not _COLLECTED_ADOPTED_OBSERVATIONS:
         return [
             pytest.param(
                 None,
                 id="empty-store",
             )
         ]
-    return [pytest.param(obs, id=obs.param_id()) for obs in observations]
+    return [
+        pytest.param(obs, id=obs.param_id())
+        for obs in _COLLECTED_ADOPTED_OBSERVATIONS
+    ]
 
 
 @pytest.mark.parametrize("obs", _observation_params())
@@ -1346,26 +1359,42 @@ def test_pinned_residuals_cover_all_live_comparable_points(
 ) -> None:
     """Baseline file and live battery must agree on the comparable set."""
 
-    live_keys = {
-        _record_pin_key(r)
-        for ev in battery_evaluations
-        for r in ev.records
-        if r.status in SCORING_STATUSES
-    }
-    assert len(live_keys) == sum(
-        r.status in SCORING_STATUSES
-        for ev in battery_evaluations
-        for r in ev.records
-    ), "duplicate live residual identity"
-    pin_keys = set(residual_baselines["by_key"])
-    assert live_keys == pin_keys, (
-        f"baseline/live comparable-key mismatch: "
-        f"live_only={sorted(live_keys - pin_keys)} "
-        f"pin_only={sorted(pin_keys - live_keys)}"
+    def assert_residual_coverage(evaluations) -> None:
+        live_keys = {
+            _record_pin_key(r)
+            for ev in evaluations
+            for r in ev.records
+            if r.status in SCORING_STATUSES
+        }
+        assert len(live_keys) == sum(
+            r.status in SCORING_STATUSES
+            for ev in evaluations
+            for r in ev.records
+        ), "duplicate live residual identity"
+        pin_keys = set(residual_baselines["by_key"])
+        assert live_keys == pin_keys, (
+            f"baseline/live comparable-key mismatch: "
+            f"live_only={sorted(live_keys - pin_keys)} "
+            f"pin_only={sorted(pin_keys - live_keys)}"
+        )
+
+    assert_residual_coverage(battery_evaluations)
+    mutated_evaluations = list(battery_evaluations)
+    omitted = next(
+        (
+            index
+            for index, evaluation in enumerate(mutated_evaluations)
+            if any(record.status in SCORING_STATUSES for record in evaluation.records)
+        ),
+        None,
     )
+    assert omitted is not None, "no scoring evaluation available for mutation proof"
+    del mutated_evaluations[omitted]
+    with pytest.raises(AssertionError, match="baseline/live comparable-key mismatch"):
+        assert_residual_coverage(mutated_evaluations)
 
 
-def test_measured_rate_series_executes_hkl(monkeypatch) -> None:
+def test_measured_rate_series_executes_hkl(monkeypatch, adopted_observations) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
 
     real_hkl = er.langmuir_molar_flux
@@ -1384,7 +1413,7 @@ def test_measured_rate_series_executes_hkl(monkeypatch) -> None:
     monkeypatch.setattr(er, "langmuir_molar_flux", _spy)
     obs = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.observation_id == "richter_2007_mg_rate_series_geometry"
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
@@ -1400,7 +1429,9 @@ def test_measured_rate_series_executes_hkl(monkeypatch) -> None:
     assert all(r.observable_id.endswith(":rate") for r in evaluation.records)
 
 
-def test_numeric_activity_executes_melt_activity_model(monkeypatch) -> None:
+def test_numeric_activity_executes_melt_activity_model(
+    monkeypatch, adopted_observations
+) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
 
     real_activity = er.melt_oxide_activity
@@ -1413,7 +1444,7 @@ def test_numeric_activity_executes_melt_activity_model(monkeypatch) -> None:
     monkeypatch.setattr(er, "melt_oxide_activity", _spy)
     obs = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.observation_id == "demaria_1971_fe_lunar_basalt_kems_main_cell"
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
@@ -1490,6 +1521,7 @@ def test_psat_standard_state_selects_one_compatible_vapor_rail(monkeypatch) -> N
 def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     residual_baselines,
     monkeypatch,
+    adopted_observations,
 ) -> None:
     """P1 proof: 10× grounded_alpha mutation must trip the residual pin (RED).
 
@@ -1517,7 +1549,7 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     # the live Richter Mg alpha series, which still has three measured pins.
     observations = [
         o
-        for o in load_adopted_observations()
+        for o in adopted_observations
         if o.source_id == "richter-et-al-2007"
         and o.observation_id == "richter_2007_mg_cai_arrhenius_langmuir"
         and o.obs_type == "alpha"
@@ -1567,7 +1599,7 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
 
 
 def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
-    monkeypatch, residual_baselines
+    monkeypatch, residual_baselines, adopted_observations
 ) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
 
@@ -1579,7 +1611,7 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
     monkeypatch.setattr(er, "langmuir_molar_flux", _ten_x)
     obs = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.observation_id == "richter_2007_mg_rate_series_geometry"
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
@@ -1607,10 +1639,11 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
 def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
     observation_id: str,
     skip_reason: str,
+    adopted_observations,
 ) -> None:
     observation = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.observation_id == observation_id
     )
     evaluation = evaluate_observation(
@@ -1622,7 +1655,7 @@ def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
     assert evaluation.skip_reasons == [skip_reason]
 
 
-def test_wetzel_model_tables_refuse_as_model_output() -> None:
+def test_wetzel_model_tables_refuse_as_model_output(adopted_observations) -> None:
     # PARENT RULE (b-483): the six quoted-model parents stay byte-identical
     # rate_series containers and are superseded; the retype lives on the
     # terminal ``*_gibbs`` children, which are the rows the store adopts.
@@ -1632,7 +1665,7 @@ def test_wetzel_model_tables_refuse_as_model_output() -> None:
     observation_ids = {f"{parent}_gibbs" for parent in parent_ids}
     wetzel = [
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.source_id == "kems-011-wetzel-gail-2013"
     ]
     parents = [row for row in wetzel if row.observation_id in parent_ids]
@@ -1682,11 +1715,11 @@ def test_transition_point_is_an_adopted_target_type(
 
 
 def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
-    vapor_pressure_data,
+    vapor_pressure_data, adopted_observations
 ) -> None:
     obs = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.observation_id == "Na_melting_point"
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
@@ -1697,11 +1730,11 @@ def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
 
 
 def test_normal_boiling_point_inverts_antoine_in_kelvin(
-    vapor_pressure_data,
+    vapor_pressure_data, adopted_observations
 ) -> None:
     obs = next(
         row
-        for row in load_adopted_observations()
+        for row in adopted_observations
         if row.observation_id == "Na_normal_boiling_point"
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
