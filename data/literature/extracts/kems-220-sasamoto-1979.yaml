@@ -1,0 +1,230 @@
+schema_version: literature_extract.v1
+source_id: kems-220-sasamoto-1979
+source:
+  citation: >-
+    Sasamoto, T., Kobayashi, M., and Sata, T. (1979). Mass Spectrometric
+    Investigation of Vapor Species over Liquid Germanium Dioxide, in
+    Hastie, J. W. (ed.), Characterization of High Temperature Vapors
+    and Gases, NBS Special Publication 561, Vol. 1, pp. 283-288,
+    National Bureau of Standards, Washington, DC. Proceedings of the
+    10th Materials Research Symposium, Gaithersburg, Maryland,
+    September 18-22, 1978. Issued October 1979.
+  doi: 10.6028/NBS.SP.561v1
+  doi_scope: volume; this extract is the Sasamoto, Kobayashi and Sata chapter only (printed pp. 283-288)
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication561v1.pdf
+  year: 1979
+  corpus_asset: raw/hastie-1979-characterization-of-high-temperature/hastie-1979-characterization-of-high-temperature.pdf
+  corpus_sha256: 5d49070831fdc68ca308fa85c9ea96203e6d717ac72ad65cd280ed2f562d44a2
+extraction:
+  method: >-
+    Manual transcription from the NBS SP 561 Vol. I scan already on the
+    box. Printed pages 283-288 are PDF pages 307-312 (pdf_page_index
+    306-311; PDF page = printed page + 24). Pages were rendered at 200
+    and 400 dpi and read as images; pdftotext was used only as a
+    cross-check. Appearance potentials have no closed scored observation
+    type in literature_extract.v1 and are stored as context. The two
+    printed parent-species abundance ratios at about 1300 °C are scored
+    as gas_speciation. Figures 1-3 were not digitised. Equation (2) is
+    an author estimate from eq. (1) with no supporting T-P table and is
+    kept as context. Printed page 288 is blank in this scan. Distinct
+    from sasamoto-1974-magnesia-vacuum-vaporization-porosity and from
+    kems-042-plante-1979 in the same volume.
+  date: '2026-11-12'
+  worker: empirical-b15-2026-11-12
+  provenance_path: raw/hastie-1979-characterization-of-high-temperature/
+review_status: draft
+fidelity_samples:
+- path: species.GeO2.observations[sasamoto_1979_parent_species_abundance_ratios].values.ratios.GeO2_g_over_GeO_g
+  value: '0.001'
+  locator: {published_page: 286, pdf_page_index: 309, note: 'Printed abundance ratio GeO2(g)/GeO(g) = 0.001 at about 1300 °C.'}
+- path: species.GeO2.observations[sasamoto_1979_parent_species_abundance_ratios].values.ratios.Ge3O3_g_over_GeO_g
+  value: '0.002'
+  locator: {published_page: 286, pdf_page_index: 309, note: 'Printed abundance ratio Ge3O3(g)/GeO(g) = 0.002 at about 1300 °C.'}
+- path: species.GeO2.observations[sasamoto_1979_parent_species_abundance_ratios].values.temperature_C_as_printed
+  value: about 1300
+  locator: {published_page: 286, pdf_page_index: 309, note: 'Temperature of the printed abundance ratios, as "about 1300 °C".'}
+- path: species.GeO2.observations[sasamoto_1979_parent_species_abundance_ratios].values.as_printed
+  value: 'GeO2(g)/GeO(g) = 0.001 and Ge3O3(g)/GeO(g) = 0.002 at about 1300 °C.'
+  locator: {published_page: 286, pdf_page_index: 309, note: 'Printed sentence carrying the two parent-species abundance ratios.'}
+
+species:
+  GeO2:
+    observations:
+    - observation_id: sasamoto_1979_parent_species_abundance_ratios
+      type: gas_speciation
+      locator:
+        published_page: 286
+        pdf_page_index: 309
+        section: Results and Discussion
+      units: dimensionless (pressure ratio, as printed)
+      values:
+        quantity: parent_species_abundance_ratio
+        method_class: kems
+        evidence_class: measured_tabulated
+        temperature_C_as_printed: about 1300
+        basis_as_printed: The abundance ratios of gaseous parent species
+        ratios:
+          GeO2_g_over_GeO_g: '0.001'
+          Ge3O3_g_over_GeO_g: '0.002'
+        as_printed: GeO2(g)/GeO(g) = 0.001 and Ge3O3(g)/GeO(g) = 0.002 at about 1300 °C.
+    context:
+    - observation_id: sasamoto_1979_experimental_method
+      type: method
+      locator:
+        published_page: 283
+        pdf_page_index: 306
+        section: Experimental
+      units: as printed
+      values:
+        quantity: experimental_method
+        method_class: kems
+        evidence_class: method_only
+        sample_as_printed: hexagonal GeO2 (99.99 percent purity)
+        sample_mass_as_printed: about 200 mg
+        instrument_as_printed: A Matauch-Herzog type double-focusing mass spectrograph (JMS-01BM, Japan Electron Optics Laboratory) equipped with a Knudsen source
+        instrument_spelling_as_printed: Matauch-Herzog
+        cell_as_printed: Knudsen cell (Pt 90%-Rh 10%)
+        effusion_hole_diameter_as_printed: 0.3 mm
+        heating_as_printed: The Knudsen cell was indirectly heated by the radiation from a tungsten outer cell which was heated by electron bombardment.
+        thermocouple_as_printed: W 5 percent Re/W 26 percent Re thermocouple positioned at the bottom of the cell
+        temperature_calibration_as_printed: Temperature calibration was made using an optical pyrometer and a carbon cell.
+        ionizing_energy_as_printed: ionized by electrons of 20 eV except when measuring appearance potentials
+        shutter_as_printed: The shutter effect was used to verify that the gaseous species originated from within the Knudsen cell.
+        conditions_assumption_as_printed: we assume that the vaporization experiment was performed under neutral oxidizing conditions
+        conditions_locator: {published_page: 284, pdf_page_index: 307, section: 'Results and Discussion'}
+    - observation_id: sasamoto_1979_assumed_ionization_cross_sections
+      type: textual_fact
+      locator:
+        published_page: 284
+        pdf_page_index: 307
+        section: Experimental
+      units: as printed (relative ionization cross sections from [2,3])
+      values:
+        quantity: assumed_relative_ionization_cross_sections
+        method_class: kems
+        evidence_class: quoted_attributed
+        sigma_Ge_as_printed: '5.71'
+        sigma_O_as_printed: '1.27'
+        sigma_GeO_as_printed: σ_Ge + σ_O = 6.98
+        sigma_GeO2_as_printed: σ_Ge + 2σ_O = 8.25
+        sigma_Ge2O3_over_GeO_as_printed: '2.1'
+        multiplier_assumption_as_printed: we assumed the sensitivity of the secondary electron multiplier was S = 1 for all species
+        references_as_printed: '[2,3]'
+        note: These cross-sections are adopted from Mann [2] and Drowart et al. [3], not measured in this chapter.
+    - observation_id: sasamoto_1979_observed_ions_and_appearance_potentials
+      type: textual_fact
+      locator:
+        published_page: 285
+        pdf_page_index: 308
+        section: Results and Discussion
+      units: eV
+      values:
+        quantity: observed_ions_and_appearance_potentials
+        method_class: kems
+        evidence_class: measured_direct
+        figure2_ions_as_printed: 'Ge+, GeO+, GeO2+, Ge2O+, Ge2O2+, Ge3+, Ge3O+ and Ge3O3+'
+        first_time_under_neutral_conditions_as_printed: 'Mass spectral ions from liquid GeO2, namely GeO2+, Ge2O+, Ge2O2+, Ge3+, Ge3O+, and Ge3O3+ were observed for the first time under neutral oxidizing conditions.'
+        not_previously_observed_as_printed: 'The ions Ge3+ and Ge3O+ were not previously observed in the system, GeO2(hex) + Ge(c), although Ge2O+, Ge2O2+, and Ge3O3+ were observed.'
+        ap_method_as_printed: The approximate appearance potentials were obtained by the linear extrapolation method, the energy scale being calibrated with the appearance potential (12.6 eV) of the H2O+ ion.
+        appearance_potentials_eV:
+          Ge_plus: '16.4'
+          GeO_plus: '13.4'
+          GeO2_plus: '13.4'
+          Ge2O2_plus: '15.8 ± 3'
+          Ge3O3_plus: '12.4'
+        parent_ion_assignment_as_printed: >-
+          We, therefore, consider that GeO+ is the parent ion and Ge+ is
+          a fragment ion from GeO as Drowart, et al. suggested. From
+          similar reasoning we consider that GeO2+ and Ge3O3+ are parent
+          ions. Ge2O+, Ge3+ and Ge3O+ are safely considered to be
+          fragment ions judging from their unusual composition, though
+          their appearance potentials were not measured.
+        comparison_with_drowart_as_printed: Although our values of the appearance potentials are several eV higher than those by Drowart, et al. [3], the relative magnitude of our appearance potentials for the two main gaseous species Ge+ and GeO+ compares well with that by Drowart, et al. [3].
+        drowart_values_reprinted: false
+        note: Appearance potentials are stored here because literature_extract.v1 has no closed scored type for them. Drowart et al. numerical appearance potentials are not reprinted and were not invented.
+    - observation_id: sasamoto_1979_estimated_geo2_vapor_pressure
+      type: textual_fact
+      locator:
+        published_page: 286
+        pdf_page_index: 309
+        equation: '2'
+      units: atm (as printed in eq. 2)
+      values:
+        quantity: estimated_GeO2_vapor_pressure_equation
+        method_class: model_derived
+        evidence_class: author_estimate
+        equation_as_printed: 'log[P(GeO2(g),atm] = 6.05 - (1.88 x 10^4 / T)'
+        preface_as_printed: The vapor pressure of GeO2(g) as estimated from eq. (1) is given by
+        supporting_TP_table: not_printed
+        note: No temperature-pressure table is printed. The coefficients were not recomputed and no points were invented from the equation.
+    - observation_id: sasamoto_1979_cited_group_iv_abundance_ratios
+      type: textual_fact
+      locator:
+        published_page: 286
+        pdf_page_index: 309
+      units: as printed
+      values:
+        quantity: cited_MO2_over_MO_comparisons
+        method_class: secondary_compilation
+        evidence_class: quoted_attributed
+        as_printed: 'CO2(g)/CO(g) >> 1, SiO2(g)/SiO(g) = 0.01 [4], GeO2(g)/GeO(g) = 0.001, and SnO2(g)/SnO(g) = 0.0 [5].'
+        note: The SiO2/SiO and SnO2/SnO ratios are attributed to [4] and [5]. The GeO2/GeO = 0.001 value is this work's printed ratio, repeated here in the comparison sentence.
+    - observation_id: sasamoto_1979_figures
+      type: figure_record
+      locator:
+        published_page: 284
+        pdf_page_index: 307
+        figure: '1-3'
+      units: as printed
+      values:
+        quantity: apparatus_and_mass_spectra_figures
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        figures_as_printed:
+        - id: '1'
+          published_page: 284
+          pdf_page_index: 307
+          caption: Knudsen cell.
+          labels_as_printed: [Orifice, W-outer cell, Pt 10%/Rh, K-cell, Al2O3 supporter, WRe-T.C., ThO2 Tube, 1 cm]
+        - id: '2'
+          published_page: 285
+          pdf_page_index: 308
+          caption: Mass spectrum of vapors over GeO2 liquid.
+          figure_title_as_printed: Mass Spectrum of Vapors over GeO2 Liquid
+          ionizing_volt_as_printed: 43 eV
+          temperature_as_printed: 1380 °C
+          isotope_abundance_ratios_printed_on_figure:
+            '70Ge': '0.2052'
+            '72Ge': '0.2743'
+            '73Ge': '0.0778'
+            '74Ge': '0.3654'
+            '76Ge': '0.0776'
+          shutter_as_printed: "Shutter: Open and Close traces are shown"
+          note: >-
+            The abundance ratios printed on the figure are the calculated
+            isotope abundances used for comparison ("compares well with
+            the corresponding calculated isotope abundance ratios"), not
+            measured peak-height ratios. Peak heights were not digitised.
+        - id: '3'
+          published_page: 286
+          pdf_page_index: 309
+          caption: Isotope peaks of GeO2+.
+          temperature_as_printed: 1160 °C
+          scale_as_printed: 1×10^{-12} A
+          mass_axis_as_printed: m/e 102-107
+          note: Arrows mark peaks assigned to GeO2+. Peak heights were not digitised.
+    - observation_id: sasamoto_1979_discussion_resolution
+      type: textual_fact
+      locator:
+        published_page: 287
+        pdf_page_index: 310
+        section: Discussion
+      units: as printed
+      values:
+        quantity: instrument_resolution_comment
+        method_class: method_only
+        evidence_class: quoted_attributed
+        sasamoto_response_as_printed: Yes, our resolution power is about 2,600 double focusing. This enables one to separate out hydrocarbon background gases from the mass spectra of interest.
+        note: Printed page 288 is blank in this scan.
