@@ -35,6 +35,7 @@ from simulator.wall_deposit_availability import (
 )
 from simulator.vapour_rail.instrumentation import (
     merge_vapour_carrier_lineage,
+    public_carrier_notices,
     vapour_carrier_authority_severity,
     vapour_carrier_authority_status,
 )
@@ -277,6 +278,36 @@ def merge_run_snapshot(
     )
 
 
+def _distinct_public_notices(
+    carriers: Sequence[Any],
+) -> dict[str, list[dict[str, Any]]]:
+    """Every distinct notice across carriers, in encounter order.
+
+    The collector folds singular and plural keys. Exact duplicates collapse.
+    The merged extra stores that list on the singular key.
+    """
+
+    collected: dict[str, list[dict[str, Any]]] = {}
+
+    def add(key: str, notice: object) -> None:
+        if not key.endswith("_notice"):
+            return
+        if not isinstance(notice, Mapping) or not notice:
+            return
+        plain = _plain_authority_mapping(notice)
+        bucket = collected.setdefault(key, [])
+        if plain not in bucket:
+            bucket.append(plain)
+
+    for carrier in carriers:
+        if not isinstance(carrier, Mapping):
+            continue
+        for key, items in public_carrier_notices(carrier).items():
+            for item in items:
+                add(key, item)
+    return collected
+
+
 def _merged_wall_deposit_sticking_authority(
     carried_authority: Mapping[str, Any] | None,
     run_authority: Mapping[str, Any] | None,
@@ -368,20 +399,16 @@ def _merged_wall_deposit_sticking_authority(
                         > vapour_carrier_authority_severity(current_status)
                     ):
                         carriers_by_species[species_key] = record
-                    notices: list[dict[str, Any]] = []
-                    for carrier in (current, record):
-                        extra = carrier.get("extra") if isinstance(carrier, Mapping) else None
-                        if not isinstance(extra, Mapping):
-                            continue
-                        candidates = [extra.get("extrapolation_notice")]
-                        candidates.extend(extra.get("extrapolation_notices", ()))
-                        for notice in candidates:
-                            if isinstance(notice, Mapping) and notice not in notices:
-                                notices.append(_plain_authority_mapping(notice))
-                    if notices:
-                        extra = carriers_by_species[species_key].setdefault("extra", {})
-                        extra.setdefault("extrapolation_notice", notices[0])
-                        extra["extrapolation_notices"] = notices
+                    # One list on the singular key. Distinct disclosures
+                    # are kept; exact duplicates are not.
+                    collected = _distinct_public_notices((current, record))
+                    if collected:
+                        extra = carriers_by_species[species_key].setdefault(
+                            "extra", {}
+                        )
+                        if isinstance(extra, dict):
+                            for key, items in collected.items():
+                                extra[key] = items
         raw_lineage = authority.get(
             "vapour_carrier_lineage_by_deposited_species"
         )

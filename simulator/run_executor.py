@@ -200,6 +200,31 @@ def _campaigns_elapsed_from_session_history(
     return float(fallback)
 
 
+def _publish_session_law_disclosure(method):
+    """Copy the session-owned disclosure onto the simulator after the run.
+
+    The registry is created by SimSession. Opening another scope here would
+    miss every advance that does not go through execute_session, and a
+    per-call snapshot would drop hours already recorded on the session.
+    """
+
+    def wrapper(self, *args, **kwargs):
+        execution = method(self, *args, **kwargs)
+        if execution is None:
+            return execution
+        session = getattr(execution, "session", None)
+        sim = getattr(execution, "simulator", None)
+        if (
+            session is not None
+            and sim is not None
+            and hasattr(session, "law_disclosures")
+        ):
+            sim.law_disclosures = tuple(session.law_disclosures or ())
+        return execution
+
+    return wrapper
+
+
 class RunExecutor:
     """Drive a configured session and return structured execution data."""
 
@@ -231,6 +256,7 @@ class RunExecutor:
             kwargs["stop_at_stage0_exit"] = True
         return self.execute_session(session, **kwargs)
 
+    @_publish_session_law_disclosure
     def execute_session(
         self,
         session: SimSession,

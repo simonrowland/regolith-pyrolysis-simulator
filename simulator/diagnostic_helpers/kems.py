@@ -533,6 +533,48 @@ def apparatus_effusion_molar_rate(
     return flux * area * factor
 
 
+def _read_kems_surface_cache(
+    cache: Mapping[tuple, Mapping[str, Any]],
+    key: tuple,
+) -> Mapping[str, Any] | None:
+    """Only read of ``KEMSAdapter._surface_cache``.
+
+    No readable ``law_disclosures`` is a miss. The caller recomputes. A known
+    row, including a measured empty disclosure, has already been re-registered
+    on the active run.
+    """
+
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    record = cache.get(key)
+    if not isinstance(record, Mapping):
+        return None
+    if accept_stored_memo(record) is None:
+        return None
+    return record
+
+
+def _store_kems_surface_cache(
+    cache: dict[tuple, dict[str, Any]],
+    key: tuple,
+    *,
+    surface: Mapping[str, float],
+    runtime: Mapping[str, Any],
+) -> None:
+    """Store one provider surface with the disclosure that dispatch measured."""
+
+    disclosures = runtime.get("law_disclosures")
+    if not isinstance(disclosures, list):
+        return
+    cache[key] = {
+        "surface": dict(surface),
+        "runtime": dict(runtime),
+        "law_disclosures": [
+            dict(item) for item in disclosures if isinstance(item, Mapping)
+        ],
+    }
+
+
 @dataclass(frozen=True)
 class KEMSRun:
     records: tuple[ComparisonRecord, ...]
@@ -547,6 +589,10 @@ class KEMSAdapter:
 
         self._vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
         self._provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+        # Survives evaluate() so a later run can replay the stored disclosure.
+        # The key includes the provider identity: a replaced provider must not
+        # reuse another provider's pressures.
+        self._surface_cache: dict[tuple, dict[str, Any]] = {}
 
     def _molar_mass_kg_mol(self, species: str) -> float | None:
         for group in ("metals", "oxide_vapors"):
@@ -560,6 +606,19 @@ class KEMSAdapter:
                     / 1000.0
                 )
         return None
+
+    def _surface_cache_key(
+        self,
+        case: Mapping[str, Any],
+        temperature_K: float,
+    ) -> tuple:
+        return (
+            id(self._provider),
+            str(case["oxide"]["formula"]),
+            float(case["provider_inputs"]["pO2_bar"]),
+            float(case["exterior_chamber_pressure"]["value_pa"]),
+            float(temperature_K),
+        )
 
     def _surface(
         self,
@@ -581,33 +640,67 @@ class KEMSAdapter:
             fO2_log=math.log10(pO2_bar),
             control_inputs={"pO2_bar": pO2_bar, "pO2_admission": "observation"},
         )
-        result = self._provider.dispatch(request)
-        provider_status = str(result.status)
-        if provider_status not in _PROVIDER_STATUSES:
-            raise KEMSSchemaError(
-                f"unsupported provider status: {provider_status!r}"
-            )
-        diagnostic = dict(result.diagnostic or {})
-        surface = {
-            str(species): _positive(
-                value,
-                f"provider vapor pressure for {species}",
-                allow_zero=True,
-            )
-            for species, value in dict(
-                diagnostic.get("vapor_pressures_Pa") or {}
-            ).items()
-            if value is not None
-        }
-        runtime = {
-            "provider_id": self._provider.name,
-            "provider_status": provider_status,
-            "temperature_K": temperature_K,
-            "pO2_bar": pO2_bar,
-            "vapor_pressures_Pa": surface,
-            "warnings": list(result.warnings),
-        }
-        return surface, runtime
+        from simulator.vapour_rail.run_disclosure import (
+            active_registry,
+            active_snapshot,
+            disclosure_delta,
+            disclosure_scope,
+        )
+
+        def _dispatch() -> tuple[dict[str, float], dict[str, Any]]:
+            before = active_snapshot()
+            result = self._provider.dispatch(request)
+            # The laws this dispatch executed, not the ambient run. A caller
+            # with no registry still records them on the cache row.
+            disclosures = [
+                dict(item)
+                for item in disclosure_delta(before, active_snapshot())
+            ]
+            provider_status = str(result.status)
+            if provider_status not in _PROVIDER_STATUSES:
+                raise KEMSSchemaError(
+                    f"unsupported provider status: {provider_status!r}"
+                )
+            diagnostic = dict(result.diagnostic or {})
+            # Per-quantity notice beside the pressure. The Antoine SiO
+            # continuation is also registered by the provider, so the
+            # disclosure delta above names that law (SiO:antoine).
+            raw_extrapolations = diagnostic.get("extrapolated_beyond_valid_range_K") or {}
+            extrapolations = {
+                str(species): dict(notice)
+                for species, notice in raw_extrapolations.items()
+                if isinstance(notice, Mapping)
+            }
+            measured = {
+                str(species): _positive(
+                    value,
+                    f"provider vapor pressure for {species}",
+                    allow_zero=True,
+                )
+                for species, value in dict(
+                    diagnostic.get("vapor_pressures_Pa") or {}
+                ).items()
+                if value is not None
+            }
+            measured_runtime = {
+                "provider_id": self._provider.name,
+                "provider_status": provider_status,
+                "temperature_K": temperature_K,
+                "pO2_bar": pO2_bar,
+                "vapor_pressures_Pa": measured,
+                "warnings": list(result.warnings),
+                "law_disclosures": disclosures,
+                "extrapolated_beyond_valid_range_K": extrapolations,
+            }
+            return measured, measured_runtime
+
+        # A caller with no run still measured the laws this dispatch executed.
+        # The temporary scope exists only so the cache row records that
+        # measurement. It is not a second registry the caller publishes.
+        if active_registry() is None:
+            with disclosure_scope(inherit=False):
+                return _dispatch()
+        return _dispatch()
 
     def evaluate(
         self,
@@ -650,7 +743,6 @@ class KEMSAdapter:
 
         records: list[ComparisonRecord] = []
         runtime_rows: list[Mapping[str, Any]] = []
-        surface_cache: dict[float, tuple[dict[str, float], dict[str, Any]]] = {}
         program = recipe["temperature_program"]
         recipe_assumed_input = recipe["provider_inputs"]["status"] == "assumed"
         transmission = recipe["cell"]["transmission_factor"]
@@ -697,14 +789,26 @@ class KEMSAdapter:
                     "temperature_K": temperature_K,
                     "vapor_pressures_Pa": {},
                     "warnings": [],
+                    # No law ran. An empty list is that measurement.
+                    "law_disclosures": [],
                 }
             else:
-                if temperature_K not in surface_cache:
-                    surface_cache[temperature_K] = self._surface(
+                cache_key = self._surface_cache_key(recipe, temperature_K)
+                cached = _read_kems_surface_cache(self._surface_cache, cache_key)
+                if cached is None:
+                    surface, runtime = self._surface(
                         recipe,
                         temperature_K=temperature_K,
                     )
-                surface, runtime = surface_cache[temperature_K]
+                    _store_kems_surface_cache(
+                        self._surface_cache,
+                        cache_key,
+                        surface=surface,
+                        runtime=runtime,
+                    )
+                else:
+                    surface = dict(cached["surface"])
+                    runtime = dict(cached["runtime"])
 
             observable = selector_observable
             species = (

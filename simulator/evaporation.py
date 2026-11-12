@@ -2266,9 +2266,14 @@ class EvaporationMixin:
     ) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
-            gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
+            gate_curve_memo_record,
             record_repair_notice,
+        )
+        from simulator.vapour_rail.run_disclosure import (
+            accept_stored_memo,
+            bind_simulation_run,
+            open_computation,
         )
 
         if self._liquid_fraction_provider == 'analytical':
@@ -2280,13 +2285,22 @@ class EvaporationMixin:
                 )
             return gate_curve_memo_record(curve, None, (), 'live')
 
+        # Same gate as the local and shared slots. A hold with no readable
+        # disclosure is unknown, not "no flagged law", so it is not returned.
+        # Dropping it lets this hour recompute; a known disclosure is
+        # re-registered before the copy is returned.
         held = self._freeze_gate_held_curve_record
         if (
-            held is not None
-            and held['hour'] == int(self.melt.hour)
-            and held['provider'] == self._liquid_fraction_provider
+            isinstance(held, Mapping)
+            and held.get('hour') == int(self.melt.hour)
+            and held.get('provider') == self._liquid_fraction_provider
         ):
-            return copy.deepcopy(held['record'])
+            published = accept_stored_memo(held.get('record'), owner=self)
+            if published is not None:
+                record = copy.deepcopy(held['record'])
+                record['law_disclosures'] = published
+                return record
+            self._freeze_gate_held_curve_record = None
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
@@ -2312,21 +2326,33 @@ class EvaporationMixin:
         )
 
         if store is not None and getattr(store, 'replay_enabled', False):
-            curve = store.replay_gate_curve(
-                self,
-                fO2_log=fO2_log,
-                **redox_state_kwargs,
-            )
-            self._record_composition_projected_liquidus_notice_from_curve(curve)
-            replay_notices = getattr(
-                self, '_last_reduced_real_replay_notices', None
-            )
-            return gate_curve_memo_record(
-                curve,
-                None,
-                replay_notices if isinstance(replay_notices, list) else (),
-                'replay',
-            )
+            # Same registry as the live solve. The store hit re-registers
+            # into it before this returns.
+            with bind_simulation_run(self):
+                curve = store.replay_gate_curve(
+                    self,
+                    fO2_log=fO2_log,
+                    **redox_state_kwargs,
+                )
+                self._record_composition_projected_liquidus_notice_from_curve(curve)
+                replay_notices = getattr(
+                    self, '_last_reduced_real_replay_notices', None
+                )
+                # The store already re-registered this hit. Copy that
+                # measurement onto the record. A second accept here would
+                # count the same read twice. None means the hit was unknown.
+                published = getattr(store, '_accepted_hit_disclosures', None)
+                return gate_curve_memo_record(
+                    curve,
+                    None,
+                    replay_notices if isinstance(replay_notices, list) else (),
+                    'replay',
+                    **(
+                        {'law_disclosures': published}
+                        if published is not None
+                        else {}
+                    ),
+                )
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
@@ -2350,31 +2376,39 @@ class EvaporationMixin:
                 **redox_state_kwargs,
             )
         ):
-            curve = dict(cached_curve)
-            for notice in cached_notices:
-                record_repair_notice(self, notice)
-            self._record_composition_projected_liquidus_notice_from_curve(curve)
-            if store is not None and getattr(store, 'capture_enabled', False):
-                if gate_curve_memo_is_cacheable(
-                    self,
-                    curve,
-                    cache.get('provider_outcome'),
-                    disposition=cache.get('disposition', 'live'),
-                ):
-                    store.capture_gate_curve(
-                        self,
-                        fO2_log=fO2_log,
-                        curve=curve,
-                        repair_notices=cached_notices,
-                        **redox_state_kwargs,
+            with bind_simulation_run(self):
+                published = accept_stored_memo(cache, owner=self)
+                if published is not None:
+                    curve = dict(cached_curve)
+                    for notice in cached_notices:
+                        record_repair_notice(self, notice)
+                    self._record_composition_projected_liquidus_notice_from_curve(
+                        curve
                     )
-            return gate_curve_memo_record(
-                curve,
-                cache.get('origin'),
-                cached_notices,
-                'memo-hit',
-                provider_outcome=cache.get('provider_outcome'),
-            )
+                    hit = gate_curve_memo_record(
+                        curve,
+                        cache.get('origin'),
+                        cached_notices,
+                        'memo-hit',
+                        provider_outcome=cache.get('provider_outcome'),
+                    )
+                    hit["law_disclosures"] = published
+                    if store is not None and getattr(store, 'capture_enabled', False):
+                        if gate_curve_memo_is_cacheable(
+                            self,
+                            curve,
+                            cache.get('provider_outcome'),
+                            disposition=cache.get('disposition', 'live'),
+                        ):
+                            store.capture_gate_curve(
+                                self,
+                                fO2_log=fO2_log,
+                                curve=curve,
+                                repair_notices=cached_notices,
+                                law_disclosures=published,
+                                **redox_state_kwargs,
+                            )
+                    return hit
 
         # Opt-in caller-owned memo for workflows that build fresh simulator
         # instances for equivalent rows. Reuse is based on the quantized
@@ -2413,39 +2447,46 @@ class EvaporationMixin:
                     **redox_state_kwargs,
                 )
             ):
-                curve = shared_value
-                for notice in shared_notices:
-                    record_repair_notice(self, notice)
-                self._record_composition_projected_liquidus_notice_from_curve(curve)
-                record = gate_curve_memo_record(
-                    curve,
-                    shared_origin,
-                    shared_notices,
-                    'memo-hit',
-                    provider_outcome=process_cached.get('provider_outcome'),
-                )
-                self._freeze_gate_liquid_fraction_cache = {
-                    **record,
-                    'key': key,
-                }
-                if (
-                    store is not None
-                    and getattr(store, 'capture_enabled', False)
-                    and gate_curve_memo_is_cacheable(
-                        self,
-                        curve,
-                        record.get('provider_outcome'),
-                        disposition=record.get('disposition', 'live'),
-                    )
-                ):
-                    store.capture_gate_curve(
-                        self,
-                        fO2_log=fO2_log,
-                        curve=curve,
-                        repair_notices=shared_notices,
-                        **redox_state_kwargs,
-                    )
-                return record
+                with bind_simulation_run(self):
+                    published = accept_stored_memo(process_cached, owner=self)
+                    if published is not None:
+                        curve = shared_value
+                        for notice in shared_notices:
+                            record_repair_notice(self, notice)
+                        self._record_composition_projected_liquidus_notice_from_curve(
+                            curve
+                        )
+                        record = gate_curve_memo_record(
+                            curve,
+                            shared_origin,
+                            shared_notices,
+                            'memo-hit',
+                            provider_outcome=process_cached.get('provider_outcome'),
+                        )
+                        record["law_disclosures"] = published
+                        self._freeze_gate_liquid_fraction_cache = {
+                            **record,
+                            'key': key,
+                        }
+                        if (
+                            store is not None
+                            and getattr(store, 'capture_enabled', False)
+                            and gate_curve_memo_is_cacheable(
+                                self,
+                                curve,
+                                record.get('provider_outcome'),
+                                disposition=record.get('disposition', 'live'),
+                            )
+                        ):
+                            store.capture_gate_curve(
+                                self,
+                                fO2_log=fO2_log,
+                                curve=curve,
+                                repair_notices=shared_notices,
+                                law_disclosures=published,
+                                **redox_state_kwargs,
+                            )
+                        return record
 
         previous_in_progress = bool(
             getattr(self, '_freeze_gate_curve_in_progress', False)
@@ -2465,174 +2506,194 @@ class EvaporationMixin:
             None,
         )
         self._invalid_projected_liquidus_notice = None
-        try:
-            reasons: list[str] = []
-            repair_notices: list[dict[str, Any]] = []
-            curve = self._freeze_gate_curve_from_gate_dispatch(
-                reasons,
-                fO2_log=fO2_log,
-                repair_notices=repair_notices,
-                redox_state=redox_state,
-            )
-            if (
-                isinstance(curve, Mapping)
-                and curve.get('gate_provider_refusal', {}).get('outcome') in {
-                    GateCurveProviderOutcome.NUMERICAL_FAILURE,
-                    GateCurveProviderOutcome.FAILED,
-                }
-            ):
-                record = gate_curve_memo_record(
-                    curve, (self._freeze_gate_last_good_curve or {}).get('origin'),
-                    repair_notices, 'live',
-                    provider_outcome=self._freeze_gate_provider_outcome,
+        # The live curve is one computation. Its memo and PT-0 row store
+        # only the laws this solve executes. A later hit re-registers them.
+        # The session registry is the parent when one is bound. Otherwise
+        # this simulator keeps the registry. open_computation does not
+        # build a detached one.
+        with bind_simulation_run(self), open_computation() as gate_computation:
+            try:
+                reasons: list[str] = []
+                repair_notices: list[dict[str, Any]] = []
+                curve = self._freeze_gate_curve_from_gate_dispatch(
+                    reasons,
+                    fO2_log=fO2_log,
+                    repair_notices=repair_notices,
+                    redox_state=redox_state,
                 )
-                # Holds and first-call floors are tick-local, never solved memos.
-                self._freeze_gate_held_curve_record = {
-                    'hour': int(self.melt.hour),
-                    'provider': self._liquid_fraction_provider,
-                    'record': copy.deepcopy(record),
-                }
-                return record
-
-            # Invalid projected bounds are not a liquidus. The Kress floor
-            # remains the qualified out-of-domain prediction and
-            # the notice names that source plus the dropped components.
-            # The projection itself is never the curve source. No bound at
-            # all is a typed refusal, not a run-killing RuntimeError.
-            invalid_notice = getattr(
-                self,
-                '_invalid_projected_liquidus_notice',
-                None,
-            )
-            if isinstance(invalid_notice, Mapping):
-                existing_notice = (
-                    curve.get('composition_projected_notice')
-                    if isinstance(curve, Mapping)
-                    else None
-                )
-                if isinstance(curve, Mapping) and isinstance(
-                    existing_notice,
-                    Mapping,
+                if (
+                    isinstance(curve, Mapping)
+                    and curve.get('gate_provider_refusal', {}).get('outcome') in {
+                        GateCurveProviderOutcome.NUMERICAL_FAILURE,
+                        GateCurveProviderOutcome.FAILED,
+                    }
                 ):
-                    pass
-                elif isinstance(curve, Mapping):
-                    curve = dict(curve)
-                    curve['composition_projected_notice'] = (
-                        self._invalid_projection_bounds_notice(
-                            invalid_notice,
-                            bounds_source=str(curve.get('source') or ''),
+                    record = gate_curve_memo_record(
+                        curve, (self._freeze_gate_last_good_curve or {}).get('origin'),
+                        repair_notices, 'live',
+                        provider_outcome=self._freeze_gate_provider_outcome,
+                    )
+                    record["law_disclosures"] = [
+                        dict(item) for item in gate_computation.snapshot()
+                    ]
+                    # Holds and first-call floors are tick-local, never solved memos.
+                    self._freeze_gate_held_curve_record = {
+                        'hour': int(self.melt.hour),
+                        'provider': self._liquid_fraction_provider,
+                        'record': copy.deepcopy(record),
+                    }
+                    return record
+
+                # Invalid projected bounds are not a liquidus. The Kress floor
+                # remains the qualified out-of-domain prediction and
+                # the notice names that source plus the dropped components.
+                # The projection itself is never the curve source. No bound at
+                # all is a typed refusal, not a run-killing RuntimeError.
+                invalid_notice = getattr(
+                    self,
+                    '_invalid_projected_liquidus_notice',
+                    None,
+                )
+                if isinstance(invalid_notice, Mapping):
+                    existing_notice = (
+                        curve.get('composition_projected_notice')
+                        if isinstance(curve, Mapping)
+                        else None
+                    )
+                    if isinstance(curve, Mapping) and isinstance(
+                        existing_notice,
+                        Mapping,
+                    ):
+                        pass
+                    elif isinstance(curve, Mapping):
+                        curve = dict(curve)
+                        curve['composition_projected_notice'] = (
+                            self._invalid_projection_bounds_notice(
+                                invalid_notice,
+                                bounds_source=str(curve.get('source') or ''),
+                            )
                         )
-                    )
-                else:
-                    curve = self._freeze_gate_kress_floor_curve(
-                        invalid_notice,
-                        reasons,
-                    )
-                    if curve is None:
-                        self._refuse_freeze_gate_without_liquidus_authority(
+                    else:
+                        curve = self._freeze_gate_kress_floor_curve(
                             invalid_notice,
                             reasons,
                         )
-            if curve is None:
-                detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
-                # Keep the token even when the joined tail is long. The redox
-                # gate must not read this refusal as a missing liquidus.
-                if any('composition_projected' in reason for reason in reasons):
-                    # Named projection, no parseable drop notice, and no
-                    # usable declared-provider bound. Typed refusal; a
-                    # RuntimeError would be re-raised as status=failed.
-                    detail = f'composition_projected; {detail}'
+                        if curve is None:
+                            self._refuse_freeze_gate_without_liquidus_authority(
+                                invalid_notice,
+                                reasons,
+                            )
+                if curve is None:
+                    detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
+                    # Keep the token even when the joined tail is long. The redox
+                    # gate must not read this refusal as a missing liquidus.
+                    if any('composition_projected' in reason for reason in reasons):
+                        # Named projection, no parseable drop notice, and no
+                        # usable declared-provider bound. Typed refusal; a
+                        # RuntimeError would be re-raised as status=failed.
+                        detail = f'composition_projected; {detail}'
+                        raise EvaporationFluxRefusal(
+                            detail,
+                            {
+                                'reason_refused': (
+                                    'freeze_gate_no_liquidus_authority'
+                                ),
+                                'kind': 'composition_projected',
+                                'reason': 'composition_projected',
+                                'bounds_source': 'refused',
+                                'projected_bounds': 'invalid',
+                                'detail': detail,
+                            },
+                        )
                     raise EvaporationFluxRefusal(
-                        detail,
+                        'liquid_fraction_provider_failed',
                         {
-                            'reason_refused': (
-                                'freeze_gate_no_liquidus_authority'
-                            ),
-                            'kind': 'composition_projected',
-                            'reason': 'composition_projected',
-                            'bounds_source': 'refused',
-                            'projected_bounds': 'invalid',
+                            'provider': self._liquid_fraction_provider,
+                            'reason': 'liquid_fraction_provider_failed',
                             'detail': detail,
+                            'outcome': self._freeze_gate_provider_outcome,
                         },
                     )
-                raise EvaporationFluxRefusal(
-                    'liquid_fraction_provider_failed',
-                    {
-                        'provider': self._liquid_fraction_provider,
-                        'reason': 'liquid_fraction_provider_failed',
-                        'detail': detail,
-                        'outcome': self._freeze_gate_provider_outcome,
-                    },
+
+                self._record_composition_projected_liquidus_notice_from_curve(curve)
+                cache_eligible = gate_curve_memo_is_cacheable(
+                    self,
+                    curve,
+                    self._freeze_gate_provider_outcome,
+                )
+                from simulator.engine_binding_admission import (
+                    gate_curve_memo_evidence,
+                    write_gate_curve_memo_record,
                 )
 
-            self._record_composition_projected_liquidus_notice_from_curve(curve)
-            cache_eligible = gate_curve_memo_is_cacheable(
-                self,
-                curve,
-                self._freeze_gate_provider_outcome,
-            )
-            from simulator.engine_binding_admission import (
-                gate_curve_memo_evidence,
-                write_gate_curve_memo_record,
-            )
-
-            evidence = gate_curve_memo_evidence(
-                self,
-                curve,
-                include_selected_bindings=cache_eligible,
-            )
-            record = write_gate_curve_memo_record(
-                self,
-                curve,
-                repair_notices,
-                evidence=evidence,
-                provider_outcome=self._freeze_gate_provider_outcome,
-                **redox_state_kwargs,
-            )
-            origin = record['origin']
-            last_good = self._freeze_gate_last_good_curve
-            if last_good is not None and last_good['curve'] == curve:
-                last_good['origin'] = origin
-            if cache_eligible:
-                self._freeze_gate_liquid_fraction_cache = {
-                    **record,
-                    'key': key,
-                }
+                evidence = gate_curve_memo_evidence(
+                    self,
+                    curve,
+                    include_selected_bindings=cache_eligible,
+                )
+                record = write_gate_curve_memo_record(
+                    self,
+                    curve,
+                    repair_notices,
+                    evidence=evidence,
+                    provider_outcome=self._freeze_gate_provider_outcome,
+                    **redox_state_kwargs,
+                )
+                origin = record['origin']
+                last_good = self._freeze_gate_last_good_curve
+                if last_good is not None and last_good['curve'] == curve:
+                    last_good['origin'] = origin
+                if cache_eligible:
+                    self._freeze_gate_liquid_fraction_cache = {
+                        **record,
+                        'key': key,
+                    }
+                    if isinstance(shared_curve_cache, dict):
+                        # Store a copy so later sim mutations of their local cache
+                        # cannot corrupt the caller-owned memo used by sibling rows.
+                        shared_curve_cache[key] = record
+                    cache_committed = True
+                self._freeze_gate_cache_rebuild_count = (
+                    int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
+                )
+            finally:
+                self._invalid_projected_liquidus_notice = previous_invalid_notice
+                if (
+                    not cache_committed
+                    and getattr(self, '_freeze_gate_liquid_fraction_cache', None)
+                    is computing_cache
+                ):
+                    self._freeze_gate_liquid_fraction_cache = previous_cache
+                self._freeze_gate_curve_in_progress = previous_in_progress
+            disclosures = [dict(item) for item in gate_computation.snapshot()]
+            record["law_disclosures"] = disclosures
+            if cache_committed:
+                cached_record = self._freeze_gate_liquid_fraction_cache
+                if isinstance(cached_record, dict):
+                    cached_record["law_disclosures"] = disclosures
                 if isinstance(shared_curve_cache, dict):
-                    # Store a copy so later sim mutations of their local cache
-                    # cannot corrupt the caller-owned memo used by sibling rows.
-                    shared_curve_cache[key] = record
-                cache_committed = True
-            self._freeze_gate_cache_rebuild_count = (
-                int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
-            )
-        finally:
-            self._invalid_projected_liquidus_notice = previous_invalid_notice
+                    shared_value = shared_curve_cache.get(key)
+                    if isinstance(shared_value, dict):
+                        shared_value["law_disclosures"] = disclosures
             if (
-                not cache_committed
-                and getattr(self, '_freeze_gate_liquid_fraction_cache', None)
-                is computing_cache
+                store is not None
+                and getattr(store, 'capture_enabled', False)
+                and gate_curve_memo_is_cacheable(
+                    self,
+                    curve,
+                    record.get('provider_outcome'),
+                    disposition=record.get('disposition', 'live'),
+                )
             ):
-                self._freeze_gate_liquid_fraction_cache = previous_cache
-            self._freeze_gate_curve_in_progress = previous_in_progress
-        if (
-            store is not None
-            and getattr(store, 'capture_enabled', False)
-            and gate_curve_memo_is_cacheable(
-                self,
-                curve,
-                record.get('provider_outcome'),
-                disposition=record.get('disposition', 'live'),
-            )
-        ):
-            store.capture_gate_curve(
-                self,
-                fO2_log=fO2_log,
-                curve=curve,
-                repair_notices=repair_notices,
-                **redox_state_kwargs,
-            )
-        return record
+                store.capture_gate_curve(
+                    self,
+                    fO2_log=fO2_log,
+                    curve=curve,
+                    repair_notices=repair_notices,
+                    law_disclosures=disclosures,
+                    **redox_state_kwargs,
+                )
+            return record
 
     @staticmethod
     def _freeze_gate_liquidus_fO2_log(fO2_log: float) -> float:

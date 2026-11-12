@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum
 import math
@@ -291,6 +292,48 @@ class SimSession:
         self._operator_decisions: list[dict[str, Any]] = []
         self._result_document: Mapping[str, Any] | None = None
         self._poisoned_error: RuntimeError | None = None
+        from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+        # The run owns the registry. Entry-point wrappers are not a second owner.
+        self._law_disclosure = RunDisclosure()
+
+    @property
+    def law_disclosures(self) -> tuple[dict[str, Any], ...]:
+        return self._law_disclosure.snapshot()
+
+    @contextmanager
+    def _bound_law_disclosure(self):
+        """Bind this session's registry for one start or advance.
+
+        Laws executed here land on the session. When an outer registry is
+        already active (an optimizer candidate), only the counts this call
+        added are merged back. Merging the whole snapshot each hour would
+        count the same execution twice.
+        """
+
+        from simulator.vapour_rail.run_disclosure import (
+            active_registry,
+            bind_run_registry,
+            disclosure_delta,
+        )
+
+        outer = active_registry()
+        before = self._law_disclosure.snapshot()
+        try:
+            with bind_run_registry(self._law_disclosure):
+                yield
+        finally:
+            disclosures = self.law_disclosures
+            sim = self._sim
+            if sim is not None:
+                # Later solves on this simulator attach here when the session
+                # context is not bound. The object is the session registry.
+                sim._law_disclosure_registry = self._law_disclosure
+                sim.law_disclosures = disclosures
+            if outer is not None and outer is not self._law_disclosure:
+                delta = disclosure_delta(before, disclosures)
+                if delta:
+                    outer.reregister_public(delta)
 
     @property
     def simulator(self) -> PyrolysisSimulator:
@@ -304,6 +347,25 @@ class SimSession:
     ) -> "SimSession":
         """Build, load, and start a simulator from explicit config."""
 
+        # A reused session (two CLI start commands) must not keep the previous
+        # run's laws. Replace the registry before the bind snapshots it, so
+        # the outer delta is only what this run adds.
+        from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+        self._law_disclosure = RunDisclosure()
+        sim = self._sim
+        if sim is not None:
+            sim._law_disclosure_registry = self._law_disclosure
+            sim.law_disclosures = ()
+        with self._bound_law_disclosure():
+            return self._start_impl(config, backend=backend)
+
+    def _start_impl(
+        self,
+        config: SimSessionConfig,
+        *,
+        backend: Any | None = None,
+    ) -> "SimSession":
         forecast_backend_resolvable = backend is None
         cached_real_config = None
         if config.backend_name == CACHED_REAL_BACKEND_NAME:
@@ -531,31 +593,42 @@ class SimSession:
             )
         if sim.is_complete():
             raise RuntimeError("cannot advance a complete session")
-        snapshot = sim.step()
-        campaign_summary = getattr(sim, "_last_campaign_summary", None)
-        backend_error = str(getattr(sim, "_last_backend_error", "") or "")
-        sim._last_campaign_summary = None
-        decision = (
-            sim.pending_decision
-            if getattr(sim, "paused_for_decision", False)
-            and sim.pending_decision is not None
-            else None
-        )
-        try:
-            result = StepResult(
-                snapshot=snapshot,
-                per_hour_summary=self._build_per_hour_summary(sim, snapshot),
-                campaign_summary=campaign_summary,
-                decision_event=_decision_event(decision) if decision else None,
-                backend_error=backend_error,
+        with self._bound_law_disclosure():
+            snapshot = sim.step()
+            campaign_summary = getattr(sim, "_last_campaign_summary", None)
+            backend_error = str(getattr(sim, "_last_backend_error", "") or "")
+            sim._last_campaign_summary = None
+            decision = (
+                sim.pending_decision
+                if getattr(sim, "paused_for_decision", False)
+                and sim.pending_decision is not None
+                else None
             )
-        except Exception as exc:
-            self._poisoned_error = RuntimeError(
-                "session projection failed after simulator state committed"
-            )
-            raise self._poisoned_error from exc
-        self._step_results.append(result)
-        return result
+            try:
+                # Projection runs after step() has committed. A failure here
+                # must poison the session; building the summary outside this
+                # block left _poisoned_error unset and the next advance skipped
+                # the hour.
+                summary = dict(self._build_per_hour_summary(sim, snapshot))
+                disclosures = self.law_disclosures
+                if disclosures:
+                    summary["law_disclosures"] = [
+                        dict(item) for item in disclosures
+                    ]
+                result = StepResult(
+                    snapshot=snapshot,
+                    per_hour_summary=summary,
+                    campaign_summary=campaign_summary,
+                    decision_event=_decision_event(decision) if decision else None,
+                    backend_error=backend_error,
+                )
+            except Exception as exc:
+                self._poisoned_error = RuntimeError(
+                    "session projection failed after simulator state committed"
+                )
+                raise self._poisoned_error from exc
+            self._step_results.append(result)
+            return result
 
     def decide(self, choice: str) -> None:
         sim = self._require_sim()
@@ -573,7 +646,10 @@ class SimSession:
                 choice,
                 valid_choices,
             )
-        sim.apply_decision(decision.decision_type, choice)
+        # A campaign change forecasts vapour laws on a detached copy.
+        # Bind first so those evaluations land on this session.
+        with self._bound_law_disclosure():
+            sim.apply_decision(decision.decision_type, choice)
 
     def pending_decision(self) -> DecisionPoint | None:
         return self._require_sim().pending_decision
@@ -775,7 +851,10 @@ class SimSession:
         else:
             raise ValueError(f"unsupported session adjustment {param!r}")
         if adjusted_c0_forecast_field is not None:
-            sim._handle_c0_forecast_adjustment(adjusted_c0_forecast_field)
+            # The forecast deep-copies the simulator and returns only the
+            # prediction. Bind first so its computations register here.
+            with self._bound_law_disclosure():
+                sim._handle_c0_forecast_adjustment(adjusted_c0_forecast_field)
         sim.melt.validate_melt_pressures()
 
     def pause(self) -> None:

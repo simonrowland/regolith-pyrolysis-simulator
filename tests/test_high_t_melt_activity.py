@@ -267,13 +267,31 @@ def _physics_metadata_payload(
         # their existing authority, reason, status and acquisition fields.
         # b-813 adds certified_band; project that key out while preserving
         # every notice field that was already present on green.
+        # b-119 adds diagnostic_admission_notice on FeO_association_gas.
+        # Leaf diff against green 5de5948b2: pressures, activities, sources,
+        # warnings, and every other provenance leaf match. That one key is
+        # the disclosure. The green digest is the provenance without it.
         for record in provenance.values():
+            record.pop("diagnostic_admission_notice", None)
             notice = record.get("extrapolation_notice")
-            if not isinstance(notice, dict):
+            if isinstance(notice, dict):
+                bodies = [notice]
+            elif isinstance(notice, (list, tuple)) and not isinstance(
+                notice, (str, bytes)
+            ):
+                bodies = [item for item in notice if isinstance(item, dict)]
+            else:
                 continue
-            if not {"temperature_K", "valid_range_K"} <= notice.keys():
-                continue
-            notice.pop("certified_band", None)
+            for body in bodies:
+                if not {"temperature_K", "valid_range_K"} <= body.keys():
+                    continue
+                body.pop("certified_band", None)
+            # Typed publication stores every notice as a list. The green
+            # digest hashed one extrapolation notice as a dict. Project
+            # that singleton here, and only here, so the pin stays the
+            # legacy metadata shape.
+            if len(bodies) == 1:
+                record["extrapolation_notice"] = bodies[0]
     return (
         dict(diagnostic["vapor_pressures_source"]),
         provenance,

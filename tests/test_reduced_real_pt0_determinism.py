@@ -633,7 +633,7 @@ def _capped_trace(sim, store: PT0DeterminismStore, snapshots: list) -> dict:
     snapshot = snapshots[-1]
     curves = [
         entry["payload"]["curve"]
-        for entry in store.entries.values()
+        for entry in store._entries.values()
         if entry["artifact"] == "freeze_gate_curve"
     ]
     liquid_fraction_path = []
@@ -2037,6 +2037,7 @@ def test_pt0_gate_replay_separates_buffers_at_same_scalar_fO2(
         ),
         redox_state=state_a,
     )
+    record["law_disclosures"] = []
     capture_sim._freeze_gate_liquid_fraction_cache = {
         **record,
         "key": local_key,
@@ -2815,7 +2816,7 @@ def test_pt0_exact_route_refuses_dependency_vector_mismatch(
     sim, result = _pt0_equilibrium_capture_context(capture)
     capture.capture_equilibrium(sim, result)
     source_key = capture.capture_sequence[-1]["key"]
-    source_entry = capture.entries[_key_hash(source_key)]
+    source_entry = capture._entries[_key_hash(source_key)]
     query_key = copy.deepcopy(source_key)
     query_key["model"]["model"] = "different-admitted-model"
     monkeypatch.setattr(
@@ -2866,7 +2867,7 @@ def test_pt0_physics_ladder_route_refuses_dependency_vector_mismatch(
     capture.capture_equilibrium(sim, result)
     source_key = capture.capture_sequence[-1]["key"]
     source_hash = _key_hash(source_key)
-    source_entry = capture.entries[source_hash]
+    source_entry = capture._entries[source_hash]
     query_key = copy.deepcopy(source_key)
     query_key["model"]["model"] = "different-admitted-model"
     query_bucket = canonical_physics_bucket_key_from_replay_key(query_key)
@@ -2912,7 +2913,7 @@ def test_pt0_capture_refuses_dependency_vector_mismatch(
     capture.capture_equilibrium(sim, result)
 
     assert capture.capture_sequence == []
-    assert capture.entries == {}
+    assert capture._entries == {}
 
 
 def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
@@ -3247,6 +3248,9 @@ def test_pt1_persistent_store_round_trips_exact_payload(
         "repair_notices",
         "disposition",
         "provider_outcome",
+        # Measured empty. The fixture records that no flagged law ran.
+        # The payload bytes below stay the curve alone.
+        "law_disclosures",
     }
     assert runtime_record["provider_outcome"] is rrd.GateCurveProviderOutcome.PRODUCED
     assert set(runtime_record["origin"]) == {
@@ -4174,8 +4178,8 @@ def test_pt0_equilibrium_lookup_capture_and_replay_stay_receipt_gated(
     assert replay.mode == "replay"
     assert replay.persistent_path == db_path
     assert replay.persistent_store is not capture.persistent_store
-    assert replay.entries == capture.entries
-    assert replay.entries is not capture.entries
+    assert replay._entries == capture._entries
+    assert replay._entries is not capture._entries
     assert replay.capture_sequence == capture.capture_sequence
     assert replay.capture_sequence is not capture.capture_sequence
 

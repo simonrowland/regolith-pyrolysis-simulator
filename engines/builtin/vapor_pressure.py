@@ -44,7 +44,7 @@ from __future__ import annotations
 
 import math
 import warnings as runtime_warnings
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
@@ -304,6 +304,11 @@ def _attach_pO2_floor_inversion_notices(
 ) -> dict[str, dict[str, Any]]:
     """Single choke: flag published metal P that used the pO2 floor."""
 
+    from simulator.vapour_rail.instrumentation import (
+        merge_public_notice,
+        public_carrier_notices,
+    )
+
     notices: dict[str, dict[str, Any]] = {}
     token = MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
     for species, pressure_Pa in vapor_pressures.items():
@@ -320,18 +325,252 @@ def _attach_pO2_floor_inversion_notices(
         if notice is None:
             continue
         notices[str(species)] = notice
-        provenance["floor_inversion_notice"] = notice
-        # Public carrier extra copies provenance["extrapolation_notice"]
-        # (request.py). Dual-write so wall/Pareto see the existing
-        # reason/authority/band without a new result field. Do not replace
-        # a temperature-range notice already on that key.
-        if provenance.get("extrapolation_notice") is None:
-            provenance["extrapolation_notice"] = notice
+        # Typed oxide provenance stores every notice as a list. A direct
+        # dict makes a consumer iterating records receive string keys.
+        # The species map above stays one body per species.
+        merge_public_notice(provenance, "floor_inversion_notice", notice)
+        # Dual-write this floor notice onto extrapolation_notice so
+        # wall/Pareto keep the existing field. Do not replace a
+        # temperature-range notice the collector already sees on that key.
+        if "extrapolation_notice" not in public_carrier_notices(provenance):
+            # Typed provenance stores a list. The physics digest projects a
+            # one-element list back to the legacy dict before it hashes.
+            merge_public_notice(provenance, "extrapolation_notice", notice)
         vapor_pressure_provenance[str(species)] = provenance
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):
             vapor_pressure_sources[species] = f"{source}:{token}"
     return notices
+
+
+def _direct_continuation_band(
+    notice: Mapping[str, Any],
+) -> tuple[float, float] | None:
+    """Certified temperature band on a direct continuation notice, if it has one."""
+
+    raw = notice.get("valid_range_K")
+    if not (
+        isinstance(raw, (list, tuple))
+        and not isinstance(raw, (str, bytes))
+        and len(raw) == 2
+    ):
+        certified = notice.get("certified_band")
+        raw = certified.get("temperature_K") if isinstance(certified, Mapping) else None
+    if not (
+        isinstance(raw, (list, tuple))
+        and not isinstance(raw, (str, bytes))
+        and len(raw) == 2
+    ):
+        return None
+    try:
+        return (float(raw[0]), float(raw[1]))
+    except (TypeError, ValueError):
+        return None
+
+
+# Every map this provider publishes to say a vapour pressure was
+# extrapolated. The registrar below is the only reader. A new map is a new
+# row here; the generative test enumerates the rows and fails while the map
+# is undisclosed. ``temperature_band`` is copied onto carrier notices before
+# publication. ``ellingham_fit_band`` is not: its record is
+# ``authority_status="extrapolation_limited"``, and a compiled neighbour's
+# disclosure does not name that Ellingham law.
+PUBLISHED_EXTRAPOLATION_CLASSES: tuple[tuple[str, str], ...] = (
+    ("temperature_band", "extrapolated_beyond_valid_range_K"),
+    ("ellingham_fit_band", "ellingham_extrapolated_beyond_fit_range_K"),
+)
+
+
+def _register_direct_flagged_continuations(
+    *,
+    vapor_pressures: Mapping[str, float],
+    vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
+    disclosure_before: Sequence[Mapping[str, Any]],
+    published_extrapolation_maps: Mapping[str, Mapping[str, Any]],
+) -> None:
+    """Register every published continuation that did not execute a compiled law.
+
+    Invariant: a published vapour pressure whose publication map says the
+    producing law was extrapolated is in the run disclosure under that law.
+    The maps are ``PUBLISHED_EXTRAPOLATION_CLASSES``. Compiled laws register
+    inside ``CompiledPressureEvaluator.evaluate``. This is the one other call
+    of ``register_executed_law``. A temperature or carrier-notice continuation
+    already registered by evaluate() for that species is not registered again.
+    An Ellingham fit-band continuation is a different law (``species:ellingham``)
+    and is registered even when a compiled carrier already disclosed the species.
+    """
+
+    from simulator.vapour_rail.instrumentation import public_carrier_notices
+    from simulator.vapour_rail.run_disclosure import (
+        active_snapshot,
+        disclosure_delta,
+        register_executed_law,
+    )
+
+    delta = disclosure_delta(disclosure_before, active_snapshot())
+    registered_law_ids = {
+        str(item.get("law_id") or "")
+        for item in delta
+        if item.get("law_id")
+    }
+    registered_species = {
+        law_id.split(":", 1)[0] for law_id in registered_law_ids
+    }
+    executions: list[tuple[Any, Any]] = []
+    for class_name, diagnostic_key in PUBLISHED_EXTRAPOLATION_CLASSES:
+        records = published_extrapolation_maps[diagnostic_key]
+        if class_name == "temperature_band":
+            executions.extend(
+                _temperature_band_executions(
+                    vapor_pressures=vapor_pressures,
+                    vapor_pressure_provenance=vapor_pressure_provenance,
+                    temperature_records=records,
+                    registered_species=registered_species,
+                    public_carrier_notices=public_carrier_notices,
+                )
+            )
+        elif class_name == "ellingham_fit_band":
+            executions.extend(
+                _ellingham_fit_band_executions(
+                    vapor_pressures=vapor_pressures,
+                    vapor_pressure_provenance=vapor_pressure_provenance,
+                    ellingham_records=records,
+                    registered_law_ids=registered_law_ids,
+                )
+            )
+        else:
+            raise RuntimeError(
+                f"unpublished extrapolation class {class_name}"
+            )
+    for evaluator, evaluation in executions:
+        register_executed_law(evaluator, evaluation)
+
+
+def _antoine_continuation_execution(
+    species: str,
+    *,
+    notices: Sequence[Mapping[str, Any]],
+):
+    """One direct Antoine continuation. The expression is log10(P/Pa) = A - B/(T+C)."""
+
+    from types import SimpleNamespace
+
+    banded = [
+        notice
+        for notice in notices
+        if _direct_continuation_band(notice) is not None
+    ]
+    chosen = banded[0] if banded else notices[0]
+    reasons: list[str] = []
+    for notice in notices:
+        reason = str(notice.get("reason") or "").strip()
+        if reason and reason not in reasons:
+            reasons.append(reason)
+    evaluator = SimpleNamespace(
+        species_id=str(species),
+        evaluator_family="antoine",
+        valid_temperature_K=_direct_continuation_band(chosen),
+        diagnostic_admission_notice=None,
+    )
+    evaluation = SimpleNamespace(
+        out_of_range=True,
+        status="; ".join(reasons) if reasons else "extrapolated",
+    )
+    return evaluator, evaluation
+
+
+def _temperature_band_executions(
+    *,
+    vapor_pressures: Mapping[str, float],
+    vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
+    temperature_records: Mapping[str, Any],
+    registered_species: set[str],
+    public_carrier_notices,
+) -> list[tuple[Any, Any]]:
+    """Carrier notices, including the temperature map copied onto provenance."""
+
+    executions: list[tuple[Any, Any]] = []
+    covered: set[str] = set()
+    for species in vapor_pressures:
+        if species in registered_species:
+            continue
+        provenance = vapor_pressure_provenance.get(species) or {}
+        extrapolated = [
+            notice
+            for items in public_carrier_notices(provenance).values()
+            for notice in items
+            if notice.get("authority_level") == "extrapolated"
+        ]
+        if not extrapolated:
+            continue
+        executions.append(
+            _antoine_continuation_execution(species, notices=extrapolated)
+        )
+        covered.add(str(species))
+    for species, notice in temperature_records.items():
+        if species not in vapor_pressures or species in registered_species:
+            continue
+        if species in covered or not isinstance(notice, Mapping):
+            continue
+        executions.append(
+            _antoine_continuation_execution(str(species), notices=(notice,))
+        )
+    return executions
+
+
+def _ellingham_fit_band_executions(
+    *,
+    vapor_pressures: Mapping[str, float],
+    vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
+    ellingham_records: Mapping[str, Any],
+    registered_law_ids: set[str],
+) -> list[tuple[Any, Any]]:
+    """Published pressures whose Ellingham fit was used outside its band.
+
+    The record's ``authority_status`` is ``extrapolation_limited``. That is
+    not a carrier notice, so the temperature reader does not see it. The law
+    is ``species:ellingham``, whether the rail is gas fugacity or condensed
+    Raoult. A compiled disclosure of the same species is a different law.
+    """
+
+    from types import SimpleNamespace
+
+    executions: list[tuple[Any, Any]] = []
+    for species, record in ellingham_records.items():
+        if species not in vapor_pressures or not isinstance(record, Mapping):
+            continue
+        if record.get("authority_status") != "extrapolation_limited":
+            continue
+        law_id = f"{species}:ellingham"
+        if law_id in registered_law_ids:
+            continue
+        fit = record.get("fit_range_K")
+        band = None
+        if (
+            isinstance(fit, (list, tuple))
+            and not isinstance(fit, (str, bytes))
+            and len(fit) == 2
+        ):
+            try:
+                band = (float(fit[0]), float(fit[1]))
+            except (TypeError, ValueError):
+                band = None
+        rail = str(
+            (vapor_pressure_provenance.get(species) or {}).get("pressure_rail")
+            or ""
+        ).strip()
+        status = "extrapolation_limited"
+        if rail:
+            status = f"{status}; {rail}"
+        evaluator = SimpleNamespace(
+            species_id=str(species),
+            evaluator_family="ellingham",
+            valid_temperature_K=band,
+            diagnostic_admission_notice=None,
+        )
+        evaluation = SimpleNamespace(out_of_range=True, status=status)
+        executions.append((evaluator, evaluation))
+    return executions
 
 
 def _vapor_pressure_temperature_extrapolation_notice(
@@ -3092,6 +3331,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 },
             )
 
+        from simulator.vapour_rail.run_disclosure import active_snapshot
+
+        # Laws evaluate() registers during this dispatch. Direct Antoine
+        # continuations are registered against this snapshot at publication.
+        disclosure_before = active_snapshot()
+
         vacuum_floor_bar = resolve_request_vacuum_floor_bar(request)
         transport_pO2_bar = self._resolve_transport_pO2_bar(request)
         controls = request.control_inputs or {}
@@ -3209,10 +3454,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             temperature_K=T_K,
             reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
         )
-        transport_notice = transport_o2.observation_or_setpoint_receipt.get(
-            "extrapolation_notice"
+        from simulator.vapour_rail.instrumentation import public_carrier_notices
+
+        transport_notices = public_carrier_notices(
+            transport_o2.observation_or_setpoint_receipt
         )
-        if transport_notice is not None:
+        # The warning text quotes the oxygen-band notice. The collector
+        # already holds every *_notice on the receipt; this selects the
+        # legacy warning body and does not publish the carrier.
+        transport_items = transport_notices.get("extrapolation_notice") or ()
+        if transport_items:
+            transport_notice = transport_items[0]
             warnings.append(
                 f"{transport_notice['reason']}: "
                 f"pO2_bar={transport_notice['pO2_bar_used']!r} "
@@ -4136,10 +4388,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "raw_metal_activity_root": metal_activity_root,
                     "source_label": source_label,
                 }
-                if species in metal_extrapolations:
-                    provenance["extrapolation_notice"] = dict(
-                        metal_extrapolations[species]
-                    )
                 if P_reference_Pa is not None:
                     provenance["P_reference_Antoine_Pa"] = P_reference_Pa
                 if reconstructed_vapor_limit is not None:
@@ -4186,6 +4434,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
         from simulator.vapour_rail.catalog import CatalogCompileError
+        from simulator.vapour_rail.instrumentation import (
+            apply_public_carrier_notices,
+        )
 
         for name, data in oxide_vapors_data.items():
             if self._vapour_rail_catalog is not None:
@@ -4616,22 +4867,33 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
-                oxygen_notice = (
-                    evaluation.extrapolation_notice
-                    if compiled_evaluator is not None
-                    else transport_notice if pO2_scaled else None
-                )
-                if oxygen_notice is not None:
-                    vapor_pressure_provenance[name].setdefault(
-                        "extrapolation_notice", dict(oxygen_notice)
+                if compiled_evaluator is not None:
+                    apply_public_carrier_notices(
+                        vapor_pressure_provenance[name], evaluation
+                    )
+                elif pO2_scaled:
+                    apply_public_carrier_notices(
+                        vapor_pressure_provenance[name],
+                        transport_o2.observation_or_setpoint_receipt,
                     )
                 if source_activity_floor_notice is not None:
-                    vapor_pressure_provenance[name][
-                        "source_activity_floor_notice"
-                    ] = dict(source_activity_floor_notice)
-                    vapor_pressure_provenance[name].setdefault(
+                    from simulator.vapour_rail.instrumentation import (
+                        merge_public_notice,
+                    )
+
+                    # Same writer as the floor notice. A one-element list
+                    # built here would be a second publisher.
+                    merge_public_notice(
+                        vapor_pressure_provenance[name],
+                        "source_activity_floor_notice",
+                        source_activity_floor_notice,
+                    )
+                    # Distinct from a temperature-range notice already on
+                    # the key. Exact duplicates collapse.
+                    merge_public_notice(
+                        vapor_pressure_provenance[name],
                         "extrapolation_notice",
-                        dict(source_activity_floor_notice),
+                        source_activity_floor_notice,
                     )
                 if compiled_evaluator is not None:
                     vapor_pressure_provenance[name][
@@ -4680,7 +4942,18 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 notice.setdefault("reason", reason)
                 provenance = vapor_pressure_provenance.get(species)
                 if provenance is not None:
-                    provenance["extrapolation_notice"] = dict(notice)
+                    # A temperature-range notice joins any disclosure already
+                    # on the key. Replacing the key would drop a distinct
+                    # floor or admission notice. Exact duplicates collapse.
+                    from simulator.vapour_rail.instrumentation import (
+                        merge_public_notice,
+                    )
+
+                    merge_public_notice(
+                        provenance,
+                        "extrapolation_notice",
+                        notice,
+                    )
 
         # YAML authority/bracket labels (pressure-neutral; Bug B pattern).
         species_authority: dict[str, dict[str, Any]] = {}
@@ -4858,6 +5131,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
         if feo_activity_diagnostic is not None:
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
+
+        _register_direct_flagged_continuations(
+            vapor_pressures=vapor_pressures,
+            vapor_pressure_provenance=vapor_pressure_provenance,
+            disclosure_before=disclosure_before,
+            published_extrapolation_maps={
+                key: diagnostic[key]
+                for _class_name, key in PUBLISHED_EXTRAPOLATION_CLASSES
+            },
+        )
 
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,

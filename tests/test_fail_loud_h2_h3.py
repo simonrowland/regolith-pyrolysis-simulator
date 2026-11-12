@@ -305,7 +305,13 @@ def test_builtin_vapor_pressure_commanded_extreme_pO2_floor_is_finite() -> None:
             "vapor_pressure_numerator_provenance"
         ].get(species)
         assert isinstance(provenance, dict)
-        assert provenance.get("extrapolation_notice") == notice
+        published = provenance.get("extrapolation_notice")
+        bodies = (
+            [published]
+            if isinstance(published, dict)
+            else list(published)
+        )
+        assert notice in bodies
 
 
 def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:

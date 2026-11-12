@@ -5249,6 +5249,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_curve_memo_is_cacheable,
             record_repair_notice,
         )
+        from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+        def _carried_disclosures(
+            source: Mapping[str, Any] | None,
+        ) -> dict[str, Any]:
+            # Normalization rebuilds the record. A measured disclosure field,
+            # including [], must survive that rebuild. Absence stays absent.
+            if isinstance(source, Mapping) and "law_disclosures" in source:
+                return {"law_disclosures": source.get("law_disclosures")}
+            return {}
 
         self._last_reduced_real_replay_notices = None
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
@@ -5290,6 +5300,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 **redox_state_kwargs,
             )
         )
+        published_cache = None
+        if cache_hit:
+            # Same miss-or-replay gate as the evaporation slots. No field
+            # is unknown, so this row is not a curve. A known field is
+            # re-registered onto this session before the curve is used.
+            published_cache = accept_stored_memo(cache, owner=self)
+            if published_cache is None:
+                cache_hit = False
         if not cache_hit:
             curve = None
         else:
@@ -5299,6 +5317,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 cache_notices,
                 'memo-hit',
                 provider_outcome=cache.get('provider_outcome'),
+                law_disclosures=published_cache,
             )
 
         memo = getattr(
@@ -5327,16 +5346,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     **redox_state_kwargs,
                 )
             ):
-                record = gate_curve_memo_record(
-                    memoized_record['curve'],
-                    memoized_record.get('origin'),
-                    memoized_record.get('repair_notices'),
-                    'memo-hit',
-                    provider_outcome=memoized_record.get('provider_outcome'),
+                published_memo = accept_stored_memo(
+                    memoized_record,
+                    owner=self,
                 )
-                curve = record['curve']
-                cache_notices = record['repair_notices']
-                core_memo_hit = True
+                if published_memo is None:
+                    memo.pop(key, None)
+                else:
+                    record = gate_curve_memo_record(
+                        memoized_record['curve'],
+                        memoized_record.get('origin'),
+                        memoized_record.get('repair_notices'),
+                        'memo-hit',
+                        provider_outcome=memoized_record.get(
+                            'provider_outcome'
+                        ),
+                        law_disclosures=published_memo,
+                    )
+                    curve = record['curve']
+                    cache_notices = record['repair_notices']
+                    core_memo_hit = True
             elif memoized_record is not None:
                 memo.pop(key, None)
 
@@ -5423,6 +5452,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             record.get('repair_notices'),
             record.get('disposition', 'live'),
             provider_outcome=record.get('provider_outcome'),
+            **_carried_disclosures(record),
         )
         validated_cache = self._freeze_gate_liquid_fraction_cache
         if cache_hit:
@@ -5465,6 +5495,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     provider_outcome=normalized_record.get(
                         'provider_outcome'
                     ),
+                    **_carried_disclosures(normalized_record),
                 ),
                 'key': key,
             }
@@ -5483,6 +5514,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 cache_notices,
                 normalized_record.get('disposition', 'live'),
                 provider_outcome=normalized_record.get('provider_outcome'),
+                **_carried_disclosures(normalized_record),
             )
         self._record_composition_projected_liquidus_notice_from_curve(
             normalized_curve
@@ -9961,18 +9993,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         A forecast can disable the post-equilibrium SulfSat hook because its
         candidate temperatures are not realized run steps.
+
+        Replay, write-through, and the live solve share one bind. A hit that
+        returns before the bind drops its stored disclosure: re-registration
+        has no registry, and the owner's snapshot is published on the way out.
         """
-        store = _pt0_determinism_store_for(self)
-        if store is not None and getattr(store, 'replay_enabled', False):
-            return store.replay_equilibrium(self)
-        cache_write_through = (
-            store is not None
-            and getattr(store, 'write_through_enabled', False)
+        from simulator.vapour_rail.run_disclosure import (
+            bind_simulation_run,
+            open_computation,
         )
-        if cache_write_through:
-            cached_result = store.cached_equilibrium(self)
-            if cached_result is not None:
-                return cached_result
+
+        with bind_simulation_run(self):
+            store = _pt0_determinism_store_for(self)
+            if store is not None and getattr(store, 'replay_enabled', False):
+                return store.replay_equilibrium(self)
+            cache_write_through = (
+                store is not None
+                and getattr(store, 'write_through_enabled', False)
+            )
+            if cache_write_through:
+                cached_result = store.cached_equilibrium(self)
+                if cached_result is not None:
+                    return cached_result
+            # The live solve is one computation. Its cache row stores only the
+            # laws this solve executes. A bound session receives those counts.
+            # With no session, the simulator registry keeps them.
+            with open_computation():
+                return self._get_equilibrium_live(
+                    store,
+                    cache_write_through=cache_write_through,
+                    run_post_equilibrium_sulfsat=run_post_equilibrium_sulfsat,
+                )
+
+    def _get_equilibrium_live(
+        self,
+        store,
+        *,
+        cache_write_through: bool,
+        run_post_equilibrium_sulfsat: bool,
+    ):
         if self.backend is None:
             if cache_write_through:
                 raise RuntimeError(
@@ -14519,15 +14578,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     else {}
                 ),
             }
-        prediction = context._evaluate_c0_exit_forecast(
-            alkali_retention_budget_fraction=(
-                alkali_retention_budget_fraction
-            ),
-            p_total_mbar=p_total_mbar,
-            pO2_mbar=pO2_mbar,
-            remaining_hold_budget_hr=remaining_hold_budget_hr,
-            preferred_exit_temperature_C=preferred_exit_temperature_C,
-        )
+        try:
+            prediction = context._evaluate_c0_exit_forecast(
+                alkali_retention_budget_fraction=(
+                    alkali_retention_budget_fraction
+                ),
+                p_total_mbar=p_total_mbar,
+                pO2_mbar=pO2_mbar,
+                remaining_hold_budget_hr=remaining_hold_budget_hr,
+                preferred_exit_temperature_C=preferred_exit_temperature_C,
+            )
+        finally:
+            # The context is dropped with the prediction. Publish the
+            # parent registry, which the forecast shares, onto this simulator.
+            from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+            parent_registry = getattr(self, '_law_disclosure_registry', None)
+            if (
+                isinstance(parent_registry, RunDisclosure)
+                and not parent_registry.computation
+            ):
+                self.law_disclosures = parent_registry.snapshot()
         forecast_engine = getattr(context, '_c0_forecast_engine', None)
         if forecast_engine is not None:
             prediction['forecast_engine'] = forecast_engine
@@ -14607,6 +14678,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         try:
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
+            # A copied registry would record forecast evaluations on an
+            # object this method drops. Share the parent's run registry.
+            from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+            parent_registry = getattr(self, '_law_disclosure_registry', None)
+            if (
+                isinstance(parent_registry, RunDisclosure)
+                and not parent_registry.computation
+            ):
+                memo[id(parent_registry)] = parent_registry
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
             if live_store is not None:
@@ -14621,6 +14702,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             context.__dict__.update(
                 _deepcopy_refusal_state(forecast_state, memo)
             )
+            if (
+                isinstance(parent_registry, RunDisclosure)
+                and not parent_registry.computation
+            ):
+                context._law_disclosure_registry = parent_registry
             context._c0_forecast_context = True
             context._c0_forecast_engine = forecast_engine
             context._c0_forecast_backend_factory = None

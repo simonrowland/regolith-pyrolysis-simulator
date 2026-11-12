@@ -1540,7 +1540,8 @@ families:
             '
           validation:
             status: pending_validation
-            anchor_refs: []
+            anchor_refs:
+            - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
           source_reactions: []
           pressure_models:
           - fit_target: pseudo_psat_backsolved_from_vaporock
@@ -1551,8 +1552,24 @@ families:
               temperature_K:
               - 1400
               - 1900
+            # Executed law of this pseudo block: diagnostic_only, backsolved
+            # from VapoRock, no coefficients fitted. Authority is
+            # diagnostic/extrapolated and the certification closer is t-1723.
+            # anchor_disagreement is evidence this law disagrees with, not the
+            # law's source. The compiler reads it from this payload and does
+            # not open the anchor file. validation.anchor_refs still points at
+            # that file for the separate residual pin.
             provenance:
-            - source: schema_v1_in_place_migration
+            - source_id: pseudo_psat_backsolved_from_vaporock
+              observation_id: Fe
+              status: diagnostic_only
+              law_provenance: backsolved from VapoRock, no coefficients fitted
+            anchor_disagreement:
+              role: disagreement_not_source
+              anchor: validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
+              temperature_K: 1750.0
+              rail_pressure_Pa: 0.6585350200427053
+              vaporock_pressure_Pa: 0.3004593572618527
             evaluator_family: antoine
             coefficients:
               A: 9.408547

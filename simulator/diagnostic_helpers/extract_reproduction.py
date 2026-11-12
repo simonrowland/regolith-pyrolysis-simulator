@@ -1612,7 +1612,11 @@ def _engine_pure_psat_pa(
 
 
 _VP_PROVIDER_CACHE: dict[int, BuiltinVaporPressureProvider] = {}
-_MELT_PSAT_CACHE: dict[tuple[Any, ...], tuple[float | None, str | None, dict[str, Any]]] = {}
+# Melt provider surfaces. A hit is a skipped law execution, so the disclosure
+# measured during the dispatch is stored on the row. The only read is
+# _read_melt_psat_cache. The key is the request (T, pO2, account), never the
+# disclosure.
+_MELT_PSAT_CACHE: dict[tuple[Any, ...], dict[str, Any]] = {}
 
 
 def _builtin_vp_provider(
@@ -1624,6 +1628,90 @@ def _builtin_vp_provider(
         provider = BuiltinVaporPressureProvider(vapor_pressure_data)
         _VP_PROVIDER_CACHE[ident] = provider
     return provider
+
+
+def _read_melt_psat_cache(cache_key: tuple[Any, ...]) -> Mapping[str, Any] | None:
+    """Only read of ``_MELT_PSAT_CACHE``.
+
+    No readable ``law_disclosures`` is a miss. The caller recomputes. A known
+    row, including a measured empty disclosure, has already been re-registered
+    on the active run.
+    """
+
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    record = _MELT_PSAT_CACHE.get(cache_key)
+    if not isinstance(record, Mapping):
+        return None
+    if accept_stored_memo(record) is None:
+        return None
+    return record
+
+
+def _published_law_disclosures(*groups: Any) -> list[dict[str, Any]]:
+    """Merge disclosure rows the way a replay adds counts.
+
+    The returned list is what a ranking or pressure publication carries.
+    The same law from two computations keeps one row and adds the counts.
+    """
+
+    merged: dict[str, dict[str, Any]] = {}
+    for group in groups:
+        if isinstance(group, Mapping) or isinstance(group, (str, bytes)):
+            continue
+        if not isinstance(group, (list, tuple)):
+            continue
+        for item in group:
+            if not isinstance(item, Mapping):
+                continue
+            law_id = str(item.get("law_id") or "")
+            if not law_id:
+                continue
+            try:
+                extra = int(item.get("evaluation_count") or 1)
+            except (TypeError, ValueError):
+                extra = 1
+            if extra < 1:
+                extra = 1
+            current = merged.get(law_id)
+            if current is None:
+                copied = dict(item)
+                copied["evaluation_count"] = extra
+                merged[law_id] = copied
+                continue
+            current["evaluation_count"] = int(current.get("evaluation_count") or 1) + extra
+    return [merged[key] for key in sorted(merged)]
+
+
+def _store_melt_psat_cache(
+    cache_key: tuple[Any, ...],
+    *,
+    status: str | None,
+    reason: str | None,
+    diagnostic: Mapping[str, Any],
+    surface: Mapping[str, Any],
+    warnings: Sequence[Any],
+    before: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Store one dispatch with the disclosure that dispatch measured."""
+
+    from simulator.vapour_rail.run_disclosure import (
+        active_snapshot,
+        disclosure_delta,
+    )
+
+    disclosures = [
+        dict(item) for item in disclosure_delta(before, active_snapshot())
+    ]
+    _MELT_PSAT_CACHE[cache_key] = {
+        "status": status,
+        "reason": reason,
+        "diagnostic": dict(diagnostic),
+        "surface": dict(surface),
+        "warnings": list(warnings),
+        "law_disclosures": disclosures,
+    }
+    return disclosures
 
 
 def _engine_melt_psat_pa(
@@ -1650,8 +1738,14 @@ def _engine_melt_psat_pa(
         float(pO2_bar),
         tuple(sorted((str(k), round(float(v), 12)) for k, v in account.items())),
     )
-    cached_surface = _MELT_PSAT_CACHE.get(cache_key)
+    cached_surface = _read_melt_psat_cache(cache_key)
     if cached_surface is None:
+        from simulator.vapour_rail.run_disclosure import (
+            active_registry,
+            active_snapshot,
+            disclosure_scope,
+        )
+
         provider = _builtin_vp_provider(vapor_pressure_data)
         request = IntentRequest(
             intent=ChemistryIntent.VAPOR_PRESSURE,
@@ -1666,36 +1760,63 @@ def _engine_melt_psat_pa(
                 "pO2_bar": float(pO2_bar), "pO2_admission": "observation",
             },
         )
-        try:
-            result = provider.dispatch(request)
-        except Exception as exc:  # noqa: BLE001
-            packed = (
-                None,
-                f"provider_exception:{type(exc).__name__}:{exc}",
-                {},
-                {},
+
+        def _dispatch() -> tuple[Any, ...]:
+            before = active_snapshot()
+            try:
+                result = provider.dispatch(request)
+            except Exception as exc:  # noqa: BLE001
+                reason = f"provider_exception:{type(exc).__name__}:{exc}"
+                _store_melt_psat_cache(
+                    cache_key,
+                    status=None,
+                    reason=reason,
+                    diagnostic={},
+                    surface={},
+                    warnings=[],
+                    before=before,
+                )
+                return ("exception", reason)
+            status = str(result.status)
+            diagnostic = dict(result.diagnostic or {})
+            surface = dict(diagnostic.get("vapor_pressures_Pa") or {})
+            warnings = list(result.warnings or ())
+            disclosures = _store_melt_psat_cache(
+                cache_key,
+                status=status,
+                reason=None,
+                diagnostic=diagnostic,
+                surface=surface,
+                warnings=warnings,
+                before=before,
             )
-            _MELT_PSAT_CACHE[cache_key] = packed
-            return packed[0], packed[1], {}
-        status = str(result.status)
-        diagnostic = dict(result.diagnostic or {})
-        surface = dict(diagnostic.get("vapor_pressures_Pa") or {})
-        packed = (
-            status,
-            dict(diagnostic),
-            surface,
-            list(result.warnings or ()),
-        )
-        _MELT_PSAT_CACHE[cache_key] = packed
-        warnings = list(packed[3])
+            return ("ok", status, diagnostic, surface, warnings, disclosures)
+
+        # Standalone reproduction has no session. The temporary scope exists
+        # so evaluate() records the laws this dispatch executed. Those laws
+        # are published on the returned runtime, which is what ranking reads.
+        if active_registry() is None:
+            with disclosure_scope(inherit=False):
+                dispatched = _dispatch()
+        else:
+            dispatched = _dispatch()
+        if dispatched[0] == "exception":
+            return None, dispatched[1], {}
+        _status_tag, status, diagnostic, surface, warnings, disclosures = dispatched
     else:
-        packed = cached_surface
-        if packed[0] is None:
-            return packed[0], packed[1], dict(packed[2])
-        status, diagnostic, surface, warnings = packed
-        diagnostic = dict(diagnostic)
-        surface = dict(surface)
-        warnings = list(warnings)
+        if cached_surface["status"] is None:
+            return cached_surface["status"], cached_surface["reason"], dict(
+                cached_surface["surface"]
+            )
+        status = cached_surface["status"]
+        diagnostic = dict(cached_surface["diagnostic"])
+        surface = dict(cached_surface["surface"])
+        warnings = list(cached_surface["warnings"])
+        disclosures = [
+            dict(item)
+            for item in cached_surface["law_disclosures"]
+            if isinstance(item, Mapping)
+        ]
     runtime = {
         "provider_id": "builtin-vapor-pressure",
         "provider_status": status,
@@ -1705,6 +1826,7 @@ def _engine_melt_psat_pa(
         "account_mol": account,
         "vapor_pressures_Pa": dict(surface),
         "warnings": list(warnings),
+        "law_disclosures": disclosures,
     }
     if status != "ok":
         return None, f"provider_status:{status}", runtime
@@ -3321,6 +3443,9 @@ def _evaluate_rate(
                     "molar_mass_kg_mol": molar_mass,
                     "alpha_context": alpha_runtime,
                     "pressure_runtime": pressure_runtime,
+                    "law_disclosures": _published_law_disclosures(
+                        pressure_runtime.get("law_disclosures")
+                    ),
                 }
             )
             break
@@ -4159,8 +4284,12 @@ def _engine_species_rank_metric(
     else:
         pressure, refusal, runtime = _engine_melt_psat_pa(species, T_K, pO2, vp_data)
         if pressure is None:
+            kept = _published_law_disclosures(runtime.get("law_disclosures"))
             pressure, refusal = _engine_pure_psat_pa(species, T_K, vp_data)
-            runtime = {"pressure_path": "pure_component"}
+            runtime = {
+                "pressure_path": "pure_component",
+                "law_disclosures": kept,
+            }
     if pressure is None:
         return None, refusal or "missing_capability:vapor_rail_species", runtime
     alpha, alpha_refusal, alpha_runtime = _engine_alpha(species, T_K)
@@ -4394,13 +4523,18 @@ def _evaluate_ordering(
     n_held = 0
     violations: list[dict[str, Any]] = []
     metric_by_T: list[dict[str, Any]] = []
+    ranked_disclosures: list[Any] = []
     for T_K in T_grid:
         metrics: dict[str, float] = {}
         refusals: dict[str, str] = {}
         needed = {s for pair in engine_pairs for s in pair}
         for species in needed:
-            value, refusal, _rt = _engine_species_rank_metric(
+            value, refusal, rank_runtime = _engine_species_rank_metric(
                 species, T_K, diagnostic_pO2, vp, melt_recipe
+            )
+            ranked_disclosures = _published_law_disclosures(
+                ranked_disclosures,
+                rank_runtime.get("law_disclosures"),
             )
             if value is None:
                 refusals[species] = refusal or "engine_rank_unavailable"
@@ -4434,6 +4568,7 @@ def _evaluate_ordering(
     runtime["pairs_held"] = n_held
     runtime["violations"] = violations
     runtime["metric_by_T"] = metric_by_T
+    runtime["law_disclosures"] = ranked_disclosures
     if n_checked == 0:
         return _emit(
             verdict="not_evaluable",
@@ -4508,10 +4643,10 @@ def _evaluate_relative_volatility(
         )
     diagnostic_pO2 = float(pO2) if pO2 is not None else DEFAULT_PO2_BAR
     T_K = T_grid[0] if len(T_grid) == 1 else T_grid[len(T_grid) // 2]
-    num_v, num_r, _ = _engine_species_rank_metric(
+    num_v, num_r, num_runtime = _engine_species_rank_metric(
         numerator, T_K, diagnostic_pO2, vp_data, melt_recipe
     )
-    den_v, den_r, _ = _engine_species_rank_metric(
+    den_v, den_r, den_runtime = _engine_species_rank_metric(
         denominator, T_K, diagnostic_pO2, vp_data, melt_recipe
     )
     runtime = {
@@ -4521,6 +4656,10 @@ def _evaluate_relative_volatility(
         "temperature_K": T_K,
         "pO2_bar": diagnostic_pO2,
         "melt_recipe_source": recipe_source,
+        "law_disclosures": _published_law_disclosures(
+            num_runtime.get("law_disclosures"),
+            den_runtime.get("law_disclosures"),
+        ),
         **axes_runtime,
     }
     if num_v is None or den_v is None or den_v == 0.0:

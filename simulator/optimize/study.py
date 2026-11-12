@@ -372,6 +372,7 @@ class StudyRecord:
     seed_lineage: bool = False
     search_provenance: Mapping[str, Any] = field(default_factory=dict)
     eval_spec: EvalSpec | None = None
+    law_disclosures: tuple[Mapping[str, Any], ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "objectives", MappingProxyType(dict(self.objectives)))
@@ -408,6 +409,15 @@ class StudyRecord:
             self,
             "search_provenance",
             MappingProxyType(dict(self.search_provenance)),
+        )
+        object.__setattr__(
+            self,
+            "law_disclosures",
+            tuple(
+                dict(item)
+                for item in self.law_disclosures
+                if isinstance(item, Mapping)
+            ),
         )
 
 
@@ -2197,7 +2207,7 @@ def _owner_strategy_payload(owner: StagedStrategy | None) -> Mapping[str, Any] |
 
 
 def _scored_result_journal_payload(scored: ScoredResult) -> Mapping[str, Any]:
-    return {
+    payload = {
         "candidate_id": scored.candidate_id,
         "eval_spec": (
             _serialize_eval_spec(scored.eval_spec)
@@ -2215,7 +2225,10 @@ def _scored_result_journal_payload(scored: ScoredResult) -> Mapping[str, Any]:
         "run_reference": _serialize_run_reference(scored.run_reference),
         "result_blob": _result_blob(scored),
         "notes": list(scored.notes),
+        # Always present. An omitted key is unknown, not a measured empty list.
+        "law_disclosures": [dict(item) for item in scored.law_disclosures],
     }
+    return payload
 
 
 def _assert_journal_objectives_consistent(
@@ -2236,7 +2249,7 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
     objectives = _deserialize_objectives(
         _sequence_of_mappings(payload.get("objectives", ()))
     )
-    return ScoredResult(
+    result = ScoredResult(
         candidate_id=(
             str(payload["candidate_id"]) if payload.get("candidate_id") is not None else None
         ),
@@ -2260,7 +2273,35 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
             payload.get("result_blob"),
         ),
         notes=tuple(str(item) for item in payload.get("notes", ())),
+        law_disclosures=_journal_law_disclosures(payload),
     )
+    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+
+    # Journal replay is a cache read. The payload is the stored entry.
+    accept_stored_memo(payload)
+    return result
+
+
+def _journal_law_disclosures(payload: Mapping[str, Any]) -> tuple[dict[str, Any], ...]:
+    """Measured journal disclosures. A missing field is not an unflagged result."""
+
+    from simulator.vapour_rail.run_disclosure import parse_stored_disclosure_field
+
+    if "law_disclosures" not in payload:
+        raise StudyReplayError(
+            "journal scored_result has no law_disclosures; "
+            "absence is unknown, not an unflagged result"
+        )
+    measured = parse_stored_disclosure_field(
+        payload.get("law_disclosures"),
+        present=True,
+    )
+    if measured is None:
+        raise StudyReplayError(
+            "journal scored_result law_disclosures is unreadable; "
+            "absence is unknown, not an unflagged result"
+        )
+    return measured
 
 
 def _strategy_replay_state(strategy: Strategy, *staged_strategies: Strategy) -> Mapping[str, Any]:
@@ -4407,6 +4448,7 @@ def _to_record(
         seed_lineage=bool(search_provenance["seed_lineage"]),
         search_provenance=search_provenance,
         eval_spec=light_scored.eval_spec,
+        law_disclosures=light_scored.law_disclosures,
     )
 
 
@@ -6593,6 +6635,26 @@ def _materialized_patch_leaderboard_row(
     }
 
 
+def _flagged_law_leaderboard_row(record: StudyRecord) -> dict[str, str]:
+    """Per-candidate law ids and authority. Empty when the metrics are unflagged."""
+
+    disclosures = tuple(getattr(record, "law_disclosures", ()) or ())
+    ids: list[str] = []
+    authorities: list[str] = []
+    for item in disclosures:
+        if not isinstance(item, Mapping):
+            continue
+        law_id = str(item.get("law_id") or "")
+        if not law_id:
+            continue
+        ids.append(law_id)
+        authorities.append(str(item.get("authority") or ""))
+    return {
+        "flagged_law_ids": ",".join(ids),
+        "flagged_law_authority": ",".join(authorities),
+    }
+
+
 def _write_leaderboard(
     path: Path,
     leaderboard: Sequence[StudyRecord],
@@ -6624,6 +6686,8 @@ def _write_leaderboard(
         *sso2_objective_fields,
         *materialized_patch_fields,
         "patch_json",
+        "flagged_law_ids",
+        "flagged_law_authority",
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
@@ -6663,6 +6727,7 @@ def _write_leaderboard(
                     materialized_patch_fields,
                 )
             )
+            row.update(_flagged_law_leaderboard_row(record))
             writer.writerow(row)
 
 

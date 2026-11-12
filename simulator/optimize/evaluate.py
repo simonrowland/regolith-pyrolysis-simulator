@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field, fields, replace
 from enum import Enum
 import hashlib
-from functools import lru_cache
+from functools import lru_cache, wraps
 import importlib
 from importlib import metadata as importlib_metadata
 import inspect
@@ -640,6 +640,7 @@ class ScoredResult:
     failing_gates: tuple[str, ...] = ()
     run_reference: RunReference | None = field(default=None, compare=False)
     notes: tuple[str, ...] = ()
+    law_disclosures: tuple[Mapping[str, Any], ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -649,6 +650,15 @@ class ScoredResult:
         )
         object.__setattr__(self, "failing_gates", _ordered_failing_gates(self.failing_gates))
         object.__setattr__(self, "notes", _ordered_notes(self.notes))
+        object.__setattr__(
+            self,
+            "law_disclosures",
+            tuple(
+                dict(item)
+                for item in self.law_disclosures
+                if isinstance(item, Mapping)
+            ),
+        )
         if self.feasible:
             if self.failure_category is not None:
                 raise ValueError("feasible result cannot carry failure_category")
@@ -686,8 +696,27 @@ class ScoredResult:
                 self.failing_gates,
                 self.run_reference,
                 self.notes,
+                self.law_disclosures,
             ),
         )
+
+
+def _publish_candidate_disclosure(fn):
+    """Isolate one candidate registry and stamp it onto the scored result."""
+
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+        with disclosure_scope(inherit=False) as registry:
+            result = fn(*args, **kwargs)
+            if isinstance(result, ScoredResult) and not result.law_disclosures:
+                snap = registry.snapshot()
+                if snap:
+                    result = replace(result, law_disclosures=snap)
+            return result
+
+    return wrapper
 
 
 class EvaluationAbort(RuntimeError):
@@ -733,6 +762,7 @@ class _CandidateAdmissionError(EvaluationInputError):
     """Raised when a candidate violates a pre-run admission limit."""
 
 
+@_publish_candidate_disclosure
 def evaluate(
     patch: RecipePatch,
     feedstock_id: str,

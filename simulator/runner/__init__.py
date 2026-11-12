@@ -107,6 +107,7 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
+from simulator.vapour_rail.instrumentation import public_carrier_notices
 from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.liner_life import build_liner_life_run_diagnostic
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
@@ -1492,6 +1493,8 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        # Measured disclosures replace an override of the same key.
+        _install_measured_law_disclosures(run_metadata, execution)
         run_metadata["campaigns_elapsed"] = _safe_failure_value(
             lambda: float(execution.campaigns_elapsed),
             section="run_metadata.campaigns_elapsed",
@@ -2917,14 +2920,45 @@ def build_per_hour_summary(
                 "metadata": batch_report.get("metadata"),
             }
         )
-        pressure_notices = {
-            species: dict(channel["extra"]["extrapolation_notice"])
-            for species, channel in batch_report.get("channels_by_species", {}).items()
-            if channel.get("extra", {}).get("extrapolation_notice")
+        pressure_notices: dict[str, dict[str, Any]] = {}
+        channels = batch_report.get("channels_by_species", {})
+        if isinstance(channels, Mapping):
+            for species, channel in channels.items():
+                if not isinstance(channel, Mapping):
+                    continue
+                found = public_carrier_notices(channel)
+                if found:
+                    pressure_notices[str(species)] = {
+                        key: [dict(item) for item in items]
+                        for key, items in found.items()
+                    }
+        # Each notice key publishes the full list. A carrier whose only
+        # notice is a diagnostic admission still appears.
+        extrapolation_notices = {
+            species: notices["extrapolation_notice"]
+            for species, notices in pressure_notices.items()
+            if notices.get("extrapolation_notice")
+        }
+        other_notices = {
+            species: {
+                key: items
+                for key, items in notices.items()
+                if key != "extrapolation_notice"
+            }
+            for species, notices in pressure_notices.items()
+        }
+        other_notices = {
+            species: notices
+            for species, notices in other_notices.items()
+            if notices
         }
         metadata = dict(summary["vapour_batch_summary"].get("metadata") or {})
-        if pressure_notices:
-            metadata["extrapolation_notices_by_species"] = _json_safe(pressure_notices)
+        if extrapolation_notices:
+            metadata["extrapolation_notices_by_species"] = _json_safe(
+                extrapolation_notices
+            )
+        if other_notices:
+            metadata["carrier_notices_by_species"] = _json_safe(other_notices)
         wall_authority = wall_deposit_sticking_authority_status(
             summary["wall_deposit_cumulative_kg"], wall_notice,
         )
@@ -5824,6 +5858,39 @@ def _execution_pO2_enforcement_by_hour(
     return _json_safe(rows)
 
 
+def _install_measured_law_disclosures(
+    run_metadata: dict[str, Any],
+    execution: Any = None,
+    *,
+    prior: Any = None,
+) -> None:
+    """Write the measured disclosure after metadata overrides.
+
+    The measurement is the execution's registry, or ``prior`` captured
+    before the override was applied. A non-empty measurement replaces the
+    override. A measured empty, and a document that had no disclosure
+    before the override, remove the key. An empty measurement must not
+    keep another run's supplied disclosure. The schema leaves the key
+    absent when the run executed no flagged law.
+    """
+
+    if execution is not None:
+        from simulator.vapour_rail.run_disclosure import published_run_disclosures
+
+        measured = published_run_disclosures(execution)
+    elif isinstance(prior, (list, tuple)):
+        measured = prior
+    else:
+        measured = ()
+    if measured:
+        run_metadata["law_disclosures"] = [
+            dict(item) if isinstance(item, Mapping) else item
+            for item in measured
+        ]
+        return
+    run_metadata.pop("law_disclosures", None)
+
+
 def _runner_failure_result(
     *,
     error: RunnerError,
@@ -5881,6 +5948,7 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
+    _install_measured_law_disclosures(run_metadata, execution)
     run_metadata["campaigns_elapsed"] = _safe_failure_value(
         lambda: _json_safe(
             float(
@@ -6421,7 +6489,12 @@ def main(argv: Optional[list[str]] = None) -> int:
                 materials=bundle.materials,
                 backend_name=args.backend,
             )
+            measured_disclosures = result["run_metadata"].get("law_disclosures")
             result["run_metadata"].update(metadata_overrides)
+            _install_measured_law_disclosures(
+                result["run_metadata"],
+                prior=measured_disclosures,
+            )
         else:
             run = PyrolysisRun(
                 feedstock_id=feedstock_id,

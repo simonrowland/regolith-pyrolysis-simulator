@@ -208,9 +208,23 @@ def _build_snapshot(
 
     payload_path = catalog_path or import_root / "data" / "vapor_pressures.yaml"
     payload = yaml.safe_load(payload_path.read_text(encoding="utf-8"))
-    catalog = catalog_module.compile_vapour_rail_catalog(
-        payload, emit_u0_request_rules=False
-    )
+    compile_kwargs: dict[str, Any] = {"emit_u0_request_rules": False}
+    # A historic blob has no fit provenance. Resolve this compiler tree's
+    # evidenced laws once and pass them. Compile does not open that file.
+    # An archived compiler has no such parameter and is left unchanged.
+    accepts_bound_fits = "bound_effective_fits" in inspect.signature(
+        catalog_module.compile_vapour_rail_catalog
+    ).parameters
+    if catalog_path is not None and accepts_bound_fits:
+        live_catalog = yaml.safe_load(
+            (import_root / "data" / "vapor_pressures.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        compile_kwargs["bound_effective_fits"] = (
+            catalog_module.bound_effective_fit_evidence(live_catalog)
+        )
+    catalog = catalog_module.compile_vapour_rail_catalog(payload, **compile_kwargs)
 
     compiled: dict[str, Any] = {}
     evaluations: dict[str, Any] = {}

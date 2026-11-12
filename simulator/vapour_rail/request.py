@@ -1507,22 +1507,43 @@ def refusal_closure(
                 provenance = state.source_reaction_activity_provenance.get(
                     rule.species_id, {}
                 )
-                source_notice = provenance.get("extrapolation_notice")
-                if source_notice is None:
-                    # Floor inversion uses the same public extra field as
-                    # temperature-range extrapolation (diagnostics.py /
-                    # runner Pareto copy extra.extrapolation_notice).
-                    source_notice = provenance.get("floor_inversion_notice")
-                if source_notice is not None:
-                    # Keep the melt source's band/reason attached to its public
-                    # pressure answer, through the existing extensible carrier.
-                    evaluation_extra["extrapolation_notice"] = dict(source_notice)
-                eval_notice = getattr(evaluation, "extrapolation_notice", None)
+                # Every *_notice on the source provenance and on the
+                # evaluation. A diagnostic admission that is the only notice
+                # on either carrier is included. Callers do not select
+                # extrapolation_notice by name. Floor inversion keeps its
+                # existing public alias: when the collected provenance has
+                # no extrapolation_notice, that notice is also published
+                # under extrapolation_notice. A notice already on that key
+                # is left in place.
+                from simulator.vapour_rail.instrumentation import (
+                    apply_public_carrier_notices,
+                    merge_public_notice,
+                )
+
+                apply_public_carrier_notices(evaluation_extra, provenance)
+                # Floor inversion keeps its public alias on the typed extra.
+                # The alias is a list, including when it is the only notice.
+                # A notice already published on extrapolation_notice stays.
                 if (
-                    eval_notice is not None
-                    and "extrapolation_notice" not in evaluation_extra
+                    "extrapolation_notice" not in evaluation_extra
+                    and "floor_inversion_notice" in evaluation_extra
                 ):
-                    evaluation_extra["extrapolation_notice"] = dict(eval_notice)
+                    floor = evaluation_extra["floor_inversion_notice"]
+                    if isinstance(floor, Mapping):
+                        floor_items = [floor]
+                    elif isinstance(floor, (list, tuple)):
+                        floor_items = [
+                            item for item in floor if isinstance(item, Mapping)
+                        ]
+                    else:
+                        floor_items = []
+                    for item in floor_items:
+                        merge_public_notice(
+                            evaluation_extra,
+                            "extrapolation_notice",
+                            item,
+                        )
+                apply_public_carrier_notices(evaluation_extra, evaluation)
                 if _unit_activity_note is not None:
                     from simulator.silent_zero import merge_notes_into_mapping
 
