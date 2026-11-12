@@ -238,16 +238,48 @@ def _magemin_git_environment():
                 os.environ[key] = value
 
 
+def _require_magemin_repository_root(src: Path) -> None:
+    with _magemin_git_environment():
+        repository = subprocess.run(
+            ["git", "-C", str(src), "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            text=True,
+            check=False,
+            env=os.environ.copy(),
+        )
+    resolved_root = repository.stdout.strip()
+    same_root = False
+    if repository.returncode == 0 and resolved_root:
+        try:
+            same_root = os.path.samefile(resolved_root, src)
+        except OSError:
+            pass
+    if not same_root:
+        source_root = src.resolve()
+        resolved_root_path = Path(resolved_root).resolve() if resolved_root else None
+        root_label = str(resolved_root_path) if resolved_root_path else "<no Git repository>"
+        detail = repository.stderr.strip() or repository.stdout.strip()
+        suffix = f": {detail}" if detail else ""
+        raise RuntimeError(
+            f"MAGEMin source {source_root} is not its own Git repository root; "
+            f"Git resolved {root_label}{suffix}"
+        )
+
+
 def _apply_magemin_patches(src: Path, patch_names: tuple[str, ...]) -> None:
     patch_dir = ROOT / "patches" / "magemin"
     with _magemin_git_environment():
         patch_env = os.environ.copy()
+        root_checked = False
         for patch_name in patch_names:
             if not patch_name or Path(patch_name).name != patch_name:
                 raise ValueError(f"invalid MAGEMin patch name: {patch_name!r}")
             patch_file = patch_dir / f"{patch_name}.patch"
             if not patch_file.is_file():
                 raise FileNotFoundError(f"locked MAGEMin patch is missing: {patch_file}")
+            if not root_checked:
+                _require_magemin_repository_root(src)
+                root_checked = True
 
             applied = subprocess.run(
                 [
@@ -296,25 +328,7 @@ def build_magemin(lock: EngineLock, root: Path) -> None:
     pin = lock.engines["magemin"]
     src = engine_install_path(lock, root, "magemin")
     with _magemin_git_environment():
-        source_root = src.resolve()
-        repository = subprocess.run(
-            ["git", "-C", str(src), "rev-parse", "--show-toplevel"],
-            capture_output=True,
-            text=True,
-            check=False,
-            env=os.environ.copy(),
-        )
-        resolved_root = repository.stdout.strip()
-        resolved_root_path = Path(resolved_root).resolve() if resolved_root else None
-        if repository.returncode != 0 or resolved_root_path != source_root:
-            root_label = str(resolved_root_path) if resolved_root_path else "<no Git repository>"
-            detail = repository.stderr.strip() or repository.stdout.strip()
-            suffix = f": {detail}" if detail else ""
-            raise RuntimeError(
-                f"MAGEMin source {source_root} is not its own Git repository root; "
-                f"Git resolved {root_label}{suffix}"
-            )
-
+        _require_magemin_repository_root(src)
         if not checkout_matches_pin(pin, src):
             _record(f"MAGEMin: SKIPPED - source is not at locked commit {pin.pin}")
             return
