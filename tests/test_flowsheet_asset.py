@@ -672,7 +672,7 @@ def test_live_major_species_admission_green(renderer, flowsheet):
     assert all(r.outcome != "FAIL" for r in result.admission_results)
 
 
-def test_live_major_ellingham_output_is_pinned_before_move(renderer):
+def test_live_major_ellingham_output_matches_pinned_baseline(renderer):
     """Pin the current reducer facts and raw ΔG values before moving the calculation."""
     from simulator.chemistry.ellingham_graph import dissociation_delta_g
     from simulator.chemistry.ellingham_thermo import ELLINGHAM_THERMO
@@ -698,6 +698,21 @@ def test_live_major_ellingham_output_is_pinned_before_move(renderer):
         "Mn": "-0x1.e440b11c6d1e0p+8",
         "Cr": "-0x1.afd14b7997a5dp+8",
     }
+
+
+def test_live_major_facts_use_ellingham_graph_calculator(renderer, monkeypatch):
+    from simulator.chemistry import ellingham_graph
+
+    seen: set[str] = set()
+    calculate = ellingham_graph.dissociation_delta_g
+
+    def record(species: str, temperature_K: float) -> float:
+        seen.add(species)
+        return calculate(species, temperature_K)
+
+    monkeypatch.setattr(ellingham_graph, "dissociation_delta_g", record)
+    renderer.build_live_major_facts()
+    assert {"Mg", "Ca", "Si", "Mn", "Cr"} <= seen
 
 
 def test_deliberate_admission_contradiction_fails(renderer, flowsheet):

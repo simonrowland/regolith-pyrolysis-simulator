@@ -809,41 +809,29 @@ def build_live_major_facts() -> dict[str, dict[str, Any]]:
 
     # --- Ellingham-backed Mg/Ca reducibility for tabulated majors ---
     try:
-        from simulator.chemistry.ellingham_thermo import (  # type: ignore
+        from simulator.chemistry.ellingham_graph import (
             ELLINGHAM_THERMO,
-            ellingham_delta_g_kj_per_mol_o2,
+            _metallothermic_reductant_for_oxide,
         )
 
         t_k = 1600.0 + 273.15
-        dg_mg = ellingham_delta_g_kj_per_mol_o2("Mg", t_k)
-        dg_ca = ellingham_delta_g_kj_per_mol_o2("Ca", t_k)
         for el in ELLINGHAM_THERMO:
             if el in facts:
                 continue
             try:
-                dg = ellingham_delta_g_kj_per_mol_o2(el, t_k)
+                reductant = _metallothermic_reductant_for_oxide(el, t_k)
             except Exception:
                 continue
-            # More positive dG than MgO ⇒ oxide less stable ⇒ Mg-reducible
-            if dg > dg_mg + 1.0:
-                facts[el] = {
-                    "element": el,
-                    "reducibility": "mg_reducible",
-                    "reductant_class": "Mg-C6",
-                }
-            elif dg > dg_ca + 1.0:
-                facts[el] = {
-                    "element": el,
-                    "reducibility": "ca_reducible",
-                    "reductant_class": "Ca-calciothermic",
-                }
-            else:
-                # Oxide as stable as or more stable than CaO
-                facts[el] = {
-                    "element": el,
-                    "reducibility": "not_reducible",
-                    "reductant_class": "not-reducible",
-                }
+            reductant_class = {
+                "Mg": "Mg-C6",
+                "Ca": "Ca-calciothermic",
+                None: "not-reducible",
+            }[reductant]
+            facts[el] = {
+                "element": el,
+                "reducibility": _reductant_to_reducibility(reductant_class),
+                "reductant_class": reductant_class,
+            }
     except Exception:  # pragma: no cover
         # Simulator import unavailable — still pin C6/calciothermic process anchors
         for el in ("Al", "Ti", "Si", "Mn", "Cr"):
