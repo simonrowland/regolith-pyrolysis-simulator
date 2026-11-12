@@ -14,6 +14,8 @@ import pytest
 
 from simulator.battery.enums import RefusalReason
 from simulator.battery.migrate import (
+    _InvalidDecimalValue,
+    _as_dec_or_none,
     _mole_fraction_composition_from_values,
     migrate,
     parse_declared_amount,
@@ -29,6 +31,52 @@ _MALFORMED = {
         "CaO": "0.4",
     }
 }
+
+
+def test_optional_decimal_keeps_absence_but_rejects_malformed_text() -> None:
+    assert _as_dec_or_none(None) is None
+    assert _as_dec_or_none("") is None
+    with pytest.raises(_InvalidDecimalValue, match="invalid numeric value"):
+        _as_dec_or_none("not-a-number")
+
+
+def test_malformed_optional_decimal_becomes_invalid_source_issue(
+    tmp_path: Path,
+) -> None:
+    values = {
+        "quantity": "residue_component_composition",
+        "value": "12",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "starting_measured_ppm": "not-a-number",
+        "composition_wt_pct": {"SiO2": "50", "MgO": "50"},
+    }
+    root = _write_min_tree(
+        tmp_path,
+        _scalar_extract(
+            quantity="residue_component_composition",
+            units="wt%",
+            obs_type="residue_component_composition",
+            values=values,
+        ),
+    )
+
+    result = migrate(root, write=False)
+    hard = result.validation.hard_issues if result.validation is not None else ()
+    matches = [
+        issue
+        for issue in hard
+        if issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path is not None
+        and "observation[" in issue.path
+        and issue.detail is not None
+        and "not-a-number" in issue.detail
+    ]
+    assert len(matches) == 1
+    assert not any(
+        observation.observation_id.startswith("fixture-source::")
+        for observation in result.observations.values()
+    )
 
 
 def test_b692_parse_declared_amount_is_single_owner() -> None:

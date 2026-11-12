@@ -885,15 +885,19 @@ def _dec_str(value: Decimal) -> str:
     return text or "0"
 
 
+class _InvalidDecimalValue(Exception):
+    """A present source value that cannot be parsed as a decimal."""
+
+
 def _as_dec_or_none(value: object) -> Decimal | None:
     if value is None or value == "":
         return None
     if isinstance(value, bool):
-        return None
+        raise _InvalidDecimalValue(f"invalid numeric value: {value!r}")
     try:
         return as_decimal(value)
-    except (TypeError, ValueError, ArithmeticError):
-        return None
+    except (TypeError, ValueError, ArithmeticError) as exc:
+        raise _InvalidDecimalValue(f"invalid numeric value: {value!r}") from exc
 
 
 def _classify_composition_cell(value: object) -> tuple[str, Decimal | None]:
@@ -990,16 +994,19 @@ def _mass_percent_component_key(name: str) -> tuple[str, bool]:
 def parse_declared_amount(value: object) -> Decimal:
     """Single owner for source-declared numeric amounts.
 
-    Soft optional fields keep ``_as_dec_or_none``. A declared amount that is
-    absent, boolean, or unparseable is a typed refusal — never a silent drop.
+    Optional fields keep ``_as_dec_or_none`` for the empty/missing case. A
+    declared amount that is absent, boolean, or unparseable is a typed refusal
+    — never a silent drop.
     """
 
     if value is None or value == "" or isinstance(value, bool):
         raise ValueError(f"malformed declared amount: {value!r}")
     try:
-        return as_decimal(value)
-    except (TypeError, ValueError, ArithmeticError) as exc:
+        amount = _as_dec_or_none(value)
+    except _InvalidDecimalValue as exc:
         raise ValueError(f"malformed declared amount: {value!r}") from exc
+    assert amount is not None
+    return amount
 
 
 def _provenance_with_printed_phase(
@@ -24518,7 +24525,26 @@ class Migrator:
 
     def migrate_extracts(self, directory: Path | None = None) -> None:
         for path in discover_extracts(directory or self.extracts_dir):
-            self._migrate_extract(path)
+            rel = (
+                path.relative_to(self.root).as_posix()
+                if path.is_relative_to(self.root)
+                else str(path)
+            )
+            try:
+                self._migrate_extract(path)
+            except _InvalidDecimalValue as exc:
+                self._record_invalid_decimal_source(f"extract[{rel}].numeric", exc)
+
+    def _record_invalid_decimal_source(
+        self, path: str, error: _InvalidDecimalValue
+    ) -> None:
+        self.result.registry_issues.append(
+            ValidationIssue(
+                path=path,
+                reason=RefusalReason.INVALID_SOURCE,
+                detail=str(error),
+            )
+        )
 
     @staticmethod
     def _qualify_registry_id(work_id: str, kind: str, raw: object) -> str:
@@ -25219,6 +25245,11 @@ class Migrator:
                     source_context=source_context,
                     provenance=extract_provenance,
                     fusion_transition_rows=fusion_transition_rows,
+                )
+            except _InvalidDecimalValue as exc:
+                self._record_invalid_decimal_source(
+                    f"observation[{source_id}::{obs['observation_id']}].values",
+                    exc,
                 )
             except (TypeError, ValueError) as exc:
                 error = str(exc)
