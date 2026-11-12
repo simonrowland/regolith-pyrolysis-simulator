@@ -78,6 +78,10 @@ def test_version_badge_current_payloads(monkeypatch, stored, expected) -> None:
             {"value_C": 1800, "kind": "certified", "usable_service_C": 1600, "usable_service": True, "display": "Usable service: 1600 C", "note": "source note"},
         ),
         (
+            CeramicServiceTemperature(1800.12345, "certified", 1600.4321, (), "rounded"),
+            {"value_C": 1800.123, "kind": "certified", "usable_service_C": 1600.432, "usable_service": True, "display": "Usable service: 1600.43 C", "note": "rounded"},
+        ),
+        (
             CeramicServiceTemperature(2200, "fusion", None, (), "not a service rating"),
             {"value_C": 2200, "kind": "fusion", "usable_service_C": None, "usable_service": False, "display": "fusion: 2200 C; not a usable service rating", "note": "not a service rating"},
         ),
