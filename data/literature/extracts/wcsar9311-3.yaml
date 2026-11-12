@@ -1,0 +1,314 @@
+schema_version: literature_extract.v1
+source_id: wcsar9311-3
+source:
+  citation: >-
+    Wittenberg, L. J. (1993). In-situ Extraction of Lunar Soil Volatiles.
+    WCSAR-TR-AR3-9311-3, Wisconsin Center for Space Automation and Robotics,
+    University of Wisconsin-Madison, November 1993. Prepared for Space 94,
+    Albuquerque NM, 26 February–3 March 1994.
+  year: 1993
+  report_number: WCSAR-TR-AR3-9311-3
+  corpus_asset: raw/wcsar9311-3/wcsar9311-3.pdf
+  corpus_sha256: 14bea83bb242b4d1e7ee33d1ba3bb6f95cac3d49bbfaa55d6d12a2d0147da1fa
+extraction:
+  method: >-
+    Manual transcription from the 12-page University of Wisconsin technical
+    report PDF. Pages were rendered at 200 dpi and read as images; the
+    pdftotext -layout layer was used as a cross-check (the PDF is
+    print-allowed but copy-restricted). The report has no numeric data
+    tables. Figures 1–3 are context-only figure records with no digitised
+    points. Printed numbers are retained with their evidence class:
+    quoted literature values, design assumptions, and author calculations.
+    This paper reports a conceptual in-situ heating design and energy-cost
+    estimate; it does not report a laboratory pyrolysis experiment.
+    Temperatures, pressures, and energy figures are stored as printed.
+    The bibliography lists Horai as 1991 while the in-text citation is
+    Horai, 1981; the in-text year is the one carried with the conductivity
+    values.
+  date: '2026-11-12'
+  worker: empirical-b15-2026-11-12
+  provenance_path: raw/wcsar9311-3/
+review_status: draft
+species:
+  lunar_maria_regolith:
+    observations: []
+    context:
+    - observation_id: wcsar9311_3_cited_volatile_concentrations_and_handling_loss
+      type: textual_fact
+      locator:
+        pdf_page_index: 2
+        section: Introduction
+      units: as printed
+      values:
+        quantity: cited_solar_wind_volatile_abundance_and_handling_loss
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        H2_concentration_as_printed: 50-60 ppm
+        He3_concentration_as_printed: 10−2 ppm
+        concentration_sentence_source: printed in the Introduction without a citation on that sentence
+        mechanical_He_release_as_printed: mechanical stress on the soil particles was observed to release helium (Carrier, 1993)
+        sieving_He_loss_as_printed: sieving the soil may have evolved 20-30% of the He (Cameron, 1987)
+        later_discussion_as_printed: the loss of 20-30% of the volatile gases by mechanical handling should be reduced in half by the pneumatic structure
+        later_discussion_locator: {pdf_page_index: 9, section: Discussion}
+    - observation_id: wcsar9311_3_thermal_conductivity_inputs
+      type: textual_fact
+      locator:
+        pdf_page_index: 3
+        section: Techniques for Heating the Soil
+      units: as printed
+      values:
+        quantity: thermal_conductivity
+        lunar_surface_k_as_printed: 10−3 W/m·K at the surface
+        lunar_k_below_0_5_m_as_printed: 10−2 W/m·K at >0.5 m
+        lunar_k_attribution: Langseth, 1976
+        evidence_class_lunar_k: quoted_attributed
+        simulated_soil_k_with_He_as_printed: 0.6-0.7 W/m·K at 1 atm pressure
+        simulated_soil_conditions_as_printed: simulated lunar soil in a conductivity cell at ∼ 27°C with He introduced into the sample
+        simulated_soil_k_attribution: Horai, 1981
+        evidence_class_simulated_k: quoted_attributed
+        predicted_bed_k_as_printed: 1.03 W/m·K
+        predicted_bed_k_attribution: empirical relationship (Deissler and Boegli, 1958), because the thermal conductivity of He increases with temperature
+        predicted_bed_k_assumption_as_printed: a 1 atm of He or H2 could be temporarily maintained in the lunar soil
+        evidence_class_predicted_k: quoted_attributed
+        abstract_k_increase_as_printed: The low thermal conductivity of the lunar soil is increased by a factor of 100 by the inject of H2 gas.
+        abstract_k_locator: {pdf_page_index: 2, section: Abstract}
+        bibliography_year_note: The reference list on pdf_page_index 10 prints Horai, K., 1991, for the same conductivity paper; the in-text citation used with the 0.6-0.7 W/m·K values is Horai, 1981.
+    - observation_id: wcsar9311_3_heater_design_and_feht_results
+      type: textual_fact
+      locator:
+        pdf_page_index: 3
+        section: Techniques for Heating the Soil
+      units: as printed
+      values:
+        quantity: in_situ_heating_design_and_calculated_boundary_temperature
+        method_class: model_derived
+        solar_daylight_as_printed: ∼ 320 hr
+        flat_plate_example:
+          heater_T_as_printed: 1000°C
+          atmosphere_as_printed: 1 atm of H2
+          volatile_release_minimum_T_as_printed: 650°C
+          penetration_as_printed: would only extend ∼ 0.5 m into the soil
+          evidence_class: author_estimate
+        solar_wind_depth_as_printed: the solar-wind elements are known to exist to at least 3 m depth
+        heater_geometry_as_printed: cylindrical heaters ∼ 2 cm diameter, placed vertically into the soil to a depth of 3 m
+        code_as_printed: Finite-Element Heat Transfer Code (Klein, 1990)
+        model_as_printed: center-line maintained at 1073 K; zero heat flow at the outer radius, simulating the boundary between two adjacent cylinders
+        preliminary_result_as_printed: at a radius of 0.5 m, the boundary temperature reached ∼ 1000 K in 400 hr
+        preliminary_evidence_class: model_derived
+        refined_discretisation_as_printed: number of nodes at this radius systematically increased to 136 and the time-steps were increased to 800
+        fig1_result_as_printed: the boundary temperature approaches 900 K in 320 hr
+        fig1_result_locator: {pdf_page_index: 4, figure: '1'}
+        fig1_evidence_class: model_derived
+        volatile_release_estimate_as_printed: Such a time-temperature correlation should be sufficient to release ∼ 90% of the H2 and He, ∼ 10% of the volatile C compounds but only 4% of the N2.
+        volatile_release_evidence_class: author_estimate
+        volatile_release_note: >-
+          These release fractions are printed as what the calculated
+          time-temperature correlation "should be sufficient to release".
+          No laboratory yield table is given, and no citation is attached
+          to that sentence. They are not stored as measured pyrolysis yields.
+    - observation_id: wcsar9311_3_dome_trench_and_heater_layout
+      type: method
+      locator:
+        pdf_page_index: 5
+        section: Configuration of the Mining Site
+      units: as printed
+      values:
+        quantity: pneumatic_dome_and_heater_layout
+        method_class: method_only
+        evidence_class: author_estimate
+        dome_atmosphere_as_printed: one atmosphere of H2
+        fabric_as_printed: carbon fibers; butyl rubber elastomer recommended to impregnate the fibers and form a 1 mm thick fabric
+        unrestrained_thickness_as_printed: woven fabric thickness required is 5.6 mm, which is too thick to be flexible
+        restrained_cells_as_printed: restraining cables ... individual cells ∼ 5 m ×5 m
+        restrained_fabric_thickness_as_printed: the woven carbon fabric needs to be only 0.4 mm thick
+        H2_permeation_as_printed: ∼ 80 kg/yr of H2 permeates the dome fabric
+        H2_permeation_attribution: Based upon the permeation of H2 through butyl rubber (Steinmeyer and Braun, 1976)
+        H2_permeation_fraction_as_printed: which is only 1.3% of the H2 collected from heating the soil
+        trench_as_printed: inflated pillow fills a trench 0.3 m wide by 5 m deep, the nominal depth of the regolith
+        core_drill_as_printed: heaters inserted vertically by use of the core-drill apparatus (NASA Report, 1980), demonstrated to be useful to a depth of 3 m
+        heater_construction_as_printed: heat-pipes composed of Mo alloy shells containing Na or Li
+        heater_spacing_as_printed: A distance of one meter would separate each heater from its 6 surrounding close-packed neighbors
+        edge_setback_as_printed: at the edge of the heated field a distance of 1.5 m is needed to separate the outer heater from the trench
+        heater_length_and_insertion_as_printed: The heaters are only 2 m long but are inserted to a depth of 3 m, so that one-meter of unheated regolith extends above the heaters
+        solar_as_printed: four heliostats to a collector mounted in the center on top of the dome; concentrated solar energy reflected through a small aperture into a long Mo furnace tube
+        layout_locator_heaters: {pdf_page_index: 6, section: Configuration of the Mining Site}
+    - observation_id: wcsar9311_3_gas_flow_model_and_transmission
+      type: textual_fact
+      locator:
+        pdf_page_index: 6
+        section: Techniques for Volatiles Containment and Collection
+      units: as printed
+      values:
+        quantity: hydrogen_cover_gas_flow_and_bottom_loss
+        method_class: model_derived
+        viscous_to_molecular_transition_as_printed: This transition occurs between 10^2 − 10^3 Pa
+        transition_result_as_printed: these diffusing particles ... form a gas pressure which eventually reaches 10^3 Pa and allows the viscous wave to penetrate to lower depths in the heated soil
+        model_as_printed: A one dimensional transient model for viscous gas flow in porous media (Arastoopour 1984) was used for this study as previously described (Wittenberg 1992b)
+        fig3_cycle_as_printed: the H2 pressure was increased from 10^3 Pa to 10^5 Pa over a period of 1200 s (10 min) and then decreased to 10^3 Pa during 1200 s
+        fig3_cycle_locator: {pdf_page_index: 7, figure: '3'}
+        fig3_4m_as_printed: At 4 m below the surface the pressure fluctuated between (2 − 5) × 10^3 Pa; the value where H2 flow changes from viscous to molecular flow
+        mare_tranquillitatis_regolith_depth_as_printed: ∼ 5 m
+        unsealed_zone_as_printed: A 1 m zone exists, therefore, between the viscous flow regime and the bottom of the regolith
+        transmission_equation_as_printed: log λ = −1.11 d (cm)
+        transmission_equation_attribution: radiative heat transfer through a randomly packed bed of spheres modeled by the Monte Carlo method (Yang et al., 1983)
+        photon_absorption_assumption_as_printed: 40% of the radiant energy was assumed to be absorbed as each photon reflected from a sphere
+        transmission_probability_as_printed: ∼ 10^{−111}/m
+        transmission_locator: {pdf_page_index: 8, section: Techniques for Volatiles Containment and Collection}
+        transmission_conclusion_as_printed: hence, an insignificant loss of gas to lower depths
+        section_title_note: The section title on pdf_page_index 6 is "Techniques for Volatiles Containment and Collection".
+        note: >-
+          The printed transmission probability is the extraordinary value
+          ∼ 10^{-111}/m, obtained from log λ = −1.11 d (cm) at d = 1 m
+          expressed per metre. The value is stored as printed; it was not
+          recomputed or corrected.
+    - observation_id: wcsar9311_3_mass_inventory
+      type: textual_fact
+      locator:
+        pdf_page_index: 8
+        section: Energy Cost of 3He Production
+      units: as printed
+      values:
+        quantity: design_mass_inventory
+        method_class: author_estimate
+        evidence_class: author_estimate
+        field_as_printed: a lunar field of 100 m diameter was considered which would be moved to a new field after each lunar day (13 times/Earth year) and produce 10 kg of 3He/yr
+        lifetime_as_printed: 20 yr lifetime (Kulcinski et al. 1989)
+        dome_diameter_as_printed: 100 m (1 mm thick)
+        cable_equivalent_thickness_as_printed: constrained by cables which is equivalent to a 5.6 mm thickness
+        dome_area_as_printed: 8200 m2
+        fabric_density_as_printed: 1800 kg/m3
+        dome_mass_as_printed: 80 tonnes
+        trench_fabric_mass_as_printed: 0.6 tonnes
+        crew_support_mass_as_printed: 52 tonnes of food, clothing, and shelter, required for 2 persons ... for 20 yrs
+        compressor_power_as_printed: 18 MW
+        pv_mass_efficiency_as_printed: 400 W/kg
+        pv_earth_mass_as_printed: 36 tonnes
+        heat_pipe_count_as_printed: 7800
+        heat_pipe_unit_mass_as_printed: 1.3 kg/each
+        heat_pipe_total_mass_as_printed: 10 tonnes
+        connecting_pipe_mass_as_printed: 35 tonnes
+        collector_and_furnace_mass_as_printed: The central solar collector and the Mo solar furnace are 7 tonnes
+        boring_machines_as_printed: Ten core-drive tube boring machines at a mass of 40 kg each
+        sweeper_and_boring_combined_as_printed: only one brush sweeper will be needed to dig the outer trench for a total combined mass of only 0.5 Mg
+        miscellaneous_mass_as_printed: 5.3 Mg
+        miscellaneous_locator: {pdf_page_index: 9, section: Energy Cost of 3He Production}
+        miscellaneous_items_as_printed: stationary solar reflectors, product gas radiators, a helium isotope separator system, and a service vehicle
+        total_transported_mass_as_printed: ∼ 226 tonnes
+        total_mass_locator: {pdf_page_index: 9, section: Energy Cost of 3He Production}
+        note: >-
+          These are design estimates for a 20-year mature industry, not
+          measured hardware masses. The arithmetic that produces 80 tonnes
+          from 8200 m2, 5.6 mm equivalent thickness, and 1800 kg/m3 was not
+          recomputed here.
+    - observation_id: wcsar9311_3_energy_cost_and_payback
+      type: textual_fact
+      locator:
+        pdf_page_index: 9
+        section: Energy Cost of 3He Production
+      units: as printed
+      values:
+        quantity: energy_cost_and_payback_for_lunar_3He
+        method_class: model_derived
+        evidence_class: model_derived
+        present_earth_moon_energy_as_printed: ∼ 100 GJ/kg
+        advanced_earth_moon_energy_as_printed: 30 GJ/kg
+        transportation_energy_total_as_printed: 6.8 × 10^6 GJ
+        He3_produced_in_20_yr_as_printed: nearly 200 kg of 3He
+        transportation_energy_per_kg_as_printed: 3.4 × 10^4 GJ/kg of 3He
+        core_drill_energy_as_printed: 6.3 × 10^{−2} kWh/hole
+        sweeper_energy_as_printed: 532 kWh/trench
+        liquefier_and_isotope_separation_as_printed: 5.25 × 10^5 kWh/yr
+        operational_energy_total_as_printed: 1890 GJ/10 kg of 3He produced, i.e., 189 GJ/kg of 3He
+        fusion_plant_construction_as_printed: 4.8×10^3 GJ/kg (3He)
+        total_energy_cost_as_printed: ∼ 3.9 × 10^4 GJ/kg (3He), i.e., 1.24 MW·yr/kg (3He)
+        electrical_output_as_printed: 10-11 MWe·yr/kg 3He depending upon the efficiency of the plant
+        payback_as_printed: ∼ 8.5 MWe·yr/MW·yr (thermal)
+        discussion_comparators:
+          locator: {pdf_page_index: 9, section: Discussion}
+          this_concept_as_printed: 8.5 MWe·yr/MW·yr (th)
+          coal_without_SO2_as_printed: 11
+          coal_with_SO2_as_printed: 3
+          solar_power_satellite_as_printed: 2 to 4
+          comparator_attribution: Spreng, 1988
+          mechanical_miner_payback_as_printed: ∼ 33
+          soil_lifted_fraction_as_printed: the lunar soil that must be lifted for the in-situ concept is only 10^{−4}% of that required for a full mining scenario
+        note: >-
+          All energy-cost and pay-back figures are author calculations or
+          cited comparators, not measured process yields. The printed soil
+          lifted fraction is 10^{-4}% as written, and was not reinterpreted.
+    - observation_id: wcsar9311_3_figure1
+      type: figure_record
+      locator:
+        pdf_page_index: 4
+        figure: '1'
+      units: as printed
+      values:
+        quantity: calculated_boundary_temperature_vs_time
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        caption: >-
+          Figure 1. Temperature increase of the soil as a function of time at
+          the boundary between two cylindrical soil configurations of 0.5 m
+          radius with the axis of each cylinder maintained at 1073°K.
+        axes_as_printed:
+          x: Time [hr]
+          y: T [°K]
+        x_ticks_labelled: [0.0, 80.0, 160.0, 240.0, 320.0, 400.0]
+        y_ticks_labelled: [200.00, 400.00, 600.00, 800.00, 1000.0, 1200.0]
+        printed_text_result: the boundary temperature approaches 900 K in 320 hr
+        note: Axis ticks and the printed 900 K / 320 hr statement are recorded; the curve was not digitised.
+    - observation_id: wcsar9311_3_figure2
+      type: figure_record
+      locator:
+        pdf_page_index: 5
+        figure: '2'
+      units: as printed
+      values:
+        quantity: conceptual_mining_site_schematic
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        caption: >-
+          Figure 2. Conceptual design of an in-situ technique to evolve
+          volatiles from the lunar regolith. Pneumatic structures are used
+          to contain the gases and an artificial H2 atmosphere. Small heaters,
+          utilizing solar energy, are placed vertically in the soil.
+        labelled_elements_as_printed:
+        - DOME
+        - GAS PUMPS
+        - HEAT PIPES
+        - HEATERS
+        - DIKE
+        note: Schematic only; no numeric scale is printed on the figure.
+    - observation_id: wcsar9311_3_figure3
+      type: figure_record
+      locator:
+        pdf_page_index: 7
+        figure: '3'
+      units: as printed
+      values:
+        quantity: calculated_periodic_hydrogen_pressure_vs_depth
+        method_class: figure_only
+        evidence_class: figure_only
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        caption: >-
+          Figure 3. Periodic hydrogen pressure at several depths in the
+          regolith as a function of time.
+        axes_as_printed:
+          x: Time (s)
+          y: Pressure (Pa)
+        x_ticks_labelled: [0, 500, 1000, 1500, 2000, 2500]
+        y_scale: logarithmic, labelled 10^3, 10^4, 10^5
+        series_labels_as_printed:
+        - Surface
+        - 1 m
+        - 2 m
+        - 3 m
+        - 4 m
+        printed_text_cycle: H2 pressure increased from 10^3 Pa to 10^5 Pa over 1200 s (10 min) and then decreased to 10^3 Pa during 1200 s
+        printed_text_4m: At 4 m below the surface the pressure fluctuated between (2 − 5) × 10^3 Pa
+        note: Axis ticks, series labels, and the printed cycle / 4 m band are recorded; the curves were not digitised.
