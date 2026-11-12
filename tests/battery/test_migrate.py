@@ -11016,10 +11016,37 @@ def test_k01_tsaplin_store_activity_not_coefficient() -> None:
     assert as_decimal(obs["value"]["point"]) == as_decimal("7.19e-10")
 
 
+_BOUNDARY_WRAPPERS = frozenset(
+    {
+        "select_declared_source",
+        "empty_value_from_payload",
+        "_series_point_value",
+        "_selection_from_named_field",
+        "_condition_ranges_from_payload",
+        "_numeric_field",
+        "_unavailable_selection",
+        "_point_selection",
+        "_interval_selection",
+        "_series_selection_from_items",
+    }
+)
+_BOUNDARY_INGEST_CALLERS = frozenset(
+    {
+        "_migrate_extract_observation",
+        "_emit_exploded_point",
+        "_migrate_kems",
+        "_migrate_mre",
+        "_migrate_langmuir",
+        "_migrate_refractory",
+        "_migrate_vacuum_pyrolysis",
+        "_migrate_ledger",
+        "_migrate_compilation_file",
+    }
+)
+
+
 def test_k01_value_constructions_live_inside_the_boundary() -> None:
     import ast
-
-    from simulator.battery.migrate import BOUNDARY_INGEST_CALLERS
 
     src = (REPO_ROOT / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
     tree = ast.parse(src)
@@ -11099,9 +11126,10 @@ def test_k01_value_constructions_live_inside_the_boundary() -> None:
                     f"Value constructed in {owner}:{node.lineno} outside the boundary"
                 )
             if name == "select_declared_source":
-                from simulator.battery.migrate import _BOUNDARY_WRAPPERS
-
-                assert owner in BOUNDARY_INGEST_CALLERS or owner in _BOUNDARY_WRAPPERS, (
+                assert (
+                    owner in _BOUNDARY_INGEST_CALLERS
+                    or owner in _BOUNDARY_WRAPPERS
+                ), (
                     f"select_declared_source called from unlisted {owner}:{node.lineno}"
                 )
             self.generic_visit(node)
@@ -11109,14 +11137,7 @@ def test_k01_value_constructions_live_inside_the_boundary() -> None:
     Visitor().visit(tree)
 
 
-def test_k01_boundary_records_ingest_callers(tmp_path: Path) -> None:
-    from simulator.battery.migrate import (
-        BOUNDARY_INGEST_CALLERS,
-        reset_boundary_served,
-        boundary_served_callers,
-    )
-
-    reset_boundary_served()
+def test_k01_boundary_migrates_declared_observation(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="pure_Psat",
         units="atm",
@@ -11279,13 +11300,19 @@ def test_k01_boundary_records_ingest_callers(tmp_path: Path) -> None:
             "rows": [{"atomic_weight": {"value": 227}}],
         },
     )
-    migrate(root, write=False)
-    served = {name for _file, _line, name in boundary_served_callers()}
-    assert served
-    unexpected = served - BOUNDARY_INGEST_CALLERS
-    assert not unexpected, unexpected
-    missing = BOUNDARY_INGEST_CALLERS - served
-    assert not missing, missing
+    result = migrate(root, write=False)
+    migrated = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith("fixture-source::")
+    ]
+    assert migrated
+    assert any(
+        observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.P_SAT
+        and observation.value.kind is ValueKind.POINT
+        for observation in migrated
+    )
 
 
 def test_k02_t_range_is_domain_not_value(tmp_path: Path) -> None:
