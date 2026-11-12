@@ -64,8 +64,10 @@ def main() -> int:
     test_file = repo_root / "tests" / "test_three_product_report.py"
     sys.path.insert(0, str(repo_root))
     mutation = _AllOrNothingMutation()
+    # pyproject addopts enables xdist (-n auto). The monkeypatch lives on this
+    # process's plugin object, so workers would execute the unmutated classifier.
     exit_code = pytest.main(
-        ["-q", f"{test_file}::{TEST_NODE}"],
+        ["-q", "-n0", f"{test_file}::{TEST_NODE}"],
         plugins=[mutation],
     )
     if exit_code == pytest.ExitCode.TESTS_FAILED and mutation._failed_call:

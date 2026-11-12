@@ -1042,15 +1042,16 @@ def test_p15_flagged_silica_product_keeps_product_route_and_flag() -> None:
     stage = _stage_card(_run_panel(artifact)["html"], "stage_3_sio_zone")
 
     assert silica["class_total_kg"] == 4.5
-    assert silica["flag"]["authority"] == "extrapolated"
+    assert silica["flag"]["authority"] == "interim purity threshold"
+    assert "owner product spec pending" in silica["flag"]["reason"]
     assert "sec-p15-stage--product" in stage
     assert "flagged silica product" in stage
     assert "qualified silica product" not in stage
     assert "flagged capture · not a product" not in stage
-    assert "status: flagged prediction" in stage
-    assert "authority: extrapolated" in stage
-    assert "band: [1400,2200]" in stage
-    assert "reason: outside certified SiO source band" in stage
+    assert "status: flagged product spec pending" in stage
+    assert "authority: interim purity threshold" in stage
+    assert "99 wt% silica-bearing per Stage 3 snapshot" in stage
+    assert "reason: owner product spec pending" in stage
 
 
 def test_p15_silica_stage_renders_partial_class_exclusion() -> None:

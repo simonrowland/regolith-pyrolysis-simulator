@@ -101,24 +101,25 @@ def test_unqualified_stage3_capture_stays_numeric_with_partial_class(
     two_hour_run, monkeypatch
 ):
     stage3 = two_hour_run.train.stages[3]
-    monkeypatch.setattr(stage3, "collected_kg", {"SiO2": 4.5})
-    monkeypatch.setattr(
-        two_hour_run.record,
-        "snapshots",
-        [
-            SimpleNamespace(
-                evap_flux=snapshot.evap_flux,
-                c2a_staged_gas={},
-                condensed_by_stage_species_delta={},
-            )
-            for snapshot in two_hour_run.record.snapshots
-        ],
-    )
+    # Measured co-deposit below the interim purity gate. The Si transport
+    # refusal stays on the snapshots, so the class remains partial and numeric.
+    collected = {"SiO2": 4.5, "Na2O": 0.1}
+    monkeypatch.setattr(stage3, "collected_kg", collected)
+    snapshots = []
+    for index, snapshot in enumerate(two_hour_run.record.snapshots):
+        delta = {(3, "SiO2"): 4.5, (3, "Na2O"): 0.1} if index == 0 else {}
+        snapshots.append(SimpleNamespace(
+            evap_flux=snapshot.evap_flux,
+            c2a_staged_gas={},
+            condensed_by_stage_species_delta=delta,
+        ))
+    monkeypatch.setattr(two_hour_run.record, "snapshots", snapshots)
 
     silica = classify_products(two_hour_run)["pure_silica_glass"]
 
     assert silica["status"] == "partial"
     assert silica["class_total_kg"] == 0.0
+    assert "purity_below_threshold" in silica["flag"]["reason"]
     assert silica["stage_3_capture_kg"] == 4.5
     assert silica["stage_3_kg_by_species"] == {"SiO2": 4.5}
     assert any(item["species"] == "Si" for item in silica["excluded"])

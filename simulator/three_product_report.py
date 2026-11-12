@@ -119,6 +119,7 @@ def _stage_3_glass_snapshot_census(snapshots) -> dict[str, Any]:
     excluded_snapshots: list[str] = []
     product_kg = 0.0
     silicon_coproduct_kg = 0.0
+    qualified_silicon_coproduct_kg = 0.0
     issue: str | None = None
 
     for snapshot_index, snapshot in enumerate(snapshots or ()):
@@ -163,6 +164,8 @@ def _stage_3_glass_snapshot_census(snapshots) -> dict[str, Any]:
             for species in (*PURE_SILICA_GLASS_SPECIES, 'Si')
         )
         purity_wt_pct = silica_bearing_kg / deposit_kg * 100.0
+        snapshot_silicon_kg = snapshot_stage_3.get('Si', 0.0)
+        silicon_coproduct_kg += snapshot_silicon_kg
         if purity_wt_pct >= PURE_SILICA_GLASS_MIN_PURITY_WT_PCT:
             for species in PURE_SILICA_GLASS_SPECIES:
                 kg = snapshot_stage_3.get(species, 0.0)
@@ -174,7 +177,7 @@ def _stage_3_glass_snapshot_census(snapshots) -> dict[str, Any]:
                 snapshot_stage_3.get(species, 0.0)
                 for species in PURE_SILICA_GLASS_SPECIES
             )
-            silicon_coproduct_kg += snapshot_stage_3.get('Si', 0.0)
+            qualified_silicon_coproduct_kg += snapshot_silicon_kg
         else:
             excluded_kg_by_reason['purity_below_threshold'] = (
                 excluded_kg_by_reason.get('purity_below_threshold', 0.0)
@@ -196,6 +199,7 @@ def _stage_3_glass_snapshot_census(snapshots) -> dict[str, Any]:
         'total_by_species': total_by_species,
         'product_kg': product_kg,
         'silicon_coproduct_kg': silicon_coproduct_kg,
+        'qualified_silicon_coproduct_kg': qualified_silicon_coproduct_kg,
         'excluded_kg_by_reason': excluded_kg_by_reason,
         'excluded_snapshots': excluded_snapshots,
         'issue': issue,
@@ -361,7 +365,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     snapshot_census = _stage_3_glass_snapshot_census(snapshots)
     silica_product_by_species = snapshot_census['product_by_species']
     silica_product_kg = snapshot_census['product_kg']
-    qualified_silicon_coproduct_kg = snapshot_census['silicon_coproduct_kg']
+    qualified_silicon_coproduct_kg = snapshot_census[
+        'qualified_silicon_coproduct_kg'
+    ]
+    total_silicon_coproduct_kg = snapshot_census['silicon_coproduct_kg']
     excluded_stage_3_snapshots = snapshot_census['excluded_snapshots']
     stage_3_snapshot_issue = snapshot_census['issue']
     snapshot_stage_3_kg_by_species = snapshot_census['total_by_species']
@@ -416,11 +423,23 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             f'>={PURE_SILICA_GLASS_MIN_PURITY_WT_PCT:g} wt% silica-bearing '
             'per Stage 3 snapshot'
         )
-    if silica_product_kg is not None and qualified_silicon_coproduct_kg > 0.0:
-        silica_flag_reason += (
-            f'; qualified Stage 3 Si coproduct '
-            f'{qualified_silicon_coproduct_kg:.6g} kg (reported separately)'
-        )
+    if silica_product_kg is not None and total_silicon_coproduct_kg > 0.0:
+        if math.isclose(
+            total_silicon_coproduct_kg,
+            qualified_silicon_coproduct_kg,
+            rel_tol=1.0e-9,
+            abs_tol=1.0e-9,
+        ):
+            silica_flag_reason += (
+                f'; Stage 3 Si coproduct {total_silicon_coproduct_kg:.6g} kg '
+                '(reported separately)'
+            )
+        else:
+            silica_flag_reason += (
+                f'; Stage 3 Si coproduct {total_silicon_coproduct_kg:.6g} kg '
+                f'(qualified {qualified_silicon_coproduct_kg:.6g} kg; '
+                'reported separately)'
+            )
     if excluded_stage_3_snapshots:
         silica_flag_reason += '; ' + '; '.join(excluded_stage_3_snapshots)
     if stage_3_snapshot_issue is not None:

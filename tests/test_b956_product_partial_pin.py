@@ -77,13 +77,14 @@ def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
     assert sio_estimate["account"] == "process.cleaned_melt"
     assert sio_estimate["authority"] in {"status_bearing", "extrapolated"}
     assert sio_estimate["reason"]
-    # C0 has no oxygen-hold qualification route: retain raw Stage-3 capture,
-    # while the qualified product contribution remains an explicit zero.
-    assert silica["class_total_kg"] == 0.0
+    # Measured Stage-3 purity qualifies this deposit. Gas-cover history is
+    # provenance only. The Si transport refusal keeps the class partial.
+    measured_glass_kg = 8.939276806021276e-11
+    assert silica["class_total_kg"] == measured_glass_kg
     glass = products["glass"]
-    assert glass["class_total_kg"] == 0.0
-    assert glass["pure_silica_glass_kg"] == 0.0
-    assert glass["species_kg"] == {}
+    assert glass["class_total_kg"] == measured_glass_kg
+    assert glass["pure_silica_glass_kg"] == measured_glass_kg
+    assert glass["species_kg"] == {"SiO2": measured_glass_kg}
     assert glass["excluded"] == silica["excluded"]
     assert glass["estimated_contributions"] == silica[
         "estimated_contributions"

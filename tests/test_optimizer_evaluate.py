@@ -245,6 +245,13 @@ class _Sim:
             oxygen_vented_kg=0.5,
             energy_electrical_plus_evaporation_kWh=44.0,
             total_hours=1,
+            # Pure Stage 3 SiO matching the train ledger. Measured purity
+            # qualifies it; gas-cover history is not on this double.
+            snapshots=(
+                SimpleNamespace(
+                    condensed_by_stage_species_delta={(3, "SiO"): 12.5},
+                ),
+            ),
         )
         self.energy_electrical_plus_evaporation_cumulative_kWh = 44.0
         self.melt = SimpleNamespace(hour=1)
@@ -2653,15 +2660,17 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
     assert feasible.feasible
     assert feasible.failure_category is None
     assert feasible.objectives is not None
-    assert feasible.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(0.0)
+    assert feasible.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
     assert feasible.objectives.as_mapping()["oxygen_kg"] == pytest.approx(3.0)
     silica_evidence = feasible.objectives.evidence["pure_silica_glass_kg"]
-    assert silica_evidence["flag"] == objective_module._SILICA_UNQUALIFIED_FLAG
-    assert silica_evidence["unqualified_capture_kg"] == pytest.approx(12.5)
-    assert silica_evidence["qualified_product_kg"] == pytest.approx(0.0)
+    assert "flag" not in silica_evidence
+    assert silica_evidence["unqualified_capture_kg"] == pytest.approx(0.0)
+    assert silica_evidence["qualified_product_kg"] == pytest.approx(12.5)
     notes = " ".join(silica_evidence["notes"])
-    assert "not product" in notes
-    assert "missing recorded pO2-hold -> pN2 SiO-release switch" in notes
+    assert "owner product spec pending" in notes
+    assert silica_evidence["certification_flag"]["authority"] == (
+        "interim purity threshold"
+    )
 
     mixed_stream_execution = _execution(trace=_trace(mixed_stream=True))
     enforced_purity = evaluate(
@@ -2767,18 +2776,43 @@ def _switched_silica_snapshots(
 
 
 def test_silica_objective_separates_route_from_authority_and_refuses_unavailable() -> None:
-    unqualified = evaluate(
+    impure = _execution()
+    impure.simulator.train.stages[3].collected_kg = {"SiO2": 98.9, "Na2O": 1.1}
+    impure.simulator.record.snapshots = (
+        SimpleNamespace(
+            condensed_by_stage_species_delta={(3, "SiO2"): 98.9, (3, "Na2O"): 1.1},
+        ),
+    )
+    below_threshold = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(impure),
+    )
+    assert below_threshold.objectives.as_mapping()["pure_silica_glass_kg"] == (
+        pytest.approx(0.0)
+    )
+    below_evidence = below_threshold.objectives.evidence["pure_silica_glass_kg"]
+    assert below_evidence["flag"] == objective_module._SILICA_UNQUALIFIED_FLAG
+    assert below_evidence["unqualified_capture_kg"] == pytest.approx(98.9)
+    assert below_evidence["qualified_product_kg"] == pytest.approx(0.0)
+    assert "purity_below_threshold" in " ".join(below_evidence["notes"])
+
+    pure_off_window = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
         profile=PROFILE,
         executor=FakeExecutor(_execution()),
     )
-    assert unqualified.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(0.0)
-    unqualified_evidence = unqualified.objectives.evidence["pure_silica_glass_kg"]
-    assert unqualified_evidence["flag"] == objective_module._SILICA_UNQUALIFIED_FLAG
-    assert unqualified_evidence["unqualified_capture_kg"] == pytest.approx(12.5)
-    assert unqualified_evidence["qualified_product_kg"] == pytest.approx(0.0)
+    assert pure_off_window.objectives.as_mapping()["pure_silica_glass_kg"] == (
+        pytest.approx(12.5)
+    )
+    off_window_evidence = pure_off_window.objectives.evidence["pure_silica_glass_kg"]
+    assert off_window_evidence["qualified_product_kg"] == pytest.approx(12.5)
+    assert off_window_evidence["unqualified_capture_kg"] == pytest.approx(0.0)
+    assert "owner product spec pending" in " ".join(off_window_evidence["notes"])
 
     qualified_execution = _execution()
     qualified_execution.simulator.record.snapshots = _switched_silica_snapshots()
@@ -2794,6 +2828,9 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
     assert "flag" not in qualified_evidence
     assert qualified_evidence["qualified_product_kg"] == pytest.approx(12.5)
     assert qualified_evidence["unqualified_capture_kg"] == pytest.approx(0.0)
+    assert qualified_evidence["certification_flag"]["authority"] == (
+        "interim purity threshold"
+    )
 
     flagged_execution = _execution()
     flagged_execution.simulator.record.snapshots = _switched_silica_snapshots(
@@ -2809,14 +2846,12 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
     assert flagged.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
     flagged_evidence = flagged.objectives.evidence["pure_silica_glass_kg"]
     assert "flag" not in flagged_evidence
-    assert flagged_evidence["qualified_product_kg"] == pytest.approx(0.0)
+    assert flagged_evidence["qualified_product_kg"] == pytest.approx(12.5)
     assert flagged_evidence["unqualified_capture_kg"] == pytest.approx(0.0)
-    assert flagged_evidence["certification_flag"] == {
-        "status": "flagged prediction",
-        "authority": "extrapolated",
-        "band": [1400.0, 2200.0],
-        "reason": "outside certified SiO source band",
-    }
+    assert flagged_evidence["certification_flag"]["authority"] == (
+        "interim purity threshold"
+    )
+    assert "owner product spec pending" in flagged_evidence["certification_flag"]["reason"]
 
     refused_execution = _execution()
     refused_execution.simulator.record.snapshots = _switched_silica_snapshots(
@@ -2831,15 +2866,15 @@ def test_silica_objective_separates_route_from_authority_and_refuses_unavailable
     )
     assert refused.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
     refused_evidence = refused.objectives.evidence["pure_silica_glass_kg"]
+    # Transport refusal still makes the objective partial. Purity qualification
+    # does not erase that exclusion, and it does not zero the measured deposit.
     assert refused_evidence["value_status"] == "partial"
     assert refused_evidence["total_basis"] == "lower_bound"
     assert "flag" not in refused_evidence
-    assert refused_evidence["certification_flag"] == {
-        "status": "unavailable",
-        "authority": "refused",
-        "band": None,
-        "reason": "missing SiO carrier input",
-    }
+    assert refused_evidence["qualified_product_kg"] == pytest.approx(12.5)
+    assert refused_evidence["certification_flag"]["authority"] == (
+        "interim purity threshold"
+    )
     assert refused_evidence["availability_flag"]["status"] == "partial"
     assert {item["species"] for item in refused_evidence["excluded"]} == {"SiO"}
 

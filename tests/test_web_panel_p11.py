@@ -929,9 +929,9 @@ def test_p11_switch_executed_extrapolated_silica_is_product_with_flag() -> None:
     )
     assert "flagged capture · not a product" not in silica_card
     visible = _visible(silica_card)
-    assert "authority: extrapolated" in visible
-    assert "band: [1400,2200]" in visible
-    assert "reason: outside certified SiO source band" in visible
+    assert "authority: interim purity threshold" in visible
+    assert "99 wt% silica-bearing per Stage 3 snapshot" in visible
+    assert "reason: owner product spec pending" in visible
 
 
 def test_p11_indeterminate_classification_kg_is_no_material() -> None:

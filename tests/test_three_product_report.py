@@ -13,6 +13,8 @@ Pins:
 
 from __future__ import annotations
 
+import subprocess
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -465,9 +467,51 @@ def test_silica_qualifies_each_snapshot_and_keeps_exclusions_local():
     assert result['glass']['species_kg'] == {'SiO2': 2.0}
     assert silica['flag']['status'] == 'flagged product spec pending'
     assert 'owner product spec pending' in silica['flag']['reason']
-    assert 'qualified Stage 3 Si coproduct 0.5 kg' in silica['flag']['reason']
+    assert 'Stage 3 Si coproduct 0.5 kg (reported separately)' in (
+        silica['flag']['reason']
+    )
     assert 'Stage 3 snapshot 1 is non-product' in silica['flag']['reason']
     assert 'purity_below_threshold' in silica['flag']['reason']
+
+
+def test_silica_census_counts_si_coproduct_in_rejected_snapshots():
+    """Total Si is qualifying plus rejected; the class still excludes rejected glass."""
+    from simulator.three_product_report import _stage_3_glass_snapshot_census
+
+    snapshots = [
+        SimpleNamespace(condensed_by_stage_species_delta={
+            (3, 'SiO2'): 2.0,
+            (3, 'Si'): 0.5,
+        }),
+        SimpleNamespace(condensed_by_stage_species_delta={
+            (3, 'SiO2'): 1.0,
+            (3, 'Si'): 0.25,
+            (3, 'Na2O'): 0.2,
+        }),
+    ]
+
+    census = _stage_3_glass_snapshot_census(snapshots)
+
+    assert census['issue'] is None
+    assert census['product_kg'] == pytest.approx(2.0)
+    assert census['qualified_silicon_coproduct_kg'] == pytest.approx(0.5)
+    assert census['silicon_coproduct_kg'] == pytest.approx(0.75)
+    assert census['excluded_kg_by_reason']['purity_below_threshold'] == (
+        pytest.approx(1.45)
+    )
+
+    sim = SimpleNamespace(
+        train=SimpleNamespace(stages=[None, None, None, SimpleNamespace(
+            collected_kg={'SiO2': 3.0, 'Si': 0.75, 'Na2O': 0.2},
+        )]),
+        record=SimpleNamespace(snapshots=snapshots),
+    )
+    silica = classify_products(sim)['pure_silica_glass']
+    assert silica['class_total_kg'] == pytest.approx(2.0)
+    assert (
+        'Stage 3 Si coproduct 0.75 kg (qualified 0.5 kg; reported separately)'
+        in silica['flag']['reason']
+    )
 
 
 def test_silica_snapshot_at_98_9_percent_is_excluded_with_reason():
@@ -510,6 +554,30 @@ def test_pure_silica_snapshot_outside_sio_window_counts_as_product():
     assert result['pure_silica_glass']['class_total_kg'] == 3.0
     assert result['glass']['class_total_kg'] == 3.0
     assert 'owner product spec pending' in result['pure_silica_glass']['flag']['reason']
+
+
+def test_all_or_nothing_mutation_check_fails_the_mixed_snapshot_node(request):
+    """The mutation script must run the classifier in-process (-n0)."""
+    script = (
+        Path(__file__).resolve().parents[1]
+        / 'scripts'
+        / 'check_b1185_all_or_nothing_mutation.py'
+    )
+    completed = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=script.parents[1],
+        capture_output=True,
+        text=True,
+        timeout=180,
+        check=False,
+    )
+    reporter = request.config.pluginmanager.get_plugin('terminalreporter')
+    if reporter is not None:
+        for line in (completed.stdout + completed.stderr).splitlines():
+            reporter.write_line(line)
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert 'PASS:' in completed.stdout
+    assert 'fails with the all-or-nothing mutation' in completed.stdout
 
 
 def test_captured_volatiles_include_condensation_train_account():

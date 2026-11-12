@@ -6,8 +6,12 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 from typing import Any, Mapping
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
 
 import yaml
 
@@ -22,7 +26,6 @@ from simulator.three_product_report import (
 )
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
 RUNNER_FIXTURE_DIR = REPO_ROOT / "tests" / "fixtures" / "runner"
 OPTIMIZER_PROFILE_DIR = REPO_ROOT / "data" / "optimize_profiles"
 
@@ -36,6 +39,7 @@ def _census(sim: Any) -> dict[str, Any]:
         "qualified_glass_kg": census["product_kg"],
         "excluded_kg_by_reason": census["excluded_kg_by_reason"],
         "si_coproduct_kg": census["silicon_coproduct_kg"],
+        "qualified_si_coproduct_kg": census["qualified_silicon_coproduct_kg"],
         "snapshot_count": len(snapshots),
     }
 
@@ -132,6 +136,7 @@ def _c0_profiles(max_hours: int) -> list[dict[str, Any]]:
                 "qualified_glass_kg": None,
                 "excluded_kg_by_reason": None,
                 "si_coproduct_kg": None,
+                "qualified_si_coproduct_kg": None,
                 "flag_present": None,
             }, sort_keys=True))
             continue
@@ -148,6 +153,7 @@ def _c0_profiles(max_hours: int) -> list[dict[str, Any]]:
             "campaign": "C0",
             "hours": hours,
             "mass_kg": float(run.get("mass_kg", 1000.0)),
+            "additives_kg": dict(run.get("additives_kg") or {}),
             "setpoints_patch": patch,
         })
     return cases
@@ -179,6 +185,7 @@ def main() -> int:
                 "qualified_glass_kg": None,
                 "excluded_kg_by_reason": None,
                 "si_coproduct_kg": None,
+                "qualified_si_coproduct_kg": None,
                 "flag_present": None,
             }
         print(json.dumps(result, sort_keys=True, allow_nan=False))
