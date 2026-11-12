@@ -1,8 +1,14 @@
-"""Keep production environment reads documented or explicitly internal."""
+"""Keep production environment reads registered.
+
+The AST scanner resolves the environment-key forms used by production. Exotic
+forms such as ``getattr(os.environ, "get")`` are deliberately left to the
+``environ``/``getenv`` token ceiling backstop below.
+"""
 
 from __future__ import annotations
 
 import ast
+import re
 import subprocess
 from pathlib import Path
 
@@ -11,6 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
+ENV_ACCESS_TOKEN_CEILING = 91
+ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep
 # each reason short and specific: these names are not normal app configuration.
@@ -199,20 +207,30 @@ def _environment_aliases(tree: ast.Module) -> tuple[set[str], set[str], set[str]
                     environ_names.add(alias.asname or alias.name)
                 elif alias.name == "getenv":
                     getenv_names.add(alias.asname or alias.name)
-        elif isinstance(node, (ast.Assign, ast.AnnAssign)) and node.value is not None:
-            value = node.value
-            is_environ = is_os_environ(value) or (
-                isinstance(value, ast.Call)
-                and isinstance(value.func, ast.Attribute)
-                and value.func.attr == "copy"
-                and isinstance(value.func.value, ast.Attribute)
-                and value.func.value.attr == "environ"
-                and isinstance(value.func.value.value, ast.Name)
-                and value.func.value.value.id in os_names
-            )
-            if is_environ:
+
+    def is_environment_mapping(node: ast.AST) -> bool:
+        return (
+            is_os_environ(node)
+            or isinstance(node, ast.Name)
+            and node.id in environ_names
+            or isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "copy"
+            and is_environment_mapping(node.func.value)
+        )
+
+    changed = True
+    while changed:
+        changed = False
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.Assign, ast.AnnAssign)) or node.value is None:
+                continue
+            if is_environment_mapping(node.value):
                 targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-                environ_names.update(target.id for target in targets if isinstance(target, ast.Name))
+                for target in targets:
+                    if isinstance(target, ast.Name) and target.id not in environ_names:
+                        environ_names.add(target.id)
+                        changed = True
     functions = {
         node.name: node
         for node in ast.walk(tree)
@@ -258,6 +276,46 @@ def _scan_source(
         for node in tree.body
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
     }
+    os_names, environ_names, getenv_names = _environment_aliases(tree)
+
+    def is_environ(node: ast.AST) -> bool:
+        return (
+            isinstance(node, ast.Name) and node.id in environ_names
+        ) or (
+            isinstance(node, ast.Attribute)
+            and node.attr == "environ"
+            and isinstance(node.value, ast.Name)
+            and node.value.id in os_names
+        ) or (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "copy"
+            and is_environ(node.func.value)
+        )
+
+    def key_argument(call: ast.Call) -> ast.AST | None:
+        if call.args:
+            return call.args[0]
+        return next((kw.value for kw in call.keywords if kw.arg == "key"), None)
+
+    key_parameter_indexes: dict[str, set[int]] = {}
+    for read_node in ast.walk(tree):
+        key_node: ast.AST | None = None
+        if isinstance(read_node, ast.Subscript) and isinstance(read_node.ctx, ast.Load) and is_environ(read_node.value):
+            key_node = read_node.slice
+        elif isinstance(read_node, ast.Call) and isinstance(read_node.func, ast.Attribute):
+            if is_environ(read_node.func.value) and read_node.func.attr in {"get", "setdefault", "pop"}:
+                key_node = key_argument(read_node)
+            elif read_node.func.attr == "getenv" and isinstance(read_node.func.value, ast.Name) and read_node.func.value.id in os_names:
+                key_node = key_argument(read_node)
+        elif isinstance(read_node, ast.Call) and isinstance(read_node.func, ast.Name) and read_node.func.id in getenv_names:
+            key_node = key_argument(read_node)
+        function = functions.get(id(read_node))
+        if isinstance(key_node, ast.Name) and isinstance(function, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            for index, parameter in enumerate(function.args.args):
+                if parameter.arg == key_node.id:
+                    key_parameter_indexes.setdefault(function.name, set()).add(index)
+
     call_bindings: dict[str, list[object]] = {}
     for node in ast.walk(tree):
         if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)):
@@ -280,6 +338,16 @@ def _scan_source(
             _literal(arg, {**constants, **caller_names})
             for arg in node.args
         ]
+        unresolved_key_indexes = key_parameter_indexes.get(node.func.id, set()) & {
+            index for index, value in enumerate(resolved_args) if value is None
+        }
+        if unresolved_key_indexes:
+            param_index = min(unresolved_key_indexes)
+            param_name = target.args.args[param_index].arg
+            raise AssertionError(
+                f"{source_path}:{node.lineno}: unresolved environment key argument "
+                f"{param_name!r} supplied to {node.func.id}"
+            )
         if any(value is None for value in resolved_args):
             continue
         previous = call_bindings.get(node.func.id)
@@ -300,23 +368,7 @@ def _scan_source(
         id(function): _static_bindings(function, constants, function_values, call_bindings)
         for function in set(functions.values())
     }
-    os_names, environ_names, getenv_names = _environment_aliases(tree)
     reads: set[str] = set()
-
-    def is_environ(node: ast.AST) -> bool:
-        return (
-            isinstance(node, ast.Name) and node.id in environ_names
-        ) or (
-            isinstance(node, ast.Attribute)
-            and node.attr == "environ"
-            and isinstance(node.value, ast.Name)
-            and node.value.id in os_names
-        )
-
-    def key_argument(call: ast.Call) -> ast.AST | None:
-        if call.args:
-            return call.args[0]
-        return next((kw.value for kw in call.keywords if kw.arg == "key"), None)
 
     for node in ast.walk(tree):
         key_node: ast.AST | None = None
@@ -375,17 +427,21 @@ def _scan_source(
     return reads
 
 
-def _production_env_reads() -> set[str]:
+def _production_python_paths() -> list[str]:
     tracked = subprocess.run(
         ["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True
     ).stdout.split(b"\0")
-    paths = [
+    return [
         raw.decode()
         for raw in tracked
         if raw
         and raw.decode().endswith(".py")
         and (raw.decode() in PRODUCTION_FILES or raw.decode().startswith(PRODUCTION_ROOTS))
     ]
+
+
+def _production_env_reads() -> set[str]:
+    paths = _production_python_paths()
     trees = {path: ast.parse((ROOT / path).read_text(encoding="utf-8"), filename=path) for path in paths}
     module_constants = {_module_name(path): _module_constants(tree) for path, tree in trees.items()}
     for _ in range(len(module_constants)):
@@ -432,6 +488,15 @@ def _unregistered(reads: set[str], operator_names: set[str], internal: dict[str,
     return overlap, unregistered, stale
 
 
+def _env_access_token_sites() -> list[tuple[str, int]]:
+    sites: list[tuple[str, int]] = []
+    for path in _production_python_paths():
+        source = (ROOT / path).read_text(encoding="utf-8")
+        for match in ENV_ACCESS_TOKEN.finditer(source):
+            sites.append((path, source.count("\n", 0, match.start()) + 1))
+    return sites
+
+
 def _scratch_scan(
     tmp_path: Path,
     source: str,
@@ -450,6 +515,15 @@ def test_production_environment_reads_are_registered():
     assert not unregistered, f"undocumented environment reads: {sorted(unregistered)}"
     assert not stale, f"stale environment registry entries: {sorted(stale)}"
     assert all(reason.strip() for reason in KNOWN_INTERNAL_ENV.values())
+
+
+def test_environment_access_token_backstop():
+    sites = _env_access_token_sites()
+    assert len(sites) <= ENV_ACCESS_TOKEN_CEILING, (
+        "new environ/getenv use at file:line: register its key(s) and lower or "
+        f"raise the ceiling with review (count={len(sites)}, "
+        f"ceiling={ENV_ACCESS_TOKEN_CEILING}, sites={sites})"
+    )
 
 
 def test_scanner_unions_branch_bindings_and_finds_fingerprint_reads(tmp_path):
@@ -481,9 +555,21 @@ def test_scanner_sees_each_supported_environment_access_form(tmp_path):
         ('import os\nos.environ.get(key="KEYWORD_KNOB")', {"KEYWORD_KNOB"}),
         ('import os\nchild = os.environ.copy()\nchild.get("COPIED_ENV")', {"COPIED_ENV"}),
         ('import os\nchild = os.environ.copy()\nchild["COPIED_SUBSCRIPT"]', {"COPIED_SUBSCRIPT"}),
+        ('import os\nos.environ.copy().get("CHAINED_COPY")', {"CHAINED_COPY"}),
+        ('from os import environ as source\nchild = source.copy()\nchild.get("IMPORTED_COPY")', {"IMPORTED_COPY"}),
+        ('import os\nenv = os.environ\nchild = env.copy()\nchild.get("ALIASED_COPY")', {"ALIASED_COPY"}),
     )
     for source, expected in cases:
-        assert _scratch_scan(tmp_path, source) == expected
+        reads = _scratch_scan(tmp_path, source)
+        assert reads == expected
+        assert _unregistered(reads, set(), {})[1] == expected
+
+
+def test_token_backstop_catches_ast_forms_outside_key_scanner(tmp_path):
+    source = 'import os\nvalue = getattr(os.environ, "get")( "BACKSTOP_ONLY" )\n'
+    path = tmp_path / "exotic.py"
+    path.write_text(source, encoding="utf-8")
+    assert len(ENV_ACCESS_TOKEN.findall(path.read_text(encoding="utf-8"))) == 1
 
 
 def test_scanner_refuses_unresolved_local_and_cross_module_keys(tmp_path):
@@ -500,6 +586,22 @@ def test_scanner_refuses_unresolved_local_and_cross_module_keys(tmp_path):
             assert "unresolved environment key" in str(exc)
         else:
             raise AssertionError("unresolved environment key escaped the scan")
+
+
+def test_wrapper_does_not_drop_later_dynamic_key_call(tmp_path):
+    source = '''
+import os
+def read(key):
+    return os.environ.get(key)
+read("SEEN")
+read(dynamic_name)
+'''
+    try:
+        _scratch_scan(tmp_path, source)
+    except AssertionError as exc:
+        assert "unresolved environment key argument 'key'" in str(exc)
+    else:
+        raise AssertionError("dynamic helper key escaped the scan")
 
 
 def test_registry_rejects_added_stale_and_conflicting_names():

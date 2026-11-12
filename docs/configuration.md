@@ -10,7 +10,7 @@ internal registry.
 
 | Name | Purpose and effect | Default | Valid values |
 | --- | --- | --- | --- |
-| `ALPHAMELTS_CALC_MODE` | Ambient AlphaMELTS subprocess mode. Unset uses the adapter-resolved mode; a set value that differs from that mode raises `ALPHAMELTS_REASON_CALC_MODE_MISMATCH`. The binding fingerprint separately records a `conflict` token. | Unset; adapter resolves `MELTS` for the supported subprocess model. | `MELTS` for the currently supported subprocess model. |
+| `ALPHAMELTS_CALC_MODE` | Ambient AlphaMELTS subprocess mode. Unset uses the adapter-resolved mode. Any set value that differs raises `ALPHAMELTS_REASON_CALC_MODE_MISMATCH`; this includes the empty string. The binding fingerprint separately stores `conflict` only for a non-empty mismatch. | Unset; adapter resolves `MELTS` for the supported subprocess model. | `MELTS` for the currently supported subprocess model. |
 | `DYLD_FALLBACK_LIBRARY_PATH` | Search path for ThermoEngine native libraries; the simulator prepends its resolved library directory. | Existing process value, otherwise unset. | Colon-separated directory paths. |
 | `DYLD_LIBRARY_PATH` | Additional search path when locating ThermoEngine native libraries. | Unset. | Colon-separated directory paths. |
 | `LD_LIBRARY_PATH` | Inherited by AlphaMELTS and included in the binding environment fingerprint digest. | Inherited from the launching process; the simulator does not set it. | Platform-standard path-separated library directories. |

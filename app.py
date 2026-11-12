@@ -53,6 +53,7 @@ def _load_secret_key() -> str:
 
     secret_path = Path(__file__).parent / 'instance' / 'flask_secret_key'
     secret_path.parent.mkdir(mode=0o700, exist_ok=True)
+    os.chmod(secret_path.parent, 0o700)
     try:
         fd = os.open(
             secret_path,
@@ -60,7 +61,10 @@ def _load_secret_key() -> str:
             0o600,
         )
     except FileExistsError:
-        fd = os.open(secret_path, os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0))
+        fd = os.open(
+            secret_path,
+            os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | os.O_NONBLOCK,
+        )
         with os.fdopen(fd, 'r', encoding='utf-8') as secret_file:
             metadata = os.fstat(secret_file.fileno())
             if not stat.S_ISREG(metadata.st_mode):
