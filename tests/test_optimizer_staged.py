@@ -94,6 +94,15 @@ PROFILE = {
 SCHEMA = RecipeSchema()
 
 
+def test_joint_refine_trace_accessor_error_is_not_a_missing_field() -> None:
+    class BrokenTrace:
+        def get(self, _key, _default=None):
+            raise RuntimeError("trace accessor failed")
+
+    with pytest.raises(RuntimeError, match="trace accessor failed"):
+        staged_module._mapping_get(BrokenTrace(), "knob_saturation", ())
+
+
 class SpyStore(ResultStore):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)

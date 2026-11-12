@@ -2569,6 +2569,24 @@ def test_pool_nonpicklable_request_payload_preflight(tmp_path: Path) -> None:
         )
 
 
+def test_supervised_process_context_refuses_unpicklable_task() -> None:
+    task = replace(
+        _pool_task(
+            0,
+            feedstock_id="lunar_mare_low_ti",
+            stage0_subprocess_required=False,
+        ),
+        profile={"bad": lambda value: value},
+    )
+
+    with pytest.raises(TypeError, match="must be picklable"):
+        pool_module._supervised_process_context(
+            task,
+            _fake_evaluate,
+            None,
+        )
+
+
 def test_pool_large_batch_bounded_inflight(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     popen_type = subprocess.Popen
     assert isinstance(popen_type, type)
