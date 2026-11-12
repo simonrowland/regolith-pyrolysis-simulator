@@ -207,9 +207,27 @@ def test_provider_flags_floor_inversion_and_completes() -> None:
         assert notice["was_clamped"] is True
         assert pressures[species] == pytest.approx(notice["pressure_Pa"])
         assert pressures[species] > 0.0
-        assert provenance[species]["floor_inversion_notice"] == notice
+        # Real provider dispatch. The typed field is a list of records.
+        # A restored singleton dict makes this loop yield string keys.
+        published = provenance[species]["floor_inversion_notice"]
+        assert isinstance(published, list)
+        assert published == [notice]
+        for record in published:
+            assert isinstance(record, dict)
+            assert record["reason"] == MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
         assert MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON in sources[species]
         assert _is_noncertifying_vapor_extrapolation(species, sources[species])
+
+    for species, row in provenance.items():
+        for key, value in row.items():
+            if not str(key).endswith("_notice"):
+                continue
+            assert isinstance(value, list), (species, key)
+            assert value, (species, key)
+            assert all(isinstance(record, dict) for record in value), (
+                species,
+                key,
+            )
 
     assert pressures["Si"] >= CATALOG_PHYSICAL_PRESSURE_CEILING_PA
     assert any(

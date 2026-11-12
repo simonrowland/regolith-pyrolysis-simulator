@@ -3025,6 +3025,8 @@ def test_public_notice_copy_pickles_nested_mapping_proxy() -> None:
 _TYPED_NOTICE_KEYS = (
     "extrapolation_notice",
     "diagnostic_admission_notice",
+    "floor_inversion_notice",
+    "source_activity_floor_notice",
     "future_carrier_notice",
 )
 
@@ -3074,6 +3076,26 @@ def test_typed_publication_notice_is_always_a_list(key: str, count: int) -> None
     assert len(coating[key]) == count
 
 
+def _assigned_notice_key(node: object) -> str | None:
+    """Constant ``*_notice`` key of a subscript assignment, if it has one."""
+
+    import ast
+
+    if not isinstance(node, ast.Subscript):
+        return None
+    slice_node = node.slice
+    index_type = getattr(ast, "Index", None)
+    if index_type is not None and isinstance(slice_node, index_type):
+        slice_node = slice_node.value
+    if (
+        isinstance(slice_node, ast.Constant)
+        and isinstance(slice_node.value, str)
+        and slice_node.value.endswith("_notice")
+    ):
+        return slice_node.value
+    return None
+
+
 def test_publication_helper_does_not_collapse_a_lone_notice() -> None:
     """The typed writer has no singleton-dict assignment.
 
@@ -3100,6 +3122,19 @@ def test_publication_helper_does_not_collapse_a_lone_notice() -> None:
         _ROOT / "engines" / "builtin" / "vapor_pressure.py"
     ).read_text(encoding="utf-8")
     assert 'provenance["extrapolation_notice"] = dict(notice)' not in oxide
+    assert 'provenance["floor_inversion_notice"] = notice' not in oxide
+    # Every literal *_notice write in the oxide provider is a call to the
+    # merger. A new subscript assignment is a second publisher.
+    oxide_tree = ast.parse(oxide)
+    direct_notice_writes = []
+    for node in ast.walk(oxide_tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        for target in node.targets:
+            key = _assigned_notice_key(target)
+            if key is not None:
+                direct_notice_writes.append(f"{node.lineno}:{key}")
+    assert direct_notice_writes == []
 
 
 def test_pt0_entries_are_private() -> None:

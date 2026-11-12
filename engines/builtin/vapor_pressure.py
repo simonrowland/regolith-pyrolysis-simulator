@@ -325,11 +325,13 @@ def _attach_pO2_floor_inversion_notices(
         if notice is None:
             continue
         notices[str(species)] = notice
-        provenance["floor_inversion_notice"] = notice
-        # Public carrier extra publishes every *_notice. Dual-write this
-        # floor notice onto extrapolation_notice so wall/Pareto keep the
-        # existing field. Do not replace a temperature-range notice the
-        # collector already sees on that key.
+        # Typed oxide provenance stores every notice as a list. A direct
+        # dict makes a consumer iterating records receive string keys.
+        # The species map above stays one body per species.
+        merge_public_notice(provenance, "floor_inversion_notice", notice)
+        # Dual-write this floor notice onto extrapolation_notice so
+        # wall/Pareto keep the existing field. Do not replace a
+        # temperature-range notice the collector already sees on that key.
         if "extrapolation_notice" not in public_carrier_notices(provenance):
             # Typed provenance stores a list. The physics digest projects a
             # one-element list back to the legacy dict before it hashes.
@@ -4879,9 +4881,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         merge_public_notice,
                     )
 
-                    vapor_pressure_provenance[name][
-                        "source_activity_floor_notice"
-                    ] = [dict(source_activity_floor_notice)]
+                    # Same writer as the floor notice. A one-element list
+                    # built here would be a second publisher.
+                    merge_public_notice(
+                        vapor_pressure_provenance[name],
+                        "source_activity_floor_notice",
+                        source_activity_floor_notice,
+                    )
                     # Distinct from a temperature-range notice already on
                     # the key. Exact duplicates collapse.
                     merge_public_notice(
