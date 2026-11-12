@@ -59,10 +59,17 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   explicit power (``1e3``, ``10^3``, ``1×10^3``) equal to that power,
   and any other value is ``superscript_in_cell``. A value in another row
   does not certify. Formula and species labels are normalized before every
-  comparison, including a label with no ASCII digit. ``_{n}``, a bare
-  ``_`` digit, and Unicode subscript digits become plain digits. A
-  ``$...$`` formula and a ``\\mathrm`` / ``\\text`` / ``\\rm`` command,
-  including ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``, go through
+  comparison, including a label with no ASCII digit. Markup folds
+  inside each whitespace token and does not delete a separator. ``_{n}``,
+  a bare ``_`` digit, Unicode subscript digits, ``$...$``, and a
+  ``\\mathrm`` / ``\\text`` / ``\\rm`` command are removed inside the
+  token. A space inside ``$...$`` stays a separator, so ``$H_{2} O_{2}$``
+  is ``H2`` and ``O2``, and ``$SiO_{2} 100$`` is ``SiO2`` and ``100``.
+  A caret is a superscript. A token that contains ``^`` is not unwrapped
+  and does not certify as a plain formula or a plain number, so
+  ``$O^{2-}$`` is not ``O2`` and ``$SiO^{2}$`` is not ``SiO2``.
+  A token with no internal space, including
+  ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``, goes through
   ``printed_formula``. A layout space is removed
   only between an element symbol or a closing parenthesis and the digit
   count that follows it. ``SiO 2`` is ``SiO2``. A space after a count
@@ -172,8 +179,7 @@ from tools.mineru_table_draft import (
     Cell,
     TableGeometryError,
     parse_table_html,
-    printed_formula,
-    printed_formula_spans,
+    printed_formula_tokens,
 )
 
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
@@ -509,10 +515,14 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     occupies ``[start, end)``, and neither neighbour extends that span.
     ``1 K`` is not ``1 KPa``. ``1`` is not ``1,000``. ``1,000`` is not
     ``1,000,000``. ``1`` is not ``-1`` or ``1µ``. ``1`` is ``the value is 1.``
+    A whitespace token that contains ``^`` holds a superscript. No span
+    inside that token certifies a plain formula or a plain number.
     This predicate is the prose boundary only. A CSV or TSV source does
     not call it. The table is parsed first, and the whole cell is compared.
     """
     if not (0 <= start < end <= len(text)):
+        return False
+    if _token_holds_superscript(text, start, end):
         return False
     if start > 0 and _extends_printed_value(
         text, start - 1, text[start], sign_attaches=True
@@ -526,6 +536,18 @@ def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
     ):
         return False
     return True
+
+
+def _token_holds_superscript(text: str, start: int, end: int) -> bool:
+    """True when the whitespace token covering ``[start, end)`` contains ``^``."""
+    left = start
+    while left > 0 and not text[left - 1].isspace():
+        left -= 1
+    right = end
+    limit = len(text)
+    while right < limit and not text[right].isspace():
+        right += 1
+    return "^" in text[left:right]
 
 
 def _printed_value_carried(
@@ -760,17 +782,13 @@ _HTML_COLUMN_KEYS = ("table_column", "table_column_number")
 # Formula-bearing label keys only. Every other key, and every number, keeps
 # the ordinary token or whole-cell comparison.
 _FORMULA_LABEL_KEYS = frozenset({"formula", "species"})
-_FORMULA_BRACE_SUBSCRIPT_RE = re.compile(r"_\{(\d+)\}")
-_FORMULA_BARE_SUBSCRIPT_RE = re.compile(r"_(\d+)")
-# Math that wraps only the subscript. The letters stay outside the dollars.
-_FORMULA_MATH_BRACE_SUBSCRIPT_RE = re.compile(r"\$\s*_\{(\d+)\}\s*\$")
-_FORMULA_MATH_BARE_SUBSCRIPT_RE = re.compile(r"\$\s*_(\d+)\s*\$")
-# Spaces inside one formula token. A newline is not one of them, and a
-# preceding measurement (``6.98 Fe``) is not an element chain.
-# A space joins only an element symbol, or a closing parenthesis, to the
-# digit count that follows. ``SiO 2`` becomes ``SiO2``. ``(OH) 2`` becomes
-# ``(OH)2``. A space after a count is never joined: ``H2 O2`` and
-# ``Fe 2 O 3`` (which becomes ``Fe2 O3``) stay separate tokens.
+# The only cross-token join. A newline is not one of these spaces, and a
+# preceding measurement (``6.98 Fe``) is not an element chain. Markup
+# folds inside a token and never deletes a separator. A space joins only
+# an element symbol, or a closing parenthesis, to the digit count that
+# follows. ``SiO 2`` becomes ``SiO2``. ``(OH) 2`` becomes ``(OH)2``.
+# A space after a count is never joined: ``H2 O2`` and ``Fe 2 O 3``
+# (which becomes ``Fe2 O3``) stay separate tokens.
 _FORMULA_INTERNAL_SPACES = " \u00a0\u2009\u202f"
 _FORMULA_ELEMENT_COUNT_SPACE_RE = re.compile(
     "(?<![A-Za-z])"
@@ -3189,31 +3207,25 @@ def _leaf_in_text(leaf: Any, text: str) -> bool:
 
 
 def _normalize_formula_label(text: str) -> str:
-    """Fold formula markup onto plain digits, inside the formula token.
+    """Fold formula markup inside each whitespace token.
 
-    ``printed_formula`` unwraps a ``$...$`` formula and a ``\\mathrm``,
-    ``\\text``, or ``\\rm`` command, including
-    ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``. ``_{n}``, a bare ``_``
-    digit, and Unicode subscript digits become plain digits. A space is
-    removed only between an element symbol or a closing parenthesis and
-    the digit count that follows it. ``SiO 2`` becomes ``SiO2``.
-    ``(OH) 2`` becomes ``(OH)2``. A space after a count stays, so
-    ``Fe 2 O 3`` becomes ``Fe2 O3``, and ``H2 O2`` and ``SiO2 Al2O3``
-    stay two tokens. ``6.98 Fe_{2}O_{3}`` stays ``6.98 Fe2O3``.
-    ``page 2`` stays ``page 2``.
+    Invariant: folding does not change how many whitespace-separated
+    tokens ``text`` has, except to join a space between an element
+    symbol or a closing parenthesis and its own count. ``$...$``,
+    ``\\mathrm``, ``\\text``, ``\\rm``, braces, and ``_{n}`` are removed
+    inside the token. A space inside ``$...$`` is a separator.
+    A caret is a superscript: a token that contains ``^`` is left as it
+    is, and no plain formula or plain number certifies from that token.
+    ``printed_formula_tokens`` applies ``printed_formula`` to each other
+    token and does not cross a space. Unicode subscript digits then become
+    plain digits. ``SiO 2`` becomes ``SiO2`` and ``(OH) 2`` becomes
+    ``(OH)2``. ``$H_{2} O_{2}$`` stays ``H2`` and ``O2``.
+    ``$SiO_{2} 100$`` stays ``SiO2`` and ``100``. ``Fe 2 O 3`` becomes
+    ``Fe2 O3``. ``H2 O2`` and ``SiO2 Al2O3`` stay two tokens.
+    ``6.98 Fe_{2}O_{3}`` stays ``6.98 Fe2O3``. ``page 2`` stays ``page 2``.
+    ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` becomes ``Al2O3``.
     """
-    parts: list[str] = []
-    cursor = 0
-    for start, end in printed_formula_spans(text):
-        parts.append(text[cursor:start])
-        parts.append(printed_formula(text[start:end]))
-        cursor = end
-    parts.append(text[cursor:])
-    normalized = "".join(parts)
-    normalized = _FORMULA_MATH_BRACE_SUBSCRIPT_RE.sub(r"\1", normalized)
-    normalized = _FORMULA_MATH_BARE_SUBSCRIPT_RE.sub(r"\1", normalized)
-    normalized = _FORMULA_BRACE_SUBSCRIPT_RE.sub(r"\1", normalized)
-    normalized = _FORMULA_BARE_SUBSCRIPT_RE.sub(r"\1", normalized)
+    normalized = printed_formula_tokens(text)
     normalized = fold_subscript_digits(normalized)
     previous = None
     while previous != normalized:
@@ -3609,9 +3621,13 @@ def fidelity_source_warnings(
     neither address refuses with ``html_table_requires_cell_address``.
     A value on a prose line in that span still certifies. A value in
     another row is source-blind. Formula
-    and species labels fold subscript markup. ``printed_formula`` unwraps
-    a ``$...$`` formula and a ``\\mathrm`` / ``\\text`` / ``\\rm`` command,
-    so ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` is ``Al2O3``. A layout
+    and species labels fold markup inside each whitespace token. A space
+    inside ``$...$`` stays a separator, so ``$H_{2} O_{2}$`` is not
+    ``H2O2``. A token that contains ``^`` holds a superscript and does
+    not certify as a plain formula or a plain number.
+    ``printed_formula`` unwraps one token, including a
+    ``\\mathrm`` / ``\\text`` / ``\\rm`` command, so
+    ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` is ``Al2O3``. A layout
     space is removed only between an element
     or a closing parenthesis and the count that follows it, before every
     comparison. ``SiO 2`` is ``SiO2``. A space after a count stays, so

@@ -1796,7 +1796,8 @@ def _blank_or_dash(text: str) -> bool:
 
 # One LaTeX-formula command list. ``printed_formula`` is the only unwrap.
 _PRINTED_FORMULA_COMMAND_RE = re.compile(r"\\(?:mathrm|text|rm)\b")
-_PRINTED_FORMULA_MARKUP_RE = re.compile(r"[\\{}_^]")
+# A detector only. ``printed_formula`` strips the subscript characters.
+_PRINTED_FORMULA_SUBSCRIPT_RE = re.compile(r"_\{?\d")
 
 
 def printed_formula(text: str) -> str:
@@ -1804,6 +1805,8 @@ def printed_formula(text: str) -> str:
 
     ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` becomes ``Al2O3``. This strips
     math wrappers only; it does not interpret chemistry or drop ``circ``.
+    Spaces in ``text`` are removed. A citation that must keep a space between
+    tokens uses ``printed_formula_tokens`` instead.
     """
 
     token = text.strip()
@@ -1813,107 +1816,49 @@ def printed_formula(text: str) -> str:
     return re.sub(r"[{}_^\\\s]", "", token)
 
 
-def _closing_brace(text: str, open_at: int) -> int | None:
-    """Index after the ``}`` that closes the brace at ``open_at``."""
-    if open_at >= len(text) or text[open_at] != "{":
-        return None
-    depth = 0
-    for index in range(open_at, len(text)):
-        char = text[index]
-        if char == "{":
-            depth += 1
-        elif char == "}":
-            depth -= 1
-            if depth == 0:
-                return index + 1
-    return None
+def _printed_formula_token(text: str) -> str:
+    """Unwrap one whitespace token by calling ``printed_formula``.
 
-
-def _command_span_end(text: str, start: int) -> int | None:
-    """End of a ``\\mathrm`` / ``\\text`` / ``\\rm`` command and its groups."""
-    match = _PRINTED_FORMULA_COMMAND_RE.match(text, start)
-    if match is None:
-        return None
-    index = match.end()
-    if index >= len(text) or text[index] != "{":
-        return None
-    while index < len(text) and text[index] == "{":
-        end = _closing_brace(text, index)
-        if end is None:
-            return None
-        index = end
-    return index
-
-
-def _brace_chain_span_end(text: str, start: int) -> int | None:
-    """A brace that holds a formula command, plus the subscripts chained to it."""
-    end = _closing_brace(text, start)
-    if end is None or _PRINTED_FORMULA_COMMAND_RE.search(text, start, end) is None:
-        return None
-    index = end
-    while index < len(text):
-        if text.startswith("_{", index):
-            brace = _closing_brace(text, index + 1)
-            if brace is None:
-                break
-            index = brace
-            continue
-        if (
-            text[index] == "_"
-            and index + 1 < len(text)
-            and text[index + 1].isdigit()
-        ):
-            index += 2
-            while index < len(text) and text[index].isdigit():
-                index += 1
-            continue
-        if text[index] == "{":
-            brace = _closing_brace(text, index)
-            if (
-                brace is None
-                or _PRINTED_FORMULA_COMMAND_RE.search(text, index, brace) is None
-            ):
-                break
-            index = brace
-            continue
-        break
-    return index
-
-
-def printed_formula_spans(text: str) -> list[tuple[int, int]]:
-    """Spans of ``text`` that ``printed_formula`` unwraps.
-
-    A ``$...$`` pair is one span when its interior has formula markup.
-    A command with brace groups is one span. A brace that contains a
-    command, and the ``_{n}`` groups chained after it, is one span.
-    Characters outside those spans stay with the caller.
+    ``text`` has no whitespace. ``$`` is math markup, including a delimiter
+    left on one side when a ``$...$`` span was split. A token with no formula
+    markup is returned unchanged, so an ordinary underscore stays. A caret
+    is a superscript, not a subscript count, so a token that contains ``^``
+    is not unwrapped. ``printed_formula`` still strips ``^`` on a whole
+    species cell.
     """
-    spans: list[tuple[int, int]] = []
-    index = 0
-    length = len(text)
-    while index < length:
-        if text[index] == "$":
-            close = text.find("$", index + 1)
-            if close != -1 and _PRINTED_FORMULA_MARKUP_RE.search(
-                text, index + 1, close
-            ):
-                spans.append((index, close + 1))
-                index = close + 1
-                continue
-        if text[index] == "\\":
-            end = _command_span_end(text, index)
-            if end is not None:
-                spans.append((index, end))
-                index = end
-                continue
-        if text[index] == "{":
-            end = _brace_chain_span_end(text, index)
-            if end is not None:
-                spans.append((index, end))
-                index = end
-                continue
-        index += 1
-    return spans
+    if "^" in text:
+        return text
+    if (
+        "$" not in text
+        and _PRINTED_FORMULA_SUBSCRIPT_RE.search(text) is None
+        and _PRINTED_FORMULA_COMMAND_RE.search(text) is None
+    ):
+        return text
+    return printed_formula(text.replace("$", ""))
+
+
+def printed_formula_tokens(text: str) -> str:
+    """Fold formula markup inside each whitespace token.
+
+    Split on whitespace first. A space inside ``$...$`` is a separator, so
+    ``$H_{2} O_{2}$`` stays two tokens. ``printed_formula`` runs on each
+    token and never across a space. The separator is kept. ``printed_formula``
+    itself still strips every space when the emitter passes one species cell.
+    """
+    parts: list[str] = []
+    cursor = 0
+    for match in re.finditer(r"\s+", text):
+        if match.start() > cursor:
+            token = _printed_formula_token(text[cursor : match.start()])
+            if token:
+                parts.append(token)
+        parts.append(match.group(0))
+        cursor = match.end()
+    if cursor < len(text):
+        token = _printed_formula_token(text[cursor:])
+        if token:
+            parts.append(token)
+    return "".join(parts)
 
 
 def _stacked_values(text: str) -> bool:

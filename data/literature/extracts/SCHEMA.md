@@ -222,9 +222,18 @@ grid is source-blind. `line_range` still chooses which complete table is
 cited.
 Formula-bearing label keys are `formula` and `species` only. The label is
 normalized before every comparison, including a label with no ASCII digit.
-`_{n}`, a bare `_` followed by digits, and Unicode subscript digits
-become plain digits. A `$...$` formula and a `\mathrm`, `\text`, or
-`\rm` command are the `printed_formula` conversion, so
+Folding does not change how many whitespace-separated tokens the cited
+text has, except to join a space between an element symbol or a closing
+parenthesis and its own count. Markup is removed inside each token:
+`_{n}`, a bare `_` followed by digits, Unicode subscript digits,
+`$...$`, and a `\mathrm`, `\text`, or `\rm` command. A space inside
+`$...$` is a separator, so `$H_{2} O_{2}$` certifies `H2` and `O2` and
+does not certify `H2O2`, and `$SiO_{2} 100$` certifies `SiO2` and does
+not certify `SiO2100`. A caret is a superscript. A whitespace token that
+contains `^` does not certify as a plain formula or a plain number, so
+`$O^{2-}$` does not certify `O2`, `$Fe^{2+}$` does not certify `Fe2`,
+and `$SiO^{2}$` does not certify `SiO2`. A token with no internal space is the
+`printed_formula` conversion, so
 `${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$` certifies `Al2O3`. A layout
 space is removed only between an element symbol or a closing parenthesis
 and the digit count that follows it. `SiO 2` is `SiO2`. `(OH) 2` is

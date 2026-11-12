@@ -62,6 +62,7 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
+from tools.mineru_table_draft import printed_formula as draft_printed_formula  # noqa: E402
 from simulator.battery import migrate as battery_migrate  # noqa: E402
 from simulator.battery.waypoints import oxygen_condition  # noqa: E402
 from tests.battery import factories as battery_factories  # noqa: E402
@@ -10570,6 +10571,166 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
             not errors or "source_blind_pin" not in "\n".join(errors)
         ):
             failures.append(f"cell refuse {key} {pin!r} ~ {cell_text!r}: {errors}")
+    assert failures == []
+
+
+# Cartesian product of the token-boundary invariant. Layout "apart" is
+# W(A) W(B). Layout "together" is W(A B), one wrapper with a space inside
+# it. Plain, Unicode, and _{n} have no outer delimiter, so the two layouts
+# are the same string and both still have to keep the space.
+_FORMULA_TOKEN_PAIRS = (
+    ("H2", "O2"),
+    ("SiO2", "Al2O3"),
+    ("SiO2", "100"),
+    ("Fe2O3", "6.98"),
+    ("Fe2", "O3"),
+    ("CO", "CO2"),
+)
+# A caret is a superscript. The plain formula is what deleting ``^`` would
+# invent. The number is the superscript's own digit.
+_SUPERSCRIPT_TOKENS = (
+    ("$O^{2-}$", "O2", 2),
+    ("$Fe^{2+}$", "Fe2", 2),
+    ("$SiO^{2}$", "SiO2", 2),
+)
+_FORMULA_TOKEN_WRAPPERS = (
+    "plain",
+    "dollar",
+    "mathrm",
+    "nested",
+    "unicode",
+    "brace",
+)
+_FORMULA_UNICODE_DIGITS = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+
+
+def _formula_count_body(token: str, kind: str) -> str:
+    """Spell one token's own digits. A plain number stays contiguous."""
+    if re.fullmatch(r"\d+(?:\.\d+)?", token):
+        return token
+    if kind == "unicode":
+        return re.sub(
+            r"\d+",
+            lambda match: match.group(0).translate(_FORMULA_UNICODE_DIGITS),
+            token,
+        )
+    if kind == "plain":
+        return token
+    return re.sub(r"\d+", lambda match: "_{" + match.group(0) + "}", token)
+
+
+def _formula_wrap_body(body: str, kind: str) -> str:
+    if kind == "dollar":
+        return f"${body}$"
+    if kind == "mathrm":
+        return f"$\\mathrm{{{body}}}$"
+    if kind == "nested":
+        return "${\\mathrm{{" + body + "}}}$"
+    return body
+
+
+def _formula_pair_text(left: str, right: str, kind: str, layout: str) -> str:
+    """``apart`` wraps each token. ``together`` wraps both with one space."""
+    left_body = _formula_count_body(left, kind)
+    right_body = _formula_count_body(right, kind)
+    if layout == "together" and kind in ("dollar", "mathrm", "nested"):
+        return _formula_wrap_body(f"{left_body} {right_body}", kind)
+    return (
+        f"{_formula_wrap_body(left_body, kind)} "
+        f"{_formula_wrap_body(right_body, kind)}"
+    )
+
+
+def _formula_citation(token: str) -> tuple[str, object]:
+    """Formula key for a formula. A plain number certifies as a number."""
+    if re.fullmatch(r"\d+", token):
+        return "alpha", int(token)
+    if re.fullmatch(r"\d+\.\d+", token):
+        return "alpha", float(token)
+    return "formula", token
+
+
+def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
+    """Label folding keeps a space between tokens.
+
+    Invariant: folding does not change how many whitespace-separated
+    tokens the cited text has, except to join a space between an element
+    symbol or a closing parenthesis and its own count. Markup is removed
+    inside each token. For every wrapper and every pair, ``W(A) W(B)``
+    and ``W(A B)`` certify A and certify B and do not certify AB.
+    A token that contains ``^`` does not certify as that plain formula
+    or as a plain number. A neighbour token still certifies.
+    """
+    assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
+    assert (
+        _formula_pair_text("SiO2", "100", "dollar", "together") == "$SiO_{2} 100$"
+    )
+    # The emitter still strips every space in one species cell.
+    assert draft_printed_formula("$H_{2} O_{2}$") == "H2O2"
+    assert (
+        draft_printed_formula(r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$") == "Al2O3"
+    )
+    assert draft_printed_formula("$O^{2-}$") == "O2-"
+    failures: list[str] = []
+    for kind in _FORMULA_TOKEN_WRAPPERS:
+        for left, right in _FORMULA_TOKEN_PAIRS:
+            for layout in ("apart", "together"):
+                source = _formula_pair_text(left, right, kind, layout)
+                folded = vle._normalize_formula_label(source)
+                where = f"{kind} {layout} {source!r}"
+                if folded.split() != [left, right]:
+                    failures.append(f"tokens {where}: {folded!r}")
+                    continue
+                for token in (left, right):
+                    key, pin = _formula_citation(token)
+                    doc = _html_source_document(
+                        tmp_path, pin, source + "\n", key=key
+                    )
+                    errors = vle.certify_extract_source_fidelity(
+                        doc,
+                        label=f"keep-{kind}-{layout}-{token}",
+                        artifact_root=tmp_path,
+                    )
+                    if errors:
+                        failures.append(
+                            f"accept {key} {pin!r} {where}: {errors}"
+                        )
+                glued = left + right
+                doc = _html_source_document(
+                    tmp_path, glued, source + "\n", key="formula"
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"glue-{kind}-{layout}",
+                    artifact_root=tmp_path,
+                )
+                if not errors or "source_blind_pin" not in "\n".join(errors):
+                    failures.append(f"refuse {glued!r} {where}: {errors}")
+                if vle._formula_cell_matches(glued, source):
+                    failures.append(f"cell glued {glued!r} {where}")
+    for source, plain, number in _SUPERSCRIPT_TOKENS:
+        folded = vle._normalize_formula_label(source)
+        if "^" not in folded or plain in folded.split():
+            failures.append(f"superscript fold {source!r}: {folded!r}")
+        neighbour = f"H2 {source}"
+        for key, pin, accepts in (
+            ("formula", plain, False),
+            ("alpha", number, False),
+            ("formula", "H2", True),
+        ):
+            text = source if pin != "H2" else neighbour
+            doc = _html_source_document(tmp_path, pin, text + "\n", key=key)
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"sup-{plain}-{pin!r}", artifact_root=tmp_path
+            )
+            if accepts and errors:
+                failures.append(f"superscript accept {pin!r} ~ {text!r}: {errors}")
+            if not accepts and (
+                not errors or "source_blind_pin" not in "\n".join(errors)
+            ):
+                failures.append(f"superscript refuse {pin!r} ~ {text!r}: {errors}")
+        if vle._formula_cell_matches(plain, source):
+            failures.append(f"superscript cell {plain!r} ~ {source!r}")
     assert failures == []
 
 
