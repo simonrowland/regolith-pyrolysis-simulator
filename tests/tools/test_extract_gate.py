@@ -1042,6 +1042,51 @@ def test_table_coverage_compares_mineru_cells_to_extract_values(tmp_path: Path):
     assert report.tables[0].percent < 80
 
 
+def test_bad_table_body_is_reported_without_discarding_other_gate_results(
+    tmp_path: Path, capsys
+):
+    corpus = tmp_path / "corpus"
+    content = [
+        {"type": "table", "table_caption": "Table 1 absent"},
+        {
+            "type": "table",
+            "table_caption": "Table 2 malformed",
+            "table_body": 12,
+        },
+        {
+            "type": "table",
+            "table_caption": "Table 3 numeric",
+            "table_body": "<table><tr><td>0.038</td></tr></table>",
+        },
+    ]
+    content_path = (
+        corpus / "raw/fixture-source/ocr-mineru/page_content_list.json"
+    )
+    content_path.parent.mkdir(parents=True)
+    content_path.write_text(json.dumps(content), encoding="utf-8")
+
+    report = _run_gate(tmp_path, _document(), corpus=corpus)
+    issue = next(item for item in report.findings if item.check == "mineru-table")
+    assert "table 2" in issue.detail
+    assert [(item.table, item.numeric_cells) for item in report.tables] == [
+        ("table 3", 1)
+    ]
+
+    status = extract_gate.main(
+        [
+            str(tmp_path / "fixture-source.yaml"),
+            "--tree",
+            str(REPO_ROOT),
+            "--corpus",
+            str(corpus),
+        ]
+    )
+    output = capsys.readouterr().out
+    assert status == 1
+    assert "HARD mineru-table:" in output
+    assert "TABLE table 3:" in output
+
+
 def test_duplicate_source_identity_is_soft(tmp_path: Path):
     doc = _document()
     doc["source"].update({"doi": "10.1234/fixture", "title": "Fixture Article"})
@@ -1492,9 +1537,13 @@ def test_tree_import_refuses_missing_migrator_without_fallback(tmp_path: Path, c
     assert "simulator/battery/migrate.py" in output
 
 
-def test_numeric_table_cells_rejects_non_string_body():
+def test_numeric_table_cells_treats_absent_body_as_absence():
+    assert gate._numeric_table_cells(None) is None
+
+
+def test_numeric_table_cells_rejects_present_non_string_body():
     with pytest.raises(ValueError, match="table body must be text") as exc:
-        gate._numeric_table_cells(None)
+        gate._numeric_table_cells(12)
     assert type(exc.value).__name__ == "ExtractTableParseError"
 
 
