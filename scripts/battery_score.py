@@ -686,6 +686,8 @@ def main(argv: list[str] | None = None) -> int:
             compilation_comparisons_partial_path,
             engines=engines,
             invoke_pure_phase=not studio_routed,
+            work_id=args.work,
+            rail=rail,
             **(
                 {"observation_filter": compilation_filter}
                 if compilation_filter is not None

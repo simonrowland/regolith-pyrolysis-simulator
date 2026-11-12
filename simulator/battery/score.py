@@ -177,14 +177,15 @@ from simulator.battery.source_lineage import (
 )
 from simulator.battery.validate import (
     Ancestry,
+    _ValidationIndexes,
     ValidationIssue,
     _asset_ids,
     _observation_lineage,
     observation_issue_location,
     _pressure_blocking_notices,
     _resolve_coefficient_sources,
-    _table_ids,
     _VAPOUR_EQUILIBRIUM,
+    _build_validation_indexes,
     validate_corpus,
 )
 from simulator.battery.validity import (
@@ -4008,20 +4009,45 @@ def _candidate_lineage_for_sources(
     works: Mapping[str, Work] | None = None,
     observations: Mapping[str, Observation] | None = None,
     experiments: Mapping[str, Experiment] | None = None,
+    _indexes: _ValidationIndexes | None = None,
 ) -> tuple[bool, Ancestry | None]:
+    source_key = tuple(sources)
+    indexes = _indexes
+    if (
+        indexes is not None
+        and observations is not None
+        and indexes.matches(works, observations, experiments)
+    ):
+        cached = indexes.candidate_lineages.get(source_key)
+        if cached is not None:
+            return cached
+
     lineage_sources = coefficient_lineage_sources(sources)
     if not lineage_sources:
-        return False, None
+        result = (False, None)
+        if indexes is not None:
+            indexes.candidate_lineages[source_key] = result
+        return result
     for src in lineage_sources:
         if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
-            return False, None
+            result = (False, None)
+            if indexes is not None:
+                indexes.candidate_lineages[source_key] = result
+            return result
     expanded = expand_coefficient_sources(lineage_sources)
     if works is None or observations is None:
         return True, None
+    if indexes is None or not indexes.matches(works, observations, experiments):
+        indexes = _build_validation_indexes(works, observations, experiments)
+    cached = indexes.candidate_lineages.get(source_key)
+    if cached is not None:
+        return cached
     candidate_lineage = _resolve_coefficient_sources(
-        expanded, observations, works, experiments
+        expanded, observations, works, experiments, _indexes=indexes
     )
-    return candidate_lineage.complete, candidate_lineage
+    result = (candidate_lineage.complete, candidate_lineage)
+    indexes.candidate_lineages[source_key] = result
+    return result
 
 
 def lineage_complete_for(
@@ -4056,20 +4082,45 @@ def resolve_source_relation(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
 ) -> SourceRelation:
+    return _resolve_source_relation_with_indexes(
+        reference,
+        coefficient_sources,
+        lineage_complete,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+        _indexes=None,
+    )
+
+
+def _resolve_source_relation_with_indexes(
+    reference: Observation,
+    coefficient_sources: Sequence[str],
+    lineage_complete: bool,
+    *,
+    works: Mapping[str, Work],
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+    _indexes: _ValidationIndexes | None,
+) -> SourceRelation:
     if not lineage_complete:
         return SourceRelation.UNKNOWN
-    table_ids = _table_ids(works)
+    indexes = _indexes
+    if indexes is None or not indexes.matches(works, observations, experiments):
+        indexes = _build_validation_indexes(works, observations, experiments)
     reference_lineage = _observation_lineage(
         reference.observation_id,
         observations,
-        table_ids,
-        asset_ids=_asset_ids(works),
+        indexes.table_ids,
+        asset_ids=indexes.asset_ids,
+        _cache=indexes.observation_lineages,
     )
     candidate_lineage = _resolve_coefficient_sources(
         coefficient_lineage_sources(coefficient_sources),
         observations,
         works,
         experiments,
+        _indexes=indexes,
     )
     return _source_relation_from_lineages(reference_lineage, candidate_lineage)
 
@@ -4092,14 +4143,19 @@ def _source_relation_from_lineages(
 class _ScoringLineageResolver:
     """Reuse resolved ancestry and relations within one scoring run."""
 
-    def __init__(self, context: ScoreContext) -> None:
+    def __init__(
+        self,
+        context: ScoreContext,
+        indexes: _ValidationIndexes | None = None,
+    ) -> None:
         self.context = context
-        self.table_ids = _table_ids(context.works)
-        self.asset_ids = _asset_ids(context.works)
-        self._candidate_lineages: dict[
-            tuple[str, ...], tuple[bool, Ancestry | None]
-        ] = {}
-        self._reference_lineages: dict[str, Ancestry] = {}
+        self.indexes = indexes
+        if self.indexes is None or not self.indexes.matches(
+            context.works, context.observations, context.experiments
+        ):
+            self.indexes = _build_validation_indexes(
+                context.works, context.observations, context.experiments
+            )
         self._source_relations: dict[
             tuple[tuple[str, ...], tuple[str, ...]], SourceRelation
         ] = {}
@@ -4107,19 +4163,13 @@ class _ScoringLineageResolver:
     def _candidate_lineage(
         self, sources: Sequence[str]
     ) -> tuple[bool, Ancestry | None]:
-        source_key = tuple(sources)
-        cached = self._candidate_lineages.get(source_key)
-        if cached is not None:
-            return cached
-
-        result = _candidate_lineage_for_sources(
-            source_key,
+        return _candidate_lineage_for_sources(
+            sources,
             works=self.context.works,
             observations=self.context.observations,
             experiments=self.context.experiments,
+            _indexes=self.indexes,
         )
-        self._candidate_lineages[source_key] = result
-        return result
 
     def lineage_complete_for(self, sources: Sequence[str]) -> bool:
         return self._candidate_lineage(sources)[0]
@@ -4131,17 +4181,17 @@ class _ScoringLineageResolver:
         if not complete or candidate_lineage is None:
             return complete, SourceRelation.UNKNOWN
 
-        reference_lineage = self._reference_lineages.get(
+        reference_lineage = self.indexes.observation_lineages.get(
             reference.observation_id
         )
         if reference_lineage is None:
             reference_lineage = _observation_lineage(
                 reference.observation_id,
                 self.context.observations,
-                self.table_ids,
-                asset_ids=self.asset_ids,
+                self.indexes.table_ids,
+                asset_ids=self.indexes.asset_ids,
+                _cache=self.indexes.observation_lineages,
             )
-            self._reference_lineages[reference.observation_id] = reference_lineage
 
         if (
             not reference_lineage.complete
@@ -12821,8 +12871,16 @@ def _compile_residual_with_lineage(
     point_observations: Sequence[Observation] | None = None,
     fo2_mode: Fo2Mode | None = None,
     _source_relation_resolver: _ScoringLineageResolver | None = None,
+    _validation_indexes: _ValidationIndexes | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
+    validation_indexes = _validation_indexes
+    if validation_indexes is None or not validation_indexes.matches(
+        context.works, context.observations, context.experiments
+    ):
+        validation_indexes = _build_validation_indexes(
+            context.works, context.observations, context.experiments
+        )
     precomputed_prediction = prediction is not None
     source_reference = reference
     sample_phase_detail = (
@@ -12859,7 +12917,15 @@ def _compile_residual_with_lineage(
         gates = run_validity_gates(
             experiment,
             gate_reference,
-            tables=_gate_tables(reference, context.observations, table_index),
+            tables=_gate_tables(
+                reference,
+                context.observations,
+                (
+                    validation_indexes.printed_thermo_index
+                    if table_index is None
+                    else table_index
+                ),
+            ),
             point_observations=point_observations,
         )
     else:
@@ -13414,12 +13480,13 @@ def _compile_residual_with_lineage(
     prediction_sources = tuple(prediction.coefficient_sources)
     expanded_sources = expand_coefficient_sources(prediction_sources)
     lineage_complete = (
-        lineage_complete_for(
+        _candidate_lineage_for_sources(
             prediction_sources,
             works=context.works,
             observations=context.observations,
             experiments=context.experiments,
-        )
+            _indexes=validation_indexes,
+        )[0]
         if _source_relation_resolver is None
         else _source_relation_resolver.lineage_complete_for(prediction_sources)
     )
@@ -13450,13 +13517,14 @@ def _compile_residual_with_lineage(
     if lineage_observation_id and lineage_observation_id != reference.observation_id:
         relation_reference = replace(reference, observation_id=lineage_observation_id)
     if _source_relation_resolver is None:
-        source_relation = resolve_source_relation(
+        source_relation = _resolve_source_relation_with_indexes(
             relation_reference,
             prediction.coefficient_sources,
             prediction.lineage_complete,
             works=context.works,
             observations=context.observations,
             experiments=context.experiments,
+            _indexes=validation_indexes,
         )
     else:
         _complete, source_relation = _source_relation_resolver.for_reference(
@@ -13473,14 +13541,16 @@ def _compile_residual_with_lineage(
         reference_lineage = _observation_lineage(
             relation_reference.observation_id,
             context.observations,
-            _table_ids(context.works),
-            asset_ids=_asset_ids(context.works),
+            validation_indexes.table_ids,
+            asset_ids=validation_indexes.asset_ids,
+            _cache=validation_indexes.observation_lineages,
         )
         coefficient_lineage = _resolve_coefficient_sources(
             coefficient_lineage_sources(prediction.coefficient_sources),
             context.observations,
             context.works,
             context.experiments,
+            _indexes=validation_indexes,
         )
         if reference_lineage.complete and coefficient_lineage.complete:
             attribution = (
@@ -14323,6 +14393,36 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
+def _observation_matches_run_filters(
+    context: ScoreContext,
+    observation: Observation,
+    *,
+    work_id: str | None = None,
+    rail: Rail | None = None,
+    observation_filter: Callable[[Observation], bool] | None = None,
+) -> bool:
+    """Apply scorer work/rail selection and an optional caller-owned filter."""
+
+    if work_id:
+        experiment = context.experiments.get(observation.experiment_id)
+        if (
+            (experiment is None or experiment.work_id != work_id)
+            and observation.source_id != work_id
+        ):
+            return False
+    if rail is not None:
+        identity = observation.identity
+        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+        formula = (
+            identity.species.formula
+            if isinstance(identity, Identity) and identity.species is not None
+            else ""
+        )
+        if rail_for_quantity(quantity, species_formula=formula) is not rail:
+            return False
+    return observation_filter is None or observation_filter(observation)
+
+
 def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
     """Compilation, ledger, and SF04 rows scored through diagnostic paths."""
 
@@ -14434,36 +14534,24 @@ def _score_store_with_decisions(
             if obs.evidence.class_.is_value
             and obs.evidence.class_.value in MEASURED_EVIDENCE
         ]
-    if work_id:
-        filtered: list[Observation] = []
-        for obs in refs:
-            experiment = context.experiments.get(obs.experiment_id)
-            if experiment is not None and experiment.work_id == work_id:
-                filtered.append(obs)
-            elif obs.source_id == work_id:
-                filtered.append(obs)
-        refs = filtered
-    if rail is not None or species_formulas:
-        selected_species = set(species_formulas)
-        kept: list[Observation] = []
-        for obs in refs:
-            if selected_species and not _matches_species_filter(
-                obs, selected_species
-            ):
-                continue
-            identity = obs.identity if isinstance(obs.identity, Identity) else None
-            quantity = quantity_token(identity) if identity is not None else None
-            formula = (
-                identity.species.formula
-                if identity is not None and identity.species is not None
-                else ""
+    selected_species = set(species_formulas)
+    species_filter = (
+        (lambda observation: _matches_species_filter(observation, selected_species))
+        if selected_species
+        else None
+    )
+    if work_id or rail is not None or species_filter is not None:
+        refs = [
+            obs
+            for obs in refs
+            if _observation_matches_run_filters(
+                context,
+                obs,
+                work_id=work_id,
+                rail=rail,
+                observation_filter=species_filter,
             )
-            if rail is not None and rail_for_quantity(
-                quantity, species_formula=formula
-            ) is not rail:
-                continue
-            kept.append(obs)
-        refs = kept
+        ]
     refs.sort(key=lambda o: o.observation_id)
     if limit is not None:
         refs = refs[: int(limit)]
@@ -14508,7 +14596,12 @@ def _score_store_with_decisions(
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         observations.values()
     )
-    lineage_resolver = _ScoringLineageResolver(live_context)
+    from simulator.battery.validate import _build_validation_indexes
+
+    validation_indexes = _build_validation_indexes(
+        context.works, observations, context.experiments
+    )
+    lineage_resolver = _ScoringLineageResolver(live_context, validation_indexes)
     empirical_ids = comparison_ids
     started = time.monotonic()
     last_progress = started
@@ -14534,9 +14627,9 @@ def _score_store_with_decisions(
         _compilation_series_point_count(obs, origins.get(obs.observation_id))
         for obs in refs
     ) * max(len(engine_set), 1)
-    from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
+    from simulator.battery.validate import _bound_work_inputs
 
-    table_index = build_printed_thermo_index(observations)
+    table_index = validation_indexes.printed_thermo_index
     ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
         context.root
     )
@@ -14550,7 +14643,12 @@ def _score_store_with_decisions(
         tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
     ] = {}
     try:
-        with bound_work_inputs(context.works, observations, context.experiments):
+        with _bound_work_inputs(
+            context.works,
+            observations,
+            context.experiments,
+            _indexes=validation_indexes,
+        ):
             for obs in refs:
                 origin = origins.get(obs.observation_id)
                 for point in _iter_compilation_series_cells(obs, origin):
@@ -14691,6 +14789,7 @@ def _score_store_with_decisions(
                                 else None
                             ),
                             _source_relation_resolver=lineage_resolver,
+                            _validation_indexes=validation_indexes,
                         )
                         if _stream is None:
                             assert residuals is not None
@@ -14704,7 +14803,7 @@ def _score_store_with_decisions(
                             and predict is None
                         ):
                             total += 1
-                            intrinsic_residual, intrinsic_candidate = compile_residual(
+                            intrinsic_residual, intrinsic_candidate = _compile_residual_with_lineage(
                                 point,
                                 engine,
                                 context=live_context,
@@ -14723,6 +14822,7 @@ def _score_store_with_decisions(
                                     point.experiment_id, ()
                                 ),
                                 fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+                                _validation_indexes=validation_indexes,
                             )
                             if _stream is None:
                                 assert residuals is not None
