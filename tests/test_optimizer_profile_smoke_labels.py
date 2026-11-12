@@ -3,8 +3,9 @@
 INVARIANT: no product objective is scored unless the executed campaign claims
 THAT objective's product. Claim keys are the setpoints ``products`` keys plus
 ``O2`` when the campaign's hour-step routes credit O2 to a terminal account.
-The executed campaign is the fidelity overlay on ``profile.run``
-(EvalSpec.campaign). Otherwise the objective is absent from objective
+The executed options are the triple (campaign, track, c5_enabled): the
+fidelity overlay, then the EvalSpec triple after the MRE voltage cap.
+Otherwise the objective is absent from objective
 definitions, ``compute_objectives``, strategy metrics, and the study scalar.
 It is named in a notice with its weight, the reason
 ``campaign_does_not_claim_product``, and the withheld weight fraction. It is
@@ -1437,12 +1438,16 @@ def test_fidelity_overlay_is_the_executed_campaign(
         profile,
         SimpleNamespace(
             campaign=executed,
+            track=str(stamped["run"].get("track") or "pyrolysis"),
+            c5_enabled=bool(stamped["run"].get("c5_enabled", False)),
             hours=1,
             runtime_campaign_overrides={},
             lab_schedule={},
         ),
     )
     assert via_spec["run"]["campaign"] == executed
+    assert via_spec["run"]["track"] == str(stamped["run"].get("track") or "pyrolysis")
+    assert via_spec["run"]["c5_enabled"] is bool(stamped["run"].get("c5_enabled", False))
     assert profile["run"].get("campaign") == authored_campaign
     claim_keys = _scoring_claim_keys(executed, stamped)
     claimed = _oracle_claims_metric(metric, claim_keys, target=target)
@@ -1906,6 +1911,7 @@ def test_unclaimed_composition_objective_imposes_no_gate(
         assert not composition_targets_require_terminal_rump(profile)
         assert not composition_targets_require_stage0_exit(profile)
         assert not composition_targets_require_coating(profile)
+    run = profile["run"]
     constraints = _composition_target_constraints(
         profile,
         PhysicsConstraintSet(
@@ -1913,6 +1919,8 @@ def test_unclaimed_composition_objective_imposes_no_gate(
             target_species=_extraction_species(gate),
         ),
         campaign=executed_campaign_id(profile),
+        track=str(run.get("track") or "pyrolysis"),
+        c5_enabled=bool(run.get("c5_enabled", False)),
     )
     assert constraints is not None
     installed = constraints.extraction_min_fraction_by_species
@@ -1958,4 +1966,4 @@ def test_objective_derived_gates_read_the_scoring_rows() -> None:
     constraints_source = inspect.getsource(
         evaluate_module._composition_target_constraints
     )
-    assert "profile_with_executed_campaign(" in constraints_source
+    assert "profile_with_resolved_execution(" in constraints_source

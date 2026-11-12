@@ -15388,6 +15388,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             history = getattr(self, '_subsolidus_bakeout_by_hour', None) or []
             if history:
                 summary['subsolidus_bakeout'] = [dict(item) for item in history]
+        elif campaign_name == 'C2A_STAGED':
+            staged = getattr(self.campaign_mgr, 'last_c2a_staged_termination', None)
+            if staged:
+                summary['c2a_staged_termination'] = dict(staged)
+        # Every completed step names endpoint_met, time_cap, or refused.
+        # A missing token stays stop_reason_unrecorded. It is not endpoint_met.
+        stop_reason = 'stop_reason_unrecorded'
+        stop_detail = None
+        refusal = None
+        if campaign_name == 'C4':
+            refusal = getattr(self, '_last_c4_refusal_diagnostic', None)
+        elif campaign_name == 'C6':
+            refusal = getattr(self, '_last_c6_refusal_diagnostic', None)
+        if isinstance(refusal, Mapping) and refusal.get('status') == 'refused':
+            stop_reason = 'refused'
+            diagnostic = refusal.get('diagnostic')
+            if isinstance(diagnostic, Mapping):
+                stop_detail = (
+                    diagnostic.get('reason_refused') or diagnostic.get('reason')
+                )
+            if not stop_detail:
+                stop_detail = (
+                    refusal.get('reason_refused') or refusal.get('reason')
+                )
+        else:
+            recorded = getattr(self.campaign_mgr, 'last_campaign_stop', None)
+            if isinstance(recorded, Mapping):
+                token = str(recorded.get('stop_reason') or '')
+                if token in ('endpoint_met', 'time_cap', 'refused'):
+                    stop_reason = token
+                    stop_detail = recorded.get('detail')
+        summary['stop_reason'] = stop_reason
+        if stop_detail:
+            summary['stop_detail'] = str(stop_detail)
         return summary
 
     def campaign_endpoint_refused(self) -> bool:

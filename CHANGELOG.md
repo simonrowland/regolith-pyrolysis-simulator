@@ -4,6 +4,20 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [0.6.7] — 2026-11-12
+
+- Objective claims, gates, and study-scalar weights use the resolved
+  execution options `(campaign, track, c5_enabled)`, including a fidelity
+  overlay and the MRE voltage-cap rewrite. A pyrolysis C0 start still
+  scores the AUTO_APPLY sequence. A track that does not run that sequence
+  does not keep its later pyrolysis objectives. Ranking traces keep each
+  completed step's stop reason (`endpoint_met`, `time_cap`, or `refused`)
+  and the cap name. `check_endpoint` is the only phase-end list. EvalSpec
+  keys follow this VERSION bump. `data/corpus_version.yaml` is unchanged.
+  Glass mass on the measured profiles remains an open finding under the
+  physics trace; this change does not treat a zero glass total as a
+  physics result.
+
 ## [0.6.6] — 2026-11-11
 
 - Optimizer evaluations that start at C0 on the pyrolysis track drive the

@@ -106,12 +106,14 @@ _MASS_OBJECTIVE_METRICS = frozenset(
 # route's setpoints ``products`` keys plus ``O2`` when its hour-step routes
 # credit O2 to a terminal account (evaporation coproduct or electrolysis
 # anode). The products map alone is a hand list and omits that by-product.
-# The executed campaign is the fidelity overlay on ``profile.run`` (the same
-# value EvalSpec.campaign stores). `_merged_run_for_fidelity` folds the
-# requested fidelity and every profile key through `canonical_backend_name`
-# before that campaign is read. `stub` and `internal-analytical` are one
-# fidelity: an alias spelling cannot give the vector one campaign and the
-# gates another. An objective whose product that campaign does not claim is
+# The executed options are the triple (campaign, track, c5_enabled).
+# Study scoring stamps the fidelity merge. A per-eval vector stamps the
+# EvalSpec triple after the MRE voltage cap. `_merged_run_for_fidelity`
+# folds the requested fidelity and every profile key through
+# `canonical_backend_name` before that triple is read. `stub` and
+# `internal-analytical` are one fidelity: an alias spelling cannot give
+# the vector one triple and the gates another. An objective whose product
+# that executed campaign does not claim is
 # withheld from every scoring path (objective definitions, compute_objectives,
 # strategy metrics, and the study scalar) and from every objective-derived gate.
 # Those gates are terminal rump, stage-0 stop, coating, composition order,
@@ -140,10 +142,13 @@ _MASS_OBJECTIVE_METRICS = frozenset(
 # expire the real-backend engine cache for a non-chemistry change.
 # ``_scoring_objective_rows`` does not change the cache key.
 # A pyrolysis start at C0 is scored on the AUTO_APPLY sequence the campaign
-# controller will execute, not on C0's products map alone. That map is
+# controller will execute, not on C0's products map alone. The union is
+# only for track pyrolysis. ``c5_enabled`` selects the C5 sequence instead
+# of post-mg C2A. Any other track scores that one campaign: the session
+# does not continue into the pyrolysis sequence. C0's own map is
 # volatiles and native_Fe. native_Fe is nanophase magnetic separation, not
 # the pyrolysis metal product, so C0 alone authorizes no named metal metric
-# and no energy-per-product intensity. Later steps in the sequence do when
+# and no energy-per-product intensity. Later pyrolysis steps do when
 # their own products maps name the metal or the glass. C0 still claims
 # ``O2``: its hour step runs the evaporation route, which credits the
 # oxide-reduction coproduct and OVERHEAD_BLEED stores it at the terminal.
@@ -1538,23 +1543,64 @@ def executed_campaign_id(
     return _campaign_id_token(merged.get("campaign", "C0"))
 
 
-def profile_with_executed_campaign(
-    profile: Mapping[str, Any],
-    campaign_id: str,
-) -> Mapping[str, Any]:
-    """Return ``profile`` with ``run.campaign`` set to ``campaign_id``.
+_EXECUTION_IDENTITY_FIELDS = ("campaign", "track", "c5_enabled")
 
-    The same object is returned when that campaign is already set, so a digest
-    of the authored profile is left alone. Otherwise this is a shallow copy
-    with a new ``run`` dict. The authored profile is not mutated.
+
+def resolved_execution_identity(
+    profile: Mapping[str, Any],
+    fidelity: str | None = None,
+) -> Mapping[str, Any]:
+    """Campaign, track, and c5 the production session will execute.
+
+    This is the merge ``_run_options`` stores, before a candidate patch
+    rewrites ``c5_enabled``. Empty track is pyrolysis, matching continuation.
     """
 
+    merged = _merged_run_for_fidelity(profile, fidelity)
+    return MappingProxyType({
+        "campaign": executed_campaign_id(profile, fidelity=fidelity),
+        "track": str(merged.get("track") or "pyrolysis"),
+        "c5_enabled": bool(merged.get("c5_enabled", False)),
+    })
+
+
+def profile_with_resolved_execution(
+    profile: Mapping[str, Any],
+    identity: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    """Return ``profile`` with the resolved execution triple on ``run``.
+
+    A missing field is an error. Callers do not fall back to the authored
+    run for the field they forgot. The same object is returned when the
+    triple is already in force, so a digest of the authored profile is left
+    alone. Otherwise this is a shallow copy with a new ``run`` dict. The
+    authored profile is not mutated.
+    """
+
+    missing = [
+        key for key in _EXECUTION_IDENTITY_FIELDS if key not in identity
+    ]
+    if missing:
+        raise ObjectiveProfileError(
+            "resolved execution identity requires campaign, track, and "
+            f"c5_enabled; missing {missing}"
+        )
+    campaign_id = _campaign_id_token(identity["campaign"])
+    track = str(identity["track"] or "pyrolysis")
+    c5_enabled = bool(identity["c5_enabled"])
     run = profile.get("run")
-    if isinstance(run, Mapping) and run.get("campaign") == campaign_id:
+    authored = run if isinstance(run, Mapping) else {}
+    if (
+        authored.get("campaign") == campaign_id
+        and str(authored.get("track") or "pyrolysis") == track
+        and bool(authored.get("c5_enabled", False)) is c5_enabled
+    ):
         return profile
     merged = dict(profile)
-    new_run = dict(run) if isinstance(run, Mapping) else {}
+    new_run = dict(authored)
     new_run["campaign"] = campaign_id
+    new_run["track"] = track
+    new_run["c5_enabled"] = c5_enabled
     merged["run"] = new_run
     return merged
 
@@ -1563,11 +1609,11 @@ def profile_scored_at_fidelity(
     profile: Mapping[str, Any],
     fidelity: str | None,
 ) -> Mapping[str, Any]:
-    """Scoring copy whose run campaign is the one ``fidelity`` executes."""
+    """Scoring copy whose run options are the ones ``fidelity`` executes."""
 
-    return profile_with_executed_campaign(
+    return profile_with_resolved_execution(
         profile,
-        executed_campaign_id(profile, fidelity=fidelity),
+        resolved_execution_identity(profile, fidelity),
     )
 
 
@@ -1657,13 +1703,15 @@ def _c0_auto_apply_phase_names(c5_enabled: bool) -> tuple[str, ...]:
 
 
 def _profile_product_claim_keys(profile: Mapping[str, Any]) -> frozenset[str]:
-    # No fidelity argument: the caller stamps the executed campaign onto
-    # ``profile.run`` first. A direct call uses the authored run, or C0 when
-    # that run names no campaign. A C0 pyrolysis start unions the claims of
-    # every phase the AUTO_APPLY controller will enter. Any other start
-    # stays that one campaign. This changes the objective vector, so the
-    # VERSION bump on this branch is what expires pre-fix EvalSpec keys.
-    # corpus_version stays at the green tag. No new cache-key dimension.
+    # No fidelity argument: the caller stamps the resolved execution triple
+    # onto ``profile.run`` first. A direct call uses the authored run, or C0
+    # when that run names no campaign. A C0 pyrolysis start unions the claims
+    # of every phase the AUTO_APPLY controller will enter for this
+    # ``c5_enabled``. Any other track or campaign stays that one campaign,
+    # because the session does not walk the pyrolysis sequence. This changes
+    # the objective vector, so the VERSION bump on this branch is what
+    # expires pre-fix EvalSpec keys. corpus_version stays at the green tag.
+    # No new cache-key dimension.
     from simulator.campaigns import CampaignManager
     from simulator.state import CampaignPhase
 

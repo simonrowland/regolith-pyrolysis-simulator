@@ -610,6 +610,7 @@ class CampaignManager:
         self._active_post_mg_c2a_overrides: dict | None = None
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
         self.last_c4_termination: dict[str, object] | None = None
+        self.last_campaign_stop: dict[str, object] | None = None
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -634,29 +635,17 @@ class CampaignManager:
     _ROUTE_LABEL_PHASES = {
         'MRE': (CampaignPhase.MRE_BASELINE,),
     }
-    # Phases whose ``check_endpoint`` can return True or raise a typed
-    # refusal. C4 and C6 are in this set because that endpoint ends them.
-    # They do not take an optimizer hour budget.
-    _ENDPOINT_OWNED_PHASES = frozenset({
-        CampaignPhase.C0,
-        CampaignPhase.C0B,
-        CampaignPhase.C2A,
-        CampaignPhase.C2A_STAGED,
-        CampaignPhase.C2B,
-        CampaignPhase.C3_K,
-        CampaignPhase.C3_NA,
-        CampaignPhase.C4,
-        CampaignPhase.C5,
-        CampaignPhase.C6,
-        CampaignPhase.C7_CA_ALUMINOTHERMIC,
-        CampaignPhase.MRE_BASELINE,
-    })
-
     @classmethod
     def endpoint_can_end(cls, phase: CampaignPhase) -> bool:
-        """True when ``check_endpoint`` owns termination for ``phase``."""
+        """True when ``check_endpoint`` owns termination for ``phase``.
 
-        return phase in cls._ENDPOINT_OWNED_PHASES
+        IDLE and COMPLETE are not processing phases. Every other phase
+        ends inside ``check_endpoint``. There is no second phase list.
+        C4 and C6 are end-criterion phases: they do not take an optimizer
+        hour budget.
+        """
+
+        return phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE)
     _OVERRIDE_CONSUMER_NAMES = frozenset({
         'campaign_overrides',
         'override',
@@ -2030,6 +2019,8 @@ class CampaignManager:
 
         Called when starting a new campaign phase.
         """
+        # The previous campaign's summary was captured before this start.
+        self.last_campaign_stop = None
         self._reset_stage_background_gas(melt)
         self._materialized_target_T_C_by_phase.pop(campaign, None)
         materialized_target = self._materialize_target_from_delta(campaign)
@@ -2733,6 +2724,25 @@ class CampaignManager:
             })
         return number
 
+    def _end_at(self, stop_reason: str, *, detail: str | None = None) -> bool:
+        """Record why this phase ended and tell the hour step to advance.
+
+        ``endpoint_met`` is the phase's own criterion, including a duration
+        that is the only criterion. ``time_cap`` is a cap that cut the phase
+        before that criterion. Refusals are not recorded here; they raise.
+        """
+
+        if stop_reason not in ("endpoint_met", "time_cap"):
+            raise ValueError(
+                "campaign stop_reason must be endpoint_met or time_cap, "
+                f"not {stop_reason!r}"
+            )
+        record: dict[str, object] = {"stop_reason": stop_reason}
+        if detail:
+            record["detail"] = detail
+        self.last_campaign_stop = record
+        return True
+
     def check_endpoint(self, melt: MeltState,
                        evap_flux: EvaporationFlux,
                        train: CondensationTrain,
@@ -2769,7 +2779,10 @@ class CampaignManager:
         - MRE_BASELINE: armed current below configured threshold after
           min voltage, else max_hold
 
-        Returns True if the campaign should end.
+        Returns True if the campaign should end. Each True records
+        ``endpoint_met`` or ``time_cap`` on ``last_campaign_stop``. A typed
+        refusal still raises. A phase this function does not handle raises
+        ``CampaignEndCapMissing`` rather than ending or continuing silently.
         """
         campaign = melt.campaign
         completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt)
@@ -2792,7 +2805,7 @@ class CampaignManager:
                 raise ValueError("max_hours override must be numeric")
             max_h = float(raw_max_hours)
             if max_h > 0 and completed_campaign_hour >= max_h:
-                return True
+                return self._end_at("time_cap", detail="max_hours")
 
         if campaign == CampaignPhase.C0:
             from simulator.accounting.stage0_inventory import (
@@ -2826,7 +2839,7 @@ class CampaignManager:
                         self.c0_forecast_adjustment_notices
                     ),
                 )
-                return True
+                return self._end_at("endpoint_met", detail="first_melt")
 
             if self.c0_remaining_budget_exit is not None:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
@@ -2842,7 +2855,7 @@ class CampaignManager:
                     ),
                     remaining_budget_exit=self.c0_remaining_budget_exit,
                 )
-                return True
+                return self._end_at("endpoint_met", detail="remaining_budget")
 
             if isinstance(prediction, Mapping):
                 exit_temperature_C = prediction.get('T_exit_C')
@@ -2869,7 +2882,7 @@ class CampaignManager:
                             self.c0_forecast_adjustment_notices
                         ),
                     )
-                    return True
+                    return self._end_at("endpoint_met", detail="computed_exit")
 
             max_hold_hr = self._max_hold_hr(campaign)
             if completed_campaign_hour >= max_hold_hr:
@@ -2885,13 +2898,14 @@ class CampaignManager:
                         self.c0_forecast_adjustment_notices
                     ),
                 )
-                return True
+                return self._end_at("time_cap", detail="maximum_hold")
             return False
 
         elif campaign == CampaignPhase.C0B:
             max_hold_hr = self._max_hold_hr(campaign)
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("endpoint_met", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C2A:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
@@ -2921,9 +2935,10 @@ class CampaignManager:
                     unit='kg/hr',
                 )
                 if total_rate < threshold_kg_hr:
-                    return True
+                    return self._end_at("endpoint_met", detail="signal_depleted")
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C2A_STAGED:
             max_hold_hr = self._configured_staged_max_hold_hr(campaign)
@@ -2941,7 +2956,7 @@ class CampaignManager:
                         'reason': 'fixed_duration',
                         'campaign_hour': int(melt.campaign_hour),
                     }
-                    return True
+                    return self._end_at("endpoint_met", detail="fixed_duration")
                 return False
 
             if not stages:
@@ -2950,7 +2965,7 @@ class CampaignManager:
                         'reason': 'fixed_duration',
                         'campaign_hour': int(melt.campaign_hour),
                     }
-                    return True
+                    return self._end_at("endpoint_met", detail="fixed_duration")
                 return False
             stage_idx = min(
                 max(0, int(self._c2a_staged_stage_idx)),
@@ -3036,7 +3051,10 @@ class CampaignManager:
                     ),
                 }
                 if final_stage:
-                    return True
+                    return self._end_at(
+                        "endpoint_met" if depletion_complete else "time_cap",
+                        detail=reason,
+                    )
                 self._c2a_staged_stage_idx = stage_idx + 1
                 self._c2a_staged_stage_start_hour = melt.campaign_hour + 1
                 self._c2a_staged_peak_flux_by_species = {}
@@ -3050,7 +3068,8 @@ class CampaignManager:
                     'stage_idx': stage_idx,
                     'campaign_hour': int(melt.campaign_hour),
                 }
-                return True
+                return self._end_at("time_cap", detail="max_hold_ceiling")
+            return False
 
         elif campaign == CampaignPhase.C2B:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
@@ -3084,9 +3103,10 @@ class CampaignManager:
                     unit='kg/hr',
                 )
                 if rate < threshold_kg_hr:
-                    return True
+                    return self._end_at("endpoint_met", detail="signal_depleted")
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C3_K:
             if record.path == 'A_staged':
@@ -3095,12 +3115,13 @@ class CampaignManager:
                     self._configured_max_hold_hr(campaign, 'C3_K', 'A_staged'),
                 ))
                 if completed_campaign_hour >= max(1, staged_hours):
-                    return True
+                    return self._end_at("endpoint_met", detail="staged_duration")
             path_key = 'A' if record.path == 'A' else 'default'
             max_hold_hr = self._configured_max_hold_hr(
                 campaign, 'C3_K', path_key)
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("endpoint_met", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C3_NA:
             # Autoreview r6 P2 (2026-05-27): the V1c-recipe-retune
@@ -3121,12 +3142,13 @@ class CampaignManager:
                     self._configured_max_hold_hr(campaign, 'C3_NA', 'A_staged'),
                 ))
                 if completed_campaign_hour >= max(1, staged_hours):
-                    return True
+                    return self._end_at("endpoint_met", detail="staged_duration")
             path_key = 'A' if record.path == 'A' else 'default'
             max_hold_hr = self._configured_max_hold_hr(
                 campaign, 'C3_NA', path_key)
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("endpoint_met", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C4:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
@@ -3288,21 +3310,22 @@ class CampaignManager:
                         'completed_window_hr': completed_window_hr,
                         'process_elapsed_hr': process_elapsed_hr,
                     }
-                    return True
+                    return self._end_at("endpoint_met", detail="mg_signal_depleted")
             if current_in_window and completed_window_hr >= max_hold_hr:
+                outcome = (
+                    'max_hold_signal_not_depleted'
+                    if signal_armed
+                    else 'max_hold_no_signal'
+                )
                 self.last_c4_termination = {
-                    'outcome': (
-                        'max_hold_signal_not_depleted'
-                        if signal_armed
-                        else 'max_hold_no_signal'
-                    ),
+                    'outcome': outcome,
                     'species': species,
                     'rate_kg_hr': float(rate),
                     'threshold_kg_hr': threshold_kg_hr,
                     'completed_window_hr': completed_window_hr,
                     'process_elapsed_hr': process_elapsed_hr,
                 }
-                return True
+                return self._end_at("time_cap", detail=outcome)
 
             if process_elapsed_hr >= process_limit_hr:
                 # Truthful typed outcomes:
@@ -3331,6 +3354,7 @@ class CampaignManager:
                         transport_state
                     )
                 raise CampaignC4EndpointRefusal(diagnostic)
+            return False
 
         elif campaign == CampaignPhase.C5:
             endpoint = self._configured_endpoint(campaign, 'endpoint')
@@ -3368,7 +3392,7 @@ class CampaignManager:
                 )
             )
             if getattr(melt, 'mre_c5_ladder_complete', False):
-                return True
+                return self._end_at("endpoint_met", detail="ladder_complete")
             # The cell dispatches at the stage cap for every ladder hold, so
             # at-cap alone no longer discriminates; low-current only counts
             # as an endpoint signal on the FINAL declared rung (earlier
@@ -3400,9 +3424,10 @@ class CampaignManager:
             else:
                 melt.mre_low_current_hours = 0
             if melt.mre_low_current_hours >= consecutive_hours:
-                return True
+                return self._end_at("endpoint_met", detail="low_current")
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C6:
             hold_target_C, _ = self.get_temp_target(
@@ -3433,7 +3458,7 @@ class CampaignManager:
                     # The current at-target tick dispatched the provider before
                     # endpoint evaluation, so the operator wall clock can end
                     # C6 without misclassifying preheat as reaction hold.
-                    return True
+                    return self._end_at("time_cap", detail="operator_wall")
             if not at_hold_target:
                 return False
             completed_hold_hr = 1 + sum(
@@ -3455,14 +3480,16 @@ class CampaignManager:
             comp = melt.composition_wt_pct()
             refractory_pct = sum(comp.get(str(name), 0.0) for name in species)
             if completed_hold_hr >= min_hold_hr and refractory_pct < threshold_wt_pct:
-                return True
+                return self._end_at("endpoint_met", detail="composition_endpoint")
             if completed_hold_hr >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             max_hold_hr = self._max_hold_hr(campaign)
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("endpoint_met", detail="max_hold")
+            return False
 
         elif campaign == CampaignPhase.MRE_BASELINE:
             soft = self._configured_endpoint(campaign, 'soft_endpoint')
@@ -3488,11 +3515,16 @@ class CampaignManager:
             else:
                 melt.mre_low_current_hours = 0
             if melt.mre_low_current_hours >= consecutive_hours:
-                return True
+                return self._end_at("endpoint_met", detail="low_current")
             if completed_campaign_hour >= max_hold_hr:
-                return True
+                return self._end_at("time_cap", detail="max_hold")
+            return False
 
-        return False
+        if campaign in (CampaignPhase.IDLE, CampaignPhase.COMPLETE):
+            return False
+        raise CampaignEndCapMissing(
+            getattr(campaign, "name", None) or str(campaign)
+        )
 
     # ------------------------------------------------------------------
     # Campaign transitions

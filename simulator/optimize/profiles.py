@@ -29,12 +29,12 @@ from simulator.optimize.objective import (
     ObjectiveProfileError,
     canonical_objective_metric,
     declared_objective_definitions,
-    executed_campaign_id,
     normalize_composition_target_objective,
     objective_definitions,
     objective_importance_evidence,
     objective_type,
-    profile_with_executed_campaign,
+    profile_with_resolved_execution,
+    resolved_execution_identity,
 )
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.product_pools import forbidden_gates_for_pool, product_pool_class
@@ -335,15 +335,15 @@ def validate_profile(
             f"{source}: feedstock {profile['feedstock']!r} does not match {expected_feedstock!r}"
         )
 
-    scoring_campaign = None
+    scoring_identity = None
     if scoring_fidelity is not None:
         canonical_fidelity = canonical_backend_name(scoring_fidelity)
         if canonical_fidelity is not None:
-            scoring_campaign = executed_campaign_id(
+            scoring_identity = resolved_execution_identity(
                 profile,
-                fidelity=str(canonical_fidelity),
+                str(canonical_fidelity),
             )
-    _validate_objectives(profile, source=source, scoring_campaign=scoring_campaign)
+    _validate_objectives(profile, source=source, scoring_identity=scoring_identity)
     _validate_constraints(profile["constraints"], source=source)
     _validate_pool_scoped_constraints(profile, source=source)
     _validate_study_constraints(profile.get("study_constraints"), source=source)
@@ -567,7 +567,7 @@ def _validate_objectives(
     profile: Mapping[str, Any],
     *,
     source: str | Path,
-    scoring_campaign: str | None = None,
+    scoring_identity: Mapping[str, Any] | None = None,
 ) -> None:
     raw_objectives = profile["objectives"]
     if not isinstance(raw_objectives, list) or not raw_objectives:
@@ -625,9 +625,9 @@ def _validate_objectives(
         declared_objective_definitions(profile)
     except ObjectiveProfileError as exc:
         raise ProfileValidationError(f"{source}: {exc}") from exc
-    if scoring_campaign is None:
+    if scoring_identity is None:
         return
-    check_profile = profile_with_executed_campaign(profile, scoring_campaign)
+    check_profile = profile_with_resolved_execution(profile, scoring_identity)
     try:
         objective_definitions(check_profile)
     except ObjectiveProfileError as exc:

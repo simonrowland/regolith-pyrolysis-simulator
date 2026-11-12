@@ -777,16 +777,15 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
 
     strategy.tell(list(zip(candidates, results, strict=True)))
     trials = _trials_by_candidate(strategy)
-    # C0 claims oxygen and withholds glass, metals, and the Stage-3 silica
-    # score. The cap still moves product_summary metals; see
-    # test_lunar_highland_60_hour_horizon_changes_extracted_metals.
-    for withheld in (
+    # The C0 pyrolysis sequence keeps metals, glass, and the Stage-3 silica
+    # score. Authored hours are the first step, not the whole evaluation.
+    for retained in (
         "metals_total_kg",
         "pure_silica_glass_kg",
         "industrial_mixed_glass_kg",
         "sso2_pn2_fe_drain_silica",
     ):
-        assert withheld not in strategy.objective_metrics
+        assert retained in strategy.objective_metrics
     assert "oxygen_kg" in strategy.objective_metrics
     duration_index = strategy.objective_metrics.index("duration_h")
     oxygen_index = strategy.objective_metrics.index("oxygen_kg")
@@ -800,7 +799,8 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
         oxygen = trial.values[oxygen_index]
         assert math.isfinite(oxygen)
         assert oxygen not in (_BAD_MAXIMIZE_VALUE, _BAD_MINIMIZE_VALUE)
-        assert "metals_total_kg" not in result.objectives.as_mapping()
+        assert "metals_total_kg" in result.objectives.as_mapping()
+        assert "pure_silica_glass_kg" in result.objectives.as_mapping()
         assert "oxygen_kg" in result.objectives.as_mapping()
         assert set(result.failing_gates) <= set(
             trial.user_attrs[_CONSTRAINT_NAMES_ATTR]
@@ -821,30 +821,26 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
         )
         for candidate in candidates
     ]
-    assert all(result.feasible and result.objectives is not None for result in short_results)
-    assert all(
-        result.run_reference is not None
-        and result.run_reference.product_summary.get("furnace_amortization_status")
-        == "available"
-        for result in short_results
-    )
-    short_mappings = [result.objectives.as_mapping() for result in short_results]
-    for mapping in short_mappings:
-        assert "metals_total_kg" not in mapping
-        assert "pure_silica_glass_kg" not in mapping
-        assert "industrial_mixed_glass_kg" not in mapping
-        assert "sso2_pn2_fe_drain_silica" not in mapping
+    for result in short_results:
+        assert result.run_reference is not None
+        if result.objectives is None:
+            assert result.feasible is False
+            assert result.run_reference.reason
+            continue
+        mapping = result.objectives.as_mapping()
+        assert "metals_total_kg" in mapping
+        assert "pure_silica_glass_kg" in mapping
+        assert "industrial_mixed_glass_kg" in mapping
+        assert "sso2_pn2_fe_drain_silica" in mapping
         assert "oxygen_kg" in mapping
-    short_oxygen = [mapping["oxygen_kg"] for mapping in short_mappings]
-    short_energy = [
-        mapping["energy_electrical_plus_evaporation_kWh"] for mapping in short_mappings
-    ]
-    assert short_oxygen[0] == short_oxygen[1]
-    assert short_energy[0] == short_energy[1]
-    assert all(
-        result.objectives.as_mapping()["duration_h"] == result.eval_spec.hours
-        for result in short_results
-    )
+        assert math.isfinite(mapping["duration_h"])
+        if result.feasible:
+            assert (
+                result.run_reference.product_summary.get(
+                    "furnace_amortization_status"
+                )
+                == "available"
+            )
 
 
 def test_tpe_infeasible_objectives_without_furnace_cost_use_raw_metrics() -> None:

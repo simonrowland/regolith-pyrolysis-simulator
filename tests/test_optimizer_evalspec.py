@@ -3385,6 +3385,8 @@ def test_active_recipe_local_furnace_field_admits_1843_c_after_default_ref_renam
         renamed_default,
         recipe_patch=active_patch,
         campaign="C2A_continuous",
+        track="pyrolysis",
+        c5_enabled=False,
     )
 
     assert spec.runtime_campaign_overrides["C2A_continuous"][
@@ -3419,6 +3421,8 @@ def test_explicit_furnace_constraint_stays_stricter_than_active_recipe_field() -
         explicit,
         recipe_patch=active_patch,
         campaign="C2A_continuous",
+        track="pyrolysis",
+        c5_enabled=False,
     )
     assert composed is not None
     assert composed.furnace_T_max_C == explicit.furnace_T_max_C

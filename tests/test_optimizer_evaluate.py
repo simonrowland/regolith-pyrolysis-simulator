@@ -28,6 +28,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
 )
 from simulator.campaigns import (
+    CampaignEndCapMissing,
     CampaignManager,
     CampaignPressureSetpointRefusal,
     campaign_evolves_terminal_oxygen,
@@ -69,11 +70,18 @@ from simulator.optimize.evalspec import DEFAULT_VAPOR_PRESSURE_PROVIDER_ID, cach
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     objective_definitions,
+    profile_scored_at_fidelity,
+    resolved_execution_identity,
+    unrenormalized_study_scalar_weights,
 )
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError, load_profile
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    RecipePatch,
+    RecipeSchema,
+)
 from simulator.optimize.results_store import (
     ResultStore,
     _deserialize_run_reference,
@@ -83,9 +91,9 @@ from simulator.optimize.results_store import (
 )
 from simulator.pumping_cost import MARS_DATUM_AMBIENT_PA, estimate_subambient_pump_cost
 from simulator.reduced_real_determinism import PT0NonFinitePayload
-from simulator.run_executor import RunExecutor
+from simulator.run_executor import RunExecutor, campaign_stop_record
 from simulator.runner import RunnerError, _force_builtin_vapor_pressure
-from simulator.session import SimSession, SimSessionConfig
+from simulator.session import DecisionPolicy, SimSession, SimSessionConfig, drive_session
 from simulator.state import (
     BatchRecord,
     CampaignPhase,
@@ -3216,6 +3224,8 @@ def test_unclaimed_composition_objective_does_not_gate_the_run(
                 target_species=("Fe",),
             ),
             campaign=evaluated,
+            track="pyrolysis",
+            c5_enabled=False,
         )
         assert profile["run"]["campaign"] == authored
         assert constraints is not None
@@ -7354,19 +7364,294 @@ def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
             summary["product_classes"]["metals_plus_O2"]["metals_total_kg"]
         )
 
+    def later_campaigns(result) -> list[str]:
+        trace = result.run_reference.trace
+        stops = trace["campaign_stops"] if "campaign_stops" in trace else ()
+        return [
+            str(stop["campaign"])
+            for stop in stops
+            if str(stop.get("campaign") or "") not in {"", "C0"}
+        ]
+
+    for label, result in (("baseline", baseline), ("capped", capped)):
+        names = later_campaigns(result)
+        assert names, (
+            f"{label} did not leave C0; "
+            f"reason={result.run_reference.reason!r} "
+            f"stops={list(result.run_reference.trace.get('campaign_stops', ()))}"
+        )
+        for stop in result.run_reference.trace["campaign_stops"]:
+            assert stop["stop_reason"] in {
+                "endpoint_met",
+                "time_cap",
+                "refused",
+                "stop_reason_unrecorded",
+            }
+
     baseline_metals = metals(baseline)
     capped_metals = metals(capped)
     # A furnace-cap refusal is a different outcome from a scored baseline.
-    if (
-        baseline_metals is not None
-        and capped_metals is not None
-    ):
+    # Both refusing is allowed only after each run has left C0.
+    if baseline_metals is not None and capped_metals is not None:
         assert math.isfinite(baseline_metals)
         assert math.isfinite(capped_metals)
         assert baseline_metals != capped_metals, (
             "C4_HORIZON_RELATION: cap must change extracted metals"
         )
-        return
-    if baseline_metals is None and capped_metals is None:
-        return
-    assert (baseline_metals is None) != (capped_metals is None)
+    elif baseline_metals is None and capped_metals is None:
+        assert baseline.run_reference.reason
+        assert capped.run_reference.reason
+    else:
+        assert (baseline_metals is None) != (capped_metals is None)
+
+
+_EXECUTION_TRACKS = ("pyrolysis", "mre_baseline")
+_EXECUTION_C5 = (False, True)
+
+
+def _profile_with_execution(track: str, c5_enabled: bool) -> dict:
+    profile = copy.deepcopy(PROFILE)
+    selected = {
+        **profile["fidelities"]["fast"],
+        "track": track,
+        "c5_enabled": c5_enabled,
+    }
+    if c5_enabled:
+        selected["mre_max_voltage_V"] = 2.5
+    profile["fidelities"]["fast"] = selected
+    return profile
+
+
+@pytest.mark.parametrize("track", _EXECUTION_TRACKS)
+@pytest.mark.parametrize("c5_enabled", _EXECUTION_C5)
+def test_claims_follow_resolved_execution_options(
+    track: str,
+    c5_enabled: bool,
+) -> None:
+    """Claims, gates, weights, and continuation are one execution triple.
+
+    The grid is every track this ticket distinguishes, with c5 on and off.
+    Study scoring, the spec stamp, and evaluate() agree. Glass stays only
+    when the pyrolysis sequence still includes post-mg C2A.
+    """
+
+    profile = _profile_with_execution(track, c5_enabled)
+    identity = resolved_execution_identity(profile, "fast")
+    assert dict(identity) == {
+        "campaign": "C0",
+        "track": track,
+        "c5_enabled": c5_enabled,
+    }
+    options = evaluate_module._run_options(profile, "fast")
+    assert options["campaign"] == identity["campaign"]
+    assert options["track"] == identity["track"]
+    assert options["c5_enabled"] is identity["c5_enabled"]
+    assert evaluate_module._c0_pyrolysis_continues_through_later_steps(
+        options,
+        stop_at_stage0_exit=False,
+    ) is (track == "pyrolysis")
+    stamped = profile_scored_at_fidelity(profile, "fast")
+    assert profile["run"].get("track") is None
+    assert profile["run"].get("c5_enabled") is None
+    defined = tuple(item.metric for item in objective_definitions(stamped))
+    assert len(unrenormalized_study_scalar_weights(stamped)) == len(defined)
+    via_spec = evaluate_module._objective_profile_for_spec(
+        profile,
+        SimpleNamespace(
+            campaign=identity["campaign"],
+            track=identity["track"],
+            c5_enabled=identity["c5_enabled"],
+            hours=1,
+            runtime_campaign_overrides={},
+            lab_schedule={},
+        ),
+    )
+    assert tuple(item.metric for item in objective_definitions(via_spec)) == defined
+    glass = track == "pyrolysis" and not c5_enabled
+    assert ("pure_silica_glass_kg" in defined) is glass
+    executor = FakeExecutor(_execution())
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=executor,
+    )
+    assert result.eval_spec is not None
+    assert result.eval_spec.track == track
+    assert result.eval_spec.c5_enabled is c5_enabled
+    assert executor.config.track == track
+    assert executor.config.c5_enabled is c5_enabled
+    assert executor.config.until_campaign_complete is (track == "pyrolysis")
+    assert result.objectives is not None
+    assert ("pure_silica_glass_kg" in result.objectives.as_mapping()) is glass
+    assert "oxygen_kg" in result.objectives.as_mapping()
+    assert tuple(result.objectives.as_mapping()) == defined
+
+
+def test_voltage_cap_c5_overrides_the_fidelity_for_scoring() -> None:
+    """The cap rewrite is part of the triple scoring reads."""
+
+    profile = _profile_with_execution("pyrolysis", False)
+    enabled = RecipePatch({
+        **_valid_patch().values,
+        C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 2.5,
+    })
+    disabled = RecipePatch({
+        **_valid_patch().values,
+        C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0,
+    })
+    on = evaluate(
+        enabled,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=copy.deepcopy(profile),
+        executor=FakeExecutor(_execution()),
+    )
+    off = evaluate(
+        disabled,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=copy.deepcopy(profile),
+        executor=FakeExecutor(_execution()),
+    )
+    assert on.eval_spec is not None and on.eval_spec.c5_enabled is True
+    assert off.eval_spec is not None and off.eval_spec.c5_enabled is False
+    assert on.objectives is not None
+    assert "pure_silica_glass_kg" not in on.objectives.as_mapping()
+    assert off.objectives is not None
+    assert "pure_silica_glass_kg" in off.objectives.as_mapping()
+
+    cleared = evaluate(
+        disabled,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_profile_with_execution("pyrolysis", True),
+        executor=FakeExecutor(_execution()),
+    )
+    assert cleared.eval_spec is not None and cleared.eval_spec.c5_enabled is False
+    assert cleared.objectives is not None
+    assert "pure_silica_glass_kg" in cleared.objectives.as_mapping()
+
+
+def test_composition_constraints_refuse_a_partial_execution_identity() -> None:
+    with pytest.raises(
+        EvaluationInputError,
+        match="campaign, track, and c5_enabled",
+    ):
+        _composition_target_constraints(PROFILE, None, campaign="C0")
+
+
+def test_ranking_trace_keeps_each_step_stop_reason() -> None:
+    execution = _execution()
+    execution.campaign_stops = (
+        {
+            "campaign": "C0",
+            "stop_reason": "endpoint_met",
+            "duration_h": 1,
+            "detail": "computed_exit",
+        },
+        {
+            "campaign": "C4",
+            "stop_reason": "time_cap",
+            "duration_h": 62,
+            "detail": "max_hold_no_signal",
+        },
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=copy.deepcopy(PROFILE),
+        executor=FakeExecutor(execution),
+    )
+    assert result.run_reference is not None
+    stops = result.run_reference.trace["campaign_stops"]
+    assert [stop["stop_reason"] for stop in stops] == ["endpoint_met", "time_cap"]
+    assert stops[1]["detail"] == "max_hold_no_signal"
+    assert campaign_stop_record({"campaign": "C4", "duration_h": 1}) is None
+    refused = campaign_stop_record(
+        {
+            "campaign": "C6",
+            "stop_reason": "refused",
+            "duration_h": 4,
+            "stop_detail": "c6_hold_target_not_acquired",
+        }
+    )
+    assert refused is not None
+    assert refused["stop_reason"] == "refused"
+    assert refused["detail"] == "c6_hold_target_not_acquired"
+
+
+class _LoopSession:
+    def __init__(self, *, complete_after: int, phase: CampaignPhase) -> None:
+        self.advanced = 0
+        self.complete_after = complete_after
+        self.simulator = SimpleNamespace(melt=SimpleNamespace(campaign=phase))
+
+    def is_complete(self) -> bool:
+        return self.advanced >= self.complete_after
+
+    def pending_decision(self) -> None:
+        return None
+
+    def advance(self) -> SimpleNamespace:
+        self.advanced += 1
+        return SimpleNamespace(campaign_summary=None)
+
+
+def test_drive_session_continues_until_the_controller_ends() -> None:
+    """Authored hours are not the stop. A phase with no endpoint does not advance."""
+
+    continuing = _LoopSession(complete_after=3, phase=CampaignPhase.C0)
+    continued = list(
+        drive_session(
+            continuing,
+            1,
+            DecisionPolicy.AUTO_APPLY,
+            until_campaign_complete=True,
+        )
+    )
+    assert len(continued) == 3
+    assert continuing.advanced == 3
+
+    bounded = _LoopSession(complete_after=5, phase=CampaignPhase.C0)
+    one_hour = list(
+        drive_session(
+            bounded,
+            1,
+            DecisionPolicy.AUTO_APPLY,
+            until_campaign_complete=False,
+        )
+    )
+    assert len(one_hour) == 1
+    assert bounded.advanced == 1
+
+    idle = _LoopSession(complete_after=5, phase=CampaignPhase.IDLE)
+    with pytest.raises(CampaignEndCapMissing):
+        list(
+            drive_session(
+                idle,
+                1,
+                DecisionPolicy.AUTO_APPLY,
+                until_campaign_complete=True,
+            )
+        )
+    assert idle.advanced == 0
+
+
+def test_check_endpoint_is_the_only_phase_end_list() -> None:
+    source = inspect.getsource(CampaignManager.check_endpoint)
+    assert "return True" not in source
+    assert not hasattr(CampaignManager, "_ENDPOINT_OWNED_PHASES")
+    processing = [
+        phase
+        for phase in CampaignPhase
+        if phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE)
+    ]
+    for phase in processing:
+        assert f"campaign == CampaignPhase.{phase.name}" in source
+        assert CampaignManager.endpoint_can_end(phase) is True
+    assert CampaignManager.endpoint_can_end(CampaignPhase.IDLE) is False
+    assert CampaignManager.endpoint_can_end(CampaignPhase.COMPLETE) is False
+    assert "CampaignEndCapMissing" in source

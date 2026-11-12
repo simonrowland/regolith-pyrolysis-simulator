@@ -102,8 +102,8 @@ from simulator.optimize.objective import (
     composition_targets_require_coating,
     composition_targets_require_stage0_exit,
     composition_targets_require_terminal_rump,
-    executed_campaign_id,
-    profile_with_executed_campaign,
+    profile_with_resolved_execution,
+    resolved_execution_identity,
     unclaimed_product_withheld_objective_note,
     compute_objectives,
     product_summary,
@@ -152,7 +152,7 @@ from simulator.pumping_cost import (
 )
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
-from simulator.run_executor import RunExecutor
+from simulator.run_executor import RunExecutor, campaign_stop_record
 from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import PyrolysisRun, RunnerError
@@ -1247,9 +1247,10 @@ def evaluate(
             profile,
             pumping_margin,
         )
-    # Gates use the executed campaign. ``objective_profile`` is stamped with
-    # EvalSpec.campaign, and ``composition_target_specs`` drops objectives
-    # that campaign does not claim. An unclaimed terminal-rump row must not
+    # Gates use the resolved execution triple. ``objective_profile`` is
+    # stamped with EvalSpec campaign, track, and c5_enabled, and
+    # ``composition_target_specs`` drops objectives that triple does not
+    # claim. An unclaimed terminal-rump row must not
     # replace the retained score with rump_terminal_completion_unknown.
     target_reason = composition_target_infeasible_reason(objective_profile)
     if target_reason:
@@ -2949,16 +2950,22 @@ def _build_eval_inputs_for_candidate(
 ) -> tuple[PhysicsConstraintSet | None, EvalSpec, Any]:
     """Build the resolved spec and run config that ``evaluate`` uses.
 
-    This is the only place that builds ``active_constraints``. Campaign is
-    ``_merged_run_for_fidelity``: the request and the profile key fold
-    through ``canonical_backend_name`` before this read. Gates below are
-    the campaign the run executes, not the literal spelling.
+    This is the only place that builds ``active_constraints``. The triple
+    is ``resolved_execution_identity``: the request and the profile key
+    fold through ``canonical_backend_name`` before this read. The voltage
+    cap can still flip ``c5_enabled`` inside ``_build_eval_inputs``. The
+    constraints returned here are rebuilt from that finished spec so the
+    gates match the run. The thermal ceiling sees the pre-cap constraints;
+    it does not depend on c5.
     """
-    active_constraints = _composition_target_constraints(
+    identity = resolved_execution_identity(profile, fidelity)
+    preliminary = _composition_target_constraints(
         profile,
         constraints,
         recipe_patch=patch,
-        campaign=str(_run_options(profile, fidelity)["campaign"]),
+        campaign=str(identity["campaign"]),
+        track=str(identity["track"]),
+        c5_enabled=bool(identity["c5_enabled"]),
     )
     spec, run_config = _build_eval_inputs(
         patch,
@@ -2966,9 +2973,39 @@ def _build_eval_inputs_for_candidate(
         fidelity,
         profile,
         schema,
-        constraints=active_constraints,
+        constraints=preliminary,
         cost_parameters=cost_parameters,
         conditional_context=conditional_context,
+    )
+    # The voltage cap can flip c5 after the preliminary gates. Rebuild only
+    # then, and replace the constraints digest so the cache key matches the
+    # gates the run used. An unchanged triple keeps the digested object.
+    post_identity = (
+        str(spec.campaign),
+        str(spec.track),
+        bool(spec.c5_enabled),
+    )
+    pre_identity = (
+        str(identity["campaign"]),
+        str(identity["track"]),
+        bool(identity["c5_enabled"]),
+    )
+    if post_identity == pre_identity:
+        return preliminary, spec, run_config
+    active_constraints = _composition_target_constraints(
+        profile,
+        constraints,
+        recipe_patch=patch,
+        campaign=str(spec.campaign),
+        track=str(spec.track),
+        c5_enabled=bool(spec.c5_enabled),
+    )
+    spec = replace(
+        spec,
+        data_digests={
+            **dict(spec.data_digests),
+            "physics_constraints": physics_constraints_digest(active_constraints),
+        },
     )
     return active_constraints, spec, run_config
 
@@ -3167,16 +3204,6 @@ def _build_eval_inputs_impl(
     feedstock = bundle.feedstocks[feedstock_id]
     profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
     profile_digest = _profile_digest(profile)
-    # The digest stays the authored profile. Gate metadata uses the executed
-    # campaign, the same id stored on EvalSpec.campaign. An unclaimed
-    # composition objective does not stop the run at stage 0 and does not
-    # enter the target digest.
-    gate_profile = profile_with_executed_campaign(
-        profile,
-        str(run_options["campaign"]),
-    )
-    target_metadata = composition_target_eval_metadata(gate_profile)
-    stop_at_stage0_exit = composition_targets_require_stage0_exit(gate_profile)
     run_options = _run_options_with_conditional_pins(
         run_options, conditional_context
     )
@@ -3192,6 +3219,20 @@ def _build_eval_inputs_impl(
         patch,
     )
     _validate_c5_eval_options(run_options, bundle.setpoints)
+    # The digest stays the authored profile. Gate metadata uses the triple
+    # after the voltage cap, the same triple stored on the EvalSpec. An
+    # unclaimed composition objective does not stop the run at stage 0 and
+    # does not enter the target digest.
+    gate_profile = profile_with_resolved_execution(
+        profile,
+        {
+            "campaign": str(run_options["campaign"]),
+            "track": str(run_options["track"] or "pyrolysis"),
+            "c5_enabled": bool(run_options["c5_enabled"]),
+        },
+    )
+    target_metadata = composition_target_eval_metadata(gate_profile)
+    stop_at_stage0_exit = composition_targets_require_stage0_exit(gate_profile)
     setpoints_patch = schema.to_setpoints_patch(patch)
     (
         stage0_redox_oxidant_kg,
@@ -3682,6 +3723,7 @@ def _c4_default_hold_temp_C(setpoints: Mapping[str, Any]) -> float:
 
 def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]:
     merged = _merged_run_for_fidelity(profile, fidelity)
+    identity = resolved_execution_identity(profile, fidelity)
     # Fold the legacy `stub` alias onto canonical `internal-analytical` at this
     # run-config acceptance boundary so downstream consumers see one token.
     backend_name = canonical_backend_name(
@@ -3707,13 +3749,13 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
     lab_overlay_scope = _lab_overlay_scope_options(merged)
     mass_kg = _positive_eval_mass_kg(merged.get("mass_kg", 1000.0))
     return MappingProxyType({
-        "campaign": executed_campaign_id(profile, fidelity=fidelity),
+        "campaign": str(identity["campaign"]),
         "hours": int(merged.get("hours", 24)),
         "mass_kg": mass_kg,
         "additives_kg": dict(merged.get("additives_kg", {}) or {}),
-        "track": merged.get("track", "pyrolysis"),
+        "track": str(identity["track"]),
         "backend_name": backend_name,
-        "c5_enabled": bool(merged.get("c5_enabled", False)),
+        "c5_enabled": bool(identity["c5_enabled"]),
         "mre_max_voltage_V": float(merged.get("mre_max_voltage_V", 0.0) or 0.0),
         "mre_target_species": str(merged.get("mre_target_species", "") or ""),
         "reduced_real_cache": reduced_real_cache,
@@ -4366,10 +4408,17 @@ def _objective_profile_for_spec(
     profile: Mapping[str, Any],
     spec: EvalSpec,
 ) -> Mapping[str, Any]:
-    # Score against EvalSpec.campaign. Fidelity options override profile.run,
-    # and that override is what _run_options stored on the spec. The digested
-    # profile is the caller's object; this copy is scoring-only.
-    profile = profile_with_executed_campaign(profile, str(spec.campaign))
+    # Score against the EvalSpec triple. Fidelity options and the voltage
+    # cap both land on the spec before this copy. The digested profile is
+    # the caller's object; this copy is scoring-only.
+    profile = profile_with_resolved_execution(
+        profile,
+        {
+            "campaign": spec.campaign,
+            "track": spec.track,
+            "c5_enabled": spec.c5_enabled,
+        },
+    )
     run = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
     changed = False
     try:
@@ -4517,12 +4566,33 @@ def _composition_target_constraints(
     *,
     recipe_patch: RecipePatch | None = None,
     campaign: str | None = None,
+    track: str | None = None,
+    c5_enabled: bool | None = None,
 ) -> PhysicsConstraintSet | None:
-    # ``campaign`` is the executed campaign, including a fidelity overlay.
-    # Stamp it before coating and extraction read the scoring rows. An
-    # unclaimed composition objective then imposes neither gate.
-    if campaign is not None:
-        profile = profile_with_executed_campaign(profile, str(campaign))
+    # The triple is the resolved execution, including a fidelity overlay
+    # and a later c5 rewrite. Stamp all three before coating and extraction
+    # read the scoring rows. Passing one field without the others would
+    # keep the authored track or c5, which is the defect. An unclaimed
+    # composition objective then imposes neither gate.
+    provided = (
+        campaign is not None,
+        track is not None,
+        c5_enabled is not None,
+    )
+    if any(provided) and not all(provided):
+        raise EvaluationInputError(
+            "composition target constraints require campaign, track, and "
+            "c5_enabled together"
+        )
+    if all(provided):
+        profile = profile_with_resolved_execution(
+            profile,
+            {
+                "campaign": campaign,
+                "track": track,
+                "c5_enabled": c5_enabled,
+            },
+        )
     active = constraints or physics_constraints_from_profile(profile)
     active = _with_recipe_local_furnace_ceiling(
         profile,
@@ -4668,10 +4738,11 @@ class _ExecutedCampaignScore:
     """Objective vector and the withhold notice of one scoring profile.
 
     INVARIANT: the notice is ``unclaimed_product_withheld_objective_note`` of
-    the same profile passed to ``compute_objectives``. That profile is the
-    evaluated campaign (EvalSpec.campaign), not the authored profile. Every
-    path that publishes a vector publishes this pair. A fidelity overlay
-    cannot attach a notice for a different campaign.
+    the same profile passed to ``compute_objectives``. That profile carries
+    the evaluated triple (campaign, track, c5_enabled), not the authored
+    run. Every path that publishes a vector publishes this pair. A fidelity
+    overlay or a voltage-cap rewrite cannot attach a notice for a different
+    triple.
     """
 
     objectives: ObjectiveVector
@@ -6473,6 +6544,31 @@ def _live_run_reference_trace(
     return _TraceOverlay(trace, MappingProxyType(dict(payload)))
 
 
+def _campaign_stops_for_trace(run_execution: Any) -> tuple[dict[str, Any], ...]:
+    """Completed-step stop records stored on the ranking trace.
+
+    Prefer the records the executor accumulated. A carrier that did not
+    copy them still yields the same records from the session step list.
+    A summary with no stop token is omitted. It is not stored as
+    ``endpoint_met``.
+    """
+
+    stored = getattr(run_execution, "campaign_stops", None)
+    if not stored:
+        session = getattr(run_execution, "session", None)
+        stored = []
+        for result in getattr(session, "_step_results", ()) or ():
+            record = campaign_stop_record(getattr(result, "campaign_summary", None))
+            if record is not None:
+                stored.append(record)
+    records: list[dict[str, Any]] = []
+    for item in stored:
+        record = campaign_stop_record(item)
+        if record is not None:
+            records.append(record)
+    return tuple(records)
+
+
 def _cache_trace_payload(
     run_execution: Any,
     trace_payload: Mapping[str, Any] | None,
@@ -6503,6 +6599,13 @@ def _cache_trace_payload(
         payload["refusal_reason"] = refusal_reason
     if isinstance(refusal_diagnostic, Mapping) and refusal_diagnostic:
         payload["refusal_diagnostic"] = _compact_jsonable(dict(refusal_diagnostic))
+
+    # Per-step stop reasons are part of the ranking trace. A time cap that
+    # carries a residual into the next campaign stays visible as time_cap
+    # plus the cap name. Missing reasons are not rewritten to endpoint_met.
+    campaign_stops = _campaign_stops_for_trace(run_execution)
+    if campaign_stops:
+        payload["campaign_stops"] = campaign_stops
 
     simulator = getattr(run_execution, "simulator", None)
     notice_reader = getattr(simulator, "engine_commissioning_run_notice", None)
