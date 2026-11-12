@@ -50,7 +50,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   isolate a row. ``table_row`` and ``table_column`` (the same indexes as
   ``table_row_number`` and ``table_column_number``) select one cell after
   the HTML table is parsed, rowspan and colspan included. The stored
-  number must be that whole trimmed cell. A cell whose text contains a
+  number must be that whole trimmed cell. A cited span that includes a
+  line of an HTML table and has no ``table_row`` or ``table_column``
+  refuses with ``html_table_requires_cell_address``. A value on a prose
+  line in that span still certifies. A value present only in the table
+  does not. A cell whose text contains a
   superscript never certifies a plain number: it certifies only an
   explicit power (``1e3``, ``10^3``, ``1×10^3``) equal to that power,
   and any other value is ``superscript_in_cell``. A value in another row
@@ -951,6 +955,70 @@ def _html_cell_address(
     return (row, column), None
 
 
+def _html_table_line_bounds(text: str, match: re.Match[str]) -> tuple[int, int]:
+    """1-based inclusive lines this ``<table>`` match occupies."""
+    start_line = text.count("\n", 0, match.start()) + 1
+    end_line = text.count("\n", 0, max(match.start(), match.end() - 1)) + 1
+    return start_line, end_line
+
+
+def _prose_line_span(
+    text: str, locator: Mapping[str, Any]
+) -> tuple[int, int] | None:
+    """1-based inclusive lines a prose locator cites.
+
+    Absent ``line_range`` is the opened text. A bad range is None; callers
+    that already refused that range do not need this.
+    """
+    if "line_range" not in locator or locator.get("line_range") is None:
+        count = len(text.splitlines())
+        if count == 0:
+            return 1, 0
+        return 1, count
+    return _parse_line_range(locator.get("line_range"))
+
+
+def _cited_span_includes_html_table(text: str, locator: Mapping[str, Any]) -> bool:
+    """True when a cited line holds an HTML ``<table>``."""
+    span = _prose_line_span(text, locator)
+    if span is None:
+        return False
+    start, end = span
+    if end < start:
+        return False
+    for match in _HTML_TABLE_RE.finditer(text):
+        table_start, table_end = _html_table_line_bounds(text, match)
+        if not (end < table_start or start > table_end):
+            return True
+    return False
+
+
+def _cited_prose_outside_html_tables(text: str, locator: Mapping[str, Any]) -> str:
+    """Cited lines that do not hold an HTML table."""
+    span = _prose_line_span(text, locator)
+    if span is None:
+        return ""
+    start, end = span
+    lines = text.splitlines()
+    if end < start or start > len(lines):
+        return ""
+    end = min(end, len(lines))
+    table_lines: set[int] = set()
+    for match in _HTML_TABLE_RE.finditer(text):
+        table_start, table_end = _html_table_line_bounds(text, match)
+        if end < table_start or start > table_end:
+            continue
+        table_lines.update(
+            range(max(start, table_start), min(end, table_end) + 1)
+        )
+    kept = [
+        lines[index]
+        for index in range(start - 1, end)
+        if (index + 1) not in table_lines
+    ]
+    return "\n".join(kept)
+
+
 def _cited_html_cell(
     text: str, locator: Mapping[str, Any]
 ) -> tuple[str | None, tuple[tuple[int, int], ...], str | None]:
@@ -984,8 +1052,7 @@ def _cited_html_cell(
             )
     chosen: list[str] = []
     for match in _HTML_TABLE_RE.finditer(text):
-        start_line = text.count("\n", 0, match.start()) + 1
-        end_line = text.count("\n", 0, max(match.start(), match.end() - 1)) + 1
+        start_line, end_line = _html_table_line_bounds(text, match)
         if span is None:
             chosen.append(match.group(0))
             continue
@@ -3409,6 +3476,28 @@ def _locator_source_blind_reason(
                     )
                     candidate_reason_codes.add("cited_span_missing")
                     break
+                if _cited_span_includes_html_table(text, locator):
+                    # Table lines are not prose. A value that survives only
+                    # inside the table needs a cell address. A value on a
+                    # prose line in the same span still certifies.
+                    prose = _cited_prose_outside_html_tables(text, locator)
+                    missing = [
+                        leaf
+                        for leaf in leaves
+                        if not _pinned_leaf_in_text(leaf, prose)
+                    ]
+                    if missing:
+                        candidate_reasons.append(
+                            "html_table_requires_cell_address: cited span "
+                            "includes an HTML table and has no table_row "
+                            "or table_column"
+                        )
+                        candidate_reason_codes.add(
+                            "html_table_requires_cell_address"
+                        )
+                        break
+                    key_matched = True
+                    break
                 missing = [
                     leaf
                     for leaf in leaves
@@ -3500,7 +3589,10 @@ def fidelity_source_warnings(
     whole when the locator carries ``table_row`` and ``table_column``
     (the same indexes as ``table_row_number`` and ``table_column_number``).
     The stored value must be that whole trimmed cell after rowspan and
-    colspan expansion. A value in another row is source-blind. Formula
+    colspan expansion. A cited span that includes a table line and has
+    neither address refuses with ``html_table_requires_cell_address``.
+    A value on a prose line in that span still certifies. A value in
+    another row is source-blind. Formula
     and species labels fold subscript markup, a ``$`` or ``\\mathrm{}``
     that touches a subscript, and a layout space only between an element
     or a closing parenthesis and the count that follows it, before every

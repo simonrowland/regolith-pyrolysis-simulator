@@ -210,7 +210,12 @@ A cell that contains a superscript does not certify a plain number. It
 certifies a float equal to that power, so `10<sup>3</sup>` certifies
 `1e3`, and a string that spells the same power (`1e3`, `10^3`,
 `1×10^3`). `103` and `1000` are `superscript_in_cell`. A value printed
-in another row of the same line does not certify. A
+in another row of the same line does not certify. A cited
+`line_range`, or the opened text when `line_range` is absent, that
+includes a line of an HTML `<table>` and has no `table_row` or
+`table_column` refuses with `html_table_requires_cell_address`. A value
+on a prose line in that span still certifies. A value present only in
+the table does not. A
 missing table, more than one table in the cited span, a span that cuts a
 table, an index that is not a positive integer, or a cell outside the
 grid is source-blind. `line_range` still chooses which complete table is

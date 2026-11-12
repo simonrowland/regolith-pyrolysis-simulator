@@ -10070,14 +10070,45 @@ def test_html_cell_expands_rowspan_and_colspan(tmp_path: Path):
     )
     if not errors or "source_blind_pin" not in "\n".join(errors):
         failures.append(f"column 2 refuses 1: {errors}")
-    # Cell addressing is opt-in. Without table_row and table_column the
-    # one-line table is prose, so 6.98 certifies even beside 265.
+    # A table line without table_row and table_column is not prose.
+    # 6.98 sits beside 265 on that line and refuses.
     unaddressed = _html_source_document(tmp_path, 6.98, _HTML_ROWSPAN)
     errors = vle.certify_extract_source_fidelity(
         unaddressed, label="rowspan-prose", artifact_root=tmp_path
     )
+    joined = "\n".join(errors)
+    if (
+        "source_blind_pin" not in joined
+        or "html_table_requires_cell_address" not in joined
+    ):
+        failures.append(f"unaddressed rowspan line refuses 6.98: {errors}")
+    mixed = "the oxide is 9.5 percent\n" + _HTML_ROWSPAN
+    prose_only = _html_source_document(
+        tmp_path,
+        9.5,
+        mixed,
+        locator_extra={"line_range": "1-2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        prose_only, label="mixed-prose", artifact_root=tmp_path
+    )
     if errors:
-        failures.append(f"unaddressed rowspan line accepts 6.98: {errors}")
+        failures.append(f"prose beside a table accepts 9.5: {errors}")
+    table_only = _html_source_document(
+        tmp_path,
+        6.98,
+        mixed,
+        locator_extra={"line_range": "1-2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        table_only, label="mixed-table", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    if (
+        "source_blind_pin" not in joined
+        or "html_table_requires_cell_address" not in joined
+    ):
+        failures.append(f"table value in a mixed span refuses 6.98: {errors}")
     assert failures == []
 
 
