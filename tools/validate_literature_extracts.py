@@ -3020,17 +3020,23 @@ def load_known_species_ids() -> set[str] | None:
         doc = yaml.safe_load(U0_MANIFEST.read_text(encoding="utf-8"))
     except Exception as exc:  # noqa: BLE001
         raise ExtractValidationError(
-            [f"{U0_MANIFEST}: failed to load U0 species manifest: {exc}"]
+            [
+                f"{U0_MANIFEST.name}: failed to load U0 species manifest "
+                f"({type(exc).__name__})"
+            ]
         ) from exc
     if not isinstance(doc, Mapping):
         raise ExtractValidationError(
-            [f"{U0_MANIFEST}: invalid U0 species manifest: expected a mapping"]
+            [
+                f"{U0_MANIFEST.name}: invalid U0 species manifest: "
+                "expected a mapping"
+            ]
         )
     species = doc.get("species")
     if not isinstance(species, (list, Mapping)):
         raise ExtractValidationError(
             [
-                f"{U0_MANIFEST}: invalid U0 species manifest: "
+                f"{U0_MANIFEST.name}: invalid U0 species manifest: "
                 "species must be a list or mapping"
             ]
         )
