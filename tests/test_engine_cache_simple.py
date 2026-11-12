@@ -292,9 +292,9 @@ def test_engine_cache_json_matches_shared_canonical_encoder() -> None:
         {"nested": {"z": (1, 2.5), "a": "café"}, "flag": True},
     )
     for value in values:
-        assert engine_cache._canonical_json_dumps(value) == canonical_json_dumps(
-            value
-        )
+        cache_bytes = engine_cache._canonical_json_dumps(value).encode("utf-8")
+        canonical_bytes = canonical_json_dumps(value).encode("utf-8")
+        assert cache_bytes == canonical_bytes
 
 
 def test_raw_key_hot_json_compression_and_exact_round_trip(
