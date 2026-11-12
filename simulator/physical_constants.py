@@ -4,6 +4,12 @@ One owner for SI constants and exact unit conversions. Shorter spellings
 that are not bit-identical to the CODATA values live here under explicit
 names. Do not alias a truncation back to the full constant: the relative
 gaps are pinned in tests/test_physical_constant_ownership.py.
+
+Which R to use (physics ruling, 2026-11-12): R inside a fitted model's own
+equations (MELTS, SulfLiq, Holzheid and similar) is that source's R, kept as
+a named, cited per-source constant, because reproducing the published
+numbers needs the R the model was fitted with. R used as a physical constant
+anywhere else is GAS_CONSTANT (CODATA) from this module.
 """
 
 from __future__ import annotations
