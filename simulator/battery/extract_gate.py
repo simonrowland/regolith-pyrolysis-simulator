@@ -428,6 +428,10 @@ def _uncertainty_issues(doc: object) -> list[str]:
     return sorted(set(issues))
 
 
+class ExtractTableParseError(ValueError):
+    """The table body could not be parsed as HTML text."""
+
+
 class _TableCellParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
@@ -450,12 +454,12 @@ class _TableCellParser(HTMLParser):
 
 def _numeric_table_cells(table_body: object) -> int:
     if not isinstance(table_body, str):
-        return 0
+        raise ExtractTableParseError("table body must be text")
     parser = _TableCellParser()
     try:
         parser.feed(table_body)
-    except Exception:
-        return 0
+    except Exception as exc:
+        raise ExtractTableParseError("failed to parse table body") from exc
     count = 0
     for cell in parser.cells:
         text = re.sub(r"\$[^$]*\$", " ", cell)

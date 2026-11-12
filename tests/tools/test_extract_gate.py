@@ -1490,3 +1490,26 @@ def test_tree_import_refuses_missing_migrator_without_fallback(tmp_path: Path, c
     output = capsys.readouterr().out
     assert "HARD tree-import:" in output
     assert "simulator/battery/migrate.py" in output
+
+
+def test_numeric_table_cells_rejects_non_string_body():
+    with pytest.raises(ValueError, match="table body must be text") as exc:
+        gate._numeric_table_cells(None)
+    assert type(exc.value).__name__ == "ExtractTableParseError"
+
+
+def test_numeric_table_cells_rejects_parser_failure(monkeypatch):
+    def fail_feed(_self, _body):
+        raise RuntimeError("injected parser failure")
+
+    monkeypatch.setattr(gate._TableCellParser, "feed", fail_feed)
+
+    with pytest.raises(ValueError, match="failed to parse table body") as exc:
+        gate._numeric_table_cells("<table><tr><td>1</td></tr></table>")
+    assert type(exc.value).__name__ == "ExtractTableParseError"
+
+
+def test_numeric_table_cells_keeps_zero_for_parsed_table_without_numbers():
+    assert gate._numeric_table_cells(
+        "<table><tr><td>FeO</td><td>—</td></tr></table>"
+    ) == 0
