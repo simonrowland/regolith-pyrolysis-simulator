@@ -552,10 +552,7 @@ def _insert_cache_row_if_absent(
         f"SELECT value FROM {_TABLE} WHERE key=?", (digest,)
     ).fetchone()
     if row is not None:
-        existing_value = row[0]
-        if isinstance(existing_value, str):
-            existing_value = existing_value.encode("ascii")
-        return False, bytes(existing_value) != bytes(value)
+        return False, bytes(row[0]) != bytes(value)
     if row_seq is None:
         row_seq = int(
             connection.execute(
