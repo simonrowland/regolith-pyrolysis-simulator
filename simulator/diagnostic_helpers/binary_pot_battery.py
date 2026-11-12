@@ -4500,7 +4500,7 @@ class _IsolatedCellWorker:
                 return result
             return EquilibrateCell.from_payload(result).to_engine_cache_value()
 
-        if self.engine in {"internal-analytical", "openimcc"}:
+        if self.engine == "internal-analytical":
             result = solve()
         else:
             from simulator.engine_cache import (
