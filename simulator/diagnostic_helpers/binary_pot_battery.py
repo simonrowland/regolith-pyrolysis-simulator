@@ -65,6 +65,7 @@ from simulator.engine_pool import (
 )
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.config import (
+    DEFAULT_ALPHAMELTS_MODEL,
     _load_setpoints_file,
     resolve_alphamelts_python_api_model,
     resolve_alphamelts_subprocess_settings,
@@ -357,8 +358,7 @@ def _call_cached_backend_equilibrate(
 
     adapter_settings = engine_cache_settings(
         handle.name,
-        handle.backend,
-        effective_settings=getattr(handle, "engine_settings", None),
+        handle.engine_settings,
     )
 
     payload = cached_engine_call(
@@ -4524,7 +4524,7 @@ class _IsolatedCellWorker:
                 request["simulate_crash"] = payload["simulate_crash"]
             request["engine_settings"] = engine_cache_settings(
                 self.engine,
-                normalize_engine_settings(self.engine, self.engine_settings),
+                self.engine_settings,
             )
             result = cached_engine_call(self.engine, request, solve)
         if isinstance(result, list):
@@ -4729,11 +4729,13 @@ def normalize_engine_settings(
         return {"pack": fields.get("pack") or DEFAULT_BACKEND_PACK_NAME}
     if engine_name == "alphamelts":
         model_name = fields.get("raw_model_name")
-        transport = fields.get("transport")
-        if transport is None or str(transport).strip().lower() not in {
-            "subprocess",
-            "binary",
-        }:
+        requested_transport = fields.get("transport")
+        transport_token = (
+            None
+            if requested_transport is None
+            else str(requested_transport).strip().lower()
+        )
+        if transport_token not in {"subprocess", "binary"}:
             # Validate before projection so a cache hit cannot hide a rejected
             # raw Python API model.
             resolve_alphamelts_python_api_model(model_name)
@@ -4744,45 +4746,86 @@ def normalize_engine_settings(
         subprocess_settings = resolve_alphamelts_subprocess_settings(
             model_name, ambient
         )
+        transport = (
+            "subprocess"
+            if transport_token in {None, ""}
+            else requested_transport
+        )
+        python_api_model = fields.get("python_api_model")
+        if transport == "python_api" and python_api_model is None:
+            python_api_model = resolve_alphamelts_python_api_model(model_name)
+        from simulator.environment import (
+            DEFAULT_VACUUM_FLOOR_BAR,
+            vacuum_floor_bar_for_environment,
+        )
+
+        configured_po2 = fields.get("configured_vapor_transport_pO2_bar")
+        if configured_po2 is None:
+            configured_po2 = DEFAULT_VACUUM_FLOOR_BAR
+        configured_floor = fields.get("configured_vapor_transport_floor_bar")
+        if configured_floor is None:
+            configured_floor = vacuum_floor_bar_for_environment()
         return {
-            "transport": fields.get("transport"),
+            "transport": transport,
             "effective_calc_mode": subprocess_settings["effective_calc_mode"],
             "raw_model_name": subprocess_settings["model"],
             "redox_buffer": fields.get("redox_buffer"),
             "fO2_offset": fields.get("fO2_offset"),
             "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),
-            "python_api_model": fields.get("python_api_model"),
-            "configured_vapor_transport_pO2_bar": fields.get(
-                "configured_vapor_transport_pO2_bar"
-            ),
-            "configured_vapor_transport_floor_bar": fields.get(
-                "configured_vapor_transport_floor_bar"
-            ),
+            "python_api_model": python_api_model,
+            "configured_vapor_transport_pO2_bar": configured_po2,
+            "configured_vapor_transport_floor_bar": configured_floor,
             "warm_worker": False,
         }
     if engine_name == "vaporock":
+        temperature_units = fields.get("temperature_units")
+        if temperature_units is None or temperature_units == "":
+            temperature_units = "C"
+        pressure_units = fields.get("pressure_units")
+        if pressure_units is None or pressure_units == "":
+            pressure_units = "bar"
+        vapor_pressure_units = fields.get("vapor_pressure_units")
+        if vapor_pressure_units is None or vapor_pressure_units == "":
+            vapor_pressure_units = "bar"
         return {
-            "temperature_units": fields.get("temperature_units", "C"),
-            "pressure_units": fields.get("pressure_units", "bar"),
-            "vapor_pressure_units": fields.get("vapor_pressure_units", "bar"),
+            "temperature_units": temperature_units,
+            "pressure_units": pressure_units,
+            "vapor_pressure_units": vapor_pressure_units,
             "warm_worker": False,
         }
     if engine_name == "magemin":
+        database = fields.get("database") or "ig"
+        bridge = fields.get("bridge") or fields.get("python_bridge")
+        if bridge is None or not str(bridge).strip():
+            bridge = "subprocess"
+        fO2_buffer = fields.get("fO2_buffer")
+        if fO2_buffer is None:
+            fO2_buffer = "qfm"
         return {
-            "database": fields.get("database"),
-            "bridge": fields.get("bridge") or fields.get("python_bridge"),
-            "fO2_buffer": fields.get("fO2_buffer"),
+            "database": database,
+            "bridge": bridge,
+            "fO2_buffer": fO2_buffer,
             "warm_worker": False,
         }
     if engine_name == "thermoengine":
+        from simulator.environment import (
+            DEFAULT_VACUUM_FLOOR_BAR,
+            vacuum_floor_bar_for_environment,
+        )
+
+        model = fields.get("model")
+        if not model:
+            model = DEFAULT_ALPHAMELTS_MODEL
+        configured_po2 = fields.get("configured_vapor_transport_pO2_bar")
+        if configured_po2 is None:
+            configured_po2 = DEFAULT_VACUUM_FLOOR_BAR
+        configured_floor = fields.get("configured_vapor_transport_floor_bar")
+        if configured_floor is None:
+            configured_floor = vacuum_floor_bar_for_environment()
         return {
-            "model": fields.get("model"),
-            "configured_vapor_transport_pO2_bar": fields.get(
-                "configured_vapor_transport_pO2_bar"
-            ),
-            "configured_vapor_transport_floor_bar": fields.get(
-                "configured_vapor_transport_floor_bar"
-            ),
+            "model": model,
+            "configured_vapor_transport_pO2_bar": configured_po2,
+            "configured_vapor_transport_floor_bar": configured_floor,
             "redox_buffer": fields.get("redox_buffer"),
             "fO2_offset": fields.get("fO2_offset"),
             "Fe3Fet_ratio": fields.get("Fe3Fet_ratio"),

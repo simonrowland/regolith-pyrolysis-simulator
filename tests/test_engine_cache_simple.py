@@ -552,19 +552,21 @@ def test_legacy_battery_payload_is_a_miss_after_layout_key_change(
 
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _call_cached_backend_equilibrate,
+        normalize_engine_settings,
     )
 
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    settings = normalize_engine_settings("thermoengine", None)
     handle = SimpleNamespace(
-        name="thermoengine", backend=SimpleNamespace(), engine_settings={}
+        name="thermoengine", backend=SimpleNamespace(), engine_settings=settings
     )
     kwargs = {"temperature_C": 1000.0}
     old_request = {
         "battery_cache_schema": 2,
         "kwargs": kwargs,
         "engine_settings": engine_cache.engine_cache_settings(
-            "thermoengine", handle.backend, effective_settings={}
+            "thermoengine", settings
         ),
     }
     engine_cache.cached_engine_call(
@@ -756,6 +758,7 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
 
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _call_cached_backend_equilibrate,
+        normalize_engine_settings,
     )
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "engine-cache.sqlite"))
@@ -767,7 +770,9 @@ def test_equilibrium_result_is_the_same_type_on_cold_and_warm_calls(
     )
     expected.diagnostics = {"backend_status_reason": "fixture-code"}
     handle = SimpleNamespace(
-        name="thermoengine", engine_settings={}, backend=SimpleNamespace()
+        name="thermoengine",
+        engine_settings=normalize_engine_settings("thermoengine", None),
+        backend=SimpleNamespace(),
     )
     calls = 0
 
@@ -805,13 +810,16 @@ def test_mapping_equilibrium_result_uses_compact_projection(
 
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _call_cached_backend_equilibrate,
+        normalize_engine_settings,
     )
 
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     _engine_cache_counters(reset=True)
     handle = SimpleNamespace(
-        name="thermoengine", engine_settings={}, backend=SimpleNamespace()
+        name="thermoengine",
+        engine_settings=normalize_engine_settings("thermoengine", None),
+        backend=SimpleNamespace(),
     )
     calls = 0
     result = {
@@ -854,7 +862,10 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from simulator.diagnostic_helpers.binary_pot_battery import _IsolatedCellWorker
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _IsolatedCellWorker,
+        normalize_engine_settings,
+    )
 
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
@@ -901,7 +912,7 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
 
     isolated = object.__new__(_IsolatedCellWorker)
     isolated.engine = "thermoengine"
-    isolated.engine_settings = {}
+    isolated.engine_settings = normalize_engine_settings("thermoengine", None)
     isolated._lock = threading.Lock()
     isolated._worker = Worker()
     request = {

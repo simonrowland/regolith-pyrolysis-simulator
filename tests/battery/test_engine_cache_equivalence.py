@@ -7,7 +7,10 @@ from typing import Any, Mapping
 
 from simulator import engine_cache
 from simulator.battery.score import is_store_stamp_payload
-from simulator.diagnostic_helpers.binary_pot_battery import _IsolatedCellWorker
+from simulator.diagnostic_helpers.binary_pot_battery import (
+    _IsolatedCellWorker,
+    normalize_engine_settings,
+)
 from scripts.battery_cache_equivalence import _without_cache_counters
 
 
@@ -47,7 +50,7 @@ def test_isolated_cell_qualification_decoration_is_omitted_from_cache_key(
     engine_cache.engine_cache_counters(reset=True)
     worker = object.__new__(_IsolatedCellWorker)
     worker.engine = "magemin"
-    worker.engine_settings = {}
+    worker.engine_settings = normalize_engine_settings("magemin", None)
     worker._lock = threading.Lock()
     worker._worker = _FakeWorker()
     first = {
