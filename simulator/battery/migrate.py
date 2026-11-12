@@ -10531,7 +10531,7 @@ def _explicit_point_conditions(
 def _point_pressure_for_identity(
     identity: Identity | None,
     point_conditions: Mapping[str, Located[Any]] | None,
-) -> State[Decimal] | None:
+) -> State[Decimal | ApproxPressure] | None:
     if identity is None:
         return None
     if (
@@ -14219,7 +14219,7 @@ def _pressure_total_from_extract(
     *,
     gas_formula: str | None,
     source_text: str,
-) -> tuple[State[Decimal] | None, str | None]:
+) -> tuple[State[Decimal | ApproxPressure] | None, str | None]:
     raw = _pressure_payload_value(obs, values, "total_pressure_Pa")
     if raw not in (None, "") and _pressure_extract_value_is_unprinted(
         obs, values, "total_pressure_Pa", raw
