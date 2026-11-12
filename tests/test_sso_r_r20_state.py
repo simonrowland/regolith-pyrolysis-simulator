@@ -272,6 +272,30 @@ def test_elemental_evaporation_credits_o2_to_gas_without_dumping_the_buffer(
     assert after_o == pytest.approx(before_o, rel=0.0, abs=2.0 * math.ulp(max(before_o, 1.0)))
 
 
+def test_settle_does_not_dump_the_fo2_buffer() -> None:
+    # 0.2 mol O2 sits inside 1 mol FeO (capacity 0.5 mol). The old settle
+    # moved the entire buffer out through oxygen_reservoir_exchange.
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt", {"FeO": 1.0},
+        source="test ferrous capacity", material_origin="feedstock",
+    )
+    sim.atom_ledger.load_external_mol(
+        "reservoir.fo2_buffer", {"O2": 0.2},
+        source="test legal buffer", material_origin="feedstock",
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
+    before = float(sim.atom_ledger.mol_by_account("reservoir.fo2_buffer")["O2"])
+    names_before = [transition.name for transition in sim.atom_ledger.transitions]
+    sim._settle_evaporative_redox_after_batch()
+    new_names = [
+        transition.name for transition in sim.atom_ledger.transitions[len(names_before):]
+    ]
+    assert "oxygen_reservoir_exchange" not in new_names
+    assert before == pytest.approx(0.2)
+
+
 @pytest.mark.nightly
 @pytest.mark.cpu_budget(1800)
 def test_default_lunar_redox_runaway_acceptance() -> None:

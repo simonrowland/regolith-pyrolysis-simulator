@@ -3245,47 +3245,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return reservoir
 
     def _settle_evaporative_redox_after_batch(self) -> None:
-        # Parent/shared-O2 caps reserve inventory for the whole carrier batch.
-        # Only after every carrier commits may Fe re-speciation consume FeO.
-        reservoir = self.melt.oxygen_reservoir
-        saturated = (
-            self._fe_redox_internal_o2_capacity_mol_this_hr > OXYGEN_RESERVOIR_NOOP_MOL
-        ) and (
-            reservoir.melt_intrinsic_fO2_log >= self._melt_redox_fO2_upper_bound_log()
-            or reservoir.melt_redox_capacity_mol_per_ln_fO2 <= OXYGEN_RESERVOIR_NOOP_MOL
-        )
-        if saturated:
-            # The evaporation transition already credited its O2 to the buffer.
-            # At saturation, solve the finite Fe split BEFORE moving the remainder:
-            # 2 FeO + 1/2 O2 = Fe2O3, so uptake is Δn(Fe2O3)/2 mol O2.
-            # Its ledger debit, not C_m * Δln(fO2), owns the absorbed atoms.
-            # At zero Fe uptake all the credited O2 leaves to overhead; no second
-            # source or parallel redox inventory is introduced.
-            diagnostic = self._apply_fe_redox_respeciation(
-                oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
-                fO2_log_override=self._melt_redox_fO2_upper_bound_log(),
-            )
-            excess_o2_mol = max(0.0, float(
-                self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(OXYGEN_SPECIES, 0.0)
-            ))
-            if excess_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
-                # Drain only this evaporation-owned carrier, including a
-                # solid/no-capacity or hot-band refusal. Bubbler passthrough
-                # has its own booking and must not be drained a second time.
-                # Move the SAME mol: ΔO_atoms = -2n + 2n = 0 exactly.
-                self._dispatch_and_commit(
-                    ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
-                    control_inputs={'dn_to_headspace_mol': excess_o2_mol},
-                )
-                diagnostic['excess_o2_to_headspace_mol'] = excess_o2_mol
-                diagnostic.setdefault('flags', []).append('EXCESS_OXYGEN_TO_GAS')
-                self._fe_redox_respeciation_diagnostics_this_hr[-1].update(diagnostic)
-        elif self._has_remaining_fe_redox_internal_o2_capacity():
-            self._apply_fe_redox_respeciation(
-                oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
-            )
-        else:
-            self._apply_fe_redox_respeciation()
+        # Elemental evaporation credits O2 to the gas, so there is no
+        # evaporation-owned buffer balance to move. The pre-evaporation
+        # respeciation cannot see the fO2 shift those gas credits apply,
+        # so this call still aligns the Fe split. It does not drain
+        # reservoir.fo2_buffer.
+        self._apply_fe_redox_respeciation()
 
     @staticmethod
     def _o2_equivalent_residual_is_roundoff(
