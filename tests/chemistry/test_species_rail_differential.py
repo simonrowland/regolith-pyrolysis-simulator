@@ -1335,6 +1335,73 @@ def test_psat_evaluator_exception_is_not_scored_as_a_missing_row(
     assert "RuntimeError" in sodium.score.note
 
 
+@pytest.mark.parametrize("pressure_pa", [float("nan"), float("inf"), 0.0, -1.0])
+def test_invalid_psat_evaluator_output_is_not_scored_as_a_missing_row(
+    monkeypatch: pytest.MonkeyPatch,
+    pressure_pa: float,
+) -> None:
+    import simulator.diagnostic_helpers.species_rail_differential as differential
+
+    evaluator = SimpleNamespace(
+        pressure_observable=(
+            differential.PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE
+        ),
+        activity_exponent=0.0,
+        evaluate=lambda *_args, **_kwargs: SimpleNamespace(
+            pressure_pa=pressure_pa
+        ),
+    )
+    catalog = SimpleNamespace(
+        species={"Na": SimpleNamespace(formula="Na", evaluator=evaluator)}
+    )
+    monkeypatch.setattr(differential, "_legacy_species_row", lambda _sid: {})
+    rail = derive_species_rail()
+
+    nbp_points = differential.score_psat_nbp_sanity(rail, catalog)
+    nbp_sodium = next(point for point in nbp_points if point.score.species == "Na")
+    gas = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Na-invalid-pressure-g",
+        formula="Na",
+        phase="g",
+        phase_kind=PHASE_GAS,
+        T_K=1500.0,
+        delta_fG_kJ_mol=0.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    condensed = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Na-invalid-pressure-l",
+        formula="Na",
+        phase="l",
+        phase_kind=PHASE_LIQUID,
+        T_K=1500.0,
+        delta_fG_kJ_mol=0.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    channel_points = differential.score_psat_channel([gas, condensed], rail, catalog)
+    channel_sodium = next(
+        point
+        for point in channel_points
+        if point.score.species == "Na" and point.score.temperature_K == 1500.0
+    )
+
+    expected_reason = f"{TYPED_REFUSAL_PREFIX}rail_evaluator_invalid_output"
+    assert nbp_sodium.score.skip_reason == expected_reason
+    assert channel_sodium.score.skip_reason == expected_reason
+    assert repr(pressure_pa) in nbp_sodium.score.note
+    assert repr(pressure_pa) in channel_sodium.score.note
+
+    failure = differential._evaluate_rail_pressure_Pa("Na", 1500.0, catalog)
+    assert type(failure).__name__ == "RailPressureEvaluationFailure"
+    assert failure != "rail_row_absent"
+    assert failure != 1.0
+
+
 def test_psat_channel_refuses_missing_gas_or_condensed_or_rail() -> None:
     rail = derive_species_rail()
     gas = KeyedTablePoint(
