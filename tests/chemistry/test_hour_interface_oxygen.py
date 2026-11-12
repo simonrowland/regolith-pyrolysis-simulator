@@ -438,6 +438,32 @@ def test_booking_collapsed_capacity_does_not_integrate_the_film() -> None:
     assert calls["redox"] == []
 
 
+def test_below_400_k_clears_interface_oxygen_without_requiring_it() -> None:
+    """A cold hour keeps a stale vapour surface and does not solve ξ_s.
+
+    The debit floor is the evaporation provider, covered beside this test.
+    """
+
+    sim = _loaded(_yaml("feedstocks.yaml"))
+    sim.melt.temperature_C = 25.0
+    sim._hour_interface_oxygen = object()
+    sim._ensure_hour_interface_oxygen()
+    assert sim._hour_interface_oxygen is None
+
+    result = SimpleNamespace(
+        vapor_pressures_Pa={"Na": 1.0e6},
+        vapor_pressures_source={},
+        warnings=[],
+        liquid_fraction=1.0,
+    )
+    sim._refresh_vapor_pressures_from_kernel(
+        result,
+        publish_interface_oxygen=True,
+    )
+    assert result.vapor_pressures_Pa == {"Na": 1.0e6}
+    assert sim._hour_interface_oxygen is None
+
+
 def test_unsolved_snapshot_notice_is_explicit() -> None:
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim._hour_interface_oxygen = None

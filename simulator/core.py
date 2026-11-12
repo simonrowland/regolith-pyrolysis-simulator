@@ -4627,6 +4627,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return
         temperature_K = float(self.melt.temperature_C) + 273.15
         if not math.isfinite(temperature_K) or temperature_K < 400.0:
+            # No ξ_s below 400 K. The evaporation provider returns before it
+            # reads vapour: an empty melt flux, or solid-host ``below_400_K``.
+            # The caller returns that still-empty flux when a catalogue
+            # pressure is present. A stale potential cannot debit.
             self._clear_hour_interface_oxygen()
             return
         if (
@@ -11033,10 +11037,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         standalone equilibrium probes omit it.
 
         Behaviour:
-          - Below 400 K this method returns before kernel dispatch and preserves
-            the backend vapor-pressure surface and matching activity-source
-            notices. It does not establish that either surface is empty; that
-            is a separate provider contract.
+          - Below 400 K this method returns before kernel dispatch and before
+            ``require_evaporation_oxygen_potential_log10``. It preserves the
+            backend vapor-pressure surface. That surface may be stale. It
+            cannot debit: the evaporation provider returns an empty flux, or
+            solid-host ``below_400_K``, before it reads vapour.
           - When the kernel returns a populated ``vapor_pressures_Pa``
             it replaces the equilibrium-result dict in place. For
             ThermoEngine-sourced species whose backend value agrees with

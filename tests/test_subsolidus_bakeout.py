@@ -314,7 +314,7 @@ def _sulfate_reaction(**overrides):
 def test_solid_host_below_400_k_is_unavailable():
     result = _dispatch_bakeout(
         temperature_C=25.0,
-        vapour_batch_flux_pressures_Pa={"S2": 10.0},
+        vapour_batch_flux_pressures_Pa={"S2": 1.0e6},
         solid_host_area_m2=1.0,
         max_throughput_kg_hr=10.0,
         dt_hr=1.0,
@@ -325,6 +325,7 @@ def test_solid_host_below_400_k_is_unavailable():
     assert result.status == "unavailable"
     assert result.transition is None
     assert result.diagnostic["reason"] == "below_400_K"
+    assert result.diagnostic.get("evaporation_flux_kg_hr") == {}
     assert result.diagnostic.get("released_mol_by_species", {}) == {}
 
 

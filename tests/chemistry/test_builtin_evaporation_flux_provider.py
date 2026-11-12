@@ -973,6 +973,7 @@ def test_provider_short_circuits_below_400_k():
     )
     result = provider.dispatch(request)
     assert result.status == "ok"
+    assert result.transition is None
     assert (result.diagnostic or {}).get("evaporation_flux_kg_hr") == {}
 
 

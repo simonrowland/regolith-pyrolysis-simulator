@@ -1210,7 +1210,11 @@ class EvaporationMixin:
                 reason,
                 diagnostic,
             )
-        if T_K < 400:  # Catalog pressure exists; thermal physical zero.
+        if T_K < 400:
+            # Catalogue pressure may be present, including a stale potential.
+            # ``flux`` is still the empty object from the top of this method.
+            # The provider has the same floor and also returns before it
+            # reads vapour, so this hour does not debit.
             return flux
         # b-149 instance 4: partial channel refusals. When some channels debit
         # and others are typed refusals, refused species drop out of
