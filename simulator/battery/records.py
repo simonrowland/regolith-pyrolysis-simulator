@@ -422,6 +422,30 @@ def approximate_derived_total_reason() -> str:
     return "approximate_term_in_derived_total"
 
 
+def approximate_pressure_band_reason(band: ApproxPressure) -> str:
+    """The sentence for one band. The basis is the assumption or the print.
+
+    A half-decade names that assumption, the point, and the edges. A printed
+    band names that the edges are the printed precision. There is no free-text
+    assumption field: a basis without a sentence refuses.
+    """
+
+    if not isinstance(band, ApproxPressure):
+        raise ApproxPressureRefusal(
+            "not_approximate_pressure",
+            f"band sentence requires ApproxPressure, not {type(band)!r}",
+        )
+    edges = f"point {band.point} Pa; edges {band.low} Pa to {band.high} Pa"
+    if band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE:
+        return f"half-decade order-of-magnitude assumption; {edges}"
+    if band.band_basis is BandBasis.PRINTED:
+        return f"edges are the printed precision; {edges}"
+    raise ApproxPressureRefusal(
+        "unknown_band_basis",
+        f"band basis {band.band_basis!r} has no sentence",
+    )
+
+
 def as_fraction(value: object) -> Fraction:
     if isinstance(value, bool):
         raise TypeError("bool is not a rational coefficient")
