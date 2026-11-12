@@ -3129,6 +3129,51 @@ def test_magemin_subprocess_argument_vector_matches_golden():
     assert (buffer_name, buffer_n) == ('nno', 0.0)
 
 
+def test_magemin_pure_phase_probe_argument_vector_is_preserved(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    backend = MAGEMinBackend()
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = {'fO2_buffer': 'nno', 'timeout_s': 2.0}
+    buffer_name, buffer_n, buffer_warnings = backend._resolve_buffer(
+        temperature_C=1200.0,
+        fO2_log=-9.0,
+    )
+    captured: dict[str, object] = {}
+
+    def run(args, **kwargs):
+        captured['args'] = args
+        output = Path(kwargs['cwd']) / 'output' / '_matlab_output.txt'
+        output.parent.mkdir(parents=True)
+        output.write_text('matlab output', encoding='utf-8')
+        return types.SimpleNamespace(returncode=0, stdout='probe stdout', stderr='')
+
+    monkeypatch.setattr('simulator.melt_backend.magemin.subprocess.run', run)
+
+    stdout, matlab_text, warnings = backend._run_pure_phase_probe(
+        bulk_wt_ig={'SiO2': 49.123456789, 'MgO': 9.0},
+        temperature_C=1200.0,
+        pressure_kbar=2.0,
+    )
+
+    assert captured['args'] == [
+        '/fake/MAGEMin',
+        '--Verb=1',
+        '--db=ig',
+        '--Temp=1200.000000',
+        '--Pres=2.000000',
+        '--sys_in=wt',
+        '--Bulk=49.123457,0,0,9,0,0,0,0,0,0,0',
+        f'--buffer={buffer_name}',
+        f'--buffer_n={buffer_n:.6f}',
+        '--out_matlab=1',
+    ]
+    assert (stdout, matlab_text, warnings) == (
+        'probe stdout', 'matlab output', list(buffer_warnings)
+    )
+
+
 def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
     backend = MAGEMinBackend()
     vector = backend._build_ig_bulk_vector({"FeO": 10.0, "Fe2O3": 1.0})

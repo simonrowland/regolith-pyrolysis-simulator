@@ -284,6 +284,19 @@ def test_engine_cache_key_preserves_exact_float_values() -> None:
     )
 
 
+def test_engine_cache_json_matches_shared_canonical_encoder() -> None:
+    from simulator.canonical import canonical_json_dumps
+
+    values = (
+        ["openimcc", 1, {"temperature_K": 1700.0000000000002}],
+        {"nested": {"z": (1, 2.5), "a": "café"}, "flag": True},
+    )
+    for value in values:
+        assert engine_cache._canonical_json_dumps(value) == canonical_json_dumps(
+            value
+        )
+
+
 def test_raw_key_hot_json_compression_and_exact_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

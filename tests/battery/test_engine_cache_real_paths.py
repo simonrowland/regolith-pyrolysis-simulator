@@ -621,6 +621,12 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
     )
     snapshots = (
         (
+            "internal-analytical default",
+            "internal-analytical",
+            None,
+            "cf35124a3cfe5211638829e1ef5d1b63e68cca41ae28b97e87f195d6d73d08a0",
+        ),
+        (
             "openimcc default",
             "openimcc",
             None,

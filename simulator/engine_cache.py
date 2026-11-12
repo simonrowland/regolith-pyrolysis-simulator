@@ -92,8 +92,6 @@ _MEMORY_CACHE: OrderedDict[tuple[str, bytes, bool], Any] = OrderedDict()
 _MEMORY_CACHE_PID = os.getpid()
 _RUNTIME_BACKENDS: dict[str, Any] = {}
 _RUNTIME_IDENTITIES: dict[str, str] = {}
-_RUNTIME_WARNED: set[str] = set()
-_RUNTIME_OPEN_RECORDED: set[str] = set()
 _CACHE_BYPASSED: ContextVar[bool] = ContextVar(
     "regolith_engine_cache_bypassed", default=False
 )
@@ -152,6 +150,15 @@ class EngineCacheSchemaMismatch(RuntimeError):
         )
 
 
+def _canonical_json_dumps(value: Any) -> str:
+    return json.dumps(
+        value,
+        allow_nan=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+
+
 def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> bytes:
     if engine_id not in ENGINE_CHEMISTRY_VERSION:
         raise ValueError(f"unknown engine {engine_id!r}")
@@ -159,12 +166,7 @@ def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> b
     if isinstance(version, str) and version.isdecimal():
         version = int(version)
     try:
-        payload = json.dumps(
-            [engine_id, version, request],
-            allow_nan=False,
-            separators=(",", ":"),
-            sort_keys=True,
-        ).encode("utf-8")
+        payload = _canonical_json_dumps([engine_id, version, request]).encode("utf-8")
     except (TypeError, ValueError) as exc:
         raise ValueError("engine request must be finite, canonical JSON data") from exc
     return hashlib.sha256(payload).digest()
@@ -342,17 +344,15 @@ def record_engine_open(engine_id: str, backend: Any | None = None) -> str | None
     """Capture and report staleness once, outside the request-key path."""
     if not os.environ.get("REGOLITH_ENGINE_CACHE"):
         return None
-    if engine_id in _RUNTIME_OPEN_RECORDED:
+    if engine_id in _RUNTIME_IDENTITIES:
         return _RUNTIME_IDENTITIES.get(engine_id)
     if backend is not None:
         _RUNTIME_BACKENDS.setdefault(engine_id, backend)
     identity = runtime_identity(engine_id)
-    _RUNTIME_OPEN_RECORDED.add(engine_id)
     _RUNTIME_IDENTITIES[engine_id] = identity
     recorded = ENGINE_CHEMISTRY_VERSION_IDENTITY_AT[engine_id]
     stored = str(recorded["identity"])
-    if identity != stored and engine_id not in _RUNTIME_WARNED:
-        _RUNTIME_WARNED.add(engine_id)
+    if identity != stored:
         logging.getLogger(__name__).warning(
             "engine cache: %s runtime changed (stored %s, now %s). "
             "Cached outputs are still used. Bump ENGINE_CHEMISTRY_VERSION['%s'] "
@@ -369,8 +369,6 @@ def engine_cache_runtime_identities(*, reset: bool = False) -> dict[str, str]:
     identities = dict(_RUNTIME_IDENTITIES)
     if reset:
         _RUNTIME_IDENTITIES.clear()
-        _RUNTIME_WARNED.clear()
-        _RUNTIME_OPEN_RECORDED.clear()
     return identities
 
 
@@ -540,18 +538,6 @@ def _is_refusal(result: Any) -> bool:
     )
 
 
-def _source_box() -> str:
-    return os.environ.get("REGOLITH_ENGINE_CACHE_BOX", "")
-
-
-def _next_row_sequence(connection: sqlite3.Connection, source_box: str) -> int:
-    row = connection.execute(
-        "SELECT COALESCE(MAX(row_seq), 0) + 1 FROM engine_outputs WHERE source_box=?",
-        (source_box,),
-    ).fetchone()
-    return int(row[0])
-
-
 def _insert_cache_row_if_absent(
     connection: sqlite3.Connection,
     digest: bytes,
@@ -571,7 +557,13 @@ def _insert_cache_row_if_absent(
             existing_value = existing_value.encode("ascii")
         return False, bytes(existing_value) != bytes(value)
     if row_seq is None:
-        row_seq = _next_row_sequence(connection, source_box)
+        row_seq = int(
+            connection.execute(
+                "SELECT COALESCE(MAX(row_seq), 0) + 1 "
+                "FROM engine_outputs WHERE source_box=?",
+                (source_box,),
+            ).fetchone()[0]
+        )
     connection.execute(
         f"INSERT INTO {_TABLE} "
         "(key, value, engine, chem_version, source_box, row_seq) "
@@ -622,13 +614,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         ).fetchone()
         if row is not None:
             try:
-                stored_value = row[0]
-                if isinstance(stored_value, str):
-                    # Older databases stored uncompressed JSON text.
-                    hot_json = stored_value
-                else:
-                    hot_json = zlib.decompress(stored_value)
-                result = _decode_hot(json.loads(hot_json))
+                result = _decode_hot(json.loads(zlib.decompress(row[0])))
             except (TypeError, UnicodeDecodeError, json.JSONDecodeError, zlib.error):
                 counts["read_error"] += 1
                 row = None
@@ -644,20 +630,14 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     try:
         stored_hot = _encode_hot(hot)
         hot_value = zlib.compress(
-            json.dumps(
-                stored_hot,
-                sort_keys=True,
-                separators=(",", ":"),
-                ensure_ascii=True,
-                allow_nan=False,
-            ).encode("ascii"),
+            _canonical_json_dumps(stored_hot).encode("ascii"),
             level=6,
         )
     except Exception:
         with _LOCK:
             _counter_bucket(engine_id)["store_error"] += 1
         return hot
-    source_box = _source_box()
+    source_box = os.environ.get("REGOLITH_ENGINE_CACHE_BOX", "")
     try:
         with _LOCK:
             connection.execute("BEGIN IMMEDIATE")
@@ -716,13 +696,7 @@ def load_cache_rows(
                 digest,
                 sqlite3.Binary(
                     zlib.compress(
-                        json.dumps(
-                            hot,
-                            sort_keys=True,
-                            separators=(",", ":"),
-                            ensure_ascii=True,
-                            allow_nan=False,
-                        ).encode("ascii"),
+                        _canonical_json_dumps(hot).encode("ascii"),
                         level=6,
                     )
                 ),
