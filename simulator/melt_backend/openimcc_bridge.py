@@ -8,6 +8,8 @@ absent.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import metadata
@@ -58,6 +60,9 @@ _IMCC_REFUSAL_ERROR_TYPE: type[BaseException] | None = (
     getattr(_openimcc, "ImccRefusal", None)
     if _openimcc is not None
     else None
+)
+_EVALUATE_SOLVE_TIMEOUT_S: ContextVar[float | None] = ContextVar(
+    "openimcc_evaluate_solve_timeout_s", default=None
 )
 
 
@@ -1159,6 +1164,15 @@ def _evaluate_request_vector(
     }
 
 
+@contextmanager
+def _with_solve_timeout(timeout_s: float | None):
+    token = _EVALUATE_SOLVE_TIMEOUT_S.set(timeout_s)
+    try:
+        yield
+    finally:
+        _EVALUATE_SOLVE_TIMEOUT_S.reset(token)
+
+
 def _evaluate_with_timeout(
     composition_mol: Mapping[str, float] | None = None,
     temperature_K: float | None = None,
@@ -1219,6 +1233,7 @@ def evaluate(
         pack=pack,
         allow_extrapolation=allow_extrapolation,
         allow_out_of_envelope=allow_out_of_envelope,
+        solve_timeout_s=_EVALUATE_SOLVE_TIMEOUT_S.get(),
     )
 
 
