@@ -57,6 +57,7 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity,
     melt_oxide_activity_coefficient,
 )
+from simulator.physical_constants import GAS_CONSTANT_10SIG
 from simulator.state import MOLAR_MASS
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
@@ -2478,7 +2479,7 @@ RAIL_NONMATCH_CONDENSED_FORMS = frozenset(
 CONDENSED_FORM_CORRECTIONS_PATH = (
     REPO_ROOT / "data" / "condensed_form_corrections.yaml"
 )
-_R_GAS_J_MOL_K = 8.314462618  # CODATA; used only in form-correction algebra
+_R_GAS_J_MOL_K = GAS_CONSTANT_10SIG  # 10-sig spelling; form-correction algebra only
 
 
 def observation_condensed_form(

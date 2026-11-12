@@ -75,9 +75,12 @@ import math
 from dataclasses import dataclass
 from typing import Literal, Sequence
 
-# CODATA 2018 molar gas constant (J/(mol·K)). Used only when converting
-# dimensionless ratios to dimensional thermo; ratio-form methods do not need it.
-R_J_PER_MOL_K = 8.314462618
+from simulator.physical_constants import GAS_CONSTANT_10SIG
+
+# 10-significant-figure R (J/(mol·K)), not the full CODATA leaf
+# (relative gap −1.843e-11). Used only when converting dimensionless
+# ratios to dimensional thermo; ratio-form methods do not need it.
+R_J_PER_MOL_K = GAS_CONSTANT_10SIG
 
 EvaluatorFamily = Literal["nasa_cea_7", "nasa_cea_9"]
 StandardState = Literal["gas", "condensed_solid", "condensed_liquid", "condensed"]

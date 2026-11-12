@@ -31,7 +31,8 @@ Algebra: as above; free-energy conveniences used by reaction ``K(T)``::
   G°/(R T) = H°/(R T) − S°/R
 
 Units: ``T`` in K; ``Cp, S`` in J/(mol·K); Shomate ``H`` equation in kJ/mol;
-SI companions multiply accordingly. ``R = 8.314462618`` J/(mol·K).
+SI companions multiply accordingly. R is ``nasa_cea.R_J_PER_MOL_K``
+(GAS_CONSTANT_10SIG), not the full CODATA leaf.
 
 Sanity (NIST WebBook O2(g), 100–700 K segment, Chase 1998)::
 
