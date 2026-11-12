@@ -890,8 +890,21 @@ class _InvalidDecimalValue(Exception):
 
 
 def _as_dec_or_none(value: object) -> Decimal | None:
-    if value is None or value == "":
+    """Return a decimal only when a mixed-map value is numeric."""
+
+    if value is None or value == "" or isinstance(value, bool):
         return None
+    try:
+        return as_decimal(value)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+
+
+def _parse_declared_decimal(value: object) -> Decimal:
+    """Parse a declared numeric value, refusing present non-numeric text."""
+
+    if value is None or value == "":
+        raise _InvalidDecimalValue(f"invalid numeric value: {value!r}")
     if isinstance(value, bool):
         raise _InvalidDecimalValue(f"invalid numeric value: {value!r}")
     try:
@@ -994,19 +1007,16 @@ def _mass_percent_component_key(name: str) -> tuple[str, bool]:
 def parse_declared_amount(value: object) -> Decimal:
     """Single owner for source-declared numeric amounts.
 
-    Optional fields keep ``_as_dec_or_none`` for the empty/missing case. A
-    declared amount that is absent, boolean, or unparseable is a typed refusal
-    — never a silent drop.
+    A declared amount that is absent, boolean, or unparseable is a typed
+    refusal — never a silent drop.
     """
 
     if value is None or value == "" or isinstance(value, bool):
         raise ValueError(f"malformed declared amount: {value!r}")
     try:
-        amount = _as_dec_or_none(value)
+        return _parse_declared_decimal(value)
     except _InvalidDecimalValue as exc:
         raise ValueError(f"malformed declared amount: {value!r}") from exc
-    assert amount is not None
-    return amount
 
 
 def _provenance_with_printed_phase(
@@ -27355,7 +27365,12 @@ class Migrator:
                 else State.unknown("no fO2_Pa mapped from source")
             )
             residue_conditions = dict(point_conditions or {})
-            starting_ppm = _as_dec_or_none(values.get("starting_measured_ppm"))
+            raw_starting_ppm = values.get("starting_measured_ppm")
+            starting_ppm = (
+                None
+                if raw_starting_ppm is None or raw_starting_ppm == ""
+                else _parse_declared_decimal(raw_starting_ppm)
+            )
             raw_uncertainty = obs.get("uncertainty")
             starting_locator = (
                 _locator_from_plain(raw_uncertainty.get("locator"))
