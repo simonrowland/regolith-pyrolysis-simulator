@@ -56,6 +56,7 @@ from simulator.condensation import (
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.core import (
     PoisonedHourError,
     read_high_t_melt_activity_fallback_notice,
@@ -1774,6 +1775,7 @@ def _trace_with_optimizer_coating_report(
         getattr(run_execution, "snapshots", ()),
         refused_species,
         campaigns_elapsed=campaigns_elapsed,
+        catalog=_execution_vapour_catalog(run_execution),
     )
     from simulator.runner import _wall_fouling_report
 
@@ -2189,7 +2191,7 @@ def _snapshot_temperature_K(snapshot: Any) -> float | None:
     raw = getattr(snapshot, "temperature_C", None)
     if isinstance(raw, bool) or not isinstance(raw, int | float):
         return None
-    kelvin = float(raw) + 273.15
+    kelvin = float(raw) + CELSIUS_TO_KELVIN_OFFSET
     if not math.isfinite(kelvin) or kelvin <= 0.0:
         return None
     return kelvin
@@ -2278,44 +2280,181 @@ def _explicit_activity_one_psat_pa(
     return pressure_pa
 
 
-@lru_cache(maxsize=1)
-def _activity_one_vapour_catalog() -> Any:
-    """Compiled vapour catalog for the activity-1 saturation lookup.
+def _execution_vapour_catalog(run_execution: Any) -> Any | None:
+    """The run's compiled vapour catalog, or None when this run has none.
 
-    ``emit_u0_request_rules`` stays off: this probe needs evaluators,
-    not request rules. The compile is memoized inside the catalog as well.
+    The supply ceiling reads this object. It does not open
+    ``DEFAULT_DATA_DIR / vapor_pressures.yaml``. A study that supplied
+    a different saturation curve would otherwise be bounded by the
+    shipped file, and a species that exists only on the run catalog
+    would be reported as having no law.
     """
 
-    from simulator.config import DEFAULT_DATA_DIR
-    from simulator.vapour_rail.catalog import compiled_catalog_for
-    from simulator.yaml_cache import load_cached_safe_yaml
+    simulator = getattr(run_execution, "simulator", None)
+    catalog = getattr(simulator, "vapour_rail_catalog", None)
+    if catalog is None or not hasattr(catalog, "evaluator_for_hot_train"):
+        return None
+    return catalog
 
-    payload = load_cached_safe_yaml(
-        (DEFAULT_DATA_DIR / "vapor_pressures.yaml").read_bytes()
+
+def _bound_vapour_catalog(snapshot: Any, catalog: Any | None) -> Any | None:
+    """Run catalog, else the catalog preserved on the snapshot."""
+
+    if catalog is not None and hasattr(catalog, "evaluator_for_hot_train"):
+        return catalog
+    stamped = getattr(snapshot, "vapour_catalog", None)
+    if stamped is not None and hasattr(stamped, "evaluator_for_hot_train"):
+        return stamped
+    return None
+
+
+def _positive_pressure_bar(raw: Any) -> float | None:
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        return None
+    pressure = float(raw)
+    if not math.isfinite(pressure) or pressure <= 0.0:
+        return None
+    return pressure
+
+
+def _snapshot_transport_pO2_bar(snapshot: Any) -> float | None:
+    """Transport/overhead pO2 this hour's flux used, in bar.
+
+    On a production hour that value is
+    ``oxygen_reservoir['headspace_transport_pO2_bar']``, the pressure
+    the vapour evaluation read. A fixture with no reservoir may set
+    ``transport_pO2_bar`` or ``overhead_pO2_bar``. Melt fO2 and the
+    catalog reference pressure are not this value. A missing key is
+    not the 1e-9 guard and not the 1e-30 envelope (d-401).
+    """
+
+    reservoir = getattr(snapshot, "oxygen_reservoir", None)
+    if isinstance(reservoir, MappingABC) and (
+        "headspace_transport_pO2_bar" in reservoir
+    ):
+        recorded = _positive_pressure_bar(
+            reservoir.get("headspace_transport_pO2_bar")
+        )
+        if recorded is not None:
+            return recorded
+    for name in ("transport_pO2_bar", "overhead_pO2_bar", "interval_pO2_bar"):
+        recorded = _positive_pressure_bar(getattr(snapshot, name, None))
+        if recorded is not None:
+            return recorded
+    return None
+
+
+def _recorded_transport_pO2_bar(snapshots: Any) -> tuple[float, ...]:
+    """Every positive transport pO2 the window actually stored."""
+
+    recorded: list[float] = []
+    for snapshot in tuple(snapshots or ()):
+        pressure = _snapshot_transport_pO2_bar(snapshot)
+        if pressure is not None:
+            recorded.append(pressure)
+    return tuple(recorded)
+
+
+def _oxygen_bar_for_activity_one_ceiling(
+    *,
+    oxygen_exponent: float,
+    reference_pO2_bar: float,
+    hour_pO2_bar: float | None,
+    recorded_pO2_bar: Sequence[float],
+) -> tuple[float | None, str]:
+    """pO2 at which ``a = 1`` is a ceiling, or ``(None, evidence)``.
+
+    The catalog law is ``P = P_unit(T) * a^n * (pO2 / p_ref)^e``.
+    Activity is at most 1 (d-369). This function chooses only pO2.
+    d-401:
+
+    (a) The hour's own transport/overhead pO2 is the oxygen potential
+    its flux used. ``P(a=1, p_ref)`` is not a ceiling when ``e < 0``:
+    a lower pO2 raises P, and ``p_ref`` of 1 bar understates it.
+
+    (b) A hour with no recorded pO2 uses the run's recorded pO2 that
+    maximises P. ``e < 0`` takes the minimum. ``e > 0`` (CrO2) takes
+    the maximum. No 1e-30 clamp and no 1e-9 guard is substituted.
+
+    (c) A run that recorded no pO2 has no ceiling for ``e != 0``.
+    ``e == 0`` is unchanged: the oxygen factor is identically 1, so
+    evaluating at ``p_ref`` is not a second oxygen state.
+    """
+
+    if oxygen_exponent == 0.0:
+        if not math.isfinite(reference_pO2_bar) or reference_pO2_bar <= 0.0:
+            return None, "missing_recorded_pO2"
+        return reference_pO2_bar, ""
+    if hour_pO2_bar is not None:
+        return float(hour_pO2_bar), ""
+    recorded = tuple(
+        pressure
+        for pressure in recorded_pO2_bar
+        if math.isfinite(pressure) and pressure > 0.0
     )
-    return compiled_catalog_for(payload, emit_u0_request_rules=False)
+    if not recorded:
+        return None, "missing_recorded_pO2"
+    if oxygen_exponent < 0.0:
+        return min(recorded), ""
+    return max(recorded), ""
 
 
-def _catalog_activity_one_psat_pa(
+def _catalog_activity_one_ceiling_pa(
+    catalog: Any | None,
     species: str,
     temperature_K: float,
-) -> float | None:
-    """Activity-1 reference-state saturation pressure, or None when no law exists.
+    hour_pO2_bar: float | None,
+    recorded_pO2_bar: Sequence[float] = (),
+) -> tuple[float | None, str]:
+    """Activity-1 ceiling pressure, or ``(None, evidence)``.
 
-    The oxygen and activity factors are identically one: ``source_activity``
-    is 1 and ``pO2`` is the evaluator's reference pressure. A missing row,
-    an inapplicable hot-train row, or a refused evaluation is no P_sat.
+    ``P = P_unit(T) * a^n * (pO2 / p_ref)^e``. For ``n >= 0`` the
+    activity factor is largest at ``a = 1``. For ``n < 0`` the pressure
+    grows as activity falls, so there is no finite activity ceiling.
+    The oxygen state is ``_oxygen_bar_for_activity_one_ceiling`` (d-401).
+    A missing row, an inapplicable hot-train row, or a refused
+    evaluation is no law.
     """
 
     from simulator.vapour_rail.catalog import CatalogCompileError
 
+    if catalog is None:
+        return None, "no_flux_law_and_no_psat"
     try:
-        catalog = _activity_one_vapour_catalog()
         evaluator = catalog.evaluator_for_hot_train(species)
+    except (
+        CatalogCompileError,
+        VaporPressureNumericalOverflowError,
+        VaporPressureRangeError,
+        OverflowError,
+        ValueError,
+        TypeError,
+        AttributeError,
+    ):
+        return None, "no_flux_law_and_no_psat"
+    try:
+        activity_exponent = float(getattr(evaluator, "activity_exponent", 0.0))
+        oxygen_exponent = float(getattr(evaluator, "pO2_exponent", 0.0))
+        reference_pO2_bar = float(getattr(evaluator, "pO2_reference_bar", 1.0))
+    except (TypeError, ValueError):
+        return None, "no_flux_law_and_no_psat"
+    if not math.isfinite(activity_exponent) or not math.isfinite(oxygen_exponent):
+        return None, "no_flux_law_and_no_psat"
+    if activity_exponent < 0.0:
+        return None, "no_finite_activity_ceiling"
+    oxygen_bar, oxygen_evidence = _oxygen_bar_for_activity_one_ceiling(
+        oxygen_exponent=oxygen_exponent,
+        reference_pO2_bar=reference_pO2_bar,
+        hour_pO2_bar=hour_pO2_bar,
+        recorded_pO2_bar=recorded_pO2_bar,
+    )
+    if oxygen_bar is None:
+        return None, oxygen_evidence or "missing_recorded_pO2"
+    try:
         evaluation = evaluator.evaluate(
             temperature_K,
             source_activity=1.0,
-            pO2_bar=float(evaluator.pO2_reference_bar),
+            pO2_bar=oxygen_bar,
         )
     except (
         CatalogCompileError,
@@ -2323,15 +2462,16 @@ def _catalog_activity_one_psat_pa(
         VaporPressureRangeError,
         OverflowError,
         ValueError,
+        TypeError,
     ):
-        return None
+        return None, "no_flux_law_and_no_psat"
     raw = getattr(evaluation, "pressure_pa", None)
     if isinstance(raw, bool) or not isinstance(raw, int | float):
-        return None
+        return None, "no_flux_law_and_no_psat"
     pressure_pa = float(raw)
     if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
-        return None
-    return pressure_pa
+        return None, "activity_one_ceiling_not_finite"
+    return pressure_pa, ""
 
 
 def _explicit_molar_mass_kg_per_mol(
@@ -2352,14 +2492,24 @@ def _explicit_molar_mass_kg_per_mol(
     return mass
 
 
-def _catalog_molar_mass_kg_per_mol(species: str) -> float | None:
-    """Publisher molar mass. A missing operand is not a guessed formula mass."""
+def _catalog_molar_mass_kg_per_mol(
+    catalog: Any | None,
+    species: str,
+) -> float | None:
+    """Publisher molar mass on this run's catalog.
+
+    A missing operand is not a guessed formula mass. The legacy view is
+    the publisher's lookup, including its ``MOLAR_MASS`` fallback. There
+    is no second catalog.
+    """
 
     from simulator.evaporation import production_vapor_molar_mass_g_per_mol
     from simulator.vapour_rail.catalog import CatalogCompileError
 
+    if catalog is None or not hasattr(catalog, "legacy_view"):
+        return None
     try:
-        legacy = _activity_one_vapour_catalog().legacy_view()
+        legacy = catalog.legacy_view()
     except CatalogCompileError:
         return None
     grams = production_vapor_molar_mass_g_per_mol(legacy, species)
@@ -2381,13 +2531,12 @@ def _activity_one_bound_rate_kg_hr(
 ) -> float:
     """Activity-1 Hertz-Knudsen mass rate for one refused interval.
 
-    Premise. Activity ``a <= 1`` implies ``P_eq = a^n P_sat <= P_sat``
-    when the activity exponent is positive, so the vacuum evaporation
-    rate is at most the activity-1 rate. The oxygen factor is taken at
-    the reference pressure, which is 1, so this ``P_sat`` is ``P_sat(T)``
-    and not a live melt ``P_eq``. ``alpha_ub`` is 1 unless a cited alpha
-    is on the channel. Deposit still cannot exceed this supply; this
-    function does not price the wall.
+    Premise. ``pressure_pa`` is the activity-1 ceiling from
+    ``_catalog_activity_one_ceiling_pa`` or an explicit
+    ``activity_one_psat_pa``. It is not the equilibrium pressure at the
+    catalog reference pO2. ``alpha_ub`` is 1 unless a cited alpha is on
+    the channel. Deposit still cannot exceed this supply; this function
+    does not price the wall.
 
     Algebra. The kinetic coefficient is the publisher's
     ``hertz_knudsen_k_kg_s_m2_pa``,
@@ -2425,12 +2574,18 @@ def _activity_one_bound_rate_kg_hr(
 def _activity_one_refused_supply_interval(
     snapshot: Any,
     species: str,
+    catalog: Any | None = None,
+    recorded_pO2_bar: Sequence[float] = (),
 ) -> _WallSupplyInterval:
-    """Bound one refused interval, or type the missing input.
+    """Bound one interval, or type the missing input.
 
     Unavailable only when this interval has no flux law and no
-    activity-1 saturation pressure, or when a required operand of that
-    bound is absent. The reason is the evidence string.
+    activity-1 ceiling, or when a required operand of that bound is
+    absent. The reason is the evidence string. An absent rate map and
+    an absent carrier record are not, by themselves, this outcome:
+    both still reach the ceiling. An oxygen-dependent law with no
+    recorded transport pO2 on this hour uses ``recorded_pO2_bar``
+    (d-401). An empty record there is a typed gap, not ``p_ref``.
     """
 
     record = _carrier_channel(snapshot, species)
@@ -2448,17 +2603,29 @@ def _activity_one_refused_supply_interval(
         )
     if record is not None and "activity_one_psat_pa" in record:
         pressure_pa = _explicit_activity_one_psat_pa(record)
+        pressure_evidence = (
+            "" if pressure_pa is not None else "no_flux_law_and_no_psat"
+        )
     else:
-        pressure_pa = _catalog_activity_one_psat_pa(species, temperature_K)
+        pressure_pa, pressure_evidence = _catalog_activity_one_ceiling_pa(
+            _bound_vapour_catalog(snapshot, catalog),
+            species,
+            temperature_K,
+            _snapshot_transport_pO2_bar(snapshot),
+            recorded_pO2_bar,
+        )
     if pressure_pa is None:
         return _WallSupplyInterval(
             _WALL_SUPPLY_UNAVAILABLE,
-            evidence="no_flux_law_and_no_psat",
+            evidence=pressure_evidence or "no_flux_law_and_no_psat",
         )
     if record is not None and "molar_mass_kg_per_mol" in record:
         molar_mass = _explicit_molar_mass_kg_per_mol(record)
     else:
-        molar_mass = _catalog_molar_mass_kg_per_mol(species)
+        molar_mass = _catalog_molar_mass_kg_per_mol(
+            _bound_vapour_catalog(snapshot, catalog),
+            species,
+        )
     if molar_mass is None:
         return _WallSupplyInterval(
             _WALL_SUPPLY_UNAVAILABLE,
@@ -2478,7 +2645,12 @@ def _activity_one_refused_supply_interval(
     )
 
 
-def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyInterval:
+def _classify_wall_supply_interval(
+    snapshot: Any,
+    species: str,
+    catalog: Any | None = None,
+    recorded_pO2_bar: Sequence[float] = (),
+) -> _WallSupplyInterval:
     """Classify one refused-wall species on one interval.
 
     This is the only classifier the supply integral uses. A
@@ -2499,17 +2671,19 @@ def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyIn
       ``zero_by_physics`` with an eligible flux) or below-bound zero
       (``proven_below_threshold``, doctrine category 3) covers that
       species when the certificate does not.
-    - ``supply_interval_upper_bound``: the interval is refused, or the
-      species is on the carrier map without a rate and without a
-      covering zero, and the activity-1 saturation pressure can be
-      evaluated. The rate is the Hertz-Knudsen upper bound. One such
-      interval does not drop the species. Withholding the other hours
-      would book an implicit zero.
-    - ``unavailable``: no flux law and no saturation pressure, or an
-      operand of that bound is missing. The evidence names which.
-      A missing flux map and an absent carrier record are this class.
-      One unavailable interval drops the species. The partial sum of
-      the other intervals is not a supply.
+    - ``supply_interval_upper_bound``: there is no computed rate and no
+      covering zero, and an activity-1 ceiling can be formed. The rate
+      is the Hertz-Knudsen flux at that ceiling. The ceiling is an
+      explicit ``activity_one_psat_pa`` or the run catalog at activity
+      1. An oxygen-dependent law uses this hour's transport pO2, or,
+      when this hour recorded none, the run pO2 that maximises P
+      (d-401). A missing rate map and an absent carrier record still
+      reach this class. One such interval does not drop the species.
+    - ``unavailable``: no flux law and no ceiling, or an operand of
+      that ceiling is missing (temperature, area, molar mass, or any
+      recorded transport pO2 for an oxygen-dependent law). The evidence
+      names which. One unavailable interval drops the species. The
+      partial sum of the other intervals is not a supply.
 
     A non-positive duration is ``outside_window``. It adds no mass and
     is not a gap.
@@ -2521,12 +2695,7 @@ def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyIn
         if isinstance(rates, MappingABC) and species in rates:
             _require_vapour_supply_rate(rates[species], species)
         return _WallSupplyInterval(_WALL_SUPPLY_OUTSIDE)
-    if not isinstance(rates, MappingABC):
-        return _WallSupplyInterval(
-            _WALL_SUPPLY_UNAVAILABLE,
-            evidence="absent_flux_map",
-        )
-    if species in rates:
+    if isinstance(rates, MappingABC) and species in rates:
         return _WallSupplyInterval(
             _WALL_SUPPLY_COMPUTED,
             rate_kg_hr=_require_vapour_supply_rate(rates[species], species),
@@ -2536,27 +2705,26 @@ def _classify_wall_supply_interval(snapshot: Any, species: str) -> _WallSupplyIn
     # A refusal or upper bound outranks the certificate. An eligible
     # channel copied and then discarded by the freeze or campaign gate
     # does not: that species is absent from the rate map and the
-    # certificate covers it.
-    if _interval_certificate_leaves_species_uncovered(flux, species):
-        # A refusal is not a physical zero and not an implicit zero.
-        # Bound the hour when saturation pressure exists. Withholding
-        # the species would drop the other hours.
-        return _activity_one_refused_supply_interval(snapshot, species)
-    interval_reason = _interval_physical_zero_reason(flux)
-    if interval_reason:
-        return _WallSupplyInterval(
-            _WALL_SUPPLY_PHYSICAL_ZERO,
-            evidence=f"interval_physical_zero:{interval_reason}",
-        )
-    evidence = _physical_zero_evidence(flux, species)
-    if evidence:
-        return _WallSupplyInterval(_WALL_SUPPLY_PHYSICAL_ZERO, evidence=evidence)
-    channels = getattr(flux, "carrier_authority_by_species", None)
-    if isinstance(channels, MappingABC) and species in channels:
-        return _activity_one_refused_supply_interval(snapshot, species)
-    return _WallSupplyInterval(
-        _WALL_SUPPLY_UNAVAILABLE,
-        evidence="absent_no_record",
+    # certificate covers it. A missing rate map is not a withhold: the
+    # hour may still carry a ceiling operand.
+    if not _interval_certificate_leaves_species_uncovered(flux, species):
+        interval_reason = _interval_physical_zero_reason(flux)
+        if interval_reason:
+            return _WallSupplyInterval(
+                _WALL_SUPPLY_PHYSICAL_ZERO,
+                evidence=f"interval_physical_zero:{interval_reason}",
+            )
+        evidence = _physical_zero_evidence(flux, species)
+        if evidence:
+            return _WallSupplyInterval(
+                _WALL_SUPPLY_PHYSICAL_ZERO,
+                evidence=evidence,
+            )
+    return _activity_one_refused_supply_interval(
+        snapshot,
+        species,
+        catalog,
+        recorded_pO2_bar,
     )
 
 
@@ -2565,6 +2733,7 @@ def _optimizer_refused_flux_bounds(
     refused_species: tuple[str, ...],
     *,
     campaigns_elapsed: float = 1.0,
+    catalog: Any | None = None,
 ) -> dict[str, float]:
     """Integral of each species' vapour supply over the window.
 
@@ -2598,9 +2767,18 @@ def _optimizer_refused_flux_bounds(
     observed: set[str] = set()
     withheld: set[str] = set()
     bound_counts = {species: 0 for species in refused_species}
+    # One recorded-pO2 set for the window. The classifier chooses the
+    # hour's own value, or the extremum that maximises P. This scan
+    # does not read a flux map.
+    recorded_pO2_bar = _recorded_transport_pO2_bar(snapshots)
     for snapshot in tuple(snapshots or ()):
         for species in refused_species:
-            contribution = _classify_wall_supply_interval(snapshot, species)
+            contribution = _classify_wall_supply_interval(
+                snapshot,
+                species,
+                catalog,
+                recorded_pO2_bar,
+            )
             if contribution.kind == _WALL_SUPPLY_OUTSIDE:
                 continue
             if contribution.kind == _WALL_SUPPLY_UNAVAILABLE:

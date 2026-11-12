@@ -2036,6 +2036,191 @@ def _oracle_physical_zero_evidence(flux: object, species: str) -> str:
     return "below_bound_zero"
 
 
+def _oracle_positive_bar(raw: object) -> float | None:
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        return None
+    pressure = float(raw)
+    if not math.isfinite(pressure) or pressure <= 0.0:
+        return None
+    return pressure
+
+
+def _oracle_transport_pO2_bar(snapshot: object) -> float | None:
+    """Hour transport pO2, written from d-401. Not melt fO2 and not p_ref."""
+
+    reservoir = getattr(snapshot, "oxygen_reservoir", None)
+    if isinstance(reservoir, Mapping) and "headspace_transport_pO2_bar" in reservoir:
+        recorded = _oracle_positive_bar(reservoir.get("headspace_transport_pO2_bar"))
+        if recorded is not None:
+            return recorded
+    for name in ("transport_pO2_bar", "overhead_pO2_bar", "interval_pO2_bar"):
+        recorded = _oracle_positive_bar(getattr(snapshot, name, None))
+        if recorded is not None:
+            return recorded
+    return None
+
+
+def _oracle_nonnegative(raw: object) -> float | None:
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        return None
+    value = float(raw)
+    if not math.isfinite(value) or value < 0.0:
+        return None
+    return value
+
+
+def _oracle_handwritten_hk_kg_hr(
+    *,
+    pressure_pa: float,
+    molar_mass_kg_per_mol: float,
+    temperature_K: float,
+    area_m2: float,
+    alpha: float,
+) -> float | None:
+    """J = alpha * P * sqrt(M / (2 * pi * R * T)) * area * 3600.
+
+    R is the publisher's 8.314462618 J/(mol K), written here. This does
+    not call the publisher coefficient.
+    """
+
+    gas_constant = 8.314462618
+    if (
+        pressure_pa < 0.0
+        or molar_mass_kg_per_mol <= 0.0
+        or temperature_K <= 0.0
+        or area_m2 <= 0.0
+        or alpha <= 0.0
+        or alpha > 1.0
+    ):
+        return None
+    coefficient = math.sqrt(
+        molar_mass_kg_per_mol / (2.0 * math.pi * gas_constant * temperature_K)
+    )
+    rate = alpha * pressure_pa * coefficient * area_m2 * 3600.0
+    if not math.isfinite(rate) or rate < 0.0:
+        return None
+    return rate
+
+
+def _oracle_ceiling_kg_hr(
+    snapshot: object,
+    species: str,
+    recorded_pO2_bar: tuple[float, ...],
+) -> float | None:
+    """Activity-1 Hertz-Knudsen rate, or None when the bound cannot be formed.
+
+    Written from d-401. It does not call the classifier or the catalog
+    evaluator. Explicit ``activity_one_psat_pa`` is the ceiling. Otherwise
+    ``P = P_unit * (pO2 / p_ref)^e`` at activity 1. ``e == 0`` does not
+    need a recorded pO2. ``e != 0`` uses this hour's transport pO2, else
+    the run extremum that maximises P, else None. ``p_ref`` is not that
+    extremum. ``n < 0`` has no finite activity ceiling.
+    """
+
+    raw_temperature = getattr(snapshot, "temperature_C", None)
+    if isinstance(raw_temperature, bool) or not isinstance(raw_temperature, int | float):
+        return None
+    temperature_K = float(raw_temperature) + 273.15
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        return None
+    flux = getattr(snapshot, "evap_flux", None)
+    area_m2 = None
+    for raw_area in (
+        getattr(flux, "melt_surface_area_m2", None),
+        getattr(snapshot, "melt_surface_area_m2", None),
+    ):
+        if isinstance(raw_area, bool) or not isinstance(raw_area, int | float):
+            continue
+        candidate = float(raw_area)
+        if math.isfinite(candidate) and candidate > 0.0:
+            area_m2 = candidate
+            break
+    if area_m2 is None:
+        return None
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    record = None
+    if isinstance(channels, Mapping) and species in channels:
+        candidate_record = channels[species]
+        if isinstance(candidate_record, Mapping):
+            record = candidate_record
+    pressure_pa: float | None
+    molar_mass: float | None
+    if record is not None and "activity_one_psat_pa" in record:
+        if record.get("activity_one_psat_pa") is None:
+            return None
+        pressure_pa = _oracle_nonnegative(record.get("activity_one_psat_pa"))
+        if pressure_pa is None:
+            return None
+    else:
+        catalog = getattr(snapshot, "vapour_catalog", None)
+        if catalog is None or not hasattr(catalog, "evaluator_for_hot_train"):
+            return None
+        try:
+            law = catalog.evaluator_for_hot_train(species)
+        except (ValueError, KeyError, AttributeError, TypeError):
+            return None
+        try:
+            activity_exponent = float(getattr(law, "activity_exponent", 0.0))
+            oxygen_exponent = float(getattr(law, "pO2_exponent", 0.0))
+            reference_bar = float(getattr(law, "pO2_reference_bar", 1.0))
+            unit_pa = float(getattr(law, "p_unit_pa"))
+        except (TypeError, ValueError, AttributeError):
+            return None
+        if activity_exponent < 0.0 or not math.isfinite(unit_pa) or unit_pa < 0.0:
+            return None
+        if oxygen_exponent == 0.0:
+            oxygen_bar = reference_bar
+        else:
+            hour_pO2 = _oracle_transport_pO2_bar(snapshot)
+            if hour_pO2 is not None:
+                oxygen_bar = hour_pO2
+            elif recorded_pO2_bar:
+                oxygen_bar = (
+                    min(recorded_pO2_bar)
+                    if oxygen_exponent < 0.0
+                    else max(recorded_pO2_bar)
+                )
+            else:
+                return None
+        if not math.isfinite(oxygen_bar) or oxygen_bar <= 0.0 or reference_bar <= 0.0:
+            return None
+        pressure_pa = unit_pa * (oxygen_bar / reference_bar) ** oxygen_exponent
+        if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
+            return None
+    if record is not None and "molar_mass_kg_per_mol" in record:
+        molar_mass = _oracle_positive_bar(record.get("molar_mass_kg_per_mol"))
+    else:
+        catalog = getattr(snapshot, "vapour_catalog", None)
+        molar_mass = None
+        if catalog is not None and hasattr(catalog, "legacy_view"):
+            try:
+                legacy = catalog.legacy_view()
+            except (ValueError, AttributeError, TypeError):
+                legacy = None
+            oxides = legacy.get("oxide_vapors") if isinstance(legacy, Mapping) else None
+            row = oxides.get(species) if isinstance(oxides, Mapping) else None
+            grams = row.get("molar_mass_g_mol") if isinstance(row, Mapping) else None
+            if not isinstance(grams, bool) and isinstance(grams, int | float):
+                molar_mass = float(grams) / 1000.0
+                if not math.isfinite(molar_mass) or molar_mass <= 0.0:
+                    molar_mass = None
+    if molar_mass is None:
+        return None
+    alpha = 1.0
+    if record is not None and "cited_alpha" in record:
+        cited = _oracle_positive_bar(record.get("cited_alpha"))
+        if cited is None or cited > 1.0:
+            return None
+        alpha = cited
+    return _oracle_handwritten_hk_kg_hr(
+        pressure_pa=pressure_pa,
+        molar_mass_kg_per_mol=molar_mass,
+        temperature_K=temperature_K,
+        area_m2=area_m2,
+        alpha=alpha,
+    )
+
+
 def _oracle_complete_flux_supply_kg(
     snapshots: tuple[object, ...],
     species_names: tuple[str, ...],
@@ -2044,13 +2229,21 @@ def _oracle_complete_flux_supply_kg(
 
     Each positive-duration interval contributes one of: the computed
     rate (any non-negative magnitude, including a rate at or below
-    1e-12 kg/h), an evidenced physical zero, or unavailable. Unavailable
-    drops the species. The partial sum of the other intervals is not a
-    supply. A missing rate map is unavailable for every species. A
-    zero-duration interval adds nothing and is not a gap. A species that
-    never contributes is not a fabricated zero.
+    1e-12 kg/h), an evidenced physical zero, the activity-1
+    Hertz-Knudsen ceiling, or unavailable. Unavailable drops the
+    species. The partial sum of the other intervals is not a supply.
+    A missing rate map is not itself unavailable: the ceiling is tried
+    first. A zero-duration interval adds nothing and is not a gap. A
+    species that never contributes is not a fabricated zero.
     """
 
+    recorded_pO2 = tuple(
+        pressure
+        for pressure in (
+            _oracle_transport_pO2_bar(snapshot) for snapshot in snapshots
+        )
+        if pressure is not None
+    )
     totals = {species: 0.0 for species in species_names}
     observed: set[str] = set()
     withheld: set[str] = set()
@@ -2066,23 +2259,23 @@ def _oracle_complete_flux_supply_kg(
                 if isinstance(rates, Mapping) and species in rates:
                     float(rates[species])
                 continue
-            if not isinstance(rates, Mapping):
-                withheld.add(species)
-                continue
-            if species in rates:
+            if isinstance(rates, Mapping) and species in rates:
                 totals[species] += float(rates[species]) * duration_h
                 observed.add(species)
                 continue
-            if _oracle_channel_blocks_interval_zero(flux, species):
+            if not _oracle_channel_blocks_interval_zero(flux, species):
+                if _oracle_interval_physical_zero(flux):
+                    observed.add(species)
+                    continue
+                if _oracle_physical_zero_evidence(flux, species):
+                    observed.add(species)
+                    continue
+            ceiling = _oracle_ceiling_kg_hr(snapshot, species, recorded_pO2)
+            if ceiling is None:
                 withheld.add(species)
                 continue
-            if _oracle_interval_physical_zero(flux):
-                observed.add(species)
-                continue
-            if _oracle_physical_zero_evidence(flux, species):
-                observed.add(species)
-                continue
-            withheld.add(species)
+            totals[species] += ceiling * duration_h
+            observed.add(species)
     return {
         species: totals[species]
         for species in species_names
@@ -3003,7 +3196,95 @@ _WALL_SUPPLY_INTERVAL_KINDS = (
     "refused",
     "absent_no_record",
     "absent_flux_map",
+    "absent_map_explicit_ceiling",
+    "catalog_m0_no_recorded_po2",
+    "catalog_oxygen_no_recorded_po2",
 )
+# Handwritten ceiling operands. R is the publisher gas constant written
+# out, not a call to the Hertz-Knudsen helper. The two pressures differ
+# so an explicit P_sat and an oxygen-free catalog law cannot pass by
+# sharing one number.
+_CEILING_T_K = 1500.0
+_CEILING_T_C = _CEILING_T_K - 273.15
+_CEILING_AREA_M2 = 0.2
+_CEILING_MASS_KG_PER_MOL = 0.070
+_EXPLICIT_CEILING_PA = 1.0e-3
+_M0_P_UNIT_PA = 2.0e-3
+
+
+def _handwritten_ceiling_kg_hr(pressure_pa: float) -> float:
+    coefficient = math.sqrt(
+        _CEILING_MASS_KG_PER_MOL / (2.0 * math.pi * 8.314462618 * _CEILING_T_K)
+    )
+    return pressure_pa * coefficient * _CEILING_AREA_M2 * 3600.0
+
+
+_EXPLICIT_CEILING_KG_HR = _handwritten_ceiling_kg_hr(_EXPLICIT_CEILING_PA)
+_M0_CEILING_KG_HR = _handwritten_ceiling_kg_hr(_M0_P_UNIT_PA)
+
+
+class _CeilingLaw:
+    """P = P_unit * a^n * (pO2 / p_ref)^e. The oracle does not call this."""
+
+    def __init__(
+        self,
+        *,
+        activity_exponent: float,
+        pO2_exponent: float,
+        pO2_reference_bar: float,
+        p_unit_pa: float,
+    ) -> None:
+        self.activity_exponent = activity_exponent
+        self.pO2_exponent = pO2_exponent
+        self.pO2_reference_bar = pO2_reference_bar
+        self.p_unit_pa = p_unit_pa
+
+    def evaluate(self, temperature_K: float, *, source_activity: float, pO2_bar: float):
+        del temperature_K
+        pressure = (
+            self.p_unit_pa
+            * (float(source_activity) ** self.activity_exponent)
+            * (float(pO2_bar) / self.pO2_reference_bar) ** self.pO2_exponent
+        )
+        return SimpleNamespace(pressure_pa=pressure)
+
+
+class _CeilingCatalog:
+    def __init__(
+        self,
+        laws: Mapping[str, _CeilingLaw],
+        masses_g_per_mol: Mapping[str, float],
+    ) -> None:
+        self._laws = dict(laws)
+        self._masses = dict(masses_g_per_mol)
+
+    def evaluator_for_hot_train(self, species: str) -> _CeilingLaw:
+        try:
+            return self._laws[species]
+        except KeyError as exc:
+            raise ValueError(species) from exc
+
+    def legacy_view(self) -> dict[str, dict[str, dict[str, float]]]:
+        return {
+            "oxide_vapors": {
+                species: {"molar_mass_g_mol": grams}
+                for species, grams in self._masses.items()
+            }
+        }
+
+
+def _species_ceiling_catalog(species: str, oxygen_exponent: float, p_unit_pa: float) -> _CeilingCatalog:
+    return _CeilingCatalog(
+        {
+            species: _CeilingLaw(
+                activity_exponent=1.0,
+                pO2_exponent=oxygen_exponent,
+                pO2_reference_bar=1.0,
+                p_unit_pa=p_unit_pa,
+            )
+        },
+        {species: _CEILING_MASS_KG_PER_MOL * 1000.0},
+    )
 _WALL_SUPPLY_ABOVE_KG_HR = 1.0
 _WALL_SUPPLY_BELOW_KG_HR = 5.0e-13
 _WALL_SUPPLY_SIBLING_KG_HR = 0.4
@@ -3037,6 +3318,12 @@ _WALL_SUPPLY_WINDOWS = (
     ("refused", "computed_above_threshold"),
     ("absent_no_record", "computed_above_threshold"),
     ("absent_flux_map", "computed_below_threshold"),
+    ("absent_map_explicit_ceiling",),
+    ("catalog_m0_no_recorded_po2",),
+    ("catalog_oxygen_no_recorded_po2",),
+    ("computed_above_threshold", "absent_map_explicit_ceiling"),
+    ("computed_above_threshold", "catalog_m0_no_recorded_po2"),
+    ("computed_above_threshold", "catalog_oxygen_no_recorded_po2"),
     ("computed_above_threshold", "authorized_zero", "absent_no_record"),
     ("computed_below_threshold", "below_bound_zero", "computed_above_threshold"),
     ("absent_no_record", "authorized_zero", "computed_below_threshold"),
@@ -3145,6 +3432,36 @@ def _supply_kind_snapshot(
         records[species] = _transport_refusal_channel(species)
     elif kind == "absent_no_record":
         pass
+    elif kind == "absent_map_explicit_ceiling":
+        record = _transport_refusal_channel(species)
+        record["activity_one_psat_pa"] = _EXPLICIT_CEILING_PA
+        record["molar_mass_kg_per_mol"] = _CEILING_MASS_KG_PER_MOL
+        return SimpleNamespace(
+            hour=hour,
+            duration_h=1.0,
+            temperature_C=_CEILING_T_C,
+            evap_flux=SimpleNamespace(
+                carrier_authority_by_species={species: record},
+                melt_surface_area_m2=_CEILING_AREA_M2,
+            ),
+        )
+    elif kind in {"catalog_m0_no_recorded_po2", "catalog_oxygen_no_recorded_po2"}:
+        oxygen_exponent = 0.0 if kind == "catalog_m0_no_recorded_po2" else -1.0
+        return SimpleNamespace(
+            hour=hour,
+            duration_h=1.0,
+            temperature_C=_CEILING_T_C,
+            vapour_catalog=_species_ceiling_catalog(
+                species,
+                oxygen_exponent,
+                _M0_P_UNIT_PA,
+            ),
+            evap_flux=SimpleNamespace(
+                published_species_kg_hr={sibling: _WALL_SUPPLY_SIBLING_KG_HR},
+                species_kg_hr={sibling: _WALL_SUPPLY_SIBLING_KG_HR},
+                melt_surface_area_m2=_CEILING_AREA_M2,
+            ),
+        )
     else:
         raise AssertionError(kind)
     return _interval_flux_snapshot(
@@ -3182,12 +3499,17 @@ def _kind_contribution_kg(kind: str) -> float | None:
         "interval_physical_zero_with_channel",
     }:
         return 0.0
+    if kind == "absent_map_explicit_ceiling":
+        return _EXPLICIT_CEILING_KG_HR
+    if kind == "catalog_m0_no_recorded_po2":
+        return _M0_CEILING_KG_HR
     if kind in {
         "refused",
         "absent_no_record",
         "absent_flux_map",
         "interval_physical_zero_refused",
         "interval_physical_zero_upper_bound",
+        "catalog_oxygen_no_recorded_po2",
     }:
         return None
     raise AssertionError(kind)
@@ -3204,7 +3526,9 @@ def _window_species_supply_kg(window: tuple[str, ...]) -> float | None:
 
 
 def _window_sibling_supply_kg(window: tuple[str, ...]) -> float | None:
-    if "absent_flux_map" in window:
+    # A missing rate map withholds the sibling. An explicit ceiling is
+    # on the target species only, so the sibling still has no law.
+    if "absent_flux_map" in window or "absent_map_explicit_ceiling" in window:
         return None
     return _WALL_SUPPLY_SIBLING_KG_HR * len(window)
 
@@ -3239,8 +3563,13 @@ def _mutate_classified_interval(kind: str, species: str):
 
     real = _classify_wall_supply_interval
 
-    def mutated(snapshot: object, name: str) -> _WallSupplyInterval:
-        interval = real(snapshot, name)
+    def mutated(
+        snapshot: object,
+        name: str,
+        catalog: object = None,
+        recorded_pO2_bar: tuple[float, ...] = (),
+    ) -> _WallSupplyInterval:
+        interval = real(snapshot, name, catalog, recorded_pO2_bar)
         if name != species:
             return interval
         if (
@@ -3271,11 +3600,20 @@ def _mutate_classified_interval(kind: str, species: str):
                 evidence="absent_no_record",
             )
         if kind in {
+            "absent_map_explicit_ceiling",
+            "catalog_m0_no_recorded_po2",
+        } and interval.kind == "supply_interval_upper_bound":
+            return _WallSupplyInterval(
+                "unavailable",
+                evidence="missing_recorded_pO2",
+            )
+        if kind in {
             "refused",
             "absent_no_record",
             "absent_flux_map",
             "interval_physical_zero_refused",
             "interval_physical_zero_upper_bound",
+            "catalog_oxygen_no_recorded_po2",
         } and interval.kind == "unavailable":
             return _WallSupplyInterval(
                 "physical_zero",
@@ -3630,61 +3968,288 @@ def test_unavailable_supply_is_only_no_flux_law_and_no_psat() -> None:
     assert bounded_interval.evidence == SUPPLY_INTERVAL_UPPER_BOUND_USED
 
 
-def test_refused_cro_interval_uses_catalog_activity_one_psat() -> None:
-    """CrO with no explicit pressure uses the catalog activity-1 law.
+def _po2_hour(
+    hour: int,
+    pO2_bar: float | None,
+    *,
+    species: str | None = None,
+    catalog: object | None = None,
+    refused: bool = False,
+) -> SimpleNamespace:
+    """One hour. A refused carrier has no rate. A pO2 of None is unrecorded."""
 
-    The expected rate calls the publisher coefficient and the catalog
-    evaluator on their own. 1800 K is inside the CrO fit.
+    flux_fields: dict[str, object] = {
+        "published_species_kg_hr": {},
+        "species_kg_hr": {},
+        "melt_surface_area_m2": _CEILING_AREA_M2,
+    }
+    if refused and species is not None:
+        flux_fields["carrier_authority_by_species"] = {
+            species: _transport_refusal_channel(species)
+        }
+    else:
+        flux_fields["wall_supply_interval_physical_zero"] = {
+            "reason": "non_evaporation_campaign",
+            "evidence": "authorized_zero",
+        }
+    fields: dict[str, object] = {
+        "hour": hour,
+        "duration_h": 1.0,
+        "temperature_C": _CEILING_T_C,
+        "evap_flux": SimpleNamespace(**flux_fields),
+    }
+    if pO2_bar is not None:
+        fields["oxygen_reservoir"] = {"headspace_transport_pO2_bar": pO2_bar}
+    if catalog is not None:
+        fields["vapour_catalog"] = catalog
+    return SimpleNamespace(**fields)
+
+
+def _literal_hk_kg_hr(pressure_pa: float, molar_mass_kg_per_mol: float) -> float:
+    """Independent J_max. R and the square root are written here."""
+
+    gas_constant = 8.314462618
+    coefficient = math.sqrt(
+        molar_mass_kg_per_mol
+        / (2.0 * math.pi * gas_constant * _CEILING_T_K)
+    )
+    return pressure_pa * coefficient * _CEILING_AREA_M2 * 3600.0
+
+
+def test_al2o_refused_hour_at_100_pa_overhead_is_1000x_one_bar() -> None:
+    """Al2O (m=-1) at 100 Pa overhead, not at p_ref = 1 bar (d-401).
+
+    P = P_unit * a^n * (pO2 / p_ref)^m with n=2, m=-1, p_ref=1 bar,
+    P_unit=1e-4 Pa. 100 Pa is 1e-3 bar, so the oxygen factor is
+    (1e-3)^(-1) = 1000. A later hour at 1e-6 bar must not replace this
+    hour's own transport pO2. The kilogram rate is the handwritten
+    Hertz-Knudsen literal at that ceiling, not the publisher helper
+    and not the shipped Al2O fit.
     """
 
-    from simulator.config import DEFAULT_DATA_DIR
-    from simulator.evaporation import production_vapor_molar_mass_g_per_mol
-    from simulator.vapour_rail.catalog import compiled_catalog_for
-    from simulator.yaml_cache import load_cached_safe_yaml
-
-    species = "CrO"
-    temperature_K = 1800.0
-    area_m2 = 0.2
-    payload = load_cached_safe_yaml(
-        (DEFAULT_DATA_DIR / "vapor_pressures.yaml").read_bytes()
+    overhead_pa = 100.0
+    hour_pO2_bar = overhead_pa / 1.0e5
+    p_unit_pa = 1.0e-4
+    p_ref_bar = 1.0
+    oxygen_exponent = -1.0
+    activity_exponent = 2.0
+    mass_kg_per_mol = 0.070
+    pressure_pa = (
+        p_unit_pa
+        * (1.0 ** activity_exponent)
+        * (hour_pO2_bar / p_ref_bar) ** oxygen_exponent
     )
-    catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
-    evaluator = catalog.evaluator_for_hot_train(species)
-    evaluation = evaluator.evaluate(
-        temperature_K,
-        source_activity=1.0,
-        pO2_bar=float(evaluator.pO2_reference_bar),
+    pressure_at_one_bar_pa = p_unit_pa * (1.0 / p_ref_bar) ** oxygen_exponent
+    assert pressure_pa / pressure_at_one_bar_pa == pytest.approx(1000.0)
+    expected = _literal_hk_kg_hr(pressure_pa, mass_kg_per_mol)
+    one_bar = _literal_hk_kg_hr(pressure_at_one_bar_pa, mass_kg_per_mol)
+    assert expected / one_bar == pytest.approx(1000.0)
+    catalog = _CeilingCatalog(
+        {
+            "Al2O": _CeilingLaw(
+                activity_exponent=activity_exponent,
+                pO2_exponent=oxygen_exponent,
+                pO2_reference_bar=p_ref_bar,
+                p_unit_pa=p_unit_pa,
+            )
+        },
+        {"Al2O": mass_kg_per_mol * 1000.0},
     )
-    pressure_pa = float(evaluation.pressure_pa)
-    reference_pa = 10.0 ** evaluator.reference_model.log10_pressure(temperature_K)
-    assert pressure_pa == pytest.approx(reference_pa)
-    grams = production_vapor_molar_mass_g_per_mol(catalog.legacy_view(), species)
-    assert grams is not None
-    expected = _activity_one_j_max_kg_hr(
-        temperature_K=temperature_K,
-        pressure_pa=pressure_pa,
-        molar_mass_kg_per_mol=float(grams) / 1000.0,
-        area_m2=area_m2,
+    snapshots = (
+        _po2_hour(1, hour_pO2_bar, species="Al2O", catalog=catalog, refused=True),
+        _po2_hour(2, 1.0e-6, catalog=catalog),
     )
-    snapshot = _activity_one_refusal_snapshot(
-        species,
-        hour=1,
-        temperature_C=temperature_K - 273.15,
-        area_m2=area_m2,
-        omit_psat=True,
-        omit_molar_mass=True,
-    )
-    interval = _classify_wall_supply_interval(snapshot, species)
-    assert interval.kind == "supply_interval_upper_bound"
-    assert interval.evidence == SUPPLY_INTERVAL_UPPER_BOUND_USED
-    assert interval.rate_kg_hr == _approx_kg(expected)
     bounds = _optimizer_refused_flux_bounds(
-        (snapshot,),
-        (species,),
+        snapshots,
+        ("Al2O",),
         campaigns_elapsed=1.0,
     )
-    assert bounds[species] == _approx_kg(expected)
-    assert bounds.supply_interval_upper_bound_used == {species: 1}
+    assert bounds["Al2O"] == _approx_kg(expected)
+    assert bounds["Al2O"] != _approx_kg(one_bar)
+    assert bounds.supply_interval_upper_bound_used == {"Al2O": 1}
+
+
+def test_positive_oxygen_exponent_uses_the_max_recorded_po2_hour() -> None:
+    """CrO2-shaped m>0 with no pO2 on the refused hour uses the maximum.
+
+    Recorded hours are 1e-6 bar and 1e-2 bar. P_unit is 1e-3 Pa,
+    m=0.25, p_ref=1 bar. The ceiling is P_unit * (1e-2)^0.25, not the
+    minimum and not the 1 bar reference (d-401).
+    """
+
+    p_unit_pa = 1.0e-3
+    oxygen_exponent = 0.25
+    low_bar = 1.0e-6
+    high_bar = 1.0e-2
+    mass_kg_per_mol = 0.070
+    pressure_pa = p_unit_pa * (high_bar ** oxygen_exponent)
+    pressure_at_min_pa = p_unit_pa * (low_bar ** oxygen_exponent)
+    pressure_at_ref_pa = p_unit_pa
+    assert pressure_pa != pytest.approx(pressure_at_min_pa)
+    assert pressure_pa != pytest.approx(pressure_at_ref_pa)
+    expected = _literal_hk_kg_hr(pressure_pa, mass_kg_per_mol)
+    catalog = _CeilingCatalog(
+        {
+            "CrO2": _CeilingLaw(
+                activity_exponent=1.0,
+                pO2_exponent=oxygen_exponent,
+                pO2_reference_bar=1.0,
+                p_unit_pa=p_unit_pa,
+            )
+        },
+        {"CrO2": mass_kg_per_mol * 1000.0},
+    )
+    snapshots = (
+        _po2_hour(1, None, species="CrO2", catalog=catalog, refused=True),
+        _po2_hour(2, low_bar, catalog=catalog),
+        _po2_hour(3, high_bar, catalog=catalog),
+    )
+    forward = _optimizer_refused_flux_bounds(
+        snapshots,
+        ("CrO2",),
+        campaigns_elapsed=1.0,
+    )
+    reverse = _optimizer_refused_flux_bounds(
+        tuple(reversed(snapshots)),
+        ("CrO2",),
+        campaigns_elapsed=1.0,
+    )
+    assert forward["CrO2"] == _approx_kg(expected)
+    assert reverse["CrO2"] == _approx_kg(expected)
+    assert forward["CrO2"] != _approx_kg(
+        _literal_hk_kg_hr(pressure_at_min_pa, mass_kg_per_mol)
+    )
+    assert forward["CrO2"] != _approx_kg(
+        _literal_hk_kg_hr(pressure_at_ref_pa, mass_kg_per_mol)
+    )
+
+
+def test_no_recorded_po2_withholds_only_oxygen_dependent_laws() -> None:
+    """No transport pO2 anywhere: m != 0 is unavailable and m = 0 is not.
+
+    The gap is typed. It is not the 1e-9 guard and not p_ref (d-401).
+    A CrO hour with temperature, area, and a transport pO2 but no run
+    catalog stays unavailable: the shipped vapour file is not the law.
+    """
+
+    mass_kg_per_mol = 0.070
+    p_unit_pa = 1.0e-3
+    catalog = _CeilingCatalog(
+        {
+            "Al2O": _CeilingLaw(
+                activity_exponent=2.0,
+                pO2_exponent=-1.0,
+                pO2_reference_bar=1.0,
+                p_unit_pa=p_unit_pa,
+            ),
+            "M0Carrier": _CeilingLaw(
+                activity_exponent=1.0,
+                pO2_exponent=0.0,
+                pO2_reference_bar=1.0,
+                p_unit_pa=p_unit_pa,
+            ),
+        },
+        {
+            "Al2O": mass_kg_per_mol * 1000.0,
+            "M0Carrier": mass_kg_per_mol * 1000.0,
+        },
+    )
+    flux = SimpleNamespace(
+        published_species_kg_hr={},
+        species_kg_hr={},
+        melt_surface_area_m2=_CEILING_AREA_M2,
+        carrier_authority_by_species={
+            "Al2O": _transport_refusal_channel("Al2O"),
+            "M0Carrier": _transport_refusal_channel("M0Carrier"),
+        },
+    )
+    snapshot = SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_CEILING_T_C,
+        vapour_catalog=catalog,
+        evap_flux=flux,
+    )
+    al2o = _classify_wall_supply_interval(snapshot, "Al2O")
+    assert al2o.kind == "unavailable"
+    assert al2o.evidence == "missing_recorded_pO2"
+    m0 = _classify_wall_supply_interval(snapshot, "M0Carrier")
+    assert m0.kind == "supply_interval_upper_bound"
+    assert m0.rate_kg_hr == _approx_kg(_literal_hk_kg_hr(p_unit_pa, mass_kg_per_mol))
+    bounds = _optimizer_refused_flux_bounds(
+        (snapshot,),
+        ("Al2O", "M0Carrier"),
+        campaigns_elapsed=1.0,
+    )
+    assert "Al2O" not in bounds
+    assert bounds["M0Carrier"] == _approx_kg(m0.rate_kg_hr)
+
+    cro = SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_CEILING_T_C,
+        oxygen_reservoir={"headspace_transport_pO2_bar": 1.0e-3},
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={},
+            species_kg_hr={},
+            melt_surface_area_m2=_CEILING_AREA_M2,
+            carrier_authority_by_species={"CrO": _transport_refusal_channel("CrO")},
+        ),
+    )
+    cro_interval = _classify_wall_supply_interval(cro, "CrO")
+    assert cro_interval.kind == "unavailable"
+    assert cro_interval.evidence == "no_flux_law_and_no_psat"
+
+
+def test_snapshot_temperature_uses_the_celsius_offset_constant() -> None:
+    """The kelvin conversion is the owned offset, not a second 273.15."""
+
+    source = inspect.getsource(evaluate_module._snapshot_temperature_K)
+    assert "CELSIUS_TO_KELVIN_OFFSET" in source
+    assert "273.15" not in source
+
+
+def test_ungrounded_resinter_threshold_keeps_physical_scores_on_the_pareto() -> None:
+    """A null resinter threshold does not drop a feasible candidate.
+
+    The furnace penalty is ungrounded. The physical scores stay, and
+    the candidate can sit on the Pareto. A missing objective is still
+    unscored. No campaign count is invented.
+    """
+
+    ungrounded = {
+        "furnace_amortization_status": "resinter_threshold_ungrounded",
+        "coating_status": "warning",
+    }
+    priced = SimpleNamespace(
+        candidate_id="priced",
+        cache_key="priced",
+        objectives={"oxygen_kg": 10.0, "energy_kWh": 1.0},
+        product_summary=ungrounded,
+    )
+    weaker = SimpleNamespace(
+        candidate_id="weaker",
+        cache_key="weaker",
+        objectives={"oxygen_kg": 1.0, "energy_kWh": 2.0},
+        product_summary=ungrounded,
+    )
+    scores = study._record_objective_scores(priced, DEFINITIONS)
+    assert scores == objective_scores(priced.objectives, DEFINITIONS)
+    assert all(score is not None for score in scores)
+    front = pareto_front(
+        (weaker, priced),
+        DEFINITIONS,
+        objective_getter=lambda item: item.objectives,
+        score_getter=lambda item: study._record_objective_scores(item, DEFINITIONS),
+    )
+    assert [item.candidate_id for item in front] == ["priced"]
+    missing = SimpleNamespace(
+        candidate_id="missing",
+        cache_key="missing",
+        objectives={"oxygen_kg": 10.0},
+        product_summary=ungrounded,
+    )
+    assert study._record_objective_scores(missing, DEFINITIONS) == (None, None)
 
 
 @pytest.mark.parametrize("kind", _WALL_SUPPLY_INTERVAL_KINDS)
@@ -3758,8 +4323,13 @@ def test_subthreshold_floor_mutation_fails_the_supply_oracle(
 
     real = _classify_wall_supply_interval
 
-    def floor_subthreshold(snapshot: object, name: str) -> _WallSupplyInterval:
-        interval = real(snapshot, name)
+    def floor_subthreshold(
+        snapshot: object,
+        name: str,
+        catalog: object = None,
+        recorded_pO2_bar: tuple[float, ...] = (),
+    ) -> _WallSupplyInterval:
+        interval = real(snapshot, name, catalog, recorded_pO2_bar)
         if (
             interval.kind == "computed"
             and interval.rate_kg_hr is not None
@@ -3809,8 +4379,13 @@ def test_dropping_interval_physical_zero_fails_the_supply_oracle(
 
     real = _classify_wall_supply_interval
 
-    def drop_interval_zero(snapshot: object, name: str) -> _WallSupplyInterval:
-        interval = real(snapshot, name)
+    def drop_interval_zero(
+        snapshot: object,
+        name: str,
+        catalog: object = None,
+        recorded_pO2_bar: tuple[float, ...] = (),
+    ) -> _WallSupplyInterval:
+        interval = real(snapshot, name, catalog, recorded_pO2_bar)
         if str(interval.evidence).startswith("interval_physical_zero"):
             return _WallSupplyInterval("unavailable", evidence="absent_no_record")
         return interval

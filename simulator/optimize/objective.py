@@ -4395,16 +4395,22 @@ def _refused_vapour_supply_kg(
 
     if not refused_species:
         return {}
-    from simulator.optimize.evaluate import _optimizer_refused_flux_bounds
+    from simulator.optimize.evaluate import (
+        _execution_vapour_catalog,
+        _optimizer_refused_flux_bounds,
+    )
 
     if snapshots is None:
         snapshots = getattr(run_execution, "snapshots", ())
     # campaigns_elapsed=1 keeps the snapshot sum. That sum is the run
     # integral; dividing by the campaign count would shrink the bound.
+    # The catalog is the run's. The integral does not open the default
+    # vapour file.
     return _optimizer_refused_flux_bounds(
         snapshots,
         refused_species,
         campaigns_elapsed=1.0,
+        catalog=_execution_vapour_catalog(run_execution),
     )
 
 

@@ -3745,18 +3745,16 @@ def test_parallel_composition_target_stub_study_completes(
     payload = json.loads(pareto_path.read_text())
     # Each Morris point books SiO at the activity-1 supply bound. The
     # coating gate is feasible: the certain deposit is 0 kg and the flagged
-    # bound is far under the 0.5 kg limit. resinter_threshold_kg is null, so
-    # a positive deposit cannot be turned into a campaign count. Furnace
-    # amortization stays resinter_threshold_ungrounded, cost-adjusted scores
-    # are absent, and the screen therefore has no priced winner. The 3736262ed
-    # winner was a measured-zero deposit, which amortized at zero. This run
-    # does not restore that winner.
-    assert result.status == "completed-no-feasible-winner"
-    assert result.winner is None
-    assert result.pareto == ()
-    assert payload["status"] == "completed-no-feasible-winner"
-    assert payload["winner_candidate_id"] is None
-    assert payload["pareto"] == []
+    # bound stays under the 0.5 kg limit. resinter_threshold_kg is null, so
+    # furnace amortization stays resinter_threshold_ungrounded. That gap is
+    # the furnace penalty only. The physical scores stay, and a feasible
+    # point is the priced winner (d-401). No campaign count is invented.
+    assert result.status == "completed"
+    assert result.winner is not None
+    assert result.pareto
+    assert payload["status"] == "completed"
+    assert payload["winner_candidate_id"] == result.winner.candidate_id
+    assert payload["pareto"]
     assert result.records
     assert result.leaderboard
     assert all(record.feasible for record in result.records)
@@ -3783,7 +3781,7 @@ def test_parallel_composition_target_stub_study_completes(
         assert bounds["SiO"] < 0.5
         scores = study._record_objective_scores(candidate, definitions)
         assert scores
-        assert all(score is None for score in scores)
+        assert all(score is not None and math.isfinite(score) for score in scores)
         summary = candidate.product_summary
         assert "coating_unavailable_reason" not in summary
         assert summary["coating_status"] == "warning"
