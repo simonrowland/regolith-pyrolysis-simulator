@@ -23,7 +23,8 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, fields, is_dataclass
-from decimal import Decimal
+from decimal import Decimal, localcontext
+from enum import StrEnum
 from fractions import Fraction
 from typing import Any, Generic, Mapping, TypeVar
 
@@ -88,7 +89,7 @@ _LOCATOR_KEYS = (
 )
 
 
-def as_decimal(value: object) -> Decimal:
+def _decimal_from_scalar(value: object) -> Decimal:
     """Exact decimal from int/str/Decimal; floats via their printed form.
 
     Binary floats are not identity keys. ``Decimal(str(x))`` preserves the
@@ -108,6 +109,163 @@ def as_decimal(value: object) -> Decimal:
     if isinstance(value, float):
         return Decimal(str(value))
     raise TypeError(f"cannot convert {type(value)!r} to Decimal")
+
+
+def as_decimal(value: object) -> Decimal:
+    """Exact decimal. An approximate pressure stays a band, not a bare point."""
+
+    if isinstance(value, ApproxPressure):
+        raise ApproxPressureRefusal(
+            "approximate_pressure_not_a_decimal",
+            "an approximate pressure is a band; as_decimal would make equality legal again",
+        )
+    return _decimal_from_scalar(value)
+
+
+# Half-decade edges are computed at this precision so a caller's ambient
+# decimal context cannot move a stored band. The factor is √10 to 50
+# significant figures. A later change of that factor does not move rows
+# already stored: the edges are part of the value.
+_HALF_DECADE_PRECISION = 50
+_APPROXIMATE_PRESSURE_KIND = "approximate_pressure"
+
+
+class BandBasis(StrEnum):
+    """Why the band has the width it has.
+
+    ``printed`` is a structured interval the source stated.
+    ``half_decade_order_of_magnitude`` is the assumption for a "~" or
+    order-of-magnitude point that states no interval. Without the token
+    those two facts are the same number.
+    """
+
+    PRINTED = "printed"
+    HALF_DECADE_ORDER_OF_MAGNITUDE = "half_decade_order_of_magnitude"
+
+
+class ApproxPressureRefusal(ValueError):
+    """A printed pressure that cannot become an identity band."""
+
+    def __init__(self, reason: str, detail: str) -> None:
+        self.reason = reason
+        self.detail = detail
+        super().__init__(f"{reason}: {detail}")
+
+
+@dataclass(frozen=True)
+class ApproxPressure:
+    """Nominal pressure plus the closed band identity compares.
+
+    The type is the approximate flag. There is no ``approximate=False``
+    on this class: a false flag would make ``Decimal ==`` legal again.
+    """
+
+    point: Decimal
+    low: Decimal
+    high: Decimal
+    band_basis: BandBasis
+    kind: str = _APPROXIMATE_PRESSURE_KIND
+
+    def __post_init__(self) -> None:
+        point = _coerce_band_decimal("point", self.point)
+        low = _coerce_band_decimal("low", self.low)
+        high = _coerce_band_decimal("high", self.high)
+        try:
+            basis = (
+                self.band_basis
+                if isinstance(self.band_basis, BandBasis)
+                else BandBasis(self.band_basis)
+            )
+        except ValueError as exc:
+            raise ApproxPressureRefusal(
+                "unknown_band_basis",
+                "band_basis must be printed or half_decade_order_of_magnitude, "
+                f"not {self.band_basis!r}",
+            ) from exc
+        if self.kind != _APPROXIMATE_PRESSURE_KIND:
+            raise ApproxPressureRefusal(
+                "unknown_kind",
+                f"kind must be {_APPROXIMATE_PRESSURE_KIND!r}, not {self.kind!r}",
+            )
+        for name, edge in (("point", point), ("low", low), ("high", high)):
+            if not edge.is_finite():
+                raise ApproxPressureRefusal(
+                    "non_finite_edge",
+                    f"{name} must be a finite decimal",
+                )
+        if low <= 0:
+            raise ApproxPressureRefusal(
+                "non_positive_low",
+                f"low must be positive, not {low}",
+            )
+        if low > high:
+            raise ApproxPressureRefusal(
+                "inverted_band",
+                f"low {low} is above high {high}",
+            )
+        if not low <= point <= high:
+            raise ApproxPressureRefusal(
+                "point_outside_band",
+                f"point {point} is outside [{low}, {high}]",
+            )
+        object.__setattr__(self, "point", point)
+        object.__setattr__(self, "low", low)
+        object.__setattr__(self, "high", high)
+        object.__setattr__(self, "band_basis", basis)
+
+
+def _coerce_band_decimal(name: str, value: object) -> Decimal:
+    try:
+        return _decimal_from_scalar(value)
+    except (TypeError, ValueError, ArithmeticError) as exc:
+        raise ApproxPressureRefusal(
+            "not_a_decimal",
+            f"{name} is not a decimal ({value!r})",
+        ) from exc
+
+
+def _half_decade_edges(point: Decimal) -> tuple[Decimal, Decimal]:
+    with localcontext() as ctx:
+        ctx.prec = _HALF_DECADE_PRECISION
+        factor = Decimal(10).sqrt()
+        return point / factor, point * factor
+
+
+def approximate_pressure_from_printed_point(value: object) -> ApproxPressure:
+    """Half-decade band around an approximate printed point, after unit conversion.
+
+    Bounds and intervals stay bounds and intervals. An exact point stays a
+    decimal. A "~" point states no edges, so the band cannot be rebuilt
+    later from a changed √10 without a regen: the edges are stored.
+    """
+
+    if not isinstance(value, Value):
+        raise ApproxPressureRefusal(
+            "not_a_printed_value",
+            f"expected a Value point, not {type(value)!r}",
+        )
+    if value.kind is not ValueKind.POINT:
+        raise ApproxPressureRefusal(
+            "not_a_point",
+            f"a {value.kind.value} stays a {value.kind.value}; it is not a pressure band",
+        )
+    if not value.approximate:
+        raise ApproxPressureRefusal(
+            "not_approximate",
+            "an exact point stays a decimal identity pressure",
+        )
+    if value.point is None:
+        raise ApproxPressureRefusal(
+            "missing_point",
+            "an approximate point has no pressure",
+        )
+    low, high = _half_decade_edges(value.point)
+    return ApproxPressure(
+        point=value.point,
+        low=low,
+        high=high,
+        band_basis=BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE,
+    )
 
 
 def as_fraction(value: object) -> Fraction:
