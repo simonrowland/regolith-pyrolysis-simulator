@@ -1,0 +1,508 @@
+schema_version: literature_extract.v1
+source_id: gooding-muenow-1977-meteoritics12-401
+source:
+  citation: "Gooding, J. L. & Muenow, D. W. (1977), Experimental vaporization of the Holbrook chondrite, Meteoritics 12(4), 401–408."
+  year: 1977
+  bibcode: 1977Metic..12..401G
+  url: https://ui.adsabs.harvard.edu/abs/1977Metic..12..401G
+  corpus_asset: raw/gooding-muenow-1977-meteoritics12-401/gooding-muenow-1977-meteoritics12-401.pdf
+extraction:
+  method: "Scanned ADS PDF with no usable text layer. All numbers were read from 200 dpi pdftoppm page renders of the eight published pages (401–408). Figure 1 ion-current pyrograms and Figure 2 log P vs 1/T points are figure-only and were not digitized. Cited Holbrook whole-rock values from Mason and Wiik (1961) and comparison vapor pressures from Nesmeyanov (1963) and De Maria et al. (1971) are not stored as this paper's measurements. No antilog conversion of the printed 10^{log10 P} abstract pressures was stored as a linear value."
+  date: '2026-11-12'
+  worker: w1112emp-gm77
+  provenance_path: raw/gooding-muenow-1977-meteoritics12-401/gooding-muenow-1977-meteoritics12-401.pdf
+review_status: draft
+fidelity_samples:
+- path: species.Na.observations[gooding_muenow_1977_na_max_partial_pressure_1200c].values.log10_p_atm
+  value: -5.3
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 401
+    section: Abstract
+    note: "Proof string on published p. 401: 'Maximum observed vapor pressures (atm) of metals are 10^{-5.3 ± 0.3} Na, 10^{-5.8 ± 0.3} K, 10^{-5.3 ± 0.3} Fe, and 10^{-6.6 ± 0.3} Ni at 1200 °C.'"
+- path: species.K.observations[gooding_muenow_1977_k_max_partial_pressure_1200c].values.log10_p_atm
+  value: -5.8
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 401
+    section: Abstract
+    note: "Proof string on published p. 401: '10^{-5.8 ± 0.3} K ... at 1200 °C.'"
+- path: species.Fe.observations[gooding_muenow_1977_fe_max_partial_pressure_1200c].values.log10_p_atm
+  value: -5.3
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 401
+    section: Abstract
+    note: "Proof string on published p. 401: '10^{-5.3 ± 0.3} Fe ... at 1200 °C.'"
+- path: species.Ni.observations[gooding_muenow_1977_ni_max_partial_pressure_1200c].values.log10_p_atm
+  value: -6.6
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 401
+    section: Abstract
+    note: "Proof string on published p. 401: '10^{-6.6 ± 0.3} Ni at 1200 °C.'"
+- path: species.Ca.observations[gooding_muenow_1977_ca_partial_pressure_upper_bound_1200c].values.p_atm_upper_bound
+  value: 5.0e-8
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 402
+    section: Results and Discussion
+    note: "Proof string on published p. 402: 'Partial pressures of Ca, Mg, Si, and Al (as monatomic vapor species) are estimated to be less than 5 × 10^{-8} atm at 1200 °C.'"
+benches:
+- id: gooding-muenow-1977-al2o3-knudsen-qms
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen cell-quadrupole mass spectrometry}
+    locator: &proc
+      page: 2
+      pdf_page_index: 1
+      published_page: 402
+      section: Experimental Procedure
+      note: "Proof string: 'Knudsen cell-quadrupole mass spectrometry' also appears in the abstract (p. 401). Procedure sentence: 'Individual aliquots of 100-300 mg were heated in a Knudsen cell (lined with high-purity Al2O3) under high vacuum (≤ 5 × 10^{-8} torr) at 2-5 °C/min to 1300 °C as the vapor phase was continuously monitored with a quadrupole mass spectrometer.'"
+  cell_material_and_liner:
+    state: {tag: value, value: Knudsen cell lined with high-purity Al2O3}
+    locator: *proc
+  detector:
+    state: {tag: value, value: quadrupole mass spectrometer; short, direct molecular beam path between the Knudsen cell orifice and the mass filter}
+    locator: *proc
+  pumping_type:
+    state: {tag: unknown, reason: not_published}
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 402
+      section: Experimental Procedure
+      note: "A high-vacuum limit is given; the pump type is not stated."
+experiments:
+- experiment_id: gooding-muenow-1977-holbrook-nmnh-569
+  bench_id: gooding-muenow-1977-al2o3-knudsen-qms
+  method: knudsen_effusion
+  locator: *proc
+  sample:
+    sample_id: NMNH-569
+    printed_identity:
+      state: {tag: value, value: "Holbrook, an L6 chondrite; Smithsonian Institution sample no. NMNH-569, freshly-exposed interior of a 24 g stone"}
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 402
+        section: Experimental Procedure
+        note: "Proof strings: 'freshly-exposed interior of a 24 g stone (Smithsonian Institution sample no. NMNH-569)'; Holbrook identified as an L6 chondrite on published p. 401 citing Van Schmus and Wood (1967)."
+    mass_kg:
+      state: {tag: unknown, reason: "Aliquot masses are given only as the range 100-300 mg; no single aliquot mass is printed."}
+      locator: *proc
+    form:
+      state: {tag: value, value: "Individual aliquots of 100-300 mg from the freshly-exposed interior; inspected for freedom from contamination by terrestrial alteration and fusion crust"}
+      locator: *proc
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: "The heating program is a 2-5 °C/min ramp from ambient to 1300 °C, not a single setpoint."}
+      locator: *proc
+    heating_rate_C_per_min:
+      state: {tag: value, value: "2-5"}
+      units: °C/min
+      locator: *proc
+    peak_T_C:
+      state: {tag: value, value: '1300'}
+      units: °C
+      locator: *proc
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: "Only an upper bound on the vacuum is printed (≤ 5 × 10^{-8} torr); a single point pressure is not printed."}
+      locator: *proc
+    vacuum_torr_upper_bound_as_printed:
+      state: {tag: value, value: "≤ 5 × 10^{-8} torr"}
+      locator: *proc
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: High vacuum is described; no sweep or carrier gas is printed, and SweepGas is not used for a free-text vacuum label.
+      locator: *proc
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The paper describes Knudsen-cell effusion but does not print a RegimeClass token.
+      locator: *proc
+species:
+  Na:
+    observations:
+    - observation_id: gooding_muenow_1977_na_max_partial_pressure_1200c
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      type: partial_pressure
+      locator: &abs401
+        page: 1
+        pdf_page_index: 0
+        published_page: 401
+        section: Abstract
+        note: "Proof string: 'Maximum observed vapor pressures (atm) of metals are 10^{-5.3 ± 0.3} Na, 10^{-5.8 ± 0.3} K, 10^{-5.3 ± 0.3} Fe, and 10^{-6.6 ± 0.3} Ni at 1200 °C.' The same species are shown as monatomic vapor in Fig. 2 (published p. 404); those figure points were not digitized."
+      phase: gas
+      T_C: 1200.0
+      T_K: 1473.15
+      units: log10(atm) as printed
+      regime: kems_effusion
+      uncertainty:
+        confidence_level: not_stated
+        log10_p_atm: 0.3
+        note: "Printed as ± 0.3 on the exponent in the abstract. Fig. 2 caption (published p. 404) states 'Individual data points are uncertain by ± 0.3 units on the log P scale.'"
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        T_C: 1200
+        T_K: 1473.15
+        T_conversion_note: "T_K = 1200 + 273.15."
+        meaning_as_printed: maximum observed vapor pressure at 1200 °C
+        value_as_printed: "10^{-5.3 ± 0.3}"
+        log10_p_atm: -5.3
+        p_unit_as_printed: atm
+        species_form_as_printed: monatomic Na
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1473.15'}
+          locator: *abs401
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "Only the high-vacuum upper bound ≤ 5 × 10^{-8} torr is printed."}
+          locator: *proc
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *abs401
+    context:
+    - observation_id: gooding_muenow_1977_na_k_vapor_ratio_prose
+      type: typed_context
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 405
+        figure: '1b'
+        note: "Proof string: 'the Na/K ratio in the high-temperature vapor phase was significantly greater than 5 between 1000 °C and 1250 °C and significantly less than 5 at temperatures greater than 1250 °C (Fig. 1b).' The whole-rock Na/K atomic ratio of approximately 5 is attributed to Mason and Wiik (1961) and is not stored as this paper's measurement."
+      units: as printed
+      values:
+        method_class: method_only
+        quantity_as_printed: Na/K ratio in the high-temperature vapor phase
+        comparison_value_as_printed: 5
+        vapor_Na_over_K_1000_to_1250_C_as_printed: significantly greater than 5
+        vapor_Na_over_K_above_1250_C_as_printed: significantly less than 5
+        figure_only_source: Fig. 1b; ratio values were not tabulated and the pyrogram was not digitized
+  K:
+    observations:
+    - observation_id: gooding_muenow_1977_k_max_partial_pressure_1200c
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      type: partial_pressure
+      locator: *abs401
+      phase: gas
+      T_C: 1200.0
+      T_K: 1473.15
+      units: log10(atm) as printed
+      regime: kems_effusion
+      uncertainty:
+        confidence_level: not_stated
+        log10_p_atm: 0.3
+        note: "Printed as ± 0.3 on the exponent in the abstract. Fig. 2 caption (published p. 404) states 'Individual data points are uncertain by ± 0.3 units on the log P scale.'"
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        T_C: 1200
+        T_K: 1473.15
+        T_conversion_note: "T_K = 1200 + 273.15."
+        meaning_as_printed: maximum observed vapor pressure at 1200 °C
+        value_as_printed: "10^{-5.8 ± 0.3}"
+        log10_p_atm: -5.8
+        p_unit_as_printed: atm
+        species_form_as_printed: monatomic K
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1473.15'}
+          locator: *abs401
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "Only the high-vacuum upper bound ≤ 5 × 10^{-8} torr is printed."}
+          locator: *proc
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *abs401
+  Fe:
+    observations:
+    - observation_id: gooding_muenow_1977_fe_max_partial_pressure_1200c
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      type: partial_pressure
+      locator: *abs401
+      phase: gas
+      T_C: 1200.0
+      T_K: 1473.15
+      units: log10(atm) as printed
+      regime: kems_effusion
+      uncertainty:
+        confidence_level: not_stated
+        log10_p_atm: 0.3
+        note: "Printed as ± 0.3 on the exponent in the abstract. Fig. 2 caption (published p. 404) states 'Individual data points are uncertain by ± 0.3 units on the log P scale.'"
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        T_C: 1200
+        T_K: 1473.15
+        T_conversion_note: "T_K = 1200 + 273.15."
+        meaning_as_printed: maximum observed vapor pressure at 1200 °C
+        value_as_printed: "10^{-5.3 ± 0.3}"
+        log10_p_atm: -5.3
+        p_unit_as_printed: atm
+        species_form_as_printed: monatomic Fe
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1473.15'}
+          locator: *abs401
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "Only the high-vacuum upper bound ≤ 5 × 10^{-8} torr is printed."}
+          locator: *proc
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *abs401
+    context:
+    - observation_id: gooding_muenow_1977_fe_ni_vapor_ratio_prose
+      type: typed_context
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 406
+        figure: '1b'
+        note: "Proof string: 'the Fe/Ni ratio in the vapor phase varied from approximately 15 at 1100 °C to 30 at 1300 °C, being 19 at about 1160 °C (Fig. 1b).' The whole-rock Fe/Ni atomic ratio of approximately 19 is attributed to Mason and Wiik (1961) and is not stored as this paper's measurement."
+      units: as printed
+      values:
+        method_class: method_only
+        quantity_as_printed: Fe/Ni ratio in the vapor phase
+        Fe_over_Ni_at_1100_C_as_printed: approximately 15
+        Fe_over_Ni_at_about_1160_C_as_printed: 19
+        Fe_over_Ni_at_1300_C_as_printed: 30
+        figure_only_source: Fig. 1b; the pyrogram was not digitized
+    - observation_id: gooding_muenow_1977_fe_ni_low_t_upper_bound_prose
+      type: typed_context
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 406
+        section: Results and Discussion
+        note: "Proof string: 'the vapor pressures of Fe and Ni are very low (< 10^{-10} atm) at these temperatures' where 'these temperatures' are the 400-820 °C range cited from Wood (1967) and Dodd (1969) for in situ Fe-Ni migration. This is the authors' statement about their own vapor-pressure curves at those temperatures, not a tabulated point."
+      units: atm
+      values:
+        method_class: method_only
+        T_C_range_as_printed: 400-820
+        p_atm_as_printed: "< 10^{-10}"
+        species_as_printed: Fe and Ni
+  Ni:
+    observations:
+    - observation_id: gooding_muenow_1977_ni_max_partial_pressure_1200c
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      type: partial_pressure
+      locator: *abs401
+      phase: gas
+      T_C: 1200.0
+      T_K: 1473.15
+      units: log10(atm) as printed
+      regime: kems_effusion
+      uncertainty:
+        confidence_level: not_stated
+        log10_p_atm: 0.3
+        note: "Printed as ± 0.3 on the exponent in the abstract. Fig. 2 caption (published p. 404) states 'Individual data points are uncertain by ± 0.3 units on the log P scale.'"
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        T_C: 1200
+        T_K: 1473.15
+        T_conversion_note: "T_K = 1200 + 273.15."
+        meaning_as_printed: maximum observed vapor pressure at 1200 °C
+        value_as_printed: "10^{-6.6 ± 0.3}"
+        log10_p_atm: -6.6
+        p_unit_as_printed: atm
+        species_form_as_printed: monatomic Ni
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1473.15'}
+          locator: *abs401
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "Only the high-vacuum upper bound ≤ 5 × 10^{-8} torr is printed."}
+          locator: *proc
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *abs401
+  Ca:
+    observations:
+    - observation_id: gooding_muenow_1977_ca_partial_pressure_upper_bound_1200c
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      type: partial_pressure
+      locator: &bound402
+        page: 2
+        pdf_page_index: 1
+        published_page: 402
+        section: Results and Discussion
+        note: "Proof string: 'Partial pressures of Ca, Mg, Si, and Al (as monatomic vapor species) are estimated to be less than 5 × 10^{-8} atm at 1200 °C.'"
+      phase: gas
+      T_C: 1200.0
+      T_K: 1473.15
+      units: atm
+      regime: kems_effusion
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        admission_status: bound_not_point
+        T_C: 1200
+        T_K: 1473.15
+        T_conversion_note: "T_K = 1200 + 273.15."
+        value_as_printed: "less than 5 × 10^{-8} atm"
+        p_atm_upper_bound: 5.0e-8
+        semantics: upper_bound_not_point
+        species_form_as_printed: monatomic Ca
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1473.15'}
+          locator: *bound402
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "Only the high-vacuum upper bound ≤ 5 × 10^{-8} torr is printed."}
+          locator: *proc
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *bound402
+  Mg:
+    observations:
+    - observation_id: gooding_muenow_1977_mg_partial_pressure_upper_bound_1200c
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      type: partial_pressure
+      locator: *bound402
+      phase: gas
+      T_C: 1200.0
+      T_K: 1473.15
+      units: atm
+      regime: kems_effusion
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        admission_status: bound_not_point
+        T_C: 1200
+        T_K: 1473.15
+        T_conversion_note: "T_K = 1200 + 273.15."
+        value_as_printed: "less than 5 × 10^{-8} atm"
+        p_atm_upper_bound: 5.0e-8
+        semantics: upper_bound_not_point
+        species_form_as_printed: monatomic Mg
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1473.15'}
+          locator: *bound402
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "Only the high-vacuum upper bound ≤ 5 × 10^{-8} torr is printed."}
+          locator: *proc
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *bound402
+  Si:
+    observations:
+    - observation_id: gooding_muenow_1977_si_partial_pressure_upper_bound_1200c
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      type: partial_pressure
+      locator: *bound402
+      phase: gas
+      T_C: 1200.0
+      T_K: 1473.15
+      units: atm
+      regime: kems_effusion
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        admission_status: bound_not_point
+        T_C: 1200
+        T_K: 1473.15
+        T_conversion_note: "T_K = 1200 + 273.15."
+        value_as_printed: "less than 5 × 10^{-8} atm"
+        p_atm_upper_bound: 5.0e-8
+        semantics: upper_bound_not_point
+        species_form_as_printed: monatomic Si
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1473.15'}
+          locator: *bound402
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "Only the high-vacuum upper bound ≤ 5 × 10^{-8} torr is printed."}
+          locator: *proc
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *bound402
+  Al:
+    observations:
+    - observation_id: gooding_muenow_1977_al_partial_pressure_upper_bound_1200c
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      type: partial_pressure
+      locator: *bound402
+      phase: gas
+      T_C: 1200.0
+      T_K: 1473.15
+      units: atm
+      regime: kems_effusion
+      values:
+        quantity: partial_pressure
+        method_class: measured_tabulated
+        admission_status: bound_not_point
+        T_C: 1200
+        T_K: 1473.15
+        T_conversion_note: "T_K = 1200 + 273.15."
+        value_as_printed: "less than 5 × 10^{-8} atm"
+        p_atm_upper_bound: 5.0e-8
+        semantics: upper_bound_not_point
+        species_form_as_printed: monatomic Al
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1473.15'}
+          locator: *bound402
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "Only the high-vacuum upper bound ≤ 5 × 10^{-8} torr is printed."}
+          locator: *proc
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: *bound402
+  H2O:
+    observations: []
+    context:
+    - observation_id: gooding_muenow_1977_h2o_co2_low_t_volume_fractions
+      type: typed_context
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 402
+        figure: '1a'
+        section: Results and Discussion
+        note: "Proof string: 'Below 800 °C, no metal was observed in the Holbrook vapor phase which consisted of approximately 60% (by volume) H2O and 40% CO2 over the 50-500 °C range and approximately equal volumes of H2O and CO2 from 500 °C to 1300 °C (Fig. 1a).' Fig. 1 curves were not digitized."
+      units: volume percent as printed
+      values:
+        method_class: method_only
+        T_C_range_50_to_500:
+          H2O_volume_pct_as_printed: approximately 60
+          CO2_volume_pct_as_printed: 40
+        T_C_range_500_to_1300:
+          H2O_and_CO2_as_printed: approximately equal volumes
+        metal_appearance_T_C_as_printed: "Above 800 °C, metal vapor began to appear"
+        minor_species_as_printed: "Minor amounts (< 5% total) of Ar, He, and CO or N2 (observed as m/e = 28 in the mass spectra); traces of C6-C7 hydrocarbons at 250-400 °C"
+        sulfur_gases_as_printed: "Above 800 °C ... sulfur gases (principally S2 with minor SO2) and increased in absolute abundance to the termination of measurements at 1300 °C (Fig. 1b)"
+        figure_only: Fig. 1a and 1b ion-current pyrograms were not digitized
+  S2:
+    observations: []
+    context:
+    - observation_id: gooding_muenow_1977_vesicle_and_residue_texture
+      type: typed_context
+      experiment: gooding-muenow-1977-holbrook-nmnh-569
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 406
+        section: Results and Discussion
+        note: "Proof strings: 'Heating to 1200 °C partially melted the Holbrook samples'; 'post-heating residues were characterized by vesicle contents as great as 30-40% by volume. Typical irregular vugs were as large as 2 mm in size although most were smaller than 1 mm.'"
+      units: as printed
+      values:
+        method_class: method_only
+        peak_heating_T_C_as_printed: 1200
+        residue_texture_as_printed: partially melted; heat-induced outward spreading of metal and/or metal sulfides
+        vesicle_content_volume_pct_as_printed: as great as 30-40
+        vug_size_as_printed: as large as 2 mm; most smaller than 1 mm
