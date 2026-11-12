@@ -124,20 +124,28 @@ An equipment pin does not contribute.
 A bare integer bracket such as `observations[0]` is a list position, not
 an id, so it does not contribute. Structured samples address `values`
 only; a condition is pinned by a path.
-Matching pins still detect later extraction drift; a mismatch does not cover
-and blocks certification. Certification opens the locator's text artifact
-(`source_path`, `quotes_path`, or a `record` that is a corpus-relative file
-under `raw/`, `corpus/`, `text/`, `tables/`, or `supporting/`). Set
-`REGOLITH_CORPUS_ROOT` to the mounted offline corpus directory (for example,
-`~/Repos/regolith-corpus`) so those paths resolve there. An unset root refuses
-with `corpus_root_unset`; a missing file refuses with
-`corpus_artifact_missing`, and a path outside the mount refuses with
-`corpus_path_outside_root`. Each corpus-resolved locator must include
-`source_sha256`, the lowercase 64-character SHA-256 of the exact bytes opened.
-A missing digest refuses with `artifact_digest_missing`; a mismatch refuses
-with `artifact_digest_mismatch`. Only a matching digest and a present token
-cover the pin. Files under
-`docs/references/` remain repository-relative and do not require a digest.
+Address coverage is based on the pin's observation and address, separately
+from source fidelity. A pin can cover its addressed observation while its
+source is missing or does not contain the value; that condition raises
+`source_blind_pin` and still blocks certification.
+
+Certification opens every declared locator artifact (`source_path`,
+`quotes_path`, and file-valued `record`) independently. For any allowed source
+prefix, it first looks for the path under the repository artifact root (the
+simulator checkout or an explicit `--root`); an existing repository artifact
+is opened there, with `source_sha256` optional but verified when supplied. If
+it is absent there, the path resolves under the offline corpus mount set by
+`REGOLITH_CORPUS_ROOT` (for example, `~/Repos/regolith-corpus`). The root is a
+lookup location, not a policy switch. An unset root refuses with
+`corpus_root_unset`; a missing file refuses with `corpus_artifact_missing`,
+and a path outside the mount refuses with `corpus_path_outside_root`. Each
+corpus-resolved locator must include `source_sha256`, the lowercase
+64-character SHA-256 of the exact bytes opened. A missing digest refuses with
+`artifact_digest_missing`; a mismatch refuses with
+`artifact_digest_mismatch`. Source fidelity passes only when the opened
+artifact's digest requirements are met and it contains the pinned value.
+Repository files under `raw/`, `corpus/`, `text/`, `tables/`,
+`supporting/`, and `docs/references/` use this same repository-first lookup.
 The extract document and program source are not source artifacts, including
 a copy parked on a source root.
 A numeric pin matches only a complete token: the sign and the exponent

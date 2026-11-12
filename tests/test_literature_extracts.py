@@ -5458,14 +5458,43 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         "record": "text/record.txt annotation",
     }
 
+    def artifact_text(token: str) -> str:
+        return f"line 1\nline 2\nline 3\nline 4\nalpha {token} measured\n"
+
     def write_artifact(root: Path, path: str, token: str) -> Path:
         artifact = root / path
         artifact.parent.mkdir(parents=True, exist_ok=True)
-        artifact.write_text(
-            f"line 1\nline 2\nline 3\nline 4\nalpha {token} measured\n",
-            encoding="utf-8",
-        )
+        artifact.write_text(artifact_text(token), encoding="utf-8")
         return artifact
+
+    # These are locator-wide settings. Give every declared key a unique path
+    # and derive its effective result from that artifact plus the shared digest.
+    needs_corpus_artifact = any(
+        outcome
+        in {
+            "artifact_digest_missing",
+            "artifact_digest_mismatch",
+            "digest_valid_token_absent",
+            "record_alternate_open",
+        }
+        for outcome in outcomes
+    )
+    if not needs_corpus_artifact or "artifact_digest_missing" in outcomes:
+        digest_token = None
+    elif (
+        "first_open_token_absent" in outcomes
+        or "token_absent" in outcomes
+        or "digest_valid_token_absent" in outcomes
+    ):
+        digest_token = "0.25"
+    elif any(
+        outcome in {"matched", "record_alternate_open"} for outcome in outcomes
+    ):
+        digest_token = "0.24"
+    elif "artifact_digest_mismatch" in outcomes:
+        digest_token = "0.24"
+    else:
+        digest_token = None
 
     for key, outcome in zip(declared_keys, outcomes):
         relative = relative_paths[key]
@@ -5479,10 +5508,13 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
             write_artifact(repository_root, path, "0.24")
         elif outcome == "token_absent":
             write_artifact(repository_root, path, "0.25")
-        elif outcome in {"artifact_digest_missing", "artifact_digest_mismatch"}:
+        elif outcome == "artifact_digest_missing":
             write_artifact(corpus_root, path, "0.25")
         elif outcome == "digest_valid_token_absent":
             write_artifact(corpus_root, path, "0.25")
+        elif outcome == "artifact_digest_mismatch":
+            mismatch_token = "0.25" if digest_token == "0.24" else "0.24"
+            write_artifact(corpus_root, path, mismatch_token)
         elif outcome == "corpus_root_unset":
             pass
         elif outcome == "corpus_artifact_missing":
@@ -5510,38 +5542,81 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
     else:
         monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
-    if "artifact_digest_mismatch" in outcomes:
-        reference_artifact = next(
-            (
-                repository_root / relative_paths[key]
-                for key, outcome in zip(declared_keys, outcomes)
-                if outcome == "matched"
-            ),
-            None,
-        )
-        if reference_artifact is None and "record_alternate_open" in outcomes:
-            reference_artifact = corpus_root / relative_paths["record"].split()[0]
-        locator["source_sha256"] = (
-            hashlib.sha256(reference_artifact.read_bytes()).hexdigest()
-            if reference_artifact is not None
-            else "0" * 64
-        )
-    elif "digest_valid_token_absent" in outcomes:
-        key = next(
-            key
-            for key, outcome in zip(declared_keys, outcomes)
-            if outcome == "digest_valid_token_absent"
-        )
+    if digest_token is not None:
         locator["source_sha256"] = hashlib.sha256(
-            (corpus_root / relative_paths[key]).read_bytes()
-        ).hexdigest()
-    elif "record_alternate_open" in outcomes:
-        locator["source_sha256"] = hashlib.sha256(
-            (corpus_root / relative_paths["record"].split()[0]).read_bytes()
+            artifact_text(digest_token).encode("utf-8")
         ).hexdigest()
 
-    # Independent oracle: each key must open a matching artifact. A record
-    # filename alternate is valid only when the full record path did not open.
+    # Independent oracle: evaluate every key from its own fixture files, then
+    # apply the locator-wide corpus root and digest. It deliberately does not
+    # call the production resolver. A record alternate is only tried if the
+    # full candidate did not open.
+    def oracle_open(raw: str):
+        repo_root = repository_root.resolve()
+        repo_path = (repo_root / Path(raw)).resolve()
+        if not repo_path.is_relative_to(repo_root):
+            return None, None, "corpus_path_outside_root"
+        if repo_path.suffix.lower() in {".py", ".pyi"}:
+            return None, None, "artifact_not_source"
+        if repo_path.is_file():
+            opened_path = repo_path
+            from_corpus = False
+        else:
+            configured_root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
+            if not configured_root:
+                return None, None, "corpus_root_unset"
+            corpus_root_resolved = Path(configured_root).expanduser().resolve()
+            opened_path = (
+                corpus_root_resolved / repo_path.relative_to(repo_root)
+            ).resolve()
+            if not opened_path.is_relative_to(corpus_root_resolved):
+                return None, None, "corpus_path_outside_root"
+            if opened_path.suffix.lower() in {".py", ".pyi"}:
+                return None, None, "artifact_not_source"
+            from_corpus = True
+        if not opened_path.is_file():
+            reason = "corpus_artifact_missing" if from_corpus else "artifact_missing"
+            return None, None, reason
+        blob = opened_path.read_bytes()
+        actual_digest = hashlib.sha256(blob).hexdigest()
+        expected_digest = locator.get("source_sha256")
+        if from_corpus and expected_digest is None:
+            return opened_path, blob, "artifact_digest_missing"
+        if expected_digest is not None and actual_digest != expected_digest:
+            return opened_path, blob, "artifact_digest_mismatch"
+        return opened_path, blob, None
+
+    expected_key_reasons = []
+    for key in declared_keys:
+        raw = locator[key].strip()
+        candidates = [raw]
+        if key == "record":
+            filename = raw.split()[0]
+            if filename != raw:
+                candidates.append(filename)
+        candidate_reasons = []
+        key_matched = False
+        for candidate in candidates:
+            opened_path, blob, refusal = oracle_open(candidate)
+            if refusal:
+                candidate_reasons.append(
+                    f"locator was not opened: {refusal} ({candidate})"
+                )
+                if opened_path is not None and blob is not None:
+                    break
+                continue
+            cited_line = blob.decode("utf-8").splitlines()[4:5]
+            if "0.24" not in "\n".join(cited_line):
+                candidate_reasons.append(
+                    f"opened {opened_path.name} but the resolved extract value is "
+                    "not in the cited text ('0.24', '0.24')"
+                )
+                break
+            key_matched = True
+            break
+        if not key_matched:
+            expected_key_reasons.extend(candidate_reasons)
+
     warnings = vle.fidelity_source_warnings(
         doc, label="locator-key-matrix", artifact_root=repository_root
     )
@@ -5550,6 +5625,13 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         None,
     )
     assert (source_blind.kind if source_blind else None) == expected_source_blind_reason
+    expected_detail = (
+        "locator-key-matrix:fidelity_samples[0]: locator source-blind: "
+        + "; ".join(expected_key_reasons)
+        if expected_key_reasons
+        else None
+    )
+    assert (source_blind.detail if source_blind else None) == expected_detail
 
     baseline = _uncovered_observation_count(
         {**doc, "fidelity_samples": []}, artifact_root=repository_root
