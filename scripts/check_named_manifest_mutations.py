@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -121,11 +122,19 @@ def _write(case: ManifestCase, payload: Any, entries: list[dict[str, Any]]) -> N
     )
 
 
-def _run_test(case: ManifestCase, identity: str, mutation: str) -> bool:
+def _run_test(
+    case: ManifestCase,
+    identity: str,
+    mutation: str,
+    *,
+    env: dict[str, str] | None = None,
+) -> bool:
+    test_env = None if env is None else {**os.environ, **env}
     try:
         result = subprocess.run(
             [sys.executable, "-m", "pytest", "-q", case.test_nodeid],
             cwd=ROOT,
+            env=test_env,
             capture_output=True,
             text=True,
             timeout=600,
@@ -199,8 +208,64 @@ def _check_case(case: ManifestCase) -> bool:
     return ok
 
 
+def _check_janaf_raw_file_mutations() -> bool:
+    """Exercise the raw JANAF file mismatch before the index path assertions."""
+    corpus_root = Path(
+        os.environ.get("REGOLITH_CORPUS_ROOT", Path.home() / "Repos/regolith-corpus")
+    )
+    source_dir = corpus_root / "raw" / "janaf-nist-txt"
+    if not source_dir.is_dir():
+        print(f"FAIL JANAF raw files: source directory not found: {source_dir}")
+        return False
+
+    source_files = sorted(source_dir.glob("*.txt"))
+    if not source_files:
+        print(f"FAIL JANAF raw files: no .txt files in {source_dir}")
+        return False
+
+    case = ManifestCase(
+        "JANAF raw file paths",
+        source_dir,
+        "yaml",
+        "table_id",
+        "tests/test_literature_index.py::test_nist_janaf_index_asset_is_the_corpus_txt_download",
+    )
+    ok = True
+    with tempfile.TemporaryDirectory(prefix="janaf-raw-file-mutation-") as scratch:
+        temp_corpus = Path(scratch) / "corpus"
+        temp_dir = temp_corpus / "raw" / "janaf-nist-txt"
+        temp_dir.parent.mkdir(parents=True)
+        shutil.copytree(source_dir, temp_dir)
+        env = {"REGOLITH_CORPUS_ROOT": str(temp_corpus)}
+
+        removed_path = temp_dir / source_files[0].name
+        removed_bytes = removed_path.read_bytes()
+        try:
+            removed_path.unlink()
+            ok &= _run_test(case, removed_path.stem, "remove raw file", env=env)
+        finally:
+            removed_path.write_bytes(removed_bytes)
+
+        fake_stem = "__mutation_added_row__"
+        fake_path = temp_dir / f"{fake_stem}.txt"
+        suffix = 1
+        while fake_path.exists():
+            fake_stem = f"__mutation_added_row_{suffix}__"
+            fake_path = temp_dir / f"{fake_stem}.txt"
+            suffix += 1
+        try:
+            fake_path.write_text("named-manifest mutation probe\n", encoding="utf-8")
+            ok &= _run_test(case, fake_stem, "add raw file", env=env)
+        finally:
+            fake_path.unlink(missing_ok=True)
+
+    print(f"{'PASS' if ok else 'FAIL'} JANAF raw file paths")
+    return ok
+
+
 def main() -> int:
     results = [_check_case(case) for case in CASES]
+    results.append(_check_janaf_raw_file_mutations())
     return 0 if all(results) else 1
 
 
