@@ -157,6 +157,20 @@ def test_kems_delta_iw_is_a_printed_buffer_reference_not_an_ideal_ratio() -> Non
     assert "no cited buffer calibration" in without_calibration.state.reason
 
 
+def test_unresolved_year_citation_does_not_suppress_unknown_buffer_refusal() -> None:
+    decision = _decision(
+        {
+            "delta_IW": "+1.0",
+            "oxygen_buffer_as_published": "Myers and Eugster, 1983",
+        }
+    )
+
+    assert decision is not None and decision.state.is_unknown
+    assert "conflicting offsets" in decision.state.reason
+    assert "missing input; no fO2_Pa assigned" in decision.state.reason
+    assert "oneill_1988" not in decision.state.reason
+
+
 def test_mavrogenes_activity_correction_names_the_holzheid_gamma_model() -> None:
     decision = _decision(
         {"log_fO2_as_delta_IW": "-1.56"},

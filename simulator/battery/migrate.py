@@ -21191,12 +21191,28 @@ def _buffer_request_from_row(
         if isinstance(raw_buffer, str) and raw_buffer.strip():
             oxygen_text.append(raw_buffer.strip())
             family, offset, printed, is_prose = _classify_buffer_phrase(raw_buffer.strip())
+            calibration = _printed_buffer_calibration(
+                mapping, raw_buffer, point_conditions
+            )
+            relative = _printed_relative_oxygen(
+                raw_item, point_conditions, None
+            )
+            calibration_resolves = (
+                temperature_K is not None
+                and temperature_K.is_finite()
+                and temperature_K > 0
+                and relative is not None
+                and relative[0] != "ambiguous"
+                and _relative_buffer_calibration(
+                    relative[0], float(temperature_K), 1.0, calibration
+                ) is not None
+            )
             if (
                 not family
                 and not is_prose
                 and offset is None
                 and not _BUFFER_TOKEN_RE.search(raw_buffer)
-                and _printed_buffer_calibration(mapping, raw_buffer) is None
+                and not calibration_resolves
             ):
                 unknown.append(raw_buffer.strip())
             elif is_prose:
