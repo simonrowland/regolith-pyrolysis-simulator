@@ -15,6 +15,7 @@ from simulator.feedstock_composition import (
 from simulator.oxygen_buffers import (
     FE_FEO_BUFFER_STANDARD,
     Kress91InvalidControls,
+    delta_iw_log10,
     feo_iw_log10_fO2_bar,
     legacy_iw_log10_fO2_bar,
 )
@@ -1188,7 +1189,7 @@ def _calphad_feo_activity_components(
         else None
     )
     pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
-    delta_iw_pure_feo = float(fO2_log) - pure_feo_iw
+    delta_iw_pure_feo = delta_iw_log10(float(fO2_log), pure_feo_iw)
     calphad_weight = _calphad_authority_weight(delta_iw_pure_feo)
     kress91_weight = 1.0 - calphad_weight
     authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity

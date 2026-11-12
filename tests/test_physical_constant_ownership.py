@@ -110,6 +110,14 @@ def test_knudsen_relative_weight_bits() -> None:
     assert counted.hex() == "0x1.1552ff5ce3623p-9"
 
 
+def test_delta_iw_subtraction_bits() -> None:
+    """ΔIW is the caller's log10 difference. The Decimal hero path is not this."""
+
+    from simulator.oxygen_buffers import delta_iw_log10
+
+    assert delta_iw_log10(-10.0, -12.5).hex() == "0x1.4000000000000p+1"
+
+
 def test_vant_hoff_antoine_and_clausius_bits() -> None:
     """Pin the carrier-tool van't Hoff expressions before they move."""
 
