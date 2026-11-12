@@ -7942,7 +7942,7 @@ def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
         },
         "execution": {
             "state": "unsupported",
-            "call_evidence": "equilibrate_cell:magemin:host=Mac-Studio-256-2:exit=None",
+            "call_evidence": "equilibrate_cell:magemin:exit=None",
         },
         "refusal": {
             "reason": RefusalReason.UNSUPPORTED.value,
@@ -7969,7 +7969,7 @@ def test_magemin_melt_activity_call_stays_observable() -> None:
         "candidate_request": {"engine": Engine.MAGEMIN.value},
         "execution": {
             "state": "unsupported",
-            "call_evidence": "equilibrate_cell:magemin:host=test:exit=None",
+            "call_evidence": "equilibrate_cell:magemin:exit=None",
         },
         "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
     }
@@ -9693,6 +9693,11 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
     from simulator.battery import residue, score
 
     context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    monkeypatch.setattr(
+        score.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
     references = sorted(
         (
             observation
@@ -9778,6 +9783,8 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         second_prediction = score._hashimoto_residue_prediction(context, second, engine, cache)
         assert first_prediction.execution.state is ExecutionState.PRODUCED, first_prediction.refusal_detail
         assert second_prediction.execution.state is ExecutionState.PRODUCED
+        assert first_prediction.version is None
+        assert "code_revision" not in first_prediction.refusal_detail
         assert first_prediction.value != second_prediction.value
         assert first_prediction.refusal_detail["experiment_id"] == first.experiment_id
         assert first_prediction.refusal_detail["consumed_row"]["observation_id"] == first.observation_id
@@ -16147,7 +16154,7 @@ def test_magemin_nonfinite_native_activity_is_one_typed_unavailable_prediction(
     assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
     assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
     assert prediction.refusal_detail["reason"] == "engine_not_converged"
-    assert prediction.refusal_detail["elapsed_s"] >= 0.0
+    assert "elapsed_s" not in prediction.refusal_detail
     notice = next(
         item for item in prediction.notices
         if item.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
