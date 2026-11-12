@@ -13,32 +13,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from simulator.battery.migrate import (
-    iter_observation_store_paths,
-    iter_work_store_paths,
-)
+from simulator.battery.migrate import _iter_score_loaded_yaml_paths
 from simulator.yaml_cache import (
     YAML12SafeLoader,
     _assert_type_exact_equal,
     load_cached_safe_yaml,
 )
-
-
-def _store_yaml_paths(root: Path) -> tuple[Path, ...]:
-    literature = root / "data" / "literature"
-    works = literature / "works"
-    paths = [
-        path for path in iter_work_store_paths(works) if path.name != "ALIASES.yaml"
-    ]
-    for directory in (
-        literature / "extracts-v2",
-        literature / "observations-v2",
-    ):
-        paths.extend(iter_observation_store_paths(directory))
-    legacy_extracts = literature / "extracts"
-    if legacy_extracts.is_dir():
-        paths.extend(sorted(legacy_extracts.glob("*.yaml")))
-    return tuple(sorted(set(paths)))
 
 
 def _check_store(root: Path) -> int:
@@ -49,7 +29,7 @@ def _check_store(root: Path) -> int:
         print("YAML12SafeLoader is not using CSafeLoader", file=sys.stderr)
         return 2
 
-    paths = _store_yaml_paths(root)
+    paths = _iter_score_loaded_yaml_paths(root)
     if not paths:
         print(
             f"no store YAML files found under {root / 'data/literature'}",
