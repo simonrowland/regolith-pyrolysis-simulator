@@ -11766,6 +11766,10 @@ def _cached_hashimoto_cohort(
     with no field drops the cohort so the caller recomputes it. Only
     ``selected_keys`` are re-registered. The other experiments stay in the
     cohort and do not join this prediction.
+
+    Every selected arm is checked before any of them is registered. A valid
+    primary arm must not publish its count when the production arm is
+    unreadable: the caller recomputes both, and the early count would remain.
     """
 
     cohort = cache.get(cache_key)
@@ -11773,7 +11777,10 @@ def _cached_hashimoto_cohort(
         return None
     if "__cohort_error__" in cohort:
         return cohort
-    from simulator.vapour_rail.run_disclosure import accept_stored_memo
+    from simulator.vapour_rail.run_disclosure import (
+        accept_stored_memo,
+        stored_disclosures_known,
+    )
 
     for row in cohort.values():
         provenance = getattr(row, "provenance", None)
@@ -11783,10 +11790,18 @@ def _cached_hashimoto_cohort(
     if not selected_keys:
         cache.pop(cache_key, None)
         return None
+    selected_provenances: list[Mapping[str, object]] = []
     for key in selected_keys:
         row = cohort.get(key)
         provenance = getattr(row, "provenance", None)
-        if row is None or accept_stored_memo(provenance) is None:
+        if not stored_disclosures_known(
+            provenance if isinstance(provenance, Mapping) else None
+        ):
+            cache.pop(cache_key, None)
+            return None
+        selected_provenances.append(provenance)
+    for provenance in selected_provenances:
+        if accept_stored_memo(provenance) is None:
             cache.pop(cache_key, None)
             return None
     return cohort

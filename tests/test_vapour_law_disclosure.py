@@ -35,7 +35,7 @@ that run's registry via ``owning_run_disclosures``. ``published_run_disclosures`
 uses that read for the session or the simulator. The bound registry is
 not a substitute, and a measured empty stays empty. A Hashimoto cohort
 stores each arm's own disclosure and replays only the arms the prediction
-consumes. A hit does not execute
+consumes. An unreadable selected arm registers none of those arms. A hit does not execute
 the law; it
 re-registers the disclosures stored with that computation, and evaluation
 counts add. An empty disclosure is a measured zero only when the computation
@@ -2951,8 +2951,12 @@ def test_cache_inventory_matches_the_production_scan() -> None:
     )[0]
     assert "selected_keys" in hashimoto_read
     assert hashimoto_read.count("accept_stored_memo(") == 1
+    assert hashimoto_read.count("stored_disclosures_known(") == 1
     assert hashimoto_read.index("for row in cohort.values()") < hashimoto_read.index(
         "for key in selected_keys"
+    )
+    assert hashimoto_read.index("stored_disclosures_known(") < hashimoto_read.index(
+        "accept_stored_memo("
     )
     arm = residue.split(
         "for alpha_arm, channels, alpha_records, row_key in arm_channels:", 1
@@ -3541,6 +3545,81 @@ def test_standalone_melt_and_rank_publish_fe_without_a_run_scope(monkeypatch) ->
         }
 
 
+# Table-3 runs whose (temperature, duration) pair is unique, so the
+# integration stub can tell them apart. The cohort does not pass experiment
+# id into ``_hashimoto_integrate_geometry``. 17c5-1 and 17c5-3 share a pair
+# and would be the wrong pins.
+_HASHIMOTO_SCORED_EXPERIMENT = "hashimoto-1983-run-17c3-2"
+_HASHIMOTO_OTHER_EXPERIMENT = "hashimoto-1983-run-20b6"
+_HASHIMOTO_PRIMARY_ARM = "alpha_common_unity_sensitivity"
+_HASHIMOTO_PRODUCTION_ARM = "alpha_runtime_catalog"
+
+
+def _hashimoto_table3_experiments() -> list[dict]:
+    """The 24 physical runs the scorer sends to the cohort builder."""
+
+    source = yaml.safe_load(
+        (_ROOT / "data/literature/extracts/kems-015-hashimoto-1983.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    store = yaml.safe_load(
+        (
+            _ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    prefix = "::hashimoto_1983_table3_residue_composition_series::"
+    experiment_ids = sorted(
+        {
+            str(observation["experiment_id"]).split("::experiment::")[-1]
+            for observation in store["observations"]
+            if prefix in str(observation.get("observation_id") or "")
+            and (observation.get("value") or {}).get("kind") == "point"
+        }
+    )
+    by_id = {
+        str(experiment["experiment_id"]): experiment
+        for experiment in source["experiments"]
+    }
+    experiments = [by_id[experiment_id] for experiment_id in experiment_ids]
+    assert len(experiments) == 24
+    return experiments
+
+
+def _hashimoto_run_point(experiment: dict) -> tuple[float, float]:
+    from simulator.battery.residue import _hashimoto_point_value
+
+    return (
+        _hashimoto_point_value(experiment["conditions"]["temperature_K"]),
+        _hashimoto_point_value(experiment["thermal_schedule"]["total_duration_s"]),
+    )
+
+
+def _hashimoto_same_point(
+    temperature_K: float,
+    duration_s: float,
+    point: tuple[float, float],
+) -> bool:
+    return math.isclose(
+        temperature_K, point[0], rel_tol=0.0, abs_tol=1e-9
+    ) and math.isclose(duration_s, point[1], rel_tol=0.0, abs_tol=1e-9)
+
+
+def _hashimoto_integrated_arm(channels) -> str:
+    """Which alpha arm this integration call belongs to.
+
+    The common-unity source text also contains the words "runtime catalog",
+    so that marker is not an arm id.
+    """
+
+    sources = [str(getattr(channel, "alpha_source", "")) for channel in channels]
+    if any("declared alpha=1 sensitivity" in source for source in sources):
+        return _HASHIMOTO_PRIMARY_ARM
+    if any(source.startswith("runtime catalog") for source in sources):
+        return _HASHIMOTO_PRODUCTION_ARM
+    raise AssertionError(sources)
+
+
 def _hashimoto_score_context():
     from decimal import Decimal
 
@@ -3556,11 +3635,14 @@ def _hashimoto_score_context():
         subtype=State.of("oxide_wt_percent"),
     )
     source = "kems-015-hashimoto-1983"
-    experiments = {}
+    experiments = {
+        str(experiment["experiment_id"]): experiment
+        for experiment in _hashimoto_table3_experiments()
+    }
+    assert _HASHIMOTO_SCORED_EXPERIMENT in experiments
+    assert _HASHIMOTO_OTHER_EXPERIMENT in experiments
     observations = {}
-    for index in range(24):
-        experiment_id = f"h-{index:02d}"
-        experiments[experiment_id] = {"experiment_id": experiment_id}
+    for experiment_id in experiments:
         observation_id = f"{source}::{experiment_id}"
         observations[observation_id] = factories.observation(
             observation_id,
@@ -3570,7 +3652,8 @@ def _hashimoto_score_context():
             evidence=EvidenceClass.MEASURED_DIRECT,
             source_id=source,
         )
-    return ScoreContext({}, experiments, observations), observations[f"{source}::h-00"]
+    reference = observations[f"{source}::{_HASHIMOTO_SCORED_EXPERIMENT}"]
+    return ScoreContext({}, experiments, observations), reference
 
 
 def _hashimoto_arm_row(experiment_id, arm, oxides, disclosures):
@@ -3591,90 +3674,274 @@ def _hashimoto_arm_row(experiment_id, arm, oxides, disclosures):
     )
 
 
-def _assert_selected_hashimoto_disclosure(run, prediction) -> None:
-    """The scored experiment's two arms, and not the other experiment's law."""
+def _hashimoto_law_counts(rows) -> dict[str, int]:
+    return {item["law_id"]: item["evaluation_count"] for item in rows}
 
-    counts = {
-        item["law_id"]: item["evaluation_count"] for item in run.snapshot()
+
+def _assert_selected_hashimoto_disclosure(run, prediction) -> None:
+    """Scored primary is the association law. Production is the Antoine law.
+
+    The other experiment's count-3 association row must stay off this run.
+    """
+
+    counts = _hashimoto_law_counts(run.snapshot())
+    assert counts == {
+        _FE_ASSOCIATION_LAW_ID: 1,
+        _FE_ANTOINE_LAW_ID: 1,
     }
-    assert counts == {_FE_ASSOCIATION_LAW_ID: 2}
-    _assert_replayed_fe(run.snapshot())
+    association = next(
+        item
+        for item in run.snapshot()
+        if item["law_id"] == _FE_ASSOCIATION_LAW_ID
+    )
+    _assert_fe_disclosure(
+        association, law_id=_FE_ASSOCIATION_LAW_ID, count=1
+    )
+    antoine = next(
+        item for item in run.snapshot() if item["law_id"] == _FE_ANTOINE_LAW_ID
+    )
+    _assert_fe_disclosure(antoine, law_id=_FE_ANTOINE_LAW_ID, count=1)
+    assert antoine["certified_band_K"] == [1400.0, 1900.0]
     detail = prediction.refusal_detail["law_disclosures"]
-    assert [item["law_id"] for item in detail] == [_FE_ASSOCIATION_LAW_ID]
-    assert detail[0]["evaluation_count"] == 1
-    nested = prediction.refusal_detail["production_alpha_arm"]["provenance"]
-    assert [item["law_id"] for item in nested["law_disclosures"]] == [
-        _FE_ASSOCIATION_LAW_ID
+    assert _hashimoto_law_counts(detail) == {_FE_ASSOCIATION_LAW_ID: 1}
+    nested = prediction.refusal_detail["production_alpha_arm"]["provenance"][
+        "law_disclosures"
     ]
+    assert _hashimoto_law_counts(nested) == {_FE_ANTOINE_LAW_ID: 1}
+
+
+def _assert_hashimoto_rows_are_per_arm(stored) -> None:
+    """Each production row holds only the laws that arm executed."""
+
+    def counts(experiment_id: str, arm: str) -> dict[str, int]:
+        row = stored[f"{experiment_id}::{arm}"]
+        return _hashimoto_law_counts(row.provenance["law_disclosures"])
+
+    assert counts(_HASHIMOTO_SCORED_EXPERIMENT, _HASHIMOTO_PRIMARY_ARM) == {
+        _FE_ASSOCIATION_LAW_ID: 1
+    }
+    assert counts(_HASHIMOTO_SCORED_EXPERIMENT, _HASHIMOTO_PRODUCTION_ARM) == {
+        _FE_ANTOINE_LAW_ID: 1
+    }
+    assert counts(_HASHIMOTO_OTHER_EXPERIMENT, _HASHIMOTO_PRIMARY_ARM) == {
+        _FE_ASSOCIATION_LAW_ID: 3
+    }
+    assert counts(_HASHIMOTO_OTHER_EXPERIMENT, _HASHIMOTO_PRODUCTION_ARM) == {}
+    for key, row in stored.items():
+        if key.startswith(_HASHIMOTO_SCORED_EXPERIMENT + "::"):
+            continue
+        if key == f"{_HASHIMOTO_OTHER_EXPERIMENT}::{_HASHIMOTO_PRIMARY_ARM}":
+            continue
+        assert row.provenance["law_disclosures"] == []
+
+
+def test_malformed_hashimoto_arm_registers_no_selected_disclosure() -> None:
+    """Reject the cohort before registering any selected arm.
+
+    Valid Fe metadata on the primary and a malformed production arm used to
+    publish the primary, then the recompute published both. The run count
+    was 3. The rejected hit must leave the run empty, so the recompute
+    publishes 2.
+    """
+
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import _cached_hashimoto_cohort
+
+    with disclosure_scope(inherit=False) as source:
+        _fe_pressure("FeO_association_gas")
+        fe_rows = source.snapshot()
+    assert len(fe_rows) == 1
+    _assert_fe_disclosure(fe_rows[0], law_id=_FE_ASSOCIATION_LAW_ID, count=1)
+    oxides = {"FeO": 11.0, "MgO": 20.0}
+    primary = _hashimoto_arm_row(
+        "run", _HASHIMOTO_PRIMARY_ARM, oxides, fe_rows
+    )
+    production = _hashimoto_arm_row(
+        "run", _HASHIMOTO_PRODUCTION_ARM, {"FeO": 12.0, "MgO": 20.0}, fe_rows
+    )
+    production.provenance["law_disclosures"] = [None]
+    cache_key = ("kems-015-hashimoto-1983", Engine.INTERNAL_ANALYTICAL)
+    primary_key = f"run::{_HASHIMOTO_PRIMARY_ARM}"
+    production_key = f"run::{_HASHIMOTO_PRODUCTION_ARM}"
+    rejected = {
+        cache_key: {
+            primary_key: primary,
+            production_key: production,
+        }
+    }
+    fresh_primary = _hashimoto_arm_row(
+        "run", _HASHIMOTO_PRIMARY_ARM, oxides, fe_rows
+    )
+    fresh_production = _hashimoto_arm_row(
+        "run", _HASHIMOTO_PRODUCTION_ARM, {"FeO": 12.0, "MgO": 20.0}, fe_rows
+    )
+    recomputed = {
+        cache_key: {
+            primary_key: fresh_primary,
+            production_key: fresh_production,
+        }
+    }
+    with disclosure_scope(inherit=False) as run:
+        missed = _cached_hashimoto_cohort(
+            rejected, cache_key, primary_key, production_key
+        )
+        assert missed is None
+        assert rejected == {}
+        assert run.snapshot() == ()
+        hit = _cached_hashimoto_cohort(
+            recomputed, cache_key, primary_key, production_key
+        )
+        assert hit is not None
+        assert _hashimoto_law_counts(run.snapshot()) == {
+            _FE_ASSOCIATION_LAW_ID: 2
+        }
+        _assert_fe_disclosure(
+            run.snapshot()[0], law_id=_FE_ASSOCIATION_LAW_ID, count=2
+        )
 
 
 def _exercise_hashimoto_cohort(_tmp_path, monkeypatch) -> None:
-    """Warm a 24-experiment Hashimoto cohort and score only h-00.
+    """Score one Hashimoto run through the real cohort builder.
 
-    h-00's two arms each execute the Fe law once. h-01's primary arm records
-    an unrelated SiO extrapolation with count 3. The other arms record a
-    measured empty. Scoring h-00 replays Fe with count 2 and leaves SiO on
-    h-01's stored row. A one-experiment cohort, or one snapshot copied onto
-    every row, cannot see this.
+    The integration boundary is stubbed. Each arm's disclosure scope is the
+    production one. The scored run's primary arm executes the Fe association
+    law once. Its production arm executes the Fe Antoine law once. Another
+    run's primary arm executes the association law three times. Scoring the
+    first run replays only that run's two laws. A cohort-wide snapshot, or
+    one arm's disclosure copied onto the other, cannot pass.
     """
+
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 
     import simulator.battery.residue as residue
     from simulator.battery.enums import Engine, ExecutionState
     from simulator.battery.score import _hashimoto_residue_prediction
+    from simulator.melt_backend import openimcc_bridge
 
-    calls = {"n": 0}
-    arms = ("alpha_common_unity_sensitivity", "alpha_runtime_catalog")
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+    experiments = _hashimoto_table3_experiments()
+    by_id = {str(experiment["experiment_id"]): experiment for experiment in experiments}
+    scored_point = _hashimoto_run_point(by_id[_HASHIMOTO_SCORED_EXPERIMENT])
+    other_point = _hashimoto_run_point(by_id[_HASHIMOTO_OTHER_EXPERIMENT])
+    assert scored_point != other_point
+    fe_antoine = BuiltinVaporPressureProvider(
+        _live_vapor()
+    )._vapour_rail_catalog.species["Fe"].evaluator
+    assert fe_antoine is not None
+    calls = {"cohort": 0, "integrate": 0}
+    seen_arms: set[str] = set()
+    real_cohort = residue._predict_hashimoto_residue_cohort
 
-    def fake_cohort(experiments, _catalog, *, preform_dimensions_mm, code_revision, engine):
-        del preform_dimensions_mm, code_revision, engine
-        calls["n"] += 1
-        rows = []
-        for experiment in experiments:
-            experiment_id = str(experiment["experiment_id"])
-            for arm in arms:
-                if experiment_id == "h-00":
-                    with disclosure_scope(inherit=False) as arm_registry:
-                        _fe_pressure("FeO_association_gas")
-                        disclosures = arm_registry.snapshot()
-                elif (
-                    experiment_id == "h-01"
-                    and arm == "alpha_common_unity_sensitivity"
-                ):
-                    disclosures = (_owner_law("SiO:antoine", count=3),)
-                else:
-                    disclosures = ()
-                oxides = {"FeO": 12.0 if arm == "alpha_runtime_catalog" else 11.0, "MgO": 20.0}
-                rows.append(
-                    _hashimoto_arm_row(experiment_id, arm, oxides, disclosures)
-                )
-        return tuple(rows)
+    def counting_cohort(*args, **kwargs):
+        calls["cohort"] += 1
+        return real_cohort(*args, **kwargs)
 
-    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fake_cohort)
+    def _arm_count(law_id: str) -> int:
+        return sum(
+            item["evaluation_count"]
+            for item in active_snapshot()
+            if item["law_id"] == law_id
+        )
+
+    def integrate(
+        inventory,
+        channels,
+        _pressure_model,
+        *,
+        temperature_K,
+        duration_s,
+        steps,
+        geometry_policy_id,
+        initial_area_m2,
+        **_ignored,
+    ):
+        del steps, geometry_policy_id, initial_area_m2
+        calls["integrate"] += 1
+        arm = _hashimoto_integrated_arm(channels)
+        seen_arms.add(arm)
+        # The arm scope starts empty on every cohort build. Later geometries
+        # of the same arm see the law and do not count it again.
+        if _hashimoto_same_point(temperature_K, duration_s, scored_point):
+            if arm == _HASHIMOTO_PRIMARY_ARM:
+                if _arm_count(_FE_ASSOCIATION_LAW_ID) < 1:
+                    _fe_pressure("FeO_association_gas")
+            elif _arm_count(_FE_ANTOINE_LAW_ID) < 1:
+                evaluation = fe_antoine.evaluate(1750.0)
+                assert math.isfinite(evaluation.pressure_pa)
+        elif (
+            _hashimoto_same_point(temperature_K, duration_s, other_point)
+            and arm == _HASHIMOTO_PRIMARY_ARM
+            and _arm_count(_FE_ASSOCIATION_LAW_ID) < 3
+        ):
+            for _ in range(3 - _arm_count(_FE_ASSOCIATION_LAW_ID)):
+                _fe_pressure("FeO_association_gas")
+        values = residue._hashimoto_project_oxide_wt_pct(inventory)
+        return (
+            values,
+            (0.1,),
+            (),
+            None,
+            {},
+            {
+                "steps_at_floor": 0,
+                "first_step": None,
+                "fraction_of_time_at_floor": 0.0,
+                "time_at_floor_s": 0.0,
+                "pO2_bar": None,
+            },
+        )
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate)
+    monkeypatch.setattr(
+        residue, "_predict_hashimoto_residue_cohort", counting_cohort
+    )
     context, reference = _hashimoto_score_context()
-    engine = Engine.INTERNAL_ANALYTICAL
+    engine = Engine.OPENIMCC
     cache: dict = {}
     with disclosure_scope(inherit=False) as run_a:
-        prediction = _hashimoto_residue_prediction(context, reference, engine, cache)
-        assert prediction.execution.state is ExecutionState.PRODUCED, prediction.refusal_detail
-        assert calls["n"] == 1
-        _assert_selected_hashimoto_disclosure(run_a, prediction)
+        prediction = _hashimoto_residue_prediction(
+            context, reference, engine, cache
+        )
+        assert prediction.execution.state is ExecutionState.PRODUCED, (
+            prediction.refusal_detail
+        )
+        assert calls["cohort"] == 1
+        assert calls["integrate"] > 0
+        assert seen_arms == {_HASHIMOTO_PRIMARY_ARM, _HASHIMOTO_PRODUCTION_ARM}
         stored = next(iter(cache.values()))
-        other = stored["h-01::alpha_common_unity_sensitivity"].provenance[
-            "law_disclosures"
-        ]
-        assert other[0]["law_id"] == "SiO:antoine"
-        assert other[0]["evaluation_count"] == 3
+        _assert_hashimoto_rows_are_per_arm(stored)
+        _assert_selected_hashimoto_disclosure(run_a, prediction)
     with disclosure_scope(inherit=False) as run_b:
         again = _hashimoto_residue_prediction(context, reference, engine, cache)
         assert again.execution.state is ExecutionState.PRODUCED, again.refusal_detail
-        assert calls["n"] == 1
+        assert calls["cohort"] == 1
         _assert_selected_hashimoto_disclosure(run_b, again)
+    stored = next(iter(cache.values()))
+    stored[
+        f"{_HASHIMOTO_SCORED_EXPERIMENT}::{_HASHIMOTO_PRODUCTION_ARM}"
+    ].provenance["law_disclosures"] = [None]
+    with disclosure_scope(inherit=False) as run_rejected:
+        rejected = _hashimoto_residue_prediction(
+            context, reference, engine, cache
+        )
+        assert rejected.execution.state is ExecutionState.PRODUCED, (
+            rejected.refusal_detail
+        )
+        assert calls["cohort"] == 2
+        _assert_selected_hashimoto_disclosure(run_rejected, rejected)
+        _assert_hashimoto_rows_are_per_arm(next(iter(cache.values())))
     for row in next(iter(cache.values())).values():
         row.provenance.pop("law_disclosures")
     with disclosure_scope(inherit=False) as run_c:
-        recomputed = _hashimoto_residue_prediction(context, reference, engine, cache)
-        assert recomputed.execution.state is ExecutionState.PRODUCED, recomputed.refusal_detail
-        assert calls["n"] == 2
+        recomputed = _hashimoto_residue_prediction(
+            context, reference, engine, cache
+        )
+        assert recomputed.execution.state is ExecutionState.PRODUCED, (
+            recomputed.refusal_detail
+        )
+        assert calls["cohort"] == 3
         _assert_selected_hashimoto_disclosure(run_c, recomputed)
 
 
