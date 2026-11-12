@@ -15,6 +15,7 @@ Usage:
 import ipaddress
 import os
 import secrets
+import stat
 import sys
 from pathlib import Path
 
@@ -51,16 +52,30 @@ def _load_secret_key() -> str:
         return env_secret
 
     secret_path = Path(__file__).parent / 'instance' / 'flask_secret_key'
-    if secret_path.exists():
-        return secret_path.read_text().strip()
-
     secret_path.parent.mkdir(mode=0o700, exist_ok=True)
-    generated = secrets.token_urlsafe(32)
-    secret_path.write_text(generated + '\n')
     try:
-        secret_path.chmod(0o600)
-    except OSError:
-        pass
+        fd = os.open(
+            secret_path,
+            os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+            0o600,
+        )
+    except FileExistsError:
+        fd = os.open(secret_path, os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0))
+        with os.fdopen(fd, 'r', encoding='utf-8') as secret_file:
+            metadata = os.fstat(secret_file.fileno())
+            if not stat.S_ISREG(metadata.st_mode):
+                raise RuntimeError(f'Flask secret path is not a regular file: {secret_path}')
+            if metadata.st_mode & 0o077:
+                os.fchmod(secret_file.fileno(), 0o600)
+            secret = secret_file.read().strip()
+        if not secret:
+            raise RuntimeError(f'Flask secret file is empty: {secret_path}')
+        return secret
+
+    os.fchmod(fd, 0o600)
+    generated = secrets.token_urlsafe(32)
+    with os.fdopen(fd, 'w', encoding='utf-8') as secret_file:
+        secret_file.write(generated + '\n')
     return generated
 
 
