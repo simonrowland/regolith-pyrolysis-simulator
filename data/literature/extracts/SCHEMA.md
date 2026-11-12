@@ -591,7 +591,7 @@ A locator is a mapping with at least one non-empty location key among:
 - `table`, `figure`, `paragraph`, `section`, `equation`
 - `line_range` (e.g. thermo.inp line range)
 - `note` (prose locator when the above do not apply — allowed, but prefer structured keys)
-- `source_path`, `record`
+- `source_path`, `quotes_path`, `record`
 
 `page` is the one-based physical page in the PDF. `pdf_page_index` is the
 zero-based PDF page index (the first PDF page is 0). `published_page` is the

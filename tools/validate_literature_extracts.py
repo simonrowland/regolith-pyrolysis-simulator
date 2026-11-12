@@ -221,6 +221,7 @@ LOCATOR_KEYS = frozenset(
         "line_range",
         "note",
         "source_path",
+        "quotes_path",
         "record",
         "source_sha256",
     }
@@ -1978,11 +1979,27 @@ def _sample_attestation_defects(sample: Mapping[str, Any]) -> list[str]:
         except ValueError:
             defects.append("reviewed_on is not a calendar date")
     locator_keys = [key for key in ("locator", "source_locator") if key in sample]
-    if len(locator_keys) != 1 or not _locator_ok(sample.get(locator_keys[0])):
+    locator = sample.get(locator_keys[0]) if len(locator_keys) == 1 else None
+    malformed_locator_keys = _malformed_locator_artifact_keys(locator)
+    if len(locator_keys) != 1 or (
+        not _locator_ok(locator) and not malformed_locator_keys
+    ):
         defects.append(
             "exactly one valid locator/source_locator is required for source attestation"
         )
     return defects
+
+
+def _malformed_locator_artifact_keys(locator: Any) -> list[str]:
+    """Return declared artifact keys that are not non-empty strings."""
+    if not isinstance(locator, Mapping):
+        return []
+    return [
+        key
+        for key in (*_ARTIFACT_PATH_KEYS, "record")
+        if key in locator
+        and (not isinstance(locator[key], str) or not locator[key].strip())
+    ]
 
 
 def _sample_addresses_scored_evidence(sample: Mapping[str, Any]) -> bool:
@@ -2259,6 +2276,22 @@ def _parse_line_range(raw: Any) -> tuple[int, int] | None:
     return None
 
 
+def _source_artifact_path_refusal(path: Path, root: Path) -> str | None:
+    """Refuse resolved paths outside source roots, prefixes, or suffix rules."""
+    if not path.is_relative_to(root):
+        return "corpus_path_outside_root"
+    relative = path.relative_to(root).as_posix()
+    if not any(relative.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES):
+        return "artifact_not_source"
+    if path.suffix.lower() in _PROGRAM_SOURCE_SUFFIXES:
+        return "artifact_not_source"
+    if path.suffix.lower() in {".yaml", ".yml"} and not relative.startswith(
+        "tables/"
+    ):
+        return "artifact_not_source"
+    return None
+
+
 def _open_source_artifact(
     raw: str,
     *,
@@ -2282,19 +2315,12 @@ def _open_source_artifact(
 
     repository_root_resolved = repository_root.expanduser().resolve()
     repository_path = (repository_root_resolved / candidate).resolve()
-    if not repository_path.is_relative_to(repository_root_resolved):
-        return None, None, None, "corpus_path_outside_root"
+    refusal = _source_artifact_path_refusal(
+        repository_path, repository_root_resolved
+    )
+    if refusal:
+        return None, None, None, refusal
     relative = repository_path.relative_to(repository_root_resolved).as_posix()
-    if not any(relative.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES):
-        return None, None, None, "artifact_not_source"
-    if repository_path.suffix.lower() in _PROGRAM_SOURCE_SUFFIXES:
-        return None, None, None, "artifact_not_source"
-    # Quotes live under tables/. Other YAML is pipeline metadata or an extract
-    # copy parked on a source root.
-    if repository_path.suffix.lower() in {".yaml", ".yml"} and not relative.startswith(
-        "tables/"
-    ):
-        return None, None, None, "artifact_not_source"
 
     is_corpus = False
     resolved = repository_path
@@ -2303,8 +2329,9 @@ def _open_source_artifact(
             return None, None, None, "corpus_root_unset"
         corpus_root_resolved = corpus_root.expanduser().resolve()
         corpus_path = (corpus_root_resolved / relative).resolve()
-        if not corpus_path.is_relative_to(corpus_root_resolved):
-            return None, None, None, "corpus_path_outside_root"
+        refusal = _source_artifact_path_refusal(corpus_path, corpus_root_resolved)
+        if refusal:
+            return None, None, None, refusal
         resolved = corpus_path
         is_corpus = True
     if not resolved.is_file():
@@ -2547,8 +2574,8 @@ def _locator_source_blind_reason(
     artifact_root: Path,
     corpus_root: Path | None,
     doc: Mapping[str, Any] | None = None,
-) -> tuple[str | None, bool]:
-    """Return the source-blind reason and whether every declared key matched.
+) -> str | None:
+    """Return a source-blind reason when the locator evidence is inadequate.
 
     No source-blind reason means a candidate was opened and contained the
     certified leaves: the sample value and resolved extract value. A tolerant
@@ -2558,8 +2585,14 @@ def _locator_source_blind_reason(
     """
     keys = [key for key in ("locator", "source_locator") if key in sample]
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
-        return "locator was not opened: attestation locator is missing", False
+        return "locator was not opened: attestation locator is missing"
     locator = sample[keys[0]]
+    malformed_keys = _malformed_locator_artifact_keys(locator)
+    if malformed_keys:
+        return (
+            "locator source-blind: locator_key_malformed "
+            f"({', '.join(malformed_keys)} must be non-empty strings)"
+        )
     candidate_groups = [
         (key, [raw.strip()])
         for key in _ARTIFACT_PATH_KEYS
@@ -2574,12 +2607,11 @@ def _locator_source_blind_reason(
     if not candidate_groups:
         return (
             "locator was not opened: no source_path, quotes_path, or file record "
-            "points at a text artifact",
-            False,
+            "points at a text artifact"
         )
     leaves, leaf_error = _certification_scalar_leaves(sample, doc)
     if leaf_error:
-        return leaf_error, False
+        return leaf_error
     reasons: list[str] = []
     for _key, candidates in candidate_groups:
         candidate_reasons: list[str] = []
@@ -2655,8 +2687,8 @@ def _locator_source_blind_reason(
         if not key_matched:
             reasons.extend(candidate_reasons)
     if reasons:
-        return "locator source-blind: " + "; ".join(reasons), False
-    return None, True
+        return "locator source-blind: " + "; ".join(reasons)
+    return None
 
 
 def fidelity_source_warnings(
@@ -2771,7 +2803,6 @@ def fidelity_source_warnings(
     )
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
-        source_evidence_covered = True
         if not isinstance(sample, Mapping):
             unattested += 1
             _note_reason(
@@ -2800,7 +2831,7 @@ def fidelity_source_warnings(
         else:
             # Attestation-complete pins are the ones that would otherwise certify
             # without opening the source. Unattested pins stay on that count.
-            blind, source_evidence_covered = _locator_source_blind_reason(
+            blind = _locator_source_blind_reason(
                 sample,
                 artifact_root=root,
                 corpus_root=corpus_root,
@@ -2817,7 +2848,6 @@ def fidelity_source_warnings(
         observation_key = _fidelity_sample_observation_key(doc, sample)
         if (
             not match_errors
-            and source_evidence_covered
             and observation_key is not None
             and observation_key in required
             and _path_selector_names_observation_id(sample)
