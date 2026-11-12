@@ -459,6 +459,11 @@ def test_normalized_engine_defaults_match_backend_defaults(
     monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: pack)
     monkeypatch.setattr(openimcc_bridge, "_pack_digest", lambda _pack: "test")
     monkeypatch.setattr(openimcc_bridge, "imported_openimcc_commit", lambda: None)
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "engine_binding_identity",
+        lambda *_args: {"engine_binding_digest": "test"},
+    )
     openimcc = _OpenImccBatteryBackend("openimcc")
     assert normalized["openimcc"]["pack"] == openimcc._pack_name == bridge_pack
     assert normalized["openimcc"]["gas_pack"] == openimcc._gas_pack_name
@@ -511,9 +516,14 @@ def test_normalized_engine_defaults_match_backend_defaults(
     magemin = MAGEMinBackend()
     magemin._binary_path = Path("MAGEMin")
     resolved_bridge, _ = magemin._import_magemin_bridge(requested=None)
+    resolved_buffer, _buffer_offset, _buffer_warnings = magemin._resolve_buffer(
+        temperature_C=1400.0,
+        fO2_log=-9.0,
+    )
     assert normalized["magemin"]["database"] == magemin._effective_database()
     assert normalized["magemin"]["bridge"] == resolved_bridge
     assert normalized["magemin"]["fO2_buffer"] == magemin._effective_fO2_buffer()
+    assert normalized["magemin"]["fO2_buffer"] == resolved_buffer
 
 
 def test_default_and_test_configuration_cache_keys_are_byte_stable(
@@ -1171,11 +1181,20 @@ def test_default_alphamelts_open_uses_resolved_mode_without_parent_environment(
 
 
 def test_openimcc_unused_gas_pack_setting_is_not_a_cache_input() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import engine_cache_settings
 
-    assert engine_cache_settings("openimcc", {"pack": "default"}) == (
+    assert engine_cache_settings(
+        "openimcc", normalize_engine_settings("openimcc", {"pack": "default"})
+    ) == (
         engine_cache_settings(
-            "openimcc", {"pack": "default", "gas_pack": "unused-custom-pack"}
+            "openimcc",
+            normalize_engine_settings(
+                "openimcc",
+                {"pack": "default", "gas_pack": "unused-custom-pack"},
+            ),
         )
     )
 

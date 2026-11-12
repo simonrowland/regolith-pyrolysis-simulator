@@ -183,7 +183,7 @@ def engine_cache_settings(
     if engine_name == "openimcc":
         return {
             "melt_pack": fields["pack"],
-            "gas_pack": "default",
+            "gas_pack": fields["gas_pack"],
         }
     if engine_name == "alphamelts":
         # Opener fields map to the transport, model, redox, and vapor settings

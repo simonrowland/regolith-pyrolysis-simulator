@@ -170,6 +170,9 @@ _MELT_MODEL_ID = 'MELTS-v1.0'
 # probe fixture (~8.3e5 bar) and well above any admitted-grid total.
 # The fixture value is historical; the ceiling (10 bar) is the gate.
 VAPOROCK_MAX_SUM_PRESSURE_BAR = 10.0
+VAPOROCK_DEFAULT_TEMPERATURE_UNITS = 'C'
+VAPOROCK_DEFAULT_PRESSURE_UNITS = 'bar'
+VAPOROCK_DEFAULT_VAPOR_PRESSURE_UNITS = 'bar'
 # First-order liquid gate (DESIGN-REV5 §5.2): when a caller supplies a
 # liquid_fraction from the melt backend, refuse sub-liquid cells rather
 # than fabricating vapor over a mostly-solid assemblage.
@@ -1395,9 +1398,9 @@ class VapoRockBackend(MeltBackend):
         self._config: Dict[str, Any] = {}
         self._startup_failure_disposition: Optional[str] = None
         self._database_path: Optional[str] = None
-        self._temperature_units: str = 'C'
-        self._pressure_units: str = 'bar'
-        self._vapor_pressure_units: str = 'bar'
+        self._temperature_units: str = VAPOROCK_DEFAULT_TEMPERATURE_UNITS
+        self._pressure_units: str = VAPOROCK_DEFAULT_PRESSURE_UNITS
+        self._vapor_pressure_units: str = VAPOROCK_DEFAULT_VAPOR_PRESSURE_UNITS
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
         self._last_pressure_authority_warning: Optional[str] = None
@@ -1456,7 +1459,9 @@ class VapoRockBackend(MeltBackend):
 
         self._database_path = self._config.get('database_path')
         temperature_units = str(
-            self._config.get('temperature_units') or 'C').strip()
+            self._config.get('temperature_units')
+            or VAPOROCK_DEFAULT_TEMPERATURE_UNITS
+        ).strip()
         if temperature_units not in ('C', 'K'):
             self._last_error = (
                 f'VapoRock temperature_units {temperature_units!r} not '
@@ -1467,7 +1472,9 @@ class VapoRockBackend(MeltBackend):
         self._temperature_units = temperature_units
 
         pressure_units = str(
-            self._config.get('pressure_units') or 'bar').strip()
+            self._config.get('pressure_units')
+            or VAPOROCK_DEFAULT_PRESSURE_UNITS
+        ).strip()
         if pressure_units not in ('bar', 'Pa'):
             self._last_error = (
                 f'VapoRock pressure_units {pressure_units!r} not '
@@ -1482,7 +1489,9 @@ class VapoRockBackend(MeltBackend):
         # infer the unit from magnitude, which inflates an already-Pa
         # sub-1e3 result 1e5x (see _normalize_vapor_pressures).
         vapor_pressure_units = str(
-            self._config.get('vapor_pressure_units') or 'bar').strip()
+            self._config.get('vapor_pressure_units')
+            or VAPOROCK_DEFAULT_VAPOR_PRESSURE_UNITS
+        ).strip()
         if vapor_pressure_units not in ('bar', 'Pa'):
             self._last_error = (
                 f'VapoRock vapor_pressure_units {vapor_pressure_units!r} '
