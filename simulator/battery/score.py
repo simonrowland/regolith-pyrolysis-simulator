@@ -95,6 +95,7 @@ from simulator.battery.identity import (
     _same_row_redox_identity_equal,
     _same_row_knudsen_residue_identity_equal,
     log10K_from_delta_fG_kJ_mol,
+    melt_activity_log10_pressure_bound,
     profile_for,
     quantity_token,
     _STANDARD_PRESSURE_AMBIGUITY_RELATION,
@@ -180,6 +181,8 @@ from simulator.battery.records import (
     Value,
     Work,
     _is_source_internally_inconsistent,
+    ApproxPressure,
+    approximate_pressure_band_reason,
     as_decimal,
     nominal_pressure_pa,
     charge_value,
@@ -217,6 +220,7 @@ from simulator.battery.score_metrics import (
     metric_operation_for_identity,
     populate_numeric,
 )
+from simulator.transport_regime import KnudsenRegime, high_edge_knudsen_clause
 from simulator.melt_backend.base import (
     MULTIVALENT_MELT_ELEMENTS,
     EquilibriumResult,
@@ -557,6 +561,7 @@ FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
 )
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
+FLAGGED_STRATUM_APPROXIMATE_PRESSURE = "approximate-pressure"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
@@ -2399,6 +2404,8 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
     if NoticeKind.APPROXIMATE_VALUE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
+    if NoticeKind.APPROXIMATE_PRESSURE.value in kinds:
+        strata.append(FLAGGED_STRATUM_APPROXIMATE_PRESSURE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
@@ -2428,6 +2435,105 @@ def _is_fusion_conversion_reason(reason: object) -> bool:
 
 def _is_flagged_stratum_notice(notice: Notice) -> bool:
     return bool(flagged_strata((notice,)))
+
+
+# Kinetic yield is the existing set. Residue composition, element retention,
+# and areal wall deposition are the other families whose notice carries the
+# regime. Knudsen residue extent is residue composition with the effusion
+# method, and that notice stays the band sentence: the axis is already omitted.
+_APPROXIMATE_PRESSURE_REGIME_QUANTITIES = KINETIC_YIELD_QUANTITIES | frozenset(
+    {
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Quantity.ELEMENT_RETENTION_RATIO,
+        Quantity.WALL_DEPOSIT_AREAL_RATE,
+    }
+)
+
+
+def _furnace_pipe_length_m() -> Decimal:
+    """Project furnace-pipe length. A missing length does not become 1 mm."""
+
+    from simulator.condensation import DEFAULT_PIPE_DIAMETER_M
+
+    return Decimal(str(DEFAULT_PIPE_DIAMETER_M))
+
+
+def _approximate_pressure_notice(
+    identity: Identity,
+    quantity: Quantity | None,
+    *,
+    origin: str,
+    engine: Engine | None = None,
+    method: MethodToken | None = None,
+    length_m: Decimal | None = None,
+) -> Notice | None:
+    """Notice for an identity pressure band. An exact decimal stays silent.
+
+    The band sentence comes from the records owner. Kn comes from the
+    transport owner. The activity dex bound comes from the identity owner.
+    This function chooses which of those sentences the row carries.
+    """
+
+    pressure = identity.total_pressure_Pa
+    if (
+        quantity is None
+        or pressure is None
+        or not pressure.is_value
+        or not isinstance(pressure.value, ApproxPressure)
+    ):
+        return None
+    band = pressure.value
+    parts = [approximate_pressure_band_reason(band)]
+    temperature = temperature_of(identity)
+    usable_temperature = (
+        temperature is not None
+        and temperature.is_finite()
+        and temperature > 0
+    )
+    knudsen_residue = (
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and method is MethodToken.KNUDSEN_EFFUSION
+    )
+    regime = None
+    if (
+        quantity in _APPROXIMATE_PRESSURE_REGIME_QUANTITIES
+        and not knudsen_residue
+        and usable_temperature
+    ):
+        resolved_length = length_m
+        length_is_default = resolved_length is None
+        if length_is_default:
+            resolved_length = _furnace_pipe_length_m()
+        regime, regime_clause = high_edge_knudsen_clause(
+            float(band.high),
+            float(temperature),
+            float(resolved_length),
+        )
+        parts.append(regime_clause)
+        if length_is_default:
+            parts.append(
+                "L is condensation.DEFAULT_PIPE_DIAMETER_M, the furnace-pipe "
+                "length and the conservative laboratory length"
+            )
+    wants_dex = quantity in MELT_ACTIVITY_QUANTITIES or (
+        regime is not None and regime is not KnudsenRegime.FREE_MOLECULAR
+    )
+    if wants_dex and usable_temperature:
+        bound = melt_activity_log10_pressure_bound(
+            band.high - band.low, temperature
+        )
+        parts.append(f"activity |Δlog10(a)| bound {format(bound, '.6e')}")
+    if quantity is Quantity.P_SAT or (
+        engine is not None
+        and (engine, quantity) in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS
+    ):
+        parts.append("prediction path ignores total pressure")
+    return Notice(
+        kind=NoticeKind.APPROXIMATE_PRESSURE,
+        affected_quantities=(quantity,),
+        reason="; ".join(parts),
+        origin=origin,
+    )
 
 
 def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
@@ -8285,7 +8391,13 @@ def _fe_redox_pressure(
         and pressure_pa.is_value
         and pressure_pa.value is not None
     ):
-        pressure_bar = float(pressure_pa.value) / PA_PER_BAR
+        pressure_amount = nominal_pressure_pa(pressure_pa)
+        if pressure_amount is None:
+            return _FeRedoxRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "invalid_input", "input": "total_pressure_Pa"},
+            )
+        pressure_bar = float(pressure_amount) / PA_PER_BAR
     elif observation.source_id == "borisov-2018-compilation":
         # The cited compilation is explicitly a 1-atm dataset.
         pressure_bar = 1.01325
@@ -12017,7 +12129,7 @@ def _wall_areal_rate_from_existing_flux(
 
     missing: list[str] = []
     temperature = _identity_decimal(identity.temperature_K)
-    pressure = _identity_decimal(identity.total_pressure_Pa)
+    pressure = nominal_pressure_pa(identity.total_pressure_Pa)
     wall_temperature = _printed_wall_temperature_K(identity)
     carrier = _printed_sweep_carrier(identity)
     if temperature is None:
@@ -16481,6 +16593,30 @@ def _compile_residual_with_lineage(
         if reference.value.approximate and quantity is not None
         else ()
     )
+    # The pressure band is not the measured observable. An exact residue
+    # wt% keeps APPROXIMATE_VALUE off and still shows this notice.
+    pressure_method = (
+        experiment.method.value
+        if experiment is not None and experiment.method.is_value
+        else None
+    )
+    approximate_pressure_notice = (
+        _approximate_pressure_notice(
+            identity,
+            quantity,
+            origin=reference.observation_id,
+            engine=engine,
+            method=pressure_method,
+            length_m=_condition_decimal(reference, "pipe_diameter_m"),
+        )
+        if isinstance(identity, Identity)
+        else None
+    )
+    approximate_pressure_notices = (
+        ()
+        if approximate_pressure_notice is None
+        else (approximate_pressure_notice,)
+    )
     # The regime sentence is true only where the apparatus gates run.
     # Model-derived rows skip those gates and must not claim the check.
     apparatus_in_scope = evidence_class.is_value and (
@@ -16501,6 +16637,7 @@ def _compile_residual_with_lineage(
         flagged_notices,
         evidence_class_notices,
         approximate_value_notices,
+        approximate_pressure_notices,
         geometry_interval_notices,
         _quench_notices(reference),
     )
@@ -22984,9 +23121,12 @@ class _ConditionHull:
             self.n_t += 1
             self.t = self._widen(self.t, temperature)
         pressure = identity.total_pressure_Pa
-        if pressure is not None and pressure.is_value and pressure.value is not None:
+        pressure_amount = (
+            None if pressure is None else nominal_pressure_pa(pressure)
+        )
+        if pressure_amount is not None:
             self.n_p += 1
-            self.p = self._widen(self.p, as_decimal(pressure.value))
+            self.p = self._widen(self.p, pressure_amount)
         state = identity.composition
         if state is None or not state.is_value or state.value is None:
             state, _notice = _printed_point_composition(observation)

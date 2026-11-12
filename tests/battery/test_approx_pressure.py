@@ -14,7 +14,10 @@ import pytest
 
 from simulator.battery.enums import (
     AmountBasis,
+    Engine,
     IdentityEqualKind,
+    MethodToken,
+    NoticeKind,
     Phase,
     Quantity,
     RefusalReason,
@@ -28,6 +31,7 @@ from simulator.battery.identity import (
     _same_row_knudsen_residue_identity_equal,
     _values_compare,
     identity_equal,
+    melt_activity_log10_pressure_bound,
     profile_for,
 )
 from simulator.battery.migrate import (
@@ -43,14 +47,30 @@ from simulator.battery.records import (
     Species,
     State,
     Value,
+    Notice,
     approx_pressure_from_mapping,
     approximate_derived_total_reason,
+    approximate_pressure_band_reason,
     approximate_pressure_from_printed_point,
     as_decimal,
     identity_pressure_from_converted_point,
     nominal_pressure_pa,
 )
-from simulator.battery.score import total_pressure_bar_for_score
+from simulator.battery.score import (
+    FLAGGED_STRATUM_APPROXIMATE_PRESSURE,
+    FLAGGED_STRATUM_APPROXIMATE_VALUE,
+    _approximate_pressure_notice,
+    flagged_strata,
+    total_pressure_bar_for_score,
+)
+from simulator.condensation import DEFAULT_PIPE_DIAMETER_M
+from simulator.transport_constants import N2_COLLISION_DIAMETER_M
+from simulator.transport_regime import (
+    KnudsenRegime,
+    classify_knudsen_regime,
+    high_edge_knudsen_clause,
+    single_species_mean_free_path_m,
+)
 from tests.battery.factories import activity_identity
 
 # 50 significant figures of √10. Independent of the constructor.
@@ -565,6 +585,250 @@ def test_approximate_partial_sum_is_not_an_exact_total() -> None:
     assert total is not None and total.is_unknown
     assert total.reason == approximate_derived_total_reason()
     assert provenance is None
+
+
+def _banded_identity(
+    quantity: Quantity,
+    band: ApproxPressure,
+    temperature: str | None,
+) -> Identity:
+    return Identity(
+        quantity=quantity,
+        species=None,
+        temperature_K=None if temperature is None else State.of(Decimal(temperature)),
+        total_pressure_Pa=State.of(band),
+    )
+
+
+def test_hashimoto_high_edge_is_transitional_at_the_furnace_pipe() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(_HASHIMOTO_PA, approximate=True)
+    )
+    length = float(DEFAULT_PIPE_DIAMETER_M)
+    assert length == 0.12
+    regime, clause = high_edge_knudsen_clause(float(band.high), 1973.15, length)
+    mean_free_path = single_species_mean_free_path_m(
+        float(band.high), 1973.15, N2_COLLISION_DIAMETER_M
+    )
+    knudsen = mean_free_path / length
+    assert regime is KnudsenRegime.TRANSITIONAL
+    assert classify_knudsen_regime(knudsen) is regime
+    assert f"Kn={knudsen:.6g}" in clause
+    assert "pressure-insensitive" not in clause
+    assert round(knudsen, 2) == 8.40
+
+    hot, _hot_clause = high_edge_knudsen_clause(float(band.high), 2273.15, length)
+    hot_knudsen = (
+        single_species_mean_free_path_m(
+            float(band.high), 2273.15, N2_COLLISION_DIAMETER_M
+        )
+        / length
+    )
+    assert hot is KnudsenRegime.TRANSITIONAL
+    assert round(hot_knudsen, 2) == 9.68
+
+    bead, _bead_clause = high_edge_knudsen_clause(
+        float(band.high), 1973.15, 0.001
+    )
+    assert bead is KnudsenRegime.FREE_MOLECULAR
+
+    notice = _approximate_pressure_notice(
+        _banded_identity(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION, band, "1973.15"
+        ),
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        origin="kems-015",
+        method=MethodToken.LANGMUIR_FREE_EVAPORATION,
+    )
+    assert notice is not None
+    assert notice.kind is NoticeKind.APPROXIMATE_PRESSURE
+    assert "half-decade order-of-magnitude assumption" in notice.reason
+    assert str(band.point) in notice.reason
+    assert "pressure-insensitive" not in notice.reason
+    assert f"Kn={knudsen:.6g}" in notice.reason
+    assert "furnace-pipe" in notice.reason
+    bound = melt_activity_log10_pressure_bound(
+        band.high - band.low, Decimal("1973.15")
+    )
+    assert format(bound, ".6e") in notice.reason
+    assert abs(bound - Decimal("3.01e-11")) / Decimal("3.01e-11") < Decimal("0.01")
+    assert flagged_strata((notice,)) == (FLAGGED_STRATUM_APPROXIMATE_PRESSURE,)
+
+
+def test_tenth_millipascal_high_edge_is_free_molecular() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(Decimal("0.0001"), approximate=True)
+    )
+    length = float(DEFAULT_PIPE_DIAMETER_M)
+    regime, clause = high_edge_knudsen_clause(float(band.high), 1673.0, length)
+    assert regime is KnudsenRegime.FREE_MOLECULAR
+    assert "pressure-insensitive regime" in clause
+    check = single_species_mean_free_path_m(0.0133, 1700.0, N2_COLLISION_DIAMETER_M)
+    assert abs(check - 2.75) < 0.02
+    assert classify_knudsen_regime(check / length) is KnudsenRegime.FREE_MOLECULAR
+
+    notice = _approximate_pressure_notice(
+        _banded_identity(Quantity.RESIDUE_COMPONENT_COMPOSITION, band, "1673"),
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        origin="zhang",
+        method=MethodToken.LANGMUIR_FREE_EVAPORATION,
+    )
+    assert notice is not None
+    assert "pressure-insensitive regime" in notice.reason
+    assert "activity |Δlog10(a)| bound" not in notice.reason
+
+
+def test_exact_residue_amount_does_not_take_the_value_stratum() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(_HASHIMOTO_PA, approximate=True)
+    )
+    measured = Value(ValueKind.POINT, point=Decimal("12.5"), approximate=False)
+    notice = _approximate_pressure_notice(
+        _banded_identity(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION, band, "1973.15"
+        ),
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        origin="kems-015",
+        method=MethodToken.LANGMUIR_FREE_EVAPORATION,
+    )
+    assert notice is not None
+    assert notice.kind is not NoticeKind.APPROXIMATE_VALUE
+    value_notices = (
+        (
+            Notice(
+                kind=NoticeKind.APPROXIMATE_VALUE,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason="approximate_printed_value",
+                origin="kems-015",
+            ),
+        )
+        if measured.approximate
+        else ()
+    )
+    assert flagged_strata((notice, *value_notices)) == (
+        FLAGGED_STRATUM_APPROXIMATE_PRESSURE,
+    )
+    both = flagged_strata(
+        (
+            Notice(
+                kind=NoticeKind.APPROXIMATE_VALUE,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason="approximate_printed_value",
+                origin="kems-015",
+            ),
+            notice,
+        )
+    )
+    assert both == (
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        FLAGGED_STRATUM_APPROXIMATE_PRESSURE,
+    )
+
+
+def test_knudsen_residue_notice_is_the_band_sentence_only() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(Decimal("0.0001"), approximate=True)
+    )
+    notice = _approximate_pressure_notice(
+        _banded_identity(Quantity.RESIDUE_COMPONENT_COMPOSITION, band, "1673"),
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        origin="kems-112",
+        method=MethodToken.KNUDSEN_EFFUSION,
+    )
+    assert notice is not None
+    assert notice.reason == approximate_pressure_band_reason(band)
+    assert "Kn=" not in notice.reason
+
+
+def test_activity_notice_carries_the_dex_bound_not_the_regime_sentence() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(_HASHIMOTO_PA, approximate=True)
+    )
+    notice = _approximate_pressure_notice(
+        _banded_identity(Quantity.ACTIVITY, band, "1973.15"),
+        Quantity.ACTIVITY,
+        origin="activity",
+    )
+    assert notice is not None
+    assert "pressure-insensitive" not in notice.reason
+    assert "Kn=" not in notice.reason
+    bound = melt_activity_log10_pressure_bound(
+        band.high - band.low, Decimal("1973.15")
+    )
+    assert format(bound, ".6e") in notice.reason
+
+
+def test_printed_band_sentence_names_the_printed_precision() -> None:
+    band = ApproxPressure(
+        point=Decimal("1"),
+        low=Decimal("0.9"),
+        high=Decimal("1.1"),
+        band_basis=BandBasis.PRINTED,
+    )
+    reason = approximate_pressure_band_reason(band)
+    assert reason.startswith("edges are the printed precision")
+    assert "half-decade" not in reason
+
+
+def test_missing_temperature_does_not_invent_a_regime() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(Decimal("0.0001"), approximate=True)
+    )
+    notice = _approximate_pressure_notice(
+        _banded_identity(Quantity.RESIDUE_COMPONENT_COMPOSITION, band, None),
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        origin="no-temperature",
+        method=MethodToken.LANGMUIR_FREE_EVAPORATION,
+    )
+    assert notice is not None
+    assert "Kn=" not in notice.reason
+    assert "pressure-insensitive" not in notice.reason
+    assert "half-decade" in notice.reason
+
+
+def test_saturation_pressure_notice_says_the_path_ignores_total_pressure() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(Decimal("0.0001"), approximate=True)
+    )
+    notice = _approximate_pressure_notice(
+        _banded_identity(Quantity.P_SAT, band, "1700"),
+        Quantity.P_SAT,
+        origin="psat",
+        engine=Engine.INTERNAL_ANALYTICAL,
+    )
+    assert notice is not None
+    assert "prediction path ignores total pressure" in notice.reason
+    assert "Kn=" not in notice.reason
+    partial = _approximate_pressure_notice(
+        _banded_identity(Quantity.P_PARTIAL, band, "1700"),
+        Quantity.P_PARTIAL,
+        origin="ppartial",
+        engine=Engine.OPENIMCC,
+    )
+    assert partial is not None
+    assert "prediction path ignores total pressure" in partial.reason
+    other = _approximate_pressure_notice(
+        _banded_identity(Quantity.P_PARTIAL, band, "1700"),
+        Quantity.P_PARTIAL,
+        origin="ppartial-other",
+        engine=Engine.VAPOROCK,
+    )
+    assert other is not None
+    assert "prediction path ignores total pressure" not in other.reason
+
+
+def test_exact_pressure_adds_no_approximate_pressure_notice() -> None:
+    identity = Identity(
+        quantity=Quantity.VISCOSITY,
+        species=None,
+        total_pressure_Pa=State.of(Decimal("101325")),
+    )
+    assert (
+        _approximate_pressure_notice(
+            identity, Quantity.VISCOSITY, origin="exact"
+        )
+        is None
+    )
 
 
 def test_band_mapping_on_temperature_is_still_the_decimal_cast() -> None:
