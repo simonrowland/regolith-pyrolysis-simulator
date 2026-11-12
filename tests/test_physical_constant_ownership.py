@@ -119,13 +119,26 @@ def test_delta_iw_subtraction_bits() -> None:
 
 
 def test_vant_hoff_antoine_and_clausius_bits() -> None:
-    """Pin the carrier-tool van't Hoff expressions before they move."""
+    """The Antoine and Clausius-Clapeyron owners keep the pre-move hexes."""
+
+    from engines.antoine import (
+        antoine_ab_from_enthalpy_entropy,
+        clausius_clapeyron_pressure,
+    )
 
     gas_constant = 8.31446261815324
-    ln10 = math.log(10.0)
-    antoine_a = math.log10(100_000.0) + 150.0 / (gas_constant * ln10)
-    antoine_b = 400_000.0 / (gas_constant * ln10)
-    pressure = 1.23e11 * math.exp(-400_000.0 / (gas_constant * 1800.0))
+    antoine_a, antoine_b = antoine_ab_from_enthalpy_entropy(
+        400_000.0,
+        150.0,
+        gas_constant=gas_constant,
+        standard_pressure=100_000.0,
+    )
+    pressure = clausius_clapeyron_pressure(
+        1.23e11,
+        400_000.0,
+        1800.0,
+        gas_constant=gas_constant,
+    )
     assert antoine_a.hex() == "0x1.9ab8ac22ada95p+3"
     assert antoine_b.hex() == "0x1.4675cacd27747p+14"
     assert pressure.hex() == "0x1.36fb264ef0908p-2"
