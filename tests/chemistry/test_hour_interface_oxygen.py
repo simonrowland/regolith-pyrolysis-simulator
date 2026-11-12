@@ -72,6 +72,8 @@ def _hour_sim(
     reservoir_log: float,
     overhead: float,
     k_bar: float = K_BAR,
+    p_total_mbar: float = 0.0,
+    pipe_diameter_m: float = 0.12,
 ):
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.melt = type("Melt", (), {})()
@@ -80,6 +82,19 @@ def _hour_sim(
     sim.melt.oxygen_reservoir = type("Reservoir", (), {})()
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = reservoir_log
     sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = overhead
+    # The debit already reads these. p_total 0 is free-molecular: Kn is
+    # infinite and the helper's gas weight is 0, so the Langmuir pins stay.
+    sim.setpoints = {"campaigns": {}, "chemistry_kernel": {}}
+    sim.melt.campaign = SimpleNamespace(name="")
+    sim.melt.atmosphere = SimpleNamespace(name="")
+    sim.melt.background_gas_species = ""
+    sim.melt.ambient_atmosphere = ""
+    sim.melt.p_total_mbar = p_total_mbar
+    sim.melt.stir_state = SimpleNamespace(axial=0.0, radial=1.0)
+    sim._overhead_model = SimpleNamespace(pipe_diameter_m=pipe_diameter_m)
+    sim.overhead = SimpleNamespace(headspace_temperature_K=0.0)
+    sim._melt_headspace_composition_mbar = {}
+    sim.vapor_pressures = {}
     calls: list[float] = []
 
     def pressures(log10_pO2_bar: float, _species) -> dict[str, float]:
@@ -138,7 +153,7 @@ def test_zero_capacity_hour_reproduces_analytic_langmuir_root() -> None:
     assert solution.surface_pO2_bar != pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
 
 
-def test_hour_passes_effusion_only(monkeypatch) -> None:
+def _spy_solve(monkeypatch):
     seen: dict[str, object] = {}
     real = solve_interface_oxygen
 
@@ -151,13 +166,68 @@ def test_hour_passes_effusion_only(monkeypatch) -> None:
         "simulator.chemistry.oxygen_interface.solve_interface_oxygen",
         spy,
     )
+    return seen
+
+
+def _o2_helper_resistances(transport):
+    from engines.builtin.evaporation_flux import (
+        _series_resistance_evaporation_flux_kg_m2_s,
+    )
+    from simulator.accounting.formulas import parse_formula
+
+    probed = _series_resistance_evaporation_flux_kg_m2_s(
+        species="O2",
+        P_eq_pa=1.0,
+        P_bulk_pa=0.0,
+        T_surface_K=TEMPERATURE_K,
+        molar_mass_kg_mol=parse_formula("O2").molar_mass_kg_per_mol(),
+        alpha_i=OXYGEN_GAS_ALPHA,
+        pipe_diameter_m=transport.pipe_diameter_m,
+        overhead_pressure_pa=transport.overhead_pressure_pa,
+        axial_stir_factor=transport.axial_stir_factor,
+        radial_stir_factor=transport.radial_stir_factor,
+        carrier_gas=transport.carrier_gas,
+        T_gas_K=transport.gas_temperature_K,
+        gas_resistance_enabled=transport.gas_resistance_enabled,
+        extrapolate_continuum=transport.extrapolate_continuum,
+    )
+    return probed
+
+
+def test_free_molecular_hour_passes_zero_gas_resistance(monkeypatch) -> None:
+    seen = _spy_solve(monkeypatch)
     sim, _calls = _solve_hour(capacity=0.0, reservoir_log=-2.0, overhead=0.0)
 
-    assert seen["kwargs"]["oxygen_r_gas_m_s"] == 0.0
+    probed = _o2_helper_resistances(sim._hour_interface_oxygen_transport)
+    assert probed.r_gas == 0.0
+    assert seen["kwargs"]["oxygen_r_gas_m_s"] == probed.r_gas
+    assert seen["kwargs"]["oxygen_r_interface_m_s"] == pytest.approx(
+        probed.r_interface
+    )
     assert OXYGEN_GAS_ALPHA == 1.0
     assert seen["kwargs"]["oxygen_alpha"] == OXYGEN_GAS_ALPHA
     assert all(channel.r_gas_m_s == 0.0 for channel in seen["channels"])
     assert sim._hour_interface_oxygen is not None
+
+
+def test_ten_mbar_hour_passes_the_helper_gas_resistance(monkeypatch) -> None:
+    seen = _spy_solve(monkeypatch)
+    sim, _calls = _solve_hour(
+        capacity=0.0,
+        reservoir_log=-2.0,
+        overhead=0.0,
+        p_total_mbar=10.0,
+    )
+
+    probed = _o2_helper_resistances(sim._hour_interface_oxygen_transport)
+    assert probed.r_gas > 0.0
+    assert seen["kwargs"]["oxygen_r_gas_m_s"] == pytest.approx(probed.r_gas)
+    assert seen["kwargs"]["oxygen_r_interface_m_s"] == pytest.approx(
+        probed.r_interface
+    )
+    assert seen["kwargs"]["transport"].overhead_pressure_pa == pytest.approx(
+        1000.0
+    )
 
 
 def test_overhead_above_root_stays_on_the_signed_balance() -> None:
@@ -563,11 +633,37 @@ def test_production_fe_channel_uses_catalog_stoichiometry() -> None:
     assert iron.oxygen_atoms == 0.0
     assert iron.parent_oxygen_demand == pytest.approx(1.0)
     assert iron.pO2_exponent == pytest.approx(-0.5)
-    assert iron.r_gas_m_s == 0.0
     assert silica.oxygen_atoms == pytest.approx(1.0)
     assert silica.parent_oxygen_demand == pytest.approx(2.0)
     assert silica.pO2_exponent == pytest.approx(-0.5)
-    assert silica.r_gas_m_s == 0.0
+    from engines.builtin.evaporation_flux import (
+        _series_resistance_evaporation_flux_kg_m2_s,
+    )
+
+    transport, refused, _domain = sim._interface_oxygen_transport(
+        1600.0 + 273.15, (iron, silica),
+    )
+    assert refused is False
+    for channel in (iron, silica):
+        probed = _series_resistance_evaporation_flux_kg_m2_s(
+            species=channel.species,
+            P_eq_pa=channel.bulk_pressure_pa + 1.0,
+            P_bulk_pa=channel.bulk_pressure_pa,
+            T_surface_K=1600.0 + 273.15,
+            molar_mass_kg_mol=channel.molar_mass_kg_per_mol,
+            alpha_i=channel.alpha,
+            pipe_diameter_m=transport.pipe_diameter_m,
+            overhead_pressure_pa=transport.overhead_pressure_pa,
+            axial_stir_factor=transport.axial_stir_factor,
+            radial_stir_factor=transport.radial_stir_factor,
+            carrier_gas=transport.carrier_gas,
+            T_gas_K=transport.gas_temperature_K,
+            gas_resistance_enabled=(
+                transport.gas_resistance_enabled and channel.uses_gas_resistance
+            ),
+            extrapolate_continuum=transport.extrapolate_continuum,
+        )
+        assert channel.r_gas_m_s == pytest.approx(probed.r_gas)
 
 
 def test_enclosed_furnace_interface_is_body_independent(tmp_path: Path) -> None:
@@ -654,3 +750,144 @@ def test_cached_and_replayed_hours_publish_the_fresh_vapour() -> None:
         str(species): float(pressure)
         for species, pressure in from_replay.vapor_pressures_Pa.items()
     } == fresh_pressures
+
+
+def test_pipe_diameter_moves_the_filmed_hour_root() -> None:
+    """A different pipe is a different frozen film. The root must move."""
+
+    narrow, _calls = _solve_hour(
+        capacity=2.0,
+        reservoir_log=-2.0,
+        overhead=0.0,
+        p_total_mbar=10.0,
+        pipe_diameter_m=0.12,
+    )
+    wide, _wide_calls = _solve_hour(
+        capacity=2.0,
+        reservoir_log=-2.0,
+        overhead=0.0,
+        p_total_mbar=10.0,
+        pipe_diameter_m=1.2,
+    )
+
+    assert narrow._hour_interface_oxygen_transport.pipe_diameter_m == 0.12
+    assert wide._hour_interface_oxygen_transport.pipe_diameter_m == 1.2
+    assert narrow._hour_interface_oxygen.surface_log10_pO2_bar != pytest.approx(
+        wide._hour_interface_oxygen.surface_log10_pO2_bar,
+        abs=1.0e-4,
+    )
+
+
+def _campaign_interface(campaign_name: str, *, p_total_mbar: float, temperature_C: float):
+    from simulator.state import CampaignPhase
+
+    sim = _loaded(_yaml("feedstocks.yaml"))
+    sim.start_campaign(CampaignPhase[campaign_name])
+    sim.melt.p_total_mbar = p_total_mbar
+    sim.melt.temperature_C = temperature_C
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    sim._ensure_hour_interface_oxygen()
+    return sim
+
+
+def _assert_series_identity(sim) -> None:
+    """Interface oxygen per species equals the helper plus production stoich.
+
+    Compared before depletion, the pipe cap, joint scale, the 1e-12 kg/h
+    threshold, and the finite-capacity partial override. Those gates are
+    downstream of the kinetic law and are not part of this identity.
+    τ, area, and capacity are the production resolvers.
+    """
+
+    from engines.builtin.evaporation_flux import (
+        _series_resistance_evaporation_flux_kg_m2_s,
+    )
+    from simulator.accounting.formulas import parse_formula
+
+    temperature_K = float(sim.melt.temperature_C) + 273.15
+    k_O, _source = sim._oxygen_exchange_k_m_s(temperature_K)
+    depth_m = sim._oxygen_exchange_effective_melt_depth_m()
+    assert sim._hour_interface_oxygen_exchange_time_s == pytest.approx(
+        depth_m / k_O
+    )
+    assert float(sim.melt.melt_surface_area_m2) > 0.0
+    solution = sim._hour_interface_oxygen
+    transport = sim._hour_interface_oxygen_transport
+    area_m2 = float(sim.melt.melt_surface_area_m2)
+    molar_o2 = parse_formula("O2").molar_mass_kg_per_mol()
+    channels = {
+        channel.species: channel
+        for channel in sim._interface_oxygen_channels(temperature_K)
+    }
+    assert solution.product_fluxes_mol_m2_s
+    for species, flux in solution.product_fluxes_mol_m2_s.items():
+        channel = channels[species]
+        row = None
+        for group in ("metals", "oxide_vapors"):
+            candidate = (sim.vapor_pressures.get(group) or {}).get(species)
+            if isinstance(candidate, dict):
+                row = candidate
+                break
+        assert row is not None
+        stoich = sim._evaporation_stoich(species, row)
+        element_o2 = (
+            channel.parent_oxygen_demand - channel.oxygen_atoms
+        ) / 2.0
+        stoich_o2 = (
+            float(stoich["O2_per_product_kg"])
+            * channel.molar_mass_kg_per_mol
+            / molar_o2
+        )
+        assert element_o2 == pytest.approx(stoich_o2, rel=1.0e-9, abs=1.0e-12), (
+            species
+        )
+        probed = _series_resistance_evaporation_flux_kg_m2_s(
+            species=species,
+            P_eq_pa=float(solution.channel_pressures_pa[species]),
+            P_bulk_pa=channel.bulk_pressure_pa,
+            T_surface_K=temperature_K,
+            molar_mass_kg_mol=channel.molar_mass_kg_per_mol,
+            alpha_i=channel.alpha,
+            pipe_diameter_m=transport.pipe_diameter_m,
+            overhead_pressure_pa=transport.overhead_pressure_pa,
+            axial_stir_factor=transport.axial_stir_factor,
+            radial_stir_factor=transport.radial_stir_factor,
+            carrier_gas=transport.carrier_gas,
+            T_gas_K=transport.gas_temperature_K,
+            melt_resistance_enabled=transport.melt_resistance_enabled,
+            gas_resistance_enabled=(
+                transport.gas_resistance_enabled and channel.uses_gas_resistance
+            ),
+            extrapolate_continuum=transport.extrapolate_continuum,
+        )
+        molar = float(probed.flux_kg_s_m2) / channel.molar_mass_kg_per_mol
+        assert float(flux) == pytest.approx(molar, rel=1.0e-9, abs=1.0e-18)
+        projected = sim._project_evaporation_overhead_source_mol_hr(
+            {species: float(probed.flux_kg_s_m2) * area_m2 * 3600.0},
+            {species: stoich},
+        )
+        assert solution.evaporative_oxygen_mol_s[species] * 3600.0 == pytest.approx(
+            float(projected.get("O2", 0.0)),
+            rel=1.0e-9,
+            abs=1.0e-18,
+        )
+
+
+def test_sso2_hour_evaporative_oxygen_matches_the_series_helper() -> None:
+    sim = _campaign_interface(
+        "C2A_STAGED", p_total_mbar=10.0, temperature_C=1650.0,
+    )
+    assert sim._hour_interface_oxygen_transport.overhead_pressure_pa == pytest.approx(
+        1000.0
+    )
+    _assert_series_identity(sim)
+
+
+def test_lunar_c0_hot_hour_evaporative_oxygen_matches_the_series_helper() -> None:
+    sim = _campaign_interface(
+        "C0", p_total_mbar=1.0, temperature_C=950.0,
+    )
+    assert sim._hour_interface_oxygen_transport.overhead_pressure_pa == pytest.approx(
+        100.0
+    )
+    _assert_series_identity(sim)

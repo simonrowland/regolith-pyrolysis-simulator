@@ -4621,7 +4621,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._hour_interface_oxygen_reservoir_ln = None
 
     def _ensure_hour_interface_oxygen(self) -> None:
-        """Solve ξ_s once per temperature. Effusion only (``R_gas = 0``)."""
+        """Solve ξ_s once per temperature on the debit's frozen series film."""
 
         if getattr(self, '_interface_oxygen_evaluating', False):
             return
@@ -4648,14 +4648,189 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._hour_interface_oxygen = solution
         self._hour_interface_oxygen_temperature_K = temperature_K
 
+    def _interface_oxygen_transport(self, temperature_K: float, channels):
+        """Frozen Kn inputs. Trial p_s is not an argument.
+
+        Overhead total pressure is ``_evaporation_overhead_total_pressure_Pa``:
+        max of the drained headspace partials and ``p_total_mbar * 100``.
+        The finite-capacity shadow's ``partial_pressures_Pa`` is applied
+        after this solve, in ``_calculate_evaporation``. It is not an
+        input to the residual. Pipe cap, depletion, joint scale, and the
+        1e-12 kg/h threshold stay downstream too.
+        """
+
+        from dataclasses import replace
+
+        from engines.builtin.evaporation_flux import (
+            series_continuum_extrapolation_decision,
+        )
+        from simulator.chemistry.oxygen_interface import InterfaceOxygenTransport
+        from simulator.evaporation import _load_hkl_upper_bound_transport_species
+
+        carrier_gas = self._resolve_condensation_carrier_gas()
+        pipe_diameter_m = float(
+            getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+        )
+        partials_pa = {
+            str(species): max(0.0, float(value)) * 100.0
+            for species, value in (
+                getattr(self, '_melt_headspace_composition_mbar', {}) or {}
+            ).items()
+        }
+        overhead_pressure_pa = float(
+            self._evaporation_overhead_total_pressure_Pa(partials_pa)
+        )
+        gas_temperature_K = float(
+            getattr(self.overhead, 'headspace_temperature_K', 0.0)
+            or temperature_K
+        )
+        kernel_config = dict(
+            getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
+        )
+        series_config = dict(
+            kernel_config.get('evaporation_series_resistance', {}) or {}
+        )
+        gas_resistance_enabled = bool_feature_flag(
+            series_config, 'gas_resistance_enabled', True
+        )
+        melt_resistance_enabled = bool(
+            series_config.get('melt_resistance_enabled', False)
+        )
+        hkl = set(
+            _load_hkl_upper_bound_transport_species(
+                getattr(self, 'vapor_pressures', None) or {}
+            )
+        )
+        transport = InterfaceOxygenTransport(
+            carrier_gas=carrier_gas,
+            pipe_diameter_m=pipe_diameter_m,
+            axial_stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
+            radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
+            overhead_pressure_pa=overhead_pressure_pa,
+            gas_temperature_K=gas_temperature_K,
+            gas_resistance_enabled=gas_resistance_enabled,
+            extrapolate_continuum=False,
+            melt_resistance_enabled=melt_resistance_enabled,
+            cold_skull_envelope=None,
+        )
+        affected = tuple(
+            channel.species
+            for channel in channels
+            if (
+                gas_resistance_enabled
+                and channel.uses_gas_resistance
+                and channel.species not in hkl
+            )
+        )
+        commanded_pressure_pa = max(
+            0.0,
+            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
+        )
+        campaign = getattr(self.melt, 'campaign', None)
+        campaign_name = str(getattr(campaign, 'name', '') or '') or None
+        domain_refusal, extrapolation, intent_refused = (
+            series_continuum_extrapolation_decision(
+                gas_resistance_enabled=gas_resistance_enabled,
+                overhead_pressure_pa=overhead_pressure_pa,
+                commanded_pressure_pa=commanded_pressure_pa,
+                pipe_diameter_m=pipe_diameter_m,
+                gas_temperature_K=gas_temperature_K,
+                carrier_gas=carrier_gas,
+                affected_species=affected,
+                campaign_name=campaign_name,
+                asking_site='simulator.core.interface_oxygen',
+            )
+        )
+        transport = replace(
+            transport,
+            extrapolate_continuum=extrapolation is not None,
+        )
+        return transport, bool(intent_refused), dict(domain_refusal or {})
+
+    def _interface_oxygen_with_bulk(self, channel, transport):
+        from dataclasses import replace
+
+        from simulator.evaporation import _load_hkl_upper_bound_transport_species
+
+        hkl = set(
+            _load_hkl_upper_bound_transport_species(
+                getattr(self, 'vapor_pressures', None) or {}
+            )
+        )
+        uses_gas = channel.uses_gas_resistance and channel.species not in hkl
+        if transport.gas_resistance_enabled and uses_gas:
+            bulk_pa = float(
+                self._evaporation_bulk_partial_pressure_pa(channel.species)
+            )
+        else:
+            bulk_pa = 0.0
+        return replace(
+            channel,
+            uses_gas_resistance=uses_gas,
+            bulk_pressure_pa=bulk_pa,
+        )
+
     def _solve_hour_interface_oxygen(self, temperature_K: float):
+        from engines.builtin.evaporation_flux import (
+            EvaporationFluxConfigurationError,
+        )
         from simulator.chemistry.oxygen_interface import (
             InterfaceOxygenSolveError,
             OXYGEN_GAS_ALPHA,
+            film_channel,
+            overhead_floor_solution,
+            oxygen_series_resistances,
             solve_interface_oxygen,
         )
+        from simulator.evaporation import (
+            evaporation_flux_refusal_from_configuration_error,
+        )
 
+        self._hour_interface_oxygen_builder_omissions = {}
         channels = self._interface_oxygen_channels(temperature_K)
+        transport, intent_refused, domain_refusal = (
+            self._interface_oxygen_transport(temperature_K, channels)
+        )
+        if intent_refused:
+            reason = str(
+                domain_refusal.get('reason')
+                or 'evaporation_flux_configuration_error'
+            )
+            raise EvaporationFluxRefusal(reason, domain_refusal)
+        filmed = []
+        omissions = dict(self._hour_interface_oxygen_builder_omissions or {})
+        for channel in channels:
+            prepared = self._interface_oxygen_with_bulk(channel, transport)
+            kept, reason = film_channel(
+                prepared, transport, temperature_K=temperature_K,
+            )
+            if kept is None:
+                omissions[prepared.species] = reason or 'series helper refusal'
+                continue
+            filmed.append(kept)
+        self._hour_interface_oxygen_omissions = omissions
+        self._hour_interface_oxygen_transport = transport
+        try:
+            oxygen_r_interface, oxygen_r_gas = oxygen_series_resistances(
+                transport,
+                temperature_K=temperature_K,
+                oxygen_alpha=OXYGEN_GAS_ALPHA,
+            )
+        except EvaporationFluxConfigurationError as exc:
+            raise evaporation_flux_refusal_from_configuration_error(exc) from exc
+        if not filmed and omissions:
+            raise EvaporationFluxRefusal(
+                'evaporation_flux_configuration_error',
+                {
+                    'reason': 'evaporation_flux_configuration_error',
+                    'detail': (
+                        'every interface channel was omitted by the series helper'
+                    ),
+                    'missing_transport_parameters': dict(omissions),
+                    'evaporation_flux_kg_hr': {},
+                },
+            )
+        channels = tuple(filmed)
         reservoir_log = float(self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
         capacity = self._melt_redox_source_capacity_mol_per_ln_fO2(
             fO2_log=reservoir_log,
@@ -4688,19 +4863,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # surplus. Unit check: p_h is bar and log10(p_h/bar) is
         # dimensionless. Limit: p_h -> 1 from above meets the bracket top;
         # a larger p_h stays on the measured partial, not the 1 bar edge.
+        area_m2 = float(getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0)
         if math.isfinite(overhead_bar) and overhead_bar > 1.0:
-            from simulator.chemistry.oxygen_interface import (
-                overhead_floor_solution,
-            )
-
             return overhead_floor_solution(
                 pressure_model,
                 channels,
                 overhead_pO2_bar=overhead_bar,
-                area_m2=float(
-                    getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0
-                ),
+                area_m2=area_m2,
                 temperature_K=temperature_K,
+                transport=transport,
+                oxygen_alpha=OXYGEN_GAS_ALPHA,
+                oxygen_r_interface_m_s=oxygen_r_interface,
+                oxygen_r_gas_m_s=oxygen_r_gas,
             )
         try:
             return solve_interface_oxygen(
@@ -4710,12 +4884,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 melt_capacity_mol_per_ln_fO2=capacity,
                 exchange_time_s=exchange_time_s,
                 overhead_pO2_bar=overhead_bar,
-                area_m2=float(
-                    getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0
-                ),
+                area_m2=area_m2,
                 temperature_K=temperature_K,
                 oxygen_alpha=OXYGEN_GAS_ALPHA,
-                oxygen_r_gas_m_s=0.0,
+                oxygen_r_interface_m_s=oxygen_r_interface,
+                oxygen_r_gas_m_s=oxygen_r_gas,
+                transport=transport,
             )
         except InterfaceOxygenSolveError as exc:
             # The solver's upper edge is a typed refusal, not a 1 bar clamp.
@@ -4775,7 +4949,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     continue
                 seen.add(species_name)
                 channels.append(channel)
-        return tuple(channels)
+        from simulator.chemistry.oxygen_interface import film_channel
+
+        transport, intent_refused, domain_refusal = (
+            self._interface_oxygen_transport(temperature_K, channels)
+        )
+        if intent_refused:
+            reason = str(
+                domain_refusal.get('reason')
+                or 'evaporation_flux_configuration_error'
+            )
+            raise EvaporationFluxRefusal(reason, domain_refusal)
+        filmed: list[InterfaceOxygenChannel] = []
+        omissions: dict[str, str] = {}
+        for channel in channels:
+            prepared = self._interface_oxygen_with_bulk(channel, transport)
+            kept, reason = film_channel(
+                prepared, transport, temperature_K=temperature_K,
+            )
+            if kept is None:
+                omissions[prepared.species] = reason or 'series helper refusal'
+                continue
+            filmed.append(kept)
+        self._hour_interface_oxygen_builder_omissions = omissions
+        return tuple(filmed)
 
     def _interface_oxygen_channel(self, species: str, row: Mapping[str, Any], *, alpha: float):
         from simulator.chemistry.oxygen_interface import InterfaceOxygenChannel
@@ -4806,7 +5003,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 parent_oxygen_demand=0.0,
                 pO2_exponent=exponent,
                 alpha=alpha,
-                r_gas_m_s=0.0,
                 kind='atomic_oxygen',
             )
         parent = str(row.get('parent_oxide') or '')
@@ -4852,7 +5048,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             parent_oxygen_demand=parent_oxygen_demand,
             pO2_exponent=exponent,
             alpha=alpha,
-            r_gas_m_s=0.0,
         )
 
     def _interface_oxygen_pressures_pa(
@@ -5061,60 +5256,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         if violation:
             payload['capacity_violation'] = dict(violation)
-        mismatch = getattr(self, '_hour_stage_c_film_mismatch_notice', None)
-        if mismatch:
-            payload['stage_c_interface_effusion_vs_ledger_film_mismatch'] = dict(
-                mismatch
-            )
-        return payload
-
-    def _record_stage_c_film_mismatch(self, evap_flux: EvaporationFlux) -> None:
-        """Wire the booked film rate to the interface effusion rate.
-
-        The ratio itself lives in ``oxygen_interface``. Mol/h on the
-        effusion side is ``J * A * 3600``: J is mol/(m² s), A is m², and
-        3600 s/h converts the hour's booked ledger mol/h.
-        """
-
+        omissions = dict(
+            getattr(self, '_hour_interface_oxygen_omissions', {}) or {}
+        )
+        if solution is not None:
+            omissions.update(dict(getattr(solution, 'omitted_reasons', {}) or {}))
         from simulator.chemistry.oxygen_interface import (
-            stage_c_film_mismatch_notice,
+            INTERFACE_SPECIES_OMITTED_KIND,
+            interface_species_omitted_notice,
         )
 
-        solution = getattr(self, '_hour_interface_oxygen', None)
-        if solution is None:
-            self._hour_stage_c_film_mismatch_notice = None
-            return
-        area_m2 = float(getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0)
-        if not math.isfinite(area_m2) or area_m2 < 0.0:
-            raise AccountingError(
-                'stage C film comparison requires a finite non-negative '
-                f'melt area; got {area_m2!r}'
-            )
-        effusion_mol_h = {
-            str(species): float(flux) * area_m2 * 3600.0
-            for species, flux in (
-                getattr(solution, 'product_fluxes_mol_m2_s', {}) or {}
-            ).items()
-        }
-        ledger_mol_h: dict[str, float] = {}
-        for species, rate_kg_h in (
-            getattr(evap_flux, 'species_kg_hr', {}) or {}
-        ).items():
-            formula = resolve_species_formula(
-                str(species),
-                self.species_formula_registry,
-            )
-            molar_mass = formula.molar_mass_kg_per_mol()
-            if not math.isfinite(molar_mass) or molar_mass <= 0.0:
-                raise AccountingError(
-                    'stage C film comparison requires a positive molar '
-                    f'mass for {species!r}; got {molar_mass!r}'
-                )
-            ledger_mol_h[str(species)] = float(rate_kg_h) / molar_mass
-        self._hour_stage_c_film_mismatch_notice = stage_c_film_mismatch_notice(
-            ledger_mol_h=ledger_mol_h,
-            interface_effusion_mol_h=effusion_mol_h,
-        )
+        omitted = interface_species_omitted_notice(omissions)
+        if omitted:
+            payload[INTERFACE_SPECIES_OMITTED_KIND] = dict(omitted)
+        return payload
 
     def _cleaned_melt_fe_atom_mol(self) -> float:
         total_fe_mol = 0.0
@@ -16652,7 +16807,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._hour_interface_oxygen = None
         self._hour_interface_oxygen_temperature_K = None
         self._hour_interface_oxygen_booking = None
-        self._hour_stage_c_film_mismatch_notice = None
+        self._hour_interface_oxygen_omissions = None
         self._hour_interface_oxygen_capacity_mol_per_ln = None
         self._hour_interface_oxygen_exchange_time_s = None
         self._hour_interface_oxygen_reservoir_ln = None
@@ -16917,9 +17072,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._pending_knudsen_zero_overhead_flow_marker = None
 
         # --- 6. Update melt composition ---
-        # Subtract evaporated mass from the melt. The film-gap notice
-        # reads this committed rate against the pre-update area.
-        self._record_stage_c_film_mismatch(evap_flux)
+        # Subtract evaporated mass from the melt. The series film is
+        # already inside the interface residual. Pipe cap, depletion,
+        # and the 1e-12 kg/h threshold still act on this booked rate.
         self._update_melt_composition(evap_flux)
         self._book_hour_interface_oxygen()
         self._settle_evaporative_redox_after_batch()

@@ -53,7 +53,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from engines.builtin._common import (
@@ -1162,6 +1162,83 @@ def _solid_host_bakeout_result(
     )
 
 
+def series_continuum_extrapolation_decision(
+    *,
+    gas_resistance_enabled: bool,
+    overhead_pressure_pa: float,
+    commanded_pressure_pa: float,
+    pipe_diameter_m: float,
+    gas_temperature_K: float,
+    carrier_gas: str,
+    affected_species: Sequence[str],
+    campaign_name: str | None,
+    asking_site: str,
+) -> tuple[dict[str, Any] | None, dict[str, Any] | None, bool]:
+    """One film-domain decision for the debit and the interface hour.
+
+    Returns ``(domain_refusal, extrapolation_notice, intent_refused)``.
+
+    ``extrapolate_continuum`` is ``extrapolation_notice is not None``.
+    The helper's ``gas_weight`` is a step at ``Kn = 0.01``, and ``Kn``
+    uses the overhead total pressure. Both callers freeze that pressure
+    for the hour. A second copy of this branch would let the residual
+    extrapolate where the debit refuses, or the reverse.
+
+    ``intent_refused`` is the provider's early return: continuum validity
+    refuses and the finite continuation does not apply. The interface
+    hour refuses with that outcome instead of solving an effusion residual.
+    An empty affected-species list does not refuse and does not extrapolate,
+    matching a debit that has nothing to price.
+    """
+
+    if not gas_resistance_enabled or overhead_pressure_pa <= 0.0:
+        return None, None, False
+    from simulator.condensation import _knudsen_number
+    from simulator.evaporation import viscous_p_bulk_out_of_domain_diagnostic
+    from simulator.transport_regime import continuum_validity_refuses
+
+    kn_domain = _knudsen_number(
+        overhead_pressure_pa,
+        max(gas_temperature_K, 1.0),
+        max(pipe_diameter_m, 0.0) or 0.12,
+        carrier_gas=carrier_gas,
+    )
+    domain_refusal = viscous_p_bulk_out_of_domain_diagnostic(
+        knudsen_number=kn_domain,
+        overhead_pressure_pa=overhead_pressure_pa,
+        commanded_pressure_pa=commanded_pressure_pa,
+        pipe_diameter_m=pipe_diameter_m,
+        gas_temperature_K=gas_temperature_K,
+        carrier_gas=carrier_gas,
+        affected_species=tuple(affected_species),
+        campaign_name=campaign_name,
+        asking_site=asking_site,
+    )
+    if not affected_species or not continuum_validity_refuses(domain_refusal):
+        return domain_refusal, None, False
+    if domain_refusal.get("reason") == "viscous_p_bulk_transport_out_of_domain":
+        extrapolation = {
+            **{
+                key: value
+                for key, value in domain_refusal.items()
+                if key not in ("silent_zero_notes", "evaporation_flux_kg_hr")
+            },
+            "status": "extrapolated",
+            "authority_level": "extrapolated",
+            "authority_class": "extrapolated",
+            "doctrine_category": 2,
+            "ledger_yields_authorized": True,
+            "evaporation_flux_status": "extrapolated",
+            "detail": (
+                domain_refusal["detail"]
+                + "; finite continuation of the same continuum fit; "
+                "not certified transitional transport"
+            ),
+        }
+        return domain_refusal, extrapolation, False
+    return domain_refusal, None, True
+
+
 class BuiltinEvaporationFluxProvider(ChemistryProvider):
     """Authoritative ``EVAPORATION_FLUX`` provider (Hertz-Knudsen-Langmuir).
 
@@ -1396,10 +1473,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 controls.get("hkl_upper_bound_transport_species", ()) or ()
             )
         )
-        from simulator.condensation import (
-            GAS_CONSTANT_J_MOL_K,
-            _knudsen_number as _kn_eval,
-        )
+        from simulator.condensation import GAS_CONSTANT_J_MOL_K
 
         alpha_by_species = _coerce_alpha_by_species(controls.get("alpha"))
         alpha_envelope_by_species = _coerce_alpha_envelope_by_species(
@@ -1527,9 +1601,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 ),
             )
         )
-        from simulator.evaporation import (
-            viscous_p_bulk_out_of_domain_diagnostic,
-        )
         from simulator.transport_regime import continuum_validity_refuses
 
         # When gas resistance is disabled, the executed model is the HKL-only
@@ -1546,71 +1617,46 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             if campaign_name_raw is None
             else (str(campaign_name_raw).strip() or None)
         )
-        domain_refusal = None
-        continuum_extrapolation = None
-        if gas_resistance_enabled and overhead_pressure_pa > 0.0:
-            kn_domain = _kn_eval(
-                overhead_pressure_pa,
-                max(gas_temperature_K, 1.0),
-                max(pipe_diameter_m, 0.0) or 0.12,
-                carrier_gas=carrier_gas,
+        (
+            domain_refusal,
+            continuum_extrapolation,
+            intent_refused,
+        ) = series_continuum_extrapolation_decision(
+            gas_resistance_enabled=gas_resistance_enabled,
+            overhead_pressure_pa=overhead_pressure_pa,
+            commanded_pressure_pa=commanded_pressure_pa,
+            pipe_diameter_m=pipe_diameter_m,
+            gas_temperature_K=gas_temperature_K,
+            carrier_gas=carrier_gas,
+            affected_species=tuple(active_gas_transport_species),
+            campaign_name=campaign_name,
+            asking_site="engines.builtin.evaporation_flux",
+        )
+        if intent_refused:
+            domain_diagnostic = dict(domain_refusal or {})
+            _attach_missing_alpha_records(
+                domain_diagnostic,
+                missing_alpha,
+                stoich_by_species,
             )
-            domain_refusal = viscous_p_bulk_out_of_domain_diagnostic(
-                knudsen_number=kn_domain,
-                overhead_pressure_pa=overhead_pressure_pa,
-                commanded_pressure_pa=commanded_pressure_pa,
-                pipe_diameter_m=pipe_diameter_m,
-                gas_temperature_K=gas_temperature_K,
-                carrier_gas=carrier_gas,
-                affected_species=tuple(active_gas_transport_species),
-                campaign_name=campaign_name,
-                asking_site="engines.builtin.evaporation_flux",
+            domain_warnings = [
+                "viscous_p_bulk_transport_out_of_domain: "
+                "evaporation flux not evaluated in transitional Kn",
+            ]
+            if missing_alpha:
+                domain_warnings.append(
+                    "per-species evaporation refusal; retained condensed "
+                    "because evaporation_alpha is missing: "
+                    + ", ".join(sorted(missing_alpha))
+                )
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic=domain_diagnostic,
+                warnings=tuple(domain_warnings),
             )
-            if (
-                active_gas_transport_species
-                and continuum_validity_refuses(domain_refusal)
-            ):
-                if domain_refusal.get("reason") == "viscous_p_bulk_transport_out_of_domain":
-                    continuum_extrapolation = {
-                        **{key: value for key, value in domain_refusal.items()
-                           if key not in ("silent_zero_notes", "evaporation_flux_kg_hr")},
-                        "status": "extrapolated",
-                        "authority_level": "extrapolated",
-                        "authority_class": "extrapolated",
-                        "doctrine_category": 2,
-                        "ledger_yields_authorized": True,
-                        "evaporation_flux_status": "extrapolated",
-                        "detail": domain_refusal["detail"] + "; finite continuation of the same continuum fit; not certified transitional transport",
-                    }
-            if (
-                active_gas_transport_species
-                and continuum_validity_refuses(domain_refusal)
-                and continuum_extrapolation is None
-            ):
-                domain_diagnostic = dict(domain_refusal)
-                _attach_missing_alpha_records(
-                    domain_diagnostic,
-                    missing_alpha,
-                    stoich_by_species,
-                )
-                domain_warnings = [
-                    "viscous_p_bulk_transport_out_of_domain: "
-                    "evaporation flux not evaluated in transitional Kn",
-                ]
-                if missing_alpha:
-                    domain_warnings.append(
-                        "per-species evaporation refusal; retained condensed "
-                        "because evaporation_alpha is missing: "
-                        + ", ".join(sorted(missing_alpha))
-                    )
-                return IntentResult(
-                    intent=ChemistryIntent.EVAPORATION_FLUX,
-                    status="refused",
-                    transition=None,
-                    control_audit=control_audit,
-                    diagnostic=domain_diagnostic,
-                    warnings=tuple(domain_warnings),
-                )
 
         flux_kg_hr: dict[str, float] = {}
         below_threshold_flux_kg_hr: dict[str, float] = {}
