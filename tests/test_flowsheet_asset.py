@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import json
 import math
 import re
 import sys
@@ -669,6 +670,34 @@ def test_live_major_species_admission_green(renderer, flowsheet):
         assert by_sym[sym].outcome == "PASS", (sym, by_sym[sym])
     assert result.ok
     assert all(r.outcome != "FAIL" for r in result.admission_results)
+
+
+def test_live_major_ellingham_output_is_pinned_before_move(renderer):
+    """Pin the current reducer facts and raw ΔG values before moving the calculation."""
+    from simulator.chemistry.ellingham_graph import dissociation_delta_g
+    from simulator.chemistry.ellingham_thermo import ELLINGHAM_THERMO
+
+    facts = renderer.build_live_major_facts()
+    derived = {
+        element: facts[element]
+        for element in sorted(ELLINGHAM_THERMO)
+        if element in facts
+    }
+    payload = json.dumps(derived, sort_keys=True, separators=(",", ":"))
+    assert hashlib.sha256(payload.encode()).hexdigest() == (
+        "3c16a5bfc982469496ad1f117033b26ff8d37e001f68901bbb47d60edea24170"
+    )
+
+    assert {
+        element: dissociation_delta_g(element, 1873.15).hex()
+        for element in ("Mg", "Ca", "Si", "Mn", "Cr")
+    } == {
+        "Mg": "-0x1.59eb804c3fa90p+9",
+        "Ca": "-0x1.aa23e56a95d71p+9",
+        "Si": "-0x1.1fbaffdb398a0p+9",
+        "Mn": "-0x1.e440b11c6d1e0p+8",
+        "Cr": "-0x1.afd14b7997a5dp+8",
+    }
 
 
 def test_deliberate_admission_contradiction_fails(renderer, flowsheet):
