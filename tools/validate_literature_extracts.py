@@ -2552,8 +2552,9 @@ def _locator_source_blind_reason(
 
     No source-blind reason means a candidate was opened and contained the
     certified leaves: the sample value and resolved extract value. A tolerant
-    sample match does not stand in for the stored number. Candidates within
-    one key are alternatives; separate declared keys must each match.
+    sample match does not stand in for the stored number. Separate declared
+    keys must each match; a record's filename alternate is considered only
+    when the earlier candidate could not be opened.
     """
     keys = [key for key in ("locator", "source_locator") if key in sample]
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
@@ -2564,13 +2565,12 @@ def _locator_source_blind_reason(
         for key in _ARTIFACT_PATH_KEYS
         if isinstance((raw := locator.get(key)), str) and raw.strip()
     ]
-    if not candidate_groups:
-        record = locator.get("record")
-        if isinstance(record, str) and record.strip():
-            text = record.strip()
-            token = text.split()[0]
-            candidates = [text] if token == text else [text, token]
-            candidate_groups = [("record", candidates)]
+    record = locator.get("record")
+    if isinstance(record, str) and record.strip():
+        text = record.strip()
+        token = text.split()[0]
+        candidates = [text] if token == text else [text, token]
+        candidate_groups.append(("record", candidates))
     if not candidate_groups:
         return (
             "locator was not opened: no source_path, quotes_path, or file record "
@@ -2595,6 +2595,8 @@ def _locator_source_blind_reason(
                 candidate_reasons.append(
                     f"locator was not opened: {open_refusal} ({raw})"
                 )
+                if path is not None and blob is not None:
+                    break
                 continue
             if path is None or blob is None:
                 candidate_reasons.append(
@@ -2605,18 +2607,18 @@ def _locator_source_blind_reason(
                 candidate_reasons.append(
                     f"{path.name} is a PDF; certification opens a text or OCR artifact"
                 )
-                continue
+                break
             try:
                 text = blob.decode("utf-8")
             except UnicodeError:
                 candidate_reasons.append(f"{path.name} is not UTF-8 text")
-                continue
+                break
             if _text_is_extract_document(text):
                 candidate_reasons.append(
                     "locator was not opened: "
                     f"{path.name} is an extract document, not an independent source"
                 )
-                continue
+                break
             delimiter = _tabular_delimiter(path)
             if delimiter is None:
                 cited, span_error = _cited_text(text, locator)
@@ -2624,7 +2626,7 @@ def _locator_source_blind_reason(
                     candidate_reasons.append(
                         span_error or "cited span was not opened"
                     )
-                    continue
+                    break
                 missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
             else:
                 # Parse the complete table, then select. A sliced line is not a table.
@@ -2634,12 +2636,12 @@ def _locator_source_blind_reason(
                     candidate_reasons.append(
                         f"opened {path.name} but the table could not be parsed ({exc})"
                     )
-                    continue
+                    break
                 if cells is None:
                     candidate_reasons.append(
                         span_error or "cited span was not opened"
                     )
-                    continue
+                    break
                 missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
             if not missing:
                 key_matched = True
@@ -2649,6 +2651,7 @@ def _locator_source_blind_reason(
                 f"opened {path.name} but the resolved extract value is not in the "
                 f"cited text ({rendered})"
             )
+            break
         if not key_matched:
             reasons.extend(candidate_reasons)
     if reasons:
