@@ -352,7 +352,7 @@ def test_product_class_mass_evidence_serializes_metric_and_source_path(
         }
 
 
-def test_pure_silica_objective_uses_route_classified_product_not_raw_capture() -> None:
+def test_pure_silica_objective_uses_purity_classified_product_not_raw_capture() -> None:
     no_switch = {
         "pure_silica_glass": {
             "stage_3_capture_kg": 4.5,
@@ -378,6 +378,38 @@ def test_pure_silica_objective_uses_route_classified_product_not_raw_capture() -
     assert _metric_value(
         "pure_silica_glass_kg", SimpleNamespace(), {}, flagged_switched_product
     ) == pytest.approx(4.5)
+
+
+def test_pure_silica_objective_uses_qualifying_snapshot_sum() -> None:
+    from simulator.three_product_report import classify_products
+
+    sim = SimpleNamespace(
+        train=SimpleNamespace(stages=[None, None, None, SimpleNamespace(
+            collected_kg={"SiO2": 5.0, "Si": 0.5, "Na2O": 0.1},
+        )]),
+        record=SimpleNamespace(snapshots=[
+            SimpleNamespace(condensed_by_stage_species_delta={
+                (3, "SiO2"): 2.0,
+                (3, "Si"): 0.5,
+            }),
+            SimpleNamespace(condensed_by_stage_species_delta={
+                (3, "SiO2"): 3.0,
+                (3, "Na2O"): 0.1,
+            }),
+        ]),
+    )
+    product_classes = classify_products(sim)
+    product_kg = _metric_value(
+        "pure_silica_glass_kg", sim, {}, product_classes
+    )
+
+    evidence = objective_module._silica_objective_evidence(
+        product_classes, product_kg
+    )
+    assert product_kg == pytest.approx(2.0)
+    assert evidence["qualified_product_kg"] == pytest.approx(2.0)
+    assert evidence["unqualified_capture_kg"] == pytest.approx(3.0)
+    assert "purity_below_threshold" in evidence["notes"][0]
 
 
 def test_partial_silica_objective_evidence_keeps_exclusions_and_lower_bound() -> None:
@@ -491,7 +523,7 @@ def test_missing_stage_3_capture_refuses_silica_objective_with_reason() -> None:
     )
     assert evidence["value_status"] == "unavailable"
     assert evidence["certification_flag"]["status"] == "unavailable"
-    assert evidence["certification_flag"]["reason"] == "stage_3_missing"
+    assert "stage_3_missing" in evidence["certification_flag"]["reason"]
 
 
 def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
@@ -2773,7 +2805,7 @@ def test_product_summary_includes_input_output_yield_table_and_mass_closure() ->
     assert outputs["ingots_metals"]["kg"] == pytest.approx(50.0)
     assert outputs["glass"]["yield_pct"] == pytest.approx(40.0 / 1001.5 * 100.0)
     assert summary["product_classes"]["pure_silica_glass"]["flag"]["authority"] == (
-        "extrapolated"
+        "interim purity threshold"
     )
     assert outputs["oxygen"]["partition_kg"]["mre_anode_stored"] == pytest.approx(20.0)
     assert outputs["captured_volatiles"]["kg_by_species"] == {"H2O": 5.0}

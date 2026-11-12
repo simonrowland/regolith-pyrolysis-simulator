@@ -25,6 +25,7 @@ from simulator.session import SimSession, SimSessionConfig
 from simulator.three_product_report import (
     METAL_PRODUCT_SPECIES,
     O2_PRODUCT_SPECIES,
+    PURE_SILICA_GLASS_MIN_PURITY_WT_PCT,
     PURE_SILICA_GLASS_SPECIES,
     classify_products,
 )
@@ -336,7 +337,8 @@ def test_silica_glass_capture_is_unavailable_when_stage_3_is_missing():
     assert silica['stage_3_capture_kg'] is None
     assert silica['class_total_kg'] is None
     assert silica['flag']['status'] == 'unavailable'
-    assert silica['flag']['reason'] == 'stage_3_missing'
+    assert 'stage_3_missing' in silica['flag']['reason']
+    assert 'owner product spec pending' in silica['flag']['reason']
     assert silica['stage_3_kg_by_species'] == {}
     assert result['glass']['class_total_kg'] is None
     assert result['glass']['pure_silica_glass_kg'] is None
@@ -364,7 +366,7 @@ def test_silica_glass_capture_is_unavailable_when_stage_3_collection_is_unknown(
     assert silica['stage_3_capture_kg'] is None
     assert silica['class_total_kg'] is None
     assert silica['flag']['status'] == 'unavailable'
-    assert silica['flag']['reason'] == reason
+    assert reason in silica['flag']['reason']
     assert result['glass']['pure_silica_glass_kg'] is None
 
 
@@ -380,7 +382,7 @@ def test_silica_glass_capture_is_zero_when_stage_3_exists_with_no_collection():
 
     silica = result['pure_silica_glass']
     assert silica['stage_3_capture_kg'] == 0.0
-    assert 'flag' not in silica
+    assert 'owner product spec pending' in silica['flag']['reason']
     assert result['pure_silica_glass']['stage_3_kg_by_species'] == {}
 
 
@@ -388,9 +390,14 @@ def test_glass_aggregate_keeps_computed_zero_when_capture_is_unqualified():
     sim = SimpleNamespace(
         product_ledger=lambda: {},
         train=SimpleNamespace(stages=[None, None, None, SimpleNamespace(
-            collected_kg={'SiO2': 4.5},
+            collected_kg={'SiO2': 4.5, 'Na2O': 0.1},
         )]),
-        record=SimpleNamespace(snapshots=[]),
+        record=SimpleNamespace(snapshots=[SimpleNamespace(
+            condensed_by_stage_species_delta={
+                (3, 'SiO2'): 4.5,
+                (3, 'Na2O'): 0.1,
+            },
+        )]),
         _last_evaporation_flux_diagnostic={
             'missing_transport_parameters': {
                 'Si': {
@@ -418,62 +425,32 @@ def test_glass_aggregate_keeps_computed_zero_when_capture_is_unqualified():
     assert glass['excluded'] == silica['excluded']
 
 
-@pytest.mark.parametrize(
-    ('events', 'verdict', 'outcome'),
-    [
-        ([], 'authoritative', 'non_product'),
-        (['release'], 'authoritative', 'non_product'),
-        (['hold', 'release'], 'authoritative', 'authoritative_product'),
-        (
-            ['hold', 'release'],
-            'status_bearing_non_authoritative',
-            'flagged_product',
-        ),
-        (['hold', 'release'], 'missing', 'uncertified_numeric_product'),
-        (['hold', 'incidental'], 'authoritative', 'non_product'),
-        (['incidental', 'hold', 'release'], 'authoritative', 'non_product'),
-        (['hold', 'release', 'incidental'], 'authoritative', 'non_product'),
-    ],
-)
-def test_silica_product_separates_executed_switch_from_evidence_certification(
-    events, verdict, outcome
-):
-    authority = {
-        'species_id': 'SiO',
-        'pressure': {'kind': 'value', 'pa': 1.0},
-        'flux': {'kind': 'eligible'},
-        'verdict_status': verdict,
-        'certification_ceiling': 'validated_point',
-        'validation_status': 'validated',
-        'is_flux_active': True,
-    }
-    if verdict == 'status_bearing_non_authoritative':
-        authority.update({
-            'authority_level': 'extrapolated',
-            'valid_range_K': [1400.0, 2200.0],
-            'reason': 'outside certified SiO source band',
-        })
+def test_silica_qualifies_each_snapshot_and_keeps_exclusions_local():
     snapshots = [
         SimpleNamespace(
             c2a_staged_gas={
-                'stage_name': 'sio_window' if event == 'release' else 'alkali_early_fe',
-                'gas_cover_mode': 'po2_hold' if event == 'hold' else 'pn2_sweep',
+                'stage_name': 'C4',
+                'gas_cover_mode': 'pn2_sweep',
             },
-            condensed_by_stage_species_delta=(
-                {} if event == 'hold' else {(3, 'SiO2'): 1.0}
-            ),
-            evap_flux=SimpleNamespace(
-                carrier_authority_by_species=(
-                    {} if verdict == 'missing' else {'SiO': authority}
-                ),
-            ),
-        )
-        for event in events
+            condensed_by_stage_species_delta={
+                (3, 'SiO2'): 2.0,
+                (3, 'Si'): 0.5,
+            },
+        ),
+        SimpleNamespace(
+            c2a_staged_gas={
+                'stage_name': 'post_mg',
+                'gas_cover_mode': 'vacuum',
+            },
+            condensed_by_stage_species_delta={
+                (3, 'SiO2'): 3.0,
+                (3, 'Na2O'): 0.1,
+            },
+        ),
     ]
-    captured_kg = float(max(1, sum(event != 'hold' for event in events)))
     sim = SimpleNamespace(
         train=SimpleNamespace(stages=[None, None, None, SimpleNamespace(
-            collected_kg={'SiO2': captured_kg},
+            collected_kg={'SiO2': 5.0, 'Si': 0.5, 'Na2O': 0.1},
         )]),
         record=SimpleNamespace(snapshots=snapshots),
     )
@@ -481,37 +458,58 @@ def test_silica_product_separates_executed_switch_from_evidence_certification(
     result = classify_products(sim)
 
     silica = result['pure_silica_glass']
-    expected_product_kg = {
-        'non_product': 0.0,
-        'authoritative_product': captured_kg,
-        'flagged_product': captured_kg,
-        'uncertified_numeric_product': captured_kg,
-    }[outcome]
-    expected_capture_kg = captured_kg
-    expected_species = {'SiO2': captured_kg}
-    assert silica['stage_3_capture_kg'] == expected_capture_kg
-    assert silica['stage_3_kg_by_species'] == expected_species
-    assert silica['class_total_kg'] == expected_product_kg
-    assert result['glass']['class_total_kg'] == expected_product_kg
-    assert result['glass']['species_kg'] == (
-        {'SiO2': captured_kg}
-        if outcome in {
-            'authoritative_product', 'flagged_product',
-            'uncertified_numeric_product',
-        }
-        else {}
+    assert silica['stage_3_capture_kg'] == 5.0
+    assert silica['stage_3_kg_by_species'] == {'SiO2': 5.0, 'Si': 0.5}
+    assert silica['class_total_kg'] == 2.0
+    assert result['glass']['class_total_kg'] == 2.0
+    assert result['glass']['species_kg'] == {'SiO2': 2.0}
+    assert silica['flag']['status'] == 'flagged product spec pending'
+    assert 'owner product spec pending' in silica['flag']['reason']
+    assert 'qualified Stage 3 Si coproduct 0.5 kg' in silica['flag']['reason']
+    assert 'Stage 3 snapshot 1 is non-product' in silica['flag']['reason']
+    assert 'purity_below_threshold' in silica['flag']['reason']
+
+
+def test_silica_snapshot_at_98_9_percent_is_excluded_with_reason():
+    assert PURE_SILICA_GLASS_MIN_PURITY_WT_PCT == 99.0
+    sim = SimpleNamespace(
+        train=SimpleNamespace(stages=[None, None, None, SimpleNamespace(
+            collected_kg={'SiO2': 98.9, 'Na2O': 1.1},
+        )]),
+        record=SimpleNamespace(snapshots=[SimpleNamespace(
+            condensed_by_stage_species_delta={
+                (3, 'SiO2'): 98.9,
+                (3, 'Na2O'): 1.1,
+            },
+        )]),
     )
-    if outcome == 'flagged_product':
-        assert silica['flag'] == {
-            'status': 'flagged prediction',
-            'authority': 'extrapolated',
-            'band': [1400.0, 2200.0],
-            'reason': 'outside certified SiO source band',
-        }
-    elif outcome == 'uncertified_numeric_product':
-        assert silica['flag']['status'] == 'unavailable'
-    else:
-        assert 'flag' not in silica
+
+    silica = classify_products(sim)['pure_silica_glass']
+
+    assert silica['class_total_kg'] == 0.0
+    assert 'purity_below_threshold' in silica['flag']['reason']
+    assert '98.900 wt% silica-bearing' in silica['flag']['reason']
+
+
+def test_pure_silica_snapshot_outside_sio_window_counts_as_product():
+    sim = SimpleNamespace(
+        train=SimpleNamespace(stages=[None, None, None, SimpleNamespace(
+            collected_kg={'SiO2': 3.0},
+        )]),
+        record=SimpleNamespace(snapshots=[SimpleNamespace(
+            c2a_staged_gas={
+                'stage_name': 'C4',
+                'gas_cover_mode': 'vacuum',
+            },
+            condensed_by_stage_species_delta={(3, 'SiO2'): 3.0},
+        )]),
+    )
+
+    result = classify_products(sim)
+
+    assert result['pure_silica_glass']['class_total_kg'] == 3.0
+    assert result['glass']['class_total_kg'] == 3.0
+    assert 'owner product spec pending' in result['pure_silica_glass']['flag']['reason']
 
 
 def test_captured_volatiles_include_condensation_train_account():
@@ -828,7 +826,7 @@ def test_classifier_handles_empty_product_ledger():
     assert result['metals_plus_O2']['class_total_kg'] == 0.0
     assert result['pure_silica_glass']['stage_3_capture_kg'] is None
     assert result['pure_silica_glass']['class_total_kg'] is None
-    assert result['pure_silica_glass']['flag']['reason'] == 'stage_3_missing'
+    assert 'stage_3_missing' in result['pure_silica_glass']['flag']['reason']
     assert result['glass']['pure_silica_glass_kg'] is None
     assert result['refractory_ceramic_rump']['class_total_kg'] == 0.0
     assert result['unclassified']['total_kg'] == 0.0
@@ -850,7 +848,7 @@ def test_classifier_handles_missing_product_ledger_method():
         assert result[bucket]['class_total_kg'] == 0.0
     assert result['pure_silica_glass']['stage_3_capture_kg'] is None
     assert result['pure_silica_glass']['class_total_kg'] is None
-    assert result['pure_silica_glass']['flag']['reason'] == 'stage_3_missing'
+    assert 'stage_3_missing' in result['pure_silica_glass']['flag']['reason']
     assert result['glass']['class_total_kg'] is None
     assert result['glass']['pure_silica_glass_kg'] is None
 

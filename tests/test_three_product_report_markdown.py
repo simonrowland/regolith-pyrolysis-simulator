@@ -196,13 +196,22 @@ def test_unqualified_silica_preserves_measured_capture_without_product_claim():
     classification['pure_silica_glass'].update({
         'stage_3_capture_kg': 1.4420316327429284e-08,
         'stage_3_kg_by_species': {'SiO2': 1.4420316327429284e-08},
+        'flag': {
+            'status': 'flagged product spec pending',
+            'authority': 'interim purity threshold',
+            'band': '>=99 wt% silica-bearing per Stage 3 snapshot',
+            'reason': 'owner product spec pending; Stage 3 snapshot 1 is non-product '
+                '(purity_below_threshold)',
+        },
     })
     report = format_three_product_markdown(classification)
     assert 'Silica glass: — kg' in report
     assert '## 2. Pure silica glass' not in report
     assert 'Stage 3 capture: 1.442e-08 kg' in report
-    assert 'recorded pO₂ hold → pN₂ SiO-release switch' in report
-    assert 'authoritative SiO evidence for every capture' in report
+    assert 'measured silica-bearing purity threshold' in report
+    assert 'Gas-cover history is provenance only' in report
+    assert 'owner product spec pending' in report
+    assert 'purity_below_threshold' in report
 
 
 def test_flagged_silica_product_reports_mass_and_certification_evidence():
@@ -227,6 +236,30 @@ def test_flagged_silica_product_reports_mass_and_certification_evidence():
     assert 'authority=extrapolated' in report
     assert 'band=[1400.0, 2200.0]' in report
     assert 'reason=outside certified SiO source band' in report
+
+
+def test_silica_report_labels_si_as_separate_coproduct():
+    classification = _empty_classification()
+    classification['pure_silica_glass'].update({
+        'stage_3_capture_kg': 1.0,
+        'stage_3_kg_by_species': {'SiO2': 1.0, 'Si': 0.5},
+        'class_total_kg': 1.0,
+        'flag': {
+            'status': 'flagged product spec pending',
+            'authority': 'interim purity threshold',
+            'band': '>=99 wt% silica-bearing per Stage 3 snapshot',
+            'reason': 'owner product spec pending; qualified Stage 3 Si coproduct '
+                '0.5 kg (reported separately)',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+    silica_section = report.split('## 2.', 1)[1].split('## 3.', 1)[0]
+
+    assert '**Class total**: 1.000 kg' in silica_section
+    assert '**Si**: 5.000e-01 kg' in silica_section
+    assert 'Si is the Stage 3 disproportionation coproduct' in silica_section
+    assert 'qualified Stage 3 Si coproduct 0.5 kg' in silica_section
 
 
 def test_refused_silica_product_quantity_is_unavailable_not_zero():

@@ -19,6 +19,7 @@ would be the runner CLI + JSON-or-MD output mode.
 
 from __future__ import annotations
 
+import math
 from typing import Any, Mapping
 
 # Display order matches CLAUDE.md § 5 product class enumeration.
@@ -234,15 +235,14 @@ def format_three_product_markdown(
             stage_3 = bucket.get('stage_3_kg_by_species', {}) or {}
             if class_total_kg is not None and class_total_kg <= 0.0:
                 lines.append(
-                    'Pure silica glass is not established. Qualification requires '
-                    'positive capture following a recorded pO₂ hold → pN₂ SiO-release '
-                    'switch, with authoritative SiO evidence for every capture.'
+                    'No Stage 3 snapshot met the measured silica-bearing purity '
+                    'threshold. Gas-cover history is provenance only.'
                 )
                 lines.append('')
             flag = bucket.get('flag')
             if isinstance(flag, Mapping):
                 lines.append(
-                    '- Certification flag: '
+                    '- Product-spec flag: '
                     f"status={flag.get('status')}; "
                     f"authority={flag.get('authority')}; "
                     f"band={flag.get('band')}; "
@@ -254,8 +254,17 @@ def format_three_product_markdown(
                 f"{_format_kg(bucket.get('stage_3_capture_kg', 0.0))} kg"
             )
             lines.append("")
-            lines.append("Per-species on Stage 3 baffles:")
+            lines.append("Stage 3 deposits by species:")
             lines.append(_kg_by_species_block(stage_3))
+            try:
+                si_coproduct_kg = float(stage_3.get('Si', 0.0))
+            except (TypeError, ValueError):
+                si_coproduct_kg = 0.0
+            if math.isfinite(si_coproduct_kg) and si_coproduct_kg > 0.0:
+                lines.append(
+                    'Si is the Stage 3 disproportionation coproduct; it is '
+                    'reported beside the glass and excluded from the class total.'
+                )
         elif bucket_key == 'industrial_mixed_glass':
             raw_residual = bucket.get('mixed_melt_residual_kg', 0.0)
             residual = None if raw_residual is None else float(raw_residual)

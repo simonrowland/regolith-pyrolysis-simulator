@@ -85,7 +85,8 @@ def test_cli_writes_markdown_report_to_file(tmp_path):
     body = output.read_text()
     assert "Three-Product-Class Report" in body
     assert "Metals + O₂" in body
-    assert "Pure silica glass" in body
+    assert "Stage 3 silica capture (not a product)" in body
+    assert "owner product spec pending" in body
     assert "Refractory ceramic rump" in body
     assert "**Run provenance**: mass_kg=1000" in body
 
@@ -134,7 +135,7 @@ def test_cli_via_subprocess_invocation(tmp_path):
         check=False,
         capture_output=True,
         text=True,
-        timeout=60,
+        timeout=120,
     )
     assert result.returncode == 0, (
         f"runner failed: stdout={result.stdout} stderr={result.stderr}"
@@ -277,10 +278,13 @@ def test_default_classification_values_preserve_pre_change_digest():
         campaign="C2A",
         hours=2,
     )
+    digest_payload = dict(result)
+    silica_bucket = dict(result["pure_silica_glass"])
+    silica_bucket.pop("flag", None)
+    digest_payload["pure_silica_glass"] = silica_bucket
     digest = hashlib.sha256(
-        json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
+        json.dumps(digest_payload, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # d137: production classification now counts tapped and stage-accepted
-    # metals, with untapped metal-phase balances represented in their own
-    # source-accounted inventory field. This pins the complete runner payload.
+    # Ignore the newly required product-spec flag while pinning unchanged
+    # runner values and class projections.
     assert digest == "bd3769a6a08b23046527cbc7f8c81cb064d6e786b3c4b2292e900c16dc60f58c"

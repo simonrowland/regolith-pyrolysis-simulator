@@ -4594,15 +4594,12 @@ def product_classes_summary(sim: Any, profile: Mapping[str, Any]) -> Mapping[str
 _SILICA_CAPTURE_PATH = ("pure_silica_glass", "stage_3_capture_kg")
 _SILICA_PRODUCT_PATH = ("pure_silica_glass", "class_total_kg")
 _SILICA_UNQUALIFIED_FLAG = "unqualified_silica_capture"
-_SILICA_UNQUALIFIED_REASON = (
-    "missing recorded pO2-hold -> pN2 SiO-release switch"
-)
 
 
 def _silica_product_objective_value(
     product_classes: Mapping[str, Any],
 ) -> float | None:
-    """Return route-classified silica product mass, preserving refusal as None."""
+    """Return purity-qualified silica product mass, preserving refusal as None."""
 
     bucket = (
         product_classes.get("pure_silica_glass")
@@ -4662,11 +4659,7 @@ def _silica_objective_evidence(
         isinstance(effective_flag, Mapping)
         and effective_flag.get("status") == "partial"
     )
-    qualified_kg = (
-        product_kg
-        if report_flag is None or (partial and not isinstance(availability_flag, Mapping))
-        else 0.0
-    )
+    qualified_kg = product_kg
     unqualified_kg = max((capture_kg or 0.0) - product_kg, 0.0)
     payload["stage_3_capture_kg"] = capture_kg
     payload["qualified_product_kg"] = qualified_kg
@@ -4676,9 +4669,14 @@ def _silica_objective_evidence(
         payload["total_basis"] = "lower_bound"
     if unqualified_kg > 0.0:
         payload["flag"] = _SILICA_UNQUALIFIED_FLAG
+        reason = (
+            effective_flag.get("reason")
+            if isinstance(effective_flag, Mapping)
+            else "measured Stage 3 purity is below the interim threshold"
+        )
         payload["notes"] = (
             f"{unqualified_kg:g} kg Stage-3 silica capture is not product: "
-            f"{_SILICA_UNQUALIFIED_REASON}",
+            f"{reason}",
         )
     elif isinstance(effective_flag, Mapping):
         reason = effective_flag.get("reason") or "certification flag emitted"

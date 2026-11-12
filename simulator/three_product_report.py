@@ -6,8 +6,8 @@ north-star product classes documented in
 
   1. METALS + O₂                — Na/K/Fe/Mg/Si/Ti/Al/Ca/Cr/Mn/Ni/Co
                                   metal alloys + accumulated O₂.
-  2. PURE SILICA GLASS          — SiO landed on Stage 3 fused-silica
-                                  baffles on-demand via gas-cover switch.
+  2. PURE SILICA GLASS          — SiO + SiO2 captured on Stage 3 at
+                                  interim >=99 wt% silica-bearing purity.
   3. INDUSTRIAL MIXED GLASS     — Si-bearing residual melt if the
                                   recipe taps before the SiO release
                                   window (early-tap option).
@@ -74,12 +74,6 @@ from simulator.condensation_routing import (
     accepted_species_for_stage_key,
     stage_key_for_stage,
 )
-from simulator.vapour_rail.instrumentation import (
-    VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
-    VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
-    vapour_carrier_authority_status,
-)
-
 CAPTURED_VOLATILE_ACCOUNTS: tuple[str, ...] = (
     'process.condensation_train',
 )
@@ -112,6 +106,100 @@ depends on whether C6 thermite fired. Use the ``has_al_thermite``
 flag on the classifier output to disambiguate. The full element
 ladder is queried via ``ExtractionMixin._RUMP_ELEMENT_SPECIES``
 which carries Si / Al / Mg / Ti routing too."""
+
+PURE_SILICA_GLASS_MIN_PURITY_WT_PCT = 99.0
+"""Interim Stage 3 purity gate; the product owner spec is pending."""
+
+
+def _stage_3_glass_snapshot_census(snapshots) -> dict[str, Any]:
+    """Qualify Stage 3 deposits per snapshot and retain exclusion mass."""
+    product_by_species: dict[str, float] = {}
+    total_by_species: dict[str, float] = {}
+    excluded_kg_by_reason: dict[str, float] = {}
+    excluded_snapshots: list[str] = []
+    product_kg = 0.0
+    silicon_coproduct_kg = 0.0
+    issue: str | None = None
+
+    for snapshot_index, snapshot in enumerate(snapshots or ()):
+        capture = getattr(snapshot, 'condensed_by_stage_species_delta', None)
+        if capture is None:
+            continue
+        if not isinstance(capture, Mapping):
+            issue = f'Stage 3 snapshot {snapshot_index} composition is malformed'
+            break
+        snapshot_stage_3: dict[str, float] = {}
+        for key, raw_kg in capture.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                issue = f'Stage 3 snapshot {snapshot_index} ledger key is malformed'
+                break
+            try:
+                stage_number = int(key[0])
+            except (TypeError, ValueError):
+                issue = f'Stage 3 snapshot {snapshot_index} ledger stage is invalid'
+                break
+            if stage_number != 3:
+                continue
+            species = str(key[1])
+            try:
+                kg = float(raw_kg)
+            except (TypeError, ValueError):
+                issue = f'Stage 3 snapshot {snapshot_index} has invalid mass for {species}'
+                break
+            if not math.isfinite(kg) or kg < 0.0:
+                issue = f'Stage 3 snapshot {snapshot_index} has invalid mass for {species}'
+                break
+            if kg > 0.0:
+                snapshot_stage_3[species] = kg
+        if issue is not None:
+            break
+        for species, kg in snapshot_stage_3.items():
+            total_by_species[species] = total_by_species.get(species, 0.0) + kg
+        deposit_kg = float(sum(snapshot_stage_3.values()))
+        if deposit_kg <= 0.0:
+            continue
+        silica_bearing_kg = sum(
+            snapshot_stage_3.get(species, 0.0)
+            for species in (*PURE_SILICA_GLASS_SPECIES, 'Si')
+        )
+        purity_wt_pct = silica_bearing_kg / deposit_kg * 100.0
+        if purity_wt_pct >= PURE_SILICA_GLASS_MIN_PURITY_WT_PCT:
+            for species in PURE_SILICA_GLASS_SPECIES:
+                kg = snapshot_stage_3.get(species, 0.0)
+                if kg > 0.0:
+                    product_by_species[species] = (
+                        product_by_species.get(species, 0.0) + kg
+                    )
+            product_kg += sum(
+                snapshot_stage_3.get(species, 0.0)
+                for species in PURE_SILICA_GLASS_SPECIES
+            )
+            silicon_coproduct_kg += snapshot_stage_3.get('Si', 0.0)
+        else:
+            excluded_kg_by_reason['purity_below_threshold'] = (
+                excluded_kg_by_reason.get('purity_below_threshold', 0.0)
+                + deposit_kg
+            )
+            composition = ', '.join(
+                f'{species}={kg:.6g} kg'
+                for species, kg in sorted(snapshot_stage_3.items())
+            )
+            excluded_snapshots.append(
+                f'Stage 3 snapshot {snapshot_index} is non-product '
+                f'(purity_below_threshold; {purity_wt_pct:.3f} wt% '
+                f'silica-bearing; {deposit_kg:.6g} kg deposit; '
+                f'{composition})'
+            )
+
+    return {
+        'product_by_species': product_by_species,
+        'total_by_species': total_by_species,
+        'product_kg': product_kg,
+        'silicon_coproduct_kg': silicon_coproduct_kg,
+        'excluded_kg_by_reason': excluded_kg_by_reason,
+        'excluded_snapshots': excluded_snapshots,
+        'issue': issue,
+    }
 
 
 def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
@@ -166,7 +254,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 'stage_3_capture_kg': float | None,
                 'stage_3_kg_by_species': {species: kg, ...},
                 'class_total_kg': float | None,
-                'flag': {status, authority, band, reason},  # when flagged
+                'flag': {status, authority, band, reason},  # owner spec notice
             },
             'glass': {
                 'species_kg': {species: kg, ...},
@@ -232,12 +320,24 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
 
     # ----- Class 2: pure silica glass (Stage 3 capture) -----
     stage_3_kg_by_species: dict[str, float] = {}
+    stage_3_collected_by_species: dict[str, float] = {}
     stage_3_unavailable_reason: str | None = 'stage_3_missing'
     if len(train_stages) > 3 and train_stages[3] is not None:
         stage_3 = train_stages[3]
         collected = getattr(stage_3, 'collected_kg', None)
         if isinstance(collected, Mapping):
             stage_3_unavailable_reason = None
+            for species, raw_kg in collected.items():
+                try:
+                    kg = float(raw_kg)
+                except (TypeError, ValueError):
+                    stage_3_unavailable_reason = 'stage_3_collection_malformed'
+                    break
+                if not math.isfinite(kg) or kg < 0.0:
+                    stage_3_unavailable_reason = 'stage_3_collection_malformed'
+                    break
+                if kg > 0.0:
+                    stage_3_collected_by_species[str(species)] = kg
         elif collected is None:
             stage_3_unavailable_reason = 'stage_3_collection_missing'
         else:
@@ -246,7 +346,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         collected = None
     if stage_3_unavailable_reason is None:
         for species in PURE_SILICA_GLASS_SPECIES:
-            kg = float(collected.get(species, 0.0))
+            kg = stage_3_collected_by_species.get(species, 0.0)
             if kg > 0.0:
                 stage_3_kg_by_species[species] = kg
     stage_3_capture_kg = (
@@ -254,91 +354,77 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         if stage_3_unavailable_reason is None
         else None
     )
-    saw_oxygen_hold = False
-    saw_release_capture = False
-    every_capture_followed_release_switch = True
-    silica_certification_flag: dict[str, Any] | None = None
-    for snapshot in getattr(getattr(sim, 'record', None), 'snapshots', ()) or ():
-        gas = getattr(snapshot, 'c2a_staged_gas', {}) or {}
-        if gas.get('gas_cover_mode') == 'po2_hold':
-            saw_oxygen_hold = True
-        capture = getattr(snapshot, 'condensed_by_stage_species_delta', {}) or {}
-        if not any(capture.get((3, species), 0.0) > 0.0
-                   for species in PURE_SILICA_GLASS_SPECIES):
-            continue
-        release_capture = (
-            saw_oxygen_hold
-            and gas.get('stage_name') == 'sio_window'
-            and gas.get('gas_cover_mode') == 'pn2_sweep'
-        )
-        saw_release_capture = saw_release_capture or release_capture
-        every_capture_followed_release_switch = (
-            every_capture_followed_release_switch and release_capture
-        )
-        if not release_capture:
-            continue
-        authority = getattr(
-            getattr(snapshot, 'evap_flux', None), 'carrier_authority_by_species', {}
-        ) or {}
-        authority_record = authority.get('SiO')
-        authority_status = vapour_carrier_authority_status(
-            authority_record, expected_species_id='SiO'
-        )
-        if authority_status == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE:
-            continue
+    stage_3_silicon_coproduct_kg = stage_3_collected_by_species.get('Si', 0.0)
+    if stage_3_silicon_coproduct_kg > 0.0:
+        stage_3_kg_by_species['Si'] = stage_3_silicon_coproduct_kg
+    snapshots = getattr(getattr(sim, 'record', None), 'snapshots', ()) or ()
+    snapshot_census = _stage_3_glass_snapshot_census(snapshots)
+    silica_product_by_species = snapshot_census['product_by_species']
+    silica_product_kg = snapshot_census['product_kg']
+    qualified_silicon_coproduct_kg = snapshot_census['silicon_coproduct_kg']
+    excluded_stage_3_snapshots = snapshot_census['excluded_snapshots']
+    stage_3_snapshot_issue = snapshot_census['issue']
+    snapshot_stage_3_kg_by_species = snapshot_census['total_by_species']
 
-        record = authority_record if isinstance(authority_record, Mapping) else {}
-        extra = record.get('extra')
-        extra = extra if isinstance(extra, Mapping) else {}
-        band = record.get('certified_band')
-        if band is None:
-            band = record.get('valid_range_K')
-        if band is None:
-            band = record.get('certification_ceiling')
-        reason = (
-            record.get('reason')
-            or record.get('original_reason')
-            or record.get('refusal_code')
-            or extra.get('reason')
-            or extra.get('activity_reason')
-            or 'missing SiO carrier evidence'
+    if stage_3_unavailable_reason is None and stage_3_snapshot_issue is None:
+        stage_3_species = set(stage_3_collected_by_species) | set(
+            snapshot_stage_3_kg_by_species
         )
-        flag_status = (
-            'flagged prediction'
-            if authority_status == VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
-            else 'unavailable'
-        )
-        if flag_status == 'unavailable' or silica_certification_flag is None:
-            silica_certification_flag = {
-                'status': flag_status,
-                'authority': record.get('authority_level') or authority_status,
-                'band': band,
-                'reason': str(reason),
-            }
+        mismatched_species = [
+            species for species in sorted(stage_3_species)
+            if not math.isclose(
+                stage_3_collected_by_species.get(species, 0.0),
+                snapshot_stage_3_kg_by_species.get(species, 0.0),
+                rel_tol=1.0e-9,
+                abs_tol=1.0e-9,
+            )
+        ]
+        if mismatched_species:
+            stage_3_snapshot_issue = (
+                'Stage 3 snapshot composition does not match the train ledger '
+                f'for {", ".join(mismatched_species)}'
+            )
 
-    # Product classification is derived from the executed release route;
-    # evidence authority certifies that mass but never erases a prediction.
-    silica_is_product = (
-        saw_release_capture and every_capture_followed_release_switch
+    silica_product_kg = (
+        None if stage_3_snapshot_issue is not None else silica_product_kg
     )
     if stage_3_unavailable_reason is not None:
         silica_product_kg: float | None = None
         reported_stage_3_capture_kg: float | None = None
-        silica_certification_flag = {
-            'status': 'unavailable',
-            'authority': 'unavailable',
-            'band': None,
-            'reason': stage_3_unavailable_reason,
-        }
-    elif not silica_is_product:
-        silica_product_kg: float | None = 0.0
-        reported_stage_3_capture_kg: float | None = stage_3_capture_kg
     else:
-        silica_product_kg = stage_3_capture_kg
         reported_stage_3_capture_kg = stage_3_capture_kg
     reported_stage_3_species = (
         stage_3_kg_by_species if reported_stage_3_capture_kg is not None else {}
     )
+    silica_is_product = (
+        silica_product_kg is not None and silica_product_kg > 0.0
+    )
+    silica_flag_reason = 'owner product spec pending'
+    if stage_3_unavailable_reason is not None:
+        silica_flag_status = 'unavailable'
+        silica_flag_authority = 'unavailable'
+        silica_flag_reason = f'{stage_3_unavailable_reason}; {silica_flag_reason}'
+    elif stage_3_snapshot_issue is not None:
+        silica_flag_status = 'unavailable'
+        silica_flag_authority = 'unavailable'
+        silica_flag_reason = f'{stage_3_snapshot_issue}; {silica_flag_reason}'
+    else:
+        silica_flag_status = 'flagged product spec pending'
+        silica_flag_authority = 'interim purity threshold'
+        silica_flag_reason = (
+            f'{silica_flag_reason}; interim threshold '
+            f'>={PURE_SILICA_GLASS_MIN_PURITY_WT_PCT:g} wt% silica-bearing '
+            'per Stage 3 snapshot'
+        )
+    if silica_product_kg is not None and qualified_silicon_coproduct_kg > 0.0:
+        silica_flag_reason += (
+            f'; qualified Stage 3 Si coproduct '
+            f'{qualified_silicon_coproduct_kg:.6g} kg (reported separately)'
+        )
+    if excluded_stage_3_snapshots:
+        silica_flag_reason += '; ' + '; '.join(excluded_stage_3_snapshots)
+    if stage_3_snapshot_issue is not None:
+        silica_product_by_species = {}
 
     # ----- Captured volatiles -----
     # The condenser ledger can contain metal and silica species as well as
@@ -411,7 +497,11 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         any(amount > 0.0 for amount in oxygen_partition.values())
         or 'O2' in products
     )
-    has_silica_capture = bool(stage_3_kg_by_species)
+    has_silica_capture = (
+        stage_3_capture_kg is not None
+        and stage_3_capture_kg > 0.0
+        and stage_3_snapshot_issue is None
+    )
     has_silica_product = silica_is_product and has_silica_capture
     has_mixed_glass_inventory = early_tap_mode and bool(mixed_melt_residual_kg)
     computed_product_parts = {
@@ -564,11 +654,16 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         'stage_3_capture_kg': reported_stage_3_capture_kg,
         'stage_3_kg_by_species': reported_stage_3_species,
         'class_total_kg': silica_product_kg,
+        'flag': {
+            'status': silica_flag_status,
+            'authority': silica_flag_authority,
+            'band': (
+                f'>={PURE_SILICA_GLASS_MIN_PURITY_WT_PCT:g} wt% '
+                'silica-bearing per Stage 3 snapshot'
+            ),
+            'reason': silica_flag_reason,
+        },
     }
-    if silica_certification_flag is not None and (
-        silica_is_product or stage_3_unavailable_reason is not None
-    ):
-        silica_bucket['flag'] = silica_certification_flag
 
     result = {
         'metals_plus_O2': {
@@ -596,7 +691,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         },
         'pure_silica_glass': silica_bucket,
         'glass': {
-            'species_kg': reported_stage_3_species if silica_is_product else {},
+            'species_kg': silica_product_by_species if silica_is_product else {},
             'class_total_kg': glass_class_total_kg,
             'pure_silica_glass_kg': silica_product_kg,
             'industrial_mixed_glass_kg': mixed_melt_residual_kg,
