@@ -144,6 +144,8 @@ corpus-resolved locator must include `source_sha256`, the lowercase
 `artifact_digest_missing`; a mismatch refuses with
 `artifact_digest_mismatch`. Source fidelity passes only when the opened
 artifact's digest requirements are met and it contains the pinned value.
+Because each locator has one digest, two or more declared keys resolving to
+corpus files refuse with `multiple_corpus_artifacts`.
 Repository files under `raw/`, `corpus/`, `text/`, `tables/`,
 `supporting/`, and `docs/references/` use this same repository-first lookup.
 The extract document and program source are not source artifacts, including

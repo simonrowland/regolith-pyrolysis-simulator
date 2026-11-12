@@ -5395,6 +5395,12 @@ _PER_KEY_OUTCOMES = (
     "token_absent",
     "digest_valid_token_absent",
 )
+_CORPUS_FILE_OUTCOMES = {
+    "artifact_digest_missing",
+    "artifact_digest_mismatch",
+    "digest_valid_token_absent",
+    "record_alternate_open",
+}
 _LOCATOR_OUTCOME_CASES = []
 for _keys in _LOCATOR_KEY_SETS:
     _outcomes_by_key = [
@@ -5407,17 +5413,68 @@ for _keys in _LOCATOR_KEY_SETS:
         else _PER_KEY_OUTCOMES
         for key in _keys
     ]
-    if len(_keys) == 2:
-        _LOCATOR_OUTCOME_CASES.extend(
-            (_keys, outcomes)
-            for outcomes in itertools.product(*_outcomes_by_key)
-        )
-    else:
-        _LOCATOR_OUTCOME_CASES.extend(
-            (_keys, (outcome,)) for outcome in _outcomes_by_key[0]
-        )
+    for _outcomes in itertools.product(*_outcomes_by_key):
+        # A locator has one global corpus mount and one source_sha256. Keep
+        # only combinations those shared settings can realize, and leave
+        # multiple corpus opens to their dedicated refusal test below.
+        if sum(outcome in _CORPUS_FILE_OUTCOMES for outcome in _outcomes) > 1:
+            continue
+        for _corpus_mounted in (False, True):
+            for _digest_token in (None, "0.24", "0.25"):
+                _mount_required = any(
+                    outcome
+                    in _CORPUS_FILE_OUTCOMES | {"corpus_artifact_missing"}
+                    for outcome in _outcomes
+                )
+                if _mount_required != _corpus_mounted:
+                    continue
+                if (
+                    "corpus_root_unset" in _outcomes
+                    and _corpus_mounted
+                ):
+                    continue
+                _realizable = True
+                for _outcome in _outcomes:
+                    if (
+                        _outcome == "artifact_digest_missing"
+                        and _digest_token is not None
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "artifact_digest_mismatch"
+                        and _digest_token is None
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "digest_valid_token_absent"
+                        and _digest_token != "0.25"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "record_alternate_open"
+                        and _digest_token != "0.24"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome in {"matched", "record_alternate_open"}
+                        and _digest_token not in {None, "0.24"}
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome in {"token_absent", "first_open_token_absent"}
+                        and _digest_token not in {None, "0.25"}
+                    ):
+                        _realizable = False
+                if _realizable:
+                    _LOCATOR_OUTCOME_CASES.append(
+                        (_keys, _outcomes, _corpus_mounted, _digest_token)
+                    )
+                    break
+            else:
+                continue
+            break
 _LOCATOR_OUTCOME_PARAMS = []
-for _keys, _outcomes in _LOCATOR_OUTCOME_CASES:
+for _keys, _outcomes, _corpus_mounted, _digest_token in _LOCATOR_OUTCOME_CASES:
     _expected_source_blind_reason = (
         "source_blind_pin"
         if not all(
@@ -5430,6 +5487,8 @@ for _keys, _outcomes in _LOCATOR_OUTCOME_CASES:
         pytest.param(
             _keys,
             _outcomes,
+            _corpus_mounted,
+            _digest_token,
             _expected_source_blind_reason,
             id="+".join(
                 f"{key}={outcome}" for key, outcome in zip(_keys, _outcomes)
@@ -5439,13 +5498,25 @@ for _keys, _outcomes in _LOCATOR_OUTCOME_CASES:
 
 
 @pytest.mark.parametrize(
-    ("declared_keys", "outcomes", "expected_source_blind_reason"),
+    (
+        "declared_keys",
+        "outcomes",
+        "corpus_mounted",
+        "digest_token",
+        "expected_source_blind_reason",
+    ),
     _LOCATOR_OUTCOME_PARAMS,
 )
 def test_locator_source_blind_matrix_preserves_address_coverage(
-    declared_keys, outcomes, expected_source_blind_reason, tmp_path, monkeypatch
+    declared_keys,
+    outcomes,
+    corpus_mounted,
+    digest_token,
+    expected_source_blind_reason,
+    tmp_path,
+    monkeypatch,
 ):
-    """Each declared key needs its own match; record selects its first open."""
+    """Each key has an independent file under one locator-wide root and digest."""
     repository_root = tmp_path / "repository"
     corpus_root = tmp_path / "corpus"
     doc = _opened_payload_document(tmp_path / "fixture", structured=False)
@@ -5466,35 +5537,6 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         artifact.parent.mkdir(parents=True, exist_ok=True)
         artifact.write_text(artifact_text(token), encoding="utf-8")
         return artifact
-
-    # These are locator-wide settings. Give every declared key a unique path
-    # and derive its effective result from that artifact plus the shared digest.
-    needs_corpus_artifact = any(
-        outcome
-        in {
-            "artifact_digest_missing",
-            "artifact_digest_mismatch",
-            "digest_valid_token_absent",
-            "record_alternate_open",
-        }
-        for outcome in outcomes
-    )
-    if not needs_corpus_artifact or "artifact_digest_missing" in outcomes:
-        digest_token = None
-    elif (
-        "first_open_token_absent" in outcomes
-        or "token_absent" in outcomes
-        or "digest_valid_token_absent" in outcomes
-    ):
-        digest_token = "0.25"
-    elif any(
-        outcome in {"matched", "record_alternate_open"} for outcome in outcomes
-    ):
-        digest_token = "0.24"
-    elif "artifact_digest_mismatch" in outcomes:
-        digest_token = "0.24"
-    else:
-        digest_token = None
 
     for key, outcome in zip(declared_keys, outcomes):
         relative = relative_paths[key]
@@ -5528,17 +5570,7 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
             write_artifact(repository_root, relative, "0.25")
             write_artifact(repository_root, relative.split()[0], "0.24")
 
-    if any(
-        outcome in {
-            "corpus_artifact_missing",
-            "corpus_path_outside_root",
-            "artifact_digest_missing",
-            "artifact_digest_mismatch",
-            "digest_valid_token_absent",
-            "record_alternate_open",
-        }
-        for outcome in outcomes
-    ):
+    if corpus_mounted:
         monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
     else:
         monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
@@ -5546,76 +5578,6 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         locator["source_sha256"] = hashlib.sha256(
             artifact_text(digest_token).encode("utf-8")
         ).hexdigest()
-
-    # Independent oracle: evaluate every key from its own fixture files, then
-    # apply the locator-wide corpus root and digest. It deliberately does not
-    # call the production resolver. A record alternate is only tried if the
-    # full candidate did not open.
-    def oracle_open(raw: str):
-        repo_root = repository_root.resolve()
-        repo_path = (repo_root / Path(raw)).resolve()
-        if not repo_path.is_relative_to(repo_root):
-            return None, None, "corpus_path_outside_root"
-        if repo_path.suffix.lower() in {".py", ".pyi"}:
-            return None, None, "artifact_not_source"
-        if repo_path.is_file():
-            opened_path = repo_path
-            from_corpus = False
-        else:
-            configured_root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
-            if not configured_root:
-                return None, None, "corpus_root_unset"
-            corpus_root_resolved = Path(configured_root).expanduser().resolve()
-            opened_path = (
-                corpus_root_resolved / repo_path.relative_to(repo_root)
-            ).resolve()
-            if not opened_path.is_relative_to(corpus_root_resolved):
-                return None, None, "corpus_path_outside_root"
-            if opened_path.suffix.lower() in {".py", ".pyi"}:
-                return None, None, "artifact_not_source"
-            from_corpus = True
-        if not opened_path.is_file():
-            reason = "corpus_artifact_missing" if from_corpus else "artifact_missing"
-            return None, None, reason
-        blob = opened_path.read_bytes()
-        actual_digest = hashlib.sha256(blob).hexdigest()
-        expected_digest = locator.get("source_sha256")
-        if from_corpus and expected_digest is None:
-            return opened_path, blob, "artifact_digest_missing"
-        if expected_digest is not None and actual_digest != expected_digest:
-            return opened_path, blob, "artifact_digest_mismatch"
-        return opened_path, blob, None
-
-    expected_key_reasons = []
-    for key in declared_keys:
-        raw = locator[key].strip()
-        candidates = [raw]
-        if key == "record":
-            filename = raw.split()[0]
-            if filename != raw:
-                candidates.append(filename)
-        candidate_reasons = []
-        key_matched = False
-        for candidate in candidates:
-            opened_path, blob, refusal = oracle_open(candidate)
-            if refusal:
-                candidate_reasons.append(
-                    f"locator was not opened: {refusal} ({candidate})"
-                )
-                if opened_path is not None and blob is not None:
-                    break
-                continue
-            cited_line = blob.decode("utf-8").splitlines()[4:5]
-            if "0.24" not in "\n".join(cited_line):
-                candidate_reasons.append(
-                    f"opened {opened_path.name} but the resolved extract value is "
-                    "not in the cited text ('0.24', '0.24')"
-                )
-                break
-            key_matched = True
-            break
-        if not key_matched:
-            expected_key_reasons.extend(candidate_reasons)
 
     warnings = vle.fidelity_source_warnings(
         doc, label="locator-key-matrix", artifact_root=repository_root
@@ -5625,22 +5587,24 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         None,
     )
     assert (source_blind.kind if source_blind else None) == expected_source_blind_reason
-    expected_detail = (
-        "locator-key-matrix:fidelity_samples[0]: locator source-blind: "
-        + "; ".join(expected_key_reasons)
-        if expected_key_reasons
-        else None
-    )
-    assert (source_blind.detail if source_blind else None) == expected_detail
+    if source_blind:
+        for key, outcome in zip(declared_keys, outcomes):
+            if outcome in _TYPED_LOCATOR_REFUSALS:
+                assert f"{outcome} ({locator[key]})" in source_blind.detail
+        if any(
+            outcome
+            in {
+                "token_absent",
+                "digest_valid_token_absent",
+                "first_open_token_absent",
+            }
+            for outcome in outcomes
+        ):
+            assert "not in the cited text" in source_blind.detail
 
-    baseline = _uncovered_observation_count(
-        {**doc, "fidelity_samples": []}, artifact_root=repository_root
-    )
-    assert baseline == 1
-    expected_uncovered = baseline - 1
-    assert _uncovered_observation_count(
+    _assert_refused_sample_still_covers_addressed_observation(
         doc, artifact_root=repository_root
-    ) == expected_uncovered
+    )
 
     if declared_keys == ("source_path", "quotes_path") and outcomes == (
         "corpus_root_unset",
@@ -5652,19 +5616,50 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
             doc, label="locator-key-matrix", artifact_root=repository_root
         )
         assert any("corpus_root_unset" in refusal for refusal in refusals)
-    for refusal in _TYPED_LOCATOR_REFUSALS:
-        if outcomes == (refusal,) * len(outcomes):
-            assert source_blind is not None
-            assert refusal in source_blind.detail
-    if outcomes in {
-        ("digest_valid_token_absent",) * len(outcomes),
-        ("token_absent",) * len(outcomes),
-    }:
-        assert source_blind is not None
-        assert "not in the cited text" in source_blind.detail
     if "first_open_token_absent" in outcomes:
         assert source_blind is not None
         assert "not in the cited text" in source_blind.detail
+
+
+def test_multiple_corpus_artifacts_refuse_and_keep_address_coverage(
+    tmp_path, monkeypatch
+):
+    repository_root = tmp_path / "repository"
+    corpus_root = tmp_path / "corpus"
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator.update(
+        {
+            "source_path": "text/source.txt",
+            "quotes_path": "tables/quotes.txt",
+            "page": 2,
+        }
+    )
+    source = corpus_root / "text" / "source.txt"
+    quotes = corpus_root / "tables" / "quotes.txt"
+    source.parent.mkdir(parents=True)
+    quotes.parent.mkdir(parents=True)
+    source.write_text("source line\nalpha 0.24 measured\n", encoding="utf-8")
+    quotes.write_text("quotes line\nalpha 0.24 measured\n", encoding="utf-8")
+    locator["source_sha256"] = hashlib.sha256(source.read_bytes()).hexdigest()
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="multiple-corpus-artifacts", artifact_root=repository_root
+    )
+    source_blind = next(
+        warning for warning in warnings if warning.kind == "source_blind_pin"
+    )
+    assert "multiple_corpus_artifacts" in source_blind.detail
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+    refusals = vle.certify_extract_source_fidelity(
+        doc, label="multiple-corpus-artifacts", artifact_root=repository_root
+    )
+    assert any("multiple_corpus_artifacts" in refusal for refusal in refusals)
+    assert not any("uncovered_observation" in refusal for refusal in refusals)
 
 
 @pytest.mark.parametrize(

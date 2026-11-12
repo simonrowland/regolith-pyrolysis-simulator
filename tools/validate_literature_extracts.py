@@ -2581,7 +2581,8 @@ def _locator_source_blind_reason(
     certified leaves: the sample value and resolved extract value. A tolerant
     sample match does not stand in for the stored number. Separate declared
     keys must each match; a record's filename alternate is considered only
-    when the earlier candidate could not be opened.
+    when the earlier candidate could not be opened. One locator digest can
+    attest at most one corpus artifact.
     """
     keys = [key for key in ("locator", "source_locator") if key in sample]
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
@@ -2613,9 +2614,14 @@ def _locator_source_blind_reason(
     if leaf_error:
         return leaf_error
     reasons: list[str] = []
+    resolved_corpus_root = (
+        corpus_root.expanduser().resolve() if corpus_root is not None else None
+    )
+    corpus_artifact_keys = 0
     for _key, candidates in candidate_groups:
         candidate_reasons: list[str] = []
         key_matched = False
+        resolved_to_corpus = False
         for raw in candidates:
             path, blob, _digest, open_refusal = _open_source_artifact(
                 raw,
@@ -2623,6 +2629,13 @@ def _locator_source_blind_reason(
                 corpus_root=corpus_root,
                 expected_sha256=locator.get("source_sha256"),
             )
+            if (
+                path is not None
+                and blob is not None
+                and resolved_corpus_root is not None
+                and path.is_relative_to(resolved_corpus_root)
+            ):
+                resolved_to_corpus = True
             if open_refusal:
                 candidate_reasons.append(
                     f"locator was not opened: {open_refusal} ({raw})"
@@ -2684,6 +2697,10 @@ def _locator_source_blind_reason(
                 f"cited text ({rendered})"
             )
             break
+        if resolved_to_corpus:
+            corpus_artifact_keys += 1
+            if corpus_artifact_keys > 1:
+                return "locator source-blind: multiple_corpus_artifacts"
         if not key_matched:
             reasons.extend(candidate_reasons)
     if reasons:
