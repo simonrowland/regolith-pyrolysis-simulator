@@ -147,7 +147,9 @@ def test_legacy_table_species_scalar_is_ignored_by_raw_observation_index(monkeyp
 
 
 @pytest.fixture(scope="module")
-def battery_evaluations(adopted_observations, vapor_pressure_data):
+def battery_evaluations(
+    adopted_observations: tuple[AdoptedObservation, ...], vapor_pressure_data
+):
     return [
         evaluate_observation(obs, vapor_pressure_data=vapor_pressure_data)
         for obs in adopted_observations
@@ -167,7 +169,7 @@ def residual_baselines() -> dict:
 
 
 def test_store_yields_adopted_target_type_observations(
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     """Battery includes every family and all KEMS sources before precedence."""
 
@@ -835,7 +837,7 @@ def test_coverage_primary_prefers_typed_refusal_over_point_drop() -> None:
 
 
 def test_wetzel_stale_duplicate_hits_system_class_and_form_gate(
-    adopted_observations,
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     observation = next(
         row
@@ -1394,7 +1396,9 @@ def test_pinned_residuals_cover_all_live_comparable_points(
         assert_residual_coverage(mutated_evaluations)
 
 
-def test_measured_rate_series_executes_hkl(monkeypatch, adopted_observations) -> None:
+def test_measured_rate_series_executes_hkl(
+    monkeypatch, adopted_observations: tuple[AdoptedObservation, ...]
+) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
 
     real_hkl = er.langmuir_molar_flux
@@ -1430,7 +1434,7 @@ def test_measured_rate_series_executes_hkl(monkeypatch, adopted_observations) ->
 
 
 def test_numeric_activity_executes_melt_activity_model(
-    monkeypatch, adopted_observations
+    monkeypatch, adopted_observations: tuple[AdoptedObservation, ...]
 ) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
 
@@ -1521,7 +1525,7 @@ def test_psat_standard_state_selects_one_compatible_vapor_rail(monkeypatch) -> N
 def test_engine_value_mutation_moves_residual_outside_band_goes_red(
     residual_baselines,
     monkeypatch,
-    adopted_observations,
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     """P1 proof: 10× grounded_alpha mutation must trip the residual pin (RED).
 
@@ -1599,7 +1603,9 @@ def test_engine_value_mutation_moves_residual_outside_band_goes_red(
 
 
 def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
-    monkeypatch, residual_baselines, adopted_observations
+    monkeypatch,
+    residual_baselines,
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
 
@@ -1639,7 +1645,7 @@ def test_hkl_assumption_diagnostic_is_not_promoted_or_pinned(
 def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
     observation_id: str,
     skip_reason: str,
-    adopted_observations,
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     observation = next(
         row
@@ -1655,7 +1661,9 @@ def test_recovered_gibbs_evidence_is_covered_but_never_pin_bearing(
     assert evaluation.skip_reasons == [skip_reason]
 
 
-def test_wetzel_model_tables_refuse_as_model_output(adopted_observations) -> None:
+def test_wetzel_model_tables_refuse_as_model_output(
+    adopted_observations: tuple[AdoptedObservation, ...],
+) -> None:
     # PARENT RULE (b-483): the six quoted-model parents stay byte-identical
     # rate_series containers and are superseded; the retype lives on the
     # terminal ``*_gibbs`` children, which are the rows the store adopts.
@@ -1693,7 +1701,7 @@ def test_wetzel_model_tables_refuse_as_model_output(adopted_observations) -> Non
 
 
 def test_transition_point_is_an_adopted_target_type(
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     assert "transition_point" in TARGET_TYPES
     rows = [obs for obs in adopted_observations if obs.obs_type == "transition_point"
@@ -1715,7 +1723,7 @@ def test_transition_point_is_an_adopted_target_type(
 
 
 def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
-    vapor_pressure_data, adopted_observations
+    vapor_pressure_data, adopted_observations: tuple[AdoptedObservation, ...]
 ) -> None:
     obs = next(
         row
@@ -1730,7 +1738,7 @@ def test_melting_point_is_typed_refusal_not_a_fabricated_psat(
 
 
 def test_normal_boiling_point_inverts_antoine_in_kelvin(
-    vapor_pressure_data, adopted_observations
+    vapor_pressure_data, adopted_observations: tuple[AdoptedObservation, ...]
 ) -> None:
     obs = next(
         row
@@ -1788,7 +1796,7 @@ def test_silicate_melt_class_does_not_pin_a_pure_component_nbp(
 
 def test_battery_rollup_matches_committed_model_limitations(
     battery_evaluations,
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
     tmp_path,
 ) -> None:
     """Rollup must NOT self-heal the committed doc.
@@ -1909,7 +1917,7 @@ def test_battery_rollup_matches_committed_model_limitations(
 
 
 def test_evaluate_all_covers_every_adopted_observation(
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
     vapor_pressure_data,
 ) -> None:
     evaluations = evaluate_all(
@@ -1926,7 +1934,7 @@ def test_evaluate_all_covers_every_adopted_observation(
 
 def test_coverage_ledger_is_observation_first_and_exact(
     battery_evaluations,
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     coverage = coverage_summary(battery_evaluations)
     # o19fix4 attribution (old pin -> current): KEMS is 1133 -> 1900 (+767;
@@ -2327,7 +2335,7 @@ _LIVE_QUALITATIVE_SKIP_BY_ID = {
 
 
 def test_live_qualitative_catch_all_is_split_by_payload_class(
-    adopted_observations: list[AdoptedObservation],
+    adopted_observations: tuple[AdoptedObservation, ...],
 ) -> None:
     by_id = {obs.observation_id: obs for obs in adopted_observations}
     missing = sorted(set(_LIVE_QUALITATIVE_SKIP_BY_ID) - set(by_id))
