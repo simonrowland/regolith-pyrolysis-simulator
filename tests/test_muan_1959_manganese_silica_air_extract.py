@@ -264,11 +264,13 @@ def test_unprinted_pressure_guard_uses_source_provenance() -> None:
     assert _without_unprinted_total_pressure({"total_pressure_Pa": unlocated}) is None
 
 
-def test_located_approximate_print_maps_to_identity_and_stays_off_calibration() -> None:
-    """A located approximate print is the source pressure.
+def test_located_approximate_print_stays_off_identity_and_calibration() -> None:
+    """A located approximate print stays off identity.
 
-    Calibration readers still refuse it. Inferred, locatorless, and bound
-    pressures stay off identity. Absence is not replaced by a default.
+    Identity.total_pressure_Pa cannot carry the approximate flag, so the
+    axis is absent. Calibration readers refuse the same print. Inferred,
+    locatorless, and bound pressures stay off identity. Absence is not
+    replaced by a default. An exact located point still maps.
     """
 
     approximate = _point_condition_from_plain(
@@ -286,12 +288,22 @@ def test_located_approximate_print_maps_to_identity_and_stays_off_calibration() 
         key="total_pressure_Pa",
     )
     identity = Identity(quantity=State.of(Quantity.VISCOSITY), species=None)
-    mapped = _point_pressure_for_identity(
-        identity, {"total_pressure_Pa": approximate}
+    assert (
+        _point_pressure_for_identity(identity, {"total_pressure_Pa": approximate})
+        is None
     )
-    assert mapped is not None and mapped.is_value
-    assert mapped.value == Decimal("0.0001")
     assert _printed_source_point_condition_pressure(approximate) is None
+
+    exact = _point_condition_from_plain(
+        {
+            "state": {"tag": "value", "value": "101325"},
+            "locator": {"page": 8, "note": "1 atm"},
+        },
+        key="total_pressure_Pa",
+    )
+    mapped = _point_pressure_for_identity(identity, {"total_pressure_Pa": exact})
+    assert mapped is not None and mapped.is_value
+    assert mapped.value == Decimal("101325")
 
     inferred = _point_condition_from_plain(
         {
@@ -309,9 +321,10 @@ def test_located_approximate_print_maps_to_identity_and_stays_off_calibration() 
         },
         key="total_pressure_Pa",
     )
-    assert _point_pressure_for_identity(
-        identity, {"total_pressure_Pa": inferred}
-    ) is None
+    assert (
+        _point_pressure_for_identity(identity, {"total_pressure_Pa": inferred})
+        is None
+    )
 
     bound = _point_condition_from_plain(
         {
@@ -327,9 +340,7 @@ def test_located_approximate_print_maps_to_identity_and_stays_off_calibration() 
         },
         key="total_pressure_Pa",
     )
-    assert _point_pressure_for_identity(
-        identity, {"total_pressure_Pa": bound}
-    ) is None
+    assert _point_pressure_for_identity(identity, {"total_pressure_Pa": bound}) is None
 
     locatorless = _point_condition_from_plain(
         {
@@ -344,9 +355,10 @@ def test_located_approximate_print_maps_to_identity_and_stays_off_calibration() 
         },
         key="total_pressure_Pa",
     )
-    assert _point_pressure_for_identity(
-        identity, {"total_pressure_Pa": locatorless}
-    ) is None
+    assert (
+        _point_pressure_for_identity(identity, {"total_pressure_Pa": locatorless})
+        is None
+    )
     assert _point_pressure_for_identity(identity, {}) is None
 
 
