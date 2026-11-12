@@ -224,11 +224,79 @@ def test_missing_declared_engine_refuses_before_first_hour(
     before = sim.atom_ledger.mol_by_account()
     with pytest.raises(EvaporationFluxRefusal) as error:
         sim.start_campaign(CampaignPhase.C2A_STAGED)
-    assert error.value.diagnostic['reason'] == 'missing_input'
+    assert error.value.reason == 'liquid_fraction_provider_missing_input'
+    assert error.value.diagnostic == {
+        'reason': 'missing_input',
+        'input': 'liquid_fraction_provider',
+        'provider': 'magemin',
+        'status': 'unavailable',
+    }
     assert error.value.diagnostic['provider'] == 'magemin'
     assert sim.melt.hour == 0
     assert sim.atom_ledger.mol_by_account() == before
     assert sim.record.snapshots == []
+
+
+def test_daemonic_missing_binary_keeps_missing_input_diagnostic(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    monkeypatch.setattr(
+        multiprocessing, 'current_process',
+        lambda: SimpleNamespace(daemon=True),
+    )
+    monkeypatch.setattr(MAGEMinBackend, '_resolve_binary_path', lambda _self: None)
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+
+    assert error.value.reason == 'liquid_fraction_provider_missing_input'
+    assert error.value.diagnostic == {
+        'reason': 'missing_input',
+        'input': 'liquid_fraction_provider',
+        'provider': 'magemin',
+        'status': 'unavailable',
+        'daemon_context': True,
+    }
+    assert provider._backend_initialization_error is None
+
+
+def test_daemonic_child_start_failure_is_preserved_for_runner_diagnostic(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    monkeypatch.setattr(
+        multiprocessing, 'current_process',
+        lambda: SimpleNamespace(daemon=True),
+    )
+    child_start_error = AssertionError(
+        'daemonic processes are not allowed to have children'
+    )
+
+    def fail_initialize(_backend, _config):
+        raise child_start_error
+
+    monkeypatch.setattr(MAGEMinBackend, 'initialize', fail_initialize)
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION
+    )
+
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+
+    assert error.value.reason == (
+        'liquid_fraction_provider_unavailable_daemonic_process_'
+        'cannot_start_child_workers'
+    )
+    assert 'daemonic process cannot start child worker processes' in (
+        error.value.diagnostic['detail']
+    )
+    assert provider._backend_initialization_error is child_start_error
 
 
 def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
@@ -243,7 +311,13 @@ def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
     )
     with pytest.raises(EvaporationFluxRefusal) as campaign_error:
         campaign_sim.start_campaign(CampaignPhase.C2A_STAGED)
-    assert campaign_error.value.diagnostic['reason'] == 'missing_input'
+    assert campaign_error.value.reason == 'liquid_fraction_provider_missing_input'
+    assert campaign_error.value.diagnostic == {
+        'reason': 'missing_input',
+        'input': 'liquid_fraction_provider',
+        'provider': 'magemin',
+        'status': 'unavailable',
+    }
     assert campaign_error.value.diagnostic['provider'] == 'magemin'
 
     gate_sim = _sim(
@@ -370,7 +444,12 @@ def test_runner_reports_typed_startup_missing_input(monkeypatch):
     assert artifact['timesteps'] == []
     metadata = artifact['terminal']['run_metadata']
     assert metadata['liquid_fraction_provider'] == 'magemin'
-    assert metadata['refusal_diagnostic']['reason'] == 'missing_input'
+    assert metadata['refusal_diagnostic'] == {
+        'reason': 'missing_input',
+        'input': 'liquid_fraction_provider',
+        'provider': 'magemin',
+        'status': 'unavailable',
+    }
 
 
 @pytest.mark.parametrize('reason', ['engine_not_converged', 'engine_worker_timeout'])
