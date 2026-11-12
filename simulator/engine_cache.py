@@ -149,6 +149,24 @@ class CacheValue:
     cold: Any = None
 
 
+class EngineCacheSchemaMismatch(RuntimeError):
+    """The configured cache store has columns this reader cannot use."""
+
+    def __init__(
+        self,
+        table: str,
+        expected_columns: Iterable[str],
+        found_columns: Iterable[str],
+    ) -> None:
+        self.table = table
+        self.expected_columns = tuple(expected_columns)
+        self.found_columns = tuple(found_columns)
+        super().__init__(
+            f"engine cache schema mismatch in {table}: expected columns "
+            f"{self.expected_columns!r}, found {self.found_columns!r}"
+        )
+
+
 def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> bytes:
     if engine_id not in ENGINE_CHEMISTRY_VERSION:
         raise ValueError(f"unknown engine {engine_id!r}")
@@ -670,15 +688,18 @@ def _connect(
                     connection.close()
                     raise
                 time.sleep(0.01)
-        table = _COLD_TABLE if cold else _TABLE
-        columns = connection.execute(f"PRAGMA table_info({table})").fetchall()
-        expected = (
-            ["key", "value"]
-            if cold
-            else ["key", "value", "engine", "chem_version", "source_box", "row_seq"]
-        )
-        if columns and [row[1] for row in columns] != expected:
-            connection.execute(f"DROP TABLE {table}")
+    table = _COLD_TABLE if cold else _TABLE
+    expected = (
+        ["key", "value"]
+        if cold
+        else ["key", "value", "engine", "chem_version", "source_box", "row_seq"]
+    )
+    columns = connection.execute(f"PRAGMA table_info({table})").fetchall()
+    found = [row[1] for row in columns]
+    if columns and found != expected:
+        connection.close()
+        raise EngineCacheSchemaMismatch(table, expected, found)
+    if not readonly:
         if cold:
             connection.execute(
                 f"CREATE TABLE IF NOT EXISTS {table} "
