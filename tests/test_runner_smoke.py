@@ -2023,7 +2023,14 @@ def _vpr_p6a_trace_result_copy_factory():
     cached_result = _run_c2a_trace_export()
 
     def copy_result():
-        return deepcopy(cached_result)
+        payload, execution = cached_result
+        return (
+            deepcopy(payload),
+            SimpleNamespace(
+                trace=deepcopy(execution.trace),
+                per_hour=deepcopy(execution.per_hour),
+            ),
+        )
 
     return copy_result
 
