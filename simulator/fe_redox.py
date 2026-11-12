@@ -15,8 +15,14 @@ from simulator.feedstock_composition import (
 from simulator.oxygen_buffers import (
     FE_FEO_BUFFER_STANDARD,
     Kress91InvalidControls,
+    delta_iw_log10,
     feo_iw_log10_fO2_bar,
     legacy_iw_log10_fO2_bar,
+)
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT,
+    PA_PER_BAR,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -226,7 +232,7 @@ def _kress91_temperature_pressure_term(
             'Kress91 invalid control pressure_bar: expected finite positive '
             f'value or None, got {pressure_bar!r}'
         )
-    p_pa = max(p_bar, 1.0e-9) * 100000.0
+    p_pa = max(p_bar, 1.0e-9) * PA_PER_BAR
     return (
         term
         + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / float(T_K))
@@ -246,9 +252,9 @@ def kress91_referenced_log_fO2(
 ) -> float:
     redox_fO2_log = float(fO2_log)
     redox_target_T_K = float(target_T_K)
-    # 273.15 K is the exact Celsius-to-kelvin offset, so this is the
-    # documented 1200 C liquid-calibration floor expressed in kelvin.
-    calibration_min_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15
+    # CELSIUS_TO_KELVIN_OFFSET is the exact Celsius-to-kelvin offset, so
+    # this is the documented 1200 C liquid-calibration floor in kelvin.
+    calibration_min_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + CELSIUS_TO_KELVIN_OFFSET
     if redox_target_T_K < calibration_min_T_K:
         raise Kress91InvalidControls(
             f'Kress91 invalid control target_T_K: {redox_target_T_K!r} K is '
@@ -291,7 +297,7 @@ def _kress91_gate_key_referenced_log_fO2(
     if reference_T_K is None:
         return redox_fO2_log
     redox_reference_T_K = float(reference_T_K)
-    if redox_reference_T_K <= 273.15:
+    if redox_reference_T_K <= CELSIUS_TO_KELVIN_OFFSET:
         return redox_fO2_log
     return kress91_referenced_log_fO2(
         redox_fO2_log,
@@ -469,7 +475,7 @@ def _linear_interpolate_or_clamp(
 
 
 def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
-    T_C = float(T_K) - 273.15
+    T_C = float(T_K) - CELSIUS_TO_KELVIN_OFFSET
     multiplier, status = _linear_interpolate_or_clamp(
         HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
         T_C,
@@ -766,8 +772,7 @@ def ban_ya_quadratic_gamma_feo(
                 alpha_fe_a + alpha_fe_b - alpha_ab
             ) * candidate[cation_a] * candidate[cation_b]
 
-    R = 8.31446261815324
-    ln_gamma = rt_ln_gamma / (R * float(T_K))
+    ln_gamma = rt_ln_gamma / (GAS_CONSTANT * float(T_K))
     gamma = math.exp(max(-745.0, min(709.0, ln_gamma)))
     return {
         'status': 'ok' if not missing else 'ok_with_ocr_gaps',
@@ -890,7 +895,7 @@ def _kress91_ln_ratio(
         # math.log(0.0) raises (BUG-159). This product is the canonical term.
         fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
-    p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
+    p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
     return (
         fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
@@ -1188,7 +1193,7 @@ def _calphad_feo_activity_components(
         else None
     )
     pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
-    delta_iw_pure_feo = float(fO2_log) - pure_feo_iw
+    delta_iw_pure_feo = delta_iw_log10(float(fO2_log), pure_feo_iw)
     calphad_weight = _calphad_authority_weight(delta_iw_pure_feo)
     kress91_weight = 1.0 - calphad_weight
     authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity
@@ -1355,7 +1360,7 @@ def kress91_split(
     fe3 = 2.0 * ratio / (2.0 * ratio + 1.0)
     x_fe2o3 = ratio * mol_fractions['FeOt'] / (2.0 * ratio + 1.0)
     x_feo = max(0.0, mol_fractions['FeOt'] - 2.0 * x_fe2o3)
-    temperature_band = kress91_temperature_band_case(float(T_K) - 273.15)
+    temperature_band = kress91_temperature_band_case(float(T_K) - CELSIUS_TO_KELVIN_OFFSET)
     return {
         'fe3': fe3,
         'ratio': ratio,

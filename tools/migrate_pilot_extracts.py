@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from simulator.physical_constants import PA_PER_BAR  # noqa: E402
 from simulator.regeneration_guard import regeneration_guard
 
 EXTRACTS = ROOT / "data" / "literature" / "extracts"
@@ -451,7 +452,7 @@ def migrate_cea() -> Path | None:
                     "T_range_K": tr,
                     "phase": model.get("standard_state") or thermo.get("standard_state"),
                     "standard_state": (
-                        f"CEA/JANAF P°={thermo.get('reference_pressure_Pa', 1.0e5)} Pa; "
+                        f"CEA/JANAF P°={thermo.get('reference_pressure_Pa', PA_PER_BAR)} Pa; "
                         f"phase_flag={thermo.get('phase_flag')}"
                     ),
                     "regime": "gas_standard_state_thermo",

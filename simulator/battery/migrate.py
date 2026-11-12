@@ -248,7 +248,6 @@ from simulator.battery.validate import (
     validate_corpus,
 )
 from simulator.chemistry.fo2_buffers import evaluate_buffer, match_printed_calibration
-from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
 from simulator.battery.phase_field import (
     OUTSIDE_SINGLE_LIQUID_FIELD,
     PhaseFieldRecords,
@@ -341,7 +340,7 @@ CORPUS_REPO_DEFAULT = "regolith-corpus"
 # Algebra: P_Pa = P_Torr × 101325 / 760.
 # Unit check: Torr × (Pa/Torr) = Pa.
 # Sanity: 760 Torr = 101325 Pa; 1 Torr = 101325/760 ≈ 133.322368421 Pa.
-PA_PER_TORR = Decimal(str(int(STANDARD_ATMOSPHERE_PA))) / Decimal("760")
+PA_PER_TORR = PA_PER_ATM_DEC / Decimal("760")
 PA_PER_MMHG = PA_PER_TORR  # millimetre of mercury is identified with Torr here
 
 DOI_URL_RE = re.compile(
@@ -4945,12 +4944,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "Torr",
     ),
     "atm_to_Pa": (
-        Decimal(str(int(STANDARD_ATMOSPHERE_PA))),
+        PA_PER_ATM_DEC,
         "P_Pa = P_atm × 101325",
         "Pa",
         "atm",
     ),
-    "bar_to_Pa": (Decimal("100000"), "P_Pa = P_bar × 1e5", "Pa", "bar"),
+    "bar_to_Pa": (PA_PER_BAR_DEC, "P_Pa = P_bar × 1e5", "Pa", "bar"),
     "kPa_to_Pa": (Decimal("1000"), "P_Pa = P_kPa × 1000", "Pa", "kPa"),
     "GPa_to_Pa": (Decimal("1000000000"), "P_Pa = P_GPa × 1e9", "Pa", "GPa"),
     "mbar_to_Pa": (Decimal("100"), "P_Pa = P_mbar × 100", "Pa", "mbar"),
@@ -9640,11 +9639,11 @@ def _convert_printed_amount(amount: Decimal, unit: str) -> tuple[Decimal, str] |
         if normalized == "C/min":
             return amount / Decimal(60), "C_per_min_to_K_per_s"
         if normalized == "Torr":
-            return amount * Decimal(101325) / Decimal(760), "Torr_to_Pa"
+            return amount * PA_PER_TORR, "Torr_to_Pa"
         if normalized == "atm":
-            return amount * Decimal(101325), "atm_to_Pa"
+            return amount * PA_PER_ATM_DEC, "atm_to_Pa"
         if normalized == "bar":
-            return amount * Decimal(100000), "bar_to_Pa"
+            return amount * PA_PER_BAR_DEC, "bar_to_Pa"
         if normalized == "mbar":
             return amount * Decimal(100), "mbar_to_Pa"
         if normalized == "MPa":
@@ -19724,7 +19723,7 @@ _AUTHOR_RATIO_REL_TOLERANCE = Decimal("1e-4")
 _CONGRUENT_VAPORIZATION_M_O2_G_MOL = Decimal("32.00")
 _CONGRUENT_VAPORIZATION_M_K_G_MOL = Decimal("39.10")
 _OXYGEN_TABLE_KEYS = frozenset({"series", "rows", "points"})
-_BAR_PA = Decimal("100000")
+_BAR_PA = PA_PER_BAR_DEC
 # Explicit frames keep their reference. An empty unit is not a printed
 # standard state: `_bare_log_convention` accepts 1 bar only inside the IW band.
 _OXYGEN_LOG_REFERENCE_PA = {
@@ -23405,7 +23404,7 @@ def compilation_source_basis(
 # ---------------------------------------------------------------------------
 
 
-_AMBIENT_PRESSURE_TOTAL_PA = Decimal("101325")
+_AMBIENT_PRESSURE_TOTAL_PA = PA_PER_ATM_DEC
 # The band is an input uncertainty on total pressure. Quantities whose model
 # value depends on absolute P through the kinetic series resistance carry it;
 # equilibrium condensed-phase quantities, where P enters only through V dP,
@@ -26150,9 +26149,9 @@ class Migrator:
         p_std = p_sel.amount if p_sel.available else None
         if p_std is not None:
             measured.gibbs_reference_pressures += 1
-            if p_std == Decimal("100000") or p_std == Decimal("100000.0"):
+            if p_std == PA_PER_BAR_DEC:
                 measured.gibbs_reference_100000 += 1
-            elif p_std == Decimal("101325") or p_std == Decimal("101325.0"):
+            elif p_std == PA_PER_ATM_DEC:
                 measured.gibbs_reference_101325 += 1
 
         method_class = values.get("method_class")

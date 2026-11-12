@@ -56,6 +56,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -119,7 +120,7 @@ ONEILL_IW_TEMPERATURE_RANGES_K = (
     (1184.0, 1450.0),
 )
 ONEILL_IW_UNCERTAINTY_J_MOL = 100.0
-_ONEILL_IW_R = 8.31446261815324
+_ONEILL_IW_R = GAS_CONSTANT
 _ONEILL_IW_LN10 = math.log(10.0)
 
 
@@ -424,15 +425,63 @@ def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
     )
 
 
+def metal_oxide_coexistence_log10_fO2_bar(
+    formation_gibbs_j_mol: float,
+    oxygen_atoms: float,
+    temperature_K: float,
+) -> float:
+    """log10(fO2/bar) for metal/oxide coexistence from the oxide formation Gibbs.
+
+    Premise: the condensed metal is the formation reference, so ΔfG(M) = 0
+    and the oxide formation reaction per mole of oxide is
+    M + (n_O/2) O2 = MOn. Written per mole of O2 that is
+    (2/n_O) M + O2 = (2/n_O) MOn, with ΔrG = (2/n_O) ΔfG.
+    Algebra: log10(fO2/bar) = ΔrG / (R T ln 10)
+    = 2 ΔfG / (n_O R T ln 10). The factor 2 is that normalization.
+    It is not applied again.
+    Unit check: J/mol / ((J/(mol·K))·K) is dimensionless.
+    Sanity: ΔfG = −500000 J/mol, n_O = 2, T = 1800 K is the hex
+    −0x1.d04c8123c6560p+3. Holzheid liquid FeO is a different expression
+    and is not this function.
+    """
+
+    return (
+        2.0
+        * formation_gibbs_j_mol
+        / (
+            oxygen_atoms
+            * GAS_CONSTANT
+            * temperature_K
+            * math.log(10.0)
+        )
+    )
+
+
 def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
     """Return the Holzheid activity-bearing IW relation for a_FeO input."""
     activity = max(float(a_feo), 1.0e-300)
-    R = 8.31446261815324
     ln_fO2 = 2.0 * (
         math.log(activity)
-        + holzheid_feo_liquid_delta_g_j_mol(T_K) / (R * float(T_K))
+        + holzheid_feo_liquid_delta_g_j_mol(T_K) / (GAS_CONSTANT * float(T_K))
     )
     return ln_fO2 / math.log(10.0)
+
+
+def delta_iw_log10(fO2_log: float, iw_log: float) -> float:
+    """log10(fO2/bar) minus the caller's IW log10(fO2/bar).
+
+    Premise: ΔIW compares two fugacities already written as log10 of bar.
+    This function does not choose the IW line. Legacy IW, Holzheid liquid
+    FeO, and O'Neill IW are different numbers; the caller passes the one
+    it means.
+    Algebra: float(fO2_log) - float(iw_log).
+    Unit check: both arguments are log10(bar), so the difference is
+    dimensionless dex.
+    Sanity: -10.0 - -12.5 is 2.5, hex 0x1.4p+1. The Decimal battery-hero
+    ΔIW is a different subtraction and is not this function.
+    """
+
+    return float(fO2_log) - float(iw_log)
 
 
 # This identifier follows the coded line's wustite-liquid standard. Holzheid

@@ -16,6 +16,7 @@ from pathlib import Path
 
 import yaml
 from simulator.corpus_paths import regolith_corpus_root
+from simulator.physical_constants import GAS_CONSTANT
 
 
 ROOT = Path(__file__).resolve().parent
@@ -309,7 +310,7 @@ def identity_checks(record, tess):
     tcell = (record.get("temperature_grid") or [{}])[0]
     t = tcell.get("value")
     if t and dg.get("value") is not None and logk.get("value") is not None:
-        factor = 8.31446261815324 * t * math.log(10) / 1000
+        factor = GAS_CONSTANT * t * math.log(10) / 1000
 
         def half_step(raw):
             return 0.5 * 10 ** (-len(raw.split(".")[1])) if raw and "." in raw else 0.5

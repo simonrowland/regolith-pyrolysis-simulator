@@ -88,6 +88,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_same_phase_extension,
     ellingham_segment_for_temperature,
 )
+from simulator.physical_constants import PA_PER_BAR
 
 # ``-> [coeff ]Formula(token)``. Coeff defaults to 1 (``TiO2(rutile,s)``).
 _PRODUCT_RE = re.compile(
@@ -998,7 +999,7 @@ def _nasa_cea_9_polynomial(record_id: str):
         "delta_f_H_298_15_J_per_mol": record["delta_f_H_298_15"]["value"],
         "citation": record["citation_as_published"],
         "source_ref_code": record["source_ref_code"],
-        "reference_pressure_Pa": 100_000.0,
+        "reference_pressure_Pa": PA_PER_BAR,
     }
     polynomial = _polynomial_from_thermo_record(
         name=record_id,
@@ -1220,7 +1221,7 @@ def _nasa_cea_9_attempt(
                     # S(T,p) = S(T,p0) - R ln(p/p0): zero shift at p0 and
                     # about +95.7 J/mol/K at 1 Pa. Use the identity owner.
                     value += ideal_gas_entropy_pressure_shift_J_per_mol_K(
-                        Decimal("100000"), gas_entropy_pressure
+                        PA_PER_BAR_DEC, gas_entropy_pressure
                     )
             else:
                 anchor_state, anchor_outside = _nasa_cea_9_state(
@@ -1353,7 +1354,7 @@ def _nasa_cea_9_attempt(
                 per_species += standard_pressure_delta_g_kJ_per_mol(
                     as_decimal(gas_coefficient),
                     temperature_K,
-                    Decimal("100000"),
+                    PA_PER_BAR_DEC,
                     as_decimal(pressure.value),
                 )
             if per is PerBasis.MOL_O2 and identity.species.formula != "O2":

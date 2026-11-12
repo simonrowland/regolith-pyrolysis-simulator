@@ -82,8 +82,9 @@ from simulator.oxygen_buffers import (
     FROST_WM_COEFFICIENTS,
     frost_condensed_buffer_log10_fO2_bar,
 )
+from simulator.physical_constants import GAS_CONSTANT_10SIG
 
-GAS_CONSTANT_J_MOL_K = 8.314462618
+GAS_CONSTANT_J_MOL_K = GAS_CONSTANT_10SIG
 LN10 = math.log(10.0)
 
 #: THE one policy number. Residual tolerance in log10 fO2 units ("dex").

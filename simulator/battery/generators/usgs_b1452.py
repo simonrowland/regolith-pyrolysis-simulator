@@ -62,12 +62,13 @@ from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader impo
     ROLE,
     SOURCE_ID,
 )
+from simulator.physical_constants import BAR_PA_DECIMAL
 
 RECORDS_DIR = COMPILATION_ROOT / "records"
 SOURCE_PATH_PREFIX = (
     "data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records"
 )
-STANDARD_PRESSURE_PA = Decimal("100000")
+STANDARD_PRESSURE_PA = BAR_PA_DECIMAL
 # B1452 Table 1 (PDF p. 9 / printed p. 3), symbol R:
 # "Gas constant, 8.3143 ± 0.0008 J· K-1· mol-1."
 B1452_R_J_PER_MOL_K = Decimal("8.3143")
