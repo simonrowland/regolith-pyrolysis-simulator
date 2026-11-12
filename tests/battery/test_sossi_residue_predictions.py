@@ -135,7 +135,6 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         catalog,
         starting_trace_ppm_by_experiment={experiment_id: starting_trace},
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
-        code_revision="pack-digest-pin-test",
         engine="openimcc",
     )[0]
 
@@ -234,7 +233,6 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
         catalog,
         starting_trace_ppm_by_experiment={experiment_id: starting_trace},
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
-        code_revision="sossi-ti-only-cache-test",
         engine="openimcc",
     )[0]
 
@@ -275,7 +273,6 @@ def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
             experiment_id: starting_trace for experiment_id in experiment_ids
         },
         buffered_fO2_log_by_experiment={experiment_id: -10.0 for experiment_id in experiment_ids},
-        code_revision="sossi-timeout-fixture",
         engine="openimcc",
     )
 
@@ -320,7 +317,6 @@ def test_sossi_worker_start_failure_after_residue_scoring_worker(
         yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
         starting_trace_ppm_by_experiment={experiment_id: starting_trace},
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
-        code_revision="sossi-worker-start-failure-order-test",
         engine="openimcc",
     )
 
@@ -386,7 +382,6 @@ def _assert_sossi_worker_start_failure_recorded(
         yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
         starting_trace_ppm_by_experiment={experiment_id: starting_trace},
         buffered_fO2_log_by_experiment={experiment_id: -10.0},
-        code_revision="sossi-worker-start-failure-test",
         engine="openimcc",
     )[0]
 
@@ -411,9 +406,15 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
         metric_operation_for_identity,
         point_magnitude,
     )
+    import simulator.battery.score as score_module
     import simulator.battery.residue as residue
 
     context = load_score_context(sources=("kems-012-sossi-2019",))
+    monkeypatch.setattr(
+        score_module.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
     rows = [
         row
         for row in context.observations.values()
@@ -435,7 +436,6 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
                 channel_missing_elements=(),
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
-                    "code_revision": "fixture-revision",
                     "melt_activity_extensions": {
                         "MnO": {
                             "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
@@ -461,6 +461,8 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert prediction.execution.state.value == "produced"
     assert prediction.value == 900.0
     assert prediction.identity == manganese.identity
+    assert prediction.version is None
+    assert "code_revision" not in prediction.refusal_detail
     assert any(
         notice.reason == "bc_open_furnace_langmuir_limit_diagnostic"
         for notice in prediction.notices
@@ -523,7 +525,6 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
                         provenance={
                             "geometry_refusal_by_geometry": {},
                             "integration": {"refinement_status": "converged"},
-                            "code_revision": "fixture-revision",
                         },
                     )
                 )
@@ -538,7 +539,6 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
                 channel_missing_elements=(),
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
-                    "code_revision": "fixture-revision",
                 },
             )
             for experiment in experiments
@@ -649,7 +649,6 @@ def test_sossi_below_liquid_floor_reaches_the_scored_notice(
                     channel_missing_elements=(),
                     provenance={
                         "integration": {"primary": {"status": "converged"}},
-                        "code_revision": "fixture-revision",
                         "liquid_rows_used": (
                             _liquid_row(
                                 "MnO(l)", certified_band, below_floor=below
@@ -792,7 +791,6 @@ def test_hashimoto_below_liquid_floor_reaches_the_scored_notice(
                 "engine": engine,
                 "integration": {"refinement_status": "converged"},
                 "geometry_refusal_by_geometry": {},
-                "code_revision": "fixture-revision",
                 "liquid_rows_used": (
                     liquid_record(
                         "Fe",

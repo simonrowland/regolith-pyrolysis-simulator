@@ -254,7 +254,7 @@ def test_battery_handle_open_cache_output_is_bit_identical(monkeypatch):
     assert scored.authority is Authority.BRIDGE
     assert scored.execution.state is ExecutionState.PRODUCED
     assert scored.execution.call_evidence == (
-        "equilibrate_cell:alphamelts:host=pin-host:exit=0"
+        "equilibrate_cell:alphamelts:exit=0"
     )
     assert scored.refusal_reason is None
     assert scored.refusal_detail == {}
