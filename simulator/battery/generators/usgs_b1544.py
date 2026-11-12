@@ -26,6 +26,15 @@ from simulator.battery.enums import (
     Quantity,
     UncertaintyKind,
 )
+from simulator.battery.generators._usgs_common import (
+    LETTER_TAIL_RE,
+    _NUMBER_RE,
+    _decimal_grain,
+    _neighbours_of,
+    _opposite_to_both_neighbours,
+    _published_decimal,
+    _value_grain,
+)
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
 from simulator.battery.polymorph_dictionary import resolve_printed_name_polymorph
@@ -216,8 +225,6 @@ RECONSTRUCTED_TOKENS = (
         ),
     },
 )
-LETTER_TAIL_RE = re.compile(r".*\d[A-Za-z]$")
-_NUMBER_RE = re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?$")
 _EXTRACT_NUMBER_RE = re.compile(
     r"[+-]?\d+(?:\.\d*)?(?:[Ee][+-]?\d+)?"
 )
@@ -626,31 +633,6 @@ def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
                         row_index=row_index,
                     )
     return tokens
-
-
-def _published_decimal(token: str) -> Decimal | None:
-    text = token.strip()
-    if text.startswith("(") and text.endswith(")") and text != "()":
-        text = text[1:-1].strip()
-    if not text or not _NUMBER_RE.fullmatch(text):
-        return None
-    try:
-        return Decimal(text)
-    except InvalidOperation:
-        return None
-
-
-def _decimal_grain(token: str) -> Decimal:
-    """10^exponent of a printed numeric token. Same concept as janaf.py."""
-
-    value = Decimal(token.strip())
-    return Decimal(1).scaleb(value.as_tuple().exponent)
-
-
-def _value_grain(value: Decimal) -> Decimal:
-    """10^exponent of a Decimal. Same scale as `_decimal_grain` / janaf.py."""
-
-    return Decimal(1).scaleb(value.as_tuple().exponent)
 
 
 def _column_grain_map(
@@ -1262,46 +1244,6 @@ def _signed_series(
             (token.row_index, token, extracted)
         )
     return series
-
-
-def _neighbours_of(
-    token: RawToken,
-    series: Mapping[tuple[str, str | None], list[tuple[int, RawToken, Decimal]]],
-) -> tuple[Decimal | None, Decimal | None]:
-    points = series.get((token.column, token.formation_basis), [])
-    ordered = sorted(points, key=lambda item: item[0])
-    index = next(
-        (i for i, item in enumerate(ordered) if item[1] is token or item[0] == token.row_index),
-        None,
-    )
-    if index is None:
-        return None, None
-    left = None
-    right = None
-    for previous in reversed(ordered[:index]):
-        if previous[2] != 0:
-            left = previous[2]
-            break
-    for following in ordered[index + 1 :]:
-        if following[2] != 0:
-            right = following[2]
-            break
-    return left, right
-
-
-def _opposite_to_both_neighbours(
-    value: Decimal, left: Decimal | None, right: Decimal | None
-) -> bool:
-    """True when value is the dropped-minus (or dropped-plus) class.
-
-    Example: +111.855 sitting between −113.073 and −110.445 on a page headed
-    FORMATION FROM THE OXIDES. The scan refuses that candidate; it is not
-    advisory-only.
-    """
-
-    if left is None or right is None or value == 0:
-        return False
-    return (value > 0 > left and right < 0) or (value < 0 < left and right > 0)
 
 
 def _neighbour_sign_hits(
