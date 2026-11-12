@@ -173,7 +173,6 @@ KNUDSEN_REFUSAL_REASON = 'knudsen_outside_viscous_flow'
 KNUDSEN_TRANSITION_REASON = 'knudsen_transitional_flow'
 INVALID_PIPE_DIAMETER_REASON = 'invalid_pipe_diameter'
 COLD_SPOT_MARGIN_C = 25.0
-DEFAULT_UPSTREAM_HOT_WALL_MIN_C = 1400.0
 LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 
 # Viscous-regime wall mass-transfer model (post-F3 follow-on, 2026-05-27).
@@ -2300,7 +2299,6 @@ class CondensationModel:
         self.pipe_segments = self._build_default_pipe_segments(
             float(wall_temperature_C))
         self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
-        self.upstream_hot_wall_min_C = DEFAULT_UPSTREAM_HOT_WALL_MIN_C
         self.last_cold_spot_diagnostic: dict[str, Any] = {
             'has_cold_spot': False,
             'warnings': [],
@@ -2308,7 +2306,11 @@ class CondensationModel:
             'has_upstream_hot_wall_violation': False,
             'upstream_hot_wall_warnings': [],
             'upstream_hot_wall_findings': [],
-            'upstream_hot_wall_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
+            'upstream_hot_wall_judgements': [],
+            'upstream_hot_wall_extrapolations': [],
+            'upstream_hot_wall_min_C': None,
+            'upstream_hot_wall_refused': False,
+            'upstream_hot_wall_refusals': [],
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
@@ -2766,10 +2768,6 @@ class CondensationModel:
         """
         if not setpoints:
             return
-        self.upstream_hot_wall_min_C = _stage0_hot_wall_min_C_from_setpoints(
-            setpoints,
-            default_C=self.upstream_hot_wall_min_C,
-        )
         block = (
             (setpoints.get('condensation_train', {}) or {})
             .get('condensation_temperatures_C', {}) or {}
@@ -3207,23 +3205,9 @@ class CondensationModel:
             else {}
         )
         knudsen_diagnostic = self._enforce_knudsen_regime()
-        diagnostic = cold_spot_diagnostic(
-            [segment for segment in self.pipe_segments
-             if segment.name not in self.wall_temperature_input_refusals],
-            evap_flux.species_kg_hr,
-            margin_C=self.cold_spot_margin_C,
-            upstream_hot_wall_min_C=self.upstream_hot_wall_min_C,
-            temps=self.condensation_temperatures_C,
-            vapor_pressure_data=self.vapor_pressure_data,
-            species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
-        )
-        self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
-        self.cold_spot_history.append(copy.deepcopy(diagnostic))
-        cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
-        if self.operating_history:
-            self.operating_history[-1]['cold_spot_warning_count'] = len(
-                cold_spot_warnings)
-            self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
+        # Hot-wall judgements run after the train walk below. Segment
+        # pressures do not exist yet; judging here would broadcast the
+        # inlet partial onto every wall (b-282).
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
         for species in evap_flux.species_kg_hr:
@@ -3260,6 +3244,9 @@ class CondensationModel:
         flowing_rates = dict(inlet_rates)
         wall_hkl_by_species: dict[str, dict[str, float]] = {}
         self.wall_species_partial_pressures_pa_by_segment = {}
+        # Flow arriving at each wall, copied before that wall deposits.
+        # The hot-wall chokepoint reads this with the segment partials.
+        arriving_species_kg_hr_by_segment: dict[str, dict[str, float]] = {}
         # The train is causal: each entering wall and then its stage consume
         # one shared inlet mixture. Recompute Dalton partials only AFTER all
         # species at that location have been evaluated, preserving carrier flow.
@@ -3292,6 +3279,10 @@ class CondensationModel:
                     inlet_rates, {segment.name: flowing_rates},
                 )[segment.name]
                 self.wall_species_partial_pressures_pa_by_segment[segment.name] = partials
+                arriving_species_kg_hr_by_segment[segment.name] = {
+                    str(species): float(flowing_rates.get(species, 0.0))
+                    for species in inlet_rates
+                }
                 wall_removed: dict[str, float] = {}
                 for species, route in stage_route_by_species.items():
                     supply = flowing_rates.get(species, 0.0)
@@ -3381,6 +3372,30 @@ class CondensationModel:
                     stage_removed[species] = deposit
             for species, deposit in stage_removed.items():
                 flowing_rates[species] = max(0.0, flowing_rates[species] - deposit)
+        # Invariant (b-282): every hot-wall judgement uses the partial
+        # pressure of the mixture that arrives at that segment. Inlet
+        # pressure is not a substitute after upstream capture.
+        diagnostic = cold_spot_diagnostic(
+            [segment for segment in self.pipe_segments
+             if segment.name not in self.wall_temperature_input_refusals],
+            evap_flux.species_kg_hr,
+            margin_C=self.cold_spot_margin_C,
+            temps=self.condensation_temperatures_C,
+            vapor_pressure_data=self.vapor_pressure_data,
+            species_partial_pressures_pa_by_segment=(
+                self.wall_species_partial_pressures_pa_by_segment
+            ),
+            surviving_species_kg_hr_by_segment=(
+                arriving_species_kg_hr_by_segment
+            ),
+        )
+        self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
+        self.cold_spot_history.append(copy.deepcopy(diagnostic))
+        cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
+        if self.operating_history:
+            self.operating_history[-1]['cold_spot_warning_count'] = len(
+                cold_spot_warnings)
+            self.operating_history[-1]['cold_spot_warnings'] = cold_spot_warnings
         wall_saturation_pressure_refusals_by_species: dict[
             str, dict[str, dict[str, Any]]
         ] = {}
@@ -7498,34 +7513,6 @@ def _finite_or_none(value: float) -> float | None:
     return value if math.isfinite(value) else None
 
 
-def _stage0_hot_wall_min_C_from_setpoints(
-    setpoints: Mapping[str, Any] | None,
-    *,
-    default_C: float = DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
-) -> float:
-    if not setpoints:
-        return float(default_C)
-    block = (
-        (setpoints.get('condensation_train', {}) or {})
-        .get('metals_train', {}) or {}
-    )
-    if not isinstance(block, Mapping):
-        return float(default_C)
-    stage0 = block.get('stage_0_hot_duct', {}) or {}
-    if not isinstance(stage0, Mapping):
-        return float(default_C)
-    band = stage0.get('temp_range_C')
-    if not isinstance(band, (list, tuple)) or not band:
-        return float(default_C)
-    try:
-        low = float(band[0])
-    except (TypeError, ValueError):
-        return float(default_C)
-    if not math.isfinite(low):
-        return float(default_C)
-    return low
-
-
 def _campaign_requires_viscous_flow(campaign_name: str | None) -> bool:
     if campaign_name is None:
         return True
@@ -7654,58 +7641,154 @@ def _segment_stage_number(stage_name: str) -> int | None:
     return int(suffix) if suffix.isdecimal() else None
 
 
+def _saturation_extrapolation_records(
+    notes: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """Copy out-of-domain saturation qualifications, excluding refusals.
+
+    A refused fit is a typed refusal, not a best estimate. An extrapolated
+    fit is a best estimate and must keep this qualification (d-367).
+    """
+
+    records: list[dict[str, Any]] = []
+    for key, record in notes.items():
+        if not isinstance(record, Mapping):
+            continue
+        status = record.get('status')
+        authority = record.get('authority_level')
+        if status == 'refused' or authority == 'unavailable':
+            continue
+        if authority != 'extrapolated' and status != 'extrapolated':
+            continue
+        published = dict(record)
+        published['telemetry_key'] = str(key)
+        records.append(published)
+    return records
+
+
 def cold_spot_diagnostic(
     pipe_segments: list[PipeSegment],
     vapor_species_kg_hr: Mapping[str, float],
     *,
     margin_C: float = COLD_SPOT_MARGIN_C,
-    upstream_hot_wall_min_C: float | None = DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
+    upstream_hot_wall_min_C: float | None = None,
     temps: Mapping[str, float] | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
-    species_partial_pressures_pa: Mapping[str, float] | None = None,
+    species_partial_pressures_pa_by_segment: (
+        Mapping[str, Mapping[str, float]] | None
+    ) = None,
+    surviving_species_kg_hr_by_segment: (
+        Mapping[str, Mapping[str, float]] | None
+    ) = None,
 ) -> dict[str, Any]:
     """Flag pipe segments that would condense flowing vapor too early.
 
     Landing-temperature cold spots stay a fixed engineering-threshold
-    check. Upstream hot-wall fouling additionally uses local partial
-    pressure versus the existing wall Antoine P_sat when that pressure
-    is supplied; the uniform 1400 C floor remains as a coarse minimum.
+    check. Upstream hot-wall fouling is the per-species dew point:
+    the partial pressure of the mixture that arrives at that segment,
+    after upstream capture, above the wall saturation pressure. That
+    inversion is the CLAUDE.md §4 / docs/concepts.md table (Na bake-off
+    about 486 C, Fe bake-off about 1775 C, both at 1 mbar). A uniform
+    temperature is not a second gate, and the inlet partial is not a
+    stand-in for a later segment. ``upstream_hot_wall_min_C`` is
+    accepted and ignored so a stage-0 schedule band cannot reintroduce
+    one (b-282).
+
+    Invariant: no arriving species flow is a silent 0.0. Every hot-wall
+    judgement is one segment's arriving partial pressure compared with
+    that species' P_sat(T_wall), or a typed refusal of that quantity.
+    When a surviving-flow map is supplied, a missing segment or a
+    missing species key is a typed refusal. Only an explicit finite
+    zero (the species was captured upstream) skips the judgement. A
+    positive flow at or below the 1e-15 kg/hr mass floor is still
+    arriving: that floor is not the zero. With no surviving-flow map
+    the inlet rate is the arriving flow, and the same predicate
+    decides it. A missing or invalid arriving pressure, or a refused
+    wall P_sat, is a typed refusal (d-367). It is not a clear and it
+    is not a supersaturation finding. A computed P_sat outside the
+    certified fit keeps that best estimate and publishes the
+    extrapolation on the judgement. The coating gate reads those
+    judgements. Reactive SiO deposition still uses its P_sat ~= 0
+    backstop on the deposition path; that backstop does not pass the
+    hot-wall check.
     """
 
+    # The historical uniform floor is not a violation threshold.
+    del upstream_hot_wall_min_C
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
     upstream_hot_wall_findings: list[dict[str, Any]] = []
-    hot_wall_threshold_C = (
-        None
-        if upstream_hot_wall_min_C is None
-        else float(upstream_hot_wall_min_C)
-    )
+    upstream_hot_wall_judgements: list[dict[str, Any]] = []
+    upstream_hot_wall_refusals: list[dict[str, Any]] = []
+
+    def _hot_wall_refusal(
+        segment: PipeSegment,
+        species: str,
+        kg_hr: float,
+        wall_T_C: float,
+        target_stage_number: int,
+        **fields: Any,
+    ) -> dict[str, Any]:
+        return {
+            'status': 'refused',
+            'output_status': 'refused',
+            'quantity': 'upstream_hot_wall',
+            'segment': segment.name,
+            'account': segment.wall_deposit_account,
+            'species': str(species),
+            'kg_hr': kg_hr,
+            'wall_temperature_C': wall_T_C,
+            'target_stage_number': target_stage_number,
+            **fields,
+        }
+
+    def _flow_is_explicit_zero(flow_kg_hr: float) -> bool:
+        """Only an exact 0.0 kg/hr skips a hot-wall judgement.
+
+        Premise: upstream capture is stored as a finite 0.0, not as a
+        mass-accounting floor. Algebra: the species arrives iff
+        flow_kg_hr > 0. Units: kg/hr. Sanity: Fe at 1e-16 kg/hr with
+        an arriving partial of 100 Pa at 1400 C has P_sat(1673.15 K)
+        ≈ 1.14 Pa, so the wall is supersaturated and must be a
+        violation. The 1e-15 kg/hr deposit-dust floor is not this
+        predicate. Both the inlet rate (when no surviving-flow map is
+        supplied) and the surviving rate go through this function.
+        """
+
+        return flow_kg_hr == 0.0
+
     for species, raw_kg_hr in vapor_species_kg_hr.items():
         kg_hr = _finite_nonnegative_value(
             raw_kg_hr,
             label=f'vapor flow for {species}',
         )
-        if kg_hr <= 1e-15:
+        # No surviving-flow map: the inlet rate is the arriving flow.
+        # Explicit zero is absent. A positive inlet, however small,
+        # stays in the chokepoint below. A supplied map can still name
+        # a positive arriving flow when the inlet itself is zero.
+        if (
+            surviving_species_kg_hr_by_segment is None
+            and _flow_is_explicit_zero(kg_hr)
+        ):
             continue
         target_stage_number = designated_stage_number(species)
         if target_stage_number is None:
             continue
-        condensation_T_C = _species_condensation_temperature_C(
-            species,
-            temps=temps,
-            vapor_pressure_data=vapor_pressure_data,
-        )
-        threshold_C = condensation_T_C - margin_C
-        p_local_pa = None
-        if species_partial_pressures_pa is not None:
-            raw_partial = species_partial_pressures_pa.get(species)
-            if raw_partial is not None:
-                try:
-                    candidate_pa = float(raw_partial)
-                except (TypeError, ValueError):
-                    candidate_pa = math.nan
-                if math.isfinite(candidate_pa) and candidate_pa > 0.0:
-                    p_local_pa = candidate_pa
+        # Cold spots keep the engineering dust floor. It is not a
+        # hot-wall skip: a positive flow at or below 1e-15 kg/hr is
+        # still judged below.
+        cold_spot_limit: tuple[float, float] | None = None
+        if kg_hr > 1e-15:
+            condensation_T_C = _species_condensation_temperature_C(
+                species,
+                temps=temps,
+                vapor_pressure_data=vapor_pressure_data,
+            )
+            cold_spot_limit = (
+                condensation_T_C,
+                condensation_T_C - margin_C,
+            )
+        species_name = str(species)
         for segment in pipe_segments:
             downstream_number = _segment_stage_number(segment.downstream_stage)
             if downstream_number is None:
@@ -7713,61 +7796,218 @@ def cold_spot_diagnostic(
             if downstream_number > target_stage_number:
                 continue
             wall_T_C = float(segment.wall_temperature_C)
-            if (
-                hot_wall_threshold_C is not None
-                and math.isfinite(hot_wall_threshold_C)
-                and wall_T_C < hot_wall_threshold_C
-            ):
-                upstream_hot_wall_findings.append({
-                    'segment': segment.name,
-                    'account': segment.wall_deposit_account,
-                    'species': str(species),
-                    'kg_hr': kg_hr,
-                    'wall_temperature_C': wall_T_C,
-                    'upstream_hot_wall_min_C': hot_wall_threshold_C,
-                    'target_stage_number': target_stage_number,
-                    'warning': (
-                        f'upstream hot-wall violation {segment.name}: '
-                        f'{wall_T_C:.1f} C below {hot_wall_threshold_C:.1f} C '
-                        f'before stage {target_stage_number}'
-                    ),
-                })
-            if p_local_pa is not None:
-                # Premise: fouling requires p_i > P_sat(T_wall) (mandate
-                # hot-wall invariant). Algebra: supersaturation iff
-                # p_local_Pa - P_sat_Pa > 0. Units: both pressures are Pa.
-                # Sanity: Fe P_sat(1673.15 K) ≈ 1.14 Pa, so a 100 Pa
-                # (1 mbar) Fe stream is ~88-fold supersaturated; Na
-                # P_sat at the same wall is ~0.93 MPa, so 100 Pa Na is
-                # undersaturated. SiO wall Antoine is not a P_sat
-                # curve; a refused P_sat does not invent a flag here
-                # (reactive P_sat ~= 0 is M30 deposition policy).
-                P_sat_pa, saturation_refused = _try_antoine_psat_pa(
-                    str(species),
-                    wall_T_C + CELSIUS_TO_KELVIN_OFFSET,
-                    vapor_pressure_data=vapor_pressure_data,
+            # One lookup: this segment's arriving stream. There is no
+            # inlet-pressure fallback. An explicit finite zero means the
+            # species was captured upstream and is not judged here. A
+            # missing species key is not that zero (b-282 / d-367).
+            arriving_kg_hr: float | None = kg_hr
+            flow_refusal: dict[str, Any] | None = None
+            if surviving_species_kg_hr_by_segment is not None:
+                segment_flows = surviving_species_kg_hr_by_segment.get(
+                    segment.name
                 )
                 if (
-                    not saturation_refused
-                    and P_sat_pa is not None
-                    and math.isfinite(P_sat_pa)
-                    and p_local_pa > P_sat_pa
+                    segment_flows is None
+                    or species_name not in segment_flows
                 ):
-                    upstream_hot_wall_findings.append({
-                        'segment': segment.name,
-                        'account': segment.wall_deposit_account,
-                        'species': str(species),
-                        'kg_hr': kg_hr,
-                        'wall_temperature_C': wall_T_C,
-                        'upstream_hot_wall_min_C': hot_wall_threshold_C,
-                        'target_stage_number': target_stage_number,
-                        'warning': (
-                            f'upstream hot-wall violation {segment.name}: '
-                            f'{species} local pressure exceeds wall '
-                            f'saturation at {wall_T_C:.1f} C before stage '
-                            f'{target_stage_number}'
-                        ),
+                    # Absent segment and absent species are the same
+                    # missing input. Neither one is an explicit 0.0.
+                    arriving_kg_hr = None
+                    flow_refusal = {
+                        'refusal_type': 'DepositionInputRefusal',
+                        'parameter': 'surviving_species_kg_hr',
+                        'reason': 'missing',
+                    }
+                else:
+                    raw_flow = segment_flows[species_name]
+                    try:
+                        arriving_kg_hr = float(raw_flow)
+                    except (TypeError, ValueError):
+                        arriving_kg_hr = math.nan
+                    if (
+                        not math.isfinite(arriving_kg_hr)
+                        or arriving_kg_hr < 0.0
+                    ):
+                        arriving_kg_hr = None
+                        flow_refusal = {
+                            'refusal_type': 'DepositionInputRefusal',
+                            'parameter': 'surviving_species_kg_hr',
+                            'reason': 'must be finite and non-negative',
+                        }
+            species_reaches_segment = (
+                flow_refusal is not None
+                or (
+                    arriving_kg_hr is not None
+                    and not _flow_is_explicit_zero(arriving_kg_hr)
+                )
+            )
+            if species_reaches_segment:
+                judged_kg_hr = (
+                    kg_hr if arriving_kg_hr is None else arriving_kg_hr
+                )
+                # Missing and non-positive pressures are not a completed
+                # clear. The value has to be this segment's arriving
+                # partial, finite and positive.
+                p_local_pa = None
+                pressure_refusal_fields: dict[str, Any] | None = flow_refusal
+                if flow_refusal is None:
+                    segment_partials = None
+                    if species_partial_pressures_pa_by_segment is not None:
+                        segment_partials = (
+                            species_partial_pressures_pa_by_segment.get(
+                                segment.name
+                            )
+                        )
+                    if (
+                        segment_partials is None
+                        or species_name not in segment_partials
+                    ):
+                        pressure_refusal_fields = {
+                            'refusal_type': 'DepositionInputRefusal',
+                            'parameter': 'species_partial_pressure_pa',
+                            'reason': 'missing',
+                        }
+                    else:
+                        raw_partial = segment_partials[species_name]
+                        try:
+                            candidate_pa = float(raw_partial)
+                        except (TypeError, ValueError):
+                            candidate_pa = math.nan
+                        if math.isfinite(candidate_pa) and candidate_pa > 0.0:
+                            p_local_pa = candidate_pa
+                        else:
+                            pressure_refusal_fields = {
+                                'refusal_type': 'DepositionInputRefusal',
+                                'parameter': 'species_partial_pressure_pa',
+                                'reason': 'must be finite and positive',
+                            }
+                if pressure_refusal_fields is not None:
+                    refusal = _hot_wall_refusal(
+                        segment,
+                        species_name,
+                        judged_kg_hr,
+                        wall_T_C,
+                        target_stage_number,
+                        **pressure_refusal_fields,
+                    )
+                    upstream_hot_wall_refusals.append(refusal)
+                    upstream_hot_wall_judgements.append({
+                        **refusal,
+                        'partial_pressure_pa': None,
+                        'saturation_pressure_pa': None,
+                        'extrapolations': [],
                     })
+                else:
+                    # Premise: fouling requires p_i > P_sat(T_wall) at the
+                    # mixture that arrives here (mandate hot-wall invariant).
+                    # Algebra: supersaturation iff p_local_Pa - P_sat_Pa > 0.
+                    # Units: both pressures are Pa. Sanity: Fe
+                    # P_sat(1673.15 K) ≈ 1.14 Pa, so 100 Pa Fe is ~88-fold
+                    # supersaturated. Na P_sat(773.15 K) ≈ 162 Pa, so 100 Pa
+                    # Na is undersaturated, but 90% Fe capture at 1000 Pa
+                    # total (inlet Na/Fe/carrier 100/800/100 Pa) raises Na
+                    # to 1000*0.1/(0.1+0.08+0.1) ≈ 357 Pa and that same
+                    # 500 C wall violates. A refused P_sat is not P_sat = 0.
+                    # Out-of-domain P_sat is kept and qualified.
+                    wall_T_K = wall_T_C + CELSIUS_TO_KELVIN_OFFSET
+                    # Read this evaluation from a private dict, then copy it
+                    # into any active route telemetry context. The private
+                    # dict is what this diagnostic publishes. Leaving the
+                    # records only in a context-or-discard dict dropped the
+                    # qualification whenever no context was set (b-282).
+                    context_notes, context_warnings = _resolve_antoine_telemetry(
+                        None,
+                        None,
+                    )
+                    call_notes: dict[str, dict[str, Any]] = {}
+                    call_warnings: list[str] = []
+                    P_sat_pa, saturation_refused = _try_antoine_psat_pa(
+                        species_name,
+                        wall_T_K,
+                        vapor_pressure_data=vapor_pressure_data,
+                        antoine_extrapolations=call_notes,
+                        antoine_extrapolation_warnings=call_warnings,
+                    )
+                    if context_notes is not None:
+                        for note_key, note_record in call_notes.items():
+                            context_notes.setdefault(note_key, note_record)
+                    if context_warnings is not None:
+                        for warning in call_warnings:
+                            if warning not in context_warnings:
+                                context_warnings.append(warning)
+                    extrapolations = _saturation_extrapolation_records(
+                        call_notes
+                    )
+                    saturation_known = (
+                        not saturation_refused
+                        and P_sat_pa is not None
+                        and math.isfinite(P_sat_pa)
+                    )
+                    if not saturation_known:
+                        note = call_notes.get(
+                            f'{species_name}#wall:{wall_T_K}',
+                            {},
+                        )
+                        refusal = _hot_wall_refusal(
+                            segment,
+                            species_name,
+                            judged_kg_hr,
+                            wall_T_C,
+                            target_stage_number,
+                            refusal_type=str(
+                                note.get('refusal_type')
+                                or 'WallSaturationPressureRefusal'
+                            ),
+                            reason=str(
+                                note.get('reason')
+                                or 'saturation_pressure_unavailable'
+                            ),
+                        )
+                        upstream_hot_wall_refusals.append(refusal)
+                        upstream_hot_wall_judgements.append({
+                            **refusal,
+                            'partial_pressure_pa': p_local_pa,
+                            'saturation_pressure_pa': None,
+                            'extrapolations': [],
+                        })
+                    else:
+                        violated = p_local_pa > P_sat_pa
+                        judgement = {
+                            'segment': segment.name,
+                            'account': segment.wall_deposit_account,
+                            'species': species_name,
+                            'kg_hr': judged_kg_hr,
+                            'wall_temperature_C': wall_T_C,
+                            'target_stage_number': target_stage_number,
+                            'status': 'violation' if violated else 'clear',
+                            'partial_pressure_pa': p_local_pa,
+                            'saturation_pressure_pa': P_sat_pa,
+                            'extrapolations': extrapolations,
+                        }
+                        upstream_hot_wall_judgements.append(judgement)
+                        if violated:
+                            finding = {
+                                'segment': segment.name,
+                                'account': segment.wall_deposit_account,
+                                'species': species_name,
+                                'kg_hr': judged_kg_hr,
+                                'wall_temperature_C': wall_T_C,
+                                'target_stage_number': target_stage_number,
+                                'warning': (
+                                    f'upstream hot-wall violation {segment.name}: '
+                                    f'{species} local pressure exceeds wall '
+                                    f'saturation at {wall_T_C:.1f} C before stage '
+                                    f'{target_stage_number}'
+                                ),
+                            }
+                            if extrapolations:
+                                finding['partial_pressure_pa'] = p_local_pa
+                                finding['saturation_pressure_pa'] = P_sat_pa
+                                finding['extrapolations'] = extrapolations
+                            upstream_hot_wall_findings.append(finding)
+            if cold_spot_limit is None:
+                continue
+            condensation_T_C, threshold_C = cold_spot_limit
             if wall_T_C >= threshold_C:
                 continue
             findings.append({
@@ -7791,15 +8031,33 @@ def cold_spot_diagnostic(
         str(finding['warning'])
         for finding in upstream_hot_wall_findings
     ]
+    upstream_hot_wall_extrapolations = [
+        {
+            'segment': judgement['segment'],
+            'account': judgement['account'],
+            'species': judgement['species'],
+            'wall_temperature_C': judgement['wall_temperature_C'],
+            'partial_pressure_pa': judgement['partial_pressure_pa'],
+            'saturation_pressure_pa': judgement['saturation_pressure_pa'],
+            'supersaturated': judgement['status'] == 'violation',
+            'records': judgement['extrapolations'],
+        }
+        for judgement in upstream_hot_wall_judgements
+        if judgement['extrapolations']
+    ]
     return {
         'has_cold_spot': bool(findings),
         'margin_C': margin_C,
         'warnings': warnings,
         'findings': findings,
         'has_upstream_hot_wall_violation': bool(upstream_hot_wall_findings),
-        'upstream_hot_wall_min_C': hot_wall_threshold_C,
+        'upstream_hot_wall_min_C': None,
         'upstream_hot_wall_warnings': upstream_hot_wall_warnings,
         'upstream_hot_wall_findings': upstream_hot_wall_findings,
+        'upstream_hot_wall_judgements': upstream_hot_wall_judgements,
+        'upstream_hot_wall_extrapolations': upstream_hot_wall_extrapolations,
+        'upstream_hot_wall_refused': bool(upstream_hot_wall_refusals),
+        'upstream_hot_wall_refusals': upstream_hot_wall_refusals,
     }
 
 
