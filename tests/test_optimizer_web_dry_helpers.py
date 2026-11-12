@@ -34,6 +34,8 @@ PROFILE = {"objectives": [{"metric": "yield", "sense": "maximize", "units": "kg"
         (1, True, True),
         ("garbage", False, None),
         ("yes", False, True),
+        (2, False, True),
+        ([], False, None),
     ],
 )
 def test_optional_bool_current_input_table(

@@ -92,7 +92,6 @@ from simulator.optimize.pool import (
 )
 from simulator.optimize.payloads import (
     _ceramic_service_temp_payload,
-    _round_or_none,
 )
 from simulator.optimize.profiles import (
     ProfileValidationError,
