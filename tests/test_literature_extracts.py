@@ -5371,6 +5371,114 @@ def _assert_refused_sample_does_not_cover(
     ) == _uncovered_observation_count(without_sample, artifact_root=artifact_root)
 
 
+_LOCATOR_KEY_SETS = (
+    ("source_path",),
+    ("quotes_path",),
+    ("source_path", "quotes_path"),
+    ("record",),
+)
+_PER_KEY_OUTCOMES = ("matched", "typed_refusal", "token_absent")
+_LOCATOR_OUTCOME_CASES = [
+    (keys, outcomes)
+    for keys in _LOCATOR_KEY_SETS
+    for outcomes in itertools.product(_PER_KEY_OUTCOMES, repeat=len(keys))
+]
+# This corpus-backed case has a valid digest but lacks the sample's value.
+_LOCATOR_OUTCOME_CASES.append(
+    (("source_path",), ("digest_valid_token_absent",))
+)
+
+
+def _locator_outcome_case_id(case) -> str:
+    keys, outcomes = case
+    return "+".join(f"{key}={outcome}" for key, outcome in zip(keys, outcomes))
+
+
+@pytest.mark.parametrize(
+    ("declared_keys", "outcomes"),
+    _LOCATOR_OUTCOME_CASES,
+    ids=_locator_outcome_case_id,
+)
+def test_locator_coverage_matches_independent_per_key_oracle(
+    declared_keys, outcomes, tmp_path, monkeypatch
+):
+    """Every declared key must match; candidates within record are alternatives."""
+    repository_root = tmp_path / "repository"
+    corpus_root = tmp_path / "corpus"
+    doc = _opened_payload_document(corpus_root, structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator["page"] = 2
+    corpus_token_absent = outcomes == ("digest_valid_token_absent",)
+
+    for key, outcome in zip(declared_keys, outcomes):
+        relative = (
+            "text/paper.txt"
+            if key in {"source_path", "record"}
+            else "tables/quotes.txt"
+        )
+        locator[key] = (
+            f"{relative} annotation" if key == "record" else relative
+        )
+        if outcome in {"matched", "token_absent"}:
+            artifact = repository_root / relative
+            artifact.parent.mkdir(parents=True, exist_ok=True)
+            token = "0.24" if outcome == "matched" else "0.25"
+            artifact.write_text(f"alpha {token} measured\n", encoding="utf-8")
+        elif outcome == "typed_refusal":
+            artifact = corpus_root / relative
+            artifact.parent.mkdir(parents=True, exist_ok=True)
+            artifact.write_text("alpha 0.24 measured\n", encoding="utf-8")
+        elif outcome == "digest_valid_token_absent":
+            artifact = corpus_root / relative
+            artifact.parent.mkdir(parents=True, exist_ok=True)
+            artifact.write_text("alpha 0.25 measured\n", encoding="utf-8")
+            locator["source_sha256"] = hashlib.sha256(
+                artifact.read_bytes()
+            ).hexdigest()
+
+    if corpus_token_absent:
+        monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+    else:
+        monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    # Independent oracle: each declared key needs one matching artifact. A
+    # record key's full value and filename token are alternatives for that key.
+    expected_covered = all(outcome == "matched" for outcome in outcomes)
+    warnings = vle.fidelity_source_warnings(
+        doc, label="locator-key-matrix", artifact_root=repository_root
+    )
+    source_blind = next(
+        (warning for warning in warnings if warning.kind == "source_blind_pin"),
+        None,
+    )
+    assert (source_blind is None) == expected_covered
+
+    baseline = _uncovered_observation_count(
+        {**doc, "fidelity_samples": []}, artifact_root=repository_root
+    )
+    expected_uncovered = 0 if expected_covered else baseline
+    assert _uncovered_observation_count(
+        doc, artifact_root=repository_root
+    ) == expected_uncovered
+
+    if declared_keys == ("source_path", "quotes_path") and outcomes == (
+        "typed_refusal",
+        "matched",
+    ):
+        assert source_blind is not None
+        assert "corpus_root_unset" in source_blind.detail
+        refusals = vle.certify_extract_source_fidelity(
+            doc, label="locator-key-matrix", artifact_root=repository_root
+        )
+        assert any("corpus_root_unset" in refusal for refusal in refusals)
+    if declared_keys == ("source_path",) and outcomes == (
+        "digest_valid_token_absent",
+    ):
+        assert source_blind is not None
+        assert "not in the cited text" in source_blind.detail
+
+
 def test_corpus_artifact_is_opened_and_digest_is_recorded(tmp_path, monkeypatch):
     doc = _corpus_pin_document(tmp_path)
     artifact = tmp_path / "text" / "paper.txt"

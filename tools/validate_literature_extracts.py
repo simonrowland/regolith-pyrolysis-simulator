@@ -2356,23 +2356,6 @@ def _text_is_extract_document(text: str) -> bool:
     }
 
 
-def _artifact_locator_values(locator: Mapping[str, Any]) -> list[str]:
-    """Return path-like locator values without resolving or opening them."""
-    explicit = [
-        raw.strip()
-        for key in _ARTIFACT_PATH_KEYS
-        if isinstance((raw := locator.get(key)), str) and raw.strip()
-    ]
-    if explicit:
-        return explicit
-    record = locator.get("record")
-    if not isinstance(record, str) or not record.strip():
-        return []
-    text = record.strip()
-    token = text.split()[0]
-    return [text] if token == text else [text, token]
-
-
 def _cited_text(
     full: str, locator: Mapping[str, Any]
 ) -> tuple[str | None, str | None]:
@@ -2565,18 +2548,30 @@ def _locator_source_blind_reason(
     corpus_root: Path | None,
     doc: Mapping[str, Any] | None = None,
 ) -> tuple[str | None, bool]:
-    """Return the source-blind reason and whether an artifact open was refused.
+    """Return the source-blind reason and whether every declared key matched.
 
     No source-blind reason means a candidate was opened and contained the
     certified leaves: the sample value and resolved extract value. A tolerant
-    sample match does not stand in for the stored number.
+    sample match does not stand in for the stored number. Candidates within
+    one key are alternatives; separate declared keys must each match.
     """
     keys = [key for key in ("locator", "source_locator") if key in sample]
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
         return "locator was not opened: attestation locator is missing", False
     locator = sample[keys[0]]
-    candidates = _artifact_locator_values(locator)
-    if not candidates:
+    candidate_groups = [
+        (key, [raw.strip()])
+        for key in _ARTIFACT_PATH_KEYS
+        if isinstance((raw := locator.get(key)), str) and raw.strip()
+    ]
+    if not candidate_groups:
+        record = locator.get("record")
+        if isinstance(record, str) and record.strip():
+            text = record.strip()
+            token = text.split()[0]
+            candidates = [text] if token == text else [text, token]
+            candidate_groups = [("record", candidates)]
+    if not candidate_groups:
         return (
             "locator was not opened: no source_path, quotes_path, or file record "
             "points at a text artifact",
@@ -2586,65 +2581,79 @@ def _locator_source_blind_reason(
     if leaf_error:
         return leaf_error, False
     reasons: list[str] = []
-    artifact_open_refused = False
-    for raw in candidates:
-        path, blob, _digest, open_refusal = _open_source_artifact(
-            raw,
-            repository_root=artifact_root,
-            corpus_root=corpus_root,
-            expected_sha256=locator.get("source_sha256"),
-        )
-        if open_refusal:
-            artifact_open_refused = True
-            reasons.append(f"locator was not opened: {open_refusal} ({raw})")
-            continue
-        if path is None or blob is None:
-            reasons.append(f"locator was not opened: artifact_not_opened ({raw})")
-            continue
-        if path.suffix.lower() == ".pdf" or blob.startswith(b"%PDF"):
-            reasons.append(
-                f"{path.name} is a PDF; certification opens a text or OCR artifact"
+    for _key, candidates in candidate_groups:
+        candidate_reasons: list[str] = []
+        key_matched = False
+        for raw in candidates:
+            path, blob, _digest, open_refusal = _open_source_artifact(
+                raw,
+                repository_root=artifact_root,
+                corpus_root=corpus_root,
+                expected_sha256=locator.get("source_sha256"),
             )
-            continue
-        try:
-            text = blob.decode("utf-8")
-        except UnicodeError:
-            reasons.append(f"{path.name} is not UTF-8 text")
-            continue
-        if _text_is_extract_document(text):
-            reasons.append(
-                "locator was not opened: "
-                f"{path.name} is an extract document, not an independent source"
-            )
-            continue
-        delimiter = _tabular_delimiter(path)
-        if delimiter is None:
-            cited, span_error = _cited_text(text, locator)
-            if cited is None:
-                reasons.append(span_error or "cited span was not opened")
-                continue
-            missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
-        else:
-            # Parse the complete table, then select. A sliced line is not a table.
-            try:
-                cells, span_error = _cited_table_cells(text, locator, delimiter)
-            except csv.Error as exc:
-                reasons.append(
-                    f"opened {path.name} but the table could not be parsed ({exc})"
+            if open_refusal:
+                candidate_reasons.append(
+                    f"locator was not opened: {open_refusal} ({raw})"
                 )
                 continue
-            if cells is None:
-                reasons.append(span_error or "cited span was not opened")
+            if path is None or blob is None:
+                candidate_reasons.append(
+                    f"locator was not opened: artifact_not_opened ({raw})"
+                )
                 continue
-            missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
-        if not missing:
-            return None, artifact_open_refused
-        rendered = ", ".join(repr(leaf) for leaf in missing[:3])
-        reasons.append(
-            f"opened {path.name} but the resolved extract value is not in the "
-            f"cited text ({rendered})"
-        )
-    return "locator source-blind: " + "; ".join(reasons), artifact_open_refused
+            if path.suffix.lower() == ".pdf" or blob.startswith(b"%PDF"):
+                candidate_reasons.append(
+                    f"{path.name} is a PDF; certification opens a text or OCR artifact"
+                )
+                continue
+            try:
+                text = blob.decode("utf-8")
+            except UnicodeError:
+                candidate_reasons.append(f"{path.name} is not UTF-8 text")
+                continue
+            if _text_is_extract_document(text):
+                candidate_reasons.append(
+                    "locator was not opened: "
+                    f"{path.name} is an extract document, not an independent source"
+                )
+                continue
+            delimiter = _tabular_delimiter(path)
+            if delimiter is None:
+                cited, span_error = _cited_text(text, locator)
+                if cited is None:
+                    candidate_reasons.append(
+                        span_error or "cited span was not opened"
+                    )
+                    continue
+                missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
+            else:
+                # Parse the complete table, then select. A sliced line is not a table.
+                try:
+                    cells, span_error = _cited_table_cells(text, locator, delimiter)
+                except csv.Error as exc:
+                    candidate_reasons.append(
+                        f"opened {path.name} but the table could not be parsed ({exc})"
+                    )
+                    continue
+                if cells is None:
+                    candidate_reasons.append(
+                        span_error or "cited span was not opened"
+                    )
+                    continue
+                missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
+            if not missing:
+                key_matched = True
+                break
+            rendered = ", ".join(repr(leaf) for leaf in missing[:3])
+            candidate_reasons.append(
+                f"opened {path.name} but the resolved extract value is not in the "
+                f"cited text ({rendered})"
+            )
+        if not key_matched:
+            reasons.extend(candidate_reasons)
+    if reasons:
+        return "locator source-blind: " + "; ".join(reasons), False
+    return None, True
 
 
 def fidelity_source_warnings(
@@ -2759,7 +2768,7 @@ def fidelity_source_warnings(
     )
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
-        artifact_open_refused = False
+        source_evidence_covered = True
         if not isinstance(sample, Mapping):
             unattested += 1
             _note_reason(
@@ -2788,7 +2797,7 @@ def fidelity_source_warnings(
         else:
             # Attestation-complete pins are the ones that would otherwise certify
             # without opening the source. Unattested pins stay on that count.
-            blind, artifact_open_refused = _locator_source_blind_reason(
+            blind, source_evidence_covered = _locator_source_blind_reason(
                 sample,
                 artifact_root=root,
                 corpus_root=corpus_root,
@@ -2805,7 +2814,7 @@ def fidelity_source_warnings(
         observation_key = _fidelity_sample_observation_key(doc, sample)
         if (
             not match_errors
-            and not artifact_open_refused
+            and source_evidence_covered
             and observation_key is not None
             and observation_key in required
             and _path_selector_names_observation_id(sample)
