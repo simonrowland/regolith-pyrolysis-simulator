@@ -965,6 +965,24 @@ def test_cost_rollup_unavailable_money_mutation_fails_then_restores(monkeypatch)
     assert isinstance(unavailable_quantity(reason="x", units="USD"), dict)
 
 
+def test_cost_rollup_failure_does_not_publish_zero_ledger_balance(monkeypatch) -> None:
+    from simulator import cost_ledger as ledger_mod
+
+    def fail_summary(**kwargs):
+        raise RuntimeError("injected summary failure")
+
+    monkeypatch.setattr(ledger_mod, "_build_cost_rollup_diagnostic", fail_summary)
+    summary = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(), per_hour=(), products_kg={}
+    )
+
+    assert "transition_count" not in summary
+    assert "transition_balance_max_abs" not in summary
+    assert summary["run_input_cost"]["allocation_status"] == (
+        "unavailable_after_cost_observation_error"
+    )
+
+
 def test_energy_and_money_consumers_do_not_default_unavailable_to_zero() -> None:
     import ast
     from pathlib import Path
