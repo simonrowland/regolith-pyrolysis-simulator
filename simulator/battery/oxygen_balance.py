@@ -24,11 +24,6 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
 )
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
 OxygenBalanceBracketBoundary = Literal["lower", "upper"]
-_OXYGEN_GAS_ALPHA = 1.0
-_OXYGEN_GAS_ALPHA_SOURCE = (
-    "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "
-    "absolute oxygen-gas alpha is not measured"
-)
 _MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
 
 

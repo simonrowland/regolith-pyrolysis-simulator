@@ -4651,6 +4651,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _solve_hour_interface_oxygen(self, temperature_K: float):
         from simulator.chemistry.oxygen_interface import (
             InterfaceOxygenSolveError,
+            OXYGEN_GAS_ALPHA,
             solve_interface_oxygen,
         )
 
@@ -4676,10 +4677,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 requested,
             )
 
-        # Declared common-unity oxygen-gas alpha. The battery copy
-        # ``_OXYGEN_GAS_ALPHA`` in simulator/battery/oxygen_balance.py stays
-        # because this hour must not import simulator.battery. Absolute
-        # oxygen-gas alpha is not a measured coefficient.
+        # Declared common-unity oxygen-gas alpha. Owner:
+        # ``simulator.chemistry.oxygen_interface.OXYGEN_GAS_ALPHA``.
         overhead_bar = self._physical_overhead_pO2_bar()
         # The solver bracket ends at 1 bar. A physical overhead above that
         # bound cannot be undercut while oxygen is leaving: the signed film
@@ -4715,7 +4714,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0
                 ),
                 temperature_K=temperature_K,
-                oxygen_alpha=1.0,
+                oxygen_alpha=OXYGEN_GAS_ALPHA,
                 oxygen_r_gas_m_s=0.0,
             )
         except InterfaceOxygenSolveError as exc:
@@ -6595,10 +6594,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
             # No resolvable differential uptake: Δln(fO2) = n_O2eq/C_m
             # (mol / (mol per ln) is dimensionless) cannot be integrated at
-            # C_m -> 0. This does NOT discard the oxygen: evaporation's caller
-            # attempts the finite Fe split, then routes the unabsorbed ledger
-            # buffer to gas even when this numerical integration is refused.
-            # Limit: at zero Fe uptake, all source O2 goes to the overhead.
+            # C_m -> 0. This records the refusal. It does not move the
+            # ledger buffer into the gas.
             skip_reason = 'no_melt_redox_capacity'
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
             skip_reason = 'below_threshold'
@@ -6636,9 +6633,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 applied_delta_ln = 0.0
             else:
                 # The derivative is a local tangent, not an unlimited oxygen
-                # capacity. Stop its prediction at the gas pressure ceiling;
-                # evaporative oxygen left after the finite Fe split is moved
-                # by OXYGEN_RESERVOIR_EXCHANGE, never discarded by this clamp.
+                # capacity. Stop its prediction at the gas pressure ceiling.
+                # This clamp updates the fO2 log. It does not move leftover
+                # evaporative oxygen.
                 candidate_fO2_log = min(
                     candidate_fO2_log, self._melt_redox_fO2_upper_bound_log(),
                 )

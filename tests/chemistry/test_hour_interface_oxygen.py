@@ -19,6 +19,7 @@ from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.oxygen_interface import (
     InterfaceOxygenChannel,
     MissingInterfaceOxygenPotential,
+    OXYGEN_GAS_ALPHA,
     require_evaporation_oxygen_potential_log10,
     solve_interface_oxygen,
 )
@@ -153,7 +154,8 @@ def test_hour_passes_effusion_only(monkeypatch) -> None:
     sim, _calls = _solve_hour(capacity=0.0, reservoir_log=-2.0, overhead=0.0)
 
     assert seen["kwargs"]["oxygen_r_gas_m_s"] == 0.0
-    assert seen["kwargs"]["oxygen_alpha"] == 1.0
+    assert OXYGEN_GAS_ALPHA == 1.0
+    assert seen["kwargs"]["oxygen_alpha"] == OXYGEN_GAS_ALPHA
     assert all(channel.r_gas_m_s == 0.0 for channel in seen["channels"])
     assert sim._hour_interface_oxygen is not None
 

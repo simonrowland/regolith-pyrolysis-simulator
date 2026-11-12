@@ -9,10 +9,12 @@ import pytest
 
 from simulator.accounting.formulas import parse_formula
 from simulator.battery.oxygen_balance import (
-    _OXYGEN_GAS_ALPHA,
-    _OXYGEN_GAS_ALPHA_SOURCE,
     _VacuumOxygenChannel,
     _solve_vacuum_oxygen_balance,
+)
+from simulator.chemistry.oxygen_interface import (
+    OXYGEN_GAS_ALPHA,
+    OXYGEN_GAS_ALPHA_SOURCE,
 )
 from simulator.physical_constants import GAS_CONSTANT
 
@@ -162,7 +164,7 @@ def _engine_models():
     for species, (parent, _gas_molecules, _oxygen_molecules) in openimcc_channels:
         if species in {"O", "O2"}:
             is_active = True
-            alpha_source = _OXYGEN_GAS_ALPHA_SOURCE
+            alpha_source = OXYGEN_GAS_ALPHA_SOURCE
         else:
             if parent and float(
                 openimcc_state.parent_oxide_activities.get(parent, 0.0) or 0.0
@@ -174,7 +176,7 @@ def _engine_models():
             is_active = row.get("flux_dormant") is not True
             alpha_source = _alpha_source_for_catalog_row(catalog_name, row)
         channel = _species_metadata(
-            species, parent or None, alpha=_OXYGEN_GAS_ALPHA
+            species, parent or None, alpha=OXYGEN_GAS_ALPHA
         )
         openimcc_channel_rows.append(
             replace(
@@ -212,7 +214,7 @@ def _engine_models():
         formula = str(match["formula"])
         parent = str(match.get("parent_oxide") or "")
         channel = _species_metadata(
-            formula, parent or None, alpha=_OXYGEN_GAS_ALPHA
+            formula, parent or None, alpha=OXYGEN_GAS_ALPHA
         )
         ia_channel_rows.append(
             replace(
@@ -238,14 +240,14 @@ def _engine_models():
     oxygen_pressure_factor_bar = float(oxygen_at_1_bar["O"])
     for species, exponent in (("O", 0.5), ("O2", 1.0)):
         channel = _species_metadata(
-            species, None, alpha=_OXYGEN_GAS_ALPHA
+            species, None, alpha=OXYGEN_GAS_ALPHA
         )
         ia_channel_rows.append(
             replace(
                 channel,
                 species=species,
                 pO2_exponent=exponent,
-                alpha_source=_OXYGEN_GAS_ALPHA_SOURCE,
+                alpha_source=OXYGEN_GAS_ALPHA_SOURCE,
             )
         )
 
@@ -449,8 +451,8 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
                 for channel in channels
                 if channel.active and channel.alpha > 0.0
             }
-            assert result.alpha_sources["O"] == _OXYGEN_GAS_ALPHA_SOURCE
-            assert result.alpha_sources["O2"] == _OXYGEN_GAS_ALPHA_SOURCE
+            assert result.alpha_sources["O"] == OXYGEN_GAS_ALPHA_SOURCE
+            assert result.alpha_sources["O2"] == OXYGEN_GAS_ALPHA_SOURCE
             dormant_species = (
                 "FeO" if engine == "openimcc" else "FeO_association_gas"
             )
@@ -524,8 +526,11 @@ def _residue_catalog_alpha(species: str) -> tuple[float, str]:
 
 
 def _residue_channels(*, fe_alpha: float | None = None):
-    from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
     from simulator.battery.residue import ResidueChannel
+    from simulator.chemistry.oxygen_interface import (
+        OXYGEN_GAS_ALPHA,
+        OXYGEN_GAS_ALPHA_SOURCE,
+    )
 
     catalog_fe_alpha, fe_source = _residue_catalog_alpha("Fe")
     catalog_mg_alpha, mg_source = _residue_catalog_alpha("Mg")
@@ -536,7 +541,9 @@ def _residue_channels(*, fe_alpha: float | None = None):
             fe_source,
         ),
         ResidueChannel("Mg", "Mg", "MgO", catalog_mg_alpha, mg_source),
-        ResidueChannel("O2", "O2", None, 1.0, _OXYGEN_GAS_ALPHA_SOURCE),
+        ResidueChannel(
+            "O2", "O2", None, OXYGEN_GAS_ALPHA, OXYGEN_GAS_ALPHA_SOURCE
+        ),
     )
 
 

@@ -65,6 +65,15 @@ from simulator.physical_constants import (
 )
 
 
+# Declared common-unity sensitivity for O/O2 free-molecular escape.
+# Absolute oxygen-gas alpha is not a measured coefficient. The hour and
+# the residue oxygen balance both read this value.
+OXYGEN_GAS_ALPHA = 1.0
+OXYGEN_GAS_ALPHA_SOURCE = (
+    "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "
+    "absolute oxygen-gas alpha is not measured"
+)
+
 _LOWER_LOG10_PO2_BAR = -30.0
 _UPPER_LOG10_PO2_BAR = 0.0
 _MELT_CAPACITY_NOOP_MOL_PER_LN = 1.0e-15

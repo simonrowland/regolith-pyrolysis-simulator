@@ -132,7 +132,7 @@ def _solve(
         overhead_pO2_bar=overhead_pO2_bar,
         area_m2=AREA_M2,
         temperature_K=TEMPERATURE_K,
-        oxygen_alpha=1.0,
+        oxygen_alpha=oxygen_interface.OXYGEN_GAS_ALPHA,
         oxygen_r_gas_m_s=0.0,
     )
 

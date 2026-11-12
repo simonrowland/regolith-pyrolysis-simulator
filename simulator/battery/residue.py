@@ -2721,7 +2721,10 @@ def _predict_hashimoto_residue_cohort(
             "openimcc_not_importable", str(exc)
         ) from exc
 
-    from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
+    from simulator.chemistry.oxygen_interface import (
+        OXYGEN_GAS_ALPHA,
+        OXYGEN_GAS_ALPHA_SOURCE,
+    )
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _openimcc_gas_channels_and_omission_notices,
     )
@@ -2840,30 +2843,41 @@ def _predict_hashimoto_residue_cohort(
         row_by_channel = {str(row["channel"]): dict(row) for row in liquid_rows}
         for species, (parent, _parent_moles, _pO2_exponent) in gas_channels:
             if not parent:
+                oxygen_channel = species in _OXYGEN_CHANNELS
+                # Parentless non-oxygen channels keep their own assumed
+                # unity. Only O/O2 use the shared oxygen-gas alpha.
+                channel_alpha = OXYGEN_GAS_ALPHA if oxygen_channel else 1.0
                 alpha_source = (
-                    _OXYGEN_GAS_ALPHA_SOURCE
-                    if species in _OXYGEN_CHANNELS
+                    OXYGEN_GAS_ALPHA_SOURCE
+                    if oxygen_channel
                     else "OpenIMCC gas channel with no parent oxide"
                 )
+                runtime_source = (
+                    OXYGEN_GAS_ALPHA_SOURCE
+                    if oxygen_channel
+                    else "assumed oxygen-gas alpha=1.0; not measured"
+                )
                 common_channels.append(
-                    ResidueChannel(species, species, None, 1.0, alpha_source)
+                    ResidueChannel(
+                        species, species, None, channel_alpha, alpha_source
+                    )
                 )
                 runtime_channels.append(
                     ResidueChannel(
                         species,
                         species,
                         None,
-                        1.0,
-                        "assumed oxygen-gas alpha=1.0; not measured",
+                        channel_alpha,
+                        runtime_source,
                     )
                 )
                 common_alpha_records.append(
-                    {"channel": species, "alpha_value": 1.0, "alpha_assumed": True,
-                     "alpha_source": alpha_source}
+                    {"channel": species, "alpha_value": channel_alpha,
+                     "alpha_assumed": True, "alpha_source": alpha_source}
                 )
                 runtime_alpha_records.append(
-                    {"channel": species, "alpha_value": 1.0, "alpha_assumed": True,
-                     "alpha_source": "assumed oxygen-gas alpha=1.0; not measured"}
+                    {"channel": species, "alpha_value": channel_alpha,
+                     "alpha_assumed": True, "alpha_source": runtime_source}
                 )
                 active_liquid_rows["common"].append(row_by_channel[species])
                 active_liquid_rows["runtime"].append(row_by_channel[species])
@@ -3361,7 +3375,6 @@ def _predict_sossi_residue_cohort(
     """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
         raise ResidueInventoryRefusal("sossi_engine_unsupported", engine)
-    from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
     from simulator.condensation import alpha_s
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _openimcc_gas_channels_and_omission_notices,
