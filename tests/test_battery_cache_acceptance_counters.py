@@ -210,3 +210,4 @@ def test_parallel_warm_worker_counters_are_summed_per_engine(
         assert counters["stores"] == 0
         assert counters["store_error"] == 0
         assert counters["read_error"] == 0
+        assert counters["conflicts"] == 0

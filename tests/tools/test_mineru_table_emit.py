@@ -119,6 +119,19 @@ def test_emit_help_documents_printed_scale_factors(capsys: pytest.CaptureFixture
     assert "scale_factor" in capsys.readouterr().out
 
 
+def test_reviewed_emit_refuses_without_an_opened_payload_pin(tmp_path: Path) -> None:
+    """Emitting review_status reviewed is the same certification chokepoint."""
+    draft_dir = _convert_html(
+        tmp_path,
+        "<table><tr><th>T, K</th><th>p, atm</th></tr>"
+        "<tr><td>1851</td><td>0.24</td></tr></table>",
+    )
+    mapping = _base_mapping(_pressure_table())
+    mapping["review_status"] = "reviewed"
+    with pytest.raises(ValueError, match="source certification refused"):
+        _emit(tmp_path, draft_dir, mapping)
+
+
 def test_printed_scale_factor_scales_exactly_and_keeps_both_spellings(
     tmp_path: Path,
 ) -> None:

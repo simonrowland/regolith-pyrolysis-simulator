@@ -19,6 +19,65 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``_fidelity_pre_policy_allowlist.yaml``)
 * fidelity sample structure: path-based *or* structured line-item form
   (species, observable, T/index, value, locator)
+* source fidelity is a typed, counted warning at this chokepoint
+  (``uncovered_observation`` / ``unattested_sample`` /
+  ``auto_migrated_pilot_pin`` / ``source_blind_pin`` /
+  ``ambiguous_observation_id`` / ``missing_observation_id`` /
+  ``non_finite_evidence``). A draft
+  corpus is not rejected for those warnings. Promoting the extract
+  (``review_status: reviewed``, graduation, load, emit, or the index)
+  refuses while any remain. Certification opens a source artifact
+  (paper, OCR, or quotes — not the extract and not program source) and
+  requires each resolved extract number as a complete token: sign and
+  exponent belong to the token, so 0.24 is not -0.24 or 0.24e-5, and
+  1.0 is not 1. A sentence period does not extend that token, so 1
+  matches "the value is 1." A CSV or TSV source, including a table
+  artifact with that suffix, is parsed completely before the locator is
+  applied. A cell certifies a stored value only when the whole trimmed,
+  unquoted cell parses to that number, or equals the stored string.
+  The comparison is decimal.Decimal of the trimmed, unquoted cell against
+  repr of a stored float or str of a stored int. The prose numeric grammar
+  is not a gate on a cell, so 91. is 91, 0.9100 is 0.91, 1e-999 is not 0,
+  and 9007199254740993 is not 9007199254740992. A cell NaN, Infinity, or
+  InvalidOperation does not certify a number. A non-finite measured value
+  (NaN or ±Inf stored as a float) is ``non_finite_evidence``: it refuses
+  certification of that observation, is never omitted, and is not cleared
+  by attesting a finite sibling. A substring does not certify, so a cell 1/2 is
+  not 1 and a cell 1,000 is not 1. A line_range selects only records that lie entirely
+  inside it. A span that cuts through a quoted cell is source-blind and
+  is not re-parsed from the sliced lines. 1 K is not 1 KPa.
+  A leading decimal is a number, so .24 is not a label
+  and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
+  only when it parses back to the stored number, so
+  ``format(0.24000000000000002, ".16g")`` is 0.24 and does not certify
+  it. A sample value within ``rel_tol`` of a different stored
+  number does not certify that stored number; the opened source must
+  contain the resolved leaf. Unicode numeric signs are folded onto that
+  grammar before the match, so a Unicode minus is a minus and −0.24 is
+  not 0.24. An observation id that names more than one scored row is not
+  collapsed into one coverage entry; certification refuses it. A scored
+  row whose ``observation_id`` is not a non-empty string is not omitted
+  from that decision; certification refuses it.
+  A recorded locator that is not opened is source-blind. An equipment
+  pin does not cover a measured payload. Coverage holds only when every
+  measured leaf of the observation's evidence has a matching pin of that
+  address or of an ancestor. Evidence is ``values`` plus each scored
+  numeric condition the temperature payload copies beside it
+  (``T_range_K``, ``T_K``, ``T_C``, ``temperature_C``, ``temp_C``,
+  ``point_conditions``). A locator inside a condition is provenance, not
+  a leaf. A coverable measured leaf is a finite int or float (not a
+  boolean), or a string that contains any digit [0-9]. A non-finite float
+  is not coverable and is not dropped: it is ``non_finite_evidence``.
+  A quantity name, a unit on its
+  own, or another label with no digit is not a leaf and may be attested
+  as text. A string the numeric parser cannot read, such as ``0.91Pa``
+  or ``0.0614K``, is still a leaf: it is uncovered unless the opened
+  source carries that printed value. Zero recognised leaves in a block
+  that still contains a digit is a refusal, not coverage. Repeating a
+  pin of one address does not cover a sibling, even when the numbers
+  are equal, and a ``values`` pin does not cover a sibling condition.
+  A descriptive label such as ``quantity: pressure`` does not cover a
+  sibling measurement.
 * structured fidelity samples resolve rows in ``observations[]`` or the
   sibling ``context[]`` container (d-032); an id matching rows in both
   containers is an ambiguity error, not a silent pick
@@ -38,13 +97,22 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import csv
 from copy import deepcopy
+from dataclasses import dataclass
+from decimal import Decimal, DecimalException
 from functools import lru_cache
 import math
 import re
 import subprocess
 import sys
-from collections.abc import MutableMapping, MutableSequence, MutableSet, Set as AbstractSet
+from collections.abc import (
+    MutableMapping,
+    MutableSequence,
+    MutableSet,
+    Set as AbstractSet,
+)
+from datetime import date
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -157,6 +225,405 @@ LOCATOR_KEYS = frozenset(
 
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
+# Unicode minus and the other dash/plus signs are not ASCII "+" or "-".
+# The citation grammar below only sees ASCII signs, so a raw scan of
+# "−0.24" (U+2212) yields the token "0.24" and certifies the opposite
+# sign. Fold these onto ASCII before that grammar runs. Plus-minus is
+# absent here on purpose: it is neither "+" nor "-" and stays in the
+# grammar as its own sign.
+_UNICODE_MINUS_SIGNS = (
+    "\u2212"  # MINUS SIGN
+    "\u2010"  # HYPHEN
+    "\u2011"  # NON-BREAKING HYPHEN
+    "\u2012"  # FIGURE DASH
+    "\u2013"  # EN DASH
+    "\u2014"  # EM DASH
+    "\u2015"  # HORIZONTAL BAR
+    "\ufe63"  # SMALL HYPHEN-MINUS
+    "\uff0d"  # FULLWIDTH HYPHEN-MINUS
+    "\u02d7"  # MODIFIER LETTER MINUS SIGN
+    "\u207b"  # SUPERSCRIPT MINUS
+    "\u208b"  # SUBSCRIPT MINUS
+    "\u2796"  # HEAVY MINUS SIGN
+)
+_UNICODE_PLUS_SIGNS = (
+    "\uff0b"  # FULLWIDTH PLUS SIGN
+    "\ufe62"  # SMALL PLUS SIGN
+    "\u207a"  # SUPERSCRIPT PLUS
+    "\u208a"  # SUBSCRIPT PLUS
+    "\u2795"  # HEAVY PLUS SIGN
+)
+_NUMERIC_SIGN_FOLD = str.maketrans(
+    {ord(ch): "-" for ch in _UNICODE_MINUS_SIGNS}
+    | {ord(ch): "+" for ch in _UNICODE_PLUS_SIGNS}
+)
+# Plus-minus stays a distinct sign so "±0.24" is not the token "0.24",
+# and so it does not compare equal to an ASCII minus or plus.
+_DISTINCT_NUMERIC_SIGNS = "\u00b1\u2213"
+# "-" is first or last in each class so it is literal, not a range.
+_TOKEN_SIGN_CLASS = "-" + "+" + _DISTINCT_NUMERIC_SIGNS
+_TOKEN_LOOKBEHIND_CLASS = "A-Za-z0-9_." + "+" + _DISTINCT_NUMERIC_SIGNS + "-"
+# Sign and exponent are part of one token. The lookbehind also rejects a
+# preceding sign so the match cannot start on the digits of -0.24. The
+# optional exponent group consumes 0.24e-5 whole, so a shorter spelling is
+# not a second match. The mantissa is digits, a fraction, or a leading
+# decimal: ".24" is a number. Without that alternative the string ".91"
+# is not a measured leaf, and the non-numeric substring path treats ".24"
+# as text inside "-.24". Callers scan text only through
+# ``_citation_token_matches``, which folds Unicode signs first and drops
+# any span ``_span_is_complete_printed_value`` rejects. The grammar is not
+# the boundary: a comma is not a hard edge here, and a yielded match is
+# still not a token of ``1,000``. A period is not a hard edge either.
+# ``(?:\.\d+)?`` consumes a decimal only when a digit follows the dot, so
+# a sentence period stays outside the match. The shared predicate then
+# accepts that period and rejects one a digit follows. Listing '.' in the
+# lookahead would drop ``1`` from ``the value is 1.`` before the predicate
+# could accept it. A second scanner would let one path drop a sign or a
+# leading decimal that another path keeps.
+_NUMERIC_TOKEN_RE = re.compile(
+    f"(?<![{_TOKEN_LOOKBEHIND_CLASS}])"
+    f"[{_TOKEN_SIGN_CLASS}]?"
+    r"(?:\d+(?:\.\d+)?|\.\d+)"
+    f"(?:[eE][{_TOKEN_SIGN_CLASS}]?"
+    r"\d+)?"
+    r"(?![A-Za-z0-9_])"
+)
+
+
+def _fold_numeric_signs(text: str) -> str:
+    """Map Unicode minus and plus onto the ASCII signs the token grammar sees.
+
+    One code point becomes one code point, so token spans stay aligned.
+    Plus-minus is not folded: it remains its own sign.
+    """
+    return text.translate(_NUMERIC_SIGN_FOLD)
+
+
+def _citation_token_matches(text: str) -> list[re.Match[str]]:
+    """Numeric tokens after Unicode signs are folded.
+
+    Spelling equality and string alignment read this list. A sign cannot
+    be dropped on one of those paths and kept on another. A match whose
+    span fails ``_span_is_complete_printed_value`` is not a token, so
+    ``1`` is not a token of ``1,000``. This grammar is not the coverage
+    membership test: a string that contains a digit is a measured leaf
+    even when this list is empty.
+    """
+    folded = _fold_numeric_signs(text)
+    return [
+        match
+        for match in _NUMERIC_TOKEN_RE.finditer(folded)
+        if _span_is_complete_printed_value(folded, match.start(), match.end())
+    ]
+
+
+_ASCII_DIGITS = "0123456789"
+# Signs that belong to the number when they sit immediately before it.
+# Unicode plus and minus are folded onto ASCII before this set is used.
+# Plus-minus stays distinct, so it is listed here and not folded.
+_ATTACHED_VALUE_SIGNS = frozenset("+-") | frozenset(_DISTINCT_NUMERIC_SIGNS)
+# Micro sign, Greek mu, and degree sign. Degree is not str.isalpha.
+_VALUE_LETTER_SIGNS = frozenset("µμ°")
+
+
+def _string_has_ascii_digit(text: str) -> bool:
+    """True when ``text`` contains a digit [0-9].
+
+    This is the coverage membership test for a string leaf. It does not
+    ask whether the numeric grammar can read the string.
+    """
+    return any(ch in _ASCII_DIGITS for ch in text)
+
+
+def _parser_reads_every_digit(text: str) -> bool:
+    """True when every ASCII digit of ``text`` sits inside a citation token.
+
+    The numeric grammar still compares values it can read. A digit that
+    sits outside every token, as in ``0.91Pa`` or ``91.``, is not read.
+    """
+    folded = _fold_numeric_signs(text)
+    if not _string_has_ascii_digit(folded):
+        return False
+    covered = [False] * len(folded)
+    for match in _citation_token_matches(folded):
+        for index in range(match.start(), match.end()):
+            covered[index] = True
+    return all(
+        covered[index] or folded[index] not in _ASCII_DIGITS
+        for index in range(len(folded))
+    )
+
+
+def _extends_printed_value(text: str, index: int, nxt: str, *, sign_attaches: bool) -> bool:
+    """True when ``text[index]`` continues a printed value.
+
+    An extending character is an ASCII letter or digit, a Unicode letter,
+    or µ/°. A '.' or ',' extends only when the next character is a digit.
+    A numeric sign extends only on the left (``sign_attaches``) and only
+    when it sits on a digit or a leading decimal, because that sign
+    belongs to the number.
+    """
+    ch = text[index]
+    if ch.isascii() and ch.isalnum():
+        return True
+    if ch.isalpha() or ch in _VALUE_LETTER_SIGNS:
+        return True
+    if ch in ".,":
+        return len(nxt) == 1 and nxt in _ASCII_DIGITS
+    if sign_attaches and ch in _ATTACHED_VALUE_SIGNS:
+        return len(nxt) == 1 and (nxt in _ASCII_DIGITS or nxt == ".")
+    return False
+
+
+def _span_is_complete_printed_value(text: str, start: int, end: int) -> bool:
+    """The only boundary predicate. Every matcher accepts a span through it.
+
+    Invariant: a digit-bearing value matches source text only as a complete
+    token. The whole stored value, number plus any attached or spaced unit,
+    occupies ``[start, end)``, and neither neighbour extends that span.
+    ``1 K`` is not ``1 KPa``. ``1`` is not ``1,000``. ``1,000`` is not
+    ``1,000,000``. ``1`` is not ``-1`` or ``1µ``. ``1`` is ``the value is 1.``
+    This predicate is the prose boundary only. A CSV or TSV source does
+    not call it. The table is parsed first, and the whole cell is compared.
+    """
+    if not (0 <= start < end <= len(text)):
+        return False
+    if start > 0 and _extends_printed_value(
+        text, start - 1, text[start], sign_attaches=True
+    ):
+        return False
+    if end < len(text) and _extends_printed_value(
+        text,
+        end,
+        text[end + 1] if end + 1 < len(text) else "",
+        sign_attaches=False,
+    ):
+        return False
+    return True
+
+
+def _printed_value_carried(leaf: str, text: str) -> bool:
+    """True when sign-folded ``leaf`` occurs in sign-folded ``text`` whole.
+
+    Acceptance is ``_span_is_complete_printed_value`` on that span.
+    ``0.91Pa`` is not ``10.91Pa`` or ``0.91Pascal``, ``91.`` is not
+    ``91.0``, ``1 K`` is not ``1 KPa``, and ``1,000`` is not ``1,000,000``.
+    """
+    leaf = _fold_numeric_signs(leaf)
+    text = _fold_numeric_signs(text)
+    if not leaf:
+        return False
+    start = 0
+    while True:
+        index = text.find(leaf, start)
+        if index < 0:
+            return False
+        if _span_is_complete_printed_value(text, index, index + len(leaf)):
+            return True
+        start = index + 1
+
+
+# Certification opens these as tables. A companion ``literature_extract_table``
+# document stays an extract, not a source. The cell is the token. Prose
+# boundary matching is not applied inside a cell, and a delimiter is never
+# an extending character because the table is parsed before comparison.
+_TABULAR_SOURCE_DELIMITERS = {
+    ".csv": ",",
+    ".tsv": "\t",
+}
+
+
+def _tabular_delimiter(path: Path) -> str | None:
+    """Comma or tab when ``path`` is a tabular source, else None."""
+    return _TABULAR_SOURCE_DELIMITERS.get(path.suffix.lower())
+
+
+def _table_records(
+    text: str, delimiter: str
+) -> list[tuple[int, int, list[str]]]:
+    """Parse the complete table. Each row is ``(start_line, end_line, cells)``.
+
+    Lines are 1-based and inclusive, the same numbering as ``str.splitlines``.
+    A quoted cell that contains a newline occupies every physical line it
+    spans. ``csv.Error`` means the table was not parsed. Callers refuse
+    that and do not search the raw text or a sliced line.
+    """
+    lines = text.splitlines(keepends=True)
+    index = 0
+
+    class _Lines:
+        def __iter__(self) -> _Lines:
+            return self
+
+        def __next__(self) -> str:
+            nonlocal index
+            if index >= len(lines):
+                raise StopIteration
+            line = lines[index]
+            index += 1
+            return line
+
+    reader = csv.reader(_Lines(), delimiter=delimiter)
+    records: list[tuple[int, int, list[str]]] = []
+    previous = 0
+    for row in reader:
+        if index <= previous:
+            raise csv.Error("table record did not consume a line")
+        records.append((previous + 1, index, list(row)))
+        previous = index
+    return records
+
+
+def _cited_table_cells(
+    text: str,
+    locator: Mapping[str, Any],
+    delimiter: str,
+) -> tuple[list[str] | None, str | None]:
+    """Cells the locator cites, after the complete table has been parsed.
+
+    Invariant: a table certifies from parsed cells only. ``line_range``
+    selects records that lie entirely inside it. A span that includes some
+    but not all lines of a record cuts through a quoted cell. That span is
+    source-blind, and the sliced lines are not parsed as their own table.
+    Without ``line_range`` every cell of the table is cited.
+    """
+    records = _table_records(text, delimiter)
+    if "line_range" not in locator or locator.get("line_range") is None:
+        return [cell for _start, _end, row in records for cell in row], None
+    span = _parse_line_range(locator.get("line_range"))
+    if span is None:
+        return None, "line_range is not a line number or start-end span"
+    start, end = span
+    line_count = len(text.splitlines())
+    if end > line_count:
+        return None, (
+            f"line_range {start}-{end} is outside the artifact "
+            f"({line_count} lines)"
+        )
+    for rec_start, rec_end, _row in records:
+        overlaps = not (end < rec_start or start > rec_end)
+        covers = start <= rec_start and rec_end <= end
+        if overlaps and not covers:
+            return None, (
+                f"line_range {start}-{end} cuts through a quoted table cell "
+                f"on lines {rec_start}-{rec_end}"
+            )
+    cells = [
+        cell
+        for rec_start, rec_end, row in records
+        if start <= rec_start and rec_end <= end
+        for cell in row
+    ]
+    return cells, None
+
+
+def _finite_decimal(text: str) -> Decimal | None:
+    """One finite Decimal, or None when ``text`` is not that number.
+
+    InvalidOperation, Overflow, and a non-finite value (NaN, Infinity)
+    are refusals. Callers treat None as "this number does not certify".
+    """
+    try:
+        parsed = Decimal(text)
+    except DecimalException:
+        return None
+    if not parsed.is_finite():
+        return None
+    return parsed
+
+
+def _whole_cell_number(cell: str) -> Decimal | None:
+    """Parse the entire trimmed cell as one finite Decimal, or return None.
+
+    The cell is the token. ``Decimal`` parses it after trim and the
+    table reader's unquote. The prose numeric grammar is not a gate, so
+    a trailing dot is the number: ``91.`` is ``91``. Value comparison is
+    ``Decimal``, never a float conversion: ``0.9100`` is ``0.91``,
+    ``1e-999`` is not ``0``, and ``9007199254740993`` is not
+    ``9007199254740992``. ``1/2``, ``1,000``, and ``0.91Pa`` do not parse.
+    NaN, Infinity, and an exponent Decimal rejects are refusals. This is
+    not a list of spellings of a stored leaf.
+    """
+    folded = _fold_numeric_signs(cell.strip())
+    return _finite_decimal(folded)
+
+
+def _stored_number_decimal(leaf: int | float) -> Decimal | None:
+    """Exact Decimal of a stored int or float.
+
+    A float uses ``repr`` (shortest round-trip). An int uses ``str``.
+    Neither path does float arithmetic on the cell. A non-finite float
+    and a bool are refusals.
+    """
+    if isinstance(leaf, bool):
+        return None
+    if isinstance(leaf, float):
+        text = repr(leaf)
+    elif isinstance(leaf, int):
+        text = str(leaf)
+    else:
+        return None
+    return _finite_decimal(text)
+
+
+def _cell_certifies_leaf(leaf: Any, cell: str) -> bool:
+    """True when the whole trimmed, unquoted cell is ``leaf``.
+
+    Invariant: every numeric table cell is decided here. The whole cell
+    certifies a stored number only when ``Decimal`` of that cell equals
+    ``Decimal`` of the stored spelling (``repr`` of a float, ``str`` of an
+    int), including the sign of zero. ``0.9100`` is ``0.91``. ``91.`` is
+    ``91``. ``1.0`` is ``1``. ``1e-999`` is not ``0``.
+    ``9007199254740993`` is not ``9007199254740992``. ``1/2`` is not ``1``.
+    ``1,000`` is not ``1``.
+    A cell that is not one finite number does not certify. A string
+    matches only that string. Spellings are not enumerated. ``Decimal``
+    equality treats negative zero as zero, so the sign bit is compared
+    when the value is zero: ``-0.0`` is not ``0.0``.
+    """
+    folded = _fold_numeric_signs(cell.strip())
+    if isinstance(leaf, str):
+        return folded == _fold_numeric_signs(leaf)
+    if isinstance(leaf, bool):
+        return folded.lower() == ("true" if leaf else "false")
+    if isinstance(leaf, (int, float)):
+        parsed = _whole_cell_number(cell)
+        stored = _stored_number_decimal(leaf)
+        if parsed is None or stored is None:
+            return False
+        if parsed != stored:
+            return False
+        # Decimal equality collapses the sign of zero. The sign is part
+        # of the value, so a negative zero does not certify a positive zero.
+        if parsed.is_zero():
+            return parsed.as_tuple().sign == stored.as_tuple().sign
+        return True
+    return False
+
+
+def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
+    """True when one whole cell is ``leaf``.
+
+    Comparison is ``_cell_certifies_leaf`` only. A numeric cell is an
+    exact ``Decimal``, so ``0.9100`` is ``0.91`` and ``1e-999`` is not
+    ``0``. The prose matcher is not used, so a digit inside ``1/2`` or
+    ``note 1`` is not that stored number.
+    """
+    return any(_cell_certifies_leaf(leaf, cell) for cell in cells)
+
+
+# Repository-relative roots that hold a paper, OCR, quotes, or a reference
+# transcription. The extract tree and the gate implementation are absent
+# on purpose: a pin must not certify against its own YAML or this file.
+_SOURCE_ARTIFACT_PREFIXES = (
+    "raw/",
+    "corpus/",
+    "text/",
+    "tables/",
+    "supporting/",
+    "docs/references/",
+)
+_PROGRAM_SOURCE_SUFFIXES = frozenset({".py", ".pyi"})
 # path segments: bare key or key[index_or_id]
 _PATH_SEGMENT_RE = re.compile(r"^([^.\[]+)(?:\[([^\]]*)\])?$")
 
@@ -454,6 +921,7 @@ def load_fidelity_policy(
     *,
     graduated_ledger_path: Path | None = None,
     prior_graduated_source_ids: set[str] | None = None,
+    artifact_root: Path | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
     """Load the fidelity policy file.
 
@@ -600,6 +1068,33 @@ def load_fidelity_policy(
     out = dict(doc)
     if "graduated_pre_policy_source_ids" not in out:
         out["graduated_pre_policy_source_ids"] = list(graduated)
+    # Promotion: graduating an id certifies that extract. A missing file is not
+    # certified here (synthetic policy tests graduate ids that have no extract).
+    # The same chokepoint refuses a stored review_status of reviewed.
+    if not errors:
+        for source_id in sorted(graduated_set):
+            extract_path = EXTRACTS_DIR / f"{source_id}.yaml"
+            if not extract_path.is_file():
+                continue
+            try:
+                extract_doc = load_extract_yaml(extract_path)
+            except Exception as exc:  # noqa: BLE001 — surface as a promotion refusal
+                errors.append(
+                    f"{p}: cannot certify graduated extract {source_id}: {exc}"
+                )
+                continue
+            if not isinstance(extract_doc, Mapping):
+                errors.append(
+                    f"{p}: graduated extract {source_id} is not a mapping"
+                )
+                continue
+            errors.extend(
+                certify_extract_source_fidelity(
+                    extract_doc,
+                    label=source_id,
+                    artifact_root=artifact_root,
+                )
+            )
     return out, errors
 
 
@@ -698,7 +1193,9 @@ def _path_is_observation_evidence(path: str) -> bool:
 
     Required shape::
 
-        species.<id>.(observations|context)[<id|index>].(values|equipment)[....]
+        species.<id>.(observations|context)[<id|index>].(values|equipment|<condition>)[....]
+
+    ``<condition>`` is a scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``).
     """
     if not path or not isinstance(path, str):
         return False
@@ -717,7 +1214,8 @@ def _path_is_observation_evidence(path: str) -> bool:
     leaf_seg = _PATH_SEGMENT_RE.match(parts[3])
     if not leaf_seg:
         return False
-    return leaf_seg.group(1) in ("values", "equipment")
+    name = leaf_seg.group(1)
+    return name in ("values", "equipment") or name in _SCORED_NUMERIC_CONDITIONS
 
 
 def _sample_expected_value(sample: Mapping[str, Any]) -> Any:
@@ -971,6 +1469,28 @@ def _find_observation(
     raise KeyError("structured sample needs observation_id or observable")
 
 
+# Point temperature keys, in the order a structured ``T_K`` / ``T`` selector
+# searches. A present key that is not the target does not hide a later key.
+_SERIES_TEMPERATURE_KEYS = ("T_K", "T", "temperature_K", "temp_K")
+
+
+def _series_temperature_index(points: Sequence[Any], target: float) -> int | None:
+    """Index of the first series point whose temperature key matches ``target``."""
+    for index, point in enumerate(points):
+        if not isinstance(point, Mapping):
+            continue
+        for key in _SERIES_TEMPERATURE_KEYS:
+            if key not in point:
+                continue
+            try:
+                seen = float(point[key])
+            except (TypeError, ValueError):
+                continue
+            if math.isclose(seen, target, rel_tol=0.0, abs_tol=1e-6):
+                return index
+    return None
+
+
 def resolve_fidelity_sample(
     doc: Mapping[str, Any],
     sample: Mapping[str, Any],
@@ -1030,23 +1550,10 @@ def resolve_fidelity_sample(
                 f"T_K={t_k!r} match requires values to be a list of points"
             )
         target = float(t_k)
-        found = None
-        for pt in cur:
-            if not isinstance(pt, Mapping):
-                continue
-            for tk in ("T_K", "T", "temperature_K", "temp_K"):
-                if tk in pt:
-                    try:
-                        if math.isclose(float(pt[tk]), target, rel_tol=0.0, abs_tol=1e-6):
-                            found = pt
-                            break
-                    except (TypeError, ValueError):
-                        continue
-            if found is not None:
-                break
-        if found is None:
+        found_index = _series_temperature_index(cur, target)
+        if found_index is None:
             raise KeyError(f"no series point with T≈{target} under species {species!r}")
-        cur = found
+        cur = cur[found_index]
 
     if field:
         if not isinstance(cur, Mapping) or field not in cur:
@@ -1127,6 +1634,1394 @@ def check_all_fidelity_samples_match(
             continue
         errors.extend(check_fidelity_sample_matches(doc, sample, label=sp))
     return errors
+
+
+def _usable_observation_id(observation: Mapping[str, Any]) -> str | None:
+    """The id coverage can name, or None when the row cannot be addressed.
+
+    Same rule as schema validation: a non-empty string. A missing key,
+    a blank string, or a non-string is not an id. Callers refuse those
+    scored rows. They do not drop them from certification.
+    """
+    observation_id = observation.get("observation_id")
+    if isinstance(observation_id, str) and observation_id:
+        return observation_id
+    return None
+
+
+def _fidelity_sample_observation_key(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> tuple[str, str] | None:
+    """Return the scored observation addressed by a fidelity sample, if any."""
+    path_keys, structured_keys = _sample_addressing_keys(sample)
+    if path_keys:
+        if len(path_keys) != 1:
+            return None
+        path = sample.get(path_keys[0])
+        if not isinstance(path, str) or not _path_is_observation_evidence(path):
+            return None
+        parts = path.split(".")
+        if len(parts) < 4 or parts[0] != "species":
+            return None
+        species_match = _PATH_SEGMENT_RE.match(parts[1])
+        observation_match = _PATH_SEGMENT_RE.match(parts[2])
+        if (
+            not species_match
+            or species_match.group(2) is not None
+            or not observation_match
+            or observation_match.group(1) != "observations"
+            or observation_match.group(2) is None
+        ):
+            return None
+        species_id = species_match.group(1)
+        try:
+            observation = resolve_field_path(doc, ".".join(parts[:3]))
+        except KeyError:
+            return None
+        if not isinstance(observation, Mapping):
+            return None
+        observation_id = _usable_observation_id(observation)
+        if observation_id is None:
+            return None
+        return species_id, observation_id
+
+    if not structured_keys or not isinstance(sample.get("species"), str):
+        return None
+    species_id = sample["species"]
+    try:
+        observation = _find_observation(
+            doc,
+            species=species_id,
+            observation_id=(
+                str(sample["observation_id"]) if sample.get("observation_id") else None
+            ),
+            observable=str(sample["observable"]) if sample.get("observable") else None,
+        )
+    except KeyError:
+        return None
+    species_map = doc.get("species")
+    if not isinstance(species_map, Mapping):
+        return None
+    block = species_map.get(species_id)
+    observations = block.get("observations") if isinstance(block, Mapping) else None
+    if not isinstance(observations, list) or not any(
+        observation is row for row in observations
+    ):
+        return None
+    observation_id = _usable_observation_id(observation)
+    if observation_id is None:
+        return None
+    return species_id, observation_id
+
+
+# Auto-migrated pilot pins copied the first stored payload. They are not a
+# source check. Do not rewrite them; the re-audit is a separate campaign.
+_PILOT_MIGRATION_NOTE = (
+    "auto fidelity sample from first observation payload (pilot migration)"
+)
+_FIDELITY_WARNING_KINDS = (
+    "uncovered_observation",
+    "unattested_sample",
+    "auto_migrated_pilot_pin",
+    "source_blind_pin",
+    "ambiguous_observation_id",
+    "missing_observation_id",
+    "non_finite_evidence",
+)
+_ARTIFACT_PATH_KEYS = ("source_path", "quotes_path")
+_FIDELITY_DETAIL_CAP = 3
+# Same bracket rule as resolve_field_path: a bare integer is a list position.
+_INTEGER_SELECTOR_RE = re.compile(r"-?\d+")
+
+
+@dataclass(frozen=True)
+class FidelityWarning:
+    """One counted source-fidelity hole. ``count`` is observations or samples."""
+
+    kind: str
+    count: int
+    label: str
+    detail: str = ""
+
+    def render(self) -> str:
+        text = f"{self.label}: fidelity warning {self.kind} count={self.count}"
+        if self.detail:
+            text = f"{text}: {self.detail}"
+        return text
+
+
+def _note_reason(reasons: list[str], extra: list[int], text: str) -> None:
+    if len(reasons) < _FIDELITY_DETAIL_CAP:
+        reasons.append(text)
+    else:
+        extra[0] += 1
+
+
+def _finish_detail(reasons: list[str], extra: int) -> str:
+    text = "; ".join(reasons)
+    if extra:
+        text = f"{text}; and {extra} more"
+    return text
+
+
+# Observation fields the scored temperature payload copies beside ``values``
+# (simulator/battery/migrate.py, the select_declared_source temperature read).
+# This is the only condition set coverage walks. A new scored condition is
+# added here, not as another branch in the coverage loop.
+_SCORED_NUMERIC_CONDITIONS = (
+    "T_range_K",
+    "T_K",
+    "T_C",
+    "temperature_C",
+    "temp_C",
+    "point_conditions",
+)
+# A locator cites a condition. Its page numbers are not measured leaves.
+_CONDITION_PROVENANCE_KEYS = frozenset({"locator"})
+
+
+def _scored_observations(
+    doc: Mapping[str, Any],
+) -> tuple[
+    dict[tuple[str, str], Mapping[str, Any]],
+    list[tuple[str, str, int]],
+    list[tuple[str, int]],
+]:
+    """Unique scored rows, ambiguous ids, and rows with no usable id.
+
+    Context rows are unscored (d-032) and are not part of this coverage set.
+    Coverage keys are ``(species_id, observation_id)``. A second row with the
+    same id used to overwrite the first, while a path pin resolves the first
+    row, so an attested pin of the first value covered the last row. An id
+    that names more than one row is omitted from the unique map and returned
+    as ``(species_id, observation_id, row_count)``. Certification refuses
+    those ids. They are not a covered observation.
+
+    A scored row whose ``observation_id`` is not a non-empty string used to
+    disappear from the required set, so a reviewed document with no samples
+    certified without opening a source. Those rows are returned as
+    ``(species_id, row_index)``. A non-mapping entry in ``observations``
+    has no id and is returned the same way. Certification refuses them.
+    """
+    grouped: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
+    missing: list[tuple[str, int]] = []
+    species_map = doc.get("species") or {}
+    if isinstance(species_map, Mapping):
+        for species_id, block in species_map.items():
+            observations = (
+                block.get("observations") if isinstance(block, Mapping) else None
+            )
+            if not isinstance(observations, list):
+                continue
+            for row_index, observation in enumerate(observations):
+                if not isinstance(observation, Mapping):
+                    missing.append((str(species_id), row_index))
+                    continue
+                observation_id = _usable_observation_id(observation)
+                if observation_id is None:
+                    missing.append((str(species_id), row_index))
+                    continue
+                grouped.setdefault(
+                    (str(species_id), observation_id), []
+                ).append(observation)
+    unique: dict[tuple[str, str], Mapping[str, Any]] = {}
+    ambiguous: list[tuple[str, str, int]] = []
+    for key in sorted(grouped):
+        rows = grouped[key]
+        if len(rows) == 1:
+            unique[key] = rows[0]
+        else:
+            ambiguous.append((key[0], key[1], len(rows)))
+    return unique, ambiguous, missing
+
+
+def _scored_evidence_leaves(
+    observation: Mapping[str, Any],
+) -> tuple[list[tuple[Any, ...]], list[tuple[Any, ...]]]:
+    """Coverable leaves and non-finite leaves of one scored observation.
+
+    One walk. ``values`` and each scored numeric condition are the evidence.
+    A ``locator`` inside a condition is provenance. The first list is what
+    a pin can cover. The second list is NaN and ±Inf. Those addresses are
+    never omitted and are never coverable.
+    """
+    coverable: list[tuple[Any, ...]] = []
+    non_finite: list[tuple[Any, ...]] = []
+
+    def take(value: Any, prefix: tuple[Any, ...], skip_keys: frozenset[str]) -> None:
+        child_coverable, child_non_finite = _classify_measured_leaves(
+            value, prefix, skip_keys=skip_keys
+        )
+        coverable.extend(child_coverable)
+        non_finite.extend(child_non_finite)
+
+    if "values" in observation:
+        take(observation.get("values"), ("values",), frozenset())
+    for key in _SCORED_NUMERIC_CONDITIONS:
+        if key not in observation or observation.get(key) is None:
+            continue
+        take(
+            observation.get(key),
+            (key,),
+            _CONDITION_PROVENANCE_KEYS,
+        )
+    return coverable, non_finite
+
+
+def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, ...]]:
+    """Coverable measured leaves of ``values`` and each scored condition.
+
+    Addresses sit in one evidence tree. ``("values", "alpha")`` and
+    ``("T_range_K", 0)`` are different leaves even when the numbers are
+    equal. A ``locator`` inside a condition is provenance and is not a
+    leaf. Locator keys inside ``values`` stay leaves. Non-finite floats
+    are not in this list; ``_scored_evidence_leaves`` records them.
+    """
+    coverable, _non_finite = _scored_evidence_leaves(observation)
+    return coverable
+
+
+def _coverable_leaves_are_pinned(
+    needed: Sequence[tuple[Any, ...]],
+    covered: AbstractSet[tuple[Any, ...]],
+    observation: Mapping[str, Any],
+) -> bool:
+    """True when every coverable leaf is pinned, or there is no coverable leaf.
+
+    An empty leaf list is pinned only when the evidence also has no digit.
+    A non-finite quantity is not a coverable leaf. Callers refuse it on
+    its own; this predicate does not certify the observation.
+    """
+    if not needed:
+        return not _observation_has_digit_bearing_string(observation)
+    return set(needed) <= set(covered)
+
+
+def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> bool:
+    """True when scored evidence contains a string with a digit [0-9].
+
+    The walk is the same evidence the measured-leaf walker uses. A locator
+    inside a condition is provenance. This is the backstop for a recognizer
+    that returns no leaves: the coverage decision refuses that block.
+    """
+
+    def contains(value: Any, skip_keys: frozenset[str]) -> bool:
+        if isinstance(value, str):
+            return _string_has_ascii_digit(value)
+        if isinstance(value, Mapping):
+            return any(
+                contains(child, skip_keys)
+                for key, child in value.items()
+                if key not in skip_keys
+            )
+        if isinstance(value, (list, tuple)):
+            return any(contains(child, skip_keys) for child in value)
+        return False
+
+    if "values" in observation and contains(observation.get("values"), frozenset()):
+        return True
+    for key in _SCORED_NUMERIC_CONDITIONS:
+        if key not in observation or observation.get(key) is None:
+            continue
+        if contains(observation.get(key), _CONDITION_PROVENANCE_KEYS):
+            return True
+    return False
+
+
+def _path_selector_names_observation_id(sample: Mapping[str, Any]) -> bool:
+    """False when the observation bracket is a list position, not an id.
+
+    ``resolve_field_path`` prefers a bare integer bracket as a list index.
+    ``observations[0]`` follows whichever row currently sits there, so the pin
+    does not identify an observation. Structured samples have no path bracket;
+    ``_fidelity_sample_observation_key`` decides those.
+    """
+    path_keys, _structured = _sample_addressing_keys(sample)
+    if len(path_keys) != 1:
+        return True
+    path = sample.get(path_keys[0])
+    if not isinstance(path, str):
+        return False
+    parts = path.split(".")
+    if len(parts) < 3:
+        return False
+    match = _PATH_SEGMENT_RE.match(parts[2])
+    if not match or match.group(1) != "observations" or match.group(2) is None:
+        return False
+    return _INTEGER_SELECTOR_RE.fullmatch(match.group(2)) is None
+
+
+def _sample_attestation_defects(sample: Mapping[str, Any]) -> list[str]:
+    """Missing reviewer, ISO date, or exactly one artifact locator."""
+    defects: list[str] = []
+    reviewer = sample.get("reviewed_by")
+    if not isinstance(reviewer, str) or not reviewer.strip():
+        defects.append("reviewed_by is required for source attestation")
+    reviewed_on = sample.get("reviewed_on")
+    if not isinstance(reviewed_on, str) or not _ISO_DATE_RE.fullmatch(reviewed_on):
+        defects.append("reviewed_on must be an ISO YYYY-MM-DD date")
+    else:
+        try:
+            date.fromisoformat(reviewed_on)
+        except ValueError:
+            defects.append("reviewed_on is not a calendar date")
+    locator_keys = [key for key in ("locator", "source_locator") if key in sample]
+    if len(locator_keys) != 1 or not _locator_ok(sample.get(locator_keys[0])):
+        defects.append(
+            "exactly one valid locator/source_locator is required for source attestation"
+        )
+    return defects
+
+
+def _sample_addresses_scored_evidence(sample: Mapping[str, Any]) -> bool:
+    """True when the pin's address is ``values`` or a scored numeric condition.
+
+    This is not coverage. The fourth path segment names the container.
+    An equipment path may be a legal sample and still must not contribute.
+    Structured samples resolve through ``values`` only; a condition needs
+    a path pin.
+    """
+    path_keys, structured_keys = _sample_addressing_keys(sample)
+    if path_keys:
+        if len(path_keys) != 1:
+            return False
+        path = sample.get(path_keys[0])
+        if not isinstance(path, str):
+            return False
+        parts = path.split(".")
+        if len(parts) < 4:
+            return False
+        leaf = _PATH_SEGMENT_RE.match(parts[3])
+        if not leaf:
+            return False
+        name = leaf.group(1)
+        return name == "values" or name in _SCORED_NUMERIC_CONDITIONS
+    return bool(structured_keys)
+
+
+# Sentinel: a bracket that does not resolve. A resolved node may itself be None.
+_ADDRESS_MISS = object()
+
+
+def _classify_measured_leaves(
+    value: Any,
+    prefix: tuple[Any, ...] = (),
+    *,
+    skip_keys: frozenset[str] = frozenset(),
+) -> tuple[list[tuple[Any, ...]], list[tuple[Any, ...]]]:
+    """Split measured leaves into coverable addresses and non-finite addresses.
+
+    Invariant: every float is accounted for. A finite int or float (not a
+    boolean) and a string that contains any digit [0-9] are coverable. A
+    non-finite float (NaN, +Inf, -Inf) is the second list. It is never
+    omitted and never coverable. A label with no digit is neither. The
+    address is the path of mapping keys and list indexes from ``value``.
+    A container is not a leaf. ``()`` is a measured scalar payload.
+    Membership of a string does not consult the numeric grammar:
+    ``0.91Pa`` is coverable because it contains digits. ``skip_keys``
+    drops a provenance mapping (a condition ``locator``) and does not
+    apply when walking ``values``.
+    """
+    if isinstance(value, bool):
+        return [], []
+    if isinstance(value, int):
+        return [prefix], []
+    if isinstance(value, float):
+        if math.isfinite(value):
+            return [prefix], []
+        return [], [prefix]
+    if isinstance(value, str):
+        if _string_has_ascii_digit(value):
+            return [prefix], []
+        return [], []
+    if isinstance(value, Mapping):
+        coverable: list[tuple[Any, ...]] = []
+        non_finite: list[tuple[Any, ...]] = []
+        for key, child in value.items():
+            if key in skip_keys:
+                continue
+            child_coverable, child_non_finite = _classify_measured_leaves(
+                child, prefix + (key,), skip_keys=skip_keys
+            )
+            coverable.extend(child_coverable)
+            non_finite.extend(child_non_finite)
+        return coverable, non_finite
+    if isinstance(value, (list, tuple)):
+        coverable = []
+        non_finite = []
+        for index, child in enumerate(value):
+            child_coverable, child_non_finite = _classify_measured_leaves(
+                child, prefix + (index,), skip_keys=skip_keys
+            )
+            coverable.extend(child_coverable)
+            non_finite.extend(child_non_finite)
+        return coverable, non_finite
+    return [], []
+
+
+def _measured_leaf_addresses(
+    value: Any,
+    prefix: tuple[Any, ...] = (),
+    *,
+    skip_keys: frozenset[str] = frozenset(),
+) -> list[tuple[Any, ...]]:
+    """Coverable measured leaves under ``value``.
+
+    This is the coverable half of ``_classify_measured_leaves``. A
+    non-finite float is not returned here and is not dropped: the same
+    walk records it, and certification refuses it.
+    """
+    coverable, _non_finite = _classify_measured_leaves(
+        value, prefix, skip_keys=skip_keys
+    )
+    return coverable
+
+
+def _step_bracket(cur: Any, bracket: str, address: list[Any]) -> Any:
+    """Apply one bracket the way ``resolve_field_path`` does.
+
+    A mapping bracket stays a string key. A list bracket is an integer index.
+    ``_ADDRESS_MISS`` means the bracket does not resolve.
+    """
+    if isinstance(cur, Mapping):
+        if bracket not in cur:
+            return _ADDRESS_MISS
+        address.append(bracket)
+        return cur[bracket]
+    if isinstance(cur, list) and _INTEGER_SELECTOR_RE.fullmatch(bracket):
+        index = int(bracket)
+        if 0 <= index < len(cur):
+            address.append(index)
+            return cur[index]
+    return _ADDRESS_MISS
+
+
+def _path_evidence_address(doc: Mapping[str, Any], path: Any) -> tuple[Any, ...] | None:
+    """Evidence-tree address of a path pin.
+
+    The first element is ``values`` or a scored condition key.
+    ``(container,)`` is that whole container. None covers nothing.
+    """
+    if not isinstance(path, str):
+        return None
+    parts = path.split(".")
+    if len(parts) < 4:
+        return None
+    container_segment = _PATH_SEGMENT_RE.match(parts[3])
+    if container_segment is None:
+        return None
+    container = container_segment.group(1)
+    if container != "values" and container not in _SCORED_NUMERIC_CONDITIONS:
+        return None
+    try:
+        observation = resolve_field_path(doc, ".".join(parts[:3]))
+    except KeyError:
+        return None
+    if not isinstance(observation, Mapping) or container not in observation:
+        return None
+    cur: Any = observation.get(container)
+    address: list[Any] = [container]
+    bracket = container_segment.group(2)
+    if bracket is not None:
+        cur = _step_bracket(cur, bracket, address)
+        if cur is _ADDRESS_MISS:
+            return None
+    for raw in parts[4:]:
+        segment = _PATH_SEGMENT_RE.match(raw)
+        if segment is None:
+            return None
+        key = segment.group(1)
+        if not isinstance(cur, Mapping) or key not in cur:
+            return None
+        cur = cur[key]
+        address.append(key)
+        bracket = segment.group(2)
+        if bracket is not None:
+            cur = _step_bracket(cur, bracket, address)
+            if cur is _ADDRESS_MISS:
+                return None
+    return tuple(address)
+
+
+def _structured_values_address(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> tuple[Any, ...] | None:
+    """Values-relative address of a structured pin. ``()`` is the whole payload."""
+    species = sample.get("species")
+    if not isinstance(species, str):
+        return None
+    try:
+        observation = _find_observation(
+            doc,
+            species=species,
+            observation_id=(
+                str(sample["observation_id"]) if sample.get("observation_id") else None
+            ),
+            observable=(
+                str(sample["observable"]) if sample.get("observable") else None
+            ),
+        )
+    except KeyError:
+        return None
+    if not isinstance(observation, Mapping) or "values" not in observation:
+        return None
+    cur: Any = observation.get("values")
+    address: list[Any] = []
+    if "index" in sample and sample.get("index") is not None:
+        try:
+            index = int(sample.get("index"))
+        except (TypeError, ValueError):
+            return None
+        if isinstance(cur, list) and 0 <= index < len(cur):
+            cur = cur[index]
+            address.append(index)
+        else:
+            return None
+    elif "T_K" in sample or "T" in sample:
+        target = sample.get("T_K") if "T_K" in sample else sample.get("T")
+        if not isinstance(cur, list):
+            return None
+        try:
+            wanted = float(target)
+        except (TypeError, ValueError):
+            return None
+        found = _series_temperature_index(cur, wanted)
+        if found is None:
+            return None
+        cur = cur[found]
+        address.append(found)
+    field = sample.get("field") or sample.get("value_key")
+    if field is not None:
+        if not isinstance(cur, Mapping) or field not in cur:
+            return None
+        address.append(field)
+    return tuple(address)
+
+
+def _sample_evidence_address(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> tuple[Any, ...] | None:
+    """Address of this pin in the scored evidence tree.
+
+    ``("values",)`` pins the whole payload. ``("T_range_K",)`` pins that
+    whole condition. None means the pin does not resolve to scored evidence,
+    so it covers nothing. Structured samples address ``values`` only. The
+    walk uses the same selectors as ``resolve_fidelity_sample``: path
+    brackets, structured ``index``, ``T_K`` / ``T``, and one ``field`` key.
+    """
+    path_keys, _structured = _sample_addressing_keys(sample)
+    if path_keys:
+        return _path_evidence_address(doc, sample.get(path_keys[0]))
+    inner = _structured_values_address(doc, sample)
+    if inner is None:
+        return None
+    return ("values",) + inner
+
+
+def _parse_line_range(raw: Any) -> tuple[int, int] | None:
+    """1-based inclusive span. A bare line number is that one line."""
+    if isinstance(raw, bool) or raw is None:
+        return None
+    if isinstance(raw, int):
+        return (raw, raw) if raw >= 1 else None
+    if isinstance(raw, str):
+        text = raw.strip()
+        if re.fullmatch(r"\d+", text):
+            number = int(text)
+            return (number, number) if number >= 1 else None
+        match = re.fullmatch(r"(\d+)\s*-\s*(\d+)", text)
+        if not match:
+            return None
+        start, end = int(match.group(1)), int(match.group(2))
+        if start >= 1 and end >= start:
+            return start, end
+        return None
+    if (
+        isinstance(raw, (list, tuple))
+        and len(raw) == 2
+        and all(isinstance(item, int) and not isinstance(item, bool) for item in raw)
+    ):
+        start, end = int(raw[0]), int(raw[1])
+        if start >= 1 and end >= start:
+            return start, end
+    return None
+
+
+def _resolve_artifact(root: Path, raw: str) -> Path | None:
+    """Repository-relative file inside ``root``, or None when it cannot be opened."""
+    text = raw.strip()
+    if not text or "://" in text or _ABS_PATH_RE.match(text):
+        return None
+    candidate = Path(text)
+    if candidate.is_absolute():
+        return None
+    root_resolved = root.resolve()
+    resolved = (root_resolved / candidate).resolve()
+    if not resolved.is_relative_to(root_resolved) or not resolved.is_file():
+        return None
+    return resolved
+
+
+def _source_artifact_refusal(root: Path, path: Path) -> str | None:
+    """None only when ``path`` is source evidence, not the gate or an extract.
+
+    Invariant: every certification path opens the artifact here. A file under
+    the extract tree, the validator, or a program-source suffix is not a
+    paper, OCR transcript, or quotes file, even when it contains the pin.
+    """
+    try:
+        relative = path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        return f"{path.name} is outside the repository root"
+    if not any(relative.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES):
+        return (
+            f"{relative} is not a source artifact "
+            "(paper, OCR, quotes, or reference transcription)"
+        )
+    if path.suffix.lower() in _PROGRAM_SOURCE_SUFFIXES:
+        return f"{relative} is implementation source, not a source artifact"
+    # Quotes live under tables/. Other YAML is pipeline metadata or an extract
+    # copy parked on a source root.
+    if path.suffix.lower() in {".yaml", ".yml"} and not relative.startswith("tables/"):
+        return f"{relative} is not a source-artifact transcription"
+    return None
+
+
+def _text_is_extract_document(text: str) -> bool:
+    """True when the opened bytes are an extract or companion table.
+
+    A copy renamed into ``text/`` still parses as the extract and would
+    otherwise supply its own pins as source evidence.
+    """
+    head = text[:8192]
+    if (
+        SCHEMA_VERSION not in head
+        and TABLE_SCHEMA_VERSION not in head
+    ):
+        return False
+    try:
+        loaded = yaml.safe_load(text)
+    except yaml.YAMLError:
+        return False
+    return isinstance(loaded, Mapping) and loaded.get("schema_version") in {
+        SCHEMA_VERSION,
+        TABLE_SCHEMA_VERSION,
+    }
+
+
+def _artifact_candidates(locator: Mapping[str, Any], root: Path) -> list[Path]:
+    explicit = [
+        raw.strip()
+        for key in _ARTIFACT_PATH_KEYS
+        if isinstance((raw := locator.get(key)), str) and raw.strip()
+    ]
+    if explicit:
+        return [
+            path
+            for raw in explicit
+            if (path := _resolve_artifact(root, raw)) is not None
+        ]
+    record = locator.get("record")
+    if not isinstance(record, str) or not record.strip():
+        return []
+    text = record.strip()
+    direct = _resolve_artifact(root, text)
+    if direct is not None:
+        return [direct]
+    token = text.split()[0]
+    if token != text:
+        fallback = _resolve_artifact(root, token)
+        if fallback is not None:
+            return [fallback]
+    return []
+
+
+def _read_artifact_text(path: Path) -> tuple[str | None, str | None]:
+    if path.suffix.lower() == ".pdf":
+        return None, f"{path.name} is a PDF; certification opens a text or OCR artifact"
+    try:
+        blob = path.read_bytes()
+    except OSError as exc:
+        return None, f"could not read {path.name}: {exc}"
+    if blob.startswith(b"%PDF"):
+        return None, f"{path.name} is a PDF; certification opens a text or OCR artifact"
+    try:
+        return blob.decode("utf-8"), None
+    except UnicodeError:
+        return None, f"{path.name} is not UTF-8 text"
+
+
+def _cited_text(
+    full: str, locator: Mapping[str, Any]
+) -> tuple[str | None, str | None]:
+    """Prose span. A table does not use this; it is parsed whole first."""
+    if "line_range" not in locator or locator.get("line_range") is None:
+        return full, None
+    span = _parse_line_range(locator.get("line_range"))
+    if span is None:
+        return None, "line_range is not a line number or start-end span"
+    start, end = span
+    lines = full.splitlines()
+    if end > len(lines):
+        return None, (
+            f"line_range {start}-{end} is outside the artifact ({len(lines)} lines)"
+        )
+    return "\n".join(lines[start - 1 : end]), None
+
+
+def _scalar_leaves(value: Any) -> list[Any]:
+    if isinstance(value, str):
+        return [value] if value.strip() else []
+    if isinstance(value, bool) or isinstance(value, (int, float)):
+        return [value]
+    if isinstance(value, Mapping):
+        leaves: list[Any] = []
+        for child in value.values():
+            leaves.extend(_scalar_leaves(child))
+        return leaves
+    if isinstance(value, (list, tuple)):
+        leaves = []
+        for child in value:
+            leaves.extend(_scalar_leaves(child))
+        return leaves
+    return []
+
+
+def _numeric_spellings(leaf: int | float) -> set[str]:
+    """Spellings whose complete token may certify this number.
+
+    Only a spelling that preserves the stored number is kept. Rounding
+    ``0.24000000000000002`` to ``0.24`` is not that number. ``str(leaf)``
+    is the shortest round trip. ``format(leaf, ".16g")`` is kept only when
+    it parses back to the same float, so an exact alternate of ``1e-20``
+    can remain and a rounded neighbour cannot. ``-0.0`` and ``0.0`` compare
+    equal, so the sign is checked separately. A float spelling still needs
+    a decimal point or an exponent: ``format(1.0, ".16g")`` is ``1`` and
+    does not certify 1.0.
+    """
+    if isinstance(leaf, int):
+        return {str(leaf)}
+    if not math.isfinite(leaf):
+        return set()
+    exact: set[str] = set()
+    for spelling in (str(leaf), format(leaf, ".16g")):
+        if "." not in spelling and "e" not in spelling.lower():
+            continue
+        try:
+            parsed = float(spelling)
+        except ValueError:
+            continue
+        if parsed != leaf:
+            continue
+        if math.copysign(1.0, parsed) != math.copysign(1.0, leaf):
+            continue
+        exact.add(spelling)
+    return exact
+
+
+def _spelling_is_complete_token(spelling: str, text: str) -> bool:
+    """True when ``spelling`` is one whole numeric token in ``text``.
+
+    The span has to pass ``_span_is_complete_printed_value`` and equal a
+    citation token. ``1`` is not a token of ``1,000``.
+    """
+    folded = _fold_numeric_signs(spelling)
+    if not _printed_value_carried(folded, text):
+        return False
+    return any(match.group(0) == folded for match in _citation_token_matches(text))
+
+
+def _string_leaf_in_text(leaf: str, text: str) -> bool:
+    """Substring match that does not slice a numeric token.
+
+    A label with no digit stays a substring. A digit-bearing leaf matches
+    only when the whole stored value, number plus any attached or spaced
+    unit, passes ``_span_is_complete_printed_value``. ``1 K`` is not
+    ``1 KPa``, ``1,000`` is not ``1,000,000``, and ``0.91Pa`` is not
+    ``10.91Pa``. A leaf the parser reads also needs each of those numbers
+    to be the same complete token, so ``0.24`` is not ``-0.24`` or
+    ``0.24e-5``. A leading decimal is a number, so ``.24`` is not ``-.24``
+    or ``10.24``. Unicode signs are folded before either string is
+    searched, so ``−0.24`` is ``-0.24``.
+    """
+    leaf = _fold_numeric_signs(leaf)
+    text = _fold_numeric_signs(text)
+    if not _string_has_ascii_digit(leaf):
+        return leaf in text
+    if not _printed_value_carried(leaf, text):
+        return False
+    if not _parser_reads_every_digit(leaf):
+        return True
+    leaf_tokens = _citation_token_matches(leaf)
+    if not leaf_tokens:
+        return True
+    placed = {
+        (match.start(), match.end()): match.group(0)
+        for match in _citation_token_matches(text)
+    }
+    start = 0
+    while True:
+        index = text.find(leaf, start)
+        if index < 0:
+            return False
+        if not _span_is_complete_printed_value(text, index, index + len(leaf)):
+            start = index + 1
+            continue
+        if all(
+            placed.get((index + token.start(), index + token.end()))
+            == token.group(0)
+            for token in leaf_tokens
+        ):
+            return True
+        start = index + 1
+
+
+def _leaf_in_text(leaf: Any, text: str) -> bool:
+    """True when the opened artifact contains this pinned scalar.
+
+    Numeric leaves match a complete token only. Sign and exponent belong to
+    the token, so 0.24 does not match -0.24, 0.24e-5, or 10.24, and 1.0 does
+    not match 1. A leading decimal is a token, so .24 does not match -.24.
+    The whole stored value has to pass ``_span_is_complete_printed_value``,
+    so 1 does not match 1,000, 1 K does not match 1 KPa, and 1,000 does not
+    match 1,000,000. A float matches only a spelling that parses back to
+    that stored number, so 0.24000000000000002 does not match 0.24. A
+    Unicode minus is a minus, so −0.24 does not match 0.24 and does match
+    -0.24. This is a cited-text grep, not a unit conversion.
+    """
+    if isinstance(leaf, bool):
+        token = "true" if leaf else "false"
+        return (
+            re.search(rf"(?i)(?<![A-Za-z0-9_]){token}(?![A-Za-z0-9_])", text)
+            is not None
+        )
+    if isinstance(leaf, int):
+        return _spelling_is_complete_token(str(leaf), text)
+    if isinstance(leaf, float):
+        if not math.isfinite(leaf):
+            return False
+        return any(
+            _spelling_is_complete_token(spelling, text)
+            for spelling in _numeric_spellings(leaf)
+        )
+    if isinstance(leaf, str):
+        return _string_leaf_in_text(leaf, text)
+    return False
+
+
+def _certification_scalar_leaves(
+    sample: Mapping[str, Any],
+    doc: Mapping[str, Any] | None,
+) -> tuple[list[Any], str | None]:
+    """Scalar leaves the opened source must contain.
+
+    The sample spelling and the resolved extract value are both required.
+    ``rel_tol`` can make those numbers differ. Dropping the resolved leaf
+    would certify a stored number the source was never searched for.
+    """
+    try:
+        expected = _sample_expected_value(sample)
+    except KeyError as exc:
+        return [], f"locator was not opened: {exc}"
+    leaves = _scalar_leaves(expected)
+    if doc is not None:
+        try:
+            resolved = resolve_fidelity_sample(doc, sample)
+        except KeyError:
+            resolved = None
+        if resolved is not None:
+            leaves.extend(_scalar_leaves(resolved))
+    if not leaves:
+        return [], "locator was not opened: pinned value has no scalar leaf to find"
+    return leaves, None
+
+
+def _locator_source_blind_reason(
+    sample: Mapping[str, Any],
+    *,
+    artifact_root: Path,
+    doc: Mapping[str, Any] | None = None,
+) -> str | None:
+    """None only when the locator was opened and the certified leaves are in it.
+
+    Certified leaves are the sample value and the resolved extract value.
+    A tolerant sample match does not stand in for the stored number.
+    """
+    keys = [key for key in ("locator", "source_locator") if key in sample]
+    if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
+        return "locator was not opened: attestation locator is missing"
+    locator = sample[keys[0]]
+    explicit = [
+        raw.strip()
+        for key in _ARTIFACT_PATH_KEYS
+        if isinstance((raw := locator.get(key)), str) and raw.strip()
+    ]
+    candidates = _artifact_candidates(locator, artifact_root)
+    if explicit and not candidates:
+        joined = ", ".join(explicit)
+        return (
+            "locator was not opened: "
+            f"{joined} is not a text artifact inside the repository root"
+        )
+    if not candidates:
+        return (
+            "locator was not opened: no source_path, quotes_path, or file record "
+            "points at a text artifact"
+        )
+    leaves, leaf_error = _certification_scalar_leaves(sample, doc)
+    if leaf_error:
+        return leaf_error
+    reasons: list[str] = []
+    for path in candidates:
+        provenance = _source_artifact_refusal(artifact_root, path)
+        if provenance:
+            reasons.append(f"locator was not opened: {provenance}")
+            continue
+        text, read_error = _read_artifact_text(path)
+        if text is None:
+            reasons.append(read_error or f"{path.name} was not opened")
+            continue
+        if _text_is_extract_document(text):
+            reasons.append(
+                "locator was not opened: "
+                f"{path.name} is an extract document, not an independent source"
+            )
+            continue
+        delimiter = _tabular_delimiter(path)
+        if delimiter is None:
+            cited, span_error = _cited_text(text, locator)
+            if cited is None:
+                reasons.append(span_error or "cited span was not opened")
+                continue
+            missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
+        else:
+            # Parse the complete table, then select. A sliced line is not a table.
+            try:
+                cells, span_error = _cited_table_cells(text, locator, delimiter)
+            except csv.Error as exc:
+                reasons.append(
+                    f"opened {path.name} but the table could not be parsed ({exc})"
+                )
+                continue
+            if cells is None:
+                reasons.append(span_error or "cited span was not opened")
+                continue
+            missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
+        if not missing:
+            return None
+        rendered = ", ".join(repr(leaf) for leaf in missing[:3])
+        reasons.append(
+            f"opened {path.name} but the resolved extract value is not in the "
+            f"cited text ({rendered})"
+        )
+    return "locator source-blind: " + "; ".join(reasons)
+
+
+def fidelity_source_warnings(
+    doc: Mapping[str, Any],
+    *,
+    label: str = "<document>",
+    artifact_root: Path | None = None,
+) -> list[FidelityWarning]:
+    """Count source-fidelity holes. Empty means the certification invariant holds.
+
+    Invariant: a scored measured leaf is certified only when its observation
+    id is one non-empty string naming exactly one scored row, and the opened
+    source contains that resolved extract leaf as a complete token of the
+    same sign and the same digits. The whole value, including a spaced or
+    attached unit, must match, and neither neighbour may extend the span:
+    an ASCII letter or digit, a Unicode letter, µ, or °, or a dot or comma
+    followed by a digit. A sentence period does not extend the token, so
+    ``1`` matches ``the value is 1.``. ``1 K`` is not ``1 KPa`` and ``1``
+    is not ``1,000``. A CSV or TSV source is parsed completely before the
+    locator is applied. A cell certifies a stored value only when the whole
+    trimmed, unquoted cell parses to that number, or equals the stored
+    string. ``0.9100`` is ``0.91``. The numbers are ``Decimal`` values,
+    so ``1e-999`` is not ``0`` and ``9007199254740993`` is not
+    ``9007199254740992``. A trailing dot is the number, so ``91.`` is
+    ``91``. The prose numeric grammar is not a gate on a cell. NaN,
+    Infinity, and InvalidOperation do not certify. A substring does not
+    certify, so a cell ``1/2`` is not ``1`` and a cell ``1,000`` is not
+    ``1``. A
+    ``line_range`` selects records that lie entirely inside it. A span that
+    cuts through a quoted cell is source-blind and is not re-parsed from
+    the sliced lines. ``1 K`` is not ``1 KPa``.
+    A leading decimal is a numeric token.
+    A spelling that rounds the stored float to a different number is not
+    that token. The sample's own spelling is not a substitute: a ``rel_tol``
+    match of a different number does not certify the stored leaf. A scored
+    row with no usable observation id is a typed refusal, never omitted.
+    A Unicode minus is a minus. Duplicate observation ids are a typed
+    refusal, never one coverage entry.
+
+    Every measured leaf of a scored observation's evidence is covered only
+    by a matching sample that names that observation and whose address is
+    that leaf or an ancestor of it. Evidence is ``values`` plus each
+    present scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``): the
+    fields the scored temperature payload copies beside ``values``. A
+    locator inside a condition is provenance, not a leaf. Repeating a pin
+    of one address does not cover a sibling, even when the numbers are
+    equal, and a ``values`` pin does not cover a sibling condition. A
+    measured leaf is a finite int or float (not a boolean), or a string
+    that contains any digit [0-9]. A non-finite float (NaN, +Inf, -Inf)
+    is ``non_finite_evidence``. It is never omitted and never contributes
+    "no required address": a pin of a finite sibling does not certify
+    the observation, and a pin of the non-finite value does not either.
+    A descriptive label with no digit is
+    not a leaf and does not cover a sibling measurement. A string the
+    numeric parser cannot read is uncovered unless the opened source
+    carries that printed value; it is never skipped. Several samples may
+    each pin part of the evidence. Equipment pins and a numeric
+    observation index do not contribute. Evidence with no measured leaf
+    is covered by any matching evidence pin only when that evidence also
+    contains no digit. Zero recognised leaves in a digit-bearing block
+    is a refusal. A pilot pin or an
+    unattested sample can still supply addresses toward
+    ``uncovered_observation``; attestation is its own count. Certification
+    refuses while any of these counts is non-zero: a pilot pin or an
+    unattested sample anywhere in the file, an attestation-complete pin
+    whose locator was not opened, or an observation id that names more
+    than one scored row. An opened locator must be a paper, OCR, quotes,
+    or reference transcription and must contain each pinned number as a
+    complete token (sign and exponent included; Unicode signs folded onto
+    that token). The extract document and program source are not artifacts.
+    Drift stays a match error. ``source_blind_pin`` is that unopened or
+    absent-value count, including a resolved extract leaf the cited text
+    does not contain. A scored row with no usable observation id is
+    ``missing_observation_id`` and is not dropped from this count. These
+    warnings do not reject a draft corpus.
+    """
+    samples = doc.get("fidelity_samples")
+    if samples is None:
+        samples = []
+    elif not isinstance(samples, list):
+        samples = []
+
+    observation_map, ambiguous_ids, missing_ids = _scored_observations(doc)
+    required = set(observation_map)
+    # Leaf addresses each observation still needs. This is the only coverage
+    # write: a pin adds an address only when its own address is that leaf or
+    # an ancestor. Value equality does not transfer coverage to a sibling,
+    # and a values pin does not transfer coverage to a condition.
+    evidence = {
+        key: _scored_evidence_leaves(observation)
+        for key, observation in observation_map.items()
+    }
+    needed_addresses = {key: evidence[key][0] for key in evidence}
+    non_finite_addresses = {key: evidence[key][1] for key in evidence}
+    covered_addresses: dict[tuple[str, str], set[tuple[Any, ...]]] = {
+        key: set() for key in required
+    }
+    addressed: set[tuple[str, str]] = set()
+    unattested = 0
+    unattested_reasons: list[str] = []
+    unattested_extra = [0]
+    pilot = 0
+    pilot_reasons: list[str] = []
+    pilot_extra = [0]
+    source_blind = 0
+    source_blind_reasons: list[str] = []
+    source_blind_extra = [0]
+    root = artifact_root if artifact_root is not None else ROOT
+
+    for index, sample in enumerate(samples):
+        sample_label = f"{label}:fidelity_samples[{index}]"
+        if not isinstance(sample, Mapping):
+            unattested += 1
+            _note_reason(
+                unattested_reasons,
+                unattested_extra,
+                f"{sample_label}: each sample must be a mapping",
+            )
+            continue
+        if sample.get("note") == _PILOT_MIGRATION_NOTE:
+            pilot += 1
+            _note_reason(
+                pilot_reasons,
+                pilot_extra,
+                f"{sample_label}: auto-migrated pilot sample cannot be "
+                "source-attested; replace it with a source-reviewed sample",
+            )
+        defects = _sample_attestation_defects(sample)
+        if defects:
+            unattested += 1
+            for defect in defects:
+                _note_reason(
+                    unattested_reasons,
+                    unattested_extra,
+                    f"{sample_label}: {defect}",
+                )
+        else:
+            # Attestation-complete pins are the ones that would otherwise certify
+            # without opening the source. Unattested pins stay on that count.
+            blind = _locator_source_blind_reason(
+                sample, artifact_root=root, doc=doc
+            )
+            if blind:
+                source_blind += 1
+                _note_reason(
+                    source_blind_reasons,
+                    source_blind_extra,
+                    f"{sample_label}: {blind}",
+                )
+        match_errors = check_fidelity_sample_matches(doc, sample, label=sample_label)
+        observation_key = _fidelity_sample_observation_key(doc, sample)
+        if (
+            not match_errors
+            and observation_key is not None
+            and observation_key in required
+            and _path_selector_names_observation_id(sample)
+            and _sample_addresses_scored_evidence(sample)
+        ):
+            addressed.add(observation_key)
+            pin_address = _sample_evidence_address(doc, sample)
+            if pin_address is None:
+                continue
+            for leaf in needed_addresses[observation_key]:
+                if leaf[: len(pin_address)] == pin_address:
+                    covered_addresses[observation_key].add(leaf)
+
+    # Invariant: an observation is covered only when every digit-bearing
+    # leaf of its evidence has a pin of that address or an ancestor. A
+    # repeated pin of one address does not cover an equal sibling, and a
+    # values pin does not cover a scored condition. Zero recognised
+    # measured leaves in a block that still contains a digit is a refusal,
+    # not a pass.
+    covered: set[tuple[str, str]] = set()
+    for key in observation_map:
+        # A non-finite quantity is not covered by any pin, including a pin
+        # of that value. The empty-leaf pass must not see it as "no address".
+        if non_finite_addresses[key]:
+            continue
+        needed = needed_addresses[key]
+        if not needed:
+            if key in addressed and not _observation_has_digit_bearing_string(
+                observation_map[key]
+            ):
+                covered.add(key)
+            continue
+        if set(needed) <= covered_addresses[key]:
+            covered.add(key)
+
+    uncovered_reasons: list[str] = []
+    uncovered_extra = [0]
+    uncovered_keys: list[tuple[str, str]] = []
+    for species_id, observation_id in sorted(required - covered):
+        key = (species_id, observation_id)
+        if non_finite_addresses[key] and _coverable_leaves_are_pinned(
+            needed_addresses[key],
+            covered_addresses[key],
+            observation_map[key],
+        ):
+            continue
+        uncovered_keys.append(key)
+    for species_id, observation_id in uncovered_keys:
+        _note_reason(
+            uncovered_reasons,
+            uncovered_extra,
+            f"{label}: fidelity sample coverage missing for observation "
+            f"species.{species_id}.observations[{observation_id}]",
+        )
+    uncovered = len(uncovered_keys)
+
+    warnings: list[FidelityWarning] = []
+    if uncovered:
+        warnings.append(
+            FidelityWarning(
+                "uncovered_observation",
+                uncovered,
+                label,
+                _finish_detail(uncovered_reasons, uncovered_extra[0]),
+            )
+        )
+    if unattested:
+        warnings.append(
+            FidelityWarning(
+                "unattested_sample",
+                unattested,
+                label,
+                _finish_detail(unattested_reasons, unattested_extra[0]),
+            )
+        )
+    if pilot:
+        warnings.append(
+            FidelityWarning(
+                "auto_migrated_pilot_pin",
+                pilot,
+                label,
+                _finish_detail(pilot_reasons, pilot_extra[0]),
+            )
+        )
+    if source_blind:
+        warnings.append(
+            FidelityWarning(
+                "source_blind_pin",
+                source_blind,
+                label,
+                _finish_detail(source_blind_reasons, source_blind_extra[0]),
+            )
+        )
+    if ambiguous_ids:
+        ambiguous_reasons: list[str] = []
+        ambiguous_extra = [0]
+        for species_id, observation_id, row_count in ambiguous_ids:
+            _note_reason(
+                ambiguous_reasons,
+                ambiguous_extra,
+                f"{label}: ambiguous observation_id {observation_id!r} under "
+                f"species {species_id} names {row_count} scored rows",
+            )
+        warnings.append(
+            FidelityWarning(
+                "ambiguous_observation_id",
+                len(ambiguous_ids),
+                label,
+                _finish_detail(ambiguous_reasons, ambiguous_extra[0]),
+            )
+        )
+    if missing_ids:
+        missing_reasons: list[str] = []
+        missing_extra = [0]
+        for species_id, row_index in missing_ids:
+            _note_reason(
+                missing_reasons,
+                missing_extra,
+                f"{label}: scored observation "
+                f"species.{species_id}.observations[{row_index}] "
+                "has no usable observation_id",
+            )
+        warnings.append(
+            FidelityWarning(
+                "missing_observation_id",
+                len(missing_ids),
+                label,
+                _finish_detail(missing_reasons, missing_extra[0]),
+            )
+        )
+    non_finite_keys = sorted(
+        key for key, leaves in non_finite_addresses.items() if leaves
+    )
+    if non_finite_keys:
+        non_finite_reasons: list[str] = []
+        non_finite_extra = [0]
+        for species_id, observation_id in non_finite_keys:
+            leaf_count = len(non_finite_addresses[(species_id, observation_id)])
+            value_word = "value" if leaf_count == 1 else "values"
+            _note_reason(
+                non_finite_reasons,
+                non_finite_extra,
+                f"{label}: non-finite measured value refuses certification of "
+                f"species.{species_id}.observations[{observation_id}] "
+                f"({leaf_count} {value_word})",
+            )
+        warnings.append(
+            FidelityWarning(
+                "non_finite_evidence",
+                len(non_finite_keys),
+                label,
+                _finish_detail(non_finite_reasons, non_finite_extra[0]),
+            )
+        )
+    return warnings
+
+
+def fidelity_warning_summary(warnings: Sequence[FidelityWarning]) -> str:
+    """One visible total line. Extract counts are how many warnings of that kind."""
+    parts: list[str] = []
+    for kind in _FIDELITY_WARNING_KINDS:
+        rows = [warning for warning in warnings if warning.kind == kind]
+        total = sum(warning.count for warning in rows)
+        if kind in ("unattested_sample", "source_blind_pin"):
+            parts.append(f"{kind}={total}")
+        else:
+            parts.append(f"{kind}={total} ({len(rows)} extracts)")
+    return " ".join(parts)
+
+
+def certify_extract_source_fidelity(
+    doc: Mapping[str, Any],
+    *,
+    label: str = "<document>",
+    warnings: Sequence[FidelityWarning] | None = None,
+    artifact_root: Path | None = None,
+) -> list[str]:
+    """Refuse source certification while any fidelity hole remains.
+
+    Invariant: an empty list is the only pass. A scored measured leaf is
+    certified only when its observation id is one non-empty string naming
+    exactly one scored row, and the opened source contains that resolved
+    extract leaf as a complete token of the same sign and the same digits.
+    The whole value, including a spaced or attached unit, must match, and
+    neither neighbour may extend the span. ``1 K`` is not ``1 KPa`` and
+    ``1`` is not ``1,000``. A sentence period does not extend the span, so
+    ``1`` matches ``the value is 1.``. A CSV or TSV source is parsed
+    completely before the locator is applied. A cell certifies a stored
+    value only when the whole trimmed, unquoted cell parses to that
+    number, or equals the stored string. ``0.9100`` is ``0.91``. The
+    numbers are ``Decimal`` values, so ``1e-999`` is not ``0`` and
+    ``9007199254740993`` is not ``9007199254740992``. A trailing dot is
+    the number, so ``91.`` is ``91``. The prose numeric grammar is not a
+    gate on a cell. NaN, Infinity, and InvalidOperation do not certify.
+    A non-finite measured value refuses that observation. A
+    substring does not certify, so a cell ``1/2`` is not ``1`` and a cell
+    ``1,000`` is not ``1``. A span
+    that cuts through a quoted cell is source-blind and is not re-parsed
+    from the sliced lines. A leading decimal
+    is a numeric token. A spelling
+    that rounds the stored float to a different number is not that token.
+    The sample's own
+    spelling is not a substitute: a ``rel_tol`` match of a different number
+    does not certify the stored leaf. A scored row with no usable
+    observation id refuses; the row is not omitted. A non-finite measured
+    value (NaN, +Inf, -Inf) refuses that observation. It is not omitted
+    and a finite sibling pin does not clear it. Every measured leaf of
+    a scored observation's evidence (``values`` and each scored numeric
+    condition) must be covered by a matching, non-pilot, attested sample
+    whose address is that leaf or an ancestor, and whose source artifact
+    was opened and contains each resolved number. A measured string is
+    every leaf that contains a digit [0-9]. A label with no digit is not
+    a leaf. A digit-bearing string the numeric parser cannot read is
+    uncovered unless the opened source carries that printed value, and
+    zero recognised leaves in a digit-bearing block refuses. A
+    Unicode minus is a minus. An observation id that names more than one
+    scored row refuses; the rows are not one coverage entry.
+    Repeating a pin of one address does not cover a sibling, even when the
+    numbers are equal, and a ``values`` pin does not cover a sibling
+    condition. A descriptive label does not stand in for a number it does
+    not contain. The extract itself and program source do not qualify.
+    Equipment pins, unopened locators, and copied values that are absent
+    from the artifact refuse. ``warnings`` is accepted for existing callers
+    and is not the decision: a supplied empty list cannot hide a hole.
+    """
+    _ = warnings
+    warnings = fidelity_source_warnings(
+        doc, label=label, artifact_root=artifact_root
+    )
+    refusals: list[str] = []
+    for warning in warnings:
+        if warning.count <= 0:
+            continue
+        detail = warning.detail or warning.kind
+        refusals.append(
+            f"{warning.label}: source certification refused: "
+            f"{warning.kind} count={warning.count}: {detail}"
+        )
+    refusals.extend(check_all_fidelity_samples_match(doc, label=label))
+    return refusals
+
+
+def _check_fidelity_gate(
+    doc: Mapping[str, Any],
+    *,
+    label: str = "<document>",
+) -> list[str]:
+    """Certification refusals for this extract.
+
+    Schema validation does not emit these. A caller that certifies or promotes
+    the extract treats a non-empty list as a hard refusal. Older trees that
+    only have this helper keep that refusal behaviour.
+    """
+    return certify_extract_source_fidelity(doc, label=label)
 
 
 def load_known_species_ids() -> set[str] | None:
@@ -1451,8 +3346,9 @@ def _check_fidelity_sample_shape(
 
     When ``enforce_observation_paths`` is True (non-allowlisted / new extracts),
         path-based samples must pin under
-        ``species.*.(observations|context)[...].(values|equipment)`` so
-        metadata-only paths cannot satisfy the gate.
+        ``species.*.(observations|context)[...].(values|equipment|<condition>)``
+        so metadata-only paths cannot satisfy the gate. ``<condition>`` is
+        a scored numeric condition.
     """
     path_keys, structured_keys = _sample_addressing_keys(sample)
     path = sample.get(path_keys[0]) if len(path_keys) == 1 else None
@@ -1476,7 +3372,7 @@ def _check_fidelity_sample_shape(
             errors.append(
                 f"{sp}: path-based fidelity sample on new extracts must pin "
                 f"observation or context evidence "
-                f"(species.*.(observations|context)[id].(values|equipment)...); "
+                f"(species.*.(observations|context)[id].(values|equipment|<condition>)...); "
                 f"got path={path!r} (metadata-only paths refused)"
             )
     if "value" not in sample and "draft_value" not in sample:
@@ -1528,7 +3424,7 @@ def _check_fidelity_sample_shape(
     elif structured:
         errors.append(
             f"{sp}: locator/source_locator required on structured fidelity samples "
-            f"(reviewer-verified against source/OCR artifact)"
+            f"(for source/OCR artifact review)"
         )
     elif not note:
         errors.append(
@@ -1563,7 +3459,7 @@ def _check_fidelity_samples(
         if samples is None:
             errors.append(
                 f"{label}: fidelity_samples required when observations are present "
-                f"(t-510 ENFORCED_FOR_NEW: ≥1 reviewer-verified located sample; "
+                f"(t-510 ENFORCED_FOR_NEW: ≥1 located sample; "
                 f"pre-policy pilot extracts may be allowlisted)"
             )
             return
@@ -1672,13 +3568,19 @@ def validate_extract_document(
     expected_source_id: str | None = None,
     known_species_ids: set[str] | None = None,
     collect_warnings: list[str] | None = None,
+    fidelity_warnings: list[FidelityWarning] | None = None,
     pre_policy_ids: set[str] | None = None,
     check_fidelity_match: bool = False,
+    artifact_root: Path | None = None,
 ) -> list[str]:
-    """Return a list of error strings (empty ⇒ valid).
+    """Return a list of error strings (empty ⇒ schema-valid).
 
-    Warnings (unknown species ids) are appended to ``collect_warnings`` when
-    provided; they do not fail validation (SCHEMA.md: draft may carry unknown ids).
+    Warnings (unknown species ids, and rendered source-fidelity warnings) are
+    appended to ``collect_warnings`` when provided. Fidelity holes do not reject
+    a draft. ``review_status: reviewed`` is a promotion: those holes become
+    errors from ``certify_extract_source_fidelity``. Typed ``FidelityWarning``
+    rows are appended to ``fidelity_warnings`` when that list is provided. The
+    holes are always computed here.
 
     ``pre_policy_ids``: source_ids exempt from the fidelity_samples presence
     requirement (ENFORCED_FOR_NEW grandfathering). When None, the on-disk
@@ -1804,6 +3706,25 @@ def validate_extract_document(
         check_match=check_fidelity_match,
     )
 
+    # Chokepoint: count source-fidelity holes on every extract. Drafts warn.
+    # review_status reviewed is promotion and refuses the same holes.
+    source_warnings = fidelity_source_warnings(
+        doc, label=label, artifact_root=artifact_root
+    )
+    if fidelity_warnings is not None:
+        fidelity_warnings.extend(source_warnings)
+    if collect_warnings is not None:
+        collect_warnings.extend(item.render() for item in source_warnings)
+    if review == "reviewed":
+        errors.extend(
+            certify_extract_source_fidelity(
+                doc,
+                label=label,
+                warnings=source_warnings,
+                artifact_root=artifact_root,
+            )
+        )
+
     return errors
 
 
@@ -1812,8 +3733,10 @@ def validate_extract_file(
     *,
     known_species_ids: set[str] | None = None,
     collect_warnings: list[str] | None = None,
+    fidelity_warnings: list[FidelityWarning] | None = None,
     pre_policy_ids: set[str] | None = None,
     check_fidelity_match: bool = False,
+    artifact_root: Path | None = None,
 ) -> list[str]:
     try:
         doc = load_extract_yaml(path)
@@ -1891,8 +3814,10 @@ def validate_extract_file(
         expected_source_id=path.stem,
         known_species_ids=known_species_ids,
         collect_warnings=collect_warnings,
+        fidelity_warnings=fidelity_warnings,
         pre_policy_ids=pre_policy_ids,
         check_fidelity_match=check_fidelity_match,
+        artifact_root=artifact_root,
     )
 
 
@@ -1948,6 +3873,7 @@ def validate_all(
     check_fidelity_policy: bool = True,
     check_fidelity_match: bool = False,
     collect_warnings: list[str] | None = None,
+    fidelity_warnings: list[FidelityWarning] | None = None,
 ) -> list[str]:
     errors: list[str] = []
     if check_priority:
@@ -1967,6 +3893,7 @@ def validate_all(
                 path,
                 known_species_ids=known,
                 collect_warnings=collect_warnings,
+                fidelity_warnings=fidelity_warnings,
                 pre_policy_ids=pre_policy if check_fidelity_policy else None,
                 check_fidelity_match=check_fidelity_match,
             )
@@ -2006,23 +3933,31 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     paths = [p.resolve() for p in args.paths] if args.paths else None
     warnings: list[str] = []
+    fidelity: list[FidelityWarning] = []
     errors = validate_all(
         paths,
         check_priority=not args.skip_priority,
         check_fidelity_policy=not args.skip_fidelity_policy,
         check_fidelity_match=args.check_fidelity_match,
         collect_warnings=warnings if args.show_warnings else None,
+        fidelity_warnings=fidelity,
     )
     if args.show_warnings and warnings:
         for w in warnings:
             print(f"WARN: {w}", file=sys.stderr)
+    summary = fidelity_warning_summary(fidelity)
+    if any(item.count for item in fidelity):
+        print(
+            f"WARN: source fidelity is not certified: {summary}",
+            file=sys.stderr,
+        )
     if errors:
         for e in errors:
             print(e, file=sys.stderr)
         print(f"FAIL: {len(errors)} error(s)", file=sys.stderr)
         return 1
     n = len(paths) if paths is not None else len(discover_extracts())
-    print(f"OK: {n} extract file(s) valid")
+    print(f"OK: {n} extract file(s) schema-valid; fidelity warnings: {summary}")
     return 0
 
 
