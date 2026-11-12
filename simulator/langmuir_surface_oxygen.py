@@ -61,7 +61,13 @@ surface-pO2 law below, or a typed refusal. A required solve that
 does not close is the refusal, including an in-band carrier whose
 reference pO2 is above the certified minimum and a positive-exponent
 carrier in the same residual. Refusing only the below-band set, or
-only ``n < 0``, would publish that unclosed pressure. The published surface is
+only ``n < 0``, would publish that unclosed pressure. A metal rail
+(``gas_fugacity`` or ``condensed_raoult_psat``) with no recorded
+``pO2_bar`` does not borrow the source fO2 as its reference. That
+missing reference does not close the gate: a negative exponent still
+runs the floor and empty-buffer tests, and an open gate omits the
+pressure with ``missing pO2 reference``. Returning the persisted
+pressure is the unclosed value. The published surface is
 the root of ``sum (nO_i - dO_i) J_i = 0`` where ``J_i`` is that
 species' publisher net flux at those partials, and the reported
 residual is that root's residual. The alpha in ``J_i`` and the
@@ -106,7 +112,12 @@ common and cancels, leaving
 and gas resistance the publisher flux is
 ``J_i = k_i*max(0, P_i - P_bulk,i)`` where
 ``k_i = 1/(M_i*(R_interface,i + R_gas,i))`` and
-``R_interface = 1/(alpha*k_HK)``. ``R_gas`` is 0 in free molecular
+``R_interface = 1/(alpha*k_HK)``. ``M_i`` is the flux publisher's
+molar mass (``production_vapor_molar_mass_g_per_mol``: catalog
+``molar_mass_g_mol``, else ``MOLAR_MASS``), not the formula-derived
+CIAAW mass. Catalog Ca is 0.04008 kg/mol; CIAAW Ca is 0.040078 kg/mol.
+The reported residual is the residual of the flux that mass emits.
+``R_gas`` is 0 in free molecular
 flow, so ``k_i`` collapses to ``alpha/sqrt(2*pi*M*R*T)`` and a zero
 bulk recovers the vacuum balance. Unequal ``k_i`` does not cancel.
 
@@ -118,9 +129,10 @@ the effusion ``1/sqrt(M)`` weights. A different O/Ca conductance ratio
 moves the surface pO2 down and Ca up; +8.4% is that, and ``p_total = 0``
 recovering the free-molecular value is the right limit. The ratio used
 is the publisher's 1 Pa probe at 2200 C, pipe 0.12 m, N2, alpha = 1,
-``R_melt = 0``, and zero bulks: ``k_O2/k_Ca = 1.424`` at 1000 Pa, against
-the free-molecular ``sqrt(M_Ca/M_O2) = 1.119``. That is the move from
-5.3423 Pa to 5.7893 Pa.
+``R_melt = 0``, and zero bulks, at the publisher molar masses (catalog
+Ca 0.04008 kg/mol, not CIAAW 0.040078): ``k_O2/k_Ca = 1.424`` at 1000 Pa,
+against the free-molecular ``sqrt(M_Ca/M_O2) = 1.119``. That is the move
+from 5.3423 Pa to 5.7893 Pa.
 The signed weight ``(nO - dO)`` equals ``2*n`` from the reaction, not
 from the local slope. Off the cap the slope in ``log10(p)`` has the
 sign of ``n^2`` and does not fold; on the cap the metal term is flat
@@ -167,7 +179,6 @@ from typing import Any
 
 from simulator.accounting.formulas import (
     SpeciesFormula,
-    parse_formula,
     resolve_species_formula,
 )
 
@@ -258,40 +269,74 @@ class _Carrier:
     cap_psat_Pa: float | None = None
 
 
-def _residual_participant(carrier: _Carrier) -> bool:
-    """True when oxygen weight ``2*n`` is nonzero.
+def _open_gate_obligation(carrier: _Carrier) -> bool:
+    """Carrier an open gate must close or refuse.
 
-    d-376 amendment 1. The residual is ``sum 2*n*J``. ``n < 0`` (Ca,
-    Al) and ``n > 0`` (AlO2, CrO2, CrO3) both move it. ``n == 0``
-    (CaO(g)) does not, and stays published. Transport channels are
-    priced at the headspace potential and stay out. A missing
-    reference cannot be rescaled onto the solved surface. A failed
-    solve refuses this whole set. Leaving an ``n > 0`` pressure
-    published is the same unclosed value as leaving Ca. The gate
-    still opens only on ``n < 0``: a positive exponent alone does not
-    demand a congruent metal root.
+    Positive pressure, nonzero reaction exponent, not a transport
+    channel. A missing pO2 reference is still an obligation. It is
+    not a reason to publish the persisted pressure (d-367). ``n == 0``
+    and transport channels are not obligations. This is the set
+    ``_assemble_open_gate_map`` enforces. ``_residual_participant``
+    is the subset that can enter the sum.
     """
 
     exponent = carrier.reaction_exponent
     return (
         not carrier.transport_channel
+        and carrier.pressure_Pa > 0.0
         and exponent is not None
         and exponent != 0.0
+    )
+
+
+def _gate_opener(carrier: _Carrier) -> bool:
+    """Negative exponent. Only this sign can open the congruent solve.
+
+    A missing reference does not disqualify the opener. The floor and
+    the empty-buffer tests still run, and an open gate refuses the
+    carrier instead of returning its persisted pressure.
+    """
+
+    exponent = carrier.reaction_exponent
+    return (
+        _open_gate_obligation(carrier)
+        and exponent is not None
+        and exponent < 0.0
+    )
+
+
+def _residual_participant(carrier: _Carrier) -> bool:
+    """True when this carrier can enter ``sum 2*n*J``.
+
+    d-376 amendment 1. ``n < 0`` (Ca, Al) and ``n > 0`` (AlO2, CrO2,
+    CrO3) both move the residual. ``n == 0`` (CaO(g)) does not, and
+    stays published. Transport channels are priced at the headspace
+    potential and stay out. A missing reference cannot be rescaled
+    onto the solved surface, so it is not a term in the sum. It is
+    still an open-gate obligation: ``_assemble_open_gate_map`` omits
+    it. Leaving an ``n > 0`` pressure published is the same unclosed
+    value as leaving Ca. The gate still opens only on ``n < 0``.
+    """
+
+    exponent = carrier.reaction_exponent
+    return (
+        _open_gate_obligation(carrier)
+        and exponent is not None
         and carrier.p_ref_bar is not None
-        and carrier.pressure_Pa > 0.0
     )
 
 
 def _needs_surface_balance(carrier: _Carrier) -> bool:
-    """True when this carrier can open the congruent solve.
+    """True when this carrier can open the congruent solve and be rescaled.
 
     Opening the solve is a separate gate (physical floor or the
     reservoir no-buffer test). Only a negative exponent opens it.
-    ``n > 0`` is still a residual participant once the gate is open;
-    ``_residual_participant`` is that set. Transport-channel pressures
-    do not open the solve and are not rewritten. A capped metal still
-    participates. Its reaction exponent stays negative even though the
-    published pressure is flat.
+    ``n > 0`` is still a residual participant once the gate is open.
+    A missing reference does not open through this predicate; it
+    opens through ``_gate_opener`` and is then refused. Transport
+    channels do not open the solve and are not rewritten. A capped
+    metal still participates. Its reaction exponent stays negative
+    even though the published pressure is flat.
     """
 
     exponent = carrier.reaction_exponent
@@ -421,7 +466,10 @@ def apply_langmuir_surface_oxygen(
         if carrier.p_ref_bar is not None
     }
     inverted = [carrier for carrier in carriers if carrier.inverted]
-    if not any(_needs_surface_balance(carrier) for carrier in carriers):
+    # No negative-exponent melt carrier. A positive exponent does not
+    # open the gate. A missing reference on an opener does not take
+    # this branch: the floor and empty-buffer tests still run.
+    if not any(_gate_opener(carrier) for carrier in carriers):
         return LangmuirSurfaceOxygen(
             pressures_Pa=pressures_Pa,
             applied=False,
@@ -775,7 +823,8 @@ def _formula_registry(legacy: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
                 continue
             # Catalog molar masses are rounded (Ca 40.08 vs CIAAW 40.078)
             # and fail the formula checker. Atom counts come from the
-            # formula; the molar mass is the derived one.
+            # formula. The conductance mass is the publisher's operand,
+            # not this derived mass.
             registry[str(species)] = {"formula": formula}
     return registry
 
@@ -1287,10 +1336,18 @@ def _solve_or_refuse(
                 "oxygen demand is negative; surface pressure omitted"
             )
             continue
+        molar_mass = _publisher_molar_mass_kg_per_mol(
+            legacy_catalog, carrier.species
+        )
+        if molar_mass is None:
+            refused[carrier.species] = (
+                "publisher molar mass unavailable; surface pressure omitted"
+            )
+            continue
         channels.append(
             _VacuumOxygenChannel(
                 species=carrier.species,
-                molar_mass_kg_per_mol=formula.molar_mass_kg_per_mol(),
+                molar_mass_kg_per_mol=molar_mass,
                 oxygen_atoms=oxygen_atoms,
                 parent_oxygen_demand=demand,
                 pO2_exponent=carrier.reaction_exponent,
@@ -1311,12 +1368,22 @@ def _solve_or_refuse(
             eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         )
 
-    o2_formula = parse_formula("O2")
+    o2_mass = _publisher_molar_mass_kg_per_mol(legacy_catalog, "O2")
     if all(channel.species != "O2" for channel in channels):
+        if o2_mass is None:
+            return _refuse_unclosed_surface(
+                pressures_Pa,
+                carriers,
+                persisted,
+                detail="publisher molar mass unavailable for O2",
+                extra_refused=refused,
+                capacity_negligible=capacity_negligible,
+                eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
+            )
         channels.append(
             _VacuumOxygenChannel(
                 species="O2",
-                molar_mass_kg_per_mol=o2_formula.molar_mass_kg_per_mol(),
+                molar_mass_kg_per_mol=o2_mass,
                 oxygen_atoms=2.0,
                 parent_oxygen_demand=0.0,
                 pO2_exponent=1.0,
@@ -1413,28 +1480,32 @@ def _solve_or_refuse(
             capacity_negligible=capacity_negligible,
             eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         )
-    adjusted = dict(pressures_Pa)
-    for species in refused:
-        adjusted.pop(species, None)
+    solved_Pa: dict[str, float] = {}
     for carrier in coupled:
         if carrier.species in refused:
             continue
         solved = balance.pressures_Pa.get(carrier.species)
         if solved is None:
             continue
-        adjusted[carrier.species] = float(solved)
+        solved_Pa[carrier.species] = float(solved)
     for carrier in zero_alpha:
         if carrier.species in refused:
             continue
         try:
-            adjusted[carrier.species] = _pressure_at_surface(
+            solved_Pa[carrier.species] = _pressure_at_surface(
                 carrier, surface_pO2_bar
             )
         except ValueError as exc:
             refused[carrier.species] = (
                 "surface pressure omitted: " + str(exc)
             )
-            adjusted.pop(carrier.species, None)
+    adjusted = _assemble_open_gate_map(
+        pressures_Pa,
+        carriers,
+        solved_Pa=solved_Pa,
+        refused=refused,
+        detail="open-gate carrier was not on the solved surface",
+    )
     warning = (
         f"{LANGMUIR_SURFACE_PO2_REASON}: "
         f"surface_pO2_bar={surface_pO2_bar:.6e} "
@@ -1456,6 +1527,77 @@ def _solve_or_refuse(
         eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         overhead_bounded=overhead_bounded,
     )
+
+
+def _publisher_molar_mass_kg_per_mol(
+    catalog: Mapping[str, Any] | None,
+    species: str,
+) -> float | None:
+    """Publisher molar mass in kg/mol, or None when that publisher will not emit.
+
+    Same operand as ``_build_evaporation_aux_maps``. A non-positive or
+    non-numeric catalog entry is not a mass the flux can use.
+    """
+
+    from simulator.evaporation import production_vapor_molar_mass_g_per_mol
+
+    raw = production_vapor_molar_mass_g_per_mol(catalog, species)
+    try:
+        mass_g = float(raw)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(mass_g) or mass_g <= 0.0:
+        return None
+    return mass_g / 1000.0
+
+
+def _assemble_open_gate_map(
+    pressures_Pa: Mapping[str, float],
+    carriers: list[_Carrier],
+    *,
+    solved_Pa: Mapping[str, float],
+    refused: dict[str, str],
+    detail: str,
+) -> dict[str, float]:
+    """Pressure map once the d-376 gate is open.
+
+    Every obligation (positive pressure, ``n != 0``, not transport) is
+    a solved pressure or a typed refusal. It is never the persisted
+    unclosed value. A missing pO2 reference, a missing formula, an
+    unmeasured alpha, and a failed root all land here. Transport
+    channels and ``n == 0`` keep the published pressure unless a
+    caller already named them in ``refused``.
+    """
+
+    obligation = {
+        carrier.species
+        for carrier in carriers
+        if _open_gate_obligation(carrier)
+    }
+    adjusted: dict[str, float] = {}
+    for species, pressure in pressures_Pa.items():
+        if species in refused:
+            continue
+        if species not in obligation:
+            adjusted[species] = pressure
+            continue
+        solved = solved_Pa.get(species)
+        if solved is None:
+            refused.setdefault(
+                species,
+                "langmuir surface pO2 unavailable; "
+                "unclosed surface pressure omitted: " + detail,
+            )
+            continue
+        adjusted[species] = float(solved)
+    for species in obligation:
+        if species in pressures_Pa or species in refused:
+            continue
+        refused[species] = (
+            "langmuir surface pO2 unavailable; "
+            "unclosed surface pressure omitted: " + detail
+        )
+    return adjusted
 
 
 def _refuse_unclosed_surface(
@@ -1484,21 +1626,20 @@ def _refuse_unclosed_surface(
     written as 0.
     """
 
-    refused = {
-        carrier.species: (
-            "langmuir surface pO2 unavailable; unclosed surface pressure omitted: "
-            + detail
-        )
-        for carrier in carriers
-        if _residual_participant(carrier)
-    }
+    refused: dict[str, str] = {}
     if extra_refused:
         refused.update(dict(extra_refused))
-    adjusted = {
-        species: pressure
-        for species, pressure in pressures_Pa.items()
-        if species not in refused
-    }
+    # One map for every open-gate return. Obligations without a more
+    # specific reason, including a missing pO2 reference that never
+    # entered the residual, get the failure detail. They are not left
+    # at the persisted pressure.
+    adjusted = _assemble_open_gate_map(
+        pressures_Pa,
+        carriers,
+        solved_Pa={},
+        refused=refused,
+        detail=detail,
+    )
     warning = (
         f"{LANGMUIR_SURFACE_PO2_REASON}: surface_pO2_unavailable "
         f"refused={','.join(sorted(refused)) or 'none'} detail={detail}"

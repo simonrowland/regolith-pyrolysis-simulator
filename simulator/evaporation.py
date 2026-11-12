@@ -69,6 +69,43 @@ from simulator.vapour_rail.instrumentation import (
 PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID = (
     'equilibrium_backend_effective_pressure_pre_rg'
 )
+
+
+def production_vapor_molar_mass_g_per_mol(
+    catalog: Mapping[str, Any] | None,
+    species: str,
+) -> Any:
+    """Molar mass in g/mol the flux publisher emits for ``species``.
+
+    ``_build_evaporation_aux_maps`` is this lookup: the legacy-view
+    ``molar_mass_g_mol``, else ``MOLAR_MASS``. The surface closure's
+    conductance uses the same operand. Catalog Ca is 40.08 g/mol; the
+    formula-derived CIAAW mass is 40.078 g/mol. A root weighted by the
+    formula mass reports a residual the emitted flux does not have.
+    ``None`` means the publisher raises and emits no flux. The closure
+    must not substitute a formula mass in that case.
+    """
+
+    row: Mapping[str, Any] | None = None
+    if isinstance(catalog, Mapping):
+        # Same group order as ``_build_evaporation_aux_maps``: a metals
+        # row wins even when its molar mass is absent. The oxide row is
+        # the fallback only when the metals entry is missing.
+        metals = catalog.get("metals") or {}
+        oxides = catalog.get("oxide_vapors") or {}
+        if isinstance(metals, Mapping):
+            candidate = metals.get(str(species))
+            if isinstance(candidate, Mapping) and candidate:
+                row = candidate
+        if row is None and isinstance(oxides, Mapping):
+            candidate = oxides.get(str(species))
+            if isinstance(candidate, Mapping) and candidate:
+                row = candidate
+    if row is not None and row.get("molar_mass_g_mol") is not None:
+        return row.get("molar_mass_g_mol")
+    return MOLAR_MASS.get(str(species))
+
+
 PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
 # Stage-0 phosphorus vapour carriers. C0 must not claim them (they stay
 # condensed). C0B claims only this set. Activity-evidence annotations use
@@ -4363,9 +4400,9 @@ class EvaporationMixin:
             if not sp_data:
                 sp_data = oxide_vapors_data.get(species, {})
 
-            M_g_mol = sp_data.get('molar_mass_g_mol')
-            if M_g_mol is None:
-                M_g_mol = MOLAR_MASS.get(species)
+            M_g_mol = production_vapor_molar_mass_g_per_mol(
+                self.vapor_pressures, species
+            )
             if M_g_mol is None:
                 raise AccountingError(
                     f"vapor species {species!r} requires "
