@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-from pathlib import Path
 
 from simulator.battery.generators import usgs_b1259, usgs_b1452, usgs_b1544
 
@@ -97,3 +96,19 @@ def test_real_input_parser_outputs_match_pins() -> None:
         digest = _parser_output_digest(name, generator)
         print(f"USGS_PARSER_OUTPUT_DIGEST {name} {digest}")
         assert digest == EXPECTED_PARSER_OUTPUT_SHA256[name], name
+
+
+def test_shared_split_mutation_changes_both_real_clone_outputs(monkeypatch) -> None:
+    for name, generator in GENERATORS[:2]:
+        baseline = _parser_output_digest(name, generator)
+        assert baseline == EXPECTED_PARSER_OUTPUT_SHA256[name], name
+
+        with monkeypatch.context() as mutation:
+            mutation.setitem(
+                generator._merged_split.__globals__,
+                "_unique_grain_split",
+                lambda *_args: None,
+            )
+            mutated = _parser_output_digest(name, generator)
+
+        assert mutated != baseline, name
