@@ -52,7 +52,7 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, cast
 
 from scipy.optimize import brentq
 
@@ -183,6 +183,123 @@ def require_evaporation_oxygen_potential_log10(solution: object | None) -> float
     return log10_p
 
 
+def channel_state_at_log10(
+    pressure_model: Callable[[float], Mapping[str, float]],
+    channels: Sequence[InterfaceOxygenChannel],
+    *,
+    log10_pO2_bar: float,
+    temperature_K: float,
+    area_m2: float,
+) -> dict[str, object]:
+    """Equilibrium pressures and series fluxes at one oxygen potential.
+
+    Product flux is ``max(P_eq - P_bulk, 0) / ((R_i + R_g) M_i)``. The
+    evaporative source is ``A/2 * sum((d_O - n_O) * J)``. The solver and
+    the above-bracket overhead prediction both use this function, so the
+    series law is not copied.
+    """
+
+    try:
+        pressures_raw = pressure_model(log10_pO2_bar)
+    except Exception as exc:
+        raise ValueError(
+            f"pressure model failed at log10(pO2/bar)={log10_pO2_bar:g}"
+        ) from exc
+    if not isinstance(pressures_raw, Mapping):
+        raise ValueError("pressure_model must return a species-to-Pa mapping")
+    pressures: dict[str, float] = {}
+    product_fluxes: dict[str, float] = {}
+    atomic_oxygen_flux = 0.0
+    evaporative_source = 0.0
+    for channel in channels:
+        try:
+            pressure = float(pressures_raw[channel.species])
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            raise ValueError(
+                f"pressure model is missing a valid {channel.species!r} pressure"
+            ) from exc
+        if not math.isfinite(pressure) or pressure < 0.0:
+            raise ValueError(
+                f"pressure model returned invalid {channel.species!r} pressure"
+            )
+        pressures[channel.species] = pressure
+        r_interface = 1.0 / (
+            channel.alpha
+            * math.sqrt(
+                channel.molar_mass_kg_per_mol
+                / (2.0 * math.pi * GAS_CONSTANT * temperature_K)
+            )
+        )
+        resistance = r_interface + channel.r_gas_m_s
+        if not math.isfinite(resistance) or resistance <= 0.0:
+            raise ValueError(f"invalid series resistance for {channel.species!r}")
+        flux = max(0.0, pressure - channel.bulk_pressure_pa) / (
+            resistance * channel.molar_mass_kg_per_mol
+        )
+        if channel.kind == "atomic_oxygen":
+            atomic_oxygen_flux += flux
+        else:
+            product_fluxes[channel.species] = flux
+            evaporative_source += (
+                channel.parent_oxygen_demand - channel.oxygen_atoms
+            ) * flux
+    evaporative_source *= area_m2 / 2.0
+    return {
+        "pressures": pressures,
+        "product_fluxes": product_fluxes,
+        "atomic_oxygen_flux": atomic_oxygen_flux,
+        "evaporative_source": evaporative_source,
+    }
+
+
+def overhead_floor_solution(
+    pressure_model: Callable[[float], Mapping[str, float]],
+    channels: Sequence[InterfaceOxygenChannel],
+    *,
+    overhead_pO2_bar: float,
+    area_m2: float,
+    temperature_K: float,
+) -> InterfaceOxygenSolution:
+    """Predict at a physical overhead partial above the 1 bar solver domain.
+
+    ``p_s = p_h``, so the film source is zero and the reservoir is not
+    stepped. Channel pressures and product fluxes are still evaluated at
+    that partial: an empty channel map would suppress every evaporative
+    source. The partial itself is the caller's measured value. This
+    function does not replace it with ``nRT/V`` of an unbled inventory
+    and does not clamp it onto 1 bar.
+    """
+
+    overhead_bar = float(overhead_pO2_bar)
+    if not math.isfinite(overhead_bar) or overhead_bar <= 0.0:
+        raise ValueError(
+            "overhead floor partial must be finite and positive; "
+            f"got {overhead_pO2_bar!r}"
+        )
+    active = tuple(channel for channel in channels if channel.alpha > 0.0)
+    state = channel_state_at_log10(
+        pressure_model,
+        active,
+        log10_pO2_bar=math.log10(overhead_bar),
+        temperature_K=temperature_K,
+        area_m2=area_m2,
+    )
+    evaporative_source = float(state["evaporative_source"])
+    return InterfaceOxygenSolution(
+        surface_pO2_bar=overhead_bar,
+        surface_log10_pO2_bar=math.log10(overhead_bar),
+        label="overhead_oxygen_floor",
+        capacity_label=None,
+        channel_pressures_pa=cast(Mapping[str, float], state["pressures"]),
+        product_fluxes_mol_m2_s=cast(Mapping[str, float], state["product_fluxes"]),
+        atomic_oxygen_flux_mol_m2_s=float(state["atomic_oxygen_flux"]),
+        melt_source_mol_s=0.0,
+        evaporative_source_mol_s=evaporative_source,
+        gas_source_mol_s=0.0,
+        residual_mol_s=evaporative_source,
+    )
+
+
 def solve_interface_oxygen(
     pressure_model: Callable[[float], Mapping[str, float]],
     channels: Sequence[InterfaceOxygenChannel],
@@ -311,51 +428,13 @@ def solve_interface_oxygen(
     )
 
     def evaluate(logp: float, overhead_pa: float) -> dict[str, object]:
-        try:
-            pressures_raw = pressure_model(logp)
-        except Exception as exc:
-            raise ValueError(
-                f"pressure model failed at log10(pO2/bar)={logp:g}"
-            ) from exc
-        if not isinstance(pressures_raw, Mapping):
-            raise ValueError("pressure_model must return a species-to-Pa mapping")
-        pressures: dict[str, float] = {}
-        product_fluxes: dict[str, float] = {}
-        atomic_oxygen_flux = 0.0
-        evaporative_source = 0.0
-        for channel in active_channels:
-            try:
-                pressure = float(pressures_raw[channel.species])
-            except (KeyError, TypeError, ValueError, OverflowError) as exc:
-                raise ValueError(
-                    f"pressure model is missing a valid {channel.species!r} pressure"
-                ) from exc
-            if not math.isfinite(pressure) or pressure < 0.0:
-                raise ValueError(
-                    f"pressure model returned invalid {channel.species!r} pressure"
-                )
-            pressures[channel.species] = pressure
-            r_interface = 1.0 / (
-                channel.alpha
-                * math.sqrt(
-                    channel.molar_mass_kg_per_mol
-                    / (2.0 * math.pi * GAS_CONSTANT * temperature)
-                )
-            )
-            resistance = r_interface + channel.r_gas_m_s
-            if not math.isfinite(resistance) or resistance <= 0.0:
-                raise ValueError(f"invalid series resistance for {channel.species!r}")
-            flux = max(0.0, pressure - channel.bulk_pressure_pa) / (
-                resistance * channel.molar_mass_kg_per_mol
-            )
-            if channel.kind == "atomic_oxygen":
-                atomic_oxygen_flux += flux
-            else:
-                product_fluxes[channel.species] = flux
-                evaporative_source += (
-                    channel.parent_oxygen_demand - channel.oxygen_atoms
-                ) * flux
-
+        state = channel_state_at_log10(
+            pressure_model,
+            active_channels,
+            log10_pO2_bar=logp,
+            temperature_K=temperature,
+            area_m2=area,
+        )
         surface_bar = 10.0**logp
         surface_pa = surface_bar * PA_PER_BAR
         oxygen_flux = (surface_pa - overhead_pa) / (
@@ -366,12 +445,13 @@ def solve_interface_oxygen(
             / exchange_time
             * (reservoir_ln - logp * math.log(10.0))
         )
-        evaporative_source *= area / 2.0
+        evaporative_source = float(state["evaporative_source"])
+        atomic_oxygen_flux = float(state["atomic_oxygen_flux"])
         gas_source = area * oxygen_flux + area * atomic_oxygen_flux / 2.0
         residual = melt_source + evaporative_source - gas_source
         return {
-            "pressures": pressures,
-            "product_fluxes": product_fluxes,
+            "pressures": state["pressures"],
+            "product_fluxes": state["product_fluxes"],
             "atomic_oxygen_flux": atomic_oxygen_flux,
             "melt_source": melt_source,
             "evaporative_source": evaporative_source,

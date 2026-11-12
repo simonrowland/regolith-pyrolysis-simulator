@@ -187,19 +187,26 @@ def test_overhead_above_root_stays_on_the_signed_balance() -> None:
     assert solution.product_fluxes_mol_m2_s["Fe"] > 0.0
 
 
-def test_overhead_above_one_bar_predicts_at_the_partial_without_the_solver() -> None:
+def test_overhead_above_one_bar_keeps_channel_fluxes_at_the_partial() -> None:
     # The solver domain ends at 1 bar. A measured partial above that bound
-    # is the overhead floor: the surface cannot undercut it, the film source
-    # is zero, and the pressure model is not called.
+    # is the surface: the film source is zero because p_s = p_h, and the
+    # channels are still evaluated there. An empty flux map would suppress
+    # every evaporative source.
     sim, calls = _solve_hour(capacity=0.0, reservoir_log=-2.0, overhead=2.0)
     solution = sim._hour_interface_oxygen
 
-    assert calls == []
+    assert calls == [pytest.approx(math.log10(2.0))]
     assert solution.surface_pO2_bar == pytest.approx(2.0)
     assert solution.surface_log10_pO2_bar == pytest.approx(math.log10(2.0))
     assert solution.label == "overhead_oxygen_floor"
     assert solution.gas_source_mol_s == 0.0
-    assert solution.product_fluxes_mol_m2_s == {}
+    assert solution.melt_source_mol_s == 0.0
+    assert solution.product_fluxes_mol_m2_s["Fe"] == pytest.approx(
+        _expected_fe_flux(solution), rel=1e-10
+    )
+    assert solution.evaporative_source_mol_s == pytest.approx(
+        AREA_M2 * solution.product_fluxes_mol_m2_s["Fe"] / 2.0, rel=1e-10
+    )
     assert sim._headspace_transport_pO2_bar() == pytest.approx(2.0)
     notice = sim._interface_oxygen_snapshot_notice()
     assert notice["solved"] is True

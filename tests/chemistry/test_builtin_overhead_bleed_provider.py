@@ -7,13 +7,46 @@ import math
 
 import pytest
 
-from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
+from engines.builtin.overhead_bleed import (
+    BuiltinOverheadBleedProvider,
+    capacity_violation_notice,
+    headspace_removal_capacity_kg,
+)
 from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.overhead import OverheadConfigurationError
 from simulator.state import Atmosphere, EvaporationFlux
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 from tests.chemistry.conftest import _build_sim
+
+
+def test_capacity_violation_reports_both_rates_and_does_not_clamp():
+    # Conductance 1 kg/s against vacuum removes 3600 kg in one hour.
+    # 10 kg is inside that capacity. 5000 kg is not: the notice carries
+    # both rates and the capacity helper does not reduce the inventory.
+    assert headspace_removal_capacity_kg(
+        conductance_kg_s=1.0,
+        p_upstream_bar=2.0,
+        p_downstream_bar=0.0,
+        dt_hr=1.0,
+    ) == pytest.approx(3600.0)
+    assert capacity_violation_notice(
+        inventory_kg=10.0,
+        inventory_mol=10.0 / 0.032,
+        removal_capacity_kg=3600.0,
+        dt_hr=1.0,
+    ) is None
+    notice = capacity_violation_notice(
+        inventory_kg=5000.0,
+        inventory_mol=5000.0 / 0.032,
+        removal_capacity_kg=3600.0,
+        dt_hr=1.0,
+    )
+    assert notice is not None
+    assert notice["kind"] == "capacity_violation"
+    assert notice["production_kg_h"] == pytest.approx(5000.0)
+    assert notice["removal_kg_h"] == pytest.approx(3600.0)
+    assert notice["production_mol_s"] > notice["removal_mol_s"]
 
 
 def test_provider_declares_overhead_bleed_authority():

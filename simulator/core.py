@@ -4663,21 +4663,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # a larger p_h stays on the measured partial, not the 1 bar edge.
         if math.isfinite(overhead_bar) and overhead_bar > 1.0:
             from simulator.chemistry.oxygen_interface import (
-                InterfaceOxygenSolution,
+                overhead_floor_solution,
             )
 
-            return InterfaceOxygenSolution(
-                surface_pO2_bar=overhead_bar,
-                surface_log10_pO2_bar=math.log10(overhead_bar),
-                label='overhead_oxygen_floor',
-                capacity_label=None,
-                channel_pressures_pa={},
-                product_fluxes_mol_m2_s={},
-                atomic_oxygen_flux_mol_m2_s=0.0,
-                melt_source_mol_s=0.0,
-                evaporative_source_mol_s=0.0,
-                gas_source_mol_s=0.0,
-                residual_mol_s=0.0,
+            return overhead_floor_solution(
+                pressure_model,
+                channels,
+                overhead_pO2_bar=overhead_bar,
+                area_m2=float(
+                    getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0
+                ),
+                temperature_K=temperature_K,
             )
         try:
             return solve_interface_oxygen(
@@ -5008,14 +5004,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _interface_oxygen_snapshot_notice(self) -> dict[str, Any]:
         solution = getattr(self, '_hour_interface_oxygen', None)
         booking = dict(getattr(self, '_hour_interface_oxygen_booking', None) or {})
+        violation = getattr(self, '_hour_capacity_violation_notice', None)
         if solution is None:
-            return {
+            payload = {
                 'solved': False,
                 'bracket_edge': False,
                 **booking,
             }
+            if violation:
+                payload['capacity_violation'] = dict(violation)
+            return payload
         surface_log10 = float(solution.surface_log10_pO2_bar)
-        return {
+        payload = {
             'solved': True,
             'surface_pO2_bar': float(solution.surface_pO2_bar),
             'surface_log10_pO2_bar': surface_log10,
@@ -5032,6 +5032,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'exchange_direction': str(booking.get('exchange_direction', '') or ''),
         }
+        if violation:
+            payload['capacity_violation'] = dict(violation)
+        return payload
 
     def _cleaned_melt_fe_atom_mol(self) -> float:
         total_fe_mol = 0.0
@@ -16217,6 +16220,77 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ):
                     history.release()
 
+    def _drain_headspace_before_interface(self) -> None:
+        """Remove this step's headspace through the live pipe, then flag excess.
+
+        The rate comparison and the notice live in the overhead-bleed
+        module. This method only reads the hour's conductance and commits
+        the existing bleed. Probes that call ``_get_equilibrium`` do not
+        come through here, so they do not commit a bleed.
+        """
+
+        self._hour_capacity_violation_notice = None
+        if not self._overhead_headspace_enabled():
+            return
+        holdup = self._overhead_holdup_mol()
+        if not holdup:
+            return
+        from engines.builtin.overhead_bleed import (
+            capacity_violation_notice,
+            headspace_removal_capacity_kg,
+        )
+
+        species_kg = self._overhead_holdup_species_kg(holdup)
+        inventory_kg = math.fsum(species_kg.values())
+        inventory_mol = math.fsum(float(mol) for mol in holdup.values())
+        diagnostic = self._overhead_gas_equilibrium_diagnostic()
+        conductance = self._headspace_bleed_conductance_kg_s(
+            species_kg_for_M_avg=species_kg,
+        )
+        try:
+            conductance_kg_s = float(conductance)
+        except (TypeError, ValueError):
+            conductance_kg_s = None
+        if (
+            conductance_kg_s is not None
+            and math.isfinite(conductance_kg_s)
+            and conductance_kg_s >= 0.0
+        ):
+            # Same downstream the bleed commits. A non-numeric total
+            # pressure skips the notice; the bleed still runs.
+            downstream_bar = float(
+                self._headspace_downstream_pressure_bar(None)
+            )
+            try:
+                upstream_bar = float(diagnostic.get('p_total_bar') or 0.0)
+            except (TypeError, ValueError):
+                upstream_bar = None
+            if upstream_bar is not None and math.isfinite(upstream_bar):
+                removal_kg = headspace_removal_capacity_kg(
+                    conductance_kg_s=conductance_kg_s,
+                    p_upstream_bar=upstream_bar,
+                    p_downstream_bar=downstream_bar,
+                    dt_hr=1.0,
+                )
+                notice = capacity_violation_notice(
+                    inventory_kg=inventory_kg,
+                    inventory_mol=inventory_mol,
+                    removal_capacity_kg=removal_kg,
+                    dt_hr=1.0,
+                )
+                if notice is not None:
+                    stamped = dict(notice)
+                    stamped['hour'] = int(self.melt.hour) + 1
+                    self._hour_capacity_violation_notice = stamped
+                    notices = getattr(
+                        self, '_capacity_violation_notices', None
+                    )
+                    if not isinstance(notices, list):
+                        notices = []
+                        self._capacity_violation_notices = notices
+                    notices.append(dict(stamped))
+        self._dispatch_overhead_bleed()
+
     def _step_one_hour(self) -> HourSnapshot:
         """
         Advance the simulation by one hour.
@@ -16358,6 +16432,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._apply_fe_redox_respeciation()
         self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
+        # Bleed the headspace through the live pipe before the interface
+        # reads a partial. Refresh after the bleed so the surface is the
+        # remaining inventory, not nRT/V of the unbled holdup.
+        self._drain_headspace_before_interface()
         self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
 
         # --- 4. Thermodynamic equilibrium ---

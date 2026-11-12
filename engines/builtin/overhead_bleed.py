@@ -183,6 +183,98 @@ def compressible_pressure_capacity_fraction(
     return (1.0 - pressure_ratio) * (1.0 + pressure_ratio)
 
 
+def headspace_removal_capacity_kg(
+    *,
+    conductance_kg_s: float,
+    p_upstream_bar: float,
+    p_downstream_bar: float,
+    dt_hr: float,
+) -> float:
+    """Mass the live pipe can remove over ``dt_hr``, not capped by inventory.
+
+    Same compressible Poiseuille factor as :meth:`_bled_species_mol`:
+    ``conductance_kg_s * fraction * dt_hr * 3600``. The bleed then takes
+    ``min(inventory, this capacity)`` and leaves the rest.
+
+    Unit check: kg/s * dimensionless * h * (s/h) = kg. Limit: downstream
+    pressure at or above upstream pressure returns 0, matching the fraction.
+    """
+
+    fraction = compressible_pressure_capacity_fraction(
+        p_upstream_bar,
+        p_downstream_bar,
+    )
+    try:
+        conductance = float(conductance_kg_s)
+        duration_hr = float(dt_hr)
+    except (TypeError, ValueError):
+        return 0.0
+    if (
+        not math.isfinite(conductance)
+        or conductance < 0.0
+        or not math.isfinite(duration_hr)
+        or duration_hr < 0.0
+        or not math.isfinite(fraction)
+    ):
+        return 0.0
+    return conductance * fraction * duration_hr * 3600.0
+
+
+def capacity_violation_notice(
+    *,
+    inventory_kg: float,
+    inventory_mol: float,
+    removal_capacity_kg: float,
+    dt_hr: float,
+) -> dict[str, float | str] | None:
+    """Predict-and-flag when the headspace inventory exceeds pipe removal.
+
+    d-367: do not clamp the excess away and do not pretend the surface can
+    read ``nRT/V`` of an unbled inventory. ``production`` is that inventory
+    expressed as a rate over the step. ``removal`` is the uncapped pipe
+    capacity over the same step. Both rates are returned when production
+    exceeds removal. A covered inventory returns None.
+
+    Unit check: kg/h = kg / h. mol/s = mol / (h * 3600 s/h). The removal
+    molar rate uses the inventory's average molar mass, kg/mol. Limit:
+    an empty inventory is not a violation.
+    """
+
+    try:
+        held_kg = float(inventory_kg)
+        held_mol = float(inventory_mol)
+        capacity_kg = float(removal_capacity_kg)
+        duration_hr = float(dt_hr)
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(held_kg)
+        or not math.isfinite(held_mol)
+        or not math.isfinite(capacity_kg)
+        or not math.isfinite(duration_hr)
+        or duration_hr <= 0.0
+        or held_kg <= 0.0
+        or held_mol <= 0.0
+    ):
+        return None
+    production_kg_h = held_kg / duration_hr
+    removal_kg_h = max(0.0, capacity_kg) / duration_hr
+    if production_kg_h <= removal_kg_h:
+        return None
+    seconds = duration_hr * 3600.0
+    average_molar_mass = held_kg / held_mol
+    removal_mol = (
+        capacity_kg / average_molar_mass if average_molar_mass > 0.0 else 0.0
+    )
+    return {
+        "kind": "capacity_violation",
+        "production_kg_h": production_kg_h,
+        "removal_kg_h": removal_kg_h,
+        "production_mol_s": held_mol / seconds,
+        "removal_mol_s": max(0.0, removal_mol) / seconds,
+    }
+
+
 class BuiltinOverheadBleedProvider(ChemistryProvider):
     """Authoritative pure-move bleed from process overhead gas."""
 
