@@ -55,12 +55,14 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   comparison, including a label with no ASCII digit. ``_{n}``, a bare
   ``_`` digit, Unicode subscript digits, and a ``$`` or ``\\mathrm{}``
   that touches a subscript become plain digits. A layout space is removed
-  only inside the formula token, so a preceding number stays separate.
-  ``CO`` is not ``CO₂`` and ``SiO₂`` is not ``SiO₂₂``. A space, thin space,
-  or narrow no-break space between digit groups of one number is
-  typography when each group after the first has exactly three digits:
-  ``1 550`` is ``1550`` and ``12 34`` is not ``1234``. A comma is not that
-  separator. A numeric leaf does not match a formula by the formula fold.
+  only inside one formula, so a preceding number stays separate and
+  ``SiO2 Al2O3`` stays two tokens. ``CO`` is not ``CO₂`` and ``SiO₂`` is
+  not ``SiO₂₂``. A space, thin space, or narrow no-break space in an
+  unsigned digit run is typography: the first group is one to three
+  digits and each group after it is exactly three. ``1 550`` is ``1550``.
+  ``1e0 001``, ``12 34``, and ``1.5 000`` are not one number. A comma is
+  not that separator. A numeric leaf does not match a formula by the
+  formula fold.
   A leading decimal is a number, so .24 is not a label
   and is not the token -0.24, 10.24, or 0.24. A float spelling is kept
   only when it parses back to the stored number, so
@@ -124,7 +126,6 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from decimal import Decimal, DecimalException
 from functools import lru_cache
-from html.parser import HTMLParser
 import math
 import os
 import re
@@ -150,6 +151,7 @@ from simulator.battery.extract_context import (
     iter_unsupported_context_container_paths,
 )
 from simulator.state_types import StateTag
+from tools.mineru_table_draft import TableGeometryError, parse_table_html
 
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 SCHEMA_VERSION = "literature_extract.v1"
@@ -339,19 +341,19 @@ def _fold_numeric_signs(text: str) -> str:
 # between groups. A comma is not this separator: ``1,000`` stays ``1,000``.
 _DIGIT_GROUP_SEPARATORS = " \u2009\u202f"
 _DIGIT_GROUP_RE = re.compile(
-    "(?<![0-9.])"
-    r"(\d+(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d{3})+)"
-    "(?![0-9])"
+    r"(?<![0-9.eE+\-])"
+    r"(\d{1,3}(?:[" + _DIGIT_GROUP_SEPARATORS + r"]\d{3})+)"
+    r"(?![0-9])"
 )
 
 
 def _fold_digit_groups(text: str) -> str:
-    """Join digit groups of one integer. A second call keeps the same spans.
+    """Join one unsigned digit run. A second call keeps the same spans.
 
-    The first group is any length. Each following group is exactly three
-    digits. ``1 550`` and ``12 345`` are ``1550`` and ``12345``. ``12 34``,
-    ``1 55``, and ``6.98 100`` stay apart: the tail is not three digits, or
-    the digits are the fraction of another number.
+    The first group is one to three digits. Each following group is exactly
+    three. A decimal point may follow the run, so ``1 550.25`` is
+    ``1550.25``. ``1 550`` is ``1550``. ``12 345`` is ``12345``. ``12 34``,
+    ``1e0 001``, ``1.5 000``, and a signed run stay apart.
     """
 
     def join(match: re.Match[str]) -> str:
@@ -709,125 +711,32 @@ _FORMULA_ELEMENT_COUNT_SPACE_RE = re.compile(
     "[" + _FORMULA_INTERNAL_SPACES + "]+"
     r"(?=\d{1,3}(?!\d))"
 )
+# A count joins the next piece only when that piece is one element and its
+# count, and that count is not followed by another letter. ``Fe2 O3`` becomes
+# ``Fe2O3``. ``SiO2 Al2O3`` stays two tokens, and a following word
+# (``SiO2 end``, ``SiO2 ratio``) stays outside the formula.
 _FORMULA_COUNT_ELEMENT_SPACE_RE = re.compile(
     r"(?<=[A-Za-z])(\d{1,3})"
     "[" + _FORMULA_INTERNAL_SPACES + "]+"
-    r"(?=[A-Z][a-z]?(?![A-Za-z]))"
+    r"(?=[A-Z][a-z]?\d+(?![A-Za-z]))"
 )
 
 
-class _HtmlTableGeometryError(Exception):
-    """A rowspan or colspan that does not land on an empty grid slot."""
-
-
-class _HtmlCellParser(HTMLParser):
-    """Rows of ``(text, rowspan, colspan)`` from one ``<table>`` element."""
-
-    def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.rows: list[list[tuple[str, int, int]]] = []
-        self.error: str | None = None
-        self._row: list[tuple[str, int, int]] | None = None
-        self._parts: list[str] | None = None
-        self._rowspan = 1
-        self._colspan = 1
-
-    def _span(self, value: str | None, name: str) -> int:
-        if value is None or str(value).strip() == "":
-            return 1
-        text = str(value).strip()
-        if not re.fullmatch(r"[0-9]+", text) or int(text) < 1:
-            self.error = (
-                f"html_table_span_invalid: {name} is not a positive integer"
-            )
-            return 1
-        return int(text)
-
-    def handle_starttag(
-        self, tag: str, attrs: list[tuple[str, str | None]]
-    ) -> None:
-        name = tag.lower()
-        if name == "tr":
-            self._row = []
-            return
-        if name in {"td", "th"}:
-            if self._row is None:
-                self._row = []
-            attributes = {key.lower(): value for key, value in attrs}
-            self._rowspan = self._span(attributes.get("rowspan"), "rowspan")
-            self._colspan = self._span(attributes.get("colspan"), "colspan")
-            self._parts = []
-            return
-        if name == "br" and self._parts is not None:
-            self._parts.append("\n")
-
-    def handle_endtag(self, tag: str) -> None:
-        name = tag.lower()
-        if name in {"td", "th"} and self._row is not None and self._parts is not None:
-            self._row.append(("".join(self._parts), self._rowspan, self._colspan))
-            self._parts = None
-            return
-        if name == "tr" and self._row is not None:
-            self.rows.append(self._row)
-            self._row = None
-
-    def handle_data(self, data: str) -> None:
-        if self._parts is not None:
-            self._parts.append(data)
-
-
 def _html_table_grid(table_html: str) -> tuple[list[list[str]] | None, str | None]:
-    """Expand one table. Each covered rowspan or colspan slot keeps the cell text.
+    """One table from ``parse_table_html``, which owns rowspan and colspan.
 
-    Overlapping spans and a span that never finds an empty slot are refusals.
-    A missing slot in a ragged row is an empty cell, not a neighbour's text.
+    Certification reads ``Cell.text``. That text keeps superscript characters
+    and formula markup. The draft's split numeric value is not used.
     """
-    parser = _HtmlCellParser()
     try:
-        parser.feed(table_html)
-        parser.close()
+        grid = parse_table_html(table_html)
+    except TableGeometryError as exc:
+        return None, str(exc)
     except Exception:
         return None, "html_table_unparsed: HTML table could not be parsed"
-    if parser.error:
-        return None, parser.error
-    if not parser.rows:
+    if not grid:
         return None, "html_table_unparsed: HTML table has no rows"
-    placed: dict[tuple[int, int], str] = {}
-    row_count = len(parser.rows)
-    try:
-        for row_index, source_row in enumerate(parser.rows):
-            column_index = 0
-            for text, rowspan, colspan in source_row:
-                steps = 0
-                limit = len(placed) + colspan + 1
-                while any(
-                    (row_index, column_index + offset) in placed
-                    for offset in range(colspan)
-                ):
-                    column_index += 1
-                    steps += 1
-                    if steps > limit:
-                        raise _HtmlTableGeometryError(
-                            "html_table_span_invalid: cell span does not fit"
-                        )
-                for row_offset in range(rowspan):
-                    for column_offset in range(colspan):
-                        key = (row_index + row_offset, column_index + column_offset)
-                        if key in placed:
-                            raise _HtmlTableGeometryError(
-                                "html_table_span_invalid: overlapping cells"
-                            )
-                        placed[key] = text
-                row_count = max(row_count, row_index + rowspan)
-                column_index += colspan
-    except _HtmlTableGeometryError as exc:
-        return None, str(exc)
-    width = max((column + 1 for _row, column in placed), default=0)
-    grid = [
-        [placed.get((row_index, column_index), "") for column_index in range(width)]
-        for row_index in range(row_count)
-    ]
-    return grid, None
+    return [[cell.text for cell in row] for row in grid], None
 
 
 def _parse_positive_index(raw: Any) -> int | None:
@@ -3054,8 +2963,10 @@ def _normalize_formula_label(text: str) -> str:
 
     ``\\mathrm{}`` and a ``$...$`` pair are removed only when they wrap a
     subscript. ``_{n}``, a bare ``_`` digit, and Unicode subscript digits
-    become plain digits. A space is removed only between an element chain
-    and its count, or between that count and the next element symbol.
+    become plain digits. A space is removed only inside one formula: between
+    an element chain and its count, or between that count and one following
+    element plus its count. ``Fe2 O3`` becomes ``Fe2O3``. ``SiO2 Al2O3``
+    stays two tokens. A following word stays outside the formula.
     ``6.98 Fe_{2}O_{3}`` stays ``6.98 Fe2O3``. ``page 2`` stays ``page 2``.
     """
     normalized = _FORMULA_MATHRM_RE.sub(r"\1", text)
@@ -3409,11 +3320,11 @@ def fidelity_source_warnings(
     and species labels fold subscript markup, a ``$`` or ``\\mathrm{}``
     that touches a subscript, and a layout space only inside the formula
     token, before every comparison. A digitless label is a complete
-    token, and a preceding number is not joined to the formula. Digit
-    groups of one number, separated by a space, thin space, or narrow
-    no-break space, with exactly three digits in each group after the
-    first, are that number: ``1 550`` is ``1550`` and ``12 34`` is not
-    ``1234``. A comma is not that separator. ``1 K`` is not ``1 KPa``.
+    token, a preceding number is not joined, and two formulas stay two
+    tokens. An unsigned digit run whose first group is one to three
+    digits, then groups of three, is that number: ``1 550`` is ``1550``.
+    ``1e0 001``, ``12 34``, and ``1.5 000`` are not. A comma is not that
+    separator. ``1 K`` is not ``1 KPa``.
     A leading decimal is a numeric token.
     A spelling that rounds the stored float to a different number is not
     that token. The sample's own spelling is not a substitute: a ``rel_tol``

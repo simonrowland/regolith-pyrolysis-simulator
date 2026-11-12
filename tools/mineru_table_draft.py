@@ -243,8 +243,8 @@ class _TableParser(HTMLParser):
                 self.row = []
             attributes = dict(attrs)
             self.cell = _RawCell(
-                rowspan=_span(attributes.get("rowspan")),
-                colspan=_span(attributes.get("colspan")),
+                rowspan=_span(attributes.get("rowspan"), "rowspan"),
+                colspan=_span(attributes.get("colspan"), "colspan"),
                 is_header=tag == "th",
             )
         elif tag == "sup" and self.cell is not None:
@@ -269,11 +269,23 @@ class _TableParser(HTMLParser):
                 self.cell.superscript_parts.append(data)
 
 
-def _span(value: str | None) -> int:
-    try:
-        return max(1, int(value or "1"))
-    except ValueError:
+class TableGeometryError(Exception):
+    """A rowspan or colspan that is not a positive integer."""
+
+
+def _span(value: str | None, name: str = "span") -> int:
+    """Positive span, or 1 when the attribute is absent.
+
+    ``0`` and a non-integer are not spans. Both callers see that refusal.
+    """
+    if value is None or str(value).strip() == "":
         return 1
+    text = str(value).strip()
+    if not re.fullmatch(r"[0-9]+", text) or int(text) < 1:
+        raise TableGeometryError(
+            f"html_table_span_invalid: {name} is not a positive integer"
+        )
+    return int(text)
 
 
 def _is_number(text: str) -> bool:

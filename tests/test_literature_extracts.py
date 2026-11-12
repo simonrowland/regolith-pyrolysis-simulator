@@ -8184,8 +8184,8 @@ _TOKEN_CASES = (
     # certify per cell; here the comma is not a delimiter.
     ("prose_adjacent_decimals", 0.91, "0.91,0.92\n", False),
     ("prose_adjacent_decimals_second", 0.92, "0.91,0.92\n", False),
-    # Digit groups of one number. The first group is any length. Each
-    # group after it is exactly three digits. A comma is not this separator.
+    # Digit groups of one unsigned number. The first group is 1-3 digits.
+    # Each group after it is exactly three. Not an exponent or a fraction.
     ("digit_group_space", 1550, "from 1 550 °C to\n", True),
     ("digit_group_thin", 1550, "from 1\u2009550 °C to\n", True),
     ("digit_group_narrow", 1550, "from 1\u202f550 °C to\n", True),
@@ -8194,6 +8194,8 @@ _TOKEN_CASES = (
     ("digit_group_short_tail", 155, "1 55\n", False),
     ("digit_group_not_the_head", 1, "from 1 550 °C to\n", False),
     ("digit_group_decimal_stays", 6.98, "6.98 100\n", True),
+    ("digit_group_exponent", 10, "1e0 001\n", False),
+    ("digit_group_fraction", 15000, "1.5 000\n", False),
 )
 
 
@@ -10394,6 +10396,10 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         "0.5 H_{2}O": "0.5 H2O",
         "page 2 stays": "page 2 stays",
         "Table 2 stays": "Table 2 stays",
+        "Fe 2 O 3": "Fe2O3",
+        "Fe2 O3": "Fe2O3",
+        "SiO2 Al2O3": "SiO2 Al2O3",
+        "SiO2Al2O3": "SiO2Al2O3",
     }
     for raw, expected in folded.items():
         got = vle._normalize_formula_label(raw)
@@ -10414,6 +10420,10 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         ("species", "CO", "the gas CO end\n", True),
         ("formula", "SiO₂", "oxide SiO₂₂ end\n", False),
         ("formula", "SiO₂", "oxide SiO₂ end\n", True),
+        ("formula", "SiO2", "SiO2 Al2O3", True),
+        ("formula", "Al2O3", "SiO2 Al2O3", True),
+        ("formula", "SiO2", "SiO2Al2O3", False),
+        ("formula", "Al2O3", "SiO2Al2O3", False),
     )
     for key, pin, source, accepts in prose_pins:
         doc = _html_source_document(tmp_path, pin, source + "\n", key=key)
@@ -10470,6 +10480,10 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
     assert vle._fold_digit_groups("1 55") == "1 55"
     assert vle._fold_digit_groups("6.98 100") == "6.98 100"
     assert vle._fold_digit_groups("1,000") == "1,000"
+    assert vle._fold_digit_groups("1e0 001") == "1e0 001"
+    assert vle._fold_digit_groups("1.5 000") == "1.5 000"
+    assert vle._fold_digit_groups("-1 550") == "-1 550"
+    assert vle._fold_digit_groups("1 550.25") == "1550.25"
     assert vle._fold_digit_groups("1 550") == vle._fold_digit_groups(
         vle._fold_digit_groups("1 550")
     )
@@ -10482,6 +10496,9 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
         (1234, "12 34\n", False),
         (155, "1 55\n", False),
         (1, "from 1 550 °C to\n", False),
+        (10, "1e0 001\n", False),
+        (15000, "1.5 000\n", False),
+        (1.5, "1.5 000\n", True),
         ("1550", "from 1 550 °C to\n", True),
     )
     for pin, source, accepts in prose:
@@ -10499,10 +10516,15 @@ def test_digit_group_spacing_is_one_number(tmp_path: Path):
         ("csv", "1 550\n", 1550, True),
         ("csv", "1\u2009550\n", 1550, True),
         ("csv", "12 34\n", 1234, False),
+        ("csv", "1e0 001\n", 10, False),
+        ("csv", "1.5 000\n", 1.5, False),
+        ("csv", "1.5 000\n", 15000, False),
         ("csv", '"1,000"\n', 1000, False),
         ("html", "1 550", 1550, True),
         ("html", "1\u202f550", 1550, True),
         ("html", "12 34", 1234, False),
+        ("html", "1e0 001", 10, False),
+        ("html", "1.5 000", 1.5, False),
     )
     for kind, source, pin, accepts in cells:
         if kind == "csv":

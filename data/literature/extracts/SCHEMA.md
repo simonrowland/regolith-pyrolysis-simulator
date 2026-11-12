@@ -180,10 +180,12 @@ not `1`. The whole stored value, including a spaced or attached unit, must
 match, and the characters on either side must not extend it. An extending
 character is an ASCII letter or digit, a Unicode letter, µ, or °, or a
 dot or comma followed by a digit. So `1 K` is not `1 KPa`, and `1` is not
-`1,000`. A space, thin space, or narrow no-break space between the digit
-groups of one number is typography. The first group may be any length and
-each group after it is exactly three digits, so `1 550` is 1550. `12 34`
-is not 1234. A comma is not this separator, so a cell `1,000` is not 1000.
+`1,000`. A space, thin space, or narrow no-break space in an unsigned
+digit run is typography. The first group is one to three digits and each
+group after it is exactly three, so `1 550` is 1550. The run is not an
+exponent, a sign, or a decimal fraction, so `1e0 001`, `12 34`, and
+`1.5 000` are not one number. A comma is not this separator, so a cell
+`1,000` is not 1000.
 The same grouped spelling in a numeric cell is that number. The token must
 appear in the cited `line_range` when one is set,
 otherwise in the opened text. A CSV or TSV source is not searched that way:
@@ -209,8 +211,10 @@ Formula-bearing label keys are `formula` and `species` only. The label is
 normalized before every comparison, including a label with no ASCII digit.
 `_{n}`, a bare `_` followed by digits, Unicode subscript digits, and a `$`
 or `\mathrm{}` wrapped around a subscript become plain digits. A layout
-space is removed only inside the formula token: between an element chain
-and its count, or between that count and the next element symbol. A
+space is removed only inside one formula: between an element chain and
+its count, or between that count and the next element of the same token.
+`Fe2 O3` is `Fe2O3`. `SiO2 Al2O3` stays two tokens and certifies each of
+them; `SiO2Al2O3` certifies neither. A
 preceding number is not joined, so `6.98 Fe_{2}O_{3}` certifies `Fe2O3`
 and certifies 6.98. In a cell, the whole trimmed cell after that fold, and
 after removing one wrapping `$...$` pair, must equal the folded label. In
