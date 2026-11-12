@@ -12,6 +12,7 @@ from tools.harvest_atct_compilation import (
     ATCT_ROOT, ROLE, SOURCE_NAME, feedstock_coverage, load_records, numeric_token,
     parse_source,
 )
+from tests.helpers.named_manifests import assert_named_rows
 
 
 @pytest.fixture(scope="module")
@@ -27,11 +28,21 @@ def published(fragment):
 def test_every_source_row_round_trips(corpus):
     manifest, records, payload = corpus
     original = payload.decode("utf-8")
+    parsed_records = parse_source(payload)
+    actual_ids = [record["record_id"] for record in parsed_records]
+    expected_ids = [entry["record_id"] for entry in manifest["entries"]]
+    assert len(actual_ids) == len(set(actual_ids)), "ATcT source has duplicate record IDs"
+    assert len(expected_ids) == len(set(expected_ids)), "ATcT manifest has duplicate record IDs"
+    assert_named_rows(
+        {record_id: None for record_id in actual_ids},
+        {record_id: None for record_id in expected_ids},
+        label="ATcT source record IDs",
+    )
     # Count the value cells independently of the harvester's row selector.
     assert original.count('<td class="bkgDHf298">') == len(records) == 3442
     assert len(manifest["entries"]) == len(records)
     assert len(list((ATCT_ROOT / "records").glob("*.json"))) == len(records)
-    assert records == parse_source(payload)
+    assert records == parsed_records
     for entry, record in zip(manifest["entries"], records, strict=True):
         locator = record["source_locator"]
         row = payload[locator["byte_start"]:locator["byte_end"]].decode("utf-8")
@@ -64,7 +75,6 @@ def test_every_source_row_round_trips(corpus):
         assert record["compilation_role"] == ROLE
     for source in manifest["source_files"]:
         assert hashlib.sha256((ATCT_ROOT / source["path"]).read_bytes()).hexdigest() == source["sha256"]
-    assert hashlib.sha256(payload).hexdigest() == "9f6f7d9197b2fb35f178fb231aa71e23e99d88a1c75623e94bb0ab80b6248731"
 
 
 def test_source_gaps_and_native_states_are_explicit(corpus):

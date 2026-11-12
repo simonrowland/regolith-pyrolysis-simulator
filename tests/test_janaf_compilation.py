@@ -1,13 +1,14 @@
 """NIST-JANAF compilation ingest — round-trip numbers and feedstock coverage.
 
 Compilations are engine reference functions, not measurements. These tests
-pin that every stored number in all 1655 tables re-parses from its
+pin that every stored number in every table re-parses from its
 ``as_published`` token, and that the 26 JANAF-absent feedstock elements
 stay explicitly uncovered.
 """
 
 from __future__ import annotations
 
+from collections import Counter
 from pathlib import Path
 from copy import deepcopy
 from decimal import Decimal
@@ -19,6 +20,7 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.named_manifests import assert_named_rows
 from simulator.yaml_cache import load_cached_safe_yaml
 import simulator.reference_data.janaf as janaf_reference
 
@@ -132,7 +134,14 @@ def test_every_stored_number_reparses_from_table_text() -> None:
     """Null hypothesis: a harvested coefficient can drift from its published token."""
 
     paths = list(iter_table_paths())
-    assert len(paths) == 1655
+    expected_table_ids = {
+        entry["table_id"] for entry in load_manifest()["entries"]
+    }
+    assert_named_rows(
+        {path.stem: None for path in paths},
+        {table_id: None for table_id in expected_table_ids},
+        label="JANAF compiled table paths",
+    )
     failures: list[str] = []
     html_era = 0
     txt_era = 0
@@ -146,7 +155,7 @@ def test_every_stored_number_reparses_from_table_text() -> None:
         failures.extend(round_trip_failures(document))
         if len(failures) > 20:
             break
-    assert html_era + txt_era == 1655
+    assert html_era + txt_era == len(expected_table_ids)
     assert failures == []
 
 
@@ -908,13 +917,23 @@ def test_b133_300k_log_kf_is_a_compilation_finding_not_a_correction() -> None:
 def test_every_manifest_entry_carries_formula_as_published() -> None:
     manifest = load_manifest()
     entries = manifest["entries"]
-    assert len(entries) == 1655
-    files = {path.name for path in iter_table_paths()}
+    table_ids = [entry["table_id"] for entry in entries]
+    duplicate_ids = sorted(
+        table_id
+        for table_id, count in Counter(table_ids).items()
+        if count > 1
+    )
+    assert not duplicate_ids, f"JANAF manifest has duplicate table IDs: {duplicate_ids}"
+    paths = list(iter_table_paths())
+    assert_named_rows(
+        {table_id: None for table_id in table_ids},
+        {path.stem: None for path in paths},
+        label="JANAF manifest table IDs",
+    )
     for entry in entries:
         assert entry["formula"] == entry["formula_as_published"]
         assert entry["formula_as_published"]
         assert entry["formula_normalised"]
-        assert f"{entry['table_id']}.yaml" in files
     for table_id in ("Al-001", "Al-006", "Fe-001", "B-001"):
         document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
         index = document["table"]["index_entry"]

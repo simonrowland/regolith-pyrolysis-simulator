@@ -23,21 +23,14 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACT_DIR = REPO_ROOT / "data" / "literature" / "extracts"
 REQUIRE_CORPUS_ENV = "REGOLITH_REQUIRE_CORPUS"
 SKIP_REASON = "corpus_checkout_not_required_by_this_gate"
 
-# Census of data/literature/extracts/*.yaml at 6badf9e3b. This change does not
-# add or remove extracts. Names starting with '_' are store policy, not
-# extracts (SCHEMA.md). 782 extracts carry 782 source_id values (wood-wade-2013-trace-activities
-# landed on green after 6badf9e3b; its corpus raw/ is on file). 781 are
-# distinct: bencze-yazhenskikh-2016.yaml and
-# bencze-yazhenskikh-2016-table-s1-k.yaml share one source_id.
-EXPECTED_EXTRACT_COUNT = 782
-EXPECTED_SOURCE_ID_COUNT = 782
-EXPECTED_DISTINCT_SOURCE_IDS = 781
+CENSUS_MANIFEST = REPO_ROOT / "tests" / "manifests" / "literature_extract_source_ids.jsonl"
 
 # Root source_id in the preamble, YAML or JSON-style. Checked against a full
 # document load of every extract at the census commit.
@@ -99,6 +92,14 @@ def _extract_source_ids(extract_dir: Path) -> list[tuple[str, str]]:
     return [(path.name, _source_id(path)) for path in paths]
 
 
+def _assert_extract_census(records: list[tuple[str, str]]) -> None:
+    assert_named_rows(
+        dict(records),
+        load_named_manifest(CENSUS_MANIFEST),
+        label="data/literature/extracts source_id census",
+    )
+
+
 def _absence_reason(source_id: str) -> str:
     if source_id.startswith("pending-"):
         return "source_pending_acquisition"
@@ -157,17 +158,14 @@ def _assert_raw_sources(corpus_root: Path, source_ids: list[str]) -> None:
 
 def test_green_extract_source_id_count() -> None:
     records = _extract_source_ids(EXTRACT_DIR)
-    source_ids = [source_id for _, source_id in records]
-    assert len(records) == EXPECTED_EXTRACT_COUNT
-    assert len(source_ids) == EXPECTED_SOURCE_ID_COUNT
-    assert len(set(source_ids)) == EXPECTED_DISTINCT_SOURCE_IDS
+    _assert_extract_census(records)
 
 
 def test_green_extract_source_ids_have_corpus_raw_directories() -> None:
     corpus = _require_corpus_root()
-    source_ids = [source_id for _, source_id in _extract_source_ids(EXTRACT_DIR)]
-    assert len(source_ids) == EXPECTED_SOURCE_ID_COUNT
-    assert len(set(source_ids)) == EXPECTED_DISTINCT_SOURCE_IDS
+    records = _extract_source_ids(EXTRACT_DIR)
+    _assert_extract_census(records)
+    source_ids = [source_id for _, source_id in records]
     _assert_raw_sources(corpus, source_ids)
 
 

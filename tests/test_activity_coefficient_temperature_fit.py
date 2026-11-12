@@ -21,6 +21,7 @@ from simulator.battery.identity import profile_for
 from simulator.battery.records import Value
 from simulator.battery.validate import _validate_activity_coefficient_temperature_fit
 from tests.battery.factories import migrate_one_extract
+from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,9 +38,18 @@ def test_fegley_2023_table_2_printed_rows_are_pinned() -> None:
     path = ROOT / "data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml"
     doc = yaml.safe_load(path.read_text())
     rows = doc["species"]["BSE"]["observations"][0]["values"]["rows_as_printed"]
+    actual = {
+        f"{index:04d}:{row['oxide']}": row
+        for index, row in enumerate(rows, start=1)
+    }
+    expected = load_named_manifest(
+        ROOT / "tests" / "manifests" / "fegley_2023_table_2_printed_rows.jsonl"
+    )
+    assert_named_rows(actual, expected, label="Fegley 2023 Table 2 printed rows")
 
-    assert len(rows) == 82
-    assert _sha256(rows) == "76e809f15c6338a5db8afb761ab8d683e627c95b85601e7ca4ece62c635af3e4"
+    actual_rows = [actual[identity] for identity in sorted(actual)]
+    expected_rows = [expected[identity] for identity in sorted(expected)]
+    assert _sha256(actual_rows) == _sha256(expected_rows)
 
 
 def test_sossi_fegley_2018_table_2_printed_rows_are_pinned() -> None:

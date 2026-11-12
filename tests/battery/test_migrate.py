@@ -123,6 +123,7 @@ from simulator.battery.migrate import (
 
 )
 from simulator.battery.stable_ids import series_row_extra
+from tests.helpers.named_manifests import assert_named_rows, load_named_manifest
 
 
 _FAST_SAFE_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
@@ -11997,28 +11998,45 @@ def test_ohta_feto_standard_state_lifts_liquid_reference(tmp_path: Path) -> None
     assert reference_state.value.endmember.phase.value is Phase.L
 
 
-def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
+def test_stolyarova_table3_reference_states_are_stable(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(
         tmp_path, "stolyarova-1996-cao-alumina-silica-kems.yaml"
     )
-    rows = sorted(
-        (oid, obs)
+    actual = {
+        oid: to_plain(obs.identity.reference_state)
         for oid, obs in result.observations.items()
         if "stolyarova_1996_table3_" in oid
+    }
+    expected = load_named_manifest(
+        REPO_ROOT
+        / "tests"
+        / "manifests"
+        / "stolyarova_table3_reference_states.jsonl"
     )
-    assert len(rows) == 137
-    payload = [(oid, to_plain(obs.identity.reference_state)) for oid, obs in rows]
-    digest = hashlib.sha256(
+    assert_named_rows(actual, expected, label="Stolyarova 1996 Table 3 reference states")
+
+    actual_digest = hashlib.sha256(
         json.dumps(
-            payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+            sorted(actual.items()),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        ).encode()
+    ).hexdigest()
+    manifest_digest = hashlib.sha256(
+        json.dumps(
+            sorted(expected.items()),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
         ).encode()
     ).hexdigest()
     # t-1353 stores the physical PDF page on locator.page, so the content-stable
     # point ids move. The Table 2-3 run conditions move the same :h= suffix.
     # The reference states in this payload are unchanged.
-    assert digest == "294d6b5b3fba35da66634a64205243f9a774bf7db707dab8ef9d7b37bbfa3754"
+    assert actual_digest == manifest_digest
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
