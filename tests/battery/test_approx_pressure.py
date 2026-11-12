@@ -553,6 +553,18 @@ def test_nominal_pressure_is_the_point_and_exact_stays_exact() -> None:
     assert built.value == band
 
 
+def test_nominal_pressure_reads_serialized_bands() -> None:
+    band = approximate_pressure_from_printed_point(
+        _point(_HASHIMOTO_PA, approximate=True)
+    )
+    serialized = to_plain(band)
+    assert nominal_pressure_pa(serialized) == _HASHIMOTO_PA
+    assert nominal_pressure_pa({"tag": "value", "value": serialized}) == _HASHIMOTO_PA
+    invalid = {**serialized, "low": "0"}
+    with pytest.raises(ApproxPressureRefusal):
+        nominal_pressure_pa(invalid)
+
+
 def test_call_pressure_uses_the_nominal_point() -> None:
     band = approximate_pressure_from_printed_point(
         _point(Decimal("100000"), approximate=True)
