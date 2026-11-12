@@ -5175,8 +5175,11 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # annotation, not measured evidence. citation and standard_state are not in
 # that set. Recounted with tools/validate_literature_extracts.py after that
 # admission: uncovered observations 48664 -> 48630 and extracts 617 -> 615;
-# unattested 3131, pilots 57, and source-blind 0 stayed unchanged. Both
-# coverage ceilings may only fall.
+# unattested 3131, pilots 57, and source-blind 0 stayed unchanged.
+# A nested locator.note inside values stays a leaf. Direct values children
+# and point_conditions.*.state.reason stay annotation. Recount held at
+# 48630 / 615, unattested 3131, pilots 57, and source-blind 0.
+# Both coverage ceilings may only fall.
 # Each ceiling may only fall.
 _UNCOVERED_OBSERVATIONS_CEILING = 48630
 _UNCOVERED_EXTRACTS_CEILING = 615
@@ -5210,14 +5213,17 @@ def _fidelity_extract_documents():
             yield path.stem, doc
 
 
-def _fidelity_warning_totals(documents, corpus_mount=None):
+def _fidelity_warning_totals(documents, corpus_mount=None, artifact_root=None):
     totals = Counter()
     extract_counts = Counter()
     mount_dependent_pins = 0
     details = []
     for label, doc in documents:
         warnings = vle.fidelity_source_warnings(
-            doc, label=label, corpus_mount=corpus_mount
+            doc,
+            label=label,
+            corpus_mount=corpus_mount,
+            artifact_root=artifact_root,
         )
         for warning in warnings:
             totals[warning.kind] += warning.count
@@ -5225,7 +5231,7 @@ def _fidelity_warning_totals(documents, corpus_mount=None):
             if warning.kind == "source_blind_pin":
                 assert len(warning.reason_codes_by_pin) == warning.count
                 mount_dependent_pins += sum(
-                    reason_codes == frozenset({"corpus_root_unset"})
+                    vle._mount_absence_only(reason_codes)
                     for reason_codes in warning.reason_codes_by_pin
                 )
                 details.append(warning.render())
@@ -5251,16 +5257,18 @@ def _format_unverified_prefixes(tally: vle.CorpusMountTally) -> str:
     )
 
 
-def _assert_corpus_pins_open(documents) -> vle.CorpusMountTally:
+def _assert_corpus_pins_open(documents, artifact_root=None) -> vle.CorpusMountTally:
     """Fail verified corpus pins. Skip when every corpus pin is unverified.
 
-    A pin whose top-level prefix directory is absent is counted, not failed.
-    A pin whose prefix directory exists fails on a missing file, a wrong
-    digest, or an absent token. The returned tally is the count line.
+    A pin is counted, not failed, only when every code is a mount absence.
+    An absent token beside an unmounted prefix fails. The returned tally
+    is the count line.
     """
     tally = vle.CorpusMountTally()
     totals, _extract_counts, _mount_dependent_pins, details = (
-        _fidelity_warning_totals(documents, corpus_mount=tally)
+        _fidelity_warning_totals(
+            documents, corpus_mount=tally, artifact_root=artifact_root
+        )
     )
     failures = totals["source_blind_pin"] - tally.unverified_pins
     rendered = _format_unverified_prefixes(tally)
@@ -5485,6 +5493,47 @@ def test_fidelity_annotation_string_is_covered_by_value_leaves_alone(annotation_
     assert _uncovered_observation_count(with_float) == 1
 
 
+def test_nested_locator_note_inside_values_stays_a_measured_leaf():
+    """A locator note nested under values is printed evidence.
+
+    Annotation strings are skipped only as a direct child of values, or at
+    point_conditions.*.state.reason. The alpha pin does not cover the note.
+    """
+    note = "printed O2 partial pressure at xTiO2=37.91 mol %"
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"]["note"] = "Extractor note from the 1978 table."
+    observation["values"]["oxygen_partial_pressure"] = {
+        "locator": {"note": note},
+    }
+    observation["point_conditions"] = {
+        "composition": {
+            "state": {"reason": "The 30A run is absent from Table 5."},
+        }
+    }
+    leaves = set(vle._scored_measured_leaves(observation))
+    assert ("values", "oxygen_partial_pressure", "locator", "note") in leaves
+    assert ("values", "note") not in leaves
+    assert ("point_conditions", "composition", "state", "reason") not in leaves
+    assert _uncovered_observation_count(doc) == 1
+    assert vle._observation_has_digit_bearing_string(
+        {"values": {"oxygen_partial_pressure": {"locator": {"note": note}}}}
+    )
+    assert not vle._observation_has_digit_bearing_string(
+        {"values": {"note": "Extractor note from the 1978 table."}}
+    )
+    assert not vle._observation_has_digit_bearing_string(
+        {
+            "point_conditions": {
+                "composition": {
+                    "state": {"reason": "The 30A run is absent from Table 5."},
+                }
+            }
+        }
+    )
+
+
 @pytest.mark.parametrize("printed_key", ["caption", "citation"])
 def test_fidelity_non_annotation_string_stays_a_measured_leaf(printed_key):
     doc = _minimal_extract()
@@ -5505,11 +5554,23 @@ _LOCATOR_KEY_SETS = (
 )
 _TYPED_LOCATOR_REFUSALS = (
     "corpus_root_unset",
+    "corpus_prefix_unmounted",
     "corpus_artifact_missing",
     "corpus_path_outside_root",
     "artifact_digest_missing",
     "artifact_digest_mismatch",
 )
+_TOKEN_ABSENT_OUTCOMES = frozenset({
+    "token_absent",
+    "digest_valid_token_absent",
+    "record_alternate_token_absent",
+    "first_open_token_absent",
+})
+_LOCATOR_KEY_PREFIX = {
+    "source_path": "text",
+    "quotes_path": "tables",
+    "record": "text",
+}
 _PER_KEY_OUTCOMES = (
     "matched",
     "repository_transcription",
@@ -5549,7 +5610,8 @@ for _keys in _LOCATOR_KEY_SETS:
             for _digest_token in (None, "0.24", "0.25"):
                 _mount_required = any(
                     outcome
-                    in _CORPUS_FILE_OUTCOMES | {"corpus_artifact_missing"}
+                    in _CORPUS_FILE_OUTCOMES
+                    | {"corpus_artifact_missing", "corpus_prefix_unmounted"}
                     for outcome in _outcomes
                 )
                 if _mount_required != _corpus_mounted:
@@ -5598,16 +5660,24 @@ for _keys in _LOCATOR_KEY_SETS:
                     ):
                         _realizable = False
                     elif (
-                        _outcome
-                        in {
-                            "token_absent",
-                            "first_open_token_absent",
-                            "digest_valid_token_absent",
-                            "record_alternate_token_absent",
-                        }
+                        _outcome in _TOKEN_ABSENT_OUTCOMES
                         and _digest_token not in {None, "0.25"}
                     ):
                         _realizable = False
+                # One prefix cannot be both present (missing file or a corpus
+                # file) and absent. source_path and record share text/.
+                _prefix_created = {
+                    _LOCATOR_KEY_PREFIX[key]
+                    for key, outcome in zip(_keys, _outcomes)
+                    if outcome in _CORPUS_FILE_OUTCOMES | {"corpus_artifact_missing"}
+                }
+                _prefix_absent = {
+                    _LOCATOR_KEY_PREFIX[key]
+                    for key, outcome in zip(_keys, _outcomes)
+                    if outcome == "corpus_prefix_unmounted"
+                }
+                if _prefix_created & _prefix_absent:
+                    _realizable = False
                 if _realizable:
                     _LOCATOR_OUTCOME_CASES.append(
                         (_keys, _outcomes, _corpus_mounted, _digest_token)
@@ -5721,6 +5791,8 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         elif outcome == "corpus_root_unset":
             pass
         elif outcome == "corpus_artifact_missing":
+            (corpus_root / path).parent.mkdir(parents=True, exist_ok=True)
+        elif outcome == "corpus_prefix_unmounted":
             pass
         elif outcome == "corpus_path_outside_root":
             pass
@@ -5753,21 +5825,14 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
     assert (source_blind.kind if source_blind else None) == expected_source_blind_reason
     if source_blind:
         expected_reason_codes = set(outcomes) & set(_TYPED_LOCATOR_REFUSALS)
+        if any(outcome in _TOKEN_ABSENT_OUTCOMES for outcome in outcomes):
+            expected_reason_codes.add("cited_token_absent")
         actual_reason_codes = set().union(*source_blind.reason_codes_by_pin)
         assert actual_reason_codes == expected_reason_codes
         for key, outcome in zip(declared_keys, outcomes):
             if outcome in _TYPED_LOCATOR_REFUSALS:
                 assert f"{outcome} ({locator[key]})" in source_blind.detail
-        token_absent = any(
-            outcome
-            in {
-                "token_absent",
-                "digest_valid_token_absent",
-                "record_alternate_token_absent",
-                "first_open_token_absent",
-            }
-            for outcome in outcomes
-        )
+        token_absent = any(outcome in _TOKEN_ABSENT_OUTCOMES for outcome in outcomes)
         assert ("not in the cited text" in source_blind.detail) == token_absent
 
     _assert_refused_sample_still_covers_addressed_observation(
@@ -6044,6 +6109,92 @@ def test_partial_corpus_mount_verifies_present_prefix_only(tmp_path, monkeypatch
 
     with pytest.raises(pytest.skip.Exception, match=r"text=1"):
         _assert_corpus_pins_open([("text-pin", text_doc)])
+
+
+def test_mixed_locator_absent_token_fails_with_unmounted_prefix(
+    tmp_path, monkeypatch
+):
+    """tables/ is mounted and the token is absent. text/ is not on the mount.
+
+    The unmounted prefix must not exempt the absent token.
+    """
+    repository_root = tmp_path / "repository"
+    corpus_root = tmp_path / "corpus"
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    tables = corpus_root / "tables" / "quotes.txt"
+    tables.parent.mkdir(parents=True)
+    tables.write_text("alpha 0.25 measured\n", encoding="utf-8")
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator.update(
+        {
+            "source_path": "text/source.txt",
+            "quotes_path": "tables/quotes.txt",
+            "page": 2,
+            "source_sha256": hashlib.sha256(tables.read_bytes()).hexdigest(),
+        }
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    tally = vle.CorpusMountTally()
+    warnings = vle.fidelity_source_warnings(
+        doc,
+        label="mixed-locator",
+        artifact_root=repository_root,
+        corpus_mount=tally,
+    )
+    warning = next(item for item in warnings if item.kind == "source_blind_pin")
+    assert warning.reason_codes_by_pin == (
+        frozenset({"corpus_prefix_unmounted", "cited_token_absent"}),
+    )
+    assert tally.unverified_pins == 0
+    assert tally.verified_opens == 0
+    with pytest.raises(AssertionError, match="not in the cited text"):
+        _assert_corpus_pins_open(
+            [("mixed-locator", doc)], artifact_root=repository_root
+        )
+
+
+def test_repository_transcription_token_miss_fails_unmounted(
+    tmp_path, monkeypatch
+):
+    """A repository transcription that lacks the token is not mount-dependent.
+
+    The same locator also cites a corpus path. With the root unset that
+    path is corpus_root_unset, and the token miss must keep the pin a failure.
+    """
+    repository_root = tmp_path / "repository"
+    transcription = repository_root / "text" / "transcription.txt"
+    transcription.parent.mkdir(parents=True)
+    transcription.write_text(
+        "repository transcription\nalpha 0.25 measured\n", encoding="utf-8"
+    )
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator.update(
+        {
+            "source_path": "text/transcription.txt",
+            "quotes_path": "tables/quotes.txt",
+            "page": 2,
+        }
+    )
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    totals, _extract_counts, mount_dependent_pins, _details = (
+        _fidelity_warning_totals(
+            [("repository-token-miss", doc)], artifact_root=repository_root
+        )
+    )
+    warnings = vle.fidelity_source_warnings(
+        doc, label="repository-token-miss", artifact_root=repository_root
+    )
+    warning = next(item for item in warnings if item.kind == "source_blind_pin")
+    assert warning.reason_codes_by_pin == (
+        frozenset({"cited_token_absent", "corpus_root_unset"}),
+    )
+    assert totals["source_blind_pin"] == 1
+    assert mount_dependent_pins == 0
 
 
 def test_repository_override_missing_artifact_refuses_without_corpus_root(

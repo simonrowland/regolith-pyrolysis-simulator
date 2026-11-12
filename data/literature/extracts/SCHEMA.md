@@ -107,9 +107,11 @@ Coverage is by leaf address. A measured leaf is a finite int or float
 (not a boolean), or a string that contains any digit [0-9]. String values
 under the closed `ANNOTATION_KEYS` set (`attribution`, `note`, `reason`,
 `schema_gap`, `composition_derivation`, `parents_not_printed`) are excluded
-because sampled values are the extractor's paraphrase, provenance, reasoning,
-schema notes, or refusal reasons, not printed evidence. Numbers under those
-keys remain leaves. A key stays outside the set when its sampled values
+only as a direct child of `values` (`values.note`, `values.attribution`, and
+the other keys in that set) or on the path `point_conditions.*.state.reason`.
+Those strings are the extractor's paraphrase, provenance, reasoning, schema
+notes, or refusal reasons, not printed evidence. A nested `locator.note`
+inside `values` stays a leaf. Numbers under those keys remain leaves. A key stays outside the set when its sampled values
 transcribe a printed citation, cell, label, id, caption, or standard state.
 `citation` and `standard_state` stay outside for that reason. A quantity
 name, a unit on its own, or another label with no digit is not a leaf.

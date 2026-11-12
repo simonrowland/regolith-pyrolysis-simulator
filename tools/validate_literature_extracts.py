@@ -66,8 +66,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   (``T_range_K``, ``T_K``, ``T_C``, ``temperature_C``, ``temp_C``,
   ``point_conditions``). A locator inside a condition is provenance, not
   a leaf. A coverable measured leaf is a finite int or float (not a
-  boolean), or a string that contains any digit [0-9] unless it is an
-  annotation string under ``ANNOTATION_KEYS``. A non-finite float
+  boolean), or a string that contains any digit [0-9] unless that string
+  is an admitted annotation: a direct child of ``values``, or
+  ``point_conditions.*.state.reason``. A nested ``locator.note`` stays a
+  leaf. A non-finite float
   is not coverable and is not dropped: it is ``non_finite_evidence``.
   A quantity name, a unit on its
   own, or another label with no digit is not a leaf and may be attested
@@ -1772,16 +1774,29 @@ class _LocatorSourceBlindReason:
     reason_codes: frozenset[str] = frozenset()
 
 
+# A pin is unverified, not failed, only when every code is in this set.
+# cited_token_absent and every other content refusal stay failures.
+_MOUNT_ABSENCE_CODES = frozenset({
+    "corpus_root_unset",
+    "corpus_prefix_unmounted",
+})
+
+
+def _mount_absence_only(reason_codes: frozenset[str]) -> bool:
+    """True when every code is a missing mount or an unmounted prefix."""
+    return bool(reason_codes) and reason_codes <= _MOUNT_ABSENCE_CODES
+
+
 @dataclass
 class CorpusMountTally:
     """Corpus pins observed while counting fidelity warnings for one walk.
 
     ``verified_opens`` are attestation-complete pins whose top-level prefix
     directory exists and which opened with a matching digest and token.
-    ``unverified_pins`` are pins whose only source-blind reason is
-    ``corpus_prefix_unmounted``. ``unverified_by_prefix`` counts those pins
-    by the missing directory. Every other source-blind reason stays on the
-    warning list.
+    ``unverified_pins`` are pins whose source-blind codes are all
+    mount-absence codes. A pin that also carries any other code, including
+    ``cited_token_absent``, stays on the warning list. ``unverified_by_prefix``
+    counts unmounted-prefix pins by the missing directory.
     """
 
     verified_opens: int = 0
@@ -1831,9 +1846,25 @@ ANNOTATION_KEYS = frozenset(
 )
 
 
-def _is_annotation_string(key: Any, value: Any) -> bool:
-    """True for extract-authored annotation strings, never numeric values."""
-    return isinstance(value, str) and key in ANNOTATION_KEYS
+def _is_annotation_string(
+    prefix: tuple[Any, ...], key: Any, value: Any
+) -> bool:
+    """True for an extractor annotation string on an admitted path.
+
+    Admitted paths are a direct child of ``values`` (``values.note``) and
+    ``point_conditions.*.state.reason``. A nested ``locator.note`` inside
+    ``values`` is printed evidence. Numbers stay leaves.
+    """
+    if not isinstance(value, str) or key not in ANNOTATION_KEYS:
+        return False
+    if prefix == ("values",):
+        return True
+    return (
+        key == "reason"
+        and len(prefix) >= 3
+        and prefix[-3] == "point_conditions"
+        and prefix[-1] == "state"
+    )
 
 
 def _scored_observations(
@@ -1930,8 +1961,10 @@ def _scored_measured_leaves(observation: Mapping[str, Any]) -> list[tuple[Any, .
     Addresses sit in one evidence tree. ``("values", "alpha")`` and
     ``("T_range_K", 0)`` are different leaves even when the numbers are
     equal. A ``locator`` inside a condition is provenance and is not a
-    leaf. Numeric values under annotation keys remain leaves, while their
-    string values do not. Non-finite floats are not in this list;
+    leaf. An annotation string is skipped only as a direct child of
+    ``values`` or at ``point_conditions.*.state.reason``. A nested
+    ``locator.note`` remains a leaf, and so does a number under an
+    annotation key. Non-finite floats are not in this list;
     ``_scored_evidence_leaves`` records them.
     """
     coverable, _non_finite = _scored_evidence_leaves(observation)
@@ -1961,28 +1994,37 @@ def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> boo
     The walk is the same evidence the measured-leaf walker uses. A locator
     inside a condition is provenance. This is the backstop for a recognizer
     that returns no leaves: the coverage decision refuses that block. A
-    string under an ``ANNOTATION_KEYS`` key is not evidence.
+    string on an admitted annotation path is not evidence. A nested
+    ``locator.note`` is evidence.
     """
 
-    def contains(value: Any, skip_keys: frozenset[str]) -> bool:
+    def contains(
+        value: Any, prefix: tuple[Any, ...], skip_keys: frozenset[str]
+    ) -> bool:
         if isinstance(value, str):
             return _string_has_ascii_digit(value)
         if isinstance(value, Mapping):
             return any(
-                contains(child, skip_keys)
+                contains(child, prefix + (key,), skip_keys)
                 for key, child in value.items()
-                if key not in skip_keys and not _is_annotation_string(key, child)
+                if key not in skip_keys
+                and not _is_annotation_string(prefix, key, child)
             )
         if isinstance(value, (list, tuple)):
-            return any(contains(child, skip_keys) for child in value)
+            return any(
+                contains(child, prefix + (index,), skip_keys)
+                for index, child in enumerate(value)
+            )
         return False
 
-    if "values" in observation and contains(observation.get("values"), frozenset()):
+    if "values" in observation and contains(
+        observation.get("values"), ("values",), frozenset()
+    ):
         return True
     for key in _SCORED_NUMERIC_CONDITIONS:
         if key not in observation or observation.get(key) is None:
             continue
-        if contains(observation.get(key), _CONDITION_PROVENANCE_KEYS):
+        if contains(observation.get(key), (key,), _CONDITION_PROVENANCE_KEYS):
             return True
     return False
 
@@ -2088,8 +2130,9 @@ def _classify_measured_leaves(
 
     Invariant: every float is accounted for. A finite int or float (not a
     boolean) and a string that contains any digit [0-9] are coverable unless
-    the string value is under a key in ``ANNOTATION_KEYS``. Numbers under
-    those keys remain leaves. A
+    the string is an admitted annotation: a direct child of ``values``, or
+    ``point_conditions.*.state.reason``. A nested ``locator.note`` stays a
+    leaf. Numbers under annotation keys remain leaves. A
     non-finite float (NaN, +Inf, -Inf) is the second list. It is never
     omitted and never coverable. A label with no digit is neither. The
     address is the path of mapping keys and list indexes from ``value``.
@@ -2115,7 +2158,7 @@ def _classify_measured_leaves(
         coverable: list[tuple[Any, ...]] = []
         non_finite: list[tuple[Any, ...]] = []
         for key, child in value.items():
-            if key in skip_keys or _is_annotation_string(key, child):
+            if key in skip_keys or _is_annotation_string(prefix, key, child):
                 continue
             child_coverable, child_non_finite = _classify_measured_leaves(
                 child, prefix + (key,), skip_keys=skip_keys
@@ -2690,7 +2733,7 @@ def _locator_source_blind_reason(
         if opened_corpus and not codes:
             corpus_mount.verified_opens += 1
             return
-        if codes != frozenset({"corpus_prefix_unmounted"}):
+        if not _mount_absence_only(codes):
             return
         corpus_mount.unverified_pins += 1
         for prefix in sorted(set(unmounted_prefixes)):
@@ -2747,17 +2790,20 @@ def _locator_source_blind_reason(
                 candidate_reasons.append(
                     f"{path.name} is a PDF; certification opens a text or OCR artifact"
                 )
+                candidate_reason_codes.add("artifact_is_pdf")
                 break
             try:
                 text = blob.decode("utf-8")
             except UnicodeError:
                 candidate_reasons.append(f"{path.name} is not UTF-8 text")
+                candidate_reason_codes.add("artifact_not_utf8")
                 break
             if _text_is_extract_document(text):
                 candidate_reasons.append(
                     "locator was not opened: "
                     f"{path.name} is an extract document, not an independent source"
                 )
+                candidate_reason_codes.add("artifact_is_extract_document")
                 break
             delimiter = _tabular_delimiter(path)
             if delimiter is None:
@@ -2766,6 +2812,7 @@ def _locator_source_blind_reason(
                     candidate_reasons.append(
                         span_error or "cited span was not opened"
                     )
+                    candidate_reason_codes.add("cited_span_missing")
                     break
                 missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
             else:
@@ -2776,11 +2823,13 @@ def _locator_source_blind_reason(
                     candidate_reasons.append(
                         f"opened {path.name} but the table could not be parsed ({exc})"
                     )
+                    candidate_reason_codes.add("cited_table_unparsed")
                     break
                 if cells is None:
                     candidate_reasons.append(
                         span_error or "cited span was not opened"
                     )
+                    candidate_reason_codes.add("cited_span_missing")
                     break
                 missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
             if not missing:
@@ -2791,6 +2840,7 @@ def _locator_source_blind_reason(
                 f"opened {path.name} but the resolved extract value is not in the "
                 f"cited text ({rendered})"
             )
+            candidate_reason_codes.add("cited_token_absent")
             break
         if resolved_to_corpus:
             corpus_artifact_keys += 1
@@ -2858,8 +2908,10 @@ def fidelity_source_warnings(
     present scored numeric condition (``_SCORED_NUMERIC_CONDITIONS``): the
     fields the scored temperature payload copies beside ``values``. A
     locator inside a condition is provenance, not a leaf. Digit-bearing
-    strings under ``ANNOTATION_KEYS`` are extractor-authored annotation and
-    are not evidence; numbers under those keys remain leaves. Repeating a pin
+    strings are extractor-authored annotation, and not evidence, only as a
+    direct child of ``values`` or at ``point_conditions.*.state.reason``.
+    A nested ``locator.note`` stays evidence. Numbers under annotation keys
+    remain leaves. Repeating a pin
     of one address does not cover a sibling, even when the numbers are
     equal, and a ``values`` pin does not cover a sibling condition. A
     measured leaf is a finite int or float (not a boolean), or a string
