@@ -2413,7 +2413,7 @@ class CondensationModel:
             ):
                 raise ValueError(f'{label} must be numeric')
             value = float(raw_temperature)
-            if not math.isfinite(value) or value <= -273.15:
+            if not math.isfinite(value) or value <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError(
                     f'{label} must be finite and above absolute zero'
                 )
@@ -2493,7 +2493,7 @@ class CondensationModel:
                 raw_temperature = float(raw_temperature)
                 if (
                     not math.isfinite(raw_temperature)
-                    or raw_temperature <= -273.15
+                    or raw_temperature <= -CELSIUS_TO_KELVIN_OFFSET
                 ):
                     raise ValueError(
                         f'{segment.name} wall temperature must be finite '
@@ -2502,7 +2502,7 @@ class CondensationModel:
 
         if wall_temperature_C is not None:
             wall_temperature = float(wall_temperature_C)
-            if not math.isfinite(wall_temperature) or wall_temperature <= -273.15:
+            if not math.isfinite(wall_temperature) or wall_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError('wall_temperature_C must be finite and above absolute zero')
             self.wall_temperature_C = wall_temperature
         if pipe_diameter_m is not None:
@@ -2514,7 +2514,7 @@ class CondensationModel:
             ]
         if gas_temperature_C is not None:
             gas_temperature = float(gas_temperature_C)
-            if not math.isfinite(gas_temperature) or gas_temperature <= -273.15:
+            if not math.isfinite(gas_temperature) or gas_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError('gas_temperature_C must be finite and above absolute zero')
             self.gas_temperature_C = gas_temperature
         elif wall_temperature_C is not None:
@@ -2980,7 +2980,7 @@ class CondensationModel:
             raw_temperature = float(temperatures_C.get(
                 segment.name, self.wall_temperature_C)
             )
-            if not math.isfinite(raw_temperature) or raw_temperature <= -273.15:
+            if not math.isfinite(raw_temperature) or raw_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError(
                     f'{segment.name} wall temperature must be finite and above absolute zero'
                 )

@@ -19,7 +19,11 @@ from simulator.oxygen_buffers import (
     feo_iw_log10_fO2_bar,
     legacy_iw_log10_fO2_bar,
 )
-from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT,
+    PA_PER_BAR,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -248,9 +252,9 @@ def kress91_referenced_log_fO2(
 ) -> float:
     redox_fO2_log = float(fO2_log)
     redox_target_T_K = float(target_T_K)
-    # 273.15 K is the exact Celsius-to-kelvin offset, so this is the
-    # documented 1200 C liquid-calibration floor expressed in kelvin.
-    calibration_min_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15
+    # CELSIUS_TO_KELVIN_OFFSET is the exact Celsius-to-kelvin offset, so
+    # this is the documented 1200 C liquid-calibration floor in kelvin.
+    calibration_min_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + CELSIUS_TO_KELVIN_OFFSET
     if redox_target_T_K < calibration_min_T_K:
         raise Kress91InvalidControls(
             f'Kress91 invalid control target_T_K: {redox_target_T_K!r} K is '
@@ -293,7 +297,7 @@ def _kress91_gate_key_referenced_log_fO2(
     if reference_T_K is None:
         return redox_fO2_log
     redox_reference_T_K = float(reference_T_K)
-    if redox_reference_T_K <= 273.15:
+    if redox_reference_T_K <= CELSIUS_TO_KELVIN_OFFSET:
         return redox_fO2_log
     return kress91_referenced_log_fO2(
         redox_fO2_log,
@@ -471,7 +475,7 @@ def _linear_interpolate_or_clamp(
 
 
 def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
-    T_C = float(T_K) - 273.15
+    T_C = float(T_K) - CELSIUS_TO_KELVIN_OFFSET
     multiplier, status = _linear_interpolate_or_clamp(
         HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
         T_C,
@@ -1356,7 +1360,7 @@ def kress91_split(
     fe3 = 2.0 * ratio / (2.0 * ratio + 1.0)
     x_fe2o3 = ratio * mol_fractions['FeOt'] / (2.0 * ratio + 1.0)
     x_feo = max(0.0, mol_fractions['FeOt'] - 2.0 * x_fe2o3)
-    temperature_band = kress91_temperature_band_case(float(T_K) - 273.15)
+    temperature_band = kress91_temperature_band_case(float(T_K) - CELSIUS_TO_KELVIN_OFFSET)
     return {
         'fe3': fe3,
         'ratio': ratio,
