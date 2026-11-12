@@ -1647,16 +1647,18 @@ _VERB0_MASS_RESIDUAL_1E5 = 'Mass residual      : +1.20000e-05\n'
 
 def _install_fake_magemin_subprocess_with_qfm_readback(monkeypatch, stdout):
     """Give Mode-parser tests valid native redox control evidence."""
-    monkeypatch.setattr(
-        MAGEMinBackend,
-        '_read_subprocess_fo2',
-        staticmethod(lambda *_args: (-8.0, True)),
-    )
-    monkeypatch.setattr(
-        'simulator.melt_backend.magemin.subprocess.run',
-        lambda args, **_kwargs: subprocess.CompletedProcess(
+    def fake_subprocess_run(args, **kwargs):
+        output = Path(kwargs['cwd']) / 'output'
+        output.mkdir()
+        (output / '_matlab_output.txt').write_text(
+            'log10(fO2) -8.000000e+00\n'
+        )
+        return subprocess.CompletedProcess(
             args, 0, stdout=stdout, stderr='',
-        ),
+        )
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.magemin.subprocess.run', fake_subprocess_run,
     )
 
 
@@ -1667,7 +1669,7 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
     _install_fake_magemin_subprocess_with_qfm_readback(
         monkeypatch,
         f'{_VERB0_MASS_RESIDUAL_1E5}'
-        'Phase: liq\nMode: 1.00003\n',
+        'Phase : liq qfm\nMode  : 1.00003 0.000000\n',
     )
     backend = MAGEMinBackend()
     backend._available = True
@@ -1683,10 +1685,12 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
 
     assert result.status == 'ok'
     assert result.phase_masses_kg['liq'] == 1.0
+    assert set(result.phase_masses_kg) == {'liq'}
     assert sum(result.phase_masses_kg.values()) == 1.0
     notice = _renormalised_mode_notice(result)
     assert notice['raw_tokens'] == [
         {'phase': 'liq', 'raw_token': '1.00003'},
+        {'phase': 'qfm', 'raw_token': '0.000000'},
     ]
     assert notice['raw_sum'] == pytest.approx(1.00003)
     assert notice['mass_residual'] == pytest.approx(1.2e-5)
@@ -1707,7 +1711,7 @@ def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
     _install_fake_magemin_subprocess_with_qfm_readback(
         monkeypatch,
         f'{_VERB0_MASS_RESIDUAL_1E5}'
-        'Phase: liq ol\nMode: 1.00003 0.00008\n',
+        'Phase : liq ol qfm\nMode  : 1.00003 0.00008 0.000000\n',
     )
     backend = MAGEMinBackend()
     backend._available = True
@@ -1722,6 +1726,7 @@ def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
     )
 
     assert result.status == 'ok'
+    assert set(result.phase_masses_kg) == {'liq', 'ol'}
     assert sum(result.phase_masses_kg.values()) == 1.0
     # Liquid is 1.00003/1.00011. Olivine stays 0.00008/1.00011.
     # The largest component takes the closure residual, so a last-token
@@ -1732,6 +1737,7 @@ def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
     assert notice['raw_tokens'] == [
         {'phase': 'liq', 'raw_token': '1.00003'},
         {'phase': 'ol', 'raw_token': '0.00008'},
+        {'phase': 'qfm', 'raw_token': '0.000000'},
     ]
     assert notice['raw_sum'] == pytest.approx(1.00011)
     assert notice['mass_residual'] == pytest.approx(1.2e-5)
