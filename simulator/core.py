@@ -3185,6 +3185,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             side='credits',
             account='process.cleaned_melt',
         )
+        melt_credit_free_o2_mol = self._transition_account_o2_equiv_mol(
+            transition,
+            side='credits',
+            account='process.cleaned_melt',
+            species_filter={OXYGEN_SPECIES},
+        )
         # Premise: MO_x(l) -> M(g) + (x/2) O2(g). The metal and its oxygen
         # leave together, so every oxide that stays has the same M:O ratio
         # and the melt redox state is unchanged. Example:
@@ -3228,7 +3234,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         stoich_free_o2_mol = (
             melt_debit_o2_equiv_mol
-            - melt_credit_o2_equiv_mol
+            # O2 parked in cleaned melt is oxygen retained while its metal
+            # leaves. It is a redox source, not an oxide credit that restores
+            # congruent M:O loss. Other oxygen-bearing melt credits remain
+            # part of the staying oxide inventory.
+            - (melt_credit_o2_equiv_mol - melt_credit_free_o2_mol)
             - vapour_carried_o2_equiv_mol
         )
         residual_o2_mol = net_overhead_o2_mol - stoich_free_o2_mol

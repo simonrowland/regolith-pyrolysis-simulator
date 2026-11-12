@@ -2460,11 +2460,46 @@ def test_nonstoichiometric_evaporation_residual_is_the_only_redox_term() -> None
     extra = sim._evaporative_redox_source_terms_from_transition(
         _rewritten(_double_o2)
     )
+    credits_with_melt_o2 = []
+    for lot in transition.credits:
+        species_kg = dict(lot.species_kg)
+        parked_o2_kg = 0.0
+        if lot.account == "process.overhead_gas":
+            parked_o2_kg = float(species_kg.pop("O2", 0.0) or 0.0)
+        if species_kg:
+            credits_with_melt_o2.append(
+                MaterialLot(
+                    lot.account,
+                    species_kg,
+                    source=lot.source,
+                    material_origin=lot.material_origin,
+                )
+            )
+        if parked_o2_kg > 0.0:
+            credits_with_melt_o2.append(
+                MaterialLot(
+                    "process.cleaned_melt",
+                    {"O2": parked_o2_kg},
+                    source=lot.source,
+                    material_origin=lot.material_origin,
+                )
+            )
+    oxygen_retained_in_melt = LedgerTransition(
+        name=transition.name,
+        debits=transition.debits,
+        credits=tuple(credits_with_melt_o2),
+    )
+    retained_source = sim._evaporative_redox_source_terms_from_transition(
+        oxygen_retained_in_melt
+    )
     assert stayed == pytest.approx(
         {"redox_source:evaporative_metal_loss": overhead_o2_mol}
     )
     assert extra == pytest.approx(
         {"redox_source:evaporative_oxygen_loss": -overhead_o2_mol}
+    )
+    assert retained_source == pytest.approx(
+        {"redox_source:evaporative_metal_loss": overhead_o2_mol}
     )
     assert sim._evaporative_redox_source_terms_from_transition(
         LedgerTransition(
