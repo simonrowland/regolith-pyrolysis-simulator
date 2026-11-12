@@ -1284,6 +1284,30 @@ def test_psat_o2_alias_is_catalog_id_and_evaluator_absent() -> None:
     assert pressure == "rail_row_absent"
 
 
+def test_psat_evaluator_exception_is_distinct_from_missing_row() -> None:
+    import simulator.diagnostic_helpers.species_rail_differential as differential
+
+    def fail_evaluate(*_args, **_kwargs):
+        raise RuntimeError("evaluator exploded")
+
+    evaluator = SimpleNamespace(
+        pressure_observable=(
+            differential.PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE
+        ),
+        activity_exponent=0.0,
+        evaluate=fail_evaluate,
+    )
+    catalog = SimpleNamespace(
+        species={"test_species": SimpleNamespace(evaluator=evaluator)}
+    )
+
+    failure = _evaluate_rail_pressure_Pa("test_species", 1500.0, catalog)
+
+    assert type(failure).__name__ == "RailPressureEvaluationFailure"
+    assert failure != "rail_row_absent"
+    assert failure != 1.0
+
+
 def test_psat_channel_refuses_missing_gas_or_condensed_or_rail() -> None:
     rail = derive_species_rail()
     gas = KeyedTablePoint(
