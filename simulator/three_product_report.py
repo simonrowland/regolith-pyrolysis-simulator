@@ -179,6 +179,25 @@ def _stage_3_ledger_issue(
     return '; '.join(parts)
 
 
+def _qualified_si_only_clause(
+    glass_kg: float | None,
+    qualified_silicon_kg: float,
+) -> str:
+    """Record a Si-only qualification beside a zero glass class.
+
+    Class mass is SiO2 + SiO. A snapshot that passes the purity gate on
+    elemental Si alone still contributes no class mass. That zero is not
+    a purity failure; this clause is the only place that says so.
+    """
+    if glass_kg is None or glass_kg != 0.0 or qualified_silicon_kg <= 0.0:
+        return ''
+    return (
+        '; qualified Si-only '
+        f'({qualified_silicon_kg:.6g} kg Si); '
+        'class mass is SiO2 + SiO and is zero'
+    )
+
+
 def _stage_3_glass_snapshot_census(snapshots) -> dict[str, Any]:
     """Qualify Stage 3 deposits per snapshot and retain exclusion mass."""
     product_by_species: dict[str, float] = {}
@@ -493,6 +512,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 f'(qualified {qualified_silicon_coproduct_kg:.6g} kg; '
                 'reported separately)'
             )
+    silica_flag_reason += _qualified_si_only_clause(
+        silica_product_kg,
+        qualified_silicon_coproduct_kg,
+    )
     if excluded_stage_3_snapshots:
         silica_flag_reason += '; ' + '; '.join(excluded_stage_3_snapshots)
     if stage_3_snapshot_issue is not None:

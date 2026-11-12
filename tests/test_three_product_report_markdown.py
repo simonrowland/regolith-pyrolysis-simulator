@@ -12,10 +12,56 @@ Pin:
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from simulator.three_product_report_markdown import (
+    _format_kg,
     format_three_product_markdown,
+)
+
+# Reviewer-cited lunar glass yield. A positive mass this small must render.
+_LUNAR_GLASS_KG = 8.939275771102051e-11
+_TRACE_MASSES_KG = (
+    _LUNAR_GLASS_KG,
+    1.0e-15,
+    1.0e-12,
+    9.99e-10,
+)
+_ZERO_GLASS_CLASS_NOTE = (
+    'Glass class mass is zero. A zero class mass does not mean the '
+    'purity gate failed.'
+)
+_INVENTED_PURITY_FAILURE = (
+    'No Stage 3 snapshot met the measured silica-bearing purity threshold'
+)
+# Every kilogram the markdown renderer prints. A new f-string path is a
+# miss against this list and against the single-formatter source pin.
+_MASS_SLOTS = (
+    'metals_class_total',
+    'metals_total',
+    'o2',
+    'metal_species',
+    'metal_source_account',
+    'silica_class_total',
+    'stage_3_capture',
+    'stage_3_species',
+    'mixed_class_total',
+    'mixed_residual',
+    'rump_class_total',
+    'rump_total',
+    'rump_refractory',
+    'rump_silicate',
+    'rump_unextracted',
+    'rump_other',
+    'rump_species',
+    'unrecovered_total',
+    'unrecovered_species',
+    'unrecovered_source',
+    'unclassified_total',
+    'unclassified_species',
+    'excluded_upper_bound',
 )
 
 
@@ -174,7 +220,7 @@ def test_partial_product_class_labels_numeric_ledger_bound_as_conservative():
     })
     report = format_three_product_markdown(classification)
     assert (
-        "Si via process.cleaned_melt (up to 0.562 kg "
+        "Si via process.cleaned_melt (up to 5.617e-01 kg "
         "(conservative upper bound); missing LJ row)"
     ) in report
     assert "includes estimated transport for SiO" in report
@@ -210,8 +256,9 @@ def test_unqualified_silica_preserves_measured_capture_without_product_claim():
     assert 'Silica glass: — kg' in report
     assert '## 2. Pure silica glass' not in report
     assert 'Stage 3 capture: 1.442e-08 kg' in report
-    assert 'measured silica-bearing purity threshold' in report
-    assert 'Gas-cover history is provenance only' in report
+    assert _ZERO_GLASS_CLASS_NOTE in report
+    assert _INVENTED_PURITY_FAILURE not in report
+    assert 'Gas-cover history is provenance only' not in report
     assert 'owner product spec pending' in report
     assert 'purity_below_threshold' in report
 
@@ -290,6 +337,8 @@ def test_refused_silica_product_quantity_is_unavailable_not_zero():
     assert '**Class total**: unavailable kg' in silica_section
     assert 'Stage 3 capture: unavailable kg' in silica_section
     assert '**Class total**: — kg' not in silica_section
+    assert _ZERO_GLASS_CLASS_NOTE not in silica_section
+    assert _INVENTED_PURITY_FAILURE not in report
 
 
 def test_refused_metal_total_renders_flag_instead_of_numeric_partial_total():
@@ -475,19 +524,167 @@ def test_small_values_use_scientific_notation():
     assert "1.000e-04" in report
 
 
-def test_below_noise_floor_renders_as_dash():
-    """Values below the noise floor (1e-9 kg) render as ``—`` rather
-    than a near-zero number — keeps the operator readout clean."""
+def test_exact_zero_stays_a_dash_and_missing_stays_unavailable():
+    assert _format_kg(0.0) == "—"
+    assert _format_kg(None) == "unavailable"
+
+
+@pytest.mark.parametrize('kg', _TRACE_MASSES_KG + (1.0e-9, 1.01e-9, 0.5617, 1.0, 12.5))
+def test_format_kg_never_hides_a_positive_mass(kg):
+    """The single kilogram formatter is the chokepoint for every slot."""
+    rendered = _format_kg(kg)
+    assert rendered != "—"
+    assert rendered != "0.000"
+    expected = f"{kg:.3e}" if kg < 1.0 else f"{kg:.3f}"
+    assert rendered == expected
+
+
+def _apply_mass_slot(classification: dict, slot: str, kg: float) -> None:
+    metals = classification['metals_plus_O2']
+    silica = classification['pure_silica_glass']
+    mixed = classification['industrial_mixed_glass']
+    rump = classification['refractory_ceramic_rump']
+    unclassified = classification['unclassified']
+    if slot == 'metals_class_total':
+        metals['class_total_kg'] = kg
+    elif slot == 'metals_total':
+        metals['metals_total_kg'] = kg
+    elif slot == 'o2':
+        metals['O2_kg'] = kg
+    elif slot == 'metal_species':
+        metals['metals_kg'] = {'Fe': kg}
+    elif slot == 'metal_source_account':
+        metals['source_accounts_by_species'] = {
+            'Fe': [{'account': 'process.condensation_train', 'kg': kg}],
+        }
+    elif slot == 'silica_class_total':
+        silica['class_total_kg'] = kg
+    elif slot == 'stage_3_capture':
+        silica['stage_3_capture_kg'] = kg
+    elif slot == 'stage_3_species':
+        silica['stage_3_kg_by_species'] = {'SiO2': kg}
+    elif slot == 'mixed_class_total':
+        mixed['class_total_kg'] = kg
+    elif slot == 'mixed_residual':
+        mixed['mixed_melt_residual_kg'] = kg
+    elif slot == 'rump_class_total':
+        rump['class_total_kg'] = kg
+    elif slot == 'rump_total':
+        rump['rump_total_kg'] = kg
+    elif slot == 'rump_refractory':
+        rump['rump_refractory_oxides_kg'] = kg
+    elif slot == 'rump_silicate':
+        rump['rump_silicate_residual_kg'] = kg
+    elif slot == 'rump_unextracted':
+        rump['rump_unextracted_metals_kg'] = kg
+    elif slot == 'rump_other':
+        rump['rump_other_kg'] = kg
+    elif slot == 'rump_species':
+        rump['rump_kg_by_species'] = {'CaO': kg}
+    elif slot == 'unrecovered_total':
+        classification['unrecovered_metal_phase'] = {
+            'species_kg': {'Fe': 0.0},
+            'class_total_kg': kg,
+        }
+    elif slot == 'unrecovered_species':
+        classification['unrecovered_metal_phase'] = {
+            'species_kg': {'Fe': kg},
+            'class_total_kg': 0.0,
+        }
+    elif slot == 'unrecovered_source':
+        classification['unrecovered_metal_phase'] = {
+            'species_kg': {'Fe': 0.0},
+            'source_accounts_by_species': {
+                'Fe': [{'account': 'process.metal_phase', 'kg': kg}],
+            },
+            'class_total_kg': 0.0,
+        }
+    elif slot == 'unclassified_total':
+        unclassified['total_kg'] = kg
+    elif slot == 'unclassified_species':
+        unclassified['total_kg'] = kg
+        unclassified['kg_by_species'] = {'NewExoticHalide': kg}
+    elif slot == 'excluded_upper_bound':
+        metals['status'] = 'partial'
+        metals['excluded'] = [{
+            'species': 'Si',
+            'account': 'process.cleaned_melt',
+            'reason': 'missing LJ row',
+            'upper_bound_kg': kg,
+        }]
+    else:
+        raise AssertionError(f'unlisted mass slot {slot}')
+
+
+@pytest.mark.parametrize('slot', _MASS_SLOTS)
+@pytest.mark.parametrize('kg', _TRACE_MASSES_KG)
+def test_every_report_mass_slot_renders_a_positive_trace(slot, kg):
+    """No report path may turn a positive trace into an em dash or 0.000."""
     classification = _empty_classification()
-    classification['metals_plus_O2'] = {
-        'metals_kg': {},
-        'metals_total_kg': 1.0e-12,
-        'O2_kg': 0.0,
-        'class_total_kg': 1.0e-12,
-    }
+    _apply_mass_slot(classification, slot, kg)
     report = format_three_product_markdown(classification)
-    # The snapshot line uses "—" for sub-noise values.
-    assert "—" in report
+    rendered = f"{kg:.3e}"
+    assert rendered in report
+    assert f"{rendered} kg" in report
+    assert "0.000 kg" not in report
+    if kg == _LUNAR_GLASS_KG:
+        assert "8.939e-11" in report
+
+
+def test_si_only_zero_class_names_the_record_and_not_a_purity_failure():
+    """A qualifying Si deposit has no SiO2/SiO class mass."""
+    si_kg = 0.025455486114855548
+    classification = _empty_classification()
+    classification['pure_silica_glass'].update({
+        'stage_3_capture_kg': 0.0,
+        'stage_3_kg_by_species': {'Si': si_kg},
+        'class_total_kg': 0.0,
+        'flag': {
+            'status': 'flagged product spec pending',
+            'authority': 'interim purity threshold',
+            'band': '>=99 wt% silica-bearing per Stage 3 snapshot',
+            'reason': (
+                'owner product spec pending; qualified Si-only '
+                f'({si_kg:.6g} kg Si); class mass is SiO2 + SiO and is zero'
+            ),
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+    silica_section = report.split('## 2.', 1)[1].split('## 3.', 1)[0]
+
+    assert _ZERO_GLASS_CLASS_NOTE in silica_section
+    assert 'qualified Si-only' in silica_section
+    assert f"**Si**: {si_kg:.3e} kg" in silica_section
+    assert _INVENTED_PURITY_FAILURE not in report
+    assert 'purity gate failed' in silica_section
+
+
+def test_trace_si_beside_a_zero_class_is_scientific_not_a_dash():
+    classification = _empty_classification()
+    classification['pure_silica_glass'].update({
+        'stage_3_capture_kg': 0.0,
+        'stage_3_kg_by_species': {'Si': _LUNAR_GLASS_KG},
+        'class_total_kg': 0.0,
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert f"**Si**: {_LUNAR_GLASS_KG:.3e} kg" in report
+    assert "8.939e-11" in report
+    assert _ZERO_GLASS_CLASS_NOTE in report
+    assert _INVENTED_PURITY_FAILURE not in report
+
+
+def test_markdown_has_one_kg_formatter_and_does_not_invent_purity_failure():
+    source = Path(format_three_product_markdown.__code__.co_filename).read_text()
+    assert source.count("def _format_kg") == 1
+    assert source.count(":.3e") == 1
+    assert source.count(":.3f") == 1
+    assert "1.0e-9" not in source
+    assert "1e-9" not in source
+    assert "qualified Si-only" not in source
+    assert _INVENTED_PURITY_FAILURE not in source
 
 
 # ---------------------------------------------------------------------------

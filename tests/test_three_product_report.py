@@ -33,7 +33,11 @@ from simulator.three_product_report import (
     O2_PRODUCT_SPECIES,
     PURE_SILICA_GLASS_MIN_PURITY_WT_PCT,
     PURE_SILICA_GLASS_SPECIES,
+    _qualified_si_only_clause,
     classify_products,
+)
+from simulator.three_product_report_markdown import (
+    format_three_product_markdown,
 )
 
 
@@ -722,6 +726,215 @@ def test_trace_rejected_si_is_not_reported_as_equal_to_qualified_si():
     assert 'Stage 3 Si coproduct 1e-10 kg (qualified 0 kg; reported separately)' in (
         silica['flag']['reason']
     )
+
+
+_INVENTED_PURITY_FAILURE = (
+    'No Stage 3 snapshot met the measured silica-bearing purity threshold'
+)
+_ZERO_GLASS_CLASS_NOTE = (
+    'Glass class mass is zero. A zero class mass does not mean the '
+    'purity gate failed.'
+)
+_LUNAR_GLASS_KG = 8.939275771102051e-11
+_MARE_QUALIFIED_SI_KG = 0.025455486114855548
+_SILICA_BEARING_SPECIES = (*PURE_SILICA_GLASS_SPECIES, 'Si')
+_REPORT_MASS_GRID_KG = (_LUNAR_GLASS_KG, 1.0e-15, 1.0e-12, 9.99e-10, 1.0)
+
+
+def _rendered_kg(kg: float) -> str:
+    return f'{kg:.3e}' if kg < 1.0 else f'{kg:.3f}'
+
+
+def _classified_report(sim):
+    result = classify_products(sim)
+    return result, format_three_product_markdown(result)
+
+
+def test_qualified_si_only_wording_has_one_owner():
+    source = Path(
+        classify_products.__code__.co_filename
+    ).read_text()
+    markdown = Path(
+        format_three_product_markdown.__code__.co_filename
+    ).read_text()
+    assert source.count('qualified Si-only') == 1
+    assert 'qualified Si-only' not in markdown
+    assert _INVENTED_PURITY_FAILURE not in source
+    assert _INVENTED_PURITY_FAILURE not in markdown
+
+
+@pytest.mark.parametrize(
+    ('glass_kg', 'qualified_silicon_kg', 'expects_clause'),
+    (
+        (None, 1.0, False),
+        (1.0, 1.0, False),
+        (0.0, 0.0, False),
+        (0.0, -1.0, False),
+        (2.0, _MARE_QUALIFIED_SI_KG, False),
+        (0.0, _MARE_QUALIFIED_SI_KG, True),
+        (0.0, _LUNAR_GLASS_KG, True),
+    ),
+)
+def test_si_only_clause_fires_only_for_a_zero_glass_class(
+    glass_kg, qualified_silicon_kg, expects_clause,
+):
+    clause = _qualified_si_only_clause(glass_kg, qualified_silicon_kg)
+    if expects_clause:
+        assert clause.startswith('; qualified Si-only ')
+        assert f'{qualified_silicon_kg:.6g} kg Si' in clause
+        assert 'class mass is SiO2 + SiO and is zero' in clause
+    else:
+        assert clause == ''
+
+
+@pytest.mark.parametrize('species', _SILICA_BEARING_SPECIES)
+@pytest.mark.parametrize('kg', _REPORT_MASS_GRID_KG)
+@pytest.mark.parametrize('off_window', (False, True))
+def test_pure_snapshot_report_keeps_the_mass_and_does_not_invent_failure(
+    species, kg, off_window,
+):
+    """History is provenance. A pure snapshot counts, and a trace stays visible."""
+    snapshot = {
+        'condensed_by_stage_species_delta': {(3, species): kg},
+    }
+    if off_window:
+        snapshot['c2a_staged_gas'] = {
+            'stage_name': 'C4',
+            'gas_cover_mode': 'vacuum',
+        }
+    result, report = _classified_report(_stage_3_sim(
+        collected={species: kg},
+        snapshots=[SimpleNamespace(**snapshot)],
+    ))
+    silica = result['pure_silica_glass']
+    rendered = _rendered_kg(kg)
+
+    assert _INVENTED_PURITY_FAILURE not in report
+    assert rendered in report
+    assert f'**{species}**: {rendered} kg' in report
+    if species == 'Si':
+        assert silica['class_total_kg'] == 0.0
+        assert 'qualified Si-only' in silica['flag']['reason']
+        assert 'qualified Si-only' in report
+        assert _ZERO_GLASS_CLASS_NOTE in report
+        assert 'purity_below_threshold' not in report
+    else:
+        assert silica['class_total_kg'] == pytest.approx(kg)
+        assert f'Silica glass: {rendered} kg' in report
+        assert 'qualified Si-only' not in report
+        assert _ZERO_GLASS_CLASS_NOTE not in report
+
+
+@pytest.mark.parametrize('species', _SILICA_BEARING_SPECIES)
+@pytest.mark.parametrize('foreign', _stage_3_foreign_species())
+@pytest.mark.parametrize('scale', (1.0, 1.0e-12))
+def test_below_threshold_report_records_the_exclusion_without_a_blanket(
+    species, foreign, scale,
+):
+    silica_kg = 98.9 * scale
+    foreign_kg = 1.1 * scale
+    result, report = _classified_report(_stage_3_sim(
+        collected={species: silica_kg, foreign: foreign_kg},
+        snapshots=[SimpleNamespace(condensed_by_stage_species_delta={
+            (3, species): silica_kg,
+            (3, foreign): foreign_kg,
+        })],
+    ))
+    silica = result['pure_silica_glass']
+
+    assert silica['class_total_kg'] == 0.0
+    assert 'purity_below_threshold' in silica['flag']['reason']
+    assert 'purity_below_threshold' in report
+    assert 'qualified Si-only' not in report
+    assert _ZERO_GLASS_CLASS_NOTE in report
+    assert _INVENTED_PURITY_FAILURE not in report
+    assert f'**{species}**: {_rendered_kg(silica_kg)} kg' in report
+
+
+@pytest.mark.parametrize('foreign', _stage_3_foreign_species())
+@pytest.mark.parametrize('kg', (_LUNAR_GLASS_KG, 1.0e-15, 1.0))
+def test_foreign_only_report_excludes_the_deposit_without_a_blanket(foreign, kg):
+    result, report = _classified_report(_stage_3_sim(
+        collected={foreign: kg},
+        snapshots=[SimpleNamespace(
+            condensed_by_stage_species_delta={(3, foreign): kg},
+        )],
+    ))
+
+    assert result['pure_silica_glass']['class_total_kg'] == 0.0
+    assert 'purity_below_threshold' in report
+    assert 'qualified Si-only' not in report
+    assert _ZERO_GLASS_CLASS_NOTE in report
+    assert _INVENTED_PURITY_FAILURE not in report
+    assert f'{kg:.6g} kg' in report
+
+
+@pytest.mark.parametrize('foreign', _stage_3_foreign_species())
+def test_si_only_snapshot_keeps_its_qualification_beside_an_exclusion(foreign):
+    """The lunar shape: zero glass class, qualified Si, and a failed snapshot."""
+    si_kg = _MARE_QUALIFIED_SI_KG
+    result, report = _classified_report(_stage_3_sim(
+        collected={'Si': si_kg, 'SiO2': 1.0, foreign: 1.0},
+        snapshots=[
+            SimpleNamespace(condensed_by_stage_species_delta={(3, 'Si'): si_kg}),
+            SimpleNamespace(condensed_by_stage_species_delta={
+                (3, 'SiO2'): 1.0,
+                (3, foreign): 1.0,
+            }),
+        ],
+    ))
+    silica = result['pure_silica_glass']
+
+    assert silica['class_total_kg'] == 0.0
+    assert 'qualified Si-only' in silica['flag']['reason']
+    assert f'{si_kg:.6g} kg Si' in silica['flag']['reason']
+    assert 'purity_below_threshold' in silica['flag']['reason']
+    assert 'qualified Si-only' in report
+    assert 'purity_below_threshold' in report
+    assert f'**Si**: {_rendered_kg(si_kg)} kg' in report
+    assert '**SiO2**: 1.000 kg' in report
+    assert _ZERO_GLASS_CLASS_NOTE in report
+    assert _INVENTED_PURITY_FAILURE not in report
+
+
+@pytest.mark.parametrize('species', PURE_SILICA_GLASS_SPECIES)
+@pytest.mark.parametrize('foreign', _stage_3_foreign_species())
+@pytest.mark.parametrize('kg', (_LUNAR_GLASS_KG, 2.0))
+def test_mixed_snapshot_report_shows_the_qualifying_mass_only(
+    species, foreign, kg,
+):
+    result, report = _classified_report(_stage_3_sim(
+        collected={species: kg, foreign: kg},
+        snapshots=[
+            SimpleNamespace(condensed_by_stage_species_delta={(3, species): kg}),
+            SimpleNamespace(condensed_by_stage_species_delta={(3, foreign): kg}),
+        ],
+    ))
+    rendered = _rendered_kg(kg)
+
+    assert result['pure_silica_glass']['class_total_kg'] == pytest.approx(kg)
+    assert f'Silica glass: {rendered} kg' in report
+    assert f'**{species}**: {rendered} kg' in report
+    assert 'purity_below_threshold' in report
+    assert 'qualified Si-only' not in report
+    assert _ZERO_GLASS_CLASS_NOTE not in report
+    assert _INVENTED_PURITY_FAILURE not in report
+    if kg == _LUNAR_GLASS_KG:
+        assert '8.939e-11' in report
+        assert 'Silica glass: — kg' not in report
+
+
+def test_empty_stage3_report_does_not_call_the_zero_a_purity_failure():
+    result, report = _classified_report(_stage_3_sim(
+        collected={},
+        snapshots=[],
+    ))
+
+    assert result['pure_silica_glass']['class_total_kg'] == 0.0
+    assert _ZERO_GLASS_CLASS_NOTE in report
+    assert 'qualified Si-only' not in report
+    assert 'purity_below_threshold' not in report
+    assert _INVENTED_PURITY_FAILURE not in report
 
 
 def _load_b1185_census():

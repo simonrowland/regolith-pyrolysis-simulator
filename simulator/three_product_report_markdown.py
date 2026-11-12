@@ -36,15 +36,25 @@ _CLASS_DISPLAY_ORDER: tuple[tuple[str, str], ...] = (
 )
 
 
-def _format_kg(value: float | None) -> str:
-    """Format a kg value with appropriate precision.
+# A zero glass class is not a purity verdict. What qualified, including
+# Si-only, is the classifier flag. This note only stops the report from
+# inventing a failure the flag did not record.
+_ZERO_GLASS_CLASS_NOTE = (
+    'Glass class mass is zero. A zero class mass does not mean the '
+    'purity gate failed.'
+)
 
-    Values < 1e-9 read as "—" (effective zero); values < 1.0 use
-    scientific notation; values >= 1.0 use 3 decimal places.
+
+def _format_kg(value: float | None) -> str:
+    """Format a kg value. Every report path uses this function.
+
+    A positive mass is never a visual zero: values below 1 kg use
+    scientific notation, including trace yields. Exact zero renders as
+    an em dash. ``None`` is unavailable, not zero.
     """
     if value is None:
         return "unavailable"
-    if value < 1.0e-9:
+    if value <= 0.0:
         return "—"
     if value < 1.0:
         return f"{value:.3e}"
@@ -61,7 +71,7 @@ def _kg_by_species_block(species_kg: Mapping[str, float]) -> str:
         if kg > 0.0:
             lines.append(f"  - **{species}**: {_format_kg(kg)} kg")
     if not lines:
-        return "  (no species above the noise floor)"
+        return "  (no positive species mass)"
     return "\n".join(lines)
 
 
@@ -162,7 +172,8 @@ def format_three_product_markdown(
             for excluded in bucket.get('excluded', ()):
                 bound = excluded.get('upper_bound_kg', 'unbounded')
                 bound_text = (
-                    f"up to {float(bound):.3f} kg (conservative upper bound)"
+                    f"up to {_format_kg(float(bound))} kg "
+                    "(conservative upper bound)"
                     if isinstance(bound, (int, float))
                     else str(bound)
                 )
@@ -233,10 +244,7 @@ def format_three_product_markdown(
         elif bucket_key == 'pure_silica_glass':
             stage_3 = bucket.get('stage_3_kg_by_species', {}) or {}
             if class_total_kg is not None and class_total_kg <= 0.0:
-                lines.append(
-                    'No Stage 3 snapshot met the measured silica-bearing purity '
-                    'threshold. Gas-cover history is provenance only.'
-                )
+                lines.append(_ZERO_GLASS_CLASS_NOTE)
                 lines.append('')
             flag = bucket.get('flag')
             if isinstance(flag, Mapping):
