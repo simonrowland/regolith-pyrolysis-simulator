@@ -39,6 +39,62 @@ def _engine_cache_counters(*, reset: bool = False):
     return counters(reset=reset)
 
 
+@pytest.mark.parametrize(
+    ("engine", "missing_fields"),
+    (
+        ("openimcc", ("pack", "gas_pack")),
+        (
+            "alphamelts",
+            (
+                "python_api_model",
+                "transport",
+                "effective_calc_mode",
+                "raw_model_name",
+                "redox_buffer",
+                "fO2_offset",
+                "Fe3Fet_ratio",
+                "configured_vapor_transport_pO2_bar",
+                "configured_vapor_transport_floor_bar",
+            ),
+        ),
+        (
+            "vaporock",
+            ("temperature_units", "pressure_units", "vapor_pressure_units"),
+        ),
+        ("magemin", ("database", "bridge", "fO2_buffer")),
+        (
+            "thermoengine",
+            (
+                "model",
+                "configured_vapor_transport_pO2_bar",
+                "configured_vapor_transport_floor_bar",
+                "redox_buffer",
+                "fO2_offset",
+                "Fe3Fet_ratio",
+            ),
+        ),
+    ),
+)
+def test_engine_cache_settings_rejects_missing_normalized_fields(
+    engine: str,
+    missing_fields: tuple[str, ...],
+) -> None:
+    from simulator.engine_cache import (
+        EngineCacheSettingsError,
+        engine_cache_settings,
+    )
+
+    with pytest.raises(EngineCacheSettingsError) as exc_info:
+        engine_cache_settings(engine, {})
+
+    error = exc_info.value
+    assert error.engine_name == engine
+    assert error.missing_fields == missing_fields
+    assert engine in str(error)
+    assert all(field in str(error) for field in missing_fields)
+    assert "normalize_engine_settings(...)" in str(error)
+
+
 def _bootstrap_cache_counter_worker():
     return None, "cache-counter-test-ready"
 
