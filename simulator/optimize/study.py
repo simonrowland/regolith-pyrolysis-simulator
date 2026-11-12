@@ -30,10 +30,7 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
-from simulator.ceramic_classifier import (
-    CeramicMatch,
-    CeramicServiceTemperature,
-)
+from simulator.ceramic_classifier import CeramicMatch
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.cost_parameters import (
     RECIPE_COST_PARAMETERS_KEY,
@@ -92,6 +89,9 @@ from simulator.optimize.pool import (
     _evaluate_batch,
     evaluate_request_supervised,
     resolve_eval_timeout_seconds,
+)
+from simulator.optimize.payloads import (
+    _ceramic_service_temp_payload,
 )
 from simulator.optimize.profiles import (
     ProfileValidationError,
@@ -5971,30 +5971,6 @@ def _ceramic_match_payload(match: CeramicMatch) -> Mapping[str, Any]:
     }
 
 
-def _ceramic_service_temp_payload(
-    service_temp: CeramicServiceTemperature,
-) -> Mapping[str, Any]:
-    usable = service_temp.usable_service_C
-    kind = service_temp.kind
-    if usable is not None:
-        display = f"Usable service: {usable:g} C"
-        usable_service = True
-    elif service_temp.value_C is not None:
-        display = f"{kind}: {service_temp.value_C:g} C; not a usable service rating"
-        usable_service = False
-    else:
-        display = f"{kind}; not a usable service rating"
-        usable_service = False
-    return {
-        "value_C": _round_or_none(service_temp.value_C),
-        "kind": kind,
-        "usable_service_C": _round_or_none(usable),
-        "usable_service": usable_service,
-        "display": display,
-        "note": service_temp.note,
-    }
-
-
 def _worst_wall_deposit_species(wall: Mapping[str, Any]) -> str | None:
     totals: dict[str, float] = {}
     for species_map in wall.values():
@@ -6027,12 +6003,6 @@ def _optional_float(value: Any) -> float | None:
     if not math.isfinite(number):
         return None
     return number
-
-
-def _round_or_none(value: float | None) -> float | None:
-    if value is None:
-        return None
-    return round(float(value), 3)
 
 
 _TAP_TRUNCATION_DURATION_PATHS: Mapping[str, tuple[str, ...]] = MappingProxyType(
