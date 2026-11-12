@@ -1398,6 +1398,8 @@ def test_invalid_psat_evaluator_output_is_not_scored_as_a_missing_row(
 
     failure = differential._evaluate_rail_pressure_Pa("Na", 1500.0, catalog)
     assert type(failure).__name__ == "RailPressureEvaluationFailure"
+    assert failure.reason == "rail_evaluator_invalid_output"
+    assert repr(pressure_pa) in str(failure)
     assert failure != "rail_row_absent"
     assert failure != 1.0
 

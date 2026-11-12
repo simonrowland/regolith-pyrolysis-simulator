@@ -119,16 +119,26 @@ MG_NBP_K = 1363.0
 
 
 class RailPressureEvaluationFailure(RuntimeError):
-    """A present rail evaluator failed while computing pressure."""
+    """A present rail evaluator failed or returned an invalid pressure."""
 
-    def __init__(self, species_id: str, cause: Exception) -> None:
+    def __init__(
+        self,
+        species_id: str,
+        cause: Exception | None,
+        *,
+        reason: str = "rail_evaluator_failed",
+        pressure_pa: float | None = None,
+    ) -> None:
         self.species_id = species_id
         self.cause = cause
-        self.exception_type = type(cause).__name__
-        super().__init__(
-            f"vapour-rail evaluator for {species_id!r} raised "
-            f"{self.exception_type}"
-        )
+        self.reason = reason
+        self.pressure_pa = pressure_pa
+        self.exception_type = type(cause).__name__ if cause is not None else None
+        if cause is None:
+            detail = f"returned invalid pressure_pa={pressure_pa!r}"
+        else:
+            detail = f"raised {self.exception_type}"
+        super().__init__(f"vapour-rail evaluator for {species_id!r} {detail}")
 
 
 # G12: only the alias the gap analysis named (O2 vs the rail id).
@@ -1139,8 +1149,8 @@ def _evaluate_rail_pressure_Pa(
     denormal). The catalog ``pure_component_antoine`` sidecar is metal
     P_sat in Pa. Use it when present; otherwise only a compiled
     PURE_COMPONENT_SATURATION_PRESSURE evaluator; otherwise rail_row_absent.
-    Evaluator exceptions return RailPressureEvaluationFailure so they cannot be
-    mistaken for missing rows.
+    Evaluator exceptions and invalid pressure outputs return
+    RailPressureEvaluationFailure so they cannot be mistaken for missing rows.
     """
 
     sidecar = _pure_component_antoine_pa(_legacy_species_row(species_id), T_K)
@@ -1167,7 +1177,12 @@ def _evaluate_rail_pressure_Pa(
         return RailPressureEvaluationFailure(species_id, exc)
     P = float(result.pressure_pa)
     if not math.isfinite(P) or P <= 0.0:
-        return "rail_row_absent"
+        return RailPressureEvaluationFailure(
+            species_id,
+            None,
+            reason="rail_evaluator_invalid_output",
+            pressure_pa=P,
+        )
     return P
 
 
@@ -1857,7 +1872,7 @@ def score_psat_nbp_sanity(
                 _wrap(
                     _psat_refusal(
                         point,
-                        "rail_evaluator_failed",
+                        pressure.reason,
                         note=str(pressure),
                     ),
                     point,
@@ -1957,7 +1972,7 @@ def score_psat_channel(
                 _wrap(
                     _psat_refusal(
                         gas,
-                        "rail_evaluator_failed",
+                        pressure.reason,
                         note=str(pressure),
                     ),
                     gas,
