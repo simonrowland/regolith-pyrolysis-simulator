@@ -2075,6 +2075,50 @@ def _coating_reason_record(
     }
 
 
+def _priced_upstream_deposit_kg(
+    certain_deposit_kg: float,
+    certain_records: list[Mapping[str, Any]],
+    refused_species: tuple[str, ...],
+    refused_bounds: Mapping[str, float],
+    resolution_kg: float,
+) -> tuple[float, float]:
+    """Measured mass that stays, and the booked mass of refused species.
+
+    Invariant. A refused species with a supply bound is booked once, at
+    ``_refused_species_booked_kg``. That is the supply, or an authorized
+    zero when the supply is at or below the mass-balance ledger
+    resolution. Measured kilograms of that species are the same vapour
+    and are omitted. Product costing removes them with
+    ``_replace_species_deposit_with_supply``; this is the same identity
+    on the fraction gate's records.
+
+    An unlabeled record is not attributed to a refused species, so it
+    stays. A refused species with no bound is not replaced: its measured
+    mass stays, and the caller leaves the upper bound unavailable.
+    """
+
+    from simulator.optimize.objective import _refused_species_booked_kg
+
+    bounded = {
+        species for species in refused_species if species in refused_bounds
+    }
+    replaced = 0.0
+    for record in certain_records:
+        species = record.get("species")
+        if species is None or str(species) not in bounded:
+            continue
+        replaced += float(record["deposit_kg_per_campaign"])
+    booked_supply = 0.0
+    for species in refused_species:
+        if species not in refused_bounds:
+            continue
+        booked_supply += _refused_species_booked_kg(
+            float(refused_bounds[species]),
+            resolution_kg,
+        )
+    return certain_deposit_kg - replaced, booked_supply
+
+
 def _coating_from_upstream_deposit_fraction_report(
     *,
     report: Mapping[str, Any],
@@ -2098,6 +2142,21 @@ def _coating_from_upstream_deposit_fraction_report(
         deposit_records,
     )
     refused_bounds = _coating_refused_flux_bounds(report, refused_species)
+    # The optimizer overlay keeps measured rows (evaluate.py's upstream
+    # records). This is the only sum of those rows with the supply.
+    # Product costing books the same species through
+    # ``_refused_species_booked_kg``: measured mass of a bounded species
+    # is replaced, not added.
+    from simulator.optimize.objective import _mass_balance_ledger_resolution_kg
+
+    resolution_kg = _mass_balance_ledger_resolution_kg(charge_mass_kg)
+    priced_certain_kg, booked_supply_kg = _priced_upstream_deposit_kg(
+        certain_deposit_kg,
+        certain_records,
+        refused_species,
+        refused_bounds,
+        resolution_kg,
+    )
     warning_flags: list[dict[str, Any]] = []
     violation_reasons: list[dict[str, Any]] = []
 
@@ -2160,7 +2219,7 @@ def _coating_from_upstream_deposit_fraction_report(
             reason.setdefault("flags", _coating_authority_flags(authority))
             violation_reasons.append(reason)
 
-    if certain_deposit_kg > limit_kg:
+    if priced_certain_kg > limit_kg:
         reason_payload = {
             key: _plain_value(certain_records[0][key])
             for key in ("campaign", "segment", "species", "zone")
@@ -2171,10 +2230,10 @@ def _coating_from_upstream_deposit_fraction_report(
                 "upstream_wall_deposit_fraction_exceeded",
                 authority=authority,
                 **reason_payload,
-                deposit_kg_per_campaign=certain_deposit_kg,
+                deposit_kg_per_campaign=priced_certain_kg,
                 threshold_kg_per_campaign=limit_kg,
                 feedstock_charge_mass_kg=charge_mass_kg,
-                deposit_fraction=certain_deposit_kg / charge_mass_kg,
+                deposit_fraction=priced_certain_kg / charge_mass_kg,
             )
         )
 
@@ -2184,7 +2243,7 @@ def _coating_from_upstream_deposit_fraction_report(
         include_coverage_unknown=True,
     )
     if unavailable_reason and (
-        certain_deposit_kg <= limit_kg
+        priced_certain_kg <= limit_kg
         or report.get("wall_quantity_unavailable") is True
         or authority.get("wall_quantity_unavailable") is True
     ):
@@ -2202,26 +2261,24 @@ def _coating_from_upstream_deposit_fraction_report(
             refused_bounds=refused_bounds,
             charge_mass_kg=charge_mass_kg,
             limit_kg=limit_kg,
-            certain_deposit_kg=certain_deposit_kg,
+            certain_deposit_kg=priced_certain_kg,
         )
 
     missing_refused_bounds = _coating_missing_refused_flux_bounds(
         refused_species,
         refused_bounds,
     )
-    refused_bound_kg = sum(
-        refused_bounds[species]
-        for species in refused_species
-        if species in refused_bounds
-    )
+    # Measured rows of a bounded species were removed above. Adding the
+    # raw supply on top of those rows counts the vapour twice: 0.2 kg
+    # measured SiO plus a 0.4 kg supply was evaluated as 0.6 kg.
     upper_bound_kg = (
         None
         if missing_refused_bounds
-        else certain_deposit_kg + refused_bound_kg
+        else priced_certain_kg + booked_supply_kg
     )
     if (
         refused_species
-        and certain_deposit_kg <= limit_kg
+        and priced_certain_kg <= limit_kg
         and upper_bound_kg is not None
         and upper_bound_kg > limit_kg
     ):
@@ -2231,9 +2288,10 @@ def _coating_from_upstream_deposit_fraction_report(
             threshold=threshold,
             output_status=output_status,
             reason=(
-                "certain upstream deposit plus refused-species vapour-flux "
-                f"upper bound {upper_bound_kg:.6g} kg/campaign exceeds "
-                f"d-045 limit {limit_kg:.6g} kg/campaign"
+                "booked upstream deposit "
+                f"{upper_bound_kg:.6g} kg/campaign exceeds "
+                f"d-045 limit {limit_kg:.6g} kg/campaign; a refused "
+                "species' measured deposit is replaced by its supply bound"
             ),
             violation_reasons=violation_reasons,
             warning_flags=warning_flags,
@@ -2243,7 +2301,7 @@ def _coating_from_upstream_deposit_fraction_report(
             refused_bounds=refused_bounds,
             charge_mass_kg=charge_mass_kg,
             limit_kg=limit_kg,
-            certain_deposit_kg=certain_deposit_kg,
+            certain_deposit_kg=priced_certain_kg,
             upper_bound_kg=upper_bound_kg,
         )
 
@@ -2265,7 +2323,7 @@ def _coating_from_upstream_deposit_fraction_report(
     unique_reasons = _unique_coating_records(violation_reasons)
     feasible = not unique_reasons
     observed_kg = (
-        certain_deposit_kg if upper_bound_kg is None else upper_bound_kg
+        priced_certain_kg if upper_bound_kg is None else upper_bound_kg
     )
     observed_fraction = observed_kg / charge_mass_kg
     coating_authoritative = _authority_is_authoritative(authority)
@@ -2277,7 +2335,7 @@ def _coating_from_upstream_deposit_fraction_report(
         )
         if upper_bound_kg is None:
             detail += (
-                f"certain upstream deposit={certain_deposit_kg:.6g} "
+                f"certain upstream deposit={priced_certain_kg:.6g} "
                 "kg/campaign; refused-species flux upper bound unavailable; "
             )
         else:
@@ -2300,7 +2358,7 @@ def _coating_from_upstream_deposit_fraction_report(
         refused_bounds=refused_bounds,
         charge_mass_kg=charge_mass_kg,
         limit_kg=limit_kg,
-        certain_deposit_kg=certain_deposit_kg,
+        certain_deposit_kg=priced_certain_kg,
         upper_bound_kg=upper_bound_kg,
         verdict="violated" if unique_reasons else "clear",
         constraint_authoritative=True,

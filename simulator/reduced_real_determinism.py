@@ -688,6 +688,26 @@ class PT0DeterminismStore:
                 temperature_K=temperature_K,
             )
         sim._last_vapor_pressure_diagnostic = vapor_pressure_diagnostic
+        # d-401. Replay and the write-through hit both adopt the cached
+        # vapour evaluation here, after the hour reset has cleared the
+        # stamp. The restored diagnostic's pO2 is the pressure that
+        # evaluation consumed. Leaving the stamp unset makes the
+        # snapshot ceiling read the post-bleed reservoir. A diagnostic
+        # that omits pO2 records absence: this path does not hold the
+        # live dispatch argument, and the later reservoir is not a
+        # substitute.
+        from simulator.evaporation import (
+            pressure_vapour_evaluation_consumed,
+            remember_evaluated_transport_pO2,
+        )
+
+        remember_evaluated_transport_pO2(
+            sim,
+            pressure_vapour_evaluation_consumed(
+                vapor_pressure_diagnostic,
+                dispatch_pO2_bar=None,
+            ),
+        )
         sulfur = getattr(result, "sulfur_saturation", None)
         sim._last_sulfur_saturation_result = sulfur
         replay_fO2_log = getattr(result, "requested_fO2_log", None)

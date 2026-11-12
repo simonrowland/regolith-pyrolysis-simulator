@@ -872,6 +872,463 @@ def test_d045_refused_flux_upper_bound_equal_to_limit_is_clear() -> None:
     assert coating.status_payload["coating_verdict"] == "clear"
 
 
+def _booking_record(
+    deposit_kg: float,
+    *,
+    species: str | None = None,
+    segment: str = "A",
+) -> dict[str, object]:
+    record: dict[str, object] = {
+        "scope": "upstream",
+        "segment": segment,
+        "deposit_kg_per_campaign": deposit_kg,
+    }
+    if species is not None:
+        record["species"] = species
+    return record
+
+
+# Input classes for the refused-species booking identity. ``bounds`` None
+# means the report carries no supply map. Mutation names the broken
+# pricer that must disagree with the oracle.
+_REFUSED_BOOKING_CASES = (
+    {
+        "name": "measured_replaced_by_supply",
+        "charge_kg": 1000.0,
+        "records": (_booking_record(0.2, species="SiO"),),
+        "refused": ("SiO",),
+        "bounds": {"SiO": 0.4},
+        "mutation": "add_measured",
+        "broken_priced": 0.2,
+        "broken_upper": 0.6,
+        "broken_verdict": "unavailable",
+    },
+    {
+        "name": "two_segments_booked_once",
+        "charge_kg": 1000.0,
+        "records": (
+            _booking_record(0.2, species="SiO", segment="A"),
+            _booking_record(0.15, species="SiO", segment="B"),
+        ),
+        "refused": ("SiO",),
+        "bounds": {"SiO": 0.4},
+        "mutation": "add_measured",
+        "broken_priced": 0.35,
+        "broken_upper": 0.75,
+        "broken_verdict": "unavailable",
+    },
+    {
+        "name": "other_species_stays",
+        "charge_kg": 1000.0,
+        "records": (
+            _booking_record(0.1, species="Fe"),
+            _booking_record(0.2, species="SiO"),
+        ),
+        "refused": ("SiO",),
+        "bounds": {"SiO": 0.4},
+        "mutation": "add_measured",
+        "broken_priced": 0.3,
+        "broken_upper": 0.7,
+        "broken_verdict": "unavailable",
+    },
+    {
+        "name": "other_species_record_order_swapped",
+        "charge_kg": 1000.0,
+        "records": (
+            _booking_record(0.2, species="SiO"),
+            _booking_record(0.1, species="Fe"),
+        ),
+        "refused": ("SiO",),
+        "bounds": {"SiO": 0.4},
+        "mutation": "add_measured",
+        "broken_priced": 0.3,
+        "broken_upper": 0.7,
+        "broken_verdict": "unavailable",
+    },
+    {
+        "name": "unlabeled_aggregate_stays",
+        "charge_kg": 1.0,
+        "records": (_booking_record(6.0e-4),),
+        "refused": ("CrO2",),
+        "bounds": {"CrO2": 1.0e-4},
+        "mutation": "drop_unlabeled",
+        "broken_priced": 0.0,
+        "broken_upper": 1.0e-4,
+        "broken_verdict": "clear",
+    },
+    {
+        "name": "authorized_zero_drops_measured",
+        "charge_kg": 1000.0,
+        "records": (_booking_record(0.2, species="SiO"),),
+        "refused": ("SiO",),
+        "bounds": {"SiO": 1.0e-15},
+        "mutation": "add_measured",
+        "broken_priced": 0.2,
+        "broken_upper": 0.2,
+        "broken_verdict": "clear",
+    },
+    {
+        "name": "measured_over_limit_is_replaced",
+        "charge_kg": 1000.0,
+        "records": (_booking_record(0.6, species="SiO"),),
+        "refused": ("SiO",),
+        "bounds": {"SiO": 0.4},
+        "mutation": "add_measured",
+        "broken_priced": 0.6,
+        "broken_upper": 1.0,
+        "broken_verdict": "violated",
+    },
+    {
+        "name": "two_supplies_sum_sio_first",
+        "charge_kg": 1000.0,
+        "records": (),
+        "refused": ("SiO", "CrO2"),
+        "bounds": {"CrO2": 0.15, "SiO": 0.25},
+        "mutation": "first_species_only",
+        "broken_priced": 0.0,
+        "broken_upper": 0.15,
+        "broken_verdict": "clear",
+    },
+    {
+        "name": "two_supplies_sum_cro2_first",
+        "charge_kg": 1000.0,
+        "records": (),
+        "refused": ("CrO2", "SiO"),
+        "bounds": {"CrO2": 0.15, "SiO": 0.25},
+        "mutation": "first_species_only",
+        "broken_priced": 0.0,
+        "broken_upper": 0.15,
+        "broken_verdict": "clear",
+    },
+    {
+        "name": "missing_bound_keeps_measured",
+        "charge_kg": 1000.0,
+        "records": (_booking_record(0.2, species="SiO"),),
+        "refused": ("SiO",),
+        "bounds": None,
+        "mutation": "zero_fill_missing",
+        "broken_priced": 0.0,
+        "broken_upper": None,
+        "broken_verdict": "unavailable",
+    },
+    {
+        "name": "one_of_two_bounds_missing",
+        "charge_kg": 1000.0,
+        "records": (_booking_record(0.1, species="Mg"),),
+        "refused": ("SiO", "Mg"),
+        "bounds": {"SiO": 0.2},
+        "mutation": "zero_fill_missing",
+        "broken_priced": 0.0,
+        "broken_upper": None,
+        "broken_verdict": "unavailable",
+    },
+)
+
+
+def _oracle_refused_species_booking(
+    charge_kg: float,
+    records: tuple[dict[str, object], ...],
+    refused: tuple[str, ...],
+    bounds: dict[str, float] | None,
+) -> dict[str, object]:
+    """Booked mass of refused wall species, written from the rule.
+
+    A refused species with a supply is booked once: the supply, or an
+    authorized zero when the supply is at or below
+    ``charge * MASS_BALANCE_ABORT_PCT / 100``. Measured kilograms of
+    that species are the same vapour and are omitted. An unlabeled
+    record and a species that was not refused stay. A refused species
+    with no supply leaves the upper bound unavailable and keeps its
+    measured mass. This does not call the pricer or the product booker.
+    """
+
+    from simulator.optimize.evaluate import MASS_BALANCE_ABORT_PCT
+    from simulator.optimize.physics import (
+        MAX_UPSTREAM_WALL_DEPOSIT_FRACTION_PER_CAMPAIGN,
+    )
+
+    bound_map = {} if bounds is None else bounds
+    resolution_kg = float(charge_kg) * float(MASS_BALANCE_ABORT_PCT) / 100.0
+    limit_kg = (
+        float(MAX_UPSTREAM_WALL_DEPOSIT_FRACTION_PER_CAMPAIGN) * float(charge_kg)
+    )
+    bounded = {species for species in refused if species in bound_map}
+    missing = tuple(species for species in refused if species not in bound_map)
+    priced = 0.0
+    for record in records:
+        amount = float(record["deposit_kg_per_campaign"])
+        species = record.get("species")
+        if species is not None and str(species) in bounded:
+            continue
+        priced += amount
+    if missing:
+        upper = None
+    else:
+        booked = 0.0
+        for species in refused:
+            supply = float(bound_map[species])
+            if supply <= resolution_kg:
+                continue
+            booked += supply
+        upper = priced + booked
+    if missing and priced <= limit_kg:
+        verdict = "unavailable"
+    elif upper is not None and priced <= limit_kg and upper > limit_kg:
+        verdict = "unavailable"
+    elif priced > limit_kg or (upper is not None and upper > limit_kg):
+        verdict = "violated"
+    else:
+        verdict = "clear"
+    return {"priced": priced, "upper": upper, "verdict": verdict}
+
+
+def _run_refused_booking_case(case: dict[str, object]):
+    overrides: dict[str, object] = {
+        "feedstock_charge_mass_kg": case["charge_kg"],
+        "upstream_wall_deposit_records": [
+            dict(record) for record in case["records"]
+        ],
+        "wall_deposit_kg_per_campaign": 0.0,
+        "unqualified_deposition_rate_kg_per_campaign": 0.0,
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": list(case["refused"]),
+        },
+    }
+    if case["bounds"] is not None:
+        overrides[
+            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+        ] = dict(case["bounds"])
+    return _d045_coating(**overrides)
+
+
+def _assert_booking_fields(
+    coating: object,
+    *,
+    priced: float,
+    upper: float | None,
+    verdict: str,
+) -> None:
+    payload = coating.status_payload
+    assert payload["coating_verdict"] == verdict
+    assert payload["certain_upstream_deposit_kg_per_campaign"] == pytest.approx(
+        priced
+    )
+    reported = payload["upstream_wall_deposit_upper_bound_kg_per_campaign"]
+    if verdict == "unavailable":
+        assert coating.status == "unavailable"
+        assert coating.feasible is False
+    if upper is None:
+        assert reported is None
+        return
+    assert reported == pytest.approx(upper)
+    if verdict == "clear":
+        assert coating.feasible is True
+        return
+    if verdict != "unavailable":
+        assert coating.feasible is False
+
+
+def _install_booking_mutation(monkeypatch: pytest.MonkeyPatch, name: str) -> None:
+    """Replace the one pricer with a broken copy of the same signature."""
+
+    import simulator.optimize.physics as physics_module
+
+    def _booked_bounds(refused: tuple[str, ...], bounds: dict[str, float]) -> float:
+        booked = 0.0
+        for species in refused:
+            if species in bounds:
+                booked += float(bounds[species])
+        return booked
+
+    def _add_measured(certain, records, refused, bounds, resolution):
+        return certain, _booked_bounds(refused, bounds)
+
+    def _drop_unlabeled(certain, records, refused, bounds, resolution):
+        dropped = 0.0
+        for record in records:
+            if record.get("species") is None:
+                dropped += float(record["deposit_kg_per_campaign"])
+        booked = 0.0
+        for species in refused:
+            if species not in bounds:
+                continue
+            supply = float(bounds[species])
+            if supply <= resolution:
+                continue
+            booked += supply
+        return certain - dropped, booked
+
+    def _first_species_only(certain, records, refused, bounds, resolution):
+        for species in refused:
+            if species in bounds:
+                return certain, float(bounds[species])
+        return certain, 0.0
+
+    def _zero_fill_missing(certain, records, refused, bounds, resolution):
+        replaced = 0.0
+        refused_names = {str(species) for species in refused}
+        for record in records:
+            species = record.get("species")
+            if species is not None and str(species) in refused_names:
+                replaced += float(record["deposit_kg_per_campaign"])
+        return certain - replaced, 0.0
+
+    mutations = {
+        "add_measured": _add_measured,
+        "drop_unlabeled": _drop_unlabeled,
+        "first_species_only": _first_species_only,
+        "zero_fill_missing": _zero_fill_missing,
+    }
+    monkeypatch.setattr(
+        physics_module,
+        "_priced_upstream_deposit_kg",
+        mutations[name],
+    )
+
+
+@pytest.mark.parametrize(
+    "case",
+    _REFUSED_BOOKING_CASES,
+    ids=[case["name"] for case in _REFUSED_BOOKING_CASES],
+)
+def test_refused_species_supply_is_booked_once_on_the_fraction_gate(
+    case: dict[str, object],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Measured mass of a bounded refused species is not added to its supply.
+
+    0.2 kg measured SiO plus a 0.4 kg supply is 0.4 kg, inside a 0.5 kg
+    limit. Adding both is 0.6 kg and rejects the candidate. The same
+    identity covers two segments, an unlabeled aggregate, an authorized
+    zero, a measurement above the limit, a sum of supplies, and a
+    missing bound. Each class has a pricer mutation that publishes the
+    other mass.
+    """
+
+    oracle = _oracle_refused_species_booking(
+        float(case["charge_kg"]),
+        case["records"],
+        case["refused"],
+        case["bounds"],
+    )
+    coating = _run_refused_booking_case(case)
+    _assert_booking_fields(
+        coating,
+        priced=float(oracle["priced"]),
+        upper=oracle["upper"],
+        verdict=str(oracle["verdict"]),
+    )
+    _install_booking_mutation(monkeypatch, str(case["mutation"]))
+    mutated = _run_refused_booking_case(case)
+    _assert_booking_fields(
+        mutated,
+        priced=float(case["broken_priced"]),
+        upper=case["broken_upper"],
+        verdict=str(case["broken_verdict"]),
+    )
+    assert (
+        mutated.status_payload["upstream_wall_deposit_upper_bound_kg_per_campaign"]
+        != coating.status_payload["upstream_wall_deposit_upper_bound_kg_per_campaign"]
+        or mutated.status_payload["certain_upstream_deposit_kg_per_campaign"]
+        != coating.status_payload["certain_upstream_deposit_kg_per_campaign"]
+        or mutated.status_payload["coating_verdict"]
+        != coating.status_payload["coating_verdict"]
+    )
+
+
+def _species_deposit_kg(deposit: dict[object, object], species: str) -> float:
+    total = 0.0
+    for key, kg in deposit.items():
+        if isinstance(key, tuple) and len(key) == 2 and str(key[1]) == species:
+            total += float(kg)
+    return total
+
+
+def test_product_booking_replaces_measured_mass_with_the_same_supply(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The fraction gate and the product booker both price SiO at 0.4 kg.
+
+    Keeping the 0.2 kg measurement and writing the 0.4 kg supply books
+    0.6 kg. ``_replace_species_deposit_with_supply`` is the product
+    write. An adder at that function leaves the measurement in place.
+    """
+
+    import simulator.optimize.objective as objective_module
+
+    charge_kg = 1000.0
+    measured_kg = 0.2
+    supply_kg = 0.4
+    case = {
+        "charge_kg": charge_kg,
+        "records": (_booking_record(measured_kg, species="SiO", segment="upstream"),),
+        "refused": ("SiO",),
+        "bounds": {"SiO": supply_kg},
+    }
+    oracle = _oracle_refused_species_booking(
+        charge_kg,
+        case["records"],
+        case["refused"],
+        case["bounds"],
+    )
+    coating = _run_refused_booking_case(case)
+    _assert_booking_fields(
+        coating,
+        priced=float(oracle["priced"]),
+        upper=oracle["upper"],
+        verdict=str(oracle["verdict"]),
+    )
+    assert oracle["upper"] == pytest.approx(supply_kg)
+    monkeypatch.setattr(
+        objective_module,
+        "_refused_vapour_supply_kg",
+        lambda *args, **kwargs: {"SiO": supply_kg},
+    )
+    authority = {
+        "authoritative_for_deposit_mass": False,
+        "code": "wall_saturation_pressure_refused",
+        "wall_saturation_pressure_refused_species": ["SiO"],
+        "wall_saturation_pressure_refusals_by_species": {
+            "SiO": {"upstream": {"reason": "wall saturation pressure refused"}},
+        },
+    }
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(record=SimpleNamespace(batch_mass_kg=charge_kg)),
+        snapshots=(),
+    )
+    wall = {("upstream", "SiO"): measured_kg}
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        wall,
+        authority,
+        execution,
+    )
+    assert _species_deposit_kg(booked["deposit"], "SiO") == pytest.approx(supply_kg)
+    assert _species_deposit_kg(booked["deposit"], "SiO") != pytest.approx(
+        measured_kg + supply_kg
+    )
+
+    def _add_supply(wall_deposit, species, segment, supply):
+        key = (segment, species)
+        previous = float(wall_deposit.get(key, 0.0))
+        wall_deposit[key] = previous + float(supply)
+
+    monkeypatch.setattr(
+        objective_module,
+        "_replace_species_deposit_with_supply",
+        _add_supply,
+    )
+    added = objective_module._book_wall_deposits_at_vapour_supply(
+        {("upstream", "SiO"): measured_kg},
+        authority,
+        execution,
+    )
+    assert _species_deposit_kg(added["deposit"], "SiO") == pytest.approx(
+        measured_kg + supply_kg
+    )
+
+
 def test_d045_refused_species_without_flux_bound_is_unavailable() -> None:
     report = _d045_report(
         sticking_alpha_authority={

@@ -464,16 +464,45 @@ def _positive_transport_pO2_bar(raw: Any) -> float | None:
     return pressure
 
 
+def pressure_vapour_evaluation_consumed(
+    diagnostic: Any,
+    *,
+    dispatch_pO2_bar: Any,
+) -> Any:
+    """Oxygen potential a vapour evaluation consumed.
+
+    d-401. This is the only choice of that pressure. Live refresh and
+    equilibrium-cache consumption both stamp its result.
+
+    The provider's ``pO2_bar`` is the pressure the flux used. A
+    diagnostic that omits the key uses ``dispatch_pO2_bar``, which the
+    live refresh still holds from the dispatch argument. Cache
+    consumption does not hold that argument: the restored diagnostic is
+    the evaluation, and a missing key is passed here as a null dispatch
+    so the stamp is a recorded absence. The post-bleed reservoir is not
+    an argument of this function.
+    """
+
+    recorded = None
+    if isinstance(diagnostic, Mapping):
+        recorded = diagnostic.get("pO2_bar")
+    if recorded is None:
+        return dispatch_pO2_bar
+    return recorded
+
+
 def remember_evaluated_transport_pO2(host: Any, pressure_bar: Any) -> None:
     """Record the transport pO2 this vapour evaluation consumed.
 
     d-401. The activity-1 ceiling needs the oxygen potential the hour's
-    flux evaluation used. ``_refresh_vapor_pressures_from_kernel`` is
-    the only vapour evaluation. It records absence on entry, so a
-    sub-400 K or frozen hour that did not dispatch keeps that absence,
-    and overwrites it when the dispatch consumed a pressure. A positive
-    finite pressure is kept. Anything else is a recorded absence, not a
-    later reservoir value and not ``p_ref``.
+    flux evaluation used. Live refresh and equilibrium-cache consumption
+    are the writers; both pass ``pressure_vapour_evaluation_consumed``.
+    The live refresh records absence on entry, so a sub-400 K or frozen
+    hour that did not dispatch keeps that absence, and overwrites it
+    when the dispatch consumed a pressure. Cache consumption writes the
+    restored evaluation after the hour reset has cleared the previous
+    stamp. A positive finite pressure is kept. Anything else is a
+    recorded absence, not a later reservoir value and not ``p_ref``.
     """
 
     host._evaluated_transport_pO2_bar = _positive_transport_pO2_bar(pressure_bar)

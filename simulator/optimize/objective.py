@@ -4436,6 +4436,23 @@ def _drop_species_wall_deposit(
         del wall_deposit[key]
 
 
+def _refused_species_booked_kg(supply_kg: float, resolution_kg: float) -> float:
+    """Booked wall mass of one refused species.
+
+    ``deposit_wall,i <= supply_i``. At or below the mass-balance ledger
+    resolution the booked mass is an authorized zero. Above it the booked
+    mass is the supply, once. Measured kilograms of this species are the
+    same vapour and are not added to this mass. The feasibility gate and
+    ``_book_wall_deposits_at_vapour_supply`` both book through this
+    function, so a second sum of measured plus supply cannot survive in
+    one of them alone.
+    """
+
+    if supply_kg <= resolution_kg:
+        return 0.0
+    return supply_kg
+
+
 def _replace_species_deposit_with_supply(
     wall_deposit: dict[Any, Any],
     species: str,
@@ -4826,7 +4843,10 @@ def _book_wall_deposits_at_vapour_supply(
             continue
         supply = float(supply_kg[species])
         candidates = _refusal_candidate_segments(notice_authority, species)
-        classified.append((species, supply, candidates, supply <= resolution_kg))
+        # The booked mass is the shared identity. Zero means the
+        # authorized-zero branch; the raw supply stays on the notice.
+        booked_kg = _refused_species_booked_kg(supply, resolution_kg)
+        classified.append((species, supply, candidates, booked_kg == 0.0))
     for species, _supply, _candidates, negligible in classified:
         if negligible:
             # Authorized physical zero. deposit_wall,i <= supply_i still
@@ -4867,7 +4887,7 @@ def _book_wall_deposits_at_vapour_supply(
             bookings.append({
                 "species": species,
                 "reason": BELOW_WALL_SUPPLY_UPPER_BOUND,
-                "deposit_kg": 0.0,
+                "deposit_kg": _refused_species_booked_kg(supply, resolution_kg),
                 "supply_upper_bound_kg": supply,
                 "ledger_resolution_kg": resolution_kg,
                 "refusal_reason": refusal_reason,
@@ -4880,16 +4900,17 @@ def _book_wall_deposits_at_vapour_supply(
         # measured + supply. The kilogram goes on the closed-form segment.
         segment = str(placements[species])
         refusal_reason = _refusal_reason(notice_authority, species, segment)
+        booked_kg = _refused_species_booked_kg(supply, resolution_kg)
         _replace_species_deposit_with_supply(
             booked_deposit,
             species,
             segment,
-            supply,
+            booked_kg,
         )
         bookings.append({
             "species": species,
             "reason": WALL_DEPOSIT_UPPER_BOUND_USED,
-            "deposit_kg": supply,
+            "deposit_kg": booked_kg,
             "supply_upper_bound_kg": supply,
             "ledger_resolution_kg": resolution_kg,
             "refusal_reason": refusal_reason,

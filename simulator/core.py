@@ -674,6 +674,7 @@ from simulator.evaporation import (
     attach_evaluated_transport_pO2,
     attach_wall_supply_interval_physical_zero,
     evaporation_flux_for_campaign_hour,
+    pressure_vapour_evaluation_consumed,
     publish_wall_supply_on_flux,
     remember_evaluated_transport_pO2,
 )
@@ -10772,11 +10773,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # d-401. The provider's recorded transport pO2 is the pressure
         # this evaluation consumed. The dispatch value is that pressure
         # only when the diagnostic omits it. The reservoir is refreshed
-        # again after the bleed and is not this value.
-        recorded_pO2 = diagnostic.get("pO2_bar")
+        # again after the bleed and is not this value. Cache consumption
+        # stamps through the same choice.
         remember_evaluated_transport_pO2(
             self,
-            consumed_transport_pO2_bar if recorded_pO2 is None else recorded_pO2,
+            pressure_vapour_evaluation_consumed(
+                diagnostic,
+                dispatch_pO2_bar=consumed_transport_pO2_bar,
+            ),
         )
         self._last_vapor_pressure_diagnostic = diagnostic
         note_high_t_fallback = getattr(

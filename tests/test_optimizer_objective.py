@@ -4597,6 +4597,187 @@ def test_kernel_refresh_keeps_the_evaluated_po2_after_the_reservoir_changes() ->
     assert cold._evaluated_transport_pO2_bar is None
 
 
+# Cache consumption has no live dispatch argument. A positive pO2_bar on
+# the restored diagnostic is the evaluation. Anything else is a recorded
+# absence. The post-bleed reservoir is not an input of this oracle.
+_CACHE_CONSUMPTION_DIAGNOSTICS = (
+    ("provider_po2", {"pO2_bar": 1.0e-2}),
+    ("omitted_po2", {"vapor_pressures_Pa": {"M025": 1.0}}),
+    ("nonpositive_po2", {"pO2_bar": 0.0}),
+    ("empty_diagnostic", {}),
+)
+_CACHE_CONSUMPTION_ENTRIES = ("replay", "write_through")
+_CACHE_BLED_BAR = 1.0e-3
+
+
+def _oracle_cached_evaluation_bar(diagnostic: Mapping[str, object]) -> float | None:
+    """Pressure a cached vapour evaluation consumed.
+
+    Written from d-401. This does not call the stamp helper. Cache
+    consumption does not hold the live dispatch argument, so a missing
+    or non-positive ``pO2_bar`` is absence. It is not the reservoir the
+    hour bleeds to afterwards.
+    """
+
+    raw = diagnostic.get("pO2_bar")
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        return None
+    pressure = float(raw)
+    if not math.isfinite(pressure) or pressure <= 0.0:
+        return None
+    return pressure
+
+
+def _cache_stamp_host() -> SimpleNamespace:
+    """Hour state after the reset and before cache consumption."""
+
+    return SimpleNamespace(
+        melt=SimpleNamespace(fO2_log=-9.0, melt_fO2_log=-9.0),
+        _evaluated_transport_pO2_bar=None,
+        _evaluated_transport_pO2_recorded=False,
+    )
+
+
+def _cache_equilibrium_payload(diagnostic: Mapping[str, object]) -> dict[str, object]:
+    return {
+        "equilibrium_result": {
+            "temperature_C": 1600.0,
+            "pressure_bar": 1.0e-6,
+            "liquid_fraction": 1.0,
+            "status": "ok",
+        },
+        "last_vapor_pressures_source": {},
+        "last_vapor_pressure_diagnostic": dict(diagnostic),
+    }
+
+
+def _consume_cached_equilibrium(
+    entry: str,
+    host: SimpleNamespace,
+    payload: Mapping[str, object],
+    db_path: object,
+) -> object:
+    """Drive the real replay or write-through return, not a copied stamp."""
+
+    from simulator.reduced_real_determinism import PT0DeterminismStore
+
+    if entry == "replay":
+        store = PT0DeterminismStore("replay")
+        setattr(store, "_authorize_cached_real_replay", lambda sim, **kwargs: None)
+        setattr(store, "_equilibrium_key", lambda sim: {"namespace_id": "stamp"})
+        setattr(store, "_lookup", lambda artifact, key, sim=None: payload)
+        return store.replay_equilibrium(host)
+    if entry != "write_through":
+        raise AssertionError(entry)
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    assert store.write_through_enabled
+    setattr(store, "_cached_real_binding_eligible", lambda sim, **kwargs: True)
+    setattr(store, "_equilibrium_key", lambda sim: {"namespace_id": "stamp"})
+    setattr(store, "_lookup_optional", lambda artifact, key, **kwargs: payload)
+    result = store.cached_equilibrium(host)
+    assert result is not None
+    return result
+
+
+def _m025_refused_flux() -> SimpleNamespace:
+    return SimpleNamespace(
+        published_species_kg_hr={},
+        species_kg_hr={},
+        melt_surface_area_m2=_CEILING_AREA_M2,
+        carrier_authority_by_species={"M025": _transport_refusal_channel("M025")},
+    )
+
+
+@pytest.mark.parametrize("entry", _CACHE_CONSUMPTION_ENTRIES)
+@pytest.mark.parametrize(
+    ("_name", "diagnostic"),
+    _CACHE_CONSUMPTION_DIAGNOSTICS,
+    ids=[case[0] for case in _CACHE_CONSUMPTION_DIAGNOSTICS],
+)
+def test_cache_consumption_stamps_the_evaluated_po2(
+    entry: str,
+    _name: str,
+    diagnostic: dict[str, object],
+    tmp_path: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Replay and the write-through hit stamp the cached evaluation.
+
+    The hour reset has cleared the stamp. Both returns adopt the
+    restored diagnostic before the headspace bleed. An m=+0.25 carrier
+    evaluated at 1e-2 bar and bled to 1e-3 bar keeps the 1e-2 ceiling.
+    (1e-3 / 1e-2)^0.25 is about 0.562 of that bound. A diagnostic with
+    no positive pO2 records absence, and the ceiling does not fall
+    through to the bled reservoir. Skipping the stamp books the bled
+    ceiling for every class.
+    """
+
+    expected_bar = _oracle_cached_evaluation_bar(diagnostic)
+    host = _cache_stamp_host()
+    _consume_cached_equilibrium(
+        entry,
+        host,
+        _cache_equilibrium_payload(diagnostic),
+        tmp_path / "cache-stamp.sqlite",
+    )
+    assert host._evaluated_transport_pO2_recorded is True
+    assert host._evaluated_transport_pO2_bar == expected_bar
+    flux = _m025_refused_flux()
+    attach_evaluated_transport_pO2(flux, host)
+    snapshot = _m025_refused_hour(flux, _CACHE_BLED_BAR)
+    assert evaluate_module._snapshot_transport_pO2_bar(snapshot) == expected_bar
+    if expected_bar is None:
+        interval = _classify_wall_supply_interval(snapshot, "M025")
+        assert interval.kind == "unavailable"
+        assert interval.evidence == "missing_recorded_pO2"
+        bounds = _optimizer_refused_flux_bounds(
+            (snapshot,),
+            ("M025",),
+            campaigns_elapsed=1.0,
+        )
+        assert "M025" not in bounds
+    else:
+        correct = _m025_hk_at(expected_bar)
+        wrong = _m025_hk_at(_CACHE_BLED_BAR)
+        assert wrong / correct == pytest.approx(0.1 ** 0.25)
+        bounds = _optimizer_refused_flux_bounds(
+            (snapshot,),
+            ("M025",),
+            campaigns_elapsed=1.0,
+        )
+        assert bounds["M025"] == _approx_kg(correct)
+        assert bounds["M025"] != _approx_kg(wrong)
+
+    import simulator.evaporation as evaporation_module
+
+    monkeypatch.setattr(
+        evaporation_module,
+        "remember_evaluated_transport_pO2",
+        lambda host, pressure_bar: None,
+    )
+    bare = _cache_stamp_host()
+    _consume_cached_equilibrium(
+        entry,
+        bare,
+        _cache_equilibrium_payload(diagnostic),
+        tmp_path / "cache-stamp-mutated.sqlite",
+    )
+    assert bare._evaluated_transport_pO2_recorded is False
+    mutated_flux = _m025_refused_flux()
+    attach_evaluated_transport_pO2(mutated_flux, bare)
+    mutated_snapshot = _m025_refused_hour(mutated_flux, _CACHE_BLED_BAR)
+    mutated = _optimizer_refused_flux_bounds(
+        (mutated_snapshot,),
+        ("M025",),
+        campaigns_elapsed=1.0,
+    )
+    assert mutated["M025"] == _approx_kg(_m025_hk_at(_CACHE_BLED_BAR))
+    if expected_bar is None:
+        assert "M025" in mutated
+    else:
+        assert mutated["M025"] != _approx_kg(_m025_hk_at(expected_bar))
+
+
 def test_snapshot_temperature_uses_the_celsius_offset_constant() -> None:
     """The kelvin conversion is the owned offset, not a second 273.15."""
 
