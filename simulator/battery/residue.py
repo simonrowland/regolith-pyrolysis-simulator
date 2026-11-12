@@ -2704,6 +2704,7 @@ def _predict_hashimoto_residue_cohort(
     preform_dimensions_mm: Mapping[str, float],
     code_revision: str,
     engine: str = "openimcc",
+    selected_experiment_ids: frozenset[str] | None = None,
     _allow_partial_cohort_for_test: bool = False,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce both alpha arms and geometry bands, without reading residues."""
@@ -2719,6 +2720,13 @@ def _predict_hashimoto_residue_cohort(
     ):
         raise ResidueInventoryRefusal(
             "hashimoto_cohort_invalid", "R2 requires 24 distinct physical runs"
+        )
+    if selected_experiment_ids is not None and (
+        not selected_experiment_ids or not selected_experiment_ids <= experiment_ids
+    ):
+        raise ResidueInventoryRefusal(
+            "hashimoto_experiment_selection_invalid",
+            "selected runs must be a non-empty subset of the validated cohort",
         )
     if not code_revision.strip():
         raise ResidueInventoryRefusal("hashimoto_code_revision_missing")
@@ -2810,6 +2818,11 @@ def _predict_hashimoto_residue_cohort(
             / _formula_terms(str(oxide))[1]
             for oxide, wt_pct in run_wt_pct.items()
         }
+        if (
+            selected_experiment_ids is not None
+            and experiment_id not in selected_experiment_ids
+        ):
+            continue
         initial_steps = min(
             _HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0))
         )
@@ -3509,6 +3522,7 @@ def _predict_sossi_residue_cohort(
     buffered_fO2_log_by_experiment: Mapping[str, float],
     code_revision: str,
     engine: str,
+    selected_experiment_ids: frozenset[str] | None = None,
 ) -> tuple[_SossiResiduePrediction, ...]:
     """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -3530,6 +3544,18 @@ def _predict_sossi_residue_cohort(
         if isinstance(row, Mapping) and row.get("formula")
     ]
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
+    experiment_ids = {
+        str(experiment.get("experiment_id") or "") for experiment in experiments
+    }
+    if selected_experiment_ids is not None and (
+        not selected_experiment_ids
+        or "" in experiment_ids
+        or not selected_experiment_ids <= experiment_ids
+    ):
+        raise ResidueInventoryRefusal(
+            "sossi_experiment_selection_invalid",
+            "selected runs must be a non-empty subset of the supplied experiments",
+        )
     engine_binding_identity: dict[str, str] | None = None
     if engine == "openimcc":
         try:
@@ -3564,6 +3590,11 @@ def _predict_sossi_residue_cohort(
         experiment_id = str(experiment.get("experiment_id") or "")
         if not experiment_id:
             raise ResidueInventoryRefusal("sossi_experiment_id_missing")
+        if (
+            selected_experiment_ids is not None
+            and experiment_id not in selected_experiment_ids
+        ):
+            continue
         schedule = experiment.get("thermal_schedule", {})
         setpoints = schedule.get("setpoints_and_holds", ())
         if not setpoints or not isinstance(setpoints[0], Mapping):

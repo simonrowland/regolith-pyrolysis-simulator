@@ -55,6 +55,12 @@ _AITHALA_REDOX_EXPERIMENTS = {
 }
 
 
+def _subset_artifact(root: Path, name: str) -> Path:
+    paths = tuple((root / "data/battery/subsets").glob(f"*/{name}"))
+    assert len(paths) == 1
+    return paths[0]
+
+
 def _sossi_aithala_redox_context():
     root = Path(__file__).resolve().parents[2]
     source_paths = (
@@ -922,10 +928,10 @@ def test_borisov_redox_headline_is_unknown_pending_kc91_registration(tmp_path):
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
     summary = json.loads(
-        (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
+        _subset_artifact(tmp_path, "score-summary.json").read_text(encoding="utf-8")
     )
     _assert_unknown_redox_headline(summary["records"])
-    report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
+    report = _subset_artifact(tmp_path, "score-report.md").read_text(encoding="utf-8")
     retired = (
         "calibration_source_overlap_fit_fidelity",
         "independent_source_accuracy",
@@ -1083,7 +1089,7 @@ def test_borisov_redox_headline_paths_keep_unknown_source_relation(tmp_path):
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
     summary = json.loads(
-        (tmp_path / "data/battery/score-summary.json").read_text(encoding="utf-8")
+        _subset_artifact(tmp_path, "score-summary.json").read_text(encoding="utf-8")
     )
     _assert_unknown_redox_headline(summary["records"])
     assert not any(
@@ -1094,7 +1100,7 @@ def test_borisov_redox_headline_paths_keep_unknown_source_relation(tmp_path):
         or row.get("source_relation") == "training"
         for row in summary["records"]
     )
-    report = (tmp_path / "data/battery/score-report.md").read_text(encoding="utf-8")
+    report = _subset_artifact(tmp_path, "score-report.md").read_text(encoding="utf-8")
     assert "calibration_source_overlap_fit_fidelity" not in report
     assert "independent_source_accuracy" not in report
     report_rows = {

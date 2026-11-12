@@ -326,6 +326,7 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
         RefusalReason,
     )
     from simulator.battery.score import (
+        _residue_prediction_cache_entry,
         _sossi_residue_prediction,
         load_score_context,
         metric_operation_for_identity,
@@ -377,7 +378,11 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
         context, gadolinium, Engine.OPENIMCC, cache
     )
 
-    assert expected_run in cache[("kems-012-sossi-2019", Engine.OPENIMCC)]
+    cached_cohort = _residue_prediction_cache_entry(
+        cache, "kems-012-sossi-2019", Engine.OPENIMCC
+    )
+    assert cached_cohort is not None
+    assert expected_run in cached_cohort
     assert prediction.execution.state.value == "produced"
     assert prediction.value == 900.0
     assert prediction.identity == manganese.identity
