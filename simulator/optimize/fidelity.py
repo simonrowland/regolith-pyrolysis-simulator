@@ -868,8 +868,6 @@ def _inherited_evidence_class_from_token(token: object) -> str:
 
 def _start_method() -> str:
     methods = mp.get_all_start_methods()
-    if "PYTEST_CURRENT_TEST" in os.environ and "fork" in methods:
-        return "fork"
     if "spawn" in methods:
         return "spawn"
     return methods[0]
