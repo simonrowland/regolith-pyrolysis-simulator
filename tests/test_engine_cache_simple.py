@@ -1047,6 +1047,9 @@ def test_bulk_loader_counts_conflicts_without_replacing_existing_bytes(
         database, [(digest, {"answer": "first"}, "magemin", 2, "box-a", 1)]
     ) == 1
     assert load_cache_rows(
+        database, [(digest, {"answer": "first"}, "magemin", 2, "box-b", 2)]
+    ) == 0
+    assert load_cache_rows(
         database, [(digest, {"answer": "different"}, "magemin", 2, "box-b", 2)]
     ) == 0
     assert _engine_cache_counters(reset=True)["magemin"]["conflicts"] == 1
