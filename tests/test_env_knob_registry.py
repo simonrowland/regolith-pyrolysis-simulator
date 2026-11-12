@@ -1,8 +1,10 @@
 """Keep production environment reads registered.
 
 The AST scanner resolves the environment-key forms used by production. Exotic
-forms such as ``getattr(os.environ, "get")`` are deliberately left to the
-``environ``/``getenv`` token ceiling backstop below.
+forms such as ``getattr(os.environ, "get")`` and ``dict(os.environ)["KEY"]``
+are deliberately left to the ``environ``/``getenv`` token ceiling backstop
+below. That token count catches newly added occurrences but cannot see a later
+`.get()` on an alias created by ``dict(os.environ)`` without another token.
 """
 
 from __future__ import annotations
@@ -519,9 +521,9 @@ def test_production_environment_reads_are_registered():
 
 def test_environment_access_token_backstop():
     sites = _env_access_token_sites()
-    assert len(sites) <= ENV_ACCESS_TOKEN_CEILING, (
-        "new environ/getenv use at file:line: register its key(s) and lower or "
-        f"raise the ceiling with review (count={len(sites)}, "
+    assert len(sites) == ENV_ACCESS_TOKEN_CEILING, (
+        "environ/getenv token count changed: register its key(s), review the "
+        f"new count {len(sites)}, and update the ceiling with review; "
         f"ceiling={ENV_ACCESS_TOKEN_CEILING}, sites={sites})"
     )
 
@@ -570,6 +572,12 @@ def test_token_backstop_catches_ast_forms_outside_key_scanner(tmp_path):
     path = tmp_path / "exotic.py"
     path.write_text(source, encoding="utf-8")
     assert len(ENV_ACCESS_TOKEN.findall(path.read_text(encoding="utf-8"))) == 1
+
+
+def test_dict_environ_access_is_a_documented_scanner_limitation():
+    source = 'import os\nvalue = dict(os.environ)["DICT_ONLY"]\n'
+    assert _scan_source(source) == set()
+    assert len(ENV_ACCESS_TOKEN.findall(source)) == 1
 
 
 def test_scanner_refuses_unresolved_local_and_cross_module_keys(tmp_path):
