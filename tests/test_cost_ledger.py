@@ -257,7 +257,14 @@ def test_furnace_flux_tracks_absolute_temperature_times_time():
     assert ELECTRICAL_USD_PER_KWH.value == 0.15
     assert ELECTRICAL_USD_PER_KWH.to_json()["status"] == "owner-ratified"
     assert THERMAL_USD_PER_FLUX_H.value == 1.0
-    assert len(owner_ratify_cost_placeholders()) == 4
+    assert {parameter.name for parameter in owner_ratify_cost_placeholders()} == {
+        "carrier_gas_earth_price_per_kg.Kr",
+        "carrier_makeup_loss_fraction_per_run",
+        "thermal_usd_per_flux_h",
+        "furnace_usd_per_h",
+        "launch_usd_per_kg",
+        "reagent_usd_per_kg",
+    }
 
 
 def test_electricity_price_is_owner_ratified_not_a_placeholder():
