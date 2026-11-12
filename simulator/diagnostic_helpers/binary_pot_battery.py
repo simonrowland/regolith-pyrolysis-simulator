@@ -37,6 +37,7 @@ from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
+from simulator.oxygen_buffers import metal_oxide_coexistence_log10_fO2_bar
 from simulator.scalar_boundary import finite_float
 from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
@@ -1792,9 +1793,8 @@ def _cell_oxide_thermodynamics(
             oxygen_atoms = sum(
                 int(count or "1") for element, count in atoms if element == "O"
             )
-            log10_p = (
-                2.0 * gibbs_j
-                / (oxygen_atoms * _CELL_GAS_CONSTANT_J_MOL_K * T * math.log(10.0))
+            log10_p = metal_oxide_coexistence_log10_fO2_bar(
+                gibbs_j, float(oxygen_atoms), T
             )
             buffers.append((log10_p, formula, table_id, digest))
         # The first solid stable as oxygen potential rises is the M/MOx pair

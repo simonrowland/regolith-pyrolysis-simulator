@@ -87,13 +87,11 @@ def test_ten_significant_figure_gas_constant_is_not_the_leaf() -> None:
 
 
 def test_cell_oxide_buffer_expression_bits() -> None:
-    """Pin the binary-pot coexistence expression before it moves."""
+    """The coexistence owner keeps the pre-move hex."""
 
-    log10_p = (
-        2.0
-        * -500_000.0
-        / (2.0 * 8.31446261815324 * 1800.0 * math.log(10.0))
-    )
+    from simulator.oxygen_buffers import metal_oxide_coexistence_log10_fO2_bar
+
+    log10_p = metal_oxide_coexistence_log10_fO2_bar(-500_000.0, 2.0, 1800.0)
     assert log10_p.hex() == "-0x1.d04c8123c6560p+3"
 
 
