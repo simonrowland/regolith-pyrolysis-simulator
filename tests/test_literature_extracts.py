@@ -5350,6 +5350,27 @@ def _source_blind_warning(doc: dict) -> vle.FidelityWarning:
     return next(warning for warning in warnings if warning.kind == "source_blind_pin")
 
 
+def _uncovered_observation_count(doc: dict, *, artifact_root: Path | None = None) -> int:
+    warnings = vle.fidelity_source_warnings(
+        doc, label="corpus-coverage", artifact_root=artifact_root
+    )
+    return sum(
+        warning.count
+        for warning in warnings
+        if warning.kind == "uncovered_observation"
+    )
+
+
+def _assert_refused_sample_does_not_cover(
+    doc: dict, *, artifact_root: Path | None = None
+) -> None:
+    without_sample = copy.deepcopy(doc)
+    without_sample["fidelity_samples"] = []
+    assert _uncovered_observation_count(
+        doc, artifact_root=artifact_root
+    ) == _uncovered_observation_count(without_sample, artifact_root=artifact_root)
+
+
 def test_corpus_artifact_is_opened_and_digest_is_recorded(tmp_path, monkeypatch):
     doc = _corpus_pin_document(tmp_path)
     artifact = tmp_path / "text" / "paper.txt"
@@ -5380,6 +5401,7 @@ def test_unset_corpus_root_is_typed_and_keeps_source_blind_count(
     warning = _source_blind_warning(doc)
     assert warning.count == 1
     assert "corpus_root_unset" in warning.detail
+    _assert_refused_sample_does_not_cover(doc)
     refusals = vle.certify_extract_source_fidelity(doc, label="corpus-pin")
     assert any("corpus_root_unset" in refusal for refusal in refusals)
 
@@ -5393,6 +5415,7 @@ def test_missing_corpus_artifact_is_typed(tmp_path, monkeypatch):
     monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
 
     assert "corpus_artifact_missing" in _source_blind_warning(doc).detail
+    _assert_refused_sample_does_not_cover(doc)
 
 
 def test_corpus_path_outside_root_is_typed(tmp_path, monkeypatch):
@@ -5404,6 +5427,7 @@ def test_corpus_path_outside_root_is_typed(tmp_path, monkeypatch):
     monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
 
     assert "corpus_path_outside_root" in _source_blind_warning(doc).detail
+    _assert_refused_sample_does_not_cover(doc)
 
 
 def test_corpus_artifact_requires_digest(tmp_path, monkeypatch):
@@ -5411,6 +5435,7 @@ def test_corpus_artifact_requires_digest(tmp_path, monkeypatch):
     monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
 
     assert "artifact_digest_missing" in _source_blind_warning(doc).detail
+    _assert_refused_sample_does_not_cover(doc)
 
 
 def test_corpus_artifact_digest_mismatch_is_typed(tmp_path, monkeypatch):
@@ -5418,6 +5443,7 @@ def test_corpus_artifact_digest_mismatch_is_typed(tmp_path, monkeypatch):
     monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
 
     assert "artifact_digest_mismatch" in _source_blind_warning(doc).detail
+    _assert_refused_sample_does_not_cover(doc)
 
 
 def test_repository_override_missing_artifact_refuses_without_corpus_root(
@@ -5436,6 +5462,7 @@ def test_repository_override_missing_artifact_refuses_without_corpus_root(
 
     assert errors
     assert "corpus_root_unset" in "\n".join(errors)
+    _assert_refused_sample_does_not_cover(doc, artifact_root=repository_root)
 
 
 def test_existing_repository_quotes_path_opens_without_corpus_root(

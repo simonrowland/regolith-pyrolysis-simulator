@@ -2564,26 +2564,29 @@ def _locator_source_blind_reason(
     artifact_root: Path,
     corpus_root: Path | None,
     doc: Mapping[str, Any] | None = None,
-) -> str | None:
-    """None only when the locator was opened and the certified leaves are in it.
+) -> tuple[str | None, bool]:
+    """Return the source-blind reason and whether an artifact open was refused.
 
-    Certified leaves are the sample value and the resolved extract value.
-    A tolerant sample match does not stand in for the stored number.
+    No source-blind reason means a candidate was opened and contained the
+    certified leaves: the sample value and resolved extract value. A tolerant
+    sample match does not stand in for the stored number.
     """
     keys = [key for key in ("locator", "source_locator") if key in sample]
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
-        return "locator was not opened: attestation locator is missing"
+        return "locator was not opened: attestation locator is missing", False
     locator = sample[keys[0]]
     candidates = _artifact_locator_values(locator)
     if not candidates:
         return (
             "locator was not opened: no source_path, quotes_path, or file record "
-            "points at a text artifact"
+            "points at a text artifact",
+            False,
         )
     leaves, leaf_error = _certification_scalar_leaves(sample, doc)
     if leaf_error:
-        return leaf_error
+        return leaf_error, False
     reasons: list[str] = []
+    artifact_open_refused = False
     for raw in candidates:
         path, blob, _digest, open_refusal = _open_source_artifact(
             raw,
@@ -2592,6 +2595,7 @@ def _locator_source_blind_reason(
             expected_sha256=locator.get("source_sha256"),
         )
         if open_refusal:
+            artifact_open_refused = True
             reasons.append(f"locator was not opened: {open_refusal} ({raw})")
             continue
         if path is None or blob is None:
@@ -2634,13 +2638,13 @@ def _locator_source_blind_reason(
                 continue
             missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
         if not missing:
-            return None
+            return None, artifact_open_refused
         rendered = ", ".join(repr(leaf) for leaf in missing[:3])
         reasons.append(
             f"opened {path.name} but the resolved extract value is not in the "
             f"cited text ({rendered})"
         )
-    return "locator source-blind: " + "; ".join(reasons)
+    return "locator source-blind: " + "; ".join(reasons), artifact_open_refused
 
 
 def fidelity_source_warnings(
@@ -2755,6 +2759,7 @@ def fidelity_source_warnings(
     )
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
+        artifact_open_refused = False
         if not isinstance(sample, Mapping):
             unattested += 1
             _note_reason(
@@ -2783,7 +2788,7 @@ def fidelity_source_warnings(
         else:
             # Attestation-complete pins are the ones that would otherwise certify
             # without opening the source. Unattested pins stay on that count.
-            blind = _locator_source_blind_reason(
+            blind, artifact_open_refused = _locator_source_blind_reason(
                 sample,
                 artifact_root=root,
                 corpus_root=corpus_root,
@@ -2800,6 +2805,7 @@ def fidelity_source_warnings(
         observation_key = _fidelity_sample_observation_key(doc, sample)
         if (
             not match_errors
+            and not artifact_open_refused
             and observation_key is not None
             and observation_key in required
             and _path_selector_names_observation_id(sample)
