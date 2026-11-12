@@ -408,6 +408,280 @@ def test_engine_cache_settings_are_the_named_prediction_projection(
     assert set(settings) == expected_fields
 
 
+def test_normalized_engine_defaults_match_backend_defaults(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import environment
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _InternalAnalyticalBatteryBackend,
+        _OpenImccBatteryBackend,
+        normalize_engine_settings,
+    )
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.melt_backend.magemin import MAGEMinBackend
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+    from simulator.melt_backend.vaporock import VapoRockBackend
+
+    monkeypatch.setattr(
+        environment,
+        "vacuum_floor_bar_for_environment",
+        lambda: environment.DEFAULT_VACUUM_FLOOR_BAR,
+    )
+    normalized = {
+        engine: normalize_engine_settings(engine, None)
+        for engine in (
+            "internal-analytical",
+            "openimcc",
+            "alphamelts",
+            "thermoengine",
+            "vaporock",
+            "magemin",
+        )
+    }
+
+    internal = _InternalAnalyticalBatteryBackend()
+    assert normalized["internal-analytical"]["oxygen_balance_backend"] == {
+        "pack": internal._oxygen_balance_pack
+    }
+
+    bridge_pack = openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+    pack = SimpleNamespace(
+        model_id="test",
+        version="test",
+        kernel_datapack=SimpleNamespace(domains=()),
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_require_openimcc",
+        lambda: SimpleNamespace(__version__="test"),
+    )
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: pack)
+    monkeypatch.setattr(openimcc_bridge, "_pack_digest", lambda _pack: "test")
+    monkeypatch.setattr(openimcc_bridge, "imported_openimcc_commit", lambda: None)
+    openimcc = _OpenImccBatteryBackend("openimcc")
+    assert normalized["openimcc"]["pack"] == openimcc._pack_name == bridge_pack
+    assert normalized["openimcc"]["gas_pack"] == openimcc._gas_pack_name
+
+    alpha = AlphaMELTSBackend()
+    alpha._configure_subprocess_calc_mode(None)
+    alpha._initialize_vapor_transport({})
+    assert normalized["alphamelts"]["transport"] == alpha._normalize_mode(None)
+    assert normalized["alphamelts"]["raw_model_name"] == alpha._raw_model_name
+    assert normalized["alphamelts"]["effective_calc_mode"] == (
+        alpha._effective_subprocess_calc_mode
+    )
+    assert normalized["alphamelts"]["redox_buffer"] == alpha._redox_buffer
+    assert normalized["alphamelts"]["fO2_offset"] == alpha._fo2_offset
+    assert normalized["alphamelts"]["Fe3Fet_ratio"] == alpha._fe3fet_ratio
+    assert normalized["alphamelts"]["python_api_model"] == alpha._python_api_model
+    assert normalized["alphamelts"]["configured_vapor_transport_pO2_bar"] == (
+        alpha._configured_vapor_transport_pO2_bar
+    )
+    assert normalized["alphamelts"]["configured_vapor_transport_floor_bar"] == (
+        alpha._configured_vapor_transport_floor_bar
+    )
+
+    thermo = ThermoEngineBackend()
+    thermo._initialize_vapor_transport({})
+    assert normalized["thermoengine"]["model"] == thermo._model
+    assert normalized["thermoengine"]["redox_buffer"] == thermo._redox_buffer
+    assert normalized["thermoengine"]["fO2_offset"] == thermo._fo2_offset
+    assert normalized["thermoengine"]["Fe3Fet_ratio"] == thermo._fe3fet_ratio
+    assert normalized["thermoengine"]["configured_vapor_transport_pO2_bar"] == (
+        thermo._configured_vapor_transport_pO2_bar
+    )
+    assert normalized["thermoengine"]["configured_vapor_transport_floor_bar"] == (
+        thermo._configured_vapor_transport_floor_bar
+    )
+
+    vaporock = VapoRockBackend()
+    try:
+        vaporock.initialize({})
+        assert normalized["vaporock"]["temperature_units"] == (
+            vaporock._temperature_units
+        )
+        assert normalized["vaporock"]["pressure_units"] == vaporock._pressure_units
+        assert normalized["vaporock"]["vapor_pressure_units"] == (
+            vaporock._vapor_pressure_units
+        )
+    finally:
+        vaporock.close()
+
+    magemin = MAGEMinBackend()
+    magemin._binary_path = Path("MAGEMin")
+    resolved_bridge, _ = magemin._import_magemin_bridge(requested=None)
+    assert normalized["magemin"]["database"] == magemin._effective_database()
+    assert normalized["magemin"]["bridge"] == resolved_bridge
+    assert normalized["magemin"]["fO2_buffer"] == magemin._effective_fO2_buffer()
+
+
+def test_default_and_test_configuration_cache_keys_are_byte_stable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import environment
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
+    from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
+        engine_cache_key,
+        engine_cache_settings,
+    )
+
+    monkeypatch.setattr(
+        environment,
+        "vacuum_floor_bar_for_environment",
+        lambda: environment.DEFAULT_VACUUM_FLOOR_BAR,
+    )
+    snapshots = (
+        (
+            "openimcc default",
+            "openimcc",
+            None,
+            "93f61bb559c3e9da6e4efb18f9aaf33129539a364de31d313cd100175765d3b3",
+        ),
+        (
+            "AlphaMELTS default",
+            "alphamelts",
+            None,
+            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252",
+        ),
+        (
+            "AlphaMELTS Python API default model",
+            "alphamelts",
+            {"transport": "python_api"},
+            "bc6e37a3acac7c543ac5b2487ee01442f52ba4405aa1edab44990c8c60d54bf4",
+        ),
+        (
+            "ThermoEngine default",
+            "thermoengine",
+            None,
+            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc",
+        ),
+        (
+            "ThermoEngine explicit None defaults",
+            "thermoengine",
+            {
+                "model": None,
+                "configured_vapor_transport_pO2_bar": None,
+                "configured_vapor_transport_floor_bar": None,
+            },
+            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc",
+        ),
+        (
+            "VapoRock default",
+            "vaporock",
+            None,
+            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b",
+        ),
+        (
+            "VapoRock explicit None units",
+            "vaporock",
+            {
+                "temperature_units": None,
+                "pressure_units": None,
+                "vapor_pressure_units": None,
+            },
+            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b",
+        ),
+        (
+            "MAGEMin default",
+            "magemin",
+            None,
+            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27",
+        ),
+        (
+            "MAGEMin explicit None defaults",
+            "magemin",
+            {
+                "database": None,
+                "bridge": None,
+                "python_bridge": None,
+                "fO2_buffer": None,
+            },
+            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27",
+        ),
+    )
+    for label, engine, configuration, expected_hex in snapshots:
+        normalized = normalize_engine_settings(engine, configuration)
+        key = engine_cache_key(
+            engine,
+            ENGINE_CHEMISTRY_VERSION[engine],
+            {"engine_settings": engine_cache_settings(engine, normalized)},
+        )
+        assert key.hex() == expected_hex, label
+
+    case_key_hex = {
+        "AlphaMELTS transport mode": (
+            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252"
+        ),
+        "AlphaMELTS model": (
+            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252"
+        ),
+        "AlphaMELTS Python API model": (
+            "bc6e37a3acac7c543ac5b2487ee01442f52ba4405aa1edab44990c8c60d54bf4"
+        ),
+        "AlphaMELTS redox buffer": (
+            "b963906c30e04848c0feb614ba3bf7472597260d9b165365c7cd8e25349edfbe"
+        ),
+        "AlphaMELTS fO2 offset": (
+            "8fc865d19b400e65d5fa735e82d16ddc1bb69579908b98c50dafbd9a5efa2e96"
+        ),
+        "AlphaMELTS Fe3+/Fet ratio": (
+            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252"
+        ),
+        "AlphaMELTS configured vapor pO2": (
+            "e8dd75150df9161e2ed3bf18e27b6c05d821708c074e3907f0c1ec72cfde287f"
+        ),
+        "AlphaMELTS configured vapor floor": (
+            "86f02e00df6c7ba3f970b3f3bddaded6b60432a2441578a8a430b70b61d7f252"
+        ),
+        "MAGEMin database": (
+            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27"
+        ),
+        "MAGEMin worker fO2 buffer": (
+            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27"
+        ),
+        "MAGEMin bridge selection": (
+            "ee60d1d7ee5b562c5666e4dcd2c45597c200118902c51694255eb7c830e01f27"
+        ),
+        "ThermoEngine transport model": (
+            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc"
+        ),
+        "ThermoEngine vapor transport pO2": (
+            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc"
+        ),
+        "ThermoEngine vapor transport floor": (
+            "50c828f51bc7020b940b55e024c2839714977c2f9ffa8d4feff070494828d4bc"
+        ),
+        "OpenIMCC loaded cell pack": (
+            "64c9cbd3a7d499a665a83a620a31dda97ca2c045571779c7db51d3f2aa70db26"
+        ),
+        "VapoRock temperature units": (
+            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b"
+        ),
+        "VapoRock pressure units": (
+            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b"
+        ),
+        "VapoRock vapor pressure units": (
+            "53ce8e2d7c9c1bb474535d2bd5f65f4126036f622dff4ff3a36d1f79717ff26b"
+        ),
+    }
+    for case in _setting_cases():
+        normalized = normalize_engine_settings(case.engine.value, case.configuration)
+        key = engine_cache_key(
+            case.engine.value,
+            ENGINE_CHEMISTRY_VERSION[case.engine.value],
+            {
+                "engine_settings": engine_cache_settings(
+                    case.engine.value, normalized
+                )
+            },
+        )
+        assert key.hex() == case_key_hex[case.label], case.label
+
+
 def test_default_alphamelts_projection_matches_resolved_opener_settings(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
