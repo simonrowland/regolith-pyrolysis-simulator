@@ -107,7 +107,7 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             lambda backend: {"MELTS-v1.0": 0.25, "pMELTS": 0.75}[
                 backend._model
             ],
-            {"raw_model_name": "MELTSv1.0.2"},
+            {"transport": "subprocess", "raw_model_name": "MELTSv1.0.2"},
             "raw_model_name",
             "pMELTS",
         ),
@@ -133,7 +133,7 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             alpha_backend,
             lambda backend: setattr(backend, "_redox_buffer", "NNO"),
             lambda backend: {"QFM": 0.25, "NNO": 0.75}[backend._redox_buffer],
-            {"redox_buffer": "QFM"},
+            {"transport": "subprocess", "redox_buffer": "QFM"},
             "redox_buffer",
             "NNO",
         ),
@@ -143,7 +143,7 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             alpha_backend,
             lambda backend: setattr(backend, "_fo2_offset", 0.5),
             lambda backend: {0.0: 0.25, 0.5: 0.75}[backend._fo2_offset],
-            {"fO2_offset": 0.0},
+            {"transport": "subprocess", "fO2_offset": 0.0},
             "fO2_offset",
             0.5,
         ),
@@ -153,7 +153,7 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
             alpha_backend,
             lambda backend: setattr(backend, "_fe3fet_ratio", 0.3),
             lambda backend: {None: 0.25, 0.3: 0.75}[backend._fe3fet_ratio],
-            {"Fe3Fet_ratio": None},
+            {"transport": "subprocess", "Fe3Fet_ratio": None},
             "Fe3Fet_ratio",
             0.3,
         ),
@@ -168,7 +168,10 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 1.0e-8: 0.25,
                 1.0e-3: 0.75,
             }[backend._configured_vapor_transport_pO2_bar],
-            {"configured_vapor_transport_pO2_bar": 1.0e-8},
+            {
+                "transport": "subprocess",
+                "configured_vapor_transport_pO2_bar": 1.0e-8,
+            },
             "configured_vapor_transport_pO2_bar",
             1.0e-3,
         ),
@@ -183,7 +186,10 @@ def _setting_cases() -> tuple[_SettingCase, ...]:
                 1.0e-9: 0.25,
                 1.0e-6: 0.75,
             }[backend._configured_vapor_transport_floor_bar],
-            {"configured_vapor_transport_floor_bar": 1.0e-9},
+            {
+                "transport": "subprocess",
+                "configured_vapor_transport_floor_bar": 1.0e-9,
+            },
             "configured_vapor_transport_floor_bar",
             1.0e-6,
         ),
@@ -462,16 +468,21 @@ def test_normalized_engine_defaults_match_backend_defaults(
             "_find_project_binary",
             lambda _backend, _root, result=binary_path: result,
         )
-        alpha = AlphaMELTSBackend()
-        resolved_transport = alphamelts_module.resolve_alphamelts_transport_mode(
-            None, backend=alpha
-        )
-        alpha_settings = normalize_engine_settings("alphamelts", None)
-        assert resolved_transport == expected_transport
-        assert alpha_settings["transport"] == resolved_transport
-        assert alpha._normalize_mode(None) is None
-        if not binary_available:
-            normalized["alphamelts"] = alpha_settings
+        for requested_transport in (None, "", "auto"):
+            alpha = AlphaMELTSBackend()
+            resolved_transport = (
+                alphamelts_module.resolve_alphamelts_transport_mode(
+                    requested_transport, backend=alpha
+                )
+            )
+            alpha_settings = normalize_engine_settings(
+                "alphamelts", {"transport": requested_transport}
+            )
+            assert resolved_transport == expected_transport
+            assert alpha_settings["transport"] == resolved_transport
+            assert alpha._normalize_mode(requested_transport) is None
+            if not binary_available and requested_transport is None:
+                normalized["alphamelts"] = alpha_settings
 
     internal = _InternalAnalyticalBatteryBackend()
     assert normalized["internal-analytical"]["oxygen_balance_backend"] == {
@@ -505,13 +516,20 @@ def test_normalized_engine_defaults_match_backend_defaults(
         == openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
     )
 
-    alpha = AlphaMELTSBackend()
-    alpha._configure_subprocess_calc_mode(None)
-    alpha._initialize_vapor_transport({})
-    alpha._python_api_model = alphamelts_module.resolve_alphamelts_python_api_model(
-        alpha._raw_model_name
+    monkeypatch.setattr(
+        AlphaMELTSBackend,
+        "_find_project_binary",
+        lambda _backend, _root: None,
     )
-    assert normalized["alphamelts"]["transport"] == "python_api"
+    alpha = AlphaMELTSBackend()
+    alpha._vaporock_helper = SimpleNamespace(
+        initialize=lambda _config: None,
+        is_available=lambda: True,
+    )
+    alpha._import_petthermotools = lambda: SimpleNamespace()
+    alpha._preload_petthermotools_payload = lambda _module: None
+    assert alpha.initialize({})
+    assert normalized["alphamelts"]["transport"] == alpha._mode == "python_api"
     assert normalized["alphamelts"]["raw_model_name"] == alpha._raw_model_name
     assert normalized["alphamelts"]["effective_calc_mode"] == (
         alpha._effective_subprocess_calc_mode
@@ -1484,7 +1502,13 @@ def test_opener_settings_reads_are_projected_or_declared_neutral(
     for key in raw.reads - set(neutral):
         changed = dict(configuration)
         value = changed.get(key)
-        if engine == "alphamelts" and key == "raw_model_name":
+        if engine == "alphamelts" and key == "transport":
+            changed[key] = (
+                "python_api"
+                if projected["transport_mode"] != "python_api"
+                else "subprocess"
+            )
+        elif engine == "alphamelts" and key == "raw_model_name":
             changed[key] = "pMELTS"
         elif isinstance(value, bool):
             changed[key] = not value

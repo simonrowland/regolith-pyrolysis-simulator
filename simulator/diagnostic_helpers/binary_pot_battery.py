@@ -4741,7 +4741,7 @@ def normalize_engine_settings(
         }
     if engine_name == "alphamelts":
         from simulator.melt_backend.alphamelts import (
-            DEFAULT_ALPHAMELTS_TRANSPORT_MODE,
+            resolve_alphamelts_transport_mode,
         )
 
         model_name = fields.get("raw_model_name")
@@ -4762,11 +4762,7 @@ def normalize_engine_settings(
         subprocess_settings = resolve_alphamelts_subprocess_settings(
             model_name, ambient
         )
-        transport = (
-            DEFAULT_ALPHAMELTS_TRANSPORT_MODE
-            if transport_token in {None, ""}
-            else requested_transport
-        )
+        transport = resolve_alphamelts_transport_mode(requested_transport)
         python_api_model = fields.get("python_api_model")
         if transport == "python_api" and python_api_model is None:
             python_api_model = resolve_alphamelts_python_api_model(model_name)
