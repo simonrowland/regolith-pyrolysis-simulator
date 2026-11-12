@@ -5196,43 +5196,73 @@ _MISSING_OBSERVATION_IDS_CEILING = 0
 _NON_FINITE_EVIDENCE_CEILING = 0
 
 
-def test_fidelity_source_warning_ratchet():
+def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path):
     """Source-fidelity holes are an upper bound, not a green bill of health.
 
     ``auto_migrated_pilot_pin`` is the number of pilot samples. Counting
     affected extracts alone would miss another pilot pin in an extract that
     already has one.
     """
-    uncovered_obs = 0
-    uncovered_extracts = 0
-    unattested_samples = 0
-    pilot_extracts = 0
-    pilot_pins = 0
-    source_blind_pins = 0
-    ambiguous_ids = 0
-    missing_ids = 0
-    non_finite = 0
-    for path in vle.discover_extracts():
-        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
-        if not isinstance(doc, dict):
-            continue
-        if doc.get("schema_version") != vle.SCHEMA_VERSION:
-            continue
-        warnings = vle.fidelity_source_warnings(doc, label=path.stem)
-        by_kind = {warning.kind: warning.count for warning in warnings}
-        uncovered = by_kind.get("uncovered_observation", 0)
-        if uncovered:
-            uncovered_extracts += 1
-            uncovered_obs += uncovered
-        unattested_samples += by_kind.get("unattested_sample", 0)
-        source_blind_pins += by_kind.get("source_blind_pin", 0)
-        ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
-        missing_ids += by_kind.get("missing_observation_id", 0)
-        non_finite += by_kind.get("non_finite_evidence", 0)
-        pilot = by_kind.get("auto_migrated_pilot_pin", 0)
-        pilot_pins += pilot
-        if pilot:
-            pilot_extracts += 1
+
+    def counts():
+        uncovered_obs = 0
+        uncovered_extracts = 0
+        unattested_samples = 0
+        pilot_extracts = 0
+        pilot_pins = 0
+        source_blind_pins = 0
+        ambiguous_ids = 0
+        missing_ids = 0
+        non_finite = 0
+        for path in vle.discover_extracts():
+            doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+            if not isinstance(doc, dict):
+                continue
+            if doc.get("schema_version") != vle.SCHEMA_VERSION:
+                continue
+            warnings = vle.fidelity_source_warnings(doc, label=path.stem)
+            by_kind = {warning.kind: warning.count for warning in warnings}
+            uncovered = by_kind.get("uncovered_observation", 0)
+            if uncovered:
+                uncovered_extracts += 1
+                uncovered_obs += uncovered
+            unattested_samples += by_kind.get("unattested_sample", 0)
+            source_blind_pins += by_kind.get("source_blind_pin", 0)
+            ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
+            missing_ids += by_kind.get("missing_observation_id", 0)
+            non_finite += by_kind.get("non_finite_evidence", 0)
+            pilot = by_kind.get("auto_migrated_pilot_pin", 0)
+            pilot_pins += pilot
+            if pilot:
+                pilot_extracts += 1
+        return (
+            uncovered_obs,
+            uncovered_extracts,
+            unattested_samples,
+            pilot_pins,
+            pilot_extracts,
+            source_blind_pins,
+            ambiguous_ids,
+            missing_ids,
+            non_finite,
+        )
+
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+    unmounted = counts()
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+    mounted = counts()
+    assert mounted == unmounted
+    (
+        uncovered_obs,
+        uncovered_extracts,
+        unattested_samples,
+        pilot_pins,
+        pilot_extracts,
+        source_blind_pins,
+        ambiguous_ids,
+        missing_ids,
+        non_finite,
+    ) = unmounted
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
     assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
@@ -5299,6 +5329,612 @@ def _opened_payload_document(root: Path, *, structured: bool) -> dict:
         sample["reviewed_on"] = "2026-11-10"
         sample["locator"] = locator
     return doc
+
+
+def _corpus_pin_document(
+    root: Path,
+    *,
+    source_sha256: str | None = None,
+    source_path: str = "text/paper.txt",
+) -> dict:
+    doc = _opened_payload_document(root, structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator["source_path"] = source_path
+    if source_sha256 is not None:
+        locator["source_sha256"] = source_sha256
+    return doc
+
+
+def _source_blind_warning(doc: dict) -> vle.FidelityWarning:
+    warnings = vle.fidelity_source_warnings(doc, label="corpus-pin")
+    return next(warning for warning in warnings if warning.kind == "source_blind_pin")
+
+
+def _uncovered_observation_count(doc: dict, *, artifact_root: Path | None = None) -> int:
+    warnings = vle.fidelity_source_warnings(
+        doc, label="corpus-coverage", artifact_root=artifact_root
+    )
+    return sum(
+        warning.count
+        for warning in warnings
+        if warning.kind == "uncovered_observation"
+    )
+
+
+def _assert_refused_sample_still_covers_addressed_observation(
+    doc: dict, *, artifact_root: Path | None = None
+) -> None:
+    without_sample = copy.deepcopy(doc)
+    without_sample["fidelity_samples"] = []
+    unaddressed = _uncovered_observation_count(
+        without_sample, artifact_root=artifact_root
+    )
+    assert _uncovered_observation_count(
+        doc, artifact_root=artifact_root
+    ) == max(0, unaddressed - 1)
+
+
+_LOCATOR_KEY_SETS = (
+    ("source_path",),
+    ("quotes_path",),
+    ("source_path", "quotes_path"),
+    ("record",),
+    ("source_path", "record"),
+    ("quotes_path", "record"),
+)
+_TYPED_LOCATOR_REFUSALS = (
+    "corpus_root_unset",
+    "corpus_artifact_missing",
+    "corpus_path_outside_root",
+    "artifact_digest_missing",
+    "artifact_digest_mismatch",
+)
+_PER_KEY_OUTCOMES = (
+    "matched",
+    "repository_transcription",
+    *_TYPED_LOCATOR_REFUSALS,
+    "token_absent",
+    "digest_valid_token_absent",
+    "corpus_valid_token_present",
+)
+_CORPUS_FILE_OUTCOMES = {
+    "artifact_digest_missing",
+    "artifact_digest_mismatch",
+    "digest_valid_token_absent",
+    "corpus_valid_token_present",
+    "record_alternate_open",
+    "record_alternate_token_absent",
+}
+_LOCATOR_OUTCOME_CASES = []
+for _keys in _LOCATOR_KEY_SETS:
+    _outcomes_by_key = [
+        (
+            *_PER_KEY_OUTCOMES,
+            "record_alternate_open",
+            "record_alternate_token_absent",
+            "first_open_token_absent",
+        )
+        if key == "record"
+        else _PER_KEY_OUTCOMES
+        for key in _keys
+    ]
+    for _outcomes in itertools.product(*_outcomes_by_key):
+        # A locator has one global corpus mount and one source_sha256. Keep
+        # only combinations those shared settings can realize, and leave
+        # multiple corpus opens to their dedicated refusal test below.
+        if sum(outcome in _CORPUS_FILE_OUTCOMES for outcome in _outcomes) > 1:
+            continue
+        for _corpus_mounted in (False, True):
+            for _digest_token in (None, "0.24", "0.25"):
+                _mount_required = any(
+                    outcome
+                    in _CORPUS_FILE_OUTCOMES | {"corpus_artifact_missing"}
+                    for outcome in _outcomes
+                )
+                if _mount_required != _corpus_mounted:
+                    continue
+                if (
+                    "corpus_root_unset" in _outcomes
+                    and _corpus_mounted
+                ):
+                    continue
+                _realizable = True
+                for _outcome in _outcomes:
+                    if (
+                        _outcome == "artifact_digest_missing"
+                        and _digest_token is not None
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "artifact_digest_mismatch"
+                        and _digest_token is None
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "digest_valid_token_absent"
+                        and _digest_token != "0.25"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "corpus_valid_token_present"
+                        and _digest_token != "0.24"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "record_alternate_token_absent"
+                        and _digest_token != "0.25"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome
+                        in {"record_alternate_open", "corpus_valid_token_present"}
+                        and _digest_token != "0.24"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "matched"
+                        and _digest_token not in {None, "0.24"}
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome
+                        in {
+                            "token_absent",
+                            "first_open_token_absent",
+                            "digest_valid_token_absent",
+                            "record_alternate_token_absent",
+                        }
+                        and _digest_token not in {None, "0.25"}
+                    ):
+                        _realizable = False
+                if _realizable:
+                    _LOCATOR_OUTCOME_CASES.append(
+                        (_keys, _outcomes, _corpus_mounted, _digest_token)
+                    )
+                    break
+            else:
+                continue
+            break
+_LOCATOR_OUTCOME_PARAMS = []
+for _keys, _outcomes, _corpus_mounted, _digest_token in _LOCATOR_OUTCOME_CASES:
+    _expected_source_blind_reason = (
+        "source_blind_pin"
+        if not all(
+            outcome
+            in {
+                "matched",
+                "repository_transcription",
+                "corpus_valid_token_present",
+                "record_alternate_open",
+            }
+            for outcome in _outcomes
+        )
+        else None
+    )
+    _LOCATOR_OUTCOME_PARAMS.append(
+        pytest.param(
+            _keys,
+            _outcomes,
+            _corpus_mounted,
+            _digest_token,
+            _expected_source_blind_reason,
+            id="+".join(
+                f"{key}={outcome}" for key, outcome in zip(_keys, _outcomes)
+            ),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    (
+        "declared_keys",
+        "outcomes",
+        "corpus_mounted",
+        "digest_token",
+        "expected_source_blind_reason",
+    ),
+    _LOCATOR_OUTCOME_PARAMS,
+)
+def test_locator_source_blind_matrix_preserves_address_coverage(
+    declared_keys,
+    outcomes,
+    corpus_mounted,
+    digest_token,
+    expected_source_blind_reason,
+    tmp_path,
+    monkeypatch,
+):
+    """Each key has an independent file under one locator-wide root and digest."""
+    repository_root = tmp_path / "repository"
+    corpus_root = tmp_path / "corpus"
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator["page"] = 2
+    relative_paths = {
+        "source_path": "text/source.txt",
+        "quotes_path": "tables/quotes.txt",
+        "record": "text/record.txt annotation",
+    }
+
+    def artifact_text(token: str) -> str:
+        return f"line 1\nline 2\nline 3\nline 4\nalpha {token} measured\n"
+
+    def write_artifact(root: Path, path: str, token: str) -> Path:
+        artifact = root / path
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text(artifact_text(token), encoding="utf-8")
+        return artifact
+
+    def write_repository_transcription(path: str) -> Path:
+        artifact = repository_root / path
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text(
+            "repository transcription\nalpha 0.24 measured\n", encoding="utf-8"
+        )
+        return artifact
+
+    for key, outcome in zip(declared_keys, outcomes):
+        relative = relative_paths[key]
+        if outcome == "corpus_path_outside_root":
+            path = f"{relative.split('/')[0]}/../../outside-{key}.txt"
+        else:
+            path = relative
+        locator[key] = path
+
+        if outcome == "matched":
+            write_artifact(repository_root, path, "0.24")
+        elif outcome == "repository_transcription":
+            write_repository_transcription(path)
+        elif outcome == "token_absent":
+            write_artifact(repository_root, path, "0.25")
+        elif outcome == "artifact_digest_missing":
+            write_artifact(corpus_root, path, "0.25")
+        elif outcome == "digest_valid_token_absent":
+            write_artifact(corpus_root, path, "0.25")
+        elif outcome == "corpus_valid_token_present":
+            write_artifact(corpus_root, path, "0.24")
+        elif outcome == "artifact_digest_mismatch":
+            mismatch_token = "0.25" if digest_token == "0.24" else "0.24"
+            write_artifact(corpus_root, path, mismatch_token)
+        elif outcome == "corpus_root_unset":
+            pass
+        elif outcome == "corpus_artifact_missing":
+            pass
+        elif outcome == "corpus_path_outside_root":
+            pass
+        elif outcome == "record_alternate_open":
+            filename = relative.split()[0]
+            write_artifact(corpus_root, filename, "0.24")
+        elif outcome == "record_alternate_token_absent":
+            filename = relative.split()[0]
+            write_artifact(corpus_root, filename, "0.25")
+        elif outcome == "first_open_token_absent":
+            write_artifact(repository_root, relative, "0.25")
+            write_artifact(repository_root, relative.split()[0], "0.24")
+
+    if corpus_mounted:
+        monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+    else:
+        monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+    if digest_token is not None:
+        locator["source_sha256"] = hashlib.sha256(
+            artifact_text(digest_token).encode("utf-8")
+        ).hexdigest()
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="locator-key-matrix", artifact_root=repository_root
+    )
+    source_blind = next(
+        (warning for warning in warnings if warning.kind == "source_blind_pin"),
+        None,
+    )
+    assert (source_blind.kind if source_blind else None) == expected_source_blind_reason
+    if source_blind:
+        expected_reason_codes = set(outcomes) & set(_TYPED_LOCATOR_REFUSALS)
+        actual_reason_codes = {
+            reason
+            for reason in _TYPED_LOCATOR_REFUSALS
+            if reason in source_blind.detail
+        }
+        assert actual_reason_codes == expected_reason_codes
+        for key, outcome in zip(declared_keys, outcomes):
+            if outcome in _TYPED_LOCATOR_REFUSALS:
+                assert f"{outcome} ({locator[key]})" in source_blind.detail
+        token_absent = any(
+            outcome
+            in {
+                "token_absent",
+                "digest_valid_token_absent",
+                "record_alternate_token_absent",
+                "first_open_token_absent",
+            }
+            for outcome in outcomes
+        )
+        assert ("not in the cited text" in source_blind.detail) == token_absent
+
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+
+    if declared_keys == ("source_path", "quotes_path") and outcomes == (
+        "corpus_root_unset",
+        "matched",
+    ):
+        assert source_blind is not None
+        assert "corpus_root_unset" in source_blind.detail
+        refusals = vle.certify_extract_source_fidelity(
+            doc, label="locator-key-matrix", artifact_root=repository_root
+        )
+        assert any("corpus_root_unset" in refusal for refusal in refusals)
+def test_multiple_corpus_artifacts_refuse_and_keep_address_coverage(
+    tmp_path, monkeypatch
+):
+    repository_root = tmp_path / "repository"
+    corpus_root = tmp_path / "corpus"
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator.update(
+        {
+            "source_path": "text/source.txt",
+            "quotes_path": "tables/quotes.txt",
+            "page": 2,
+        }
+    )
+    source = corpus_root / "text" / "source.txt"
+    quotes = corpus_root / "tables" / "quotes.txt"
+    source.parent.mkdir(parents=True)
+    quotes.parent.mkdir(parents=True)
+    source.write_text("source line\nalpha 0.24 measured\n", encoding="utf-8")
+    quotes.write_text("quotes line\nalpha 0.24 measured\n", encoding="utf-8")
+    locator["source_sha256"] = hashlib.sha256(source.read_bytes()).hexdigest()
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="multiple-corpus-artifacts", artifact_root=repository_root
+    )
+    source_blind = next(
+        warning for warning in warnings if warning.kind == "source_blind_pin"
+    )
+    assert "multiple_corpus_artifacts" in source_blind.detail
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+    refusals = vle.certify_extract_source_fidelity(
+        doc, label="multiple-corpus-artifacts", artifact_root=repository_root
+    )
+    assert any("multiple_corpus_artifacts" in refusal for refusal in refusals)
+    assert not any("uncovered_observation" in refusal for refusal in refusals)
+
+
+@pytest.mark.parametrize(
+    ("malformed_key", "malformed_value"),
+    [("record", None), ("record", 123), ("quotes_path", "")],
+)
+def test_malformed_declared_locator_key_refuses_but_keeps_address_coverage(
+    malformed_key, malformed_value, tmp_path, monkeypatch
+):
+    repository_root = tmp_path / "repository"
+    artifact = repository_root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_text(
+        "line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n",
+        encoding="utf-8",
+    )
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    doc["fidelity_samples"][0]["locator"][malformed_key] = malformed_value
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="malformed-locator-key", artifact_root=repository_root
+    )
+    source_blind = next(
+        warning for warning in warnings if warning.kind == "source_blind_pin"
+    )
+    assert "locator_key_malformed" in source_blind.detail
+    assert malformed_key in source_blind.detail
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+    refusals = vle.certify_extract_source_fidelity(
+        doc, label="malformed-locator-key", artifact_root=repository_root
+    )
+    assert any("locator_key_malformed" in refusal for refusal in refusals)
+    assert not any("uncovered_observation" in refusal for refusal in refusals)
+
+
+def test_corpus_artifact_is_opened_and_digest_is_recorded(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(tmp_path)
+    artifact = tmp_path / "text" / "paper.txt"
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    doc["fidelity_samples"][0]["locator"]["source_sha256"] = digest
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert vle.fidelity_source_warnings(doc, label="corpus-pin") == []
+    assert vle.certify_extract_source_fidelity(doc, label="corpus-pin") == []
+    assert doc["fidelity_samples"][0]["locator"] == {
+        "source_path": "text/paper.txt",
+        "line_range": "5-5",
+        "page": 2,
+        "source_sha256": digest,
+    }
+
+
+def test_unset_corpus_root_is_typed_and_keeps_source_blind_count(
+    tmp_path, monkeypatch
+):
+    artifact = tmp_path / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text("line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n")
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    doc = _corpus_pin_document(tmp_path, source_sha256=digest)
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    warning = _source_blind_warning(doc)
+    assert warning.count == 1
+    assert "corpus_root_unset" in warning.detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+    refusals = vle.certify_extract_source_fidelity(doc, label="corpus-pin")
+    assert any("corpus_root_unset" in refusal for refusal in refusals)
+
+
+def test_missing_corpus_artifact_is_typed(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(
+        tmp_path,
+        source_sha256="0" * 64,
+        source_path="text/missing.txt",
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "corpus_artifact_missing" in _source_blind_warning(doc).detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+def test_corpus_path_outside_root_is_typed(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(
+        tmp_path,
+        source_sha256="0" * 64,
+        source_path="../outside.txt",
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "corpus_path_outside_root" in _source_blind_warning(doc).detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+@pytest.mark.parametrize(
+    ("link_target", "expected_reason"),
+    [
+        ("../implementation.py", "artifact_not_source"),
+        ("../raw/implementation.py", "artifact_not_source"),
+        ("../../outside.txt", "corpus_path_outside_root"),
+    ],
+)
+def test_corpus_symlink_target_must_remain_eligible_source(
+    link_target, expected_reason, tmp_path, monkeypatch
+):
+    corpus_root = tmp_path / "corpus"
+    doc = _corpus_pin_document(corpus_root)
+    source_link = corpus_root / "text" / "paper.txt"
+    source_link.unlink()
+    target = (source_link.parent / link_target).resolve()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        "line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n",
+        encoding="utf-8",
+    )
+    source_link.symlink_to(link_target)
+    doc["fidelity_samples"][0]["locator"]["source_sha256"] = hashlib.sha256(
+        target.read_bytes()
+    ).hexdigest()
+    repository_root = tmp_path / "repository"
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    warning = next(
+        warning
+        for warning in vle.fidelity_source_warnings(
+            doc, label="corpus-symlink", artifact_root=repository_root
+        )
+        if warning.kind == "source_blind_pin"
+    )
+    assert expected_reason in warning.detail
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+
+
+def test_corpus_artifact_requires_digest(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(tmp_path)
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "artifact_digest_missing" in _source_blind_warning(doc).detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+def test_corpus_artifact_digest_mismatch_is_typed(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(tmp_path, source_sha256="0" * 64)
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "artifact_digest_mismatch" in _source_blind_warning(doc).detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+def test_repository_override_missing_artifact_refuses_without_corpus_root(
+    tmp_path, monkeypatch
+):
+    corpus_root = tmp_path / "corpus"
+    doc = _corpus_pin_document(corpus_root)
+    digest = hashlib.sha256(
+        (corpus_root / "text" / "paper.txt").read_bytes()
+    ).hexdigest()
+    doc["fidelity_samples"][0]["locator"]["source_sha256"] = digest
+    repository_root = tmp_path / "repository"
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    errors = _promotion_errors("index", doc, repository_root, monkeypatch)
+
+    assert errors
+    assert "corpus_root_unset" in "\n".join(errors)
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+
+
+def test_existing_repository_quotes_path_opens_without_corpus_root(
+    tmp_path, monkeypatch
+):
+    doc = _opened_payload_document(tmp_path, structured=False)
+    quotes = tmp_path / "tables" / "quotes.txt"
+    quotes.parent.mkdir(parents=True, exist_ok=True)
+    quotes.write_text("alpha 0.24 measured\n", encoding="utf-8")
+    doc["fidelity_samples"][0]["locator"] = {
+        "quotes_path": "tables/quotes.txt",
+        "page": 2,
+    }
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    assert vle.fidelity_source_warnings(doc, label="repo-quotes", artifact_root=tmp_path) == []
+    assert vle.certify_extract_source_fidelity(
+        doc, label="repo-quotes", artifact_root=tmp_path
+    ) == []
+
+
+@pytest.mark.parametrize(
+    ("locator_key", "relative_path"),
+    [("quotes_path", "tables/quotes.txt"), ("record", "text/paper.txt")],
+)
+def test_non_source_path_locators_resolve_from_mounted_corpus(
+    locator_key, relative_path, tmp_path, monkeypatch
+):
+    corpus_root = tmp_path / "corpus"
+    repository_root = tmp_path / "repository"
+    doc = _opened_payload_document(corpus_root, structured=False)
+    artifact = corpus_root / relative_path
+    if locator_key == "quotes_path":
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("alpha 0.24 measured\n", encoding="utf-8")
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator[locator_key] = relative_path
+    locator["page"] = 2
+    locator["source_sha256"] = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    assert vle.fidelity_source_warnings(
+        doc, label=f"corpus-{locator_key}", artifact_root=repository_root
+    ) == []
+    assert vle.certify_extract_source_fidelity(
+        doc, label=f"corpus-{locator_key}", artifact_root=repository_root
+    ) == []
+
+
+@pytest.mark.parametrize("digest", ["A" * 64, "a" * 63, "g" * 64, 123])
+def test_source_sha256_locator_requires_lowercase_64_digit_hex(digest):
+    assert not vle._locator_ok(
+        {"source_path": "text/paper.txt", "source_sha256": digest}
+    )
+    assert not vle._locator_ok({"source_sha256": "a" * 64})
 
 
 def _source_locator(root: Path, text: str) -> dict:

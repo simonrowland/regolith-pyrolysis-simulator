@@ -98,11 +98,13 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 from copy import deepcopy
 from dataclasses import dataclass
 from decimal import Decimal, DecimalException
 from functools import lru_cache
 import math
+import os
 import re
 import subprocess
 import sys
@@ -219,12 +221,22 @@ LOCATOR_KEYS = frozenset(
         "line_range",
         "note",
         "source_path",
+        "quotes_path",
         "record",
+        "source_sha256",
     }
 )
 
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+def _valid_source_sha256(value: Any) -> bool:
+    """True when value is lowercase, 64-character SHA-256 hex."""
+    return isinstance(value, str) and _SHA256_RE.fullmatch(value) is not None
+
+
 # Unicode minus and the other dash/plus signs are not ASCII "+" or "-".
 # The citation grammar below only sees ASCII signs, so a raw scan of
 # "−0.24" (U+2212) yields the token "0.24" and certifies the opposite
@@ -612,9 +624,10 @@ def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
     return any(_cell_certifies_leaf(leaf, cell) for cell in cells)
 
 
-# Repository-relative roots that hold a paper, OCR, quotes, or a reference
-# transcription. The extract tree and the gate implementation are absent
-# on purpose: a pin must not certify against its own YAML or this file.
+# Corpus-relative roots that hold a paper, OCR, or quotes. Reference
+# transcriptions under docs/references/ remain repository-relative. The
+# extract tree and gate implementation are absent: a pin must not certify
+# against its own YAML or this file.
 _SOURCE_ARTIFACT_PREFIXES = (
     "raw/",
     "corpus/",
@@ -1966,11 +1979,27 @@ def _sample_attestation_defects(sample: Mapping[str, Any]) -> list[str]:
         except ValueError:
             defects.append("reviewed_on is not a calendar date")
     locator_keys = [key for key in ("locator", "source_locator") if key in sample]
-    if len(locator_keys) != 1 or not _locator_ok(sample.get(locator_keys[0])):
+    locator = sample.get(locator_keys[0]) if len(locator_keys) == 1 else None
+    malformed_locator_keys = _malformed_locator_artifact_keys(locator)
+    if len(locator_keys) != 1 or (
+        not _locator_ok(locator) and not malformed_locator_keys
+    ):
         defects.append(
             "exactly one valid locator/source_locator is required for source attestation"
         )
     return defects
+
+
+def _malformed_locator_artifact_keys(locator: Any) -> list[str]:
+    """Return declared artifact keys that are not non-empty strings."""
+    if not isinstance(locator, Mapping):
+        return []
+    return [
+        key
+        for key in (*_ARTIFACT_PATH_KEYS, "record")
+        if key in locator
+        and (not isinstance(locator[key], str) or not locator[key].strip())
+    ]
 
 
 def _sample_addresses_scored_evidence(sample: Mapping[str, Any]) -> bool:
@@ -2247,44 +2276,89 @@ def _parse_line_range(raw: Any) -> tuple[int, int] | None:
     return None
 
 
-def _resolve_artifact(root: Path, raw: str) -> Path | None:
-    """Repository-relative file inside ``root``, or None when it cannot be opened."""
-    text = raw.strip()
-    if not text or "://" in text or _ABS_PATH_RE.match(text):
-        return None
-    candidate = Path(text)
-    if candidate.is_absolute():
-        return None
-    root_resolved = root.resolve()
-    resolved = (root_resolved / candidate).resolve()
-    if not resolved.is_relative_to(root_resolved) or not resolved.is_file():
-        return None
-    return resolved
-
-
-def _source_artifact_refusal(root: Path, path: Path) -> str | None:
-    """None only when ``path`` is source evidence, not the gate or an extract.
-
-    Invariant: every certification path opens the artifact here. A file under
-    the extract tree, the validator, or a program-source suffix is not a
-    paper, OCR transcript, or quotes file, even when it contains the pin.
-    """
-    try:
-        relative = path.resolve().relative_to(root.resolve()).as_posix()
-    except ValueError:
-        return f"{path.name} is outside the repository root"
+def _source_artifact_path_refusal(path: Path, root: Path) -> str | None:
+    """Refuse resolved paths outside source roots, prefixes, or suffix rules."""
+    if not path.is_relative_to(root):
+        return "corpus_path_outside_root"
+    relative = path.relative_to(root).as_posix()
     if not any(relative.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES):
-        return (
-            f"{relative} is not a source artifact "
-            "(paper, OCR, quotes, or reference transcription)"
-        )
+        return "artifact_not_source"
     if path.suffix.lower() in _PROGRAM_SOURCE_SUFFIXES:
-        return f"{relative} is implementation source, not a source artifact"
-    # Quotes live under tables/. Other YAML is pipeline metadata or an extract
-    # copy parked on a source root.
-    if path.suffix.lower() in {".yaml", ".yml"} and not relative.startswith("tables/"):
-        return f"{relative} is not a source-artifact transcription"
+        return "artifact_not_source"
+    if path.suffix.lower() in {".yaml", ".yml"} and not relative.startswith(
+        "tables/"
+    ):
+        return "artifact_not_source"
     return None
+
+
+def _open_source_artifact(
+    raw: str,
+    *,
+    repository_root: Path,
+    corpus_root: Path | None,
+    expected_sha256: Any,
+) -> tuple[Path | None, bytes | None, str | None, str | None]:
+    """Resolve and open one source artifact, returning path, bytes, hash, refusal.
+
+    Corpus artifacts are relative to ``REGOLITH_CORPUS_ROOT`` and must match
+    the digest recorded on the attesting locator. Existing files under any
+    allowed prefix in ``artifact_root`` remain repository-local; the root is
+    only a lookup location and never disables corpus resolution.
+    """
+    text = raw.strip()
+    candidate = Path(text)
+    if not text or "://" in text or _ABS_PATH_RE.match(text):
+        return None, None, None, "corpus_path_outside_root"
+    if candidate.is_absolute():
+        return None, None, None, "corpus_path_outside_root"
+
+    repository_root_resolved = repository_root.expanduser().resolve()
+    repository_path = (repository_root_resolved / candidate).resolve()
+    refusal = _source_artifact_path_refusal(
+        repository_path, repository_root_resolved
+    )
+    if refusal:
+        return None, None, None, refusal
+    relative = repository_path.relative_to(repository_root_resolved).as_posix()
+
+    is_corpus = False
+    resolved = repository_path
+    if not repository_path.is_file():
+        if corpus_root is None:
+            return None, None, None, "corpus_root_unset"
+        corpus_root_resolved = corpus_root.expanduser().resolve()
+        corpus_path = (corpus_root_resolved / relative).resolve()
+        refusal = _source_artifact_path_refusal(corpus_path, corpus_root_resolved)
+        if refusal:
+            return None, None, None, refusal
+        resolved = corpus_path
+        is_corpus = True
+    if not resolved.is_file():
+        return (
+            None,
+            None,
+            None,
+            "corpus_artifact_missing" if is_corpus else "artifact_missing",
+        )
+    try:
+        blob = resolved.read_bytes()
+    except OSError:
+        return (
+            None,
+            None,
+            None,
+            "corpus_artifact_unreadable" if is_corpus else "artifact_unreadable",
+        )
+    digest = hashlib.sha256(blob).hexdigest()
+    if is_corpus:
+        if expected_sha256 is None:
+            return resolved, blob, digest, "artifact_digest_missing"
+        if not _valid_source_sha256(expected_sha256):
+            return resolved, blob, digest, "artifact_digest_invalid"
+        if digest != expected_sha256:
+            return resolved, blob, digest, "artifact_digest_mismatch"
+    return resolved, blob, digest, None
 
 
 def _text_is_extract_document(text: str) -> bool:
@@ -2307,48 +2381,6 @@ def _text_is_extract_document(text: str) -> bool:
         SCHEMA_VERSION,
         TABLE_SCHEMA_VERSION,
     }
-
-
-def _artifact_candidates(locator: Mapping[str, Any], root: Path) -> list[Path]:
-    explicit = [
-        raw.strip()
-        for key in _ARTIFACT_PATH_KEYS
-        if isinstance((raw := locator.get(key)), str) and raw.strip()
-    ]
-    if explicit:
-        return [
-            path
-            for raw in explicit
-            if (path := _resolve_artifact(root, raw)) is not None
-        ]
-    record = locator.get("record")
-    if not isinstance(record, str) or not record.strip():
-        return []
-    text = record.strip()
-    direct = _resolve_artifact(root, text)
-    if direct is not None:
-        return [direct]
-    token = text.split()[0]
-    if token != text:
-        fallback = _resolve_artifact(root, token)
-        if fallback is not None:
-            return [fallback]
-    return []
-
-
-def _read_artifact_text(path: Path) -> tuple[str | None, str | None]:
-    if path.suffix.lower() == ".pdf":
-        return None, f"{path.name} is a PDF; certification opens a text or OCR artifact"
-    try:
-        blob = path.read_bytes()
-    except OSError as exc:
-        return None, f"could not read {path.name}: {exc}"
-    if blob.startswith(b"%PDF"):
-        return None, f"{path.name} is a PDF; certification opens a text or OCR artifact"
-    try:
-        return blob.decode("utf-8"), None
-    except UnicodeError:
-        return None, f"{path.name} is not UTF-8 text"
 
 
 def _cited_text(
@@ -2540,30 +2572,40 @@ def _locator_source_blind_reason(
     sample: Mapping[str, Any],
     *,
     artifact_root: Path,
+    corpus_root: Path | None,
     doc: Mapping[str, Any] | None = None,
 ) -> str | None:
-    """None only when the locator was opened and the certified leaves are in it.
+    """Return a source-blind reason when the locator evidence is inadequate.
 
-    Certified leaves are the sample value and the resolved extract value.
-    A tolerant sample match does not stand in for the stored number.
+    No source-blind reason means a candidate was opened and contained the
+    certified leaves: the sample value and resolved extract value. A tolerant
+    sample match does not stand in for the stored number. Separate declared
+    keys must each match; a record's filename alternate is considered only
+    when the earlier candidate could not be opened. One locator digest can
+    attest at most one corpus artifact.
     """
     keys = [key for key in ("locator", "source_locator") if key in sample]
     if len(keys) != 1 or not isinstance(sample.get(keys[0]), Mapping):
         return "locator was not opened: attestation locator is missing"
     locator = sample[keys[0]]
-    explicit = [
-        raw.strip()
+    malformed_keys = _malformed_locator_artifact_keys(locator)
+    if malformed_keys:
+        return (
+            "locator source-blind: locator_key_malformed "
+            f"({', '.join(malformed_keys)} must be non-empty strings)"
+        )
+    candidate_groups = [
+        (key, [raw.strip()])
         for key in _ARTIFACT_PATH_KEYS
         if isinstance((raw := locator.get(key)), str) and raw.strip()
     ]
-    candidates = _artifact_candidates(locator, artifact_root)
-    if explicit and not candidates:
-        joined = ", ".join(explicit)
-        return (
-            "locator was not opened: "
-            f"{joined} is not a text artifact inside the repository root"
-        )
-    if not candidates:
+    record = locator.get("record")
+    if isinstance(record, str) and record.strip():
+        text = record.strip()
+        token = text.split()[0]
+        candidates = [text] if token == text else [text, token]
+        candidate_groups.append(("record", candidates))
+    if not candidate_groups:
         return (
             "locator was not opened: no source_path, quotes_path, or file record "
             "points at a text artifact"
@@ -2572,49 +2614,102 @@ def _locator_source_blind_reason(
     if leaf_error:
         return leaf_error
     reasons: list[str] = []
-    for path in candidates:
-        provenance = _source_artifact_refusal(artifact_root, path)
-        if provenance:
-            reasons.append(f"locator was not opened: {provenance}")
-            continue
-        text, read_error = _read_artifact_text(path)
-        if text is None:
-            reasons.append(read_error or f"{path.name} was not opened")
-            continue
-        if _text_is_extract_document(text):
-            reasons.append(
-                "locator was not opened: "
-                f"{path.name} is an extract document, not an independent source"
+    resolved_corpus_root = (
+        corpus_root.expanduser().resolve() if corpus_root is not None else None
+    )
+    corpus_artifact_keys = 0
+    for _key, candidates in candidate_groups:
+        candidate_reasons: list[str] = []
+        key_matched = False
+        resolved_to_corpus = False
+        for raw in candidates:
+            path, blob, _digest, open_refusal = _open_source_artifact(
+                raw,
+                repository_root=artifact_root,
+                corpus_root=corpus_root,
+                expected_sha256=locator.get("source_sha256"),
             )
-            continue
-        delimiter = _tabular_delimiter(path)
-        if delimiter is None:
-            cited, span_error = _cited_text(text, locator)
-            if cited is None:
-                reasons.append(span_error or "cited span was not opened")
+            if path is not None and blob is not None:
+                # The first opened record candidate decides this key. Discard
+                # refusals from candidates that did not open.
+                candidate_reasons.clear()
+            if (
+                path is not None
+                and blob is not None
+                and resolved_corpus_root is not None
+                and path.is_relative_to(resolved_corpus_root)
+            ):
+                resolved_to_corpus = True
+            if open_refusal:
+                candidate_reasons.append(
+                    f"locator was not opened: {open_refusal} ({raw})"
+                )
+                if path is not None and blob is not None:
+                    break
                 continue
-            missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
-        else:
-            # Parse the complete table, then select. A sliced line is not a table.
-            try:
-                cells, span_error = _cited_table_cells(text, locator, delimiter)
-            except csv.Error as exc:
-                reasons.append(
-                    f"opened {path.name} but the table could not be parsed ({exc})"
+            if path is None or blob is None:
+                candidate_reasons.append(
+                    f"locator was not opened: artifact_not_opened ({raw})"
                 )
                 continue
-            if cells is None:
-                reasons.append(span_error or "cited span was not opened")
-                continue
-            missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
-        if not missing:
-            return None
-        rendered = ", ".join(repr(leaf) for leaf in missing[:3])
-        reasons.append(
-            f"opened {path.name} but the resolved extract value is not in the "
-            f"cited text ({rendered})"
-        )
-    return "locator source-blind: " + "; ".join(reasons)
+            if path.suffix.lower() == ".pdf" or blob.startswith(b"%PDF"):
+                candidate_reasons.append(
+                    f"{path.name} is a PDF; certification opens a text or OCR artifact"
+                )
+                break
+            try:
+                text = blob.decode("utf-8")
+            except UnicodeError:
+                candidate_reasons.append(f"{path.name} is not UTF-8 text")
+                break
+            if _text_is_extract_document(text):
+                candidate_reasons.append(
+                    "locator was not opened: "
+                    f"{path.name} is an extract document, not an independent source"
+                )
+                break
+            delimiter = _tabular_delimiter(path)
+            if delimiter is None:
+                cited, span_error = _cited_text(text, locator)
+                if cited is None:
+                    candidate_reasons.append(
+                        span_error or "cited span was not opened"
+                    )
+                    break
+                missing = [leaf for leaf in leaves if not _leaf_in_text(leaf, cited)]
+            else:
+                # Parse the complete table, then select. A sliced line is not a table.
+                try:
+                    cells, span_error = _cited_table_cells(text, locator, delimiter)
+                except csv.Error as exc:
+                    candidate_reasons.append(
+                        f"opened {path.name} but the table could not be parsed ({exc})"
+                    )
+                    break
+                if cells is None:
+                    candidate_reasons.append(
+                        span_error or "cited span was not opened"
+                    )
+                    break
+                missing = [leaf for leaf in leaves if not _leaf_in_table(leaf, cells)]
+            if not missing:
+                key_matched = True
+                break
+            rendered = ", ".join(repr(leaf) for leaf in missing[:3])
+            candidate_reasons.append(
+                f"opened {path.name} but the resolved extract value is not in the "
+                f"cited text ({rendered})"
+            )
+            break
+        if resolved_to_corpus:
+            corpus_artifact_keys += 1
+            if corpus_artifact_keys > 1:
+                return "locator source-blind: multiple_corpus_artifacts"
+        if not key_matched:
+            reasons.extend(candidate_reasons)
+    if reasons:
+        return "locator source-blind: " + "; ".join(reasons)
+    return None
 
 
 def fidelity_source_warnings(
@@ -2723,7 +2818,10 @@ def fidelity_source_warnings(
     source_blind_reasons: list[str] = []
     source_blind_extra = [0]
     root = artifact_root if artifact_root is not None else ROOT
-
+    configured_corpus_root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
+    corpus_root = (
+        Path(configured_corpus_root).expanduser() if configured_corpus_root else None
+    )
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
         if not isinstance(sample, Mapping):
@@ -2755,7 +2853,10 @@ def fidelity_source_warnings(
             # Attestation-complete pins are the ones that would otherwise certify
             # without opening the source. Unattested pins stay on that count.
             blind = _locator_source_blind_reason(
-                sample, artifact_root=root, doc=doc
+                sample,
+                artifact_root=root,
+                corpus_root=corpus_root,
+                doc=doc,
             )
             if blind:
                 source_blind += 1
@@ -3053,8 +3154,12 @@ def _locator_ok(locator: Any) -> bool:
     """
     if not isinstance(locator, Mapping):
         return False
+    if "source_sha256" in locator and not _valid_source_sha256(
+        locator["source_sha256"]
+    ):
+        return False
     for key, val in locator.items():
-        if key not in LOCATOR_KEYS:
+        if key not in LOCATOR_KEYS or key == "source_sha256":
             continue
         if val is None:
             continue

@@ -124,12 +124,32 @@ An equipment pin does not contribute.
 A bare integer bracket such as `observations[0]` is a list position, not
 an id, so it does not contribute. Structured samples address `values`
 only; a condition is pinned by a path.
-Matching pins still detect later extraction drift; a mismatch does not cover
-and blocks certification. Certification opens the locator's text artifact
-(`source_path`, `quotes_path`, or a `record` that is a repository-relative
-file under a source-evidence root: `raw/`, `corpus/`, `text/`, `tables/`,
-`supporting/`, or `docs/references/`). The extract document and program
-source are not source artifacts, including a copy parked on a source root.
+Address coverage is based on the pin's observation and address, separately
+from source fidelity. A pin can cover its addressed observation while its
+source is missing or does not contain the value; that condition raises
+`source_blind_pin` and still blocks certification.
+
+Certification opens every declared locator artifact (`source_path`,
+`quotes_path`, and file-valued `record`) independently. For any allowed source
+prefix, it first looks for the path under the repository artifact root (the
+simulator checkout or an explicit `--root`); an existing repository artifact
+is opened there, and `source_sha256` is not applied to repository artifacts.
+If a path is absent there, it resolves under the offline corpus mount set by
+`REGOLITH_CORPUS_ROOT` (for example, `~/Repos/regolith-corpus`). The root is a
+lookup location, not a policy switch. An unset root refuses with
+`corpus_root_unset`; a missing file refuses with `corpus_artifact_missing`,
+and a path outside the mount refuses with `corpus_path_outside_root`. Each
+corpus-resolved locator must include `source_sha256`, the lowercase
+64-character SHA-256 of the exact bytes opened. A missing digest refuses with
+`artifact_digest_missing`; a mismatch refuses with
+`artifact_digest_mismatch`. Source fidelity passes only when the opened
+artifact's digest requirements are met and it contains the pinned value.
+Because each locator has one digest, two or more declared keys resolving to
+corpus files refuse with `multiple_corpus_artifacts`.
+Repository files under `raw/`, `corpus/`, `text/`, `tables/`,
+`supporting/`, and `docs/references/` use this same repository-first lookup.
+The extract document and program source are not source artifacts, including
+a copy parked on a source root.
 A numeric pin matches only a complete token: the sign and the exponent
 belong to the token, so `0.24` is not `-0.24` or `0.24e-5`, and `1.0` is
 not `1`. The whole stored value, including a spaced or attached unit, must
@@ -581,7 +601,7 @@ A locator is a mapping with at least one non-empty location key among:
 - `table`, `figure`, `paragraph`, `section`, `equation`
 - `line_range` (e.g. thermo.inp line range)
 - `note` (prose locator when the above do not apply — allowed, but prefer structured keys)
-- `source_path`, `record`
+- `source_path`, `quotes_path`, `record`
 
 `page` is the one-based physical page in the PDF. `pdf_page_index` is the
 zero-based PDF page index (the first PDF page is 0). `published_page` is the
