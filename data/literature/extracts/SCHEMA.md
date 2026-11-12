@@ -256,8 +256,13 @@ tokens and certifies each of them. `SiO2Al2O3` certifies neither. A
 preceding number is not joined, so `6.98 Fe_{2}O_{3}` certifies `Fe2O3`
 and certifies 6.98. In a cell, the whole trimmed cell after that fold, and
 after removing one wrapping `$...$` pair, must equal the folded label. In
-running text the folded label must be one complete token, so `CO` does not
-certify text that contains only `CO₂`, and `SiO₂` does not certify `SiO₂₂`.
+running text the folded label must equal one whole formula run. A run is
+a maximal span of element symbols, digits, parentheses, square brackets,
+and the charge marks ·, +, and -. Whitespace or any other character
+delimits it. `CO` does not certify text that contains only `CO₂`, and
+`SiO₂` does not certify `SiO₂₂`. `SO4` does not certify `Fe₂(SO₄)₃`.
+`Fe2(SO4)3` does. `CaO·SiO2` certifies only as that whole run, so `SiO2`
+does not.
 Numbers, numeric strings, and every other key keep the un-folded formula
 comparison. A page or table number alone is not an open.
 A PDF is not opened as text. Do not backfill reviewer fields from the

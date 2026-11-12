@@ -10324,7 +10324,8 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     assert "_normalize_formula_label" not in inspect.getsource(vle._cell_certifies_leaf)
     formula_text = inspect.getsource(vle._formula_label_in_text)
     assert "_fold_digit_groups" not in formula_text
-    assert "group_digits=False" in formula_text
+    assert "_printed_value_carried" not in formula_text
+    assert "_formula_run_char" in formula_text
     normalizer = inspect.getsource(vle._normalize_formula_label)
     assert "fold_subscript_digits" in normalizer
     assert "_fold_digit_groups" not in normalizer
@@ -10650,6 +10651,12 @@ _FORMULA_TOKEN_WRAPPERS = (
     "unicode",
     "brace",
 )
+# Sub-formula inside a compound. The stored label must be the whole run.
+# Parentheses and the charge mark · stay inside that run.
+_FORMULA_COMPOUNDS = (
+    ("Fe2(SO4)3", ("SO4",)),
+    ("CaO\u00b7SiO2", ("SiO2",)),
+)
 _FORMULA_UNICODE_DIGITS = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
 
@@ -10710,7 +10717,9 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     A token that contains ``^`` does not certify as that plain formula
     or as a plain number. A neighbour token still certifies. A subscript
     digit inside a formula token does not certify as a number, for every
-    wrapper. A separate number token still certifies.
+    wrapper. A separate number token still certifies. A sub-formula inside
+    a compound is not the compound: ``SO4`` is not ``Fe2(SO4)3``, and
+    ``SiO2`` is not ``CaO·SiO2``.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -10799,6 +10808,42 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                 failures.append(f"superscript refuse {pin!r} ~ {text!r}: {errors}")
         if vle._formula_cell_matches(plain, source):
             failures.append(f"superscript cell {plain!r} ~ {source!r}")
+    assert vle._formula_label_in_text("SO4", "Fe₂(SO₄)₃") is False
+    assert vle._formula_label_in_text("Fe2(SO4)3", "Fe₂(SO₄)₃") is True
+    assert vle._formula_label_in_text("SiO2", "CaO\u00b7SiO2") is False
+    assert vle._formula_label_in_text("CaO\u00b7SiO2", "CaO\u00b7SiO2") is True
+    assert vle._formula_label_in_text("SO4", "phase Fe₂(SO₄)₃, next") is False
+    assert vle._formula_label_in_text(
+        "Fe2(SO4)3", "phase Fe₂(SO₄)₃, next"
+    ) is True
+    for kind in _FORMULA_TOKEN_WRAPPERS:
+        for whole, parts in _FORMULA_COMPOUNDS:
+            source = _formula_wrap_body(_formula_count_body(whole, kind), kind)
+            folded = vle._normalize_formula_label(source)
+            where = f"compound {kind} {source!r}"
+            if folded != whole:
+                failures.append(f"compound fold {where}: {folded!r}")
+                continue
+            doc = _html_source_document(
+                tmp_path, whole, source + "\n", key="formula"
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"compound-{kind}-{whole}", artifact_root=tmp_path
+            )
+            if errors:
+                failures.append(f"compound accept {whole!r} {where}: {errors}")
+            for part in parts:
+                doc = _html_source_document(
+                    tmp_path, part, source + "\n", key="formula"
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"compound-part-{kind}-{part}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if not errors or "source_blind_pin" not in joined:
+                    failures.append(f"compound refuse {part!r} {where}: {errors}")
     assert failures == []
 
 

@@ -73,7 +73,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``$O^{2-}$`` is not ``O2`` and ``$SiO^{2}$`` is not ``SiO2``.
   A subscript digit inside a formula token is not a number: ``SiO_{2}``
   and ``SiO₂`` do not certify 2, and ``Fe_{2}O_{3}`` does not certify 2.
-  ``SiO_{2} 100`` still certifies 100.
+  ``SiO_{2} 100`` still certifies 100. A formula label matches one whole
+  run of element symbols, digits, parentheses, square brackets, and the
+  charge marks ·, +, and -. ``SO4`` is not ``Fe₂(SO₄)₃``. ``Fe2(SO4)3``
+  is. ``CaO·SiO2`` certifies only as that whole run, so ``SiO2`` does not.
   A token with no internal space, including
   ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``, goes through
   ``printed_formula``. A layout space is removed
@@ -585,14 +588,12 @@ def _token_holds_superscript(text: str, start: int, end: int) -> bool:
     return "^" in text[left:right]
 
 
-def _printed_value_carried(
-    leaf: str, text: str, *, group_digits: bool = True
-) -> bool:
+def _printed_value_carried(leaf: str, text: str) -> bool:
     """True when the folded ``leaf`` occurs in the folded ``text`` whole.
 
-    Signs are folded on both sides. Digit groups are folded only when
-    ``group_digits`` is true. The formula-label path passes false, so a
-    formula count is not joined to a following measurement. Acceptance is
+    Signs and typographic digit groups are folded on both sides. This is
+    the numeric boundary. A formula label does not use it: parentheses
+    would split ``Fe2(SO4)3``. Acceptance is
     ``_span_is_complete_printed_value`` on that span. ``0.91Pa`` is not
     ``10.91Pa`` or ``0.91Pascal``, ``91.`` is not ``91.0``, ``1 K`` is not
     ``1 KPa``, ``1,000`` is not ``1,000,000``, and ``12 34`` is not ``1234``.
@@ -600,11 +601,8 @@ def _printed_value_carried(
     unsigned digit run, so ``1 650`` is ``1650``. An ASCII space does not,
     so ``1 100`` is not ``1100``. ``SiO2 100`` is not ``SiO2100``.
     """
-    leaf = _fold_numeric_signs(leaf)
-    text = _fold_numeric_signs(text)
-    if group_digits:
-        leaf = _fold_digit_groups(leaf)
-        text = _fold_digit_groups(text)
+    leaf = _fold_digit_groups(_fold_numeric_signs(leaf))
+    text = _fold_digit_groups(_fold_numeric_signs(text))
     if not leaf:
         return False
     start = 0
@@ -3331,24 +3329,47 @@ def _formula_cell_matches(leaf: str, cell: str) -> bool:
     return bool(right) and left == right
 
 
-def _formula_label_in_text(leaf: str, text: str) -> bool:
-    """True when the folded label is one complete token of the folded text.
+# A formula run is element symbols, digits, parentheses, square brackets,
+# and the charge marks · U+00B7, +, and -. Whitespace or any other
+# character ends the run. Parentheses do not.
+_FORMULA_RUN_MARKS = "()[]+-\u00b7"
 
-    A numeric string does not match here. Digitless labels use the same
-    complete-token boundary as a digit-bearing label, so ``CO`` is not a
-    token of ``CO2``. This path does not fold digit groups: ``SiO2 100``
-    is ``SiO2`` and is not ``SiO2100``.
+
+def _formula_run_char(ch: str) -> bool:
+    """True when ``ch`` stays inside one formula run."""
+    return (ch.isascii() and ch.isalnum()) or ch in _FORMULA_RUN_MARKS
+
+
+def _formula_label_in_text(leaf: str, text: str) -> bool:
+    """True when the folded label equals one whole formula run.
+
+    The run is a maximal span of element symbols, digits, parentheses,
+    square brackets, and the charge marks ·, +, and -. Whitespace, either
+    end of the text, or any other character delimits it. The stored label
+    matches only that whole run. ``SO4`` is not ``Fe2(SO4)3``. ``SiO2``
+    is not ``CaO·SiO2``. ``CO`` is not ``CO2``. A numeric string does not
+    match here. This path does not fold digit groups, so ``SiO2 100`` is
+    ``SiO2`` and is not ``SiO2100``.
     """
     if _string_is_plain_number(leaf):
         return False
     normalized = _normalize_formula_label(leaf)
     if not normalized.strip():
         return False
-    return _printed_value_carried(
-        normalized,
-        _normalize_formula_label(text),
-        group_digits=False,
-    )
+    folded = _normalize_formula_label(text)
+    start = 0
+    limit = len(folded)
+    while start < limit:
+        if not _formula_run_char(folded[start]):
+            start += 1
+            continue
+        end = start + 1
+        while end < limit and _formula_run_char(folded[end]):
+            end += 1
+        if folded[start:end] == normalized:
+            return True
+        start = end
+    return False
 
 
 def _pinned_leaf_in_text(leaf: _PinnedLeaf, text: str) -> bool:
@@ -3702,7 +3723,10 @@ def fidelity_source_warnings(
     not certify as a plain formula or a plain number.
     A subscript digit inside a formula token is not a number, so
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
-    measurement still does.
+    measurement still does. A formula label equals one whole run of
+    element symbols, digits, parentheses, square brackets, and the
+    charge marks ·, +, and -. ``SO4`` is not ``Fe2(SO4)3``. ``SiO2``
+    is not ``CaO·SiO2``.
     ``printed_formula`` unwraps one token, including a
     ``\\mathrm`` / ``\\text`` / ``\\rm`` command, so
     ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` is ``Al2O3``. A layout
