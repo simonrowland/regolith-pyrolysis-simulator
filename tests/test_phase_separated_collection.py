@@ -247,32 +247,78 @@ def test_stage3_committed_overhead_o2_drives_favourability_from_stream_once():
     assert reaction["log_Q_over_K"] is not None
 
 
-@pytest.mark.parametrize("oxygen_mol", [1e-7, 1.0])
-def test_stage3_shared_oxygen_split_is_order_independent(monkeypatch, oxygen_mol):
+def test_stage3_shared_oxygen_split_is_order_independent(monkeypatch):
     import simulator.evaporation as source_owner
     # Isolate carried-in oxidant competition from the newly evolved stream.
     monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
                         lambda *args, **kwargs: {}, raising=False)
+    oxygen_mol = 9.3988
     results = []
     for order in (("Na", "K"), ("K", "Na")):
         model = _model("through", hard_gate=False)
+        # Premise: 4 M(g) + O2 -> 2 M2O, so combined reactive demand is
+        # (Na uptake + K uptake) / 4 mol O2. This parcel leaves about 0.00810
+        # mol O2 after the upstream SiO wall booking, below the ~0.00825 mol
+        # transport demand; both species therefore receive material uptake
+        # from a binding shared budget. At or above demand, uptake equals the
+        # transport extent; here the common budget factor is below one.
         model.retained_vapor_mol = {"O2": oxygen_mol}
+        model.pipe_segments = []
         melt = MeltState(temperature_C=1650)
         melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
         rates = {"SiO": 1.0, **{sp: {"Na": 0.0007, "K": 0.0001}[sp] for sp in order}}
         result = model.route(EvaporationFlux(rates), melt)
         _assert_stage3_single_stream_oxygen_basis(model, result, oxygen_mol)
         results.append(result)
-    uptake_by_order = [
-        {sp: reaction["uptake_mol"] for sp, reaction in result.stage3_reactive_alkali_by_species.items()}
-        for result in results
-    ]
-    assert uptake_by_order[0] == pytest.approx(uptake_by_order[1], rel=1e-12)
+    uptake_by_order = [{
+        sp: reaction["uptake_mol"]
+        for sp, reaction in result.stage3_reactive_alkali_by_species.items()
+    } for result in results]
+    assert set(uptake_by_order[0]) == {"Na", "K"}
+    assert set(uptake_by_order[1]) == {"Na", "K"}
+    for species, minimum_material_uptake_mol in (("Na", 1e-2), ("K", 1e-3)):
+        first = uptake_by_order[0][species]
+        second = uptake_by_order[1][species]
+        assert first > minimum_material_uptake_mol
+        assert second > minimum_material_uptake_mol
+        uptake_abs_tolerance = 1e-12 * max(abs(first), abs(second), 1e-30)
+        assert first == pytest.approx(
+            second, rel=1e-12, abs=uptake_abs_tolerance,
+        )
     for result in results:
-        reactions = result.stage3_reactive_alkali_by_species.values()
-        assert sum(reaction["oxygen_debit_mol"] for reaction in reactions) <= oxygen_mol + 1e-15
-        assert all(reaction["uptake_mol"] <= reaction["transport_uptake_mol"] + 1e-15
-                   for reaction in reactions)
+        reactions = result.stage3_reactive_alkali_by_species
+        available_o2_mol = reactions["Na"]["available_oxygen_mol"]
+        available_abs_tolerance = 1e-12 * max(abs(available_o2_mol), 1e-30)
+        assert reactions["K"]["available_oxygen_mol"] == pytest.approx(
+            available_o2_mol, rel=1e-12, abs=available_abs_tolerance,
+        )
+        oxygen_debit_mol = sum(
+            reaction["oxygen_debit_mol"] for reaction in reactions.values()
+        )
+        debit_abs_tolerance = 1e-12 * max(abs(available_o2_mol), 1e-30)
+        assert oxygen_debit_mol == pytest.approx(
+            available_o2_mol, rel=1e-12, abs=debit_abs_tolerance,
+        )
+        transport_demand_o2_mol = sum(
+            reaction["transport_uptake_mol"] for reaction in reactions.values()
+        ) / 4.0
+        assert oxygen_debit_mol < transport_demand_o2_mol
+        for reaction in reactions.values():
+            assert reaction["oxidant_limited"]
+            transport_abs_tolerance = 1e-12 * max(
+                abs(reaction["transport_uptake_mol"]), 1e-30,
+            )
+            assert reaction["uptake_mol"] <= (
+                reaction["transport_uptake_mol"] + transport_abs_tolerance
+            )
+            reaction_debit_abs_tolerance = 1e-12 * max(
+                abs(reaction["oxygen_debit_mol"]), 1e-30,
+            )
+            assert reaction["oxygen_debit_mol"] == pytest.approx(
+                reaction["uptake_mol"] / 4.0,
+                rel=1e-12,
+                abs=reaction_debit_abs_tolerance,
+            )
 
 
 @pytest.mark.parametrize("po2_bar", [1e-8, 1.06560249466e-25])
