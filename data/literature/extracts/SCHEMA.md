@@ -220,9 +220,10 @@ raised to that exponent. `10<sup>3</sup>` certifies `1e3`.
 to the whole power. The HTML cell and the caret spelling use that one
 parser, so `-10<sup>2</sup>` and `-10^2` are -100 and `100` does not
 certify. `-1.5×10<sup>3</sup>` is -1500. `10<sup>3</sup>2` and any
-other leading or trailing content are `superscript_in_cell`. A plain
-number is also `superscript_in_cell`, so `103` and `1000` do not
-certify. A string certifies only as a spelling of that power (`1e3`,
+other leading or trailing content are `superscript_in_cell`. A stored
+integer uses the same numeric equality as a float, so `10<sup>3</sup>`
+certifies `1000` and `1000.0`, and `103` does not. A string certifies
+only as a spelling of that power (`1e3`,
 `10^3`, `1×10^3`, `-10^2`). A value printed
 in another row of the same line does not certify. A cited
 `line_range`, or the opened text when `line_range` is absent, that
@@ -237,8 +238,8 @@ cited.
 Formula-bearing label keys are `formula` and `species` only. The label is
 normalized before every comparison, including a label with no ASCII digit.
 Folding does not change how many whitespace-separated tokens the cited
-text has, except to join a space between an element symbol or a closing
-parenthesis and its own count. Markup is removed inside each token:
+text has. A space always separates tokens. No wrapper joins across a
+space. Markup is removed inside each token:
 `_{n}`, a bare `_` followed by digits, Unicode subscript digits,
 `$...$`, and a `\mathrm`, `\text`, or `\rm` command. A space inside
 `$...$` is a separator, so `$H_{2} O_{2}$` certifies `H2` and `O2` and
@@ -265,14 +266,14 @@ formula token is not a number. `SiO_{2}` and `SiO₂` do not certify 2.
 certifies, so `SiO_{2} 100` certifies 100 and `6.98 Fe_{2}O_{3}`
 certifies 6.98. A token with no internal space is the
 `printed_formula` conversion, so
-`${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$` certifies `Al2O3`. A layout
-space is removed only between an element symbol or a closing parenthesis
-and the digit count that follows it. `SiO 2` is `SiO2`. `(OH) 2` is
-`(OH)2`. A space after a count is not removed, so `H2 O2` does not
-certify `H2O2` and certifies `H2` and `O2` separately, `Fe 2 O 3` folds
-to `Fe2 O3` and does not certify `Fe2O3`, and `SiO2 Al2O3` stays two
-tokens and certifies each of them. `SiO2Al2O3` certifies neither. A
-preceding number is not joined, so `6.98 Fe_{2}O_{3}` certifies `Fe2O3`
+`${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$` certifies `Al2O3`. A space is
+never removed. `SiO 2` does not certify `SiO2`. `(OH) 2` does not
+certify `(OH)2`. `Fe 6.98` certifies `Fe` and `6.98` and does not
+certify `Fe6`. `H2 O2` does not certify `H2O2` and certifies `H2` and
+`O2` separately, `Fe 2 O 3` does not certify `Fe2O3`, and `SiO2 Al2O3`
+stays two tokens and certifies each of them. `SiO2Al2O3` certifies
+neither. A preceding number stays its own token, so `6.98 Fe_{2}O_{3}`
+certifies `Fe2O3`
 and certifies 6.98. In a cell, the whole trimmed cell after that fold, and
 after removing one wrapping `$...$` pair, must equal the folded label. In
 running text the folded label must equal one whole formula run. A run is

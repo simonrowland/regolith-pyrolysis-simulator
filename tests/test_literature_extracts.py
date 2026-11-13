@@ -9870,7 +9870,6 @@ _HTML_COLSPAN_GRID = (("6.98", "6.98", "1"),)
 _FORMULA_MARKUPS = (
     ("SiO2", "SiO_{2}"),
     ("SiO2", "SiO₂"),
-    ("SiO2", "SiO 2"),
     ("Fe2O3", "Fe_{2}O_{3}"),
     ("Al2O3", "Al_2O_3"),
     ("Fe2O3", "Fe₂O₃"),
@@ -10256,7 +10255,7 @@ def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
     power_cell = "<table><tr><td>10<sup>3</sup></td></tr></table>\n"
     power_pins = (
         (103, False),
-        (1000, False),
+        (1000, True),
         (1e3, True),
         ("1e3", True),
         ("10^3", True),
@@ -10289,7 +10288,7 @@ def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
             "1.5\u00d710^3",
             True,
         ),
-        ("<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n", 1500, False),
+        ("<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n", 1500, True),
         ("<table><tr><td>1.5x10<sup>3</sup></td></tr></table>\n", 1.5e3, True),
         ("<table><tr><td>1.5\u00b710<sup>3</sup></td></tr></table>\n", 1.5e3, True),
         ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", -100.0, True),
@@ -10537,9 +10536,9 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     if not errors or "source_blind_pin" not in "\n".join(errors):
         failures.append(f"csv formula cell refuses 2: {errors}")
     folded = {
-        "SiO $_{2}$": "SiO2",
-        "SiO $_2$": "SiO2",
-        "CaO/SiO $_{2}$ ratio": "CaO/SiO2 ratio",
+        "SiO $_{2}$": "SiO 2",
+        "SiO $_2$": "SiO 2",
+        "CaO/SiO $_{2}$ ratio": "CaO/SiO 2 ratio",
         "\\mathrm{SiO}_{2}": "SiO2",
         r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$": "Al2O3",
         r"{\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}": "Al2O3",
@@ -10548,13 +10547,13 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         "0.5 H_{2}O": "0.5 H2O",
         "page 2 stays": "page 2 stays",
         "Table 2 stays": "Table 2 stays",
-        "Fe 2 O 3": "Fe2 O3",
+        "Fe 2 O 3": "Fe 2 O 3",
         "Fe2 O3": "Fe2 O3",
         "H2 O2": "H2 O2",
-        "oxide SiO 2 N2 end": "oxide SiO2 N2 end",
+        "oxide SiO 2 N2 end": "oxide SiO 2 N2 end",
         "CO2 N2": "CO2 N2",
-        "SiO 2": "SiO2",
-        "(OH) 2": "(OH)2",
+        "SiO 2": "SiO 2",
+        "(OH) 2": "(OH) 2",
         "SiO2 Al2O3": "SiO2 Al2O3",
         "SiO2Al2O3": "SiO2Al2O3",
     }
@@ -10563,9 +10562,9 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         if got != expected:
             failures.append(f"fold {raw!r}: {got!r} != {expected!r}")
     prose_pins = (
-        ("formula", "SiO2", "SiO $_{2}$", True),
-        ("formula", "SiO2", "SiO $_2$", True),
-        ("formula", "SiO2", "CaO/SiO $_{2}$ ratio", True),
+        ("formula", "SiO2", "SiO $_{2}$", False),
+        ("formula", "SiO2", "SiO $_2$", False),
+        ("formula", "SiO2", "CaO/SiO $_{2}$ ratio", False),
         ("formula", "SiO2", "\\mathrm{SiO}_{2}", True),
         ("formula", "Al2O3", r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$", True),
         ("formula", "Fe2O3", "6.98 Fe_{2}O_{3}", True),
@@ -10597,9 +10596,14 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         ("formula", "H2", "H2 O2", True),
         ("formula", "O2", "H2 O2", True),
         ("formula", "Fe2O3", "Fe 2 O 3", False),
-        ("formula", "SiO2", "SiO 2", True),
-        ("formula", "Ca(OH)2", "Ca(OH) 2", True),
-        ("formula", "SiO2", "oxide SiO 2 N2 end", True),
+        ("formula", "SiO2", "SiO 2", False),
+        ("formula", "Fe", "Fe 6.98", True),
+        ("species", "Fe", "Fe 6.98", True),
+        ("alpha", 6.98, "Fe 6.98", True),
+        ("formula", "Fe6", "Fe 6.98", False),
+        ("formula", "Ca(OH)2", "Ca(OH) 2", False),
+        ("formula", "(OH)2", "(OH) 2", False),
+        ("formula", "SiO2", "oxide SiO 2 N2 end", False),
         ("formula", "SiO2N2", "oxide SiO 2 N2 end", False),
         ("formula", "CO2N2", "CO2 N2", False),
         ("formula", "CO2", "CO2 N2", True),
@@ -10620,8 +10624,8 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
         ):
             failures.append(f"refuse {key} {pin!r} ~ {source!r}: {errors}")
     cell_pins = (
-        ("formula", "SiO2", "SiO $_{2}$", True),
-        ("formula", "SiO2", "SiO $_2$", True),
+        ("formula", "SiO2", "SiO $_{2}$", False),
+        ("formula", "SiO2", "SiO $_2$", False),
         ("formula", "SiO2", "\\mathrm{SiO}_{2}", True),
         ("formula", "Al2O3", r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$", True),
         ("species", "CO", "CO₂", False),
@@ -10663,7 +10667,13 @@ _FORMULA_TOKEN_PAIRS = (
     ("Fe2O3", "6.98"),
     ("Fe2", "O3"),
     ("CO", "CO2"),
+    # A count after a space is its own token. Nothing joins it back.
+    ("SiO", "2"),
+    ("Fe", "6.98"),
+    ("(OH)", "2"),
 )
+# Spaces the deleted symbol-count join used to remove.
+_FORMULA_GAPS = (" ", "\u00a0", "\u2009", "\u202f")
 # A caret is a superscript. The plain formula is what deleting ``^`` would
 # invent. The number is the superscript's own digit.
 _SUPERSCRIPT_TOKENS = (
@@ -10726,14 +10736,16 @@ def _formula_wrap_body(body: str, kind: str) -> str:
     return body
 
 
-def _formula_pair_text(left: str, right: str, kind: str, layout: str) -> str:
-    """``apart`` wraps each token. ``together`` wraps both with one space."""
+def _formula_pair_text(
+    left: str, right: str, kind: str, layout: str, gap: str = " "
+) -> str:
+    """``apart`` wraps each token. ``together`` wraps both around ``gap``."""
     left_body = _formula_count_body(left, kind)
     right_body = _formula_count_body(right, kind)
     if layout == "together" and kind in ("dollar", "mathrm", "nested"):
-        return _formula_wrap_body(f"{left_body} {right_body}", kind)
+        return _formula_wrap_body(f"{left_body}{gap}{right_body}", kind)
     return (
-        f"{_formula_wrap_body(left_body, kind)} "
+        f"{_formula_wrap_body(left_body, kind)}{gap}"
         f"{_formula_wrap_body(right_body, kind)}"
     )
 
@@ -10751,10 +10763,13 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     """Label folding keeps a space between tokens.
 
     Invariant: folding does not change how many whitespace-separated
-    tokens the cited text has, except to join a space between an element
-    symbol or a closing parenthesis and its own count. Markup is removed
+    tokens the cited text has. A space always separates tokens. No
+    wrapper or spacing joins a token across a space. Markup is removed
     inside each token. For every wrapper and every pair, ``W(A) W(B)``
     and ``W(A B)`` certify A and certify B and do not certify AB.
+    ``SiO 2`` does not certify ``SiO2``. ``Fe 6.98`` certifies ``Fe``
+    and ``6.98`` and does not certify ``Fe6``. ``(OH) 2`` does not
+    certify ``(OH)2``.
     A token that contains ``^`` does not certify as that plain formula
     or as a plain number. A neighbour token still certifies. A subscript
     digit inside a formula token does not certify as a number, for every
@@ -10817,19 +10832,38 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                                 failures.append(
                                     f"count {pin!r} {where}: {errors}"
                                 )
-                glued = left + right
-                doc = _html_source_document(
-                    tmp_path, glued, source + "\n", key="formula"
-                )
-                errors = vle.certify_extract_source_fidelity(
-                    doc,
-                    label=f"glue-{kind}-{layout}",
-                    artifact_root=tmp_path,
-                )
-                if not errors or "source_blind_pin" not in "\n".join(errors):
-                    failures.append(f"refuse {glued!r} {where}: {errors}")
-                if vle._formula_cell_matches(glued, source):
-                    failures.append(f"cell glued {glued!r} {where}")
+                refused = [left + right]
+                if (left, right) == ("Fe", "6.98"):
+                    refused.append("Fe6")
+                for glued in refused:
+                    doc = _html_source_document(
+                        tmp_path, glued, source + "\n", key="formula"
+                    )
+                    errors = vle.certify_extract_source_fidelity(
+                        doc,
+                        label=f"glue-{kind}-{layout}-{glued}",
+                        artifact_root=tmp_path,
+                    )
+                    if not errors or "source_blind_pin" not in "\n".join(errors):
+                        failures.append(f"refuse {glued!r} {where}: {errors}")
+                    if vle._formula_cell_matches(glued, source):
+                        failures.append(f"cell glued {glued!r} {where}")
+    for gap in _FORMULA_GAPS:
+        for kind in _FORMULA_TOKEN_WRAPPERS:
+            for left, right in _FORMULA_TOKEN_PAIRS:
+                for layout in ("apart", "together"):
+                    source = _formula_pair_text(left, right, kind, layout, gap)
+                    folded = vle._normalize_formula_label(source)
+                    where = f"gap {gap!r} {kind} {layout} {source!r}"
+                    if folded.split() != [left, right]:
+                        failures.append(f"gap tokens {where}: {folded!r}")
+                        continue
+                    refused = [left + right]
+                    if (left, right) == ("Fe", "6.98"):
+                        refused.append("Fe6")
+                    for glued in refused:
+                        if vle._formula_label_in_text(glued, source):
+                            failures.append(f"gap join {glued!r} {where}")
     for source, plain, number in _SUPERSCRIPT_TOKENS:
         folded = vle._normalize_formula_label(source)
         if "^" not in folded or plain in folded.split():

@@ -88,11 +88,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   is. ``CaO·SiO2`` certifies only as that whole run, so ``SiO2`` does not.
   A token with no internal space, including
   ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``, goes through
-  ``printed_formula``. A layout space is removed
-  only between an element symbol or a closing parenthesis and the digit
-  count that follows it. ``SiO 2`` is ``SiO2``. A space after a count
-  stays, so ``H2 O2``, ``SiO2 Al2O3``, and ``Fe 2 O 3`` (folded to
-  ``Fe2 O3``) stay separate tokens. ``CO`` is not ``CO₂`` and ``SiO₂`` is
+  ``printed_formula``. A space always separates tokens, so ``SiO 2``
+  does not certify ``SiO2`` and ``Fe 6.98`` certifies ``Fe`` and
+  ``6.98`` and does not certify ``Fe6``. ``H2 O2``, ``SiO2 Al2O3``,
+  and ``Fe 2 O 3`` stay separate tokens. ``CO`` is not ``CO₂`` and ``SiO₂`` is
   not ``SiO₂₂``. A thin space (U+2009), narrow no-break space (U+202F),
   or no-break space (U+00A0) in an unsigned digit run is typography.
   An ASCII space is not, so ``1 100`` certifies 1 and 100 and does not
@@ -830,27 +829,9 @@ _HTML_TABLE_RE = re.compile(
 _HTML_ROW_KEYS = ("table_row", "table_row_number")
 _HTML_COLUMN_KEYS = ("table_column", "table_column_number")
 # Formula-bearing label keys only. Every other key, and every number, keeps
-# the ordinary token or whole-cell comparison.
+# the ordinary token or whole-cell comparison. A space always separates
+# formula tokens. There is no symbol-space-count join.
 _FORMULA_LABEL_KEYS = frozenset({"formula", "species"})
-# The only cross-token join. A newline is not one of these spaces, and a
-# preceding measurement (``6.98 Fe``) is not an element chain. Markup
-# folds inside a token and never deletes a separator. A space joins only
-# an element symbol, or a closing parenthesis, to the digit count that
-# follows. ``SiO 2`` becomes ``SiO2``. ``(OH) 2`` becomes ``(OH)2``.
-# A space after a count is never joined: ``H2 O2`` and ``Fe 2 O 3``
-# (which becomes ``Fe2 O3``) stay separate tokens.
-_FORMULA_INTERNAL_SPACES = " \u00a0\u2009\u202f"
-_FORMULA_ELEMENT_COUNT_SPACE_RE = re.compile(
-    "(?<![A-Za-z])"
-    "((?:[A-Z][a-z]?)+)"
-    "[" + _FORMULA_INTERNAL_SPACES + "]+"
-    r"(?=\d{1,3}(?!\d))"
-)
-_FORMULA_PAREN_COUNT_SPACE_RE = re.compile(
-    r"(\))"
-    "[" + _FORMULA_INTERNAL_SPACES + "]+"
-    r"(?=\d{1,3}(?!\d))"
-)
 
 
 def _html_table_grid(
@@ -979,11 +960,12 @@ def _superscript_leaf_certifies(
 ) -> bool:
     """True when ``leaf`` spells the cell's power and equals it.
 
-    An int is a plain number, so ``103``, ``1000``, and ``1500`` do not
-    certify. A float certifies when it is that power, so ``1e3`` certifies
+    An int and a float use the same numeric equality. ``1000`` and
+    ``1000.0`` certify ``10<sup>3</sup>``. ``1e3`` certifies
     ``10<sup>3</sup>`` and ``1.5e3`` certifies ``1.5×10<sup>3</sup>``.
-    A string certifies only as ``1e3``, ``10^3``, or ``1×10^3`` (the same
-    value). Extra characters in the cell are not a power.
+    ``103`` does not, because it is not that power. A string certifies
+    only as ``1e3``, ``10^3``, or ``1×10^3`` (the same value). Extra
+    characters in the cell are not a power.
     """
     power = _superscript_power_decimal(text, spans)
     if power is None:
@@ -991,7 +973,7 @@ def _superscript_leaf_certifies(
     if isinstance(leaf, str):
         spelled = _explicit_power_decimal(leaf)
         return spelled is not None and spelled == power
-    if isinstance(leaf, bool) or not isinstance(leaf, float):
+    if isinstance(leaf, bool) or not isinstance(leaf, (int, float)):
         return False
     stored = _stored_number_decimal(leaf)
     return stored is not None and stored == power
@@ -3291,29 +3273,23 @@ def _normalize_formula_label(text: str) -> str:
     """Fold formula markup inside each whitespace token.
 
     Invariant: folding does not change how many whitespace-separated
-    tokens ``text`` has, except to join a space between an element
-    symbol or a closing parenthesis and its own count. ``$...$``,
+    tokens ``text`` has. A space always separates tokens. ``SiO 2``
+    stays ``SiO`` and ``2`` and does not certify ``SiO2``. ``Fe 6.98``
+    stays ``Fe`` and ``6.98`` and does not certify ``Fe6``. ``$...$``,
     ``\\mathrm``, ``\\text``, ``\\rm``, braces, and ``_{n}`` are removed
     inside the token. A space inside ``$...$`` is a separator.
     A caret is a superscript: a token that contains ``^`` is left as it
     is, and no plain formula or plain number certifies from that token.
     ``printed_formula_tokens`` applies ``printed_formula`` to each other
     token and does not cross a space. Unicode subscript digits then become
-    plain digits. ``SiO 2`` becomes ``SiO2`` and ``(OH) 2`` becomes
-    ``(OH)2``. ``$H_{2} O_{2}$`` stays ``H2`` and ``O2``.
-    ``$SiO_{2} 100$`` stays ``SiO2`` and ``100``. ``Fe 2 O 3`` becomes
-    ``Fe2 O3``. ``H2 O2`` and ``SiO2 Al2O3`` stay two tokens.
-    ``6.98 Fe_{2}O_{3}`` stays ``6.98 Fe2O3``. ``page 2`` stays ``page 2``.
-    ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` becomes ``Al2O3``.
+    plain digits. ``(OH) 2`` stays ``(OH)`` and ``2``. ``$H_{2} O_{2}$``
+    stays ``H2`` and ``O2``. ``$SiO_{2} 100$`` stays ``SiO2`` and ``100``.
+    ``Fe 2 O 3`` stays four tokens. ``H2 O2`` and ``SiO2 Al2O3`` stay
+    two tokens. ``6.98 Fe_{2}O_{3}`` stays ``6.98 Fe2O3``. ``page 2``
+    stays ``page 2``. ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``
+    becomes ``Al2O3``.
     """
-    normalized = printed_formula_tokens(text)
-    normalized = fold_subscript_digits(normalized)
-    previous = None
-    while previous != normalized:
-        previous = normalized
-        normalized = _FORMULA_ELEMENT_COUNT_SPACE_RE.sub(r"\1", normalized)
-        normalized = _FORMULA_PAREN_COUNT_SPACE_RE.sub(r"\1", normalized)
-    return normalized
+    return fold_subscript_digits(printed_formula_tokens(text))
 
 
 def _strip_wrapping_math(text: str) -> str:
@@ -3877,11 +3853,11 @@ def fidelity_source_warnings(
     is not ``CaO·SiO2``.
     ``printed_formula`` unwraps one token, including a
     ``\\mathrm`` / ``\\text`` / ``\\rm`` command, so
-    ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` is ``Al2O3``. A layout
-    space is removed only between an element
-    or a closing parenthesis and the count that follows it, before every
-    comparison. ``SiO 2`` is ``SiO2``. A space after a count stays, so
-    ``Fe 2 O 3`` is ``Fe2 O3`` and does not certify ``Fe2O3``. A digitless
+    ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` is ``Al2O3``. A space
+    always separates tokens, before every comparison. ``SiO 2`` does
+    not certify ``SiO2``. ``Fe 6.98`` certifies ``Fe`` and ``6.98``
+    and does not certify ``Fe6``. ``Fe 2 O 3`` does not certify
+    ``Fe2O3``. A digitless
     label is a complete token, a preceding number is not joined, and two
     formulas stay two tokens. A superscript cell certifies only when it
     is a complete power and nothing else. ``10<sup>3</sup>`` certifies
@@ -3889,7 +3865,9 @@ def fidelity_source_warnings(
     A leading minus applies to the whole power, so ``-10<sup>2</sup>``
     and the caret spelling ``-10^2`` are ``-100``. ``100`` does not
     certify.
-    ``10<sup>3</sup>2`` and a plain number are ``superscript_in_cell``.
+    ``10<sup>3</sup>2`` and a number that is not that power are
+    ``superscript_in_cell``. ``103`` is not. A stored integer uses the
+    same equality as a float, so ``1000`` certifies ``10<sup>3</sup>``.
     An unsigned digit run joins on a thin space, narrow no-break space,
     or no-break space. An ASCII space does not. The first group is one
     to three digits, then groups of three, and the run starts at the
