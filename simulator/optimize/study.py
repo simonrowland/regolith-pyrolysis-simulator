@@ -74,14 +74,17 @@ from simulator.optimize.objective import (
     ObjectiveProfileError,
     ObjectiveVector,
     ask_time_objective_definitions,
+    candidate_rank_key,
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
+    executed_objective_definitions,
     objective_definitions,
     objective_importance_evidence,
     objective_scores,
     objective_value_for_metric,
     pareto_front,
     profile_scored_at_fidelity,
+    rank_axis_metrics,
     scoring_profile_for_executed_spec,
     unrenormalized_study_scalar_weights,
 )
@@ -4215,14 +4218,9 @@ def _executed_definitions(
     Those are the only identities that exist before a candidate.
     """
 
-    if profile is None or record.eval_spec is None:
+    if profile is None:
         return definitions
-    try:
-        return objective_definitions(
-            scoring_profile_for_executed_spec(profile, record.eval_spec)
-        )
-    except ObjectiveProfileError:
-        return definitions
+    return executed_objective_definitions(profile, record.eval_spec, definitions)
 
 
 def _definition_metrics(
@@ -5081,21 +5079,16 @@ def _rank_key(
     *,
     profile: Mapping[str, Any] | None = None,
 ) -> tuple[Any, ...]:
-    active = definitions
-    prefix: tuple[str, ...] = ()
-    if profile is not None:
-        active = _executed_definitions(record, definitions, profile)
-        # Every profile-scoped key carries its metric tuple, so a mixed
-        # study can order rows from different executed spaces. A shared
-        # tuple does not change order. Callers that omit profile keep the
-        # historical key.
-        prefix = _definition_metrics(active)
-    scores = _record_objective_scores(record, active)
-    return (
-        *prefix,
-        *_rank_score_components(scores),
-        record.cache_key or "",
-        record.candidate_id,
+    retained = _executed_definitions(record, definitions, profile)
+    scores = _record_objective_scores(record, retained)
+    # One axis for every declared objective. Withheld products stay absent
+    # slots. Metric names are not compared.
+    return candidate_rank_key(
+        rank_axis_metrics(profile, definitions),
+        _definition_metrics(retained),
+        scores,
+        cache_key=record.cache_key or "",
+        candidate_id=record.candidate_id,
     )
 
 
@@ -5185,12 +5178,6 @@ def _study_progress(
         for record in front_records
     )
     return max(scalarized_scores), pareto_signature
-
-
-def _rank_score_components(
-    scores: Sequence[float | None],
-) -> tuple[tuple[int, float], ...]:
-    return tuple((1, 0.0) if score is None else (0, -score) for score in scores)
 
 
 def _write_artifacts(

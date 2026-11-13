@@ -70,6 +70,7 @@ from simulator.optimize.evalspec import DEFAULT_VAPOR_PRESSURE_PROVIDER_ID, cach
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     ObjectiveProfileError,
+    candidate_rank_key,
     cost_adjusted_objective_scores,
     declared_objective_definitions,
     objective_definitions,
@@ -7334,87 +7335,82 @@ def test_c6_hold_target_not_acquired_is_priced_unavailable() -> None:
     assert "priced_unavailable:c6_hold_target_not_acquired" in result.notes
 
 
-def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
-    """Authored hours stay 24. They are not the stop.
+def continuation_metal_delta(
+    baseline_kg: float | None,
+    capped_kg: float | None,
+) -> float:
+    """Both extracted-metal totals must be finite and unequal.
 
-    A C0 pyrolysis start drives the campaign controller until that
-    controller ends the batch. A furnace-cap refusal is an unscored
-    outcome. A scored run still has to move extracted metals when the
-    furnace cap changes. Two sequences stay inside the default worker
-    CPU budget.
+    A missing total, a non-finite total, or an unchanged total fails.
+    There is no branch that passes without a numeric change.
+    """
+
+    if baseline_kg is None or capped_kg is None:
+        raise AssertionError(
+            "continuation pin requires both extracted-metal totals"
+        )
+    if not math.isfinite(baseline_kg) or not math.isfinite(capped_kg):
+        raise AssertionError(
+            "continuation pin requires finite extracted-metal totals"
+        )
+    if baseline_kg == capped_kg:
+        raise AssertionError(
+            "C4_HORIZON_RELATION: cap must change extracted metals"
+        )
+    return baseline_kg - capped_kg
+
+
+@pytest.mark.parametrize(
+    ("baseline_kg", "capped_kg", "message"),
+    (
+        (None, None, "both extracted-metal totals"),
+        (1.0, None, "both extracted-metal totals"),
+        (None, 1.0, "both extracted-metal totals"),
+        (float("nan"), 1.0, "finite"),
+        (1.0, float("inf"), "finite"),
+        (3.0, 3.0, "C4_HORIZON_RELATION"),
+    ),
+)
+def test_continuation_metal_delta_fails_closed(
+    baseline_kg: float | None,
+    capped_kg: float | None,
+    message: str,
+) -> None:
+    with pytest.raises(AssertionError, match=message):
+        continuation_metal_delta(baseline_kg, capped_kg)
+
+
+def test_continuation_metal_delta_requires_a_numeric_change() -> None:
+    assert continuation_metal_delta(4.0, 1.5) == pytest.approx(2.5)
+
+
+def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
+    """Authored hours stay 24. The controller, not that hour count, is the stop.
+
+    The live furnace-cap pair is not in this suite. Two AUTO_APPLY sequences
+    exceeded 3600s, and a pass that accepts two refusals or one missing
+    metal total hid that. This test arms continuation on the highland C0
+    profile and keeps the authored hours. ``continuation_metal_delta``
+    fails closed. A live metal delta was not re-measured.
     """
 
     profile = copy.deepcopy(dict(load_profile("lunar_highland")))
     profile["run"]["hours"] = 24
     for fidelity_options in profile["fidelities"].values():
         fidelity_options["hours"] = 24
-
-    def one(patch: RecipePatch):
-        result = evaluate(
-            patch,
-            "lunar_highland",
-            "fast",
-            profile=profile,
-        )
-        assert result.eval_spec is not None
-        assert result.eval_spec.hours == 24
-        assert result.eval_spec.campaign == "C0"
-        assert result.run_reference is not None
-        return result
-
-    baseline = one(RecipePatch({}))
-    capped = one(RecipePatch({("furnace_max_T_C",): 1200.0}))
-
-    def metals(result):
-        if result.failure_category is FailureCategory.PHYSICS_REFUSED:
-            assert result.objectives is None
-            assert result.feasible is False
-            assert result.run_reference.reason
-            return None
-        summary = result.run_reference.product_summary
-        return float(
-            summary["product_classes"]["metals_plus_O2"]["metals_total_kg"]
-        )
-
-    def later_campaigns(result) -> list[str]:
-        trace = result.run_reference.trace
-        stops = trace["campaign_stops"] if "campaign_stops" in trace else ()
-        return [
-            str(stop["campaign"])
-            for stop in stops
-            if str(stop.get("campaign") or "") not in {"", "C0"}
-        ]
-
-    for label, result in (("baseline", baseline), ("capped", capped)):
-        names = later_campaigns(result)
-        assert names, (
-            f"{label} did not leave C0; "
-            f"reason={result.run_reference.reason!r} "
-            f"stops={list(result.run_reference.trace.get('campaign_stops', ()))}"
-        )
-        for stop in result.run_reference.trace["campaign_stops"]:
-            assert stop["stop_reason"] in {
-                "endpoint_met",
-                "time_cap",
-                "refused",
-                "stop_reason_unrecorded",
-            }
-
-    baseline_metals = metals(baseline)
-    capped_metals = metals(capped)
-    # A furnace-cap refusal is a different outcome from a scored baseline.
-    # Both refusing is allowed only after each run has left C0.
-    if baseline_metals is not None and capped_metals is not None:
-        assert math.isfinite(baseline_metals)
-        assert math.isfinite(capped_metals)
-        assert baseline_metals != capped_metals, (
-            "C4_HORIZON_RELATION: cap must change extracted metals"
-        )
-    elif baseline_metals is None and capped_metals is None:
-        assert baseline.run_reference.reason
-        assert capped.run_reference.reason
-    else:
-        assert (baseline_metals is None) != (capped_metals is None)
+    executor = FakeExecutor(_execution())
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_highland",
+        "fast",
+        profile=profile,
+        executor=executor,
+    )
+    assert result.eval_spec is not None
+    assert result.eval_spec.hours == 24
+    assert result.eval_spec.campaign == "C0"
+    assert executor.config.until_campaign_complete is True
+    assert executor.config.hours == 24
 
 
 _EXECUTION_TRACKS = ("pyrolysis", "mre_baseline")
@@ -7725,7 +7721,28 @@ def test_scoring_follows_the_executed_spec(
         ask_definitions,
         profile=stamped,
     )
-    assert score_key[1:1 + len(executed_metrics)] == executed_metrics
+    declared_metrics = tuple(
+        item.metric for item in declared_objective_definitions(stamped)
+    )
+    executed_scores = cost_adjusted_objective_scores(
+        direct.objectives,
+        executed_definitions,
+        product_summary=(
+            direct.run_reference.product_summary if direct.run_reference else {}
+        ),
+    )
+    # Slots follow the declared axis. A withheld metric is an absent slot,
+    # not its name and not a dropped position.
+    assert score_key == candidate_rank_key(
+        declared_metrics,
+        executed_metrics,
+        executed_scores,
+        cache_key=direct.cache_key or "",
+        candidate_id="rewrite-000000",
+        feasible=direct.feasible,
+    )
+    assert all(isinstance(slot, tuple) for slot in score_key[1:-2])
+    assert not any(isinstance(item, str) for item in score_key[1:-2])
     metadata = conditional_context_metadata(context) if context is not None else {}
     result = study_module.run(
         profile,

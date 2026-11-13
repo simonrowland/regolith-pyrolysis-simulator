@@ -22,13 +22,13 @@ from simulator.optimize.evaluate import RunReference, ScoredResult
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveDefinition,
-    ObjectiveProfileError,
     ask_time_objective_definitions,
+    candidate_rank_key,
     cost_adjusted_objective_scores,
-    objective_definitions,
+    executed_objective_definitions,
     objective_scores,
     pareto_front,
-    scoring_profile_for_executed_spec,
+    rank_axis_metrics,
 )
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.recipe import (
@@ -1091,14 +1091,9 @@ def _active_definitions(
     definitions: Sequence[ObjectiveDefinition],
     profile: Mapping[str, Any] | None,
 ) -> Sequence[ObjectiveDefinition]:
-    if profile is None or scored.eval_spec is None:
+    if profile is None:
         return definitions
-    try:
-        return objective_definitions(
-            scoring_profile_for_executed_spec(profile, scored.eval_spec)
-        )
-    except ObjectiveProfileError:
-        return definitions
+    return executed_objective_definitions(profile, scored.eval_spec, definitions)
 
 
 def _members_share_definitions(
@@ -1125,22 +1120,20 @@ def _score_key(
     profile: Mapping[str, Any] | None = None,
 ) -> tuple[Any, ...]:
     active = _active_definitions(scored, definitions, profile)
-    prefix: tuple[str, ...] = ()
-    if profile is not None:
-        # Same shape for every profile-scoped key, so mixed executed spaces
-        # stay comparable. A shared tuple does not change beam order.
-        prefix = tuple(item.metric for item in active)
     scores = (
         _scored_objective_scores(scored, active)
         if scored.objectives is not None
         else (None,) * len(active)
     )
-    return (
-        0 if scored.feasible else 1,
-        *prefix,
-        *_score_key_components(scores),
-        scored.cache_key or "",
-        candidate.id,
+    # Feasible members sort first. Score slots are the same axis the study
+    # leaderboard uses. Metric names are not compared.
+    return candidate_rank_key(
+        rank_axis_metrics(profile, definitions),
+        tuple(item.metric for item in active),
+        scores,
+        cache_key=scored.cache_key or "",
+        candidate_id=candidate.id,
+        feasible=bool(scored.feasible),
     )
 
 
@@ -1163,12 +1156,6 @@ def _scored_objective_scores(
         )
     except ObjectiveComputationError:
         return (None,) * len(definitions)
-
-
-def _score_key_components(
-    scores: Sequence[float | None],
-) -> tuple[tuple[int, float], ...]:
-    return tuple((1, 0.0) if score is None else (0, -score) for score in scores)
 
 
 def _stage0_seeds_for_topology(

@@ -144,10 +144,11 @@ def _run_reference(**kwargs: Any) -> RunReference:
 def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
     profile = copy.deepcopy(PROFILE)
     profile["profile_id"] = "cli-physics-smoke"
-    # Stay on the profile's one-hour campaign. A C0 pyrolysis start now
-    # follows the campaign controller through later steps, and a staged
-    # beam of those sequences does not fit this wiring smoke's wall guard.
-    # The continuation pin is test_lunar_highland_c0_horizon_changes_extracted_metals.
+    # Stay on the profile's one-hour campaign. A C0 pyrolysis start follows
+    # the campaign controller through later steps, and a staged beam of
+    # those sequences does not fit this wiring smoke's wall guard.
+    # Continuation arming is test_lunar_highland_c0_horizon_changes_extracted_metals.
+    # That test does not run the live sequence: two AUTO_APPLY runs exceeded 3600s.
     # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
     profile["run"]["allow_unmeasured_alpha_fallback"] = True
     profile["constraints"] = {
@@ -6955,8 +6956,9 @@ def test_cli_rejects_incoherent_constrained_max_args(
 def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> None:
     # One-hour C2A_continuous smoke. It qualifies wall deposit, and the
     # resinter threshold is null, so lifespan is unpriced rather than a
-    # number. A C0 start would continue through later steps; that pin is
-    # test_lunar_highland_c0_horizon_changes_extracted_metals.
+    # number. A C0 start would continue through later steps. Arming is
+    # test_lunar_highland_c0_horizon_changes_extracted_metals, which does
+    # not run the live sequence: two AUTO_APPLY runs exceeded 3600s.
     out_dir = tmp_path / "constrained-max"
     cli_profile = _write_cli_physics_smoke_profile(tmp_path)
 

@@ -4362,6 +4362,128 @@ def cost_adjusted_objective_scores(
     return tuple(adjusted)
 
 
+def executed_objective_definitions(
+    profile: Mapping[str, Any] | None,
+    spec: Any,
+    fallback: Sequence[ObjectiveDefinition],
+) -> Sequence[ObjectiveDefinition]:
+    """Definitions of the triple ``spec`` executed.
+
+    ``profile is None`` or a missing spec keeps ``fallback``. Those are the
+    only identities that exist before a candidate.
+    """
+
+    if profile is None or spec is None:
+        return fallback
+    try:
+        return objective_definitions(
+            scoring_profile_for_executed_spec(profile, spec)
+        )
+    except ObjectiveProfileError:
+        return fallback
+
+
+def rank_axis_metrics(
+    profile: Mapping[str, Any] | None,
+    fallback: Sequence[ObjectiveDefinition],
+) -> tuple[str, ...]:
+    """Declared objective order. Withheld products keep a slot.
+
+    ``profile is None`` uses ``fallback``. That is the historical key, from
+    before a candidate existed.
+    """
+
+    if profile is None:
+        return tuple(definition.metric for definition in fallback)
+    return tuple(
+        definition.metric for definition in declared_objective_definitions(profile)
+    )
+
+
+def objective_rank_slot(score: float | None) -> tuple[int, float]:
+    """One axis of a rank key.
+
+    ``None`` is a typed absence. The ``(1, 0.0)`` payload sorts after every
+    finite score and ties with other absences. It is not a zero score.
+    """
+
+    if score is None:
+        return (1, 0.0)
+    numeric = _finite_float(score, "objective rank score")
+    return (0, -numeric)
+
+
+def aligned_objective_rank_slots(
+    declared_metrics: Sequence[str],
+    retained_metrics: Sequence[str],
+    retained_scores: Sequence[float | None],
+) -> tuple[tuple[int, float], ...]:
+    """Maximize-native scores on the declared axis, one slot per metric.
+
+    Metric names are not part of the key. A withheld objective is an absent
+    slot in its declared position, not a dropped slot. An executed metric
+    that is not on the declared axis is a typed refusal.
+
+    Sort order is not stored on EvalSpec. This function does not add a
+    cache-key dimension and does not bump corpus_version. EvalSpec keys stay
+    VERSION-scoped (evalspec.py). The withholding chokepoint names that
+    VERSION bump.
+    """
+
+    declared = tuple(
+        canonical_objective_metric(metric) for metric in declared_metrics
+    )
+    retained = tuple(
+        canonical_objective_metric(metric) for metric in retained_metrics
+    )
+    if len(retained_scores) != len(retained):
+        raise ObjectiveComputationError(
+            "retained scores do not match retained metrics"
+        )
+    if len(set(declared)) != len(declared):
+        raise ObjectiveComputationError("declared objective metrics must be unique")
+    if len(set(retained)) != len(retained):
+        raise ObjectiveComputationError("retained objective metrics must be unique")
+    if not declared and not retained:
+        return ()
+    if not declared:
+        raise ObjectiveComputationError(
+            "retained objectives have no declared rank axis"
+        )
+    unknown = [metric for metric in retained if metric not in set(declared)]
+    if unknown:
+        raise ObjectiveComputationError(
+            "executed objective is not on the declared rank axis: "
+            + ", ".join(unknown)
+        )
+    by_metric = dict(zip(retained, retained_scores, strict=True))
+    return tuple(objective_rank_slot(by_metric.get(metric)) for metric in declared)
+
+
+def candidate_rank_key(
+    declared_metrics: Sequence[str],
+    retained_metrics: Sequence[str],
+    retained_scores: Sequence[float | None],
+    *,
+    cache_key: str,
+    candidate_id: str,
+    feasible: bool | None = None,
+) -> tuple[Any, ...]:
+    """Shared study and staged rank key.
+
+    Study omits ``feasible``. Staged passes it so a feasible beam member
+    sorts before an infeasible one. Both then use the same score slots.
+    """
+
+    slots = aligned_objective_rank_slots(
+        declared_metrics,
+        retained_metrics,
+        retained_scores,
+    )
+    head: tuple[Any, ...] = () if feasible is None else ((0 if feasible else 1),)
+    return (*head, *slots, cache_key, candidate_id)
+
+
 def pareto_front(
     items: Sequence[T],
     definitions: Sequence[ObjectiveDefinition],
