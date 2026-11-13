@@ -291,7 +291,6 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         preform_dimensions_mm=preform_dimensions_mm,
         code_revision="pre-mass-loss-pin",
         engine="openimcc",
-        selected_experiment_ids=frozenset({"hashimoto-1983-run-17c3-2"}),
     )
     primary = next(
         row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
@@ -723,16 +722,14 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
         lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
     )
     monkeypatch.setattr(openimcc_bridge, "evaluate", track_activities)
-    pinned_run = str(experiments[0]["experiment_id"])
     predictions = _predict_hashimoto_residue_cohort(
         experiments,
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
         code_revision="single-vector-activity-refresh-test",
-        selected_experiment_ids=frozenset({pinned_run}),
     )
 
-    assert len(predictions) == 2
+    assert len(predictions) == 48
     assert len(set(activity_compositions)) > 1
     assert all(
         set(prediction.provenance["integration"]["refinement_status_by_geometry"])
