@@ -9,7 +9,6 @@ from hashlib import sha256
 from pathlib import Path
 import pickle
 import re
-import shutil
 import stat
 import tempfile
 from typing import Any
@@ -21,10 +20,10 @@ _CACHE_ENV = "REGOLITH_PARSED_YAML_CACHE_DIR"
 _CACHE_ENABLED_ENV = "REGOLITH_PARSED_YAML_CACHE"
 _CACHE_MAX_BYTES_ENV = "REGOLITH_PARSED_YAML_CACHE_MAX_BYTES"
 _DEFAULT_CACHE_MAX_BYTES = 1536 * 1024 * 1024
-# A full-root sweep every 32 writes keeps hit paths scan-free while limiting
-# how much ordinary write traffic can exceed the cap between sweeps.
+# The first write triggers a sweep for short-lived processes; later full-root
+# sweeps every 32 writes keep hits scan-free and bound growth between scans.
 _CACHE_EVICTION_WRITE_INTERVAL = 32
-_CACHE_WRITES_SINCE_EVICTION = 0
+_CACHE_WRITES_SINCE_EVICTION = _CACHE_EVICTION_WRITE_INTERVAL
 _CACHE_FORMAT = 3
 _YAML12_SCHEMA_ID = "yaml12-core-boolean-resolver-v1"
 _CACHE_MISS = object()
@@ -459,7 +458,6 @@ def _evict_after_write(path: Path, max_bytes: int | None) -> None:
     # The cache path is root/version/loader-token/format/file.pickle.
     _evict_cache(
         root=path.parents[3],
-        current_loader_dir=path.parents[1],
         just_written=path,
         max_bytes=max_bytes,
     )
@@ -468,11 +466,9 @@ def _evict_after_write(path: Path, max_bytes: int | None) -> None:
 def _evict_cache(
     *,
     root: Path,
-    current_loader_dir: Path,
     just_written: Path,
     max_bytes: int | None,
 ) -> None:
-    _remove_stale_loader_directories(root, current_loader_dir)
     if max_bytes is None:
         return
 
@@ -508,39 +504,3 @@ def _evict_cache(
             continue
         else:
             total_bytes -= size
-
-
-def _remove_stale_loader_directories(
-    root: Path,
-    current_loader_dir: Path,
-) -> None:
-    try:
-        version_directories = list(root.iterdir())
-    except OSError:
-        return
-
-    for version_dir in version_directories:
-        try:
-            metadata = version_dir.lstat()
-        except OSError:
-            continue
-        if not stat.S_ISDIR(metadata.st_mode) or not version_dir.name.startswith(
-            "pyyaml-"
-        ):
-            continue
-        try:
-            loader_directories = list(version_dir.iterdir())
-        except OSError:
-            continue
-        for loader_dir in loader_directories:
-            try:
-                metadata = loader_dir.lstat()
-            except OSError:
-                continue
-            if (
-                stat.S_ISDIR(metadata.st_mode)
-                and loader_dir.name.startswith("yaml12-")
-                and loader_dir != current_loader_dir
-            ):
-                # Retired tokens cannot produce hits; ignore concurrent removals.
-                shutil.rmtree(loader_dir, ignore_errors=True)

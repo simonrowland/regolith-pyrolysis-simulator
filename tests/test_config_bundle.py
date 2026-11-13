@@ -234,14 +234,60 @@ def test_parsed_yaml_cache_obeys_byte_cap_after_many_writes(
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "2048")
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
-    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+    monkeypatch.setattr(
+        yaml_cache_module,
+        "_CACHE_WRITES_SINCE_EVICTION",
+        yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL,
+    )
 
-    for index in range(2 * yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL):
+    for index in range(2 * yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL + 1):
         load_cached_safe_yaml(_unique_cache_payload(index))
 
     cache_entries = list(cache_root.rglob("*.pickle"))
     assert cache_entries
     assert sum(path.stat().st_size for path in cache_entries) <= 2048
+
+
+def test_first_write_in_fresh_process_evicts_over_cap(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    cache_root = tmp_path / "yaml-cache"
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "off")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+
+    for index in range(12):
+        load_cached_safe_yaml(_unique_cache_payload(index))
+    prior_entries = list(cache_root.rglob("*.pickle"))
+    cap_bytes = prior_entries[0].stat().st_size * 4
+    assert sum(path.stat().st_size for path in prior_entries) > cap_bytes
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", str(cap_bytes))
+
+    child = """
+import os
+from hashlib import sha256
+from pathlib import Path
+
+import simulator.yaml_cache as cache
+
+payload = f"value: item-{1000:064d}\\n".encode("ascii")
+cache.load_cached_safe_yaml(payload)
+root = Path(os.environ["REGOLITH_PARSED_YAML_CACHE_DIR"])
+entries = list(root.rglob("*.pickle"))
+assert sum(path.stat().st_size for path in entries) <= int(
+    os.environ["REGOLITH_PARSED_YAML_CACHE_MAX_BYTES"]
+)
+assert cache._cache_path(sha256(payload).hexdigest()).exists()
+"""
+    subprocess.run(
+        [sys.executable, "-c", child],
+        check=True,
+        cwd=DEFAULT_DATA_DIR.parent,
+        capture_output=True,
+        text=True,
+    )
 
 
 def test_parsed_yaml_cache_hit_refreshes_lru_mtime(
@@ -251,11 +297,15 @@ def test_parsed_yaml_cache_hit_refreshes_lru_mtime(
     cache_root = tmp_path / "yaml-cache"
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
-    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+    monkeypatch.setattr(
+        yaml_cache_module,
+        "_CACHE_WRITES_SINCE_EVICTION",
+        yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL,
+    )
 
     payloads = [
         _unique_cache_payload(index)
-        for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL)
+        for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL + 1)
     ]
     first_result = load_cached_safe_yaml(payloads[0])
     first_path = yaml_cache_module._cache_path(sha256(payloads[0]).hexdigest())
@@ -275,27 +325,6 @@ def test_parsed_yaml_cache_hit_refreshes_lru_mtime(
     second_path = yaml_cache_module._cache_path(sha256(payloads[1]).hexdigest())
     assert first_path.exists()
     assert not second_path.exists()
-
-
-def test_parsed_yaml_cache_removes_stale_loader_token_directories(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
-) -> None:
-    cache_root = tmp_path / "yaml-cache"
-    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
-    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
-    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", raising=False)
-    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
-
-    stale_path = yaml_cache_module._cache_path("a" * 64, "retired-loader")
-    stale_path.parent.mkdir(parents=True)
-    stale_path.write_bytes(b"retired")
-    stale_loader_dir = stale_path.parent.parent
-
-    for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL):
-        load_cached_safe_yaml(_unique_cache_payload(index))
-
-    assert not stale_loader_dir.exists()
 
 
 def test_parsed_yaml_cache_rejects_unparseable_byte_cap(
@@ -321,11 +350,15 @@ def test_parsed_yaml_cache_eviction_ignores_racing_deleted_file(
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "1")
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
-    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+    monkeypatch.setattr(
+        yaml_cache_module,
+        "_CACHE_WRITES_SINCE_EVICTION",
+        yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL,
+    )
 
     payloads = [
         _unique_cache_payload(index)
-        for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL)
+        for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL + 1)
     ]
     for payload in payloads[:-1]:
         load_cached_safe_yaml(payload)
@@ -355,11 +388,15 @@ def test_evicted_yaml_cache_entry_reparses_to_same_bytes_as_cache_off(
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "1")
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
-    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+    monkeypatch.setattr(
+        yaml_cache_module,
+        "_CACHE_WRITES_SINCE_EVICTION",
+        yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL,
+    )
 
     payloads = [
         _unique_cache_payload(index)
-        for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL)
+        for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL + 1)
     ]
     for payload in payloads:
         load_cached_safe_yaml(payload)
