@@ -12114,6 +12114,17 @@ def _residue_prediction_cache_entry(
     return cache.get(key)
 
 
+def _residue_cohort_selection(
+    selected_experiment_ids: frozenset[str] | None,
+    test_experiment_ids: frozenset[str] | None,
+) -> frozenset[str] | None:
+    return (
+        selected_experiment_ids
+        if selected_experiment_ids is not None
+        else test_experiment_ids
+    )
+
+
 def _hashimoto_engine_floor_inversion_notices(
     engine: Engine, diagnostics: object
 ) -> tuple[Notice, ...]:
@@ -12157,10 +12168,8 @@ def _hashimoto_residue_prediction(
     quantity = quantity_token(reference.identity)
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
-    cohort_selection = (
-        selected_experiment_ids
-        if selected_experiment_ids is not None
-        else test_experiment_ids
+    cohort_selection = _residue_cohort_selection(
+        selected_experiment_ids, test_experiment_ids
     )
     rows_by_key = _residue_prediction_cache_entry(
         cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection
@@ -12659,10 +12668,8 @@ def _sossi_residue_prediction(
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     formula = reference.identity.species.formula
-    cohort_selection = (
-        selected_experiment_ids
-        if selected_experiment_ids is not None
-        else test_experiment_ids
+    cohort_selection = _residue_cohort_selection(
+        selected_experiment_ids, test_experiment_ids
     )
     if formula not in {"Mn", "Ti"}:
         return EnginePrediction(
@@ -14828,6 +14835,20 @@ class _PreparedScoreRun:
     validation_indexes: _ValidationIndexes
 
 
+def _report_selected_species_count(
+    prepared: _PreparedScoreRun,
+    species_formulas: Sequence[str],
+    stream: _ResidualJsonlStream,
+) -> None:
+    stream.selected_reference_count = len(prepared.refs)
+    if species_formulas:
+        print(
+            f"species references selected={len(prepared.refs)} "
+            f"formulas={','.join(species_formulas)}",
+            flush=True,
+        )
+
+
 def _prepare_score_run(
     context: ScoreContext,
     *,
@@ -15035,13 +15056,7 @@ def _score_store_with_decisions(
         _test_experiment_ids=_test_experiment_ids,
     )
     if _stream is not None and _prepared is None:
-        _stream.selected_reference_count = len(prepared.refs)
-        if species_formulas:
-            print(
-                f"species references selected={len(prepared.refs)} "
-                f"formulas={','.join(species_formulas)}",
-                flush=True,
-            )
+        _report_selected_species_count(prepared, species_formulas, _stream)
     if prepared.context is not context:
         raise ValueError("prepared score context does not match the scoring context")
     engine_set = (
@@ -15732,13 +15747,7 @@ def _score_store_to_jsonl(
                 measured_only=measured_only,
                 _test_experiment_ids=_test_experiment_ids,
             )
-            stream.selected_reference_count = len(prepared.refs)
-            if species_formulas:
-                print(
-                    f"species references selected={len(prepared.refs)} "
-                    f"formulas={','.join(species_formulas)}",
-                    flush=True,
-                )
+            _report_selected_species_count(prepared, species_formulas, stream)
             chunks = _partition_score_refs(prepared.refs, workers=workers)
             populated_chunks = [
                 (index, chunk)
