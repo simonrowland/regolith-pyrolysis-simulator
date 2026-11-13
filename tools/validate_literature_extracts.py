@@ -110,8 +110,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   certifies no formula or species label, so ``<sup>SiO2</sup>``,
   ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` are
   ``charged_species_unsupported``. A superscript in another token of
-  the same cited span does not type an unrelated miss. A numeric token has no element letter,
-  so ``-6.98`` still certifies ``-6.98``. ``Fe`` is not
+  the same cited span does not type an unrelated miss. A CSV or TSV
+  cell is one unit, the same classifier as an HTML cell, so a space
+  inside the cell does not split it. ``SiO2 ⁿ`` is
+  ``charged_species_unsupported`` for ``SiO2``. A numeric token has
+  no element letter, so ``-6.98`` still certifies ``-6.98``. ``Fe`` is not
   ``$\\mathrm{Fe}^{2+}$`` and ``Fe^{2+}`` is not an identical CSV cell.
   A plain numeric cell with no element symbol is still a power.
   A subscript digit inside a formula token is not a number: ``SiO_{2}``
@@ -3574,6 +3577,7 @@ def _charged_formula_miss(
     spans: tuple[tuple[int, int], ...] = (),
     *,
     has_superscript: bool = False,
+    cells: Sequence[str] | None = None,
 ) -> bool:
     """True when a formula miss is the unsupported charged-species refusal.
 
@@ -3584,8 +3588,11 @@ def _charged_formula_miss(
     in another token leaves an unrelated miss as
     ``cited_token_absent``. ``has_superscript`` is the HTML cell, so
     every formula label on that cell is charged, including an unrelated
-    one. Lowercase letters stay on the charge-sign path, so ``SO₄−``
-    is not ``SiO2``.
+    one. ``cells`` is a CSV or TSV citation. Each cell is one unit and
+    is not split on whitespace, so ``SiO2 ⁿ`` charges ``SiO2``. One
+    superscripted cell charges every formula label, as an HTML cell
+    does. Another cell does not. Lowercase letters stay on the
+    charge-sign path, so ``SO₄−`` is not ``SiO2``.
     """
     formula_miss = [
         leaf
@@ -3601,14 +3608,20 @@ def _charged_formula_miss(
         return True
     if has_superscript:
         return True
-    tokens = re.findall(r"\S+", text)
+    # A CSV or TSV cell is one unit, classified by the HTML cell test.
+    # Prose still splits on whitespace.
+    if cells is None:
+        tokens = re.findall(r"\S+", text)
+        charged = [
+            token for token in tokens if _raw_token_is_charged_species(token)
+        ]
+    else:
+        tokens = list(cells)
+        charged = [
+            token for token in tokens if _html_cell_is_charged_species(token)
+        ]
     if len(tokens) == 1 and is_superscripted(tokens[0]):
         return True
-    charged = [
-        token
-        for token in tokens
-        if _raw_token_is_charged_species(token)
-    ]
     return any(
         _charged_token_carries_label(token, leaf.value)
         for leaf in formula_miss
@@ -3861,6 +3874,7 @@ def _locator_source_blind_reason(
                 break
             delimiter = _tabular_delimiter(path)
             charge_text = ""
+            charge_cells = None
             if delimiter is None and _locator_has_html_cell_address(locator):
                 # One parsed cell. A miss is source-blind, not a prose search
                 # of the same line.
@@ -4032,11 +4046,14 @@ def _locator_source_blind_reason(
                     for leaf in leaves
                     if not _pinned_leaf_certifies(leaf, charge_text, cells)
                 ]
+                charge_cells = cells
             if not missing:
                 key_matched = True
                 break
             rendered = ", ".join(repr(leaf.value) for leaf in missing[:3])
-            if _charged_formula_miss(missing, charge_text):
+            if _charged_formula_miss(
+                missing, charge_text, cells=charge_cells
+            ):
                 candidate_reasons.append(
                     "charged_species_unsupported: a charged or powered species "
                     f"certifies no formula or species label ({rendered})"
@@ -4133,7 +4150,10 @@ def fidelity_source_warnings(
     ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` certify no formula or species
     label. The refusal is ``charged_species_unsupported``. A superscript
     in another token of the same cited span does not type an unrelated
-    miss; that miss stays ``cited_token_absent``.
+    miss; that miss stays ``cited_token_absent``. A CSV or TSV cell is
+    one unit, the same classifier as an HTML cell. A space inside the
+    cell does not split it, so ``SiO2 ⁿ`` is
+    ``charged_species_unsupported`` for ``SiO2``.
     A subscript digit inside a formula token is not a number, so
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
     measurement still does. A formula label equals one whole run of

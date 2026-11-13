@@ -11974,6 +11974,67 @@ def test_superscript_span_does_not_type_an_unrelated_formula(tmp_path: Path):
     assert failures == []
 
 
+def test_csv_tsv_cell_superscript_is_classified_whole(tmp_path: Path):
+    """A CSV or TSV cell is one unit, the same classifier as an HTML cell.
+
+    ``SiO2 ⁿ`` refuses ``SiO2`` as charged, not cited. The same cell
+    refuses ``Al2O3`` as charged. A second cell does not: ``Fe`` beside
+    ``SiO2 ⁿ`` refuses ``Al2O3`` as cited and ``SiO2`` as charged. A
+    space in prose still splits tokens. ``SO₄−`` does not type ``SiO2``.
+    """
+    sio = vle._PinnedLeaf("SiO2", True)
+    al = vle._PinnedLeaf("Al2O3", True)
+    cell = "SiO2 ⁿ"
+    assert vle._charged_formula_miss([sio], cell, cells=(cell,)) is True
+    assert vle._charged_formula_miss([al], cell, cells=(cell,)) is True
+    assert (
+        vle._charged_formula_miss([al], "Fe\n" + cell, cells=("Fe", cell))
+        is False
+    )
+    assert (
+        vle._charged_formula_miss([sio], "Fe\n" + cell, cells=("Fe", cell))
+        is True
+    )
+    assert vle._charged_formula_miss([sio], cell) is False
+    assert (
+        vle._charged_formula_miss([sio], "SO\u2084\u2212", cells=("SO\u2084\u2212",))
+        is False
+    )
+    failures: list[str] = []
+    cases = (
+        ("SiO2 ⁿ\n", "SiO2", "charged_species_unsupported", "tables/sio2-spaced.csv"),
+        ("SiO2 ⁿ\n", "SiO2", "charged_species_unsupported", "tables/sio2-spaced.tsv"),
+        ("SiO2 ⁿ\n", "Al2O3", "charged_species_unsupported", "tables/sio2-spaced-al.csv"),
+        ("Fe,SiO2 ⁿ\n", "Al2O3", "cited_token_absent", "tables/sio2-neighbour.csv"),
+        ("Fe,SiO2 ⁿ\n", "SiO2", "charged_species_unsupported", "tables/sio2-neighbour-hit.csv"),
+        ("Fe\tSiO2 ⁿ\n", "Al2O3", "cited_token_absent", "tables/sio2-neighbour.tsv"),
+        ("Fe\tSiO2 ⁿ\n", "SiO2", "charged_species_unsupported", "tables/sio2-neighbour-hit.tsv"),
+    )
+    for source, label, expected, relative in cases:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path, label, source, key=key, relative=relative
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc, label=f"cell-{key}-{label}", artifact_root=tmp_path
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {expected}:
+                failures.append(
+                    f"{key} {label!r} ~ {relative}: {codes} != {expected}"
+                )
+    assert failures == []
+
+
 def test_digit_group_spacing_is_one_number(tmp_path: Path):
     """A typographic digit group is one number. An ASCII space is not.
 
