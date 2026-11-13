@@ -41,10 +41,17 @@ from simulator.engine_pool import (
 )
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.domain_reason import OutOfDomainReason
-from engines.magemin.domain import MAGEMinDomainGate
+from engines.magemin.domain import (
+    MAGEMIN_NATIVE_MELT_ACTIVITIES,
+    MAGEMinDomainGate,
+)
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
+from simulator.melt_backend.base import (
+    LiquidFractionInvalidError,
+    MeltCompositionError,
+    project_melt_to_oxide_projection,
+)
 from simulator.feedstock_composition import FEOT_FROM_FE2O3
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
@@ -3921,26 +3928,29 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     )
     assert result.status == "ok", result.warnings
 
-    projection = backend._build_db_bulk_projection(composition)
+    # Use the same kg-to-normalized-wt%-to-MAGEMin projection as equilibrate().
+    # The raw fixture sums to 99 kg, so passing it straight to the CLI would
+    # compare against a different bulk than the adapter solved.
+    melt_projection = project_melt_to_oxide_projection(
+        composition_kg=composition,
+        composition_mol=None,
+        oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+    )
+    projection = backend._build_db_bulk_projection(
+        melt_projection.oxide_wt_pct
+    )
     pressure_kbar = backend._GPa_to_kbar(
         backend._pressure_bar_to_GPa(pressure_bar)
     )
-    buffer_name, buffer_n, _warnings = backend._resolve_buffer(
-        temperature_C=temperature_C,
-        fO2_log=fO2_log,
+    direct_args, _buffer_name, _buffer_n, _buffer_warnings = (
+        backend._build_magemin_subprocess_args(
+            bulk_projection=projection,
+            temperature_C=temperature_C,
+            pressure_kbar=pressure_kbar,
+            fO2_log=fO2_log,
+            capture_native_activities=True,
+        )
     )
-    direct_args = [
-        str(_LIVE_MAGEMIN_BINARY.resolve()),
-        "--Verb=1",
-        "--db=ig",
-        f"--Temp={temperature_C:.6f}",
-        f"--Pres={pressure_kbar:.6f}",
-        "--sys_in=wt",
-        "--Bulk=" + ",".join(f"{value:.6f}" for value in projection.vector),
-        f"--buffer={buffer_name}",
-        f"--buffer_n={buffer_n:.6f}",
-        "--out_matlab=1",
-    ]
     from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
 
     with _magemin_subprocess_slot(20.0):
@@ -3959,10 +3969,11 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
             ).read_text()
 
     direct_fields = backend._parse_subprocess_native_activities(matlab_text)
-    for formula, field in (("MgO", "aMgO"), ("SiO2", "aSiO2")):
+    assert {"MgO", "SiO2"} <= set(MAGEMIN_NATIVE_MELT_ACTIVITIES)
+    for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
         direct_activity = direct_fields[field]
         adapted_activity = result.activity_coefficients[formula]
-        assert abs(adapted_activity - direct_activity) / abs(direct_activity) <= 1e-9
+        assert adapted_activity == direct_activity
     assert result.diagnostics["magemin_solver_status"] == 0
     assert result.diagnostics["magemin_native_phase"]
     assert result.diagnostics["magemin_iterations"] > 0

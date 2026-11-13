@@ -2551,14 +2551,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         backend = provider._ensure_backend()
         if backend is None or not backend.is_available():
-            raise EvaporationFluxRefusal(
-                'liquid_fraction_provider_missing_input',
-                {
+            import multiprocessing
+
+            daemon_context = multiprocessing.current_process().daemon
+            initialization_error = getattr(
+                provider, '_backend_initialization_error', None
+            )
+            child_start_refusal = (
+                daemon_context
+                and isinstance(initialization_error, AssertionError)
+                and str(initialization_error)
+                == 'daemonic processes are not allowed to have children'
+            )
+            if child_start_refusal:
+                reason = (
+                    "liquid_fraction_provider_unavailable_daemonic_process_"
+                    "cannot_start_child_workers"
+                )
+                diagnostic = {
+                    'reason': reason,
+                    'input': 'liquid_fraction_provider',
+                    'provider': self._liquid_fraction_provider,
+                    'status': 'unavailable',
+                    'detail': (
+                        'a daemonic process cannot start child worker processes'
+                    ),
+                }
+            else:
+                diagnostic = {
                     'reason': 'missing_input',
                     'input': 'liquid_fraction_provider',
                     'provider': self._liquid_fraction_provider,
                     'status': 'unavailable',
-                },
+                }
+                if daemon_context:
+                    diagnostic['daemon_context'] = True
+                reason = 'liquid_fraction_provider_missing_input'
+            raise EvaporationFluxRefusal(
+                reason,
+                diagnostic,
             )
 
     def _register_magemin_shadow_if_available(self) -> None:

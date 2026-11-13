@@ -221,11 +221,13 @@ def test_sossi_printed_mn_row_reaches_the_scored_retention_path() -> None:
         code_revision="test",
         engine="internal-analytical",
     )[0]
-    cache = {
-        ("kems-012-sossi-2019", Engine.INTERNAL_ANALYTICAL): {
-            run_id: integrated
-        }
-    }
+    cache = {}
+    score_module._residue_prediction_cache_entry(
+        cache,
+        "kems-012-sossi-2019",
+        Engine.INTERNAL_ANALYTICAL,
+        value={run_id: integrated},
+    )
     prediction = _sossi_residue_prediction(
         context, q_reference, Engine.INTERNAL_ANALYTICAL, cache
     )

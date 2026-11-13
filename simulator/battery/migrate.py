@@ -161,7 +161,7 @@ from simulator.battery.enums import (
     ValencePrintedForm,
     ValenceValueForm,
 )
-from simulator.yaml_cache import YAML12SafeLoader
+from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
 from simulator.battery.identity import (
     Exposure,
     Identity,
@@ -311,6 +311,23 @@ def iter_observation_store_paths(
             continue
         paths.extend(path for path in sorted(child.glob("*.yaml")) if path.is_file())
     return paths
+
+
+def _iter_score_loaded_yaml_paths(root: Path) -> tuple[Path, ...]:
+    """Return the YAML files parsed by an unfiltered ``load_score_context``."""
+
+    literature = root / "data" / "literature"
+    paths = [
+        path
+        for path in iter_work_store_paths(literature / "works")
+        if path.name != "ALIASES.yaml"
+    ]
+    for directory in (literature / "extracts-v2", literature / "observations-v2"):
+        paths.extend(iter_observation_store_paths(directory))
+    extracts = literature / "extracts"
+    if extracts.is_dir():
+        paths.extend(sorted(extracts.glob("*.yaml")))
+    return tuple(sorted(set(paths)))
 
 
 def compilation_family_from_store_path(path: Path) -> str | None:
@@ -4473,8 +4490,14 @@ def resolve_equipment_context(
 _YAML_LOADER = YAML12SafeLoader
 
 
+def _load_yaml_text(payload: str | bytes) -> object:
+    """Parse battery YAML through the shared loader and exact-type cache."""
+
+    return load_cached_safe_yaml(payload)
+
+
 def load_yaml(path: Path) -> object:
-    return yaml.load(path.read_text(encoding="utf-8"), Loader=_YAML_LOADER)
+    return _load_yaml_text(path.read_bytes())
 
 
 def load_json(path: Path) -> object:

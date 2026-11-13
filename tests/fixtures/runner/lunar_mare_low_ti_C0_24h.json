@@ -5450,6 +5450,22 @@
       ],
       "owner_ratify_placeholders": [
         {
+          "name": "carrier_gas_earth_price_per_kg.Kr",
+          "value": 290.0,
+          "units": "USD/kg",
+          "source_tag": "FLAGGED dated estimate 2026-11-11: Ullmann's (1999) via Wikipedia 'Prices of chemical elements'; USGS MCS 2026 reports rare-gas prices unavailable",
+          "ticket": "COST-PARAM-CARRIER-KR-EARTH-KG",
+          "status": "owner-ratify-placeholder"
+        },
+        {
+          "name": "carrier_makeup_loss_fraction_per_run",
+          "value": 0.01,
+          "units": "fraction/run",
+          "source_tag": "FLAGGED: controller assumption pending owner number (d-389)",
+          "ticket": "COST-PARAM-CARRIER-MAKEUP-LOSS-RUN",
+          "status": "owner-ratify-placeholder"
+        },
+        {
           "name": "thermal_usd_per_flux_h",
           "value": 1.0,
           "units": "USD/(K*h)",
@@ -5482,7 +5498,7 @@
           "status": "owner-ratify-placeholder"
         }
       ],
-      "owner_ratify_placeholder_count": 4,
+      "owner_ratify_placeholder_count": 6,
       "pumping_diagnostic": {
         "schema_version": "pumping-cost-rollup-v1",
         "status": "no_rows",
@@ -190370,7 +190386,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O, Fe2O3->FeOt+O",
