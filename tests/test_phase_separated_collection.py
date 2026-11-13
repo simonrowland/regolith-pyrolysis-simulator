@@ -352,8 +352,8 @@ def test_stage3_na_gate_matches_liquid_activity_reference(
 
     # Independent expected signs use the liquid Na2O Gibbs basis owned by
     # ellingham_thermo (NIST-JANAF Na-013): the 1e-8 bar case has ln(Q/K)
-    # about -38.972, while 1.0656e-25 bar (the liquid/crystal critical-pressure
-    # midpoint) has ln(Q/K) about +0.252. Keep the signs explicit instead of
+    # about -38.972, while 1.0656e-25 bar (near the log-pressure midpoint)
+    # has ln(Q/K) about +0.252. Keep the signs explicit instead of
     # repeating the production log(Q/K) expression in this test.
     assert reaction["log_Q_over_K"] is not None
     assert reaction["pO2_bar"] > 0.0
