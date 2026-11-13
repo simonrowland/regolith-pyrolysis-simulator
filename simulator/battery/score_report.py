@@ -8,13 +8,15 @@ rows and counts those decisions already produced.
 from __future__ import annotations
 
 import json
-from collections import defaultdict
 from decimal import Decimal
 from typing import Iterable, Mapping, Protocol, Sequence
 
-from simulator.battery.enums import Engine, Quantity, ValueKind
-from simulator.battery.identity import Identity, quantity_token
-from simulator.battery.records import Observation, Residual
+from simulator.battery.enums import Engine
+from simulator.battery.records import Observation
+from simulator.battery.score_report_data import (
+    ElementRetentionReportData,
+    Nasa9FitComparisonData,
+)
 
 
 REPORT_HEADING = "# Battery score report (schema v2.1)"
@@ -219,94 +221,11 @@ def _append_quench_pair_diagnostics(
     return f"{report.rstrip()}\n\n{section}\n"
 
 
-def _append_element_retention_diagnostics(
+def format_element_retention_diagnostics(
     report: str,
-    rows: Iterable[Residual | Mapping[str, object]],
-    observations: Mapping[str, Observation],
+    data: ElementRetentionReportData,
 ) -> str:
-    cells: list[tuple[str, str, str, str, str, str, Decimal | None]] = []
-    loss_bins: dict[str, set[str]] = {
-        "negative (FM > 1)": set(),
-        "0–1%": set(),
-        ">1–10%": set(),
-        ">10–50%": set(),
-        ">50%": set(),
-    }
-    for row in rows:
-        if isinstance(row, Residual):
-            reference_id = row.reference
-            status = row.status.value
-            numeric = None if row.numeric is None else row.numeric.value
-            engine = (
-                row.candidate_request.engine.value
-                if row.candidate_request is not None
-                else "—"
-            )
-        else:
-            reference_id = str(row.get("reference") or "")
-            status = str(row.get("status") or "unknown")
-            numeric_payload = row.get("numeric")
-            raw_numeric = (
-                numeric_payload.get("value")
-                if isinstance(numeric_payload, Mapping)
-                else None
-            )
-            try:
-                numeric = None if raw_numeric is None else Decimal(str(raw_numeric))
-            except (ArithmeticError, TypeError, ValueError):
-                numeric = None
-            request = row.get("candidate_request")
-            engine = (
-                str(request.get("engine") or "—")
-                if isinstance(request, Mapping)
-                else "—"
-            )
-        observation = observations.get(reference_id)
-        if (
-            observation is None
-            or not isinstance(observation.identity, Identity)
-            or quantity_token(observation.identity)
-            is not Quantity.ELEMENT_RETENTION_RATIO
-        ):
-            continue
-        fm = observation.value.point if observation.value.kind is ValueKind.POINT else None
-        loss = None if fm is None else Decimal(1) - fm
-        loss_bin = "—"
-        if fm is not None and fm > 0:
-            if loss is not None and loss < 0:
-                loss_bin = "negative (FM > 1)"
-            elif loss is not None and loss <= Decimal("0.01"):
-                loss_bin = "0–1%"
-            elif loss is not None and loss <= Decimal("0.10"):
-                loss_bin = ">1–10%"
-            elif loss is not None and loss <= Decimal("0.50"):
-                loss_bin = ">10–50%"
-            else:
-                loss_bin = ">50%"
-            loss_bins[loss_bin].add(observation.observation_id)
-        uncertainty = observation.uncertainty
-        raw_uncertainty = uncertainty.verbatim
-        if raw_uncertainty is None and uncertainty.value is not None:
-            raw_uncertainty = f"{uncertainty.value} {uncertainty.basis or ''}".strip()
-        if raw_uncertainty is None:
-            uncertainty_text = "not printed"
-        elif isinstance(raw_uncertainty, Mapping):
-            uncertainty_text = json.dumps(
-                raw_uncertainty, sort_keys=True, ensure_ascii=False
-            )
-        else:
-            uncertainty_text = str(raw_uncertainty)
-        cells.append(
-            (
-                observation.observation_id,
-                engine,
-                status,
-                "—" if fm is None else str(fm),
-                "—" if loss is None else str(loss),
-                uncertainty_text,
-                numeric,
-            )
-        )
+    cells, loss_bin_counts = data
     if not cells:
         return report
 
@@ -323,9 +242,21 @@ def _append_element_retention_diagnostics(
         "|---|---|---|---:|---:|---|---:|",
     ]
     for observation_id, engine, status, fm, loss, uncertainty, numeric in cells:
+        raw_uncertainty = uncertainty.verbatim
+        if raw_uncertainty is None and uncertainty.value is not None:
+            raw_uncertainty = f"{uncertainty.value} {uncertainty.basis or ''}".strip()
+        if raw_uncertainty is None:
+            uncertainty_text = "not printed"
+        elif isinstance(raw_uncertainty, Mapping):
+            uncertainty_text = json.dumps(
+                raw_uncertainty, sort_keys=True, ensure_ascii=False
+            )
+        else:
+            uncertainty_text = str(raw_uncertainty)
         lines.append(
             f"| {markdown(observation_id)} | {markdown(engine)} | {markdown(status)} | "
-            f"{fm} | {loss} | {markdown(uncertainty)} | "
+            f"{'—' if fm is None else fm} | "
+            f"{'—' if loss is None else loss} | {markdown(uncertainty_text)} | "
             f"{'—' if numeric is None else numeric} |"
         )
     lines.extend(
@@ -337,41 +268,15 @@ def _append_element_retention_diagnostics(
             "|---|---:|",
         ]
     )
-    lines.extend(
-        f"| {label} | {len(loss_bins[label])} |" for label in loss_bins
-    )
+    lines.extend(f"| {label} | {count} |" for label, count in loss_bin_counts)
     section = "\n".join(lines)
     return f"{report.rstrip()}\n\n{section}\n"
 
 
-def _append_nasa9_fit_comparison_stratum(
-    report: str, comparisons: Iterable[Mapping[str, object]]
+def format_nasa9_fit_comparison_stratum(
+    report: str, data: Nasa9FitComparisonData
 ) -> str:
-    counts: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0, 0])
-    refusals: dict[tuple[str, str, str, str], int] = defaultdict(int)
-    for row in comparisons:
-        channel = row.get("comparison_channel")
-        if not isinstance(channel, str) or not channel.startswith("nasa9_fit:"):
-            continue
-        engine = channel.partition(":")[2]
-        quantity = str(row.get("quantity") or "unknown")
-        numeric = row.get("value") is not None and row.get("status") != "refused"
-        group = counts[(engine, quantity)]
-        group[0] += 1
-        group[1 if numeric else 2] += 1
-        if numeric:
-            continue
-        reason = str(row.get("refusal_reason") or "untyped")
-        detail = row.get("refusal_detail")
-        detail_text = json.dumps(
-            dict(detail) if isinstance(detail, Mapping) else {},
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        refusals[(engine, quantity, reason, detail_text)] += 1
-
-    if not counts:
+    if not data.counts:
         return report
 
     lines = [
@@ -382,12 +287,12 @@ def _append_nasa9_fit_comparison_stratum(
         "| engine | quantity | n comparisons | n numeric | n refused |",
         "|---|---|---:|---:|---:|",
     ]
-    for (engine, quantity), (total, numeric, refused) in sorted(counts.items()):
+    for engine, quantity, total, numeric, refused in data.counts:
         lines.append(
             f"| {engine} | {quantity} | {total} | {numeric} | {refused} |"
         )
     lines.extend(["", "### Typed refusal diagnostics", ""])
-    if not refusals:
+    if not data.refusals:
         lines.append("None.")
     else:
         lines.extend(
@@ -396,7 +301,7 @@ def _append_nasa9_fit_comparison_stratum(
                 "|---|---|---|---:|---|",
             ]
         )
-        for (engine, quantity, reason, detail), count in sorted(refusals.items()):
+        for engine, quantity, reason, detail, count in data.refusals:
             safe_detail = detail.replace("|", "\\|").replace("`", "\\`")
             lines.append(
                 f"| {engine} | {quantity} | `{reason}` | {count} | `{safe_detail}` |"

@@ -667,7 +667,6 @@ def test_dimension_mismatch_drops_the_band_and_refuses_if_forced(
 
 _MOVED_NAMES = (
     "QUANTITY_METRIC",
-    "_UNIT_DIMENSION",
     "_phase_component_reference_wt_percent",
     "_reference_from_metric",
     "_residual_metric_operation",
@@ -678,7 +677,6 @@ _MOVED_NAMES = (
     "metric_operation",
     "metric_operation_for_identity",
     "populate_numeric",
-    "unit_dimension",
 )
 
 _METRICS_IMPORT_MODULES = frozenset({
@@ -693,7 +691,7 @@ _METRICS_IMPORT_MODULES = frozenset({
 
 
 def test_score_metrics_owns_the_block_and_imports_no_scorer() -> None:
-    """The metric module is the owner, and score.py only re-exports it.
+    """The metric module owns its API and score.py imports only real callers.
 
     Allowed imports are the stdlib plus records, enums, and identity.
     score.py, score_report, migrate, and the engines stay out.
@@ -727,3 +725,28 @@ def test_score_metrics_owns_the_block_and_imports_no_scorer() -> None:
     assert set(imported) == set(_MOVED_NAMES)
     for name in _MOVED_NAMES:
         assert getattr(score, name) is getattr(metrics, name)
+
+
+def test_score_report_data_import_direction() -> None:
+    """Report aggregation depends on records and metrics, never renderers."""
+
+    import simulator.battery.score_report_data as report_data
+
+    root = Path(report_data.__file__).resolve().parent
+    tree = ast.parse((root / "score_report_data.py").read_text(encoding="utf-8"))
+    imported: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if node.level == 0:
+                imported.add(node.module or "")
+                if node.module == "simulator.battery":
+                    imported.update(
+                        f"simulator.battery.{alias.name}" for alias in node.names
+                    )
+        elif isinstance(node, ast.Import):
+            imported.update(alias.name for alias in node.names)
+
+    assert "simulator.battery.records" in imported
+    assert "simulator.battery.score_metrics" in imported
+    assert "simulator.battery.score" not in imported
+    assert "simulator.battery.score_report" not in imported
