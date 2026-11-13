@@ -143,6 +143,8 @@ def test_missing_po2_uses_flagged_free_route_and_refuses_only_without_one() -> N
     result = operative_wall_saturation((_sio_disp(), _sio_ox()), T_K=_T_K)
     assert result.reaction_id == _sio_disp().reaction_id
     assert result.pressure_Pa == pytest.approx(1.14529, rel=1e-5)
+    # Pin the current computed value before consolidating the 1 bar owner.
+    assert result.pressure_Pa.hex() == "0x1.2531b1eddf47ap+0"
     assert result.notices == ("wall_pO2_unknown_pO2_free_route_used",)
     with pytest.raises(WallSaturationLawRefusal) as exc_info:
         operative_wall_saturation((_sio_ox(),), T_K=_T_K)
