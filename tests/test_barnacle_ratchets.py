@@ -10,7 +10,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID_SIMULATOR_CEILING = 25
 SOURCE_ID_TOOLS_SCRIPTS_CEILING = 2
 FINITE_HELPER_CEILING = 87
-SC_388_SITE_CEILING = 30  # b261: 32 -> 30 after engine/physics removed sites
+SC_388_SITE_CEILING = 30  # b261: 32 -> 30; the discovery walker no longer finds species_rail_differential._evaluate_rail_pressure_Pa or engine_binding_admission.gate_curve_memo_origin_matches (the other allow-list rows were behavior pins, not counted sites)
 
 SC_388_ALLOWLIST = ()  # emptied in b261: engine typed-failures (4de120b56) and physics dry56/dry10 fixed every listed site
 
