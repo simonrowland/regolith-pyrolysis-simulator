@@ -68,6 +68,20 @@ _COMPARABLE = (
 )
 
 
+def _fo2_input(resolved):
+    if resolved is None:
+        return None
+    return (
+        resolved.route,
+        resolved.tier,
+        resolved.physics_rung,
+        resolved.po2_bar,
+        resolved.closure,
+        resolved.cell_material,
+        None if resolved.closure else resolved.log10_fO2_bar,
+    )
+
+
 def test_fo2_ladder_and_migrate_share_redox_fields_in_fresh_interpreter() -> None:
     result = subprocess.run(
         [
@@ -219,6 +233,34 @@ def test_tier3_buffer_matches_the_oxygen_condition_point() -> None:
     assert payload["fO2_route"] == "buffer_relation"
     assert payload["fO2_borrowed"] is False
     assert payload["fO2_log"] == float(selected.value.point)
+
+
+def test_metal_saturation_activity_target_never_seeds_its_own_fo2() -> None:
+    from pathlib import Path
+
+    from simulator.battery.migrate import Migrator
+
+    root = Path(__file__).resolve().parents[2]
+    migrator = Migrator(root=root, index={}, aliases={})
+    migrator._migrate_extract(
+        root / "data/literature/extracts/basu-2008-feo-steelmaking.yaml"
+    )
+    migrator.finalize()
+    observation = migrator.result.observations[
+        "basu-2008-feo-steelmaking::basu_2008_tii_s02_a_feo_1873k"
+    ]
+    experiment = migrator.result.experiments[observation.experiment_id]
+    bench = migrator.result.benches[experiment.bench_id]
+
+    selected = resolve_row_fo2(experiment, bench, observation)
+    changed = resolve_row_fo2(
+        experiment,
+        bench,
+        replace(observation, value=Value.point_of(observation.value.point * 1.7)),
+    )
+
+    assert selected is None
+    assert changed is None
 
 
 def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> None:
@@ -749,6 +791,19 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     assert printed is not None
     assert printed.route == "identity_fO2_Pa"
     assert printed.po2_bar == float(printed_pa / Decimal("100000"))
+    changed_target = replace(
+        observation, value=Value.point_of(observation.value.point * 1.7)
+    )
+    changed_printed = resolve_row_fo2(
+        experiment,
+        bench,
+        replace(changed_target, identity=printed_row.identity),
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=linked_bar,
+    )
+    assert _fo2_input(changed_printed) == _fo2_input(printed)
 
     buffer_experiment = replace(
         experiment,
@@ -775,6 +830,16 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     assert buffer is not None
     assert buffer.route == selected.route == "buffer_relation"
     assert buffer.log10_fO2_bar == float(selected.value.point)
+    changed_buffer = resolve_row_fo2(
+        buffer_experiment,
+        bench,
+        changed_target,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=linked_bar,
+    )
+    assert _fo2_input(changed_buffer) == _fo2_input(buffer)
 
     linked = resolve_row_fo2(
         experiment,
@@ -788,6 +853,16 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     assert linked is not None
     assert linked.route == "source_linked_oxygen_condition"
     assert linked.po2_bar == linked_bar
+    changed_linked = resolve_row_fo2(
+        experiment,
+        bench,
+        changed_target,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=linked_bar,
+    )
+    assert _fo2_input(changed_linked) == _fo2_input(linked)
 
     balanced = resolve_row_fo2(
         experiment,
@@ -799,6 +874,15 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     )
     assert balanced is not None and balanced.closure
     assert balanced.route == "effusion_oxygen_balance"
+    changed_balanced = resolve_row_fo2(
+        experiment,
+        bench,
+        changed_target,
+        composition=composition,
+        temperature_K=1200.0,
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert _fo2_input(changed_balanced) == _fo2_input(balanced)
 
 
 @pytest.mark.parametrize("missing", ("composition", "temperature"))
@@ -847,6 +931,19 @@ def test_knudsen_missing_balance_input_refuses_before_vacuum_bound(missing) -> N
         quantity=Quantity.P_PARTIAL,
     )
     assert resolved is None
+    changed_target = replace(
+        observation, value=Value.point_of(observation.value.point * 1.7)
+    )
+    changed = resolve_row_fo2(
+        experiment,
+        bench,
+        changed_target,
+        composition=composition,
+        temperature_K=temperature,
+        oxygen=oxygen,
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert _fo2_input(changed) == _fo2_input(resolved)
 
 
 def test_supported_engines_receive_the_same_effusion_condition(monkeypatch) -> None:

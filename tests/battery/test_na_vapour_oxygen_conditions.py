@@ -97,7 +97,7 @@ def test_rego_table_i_row_selects_flagged_two_species_c_co_condition() -> None:
     assert changed.log10_fO2_bar > selected.log10_fO2_bar
 
 
-def test_rys_na_row_without_oxygen_selects_flagged_congruent_condition() -> None:
+def test_rys_na_row_without_oxygen_selects_effusion_closure() -> None:
     # Ryś Table 10a, NaKAlSi_1 row 8 (1742.385 K, 0.01475 Pa Na).
     composition = Composition(
         "oxides",
@@ -127,14 +127,13 @@ def test_rys_na_row_without_oxygen_selects_flagged_congruent_condition() -> None
     )
 
     assert selected is not None
-    assert selected.route == "rys_congruent_vaporization_predicted"
+    assert selected.route == "effusion_oxygen_balance"
     assert selected.tier == 3
     assert selected.physics_rung == 3
-    assert selected.closure is False
-    assert selected.po2_bar == pytest.approx(4.35036944144e-8, rel=1e-12)
-    assert selected.log10_fO2_bar == pytest.approx(-7.361473860386677, abs=1e-12)
+    assert selected.closure is True
+    assert selected.po2_bar is None
 
-    # Mutation proof: doubling the measured Na pressure doubles predicted O2.
+    # A prediction must not depend on the observed target that it predicts.
     changed = resolve_row_fo2(
         experiment,
         None,
@@ -142,7 +141,132 @@ def test_rys_na_row_without_oxygen_selects_flagged_congruent_condition() -> None
         quantity=Quantity.P_PARTIAL,
     )
     assert changed is not None
-    assert changed.po2_bar == pytest.approx(2.0 * selected.po2_bar, rel=1e-12)
+    assert changed.route == selected.route
+    assert changed.closure is True
+    assert changed.po2_bar is None
+
+
+@pytest.mark.parametrize("status", ("calculated_from_pNa", "unknown"))
+def test_rys_na_without_independent_oxygen_closes_independently_of_target(
+    status: str,
+) -> None:
+    composition = Composition(
+        "oxides",
+        (
+            ("Na2O", Decimal("0.0380")),
+            ("Al2O3", Decimal("0.0647")),
+            ("SiO2", Decimal("0.8659")),
+            ("K2O", Decimal("0.0314")),
+        ),
+        AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.kems_experiment(f"rys-{status}")
+    row = _na_partial_row(
+        source_id=RYS_SOURCE,
+        observation_id=f"rys-{status}-pNa",
+        experiment_id=experiment.experiment_id,
+        temperature_K="1742.385",
+        pressure_Pa="0.01475",
+        composition=composition,
+    )
+    row = replace(row, provenance={"oxygen_condition_provenance": status})
+
+    selected = resolve_row_fo2(
+        experiment,
+        None,
+        row,
+        quantity=Quantity.P_PARTIAL,
+    )
+    changed = resolve_row_fo2(
+        experiment,
+        None,
+        replace(row, value=Value.point_of(row.value.point * 1.7)),
+        quantity=Quantity.P_PARTIAL,
+    )
+
+    assert selected is not None and changed is not None
+    assert selected.closure is True
+    assert selected.po2_bar is None
+    assert changed.closure is True
+    assert changed.po2_bar is None
+    assert changed.route == selected.route
+
+
+def test_rys_measured_and_source_linked_oxygen_survive_target_mutation() -> None:
+    experiment = F.kems_experiment("rys-linked-oxygen")
+    row = _na_partial_row(
+        source_id=RYS_SOURCE,
+        observation_id="rys-linked-oxygen-pNa",
+        experiment_id=experiment.experiment_id,
+        temperature_K="1742.385",
+        pressure_Pa="0.01475",
+    )
+    measured = replace(
+        row,
+        identity=replace(row.identity, fO2_Pa=State.of(Decimal("0.00002"))),
+    )
+    changed_measured = replace(
+        measured, value=Value.point_of(measured.value.point * 1.7)
+    )
+    selected_measured = resolve_row_fo2(
+        experiment, None, measured, quantity=Quantity.P_PARTIAL
+    )
+    changed_selected_measured = resolve_row_fo2(
+        experiment, None, changed_measured, quantity=Quantity.P_PARTIAL
+    )
+    assert selected_measured is not None and changed_selected_measured is not None
+    assert selected_measured.po2_bar == changed_selected_measured.po2_bar
+    assert selected_measured.log10_fO2_bar == changed_selected_measured.log10_fO2_bar
+
+    selected_linked = resolve_row_fo2(
+        experiment,
+        None,
+        row,
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=2.0e-8,
+    )
+    changed_selected_linked = resolve_row_fo2(
+        experiment,
+        None,
+        replace(row, value=Value.point_of(row.value.point * 1.7)),
+        quantity=Quantity.P_PARTIAL,
+        source_oxygen_bar=2.0e-8,
+    )
+    assert selected_linked is not None and changed_selected_linked is not None
+    assert selected_linked.route == "source_linked_oxygen_condition"
+    assert selected_linked.po2_bar == changed_selected_linked.po2_bar
+    assert selected_linked.log10_fO2_bar == changed_selected_linked.log10_fO2_bar
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="Rego pCO=P_total-pNa_obs; physics b-1195/d-405 owns the fix",
+)
+def test_rego_na_oxygen_condition_is_independent_of_observed_target() -> None:
+    experiment = F.tabulation_experiment(
+        "rego-target-mutation",
+        T_K=Decimal("1573.15"),
+        total_P=Decimal("102844.875"),
+    )
+    row = _na_partial_row(
+        source_id=REGO_SOURCE,
+        observation_id="rego-target-mutation-pNa",
+        experiment_id=experiment.experiment_id,
+        temperature_K="1573.15",
+        pressure_Pa="226.968",
+        total_pressure_Pa="102844.875",
+    )
+    selected = resolve_row_fo2(
+        experiment, None, row, quantity=Quantity.P_PARTIAL
+    )
+    changed = resolve_row_fo2(
+        experiment,
+        None,
+        replace(row, value=Value.point_of(row.value.point * 1.7)),
+        quantity=Quantity.P_PARTIAL,
+    )
+    assert selected is not None and changed is not None
+    assert changed.log10_fO2_bar == selected.log10_fO2_bar
 
 
 def test_rys_table10a_child_restores_nakalsi_1_row_8() -> None:
