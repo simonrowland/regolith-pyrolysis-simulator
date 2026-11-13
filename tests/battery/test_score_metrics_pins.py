@@ -728,7 +728,7 @@ def test_score_metrics_owns_the_block_and_imports_no_scorer() -> None:
 
 
 def test_score_report_data_import_direction() -> None:
-    """Report aggregation depends on records and metrics, never renderers."""
+    """Report data uses records and identity helpers, never scoring or rendering."""
 
     import simulator.battery.score_report_data as report_data
 
