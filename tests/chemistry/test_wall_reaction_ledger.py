@@ -18,6 +18,8 @@ from simulator.accounting.formulas import (
     load_species_formulas,
     resolve_species_formula,
 )
+from simulator.accounting.ledger import AtomLedger
+from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import (
@@ -29,8 +31,19 @@ from simulator.condensation import (
     _keep_declared_wall_deposit,
     _species_vapor_data,
 )
-from simulator.core import CondensationTrain, EvaporationFlux, MeltState
-from simulator.condensation_routing import STAGE_KEY_BY_NUMBER
+from simulator.condensation_routing import (
+    K_TRAP_STAGE_KEY,
+    K_TRAP_STAGE_NUMBER,
+    K_TRAP_SUB_ORDER,
+    STAGE_KEY_BY_NUMBER,
+    stage_index_for_visit_identity,
+)
+from simulator.core import (
+    CondensationTrain,
+    EvaporationFlux,
+    MeltState,
+    PyrolysisSimulator,
+)
 from simulator.state import MOLAR_MASS
 from simulator.vapour_rail.nasa_cea import WallSaturationLawRefusal
 from simulator.vapour_rail.wall_saturation import (
@@ -575,3 +588,144 @@ def test_general_oxidant_limit_reaches_a_non_oxidative_sibling(formula_registry)
         for element, net in _atom_net(proposal, formula_registry).items():
             assert abs(net) < 1e-9, f"{species} {element} net {net}"
     assert seen >= 2
+
+
+def _bare_projector(formula_registry, ledger: AtomLedger):
+    sim = object.__new__(PyrolysisSimulator)
+    sim.atom_ledger = ledger
+    sim.train = CondensationTrain.create_default()
+    sim.species_formula_registry = formula_registry
+    sim.vapor_pressures = {}
+    sim._last_condensed_by_stage_species_delta = {}
+    sim._last_impurity_delta = {}
+    sim._stage_collection_kg_by_source = {}
+    sim._LEDGER_KG_TOL = 1e-9
+    return sim
+
+
+def test_k_trap_swing_moves_booked_silica_not_static_silicon(formula_registry) -> None:
+    """Oxidative SiO credits SiO2 only. The cartridge swing must not
+    withdraw the static disproportionation's elemental Si.
+    """
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        _TRAIN,
+        {"SiO2": 1.0},
+        source="oxidative SiO booking",
+        material_origin="feedstock",
+    )
+    silica_kg = ledger.kg_by_account(_TRAIN)["SiO2"]
+    vapour_kg = MOLAR_MASS["SiO"] / 1000.0
+    sim = _bare_projector(formula_registry, ledger)
+    sim._last_condensation_baffle_product_kg_by_account = {
+        _TRAIN: {"SiO2": silica_kg},
+    }
+    route = CondensationRouteResult(
+        condensed_by_stage_species={K_TRAP_STAGE_KEY: {"SiO": vapour_kg}},
+        capture_kg_by_stage_identity={
+            (K_TRAP_STAGE_NUMBER, K_TRAP_SUB_ORDER): {"SiO": vapour_kg},
+        },
+        wall_reaction_booking_by_species={
+            "SiO": {"baffle_products_mol": {"SiO2": 1.0}},
+        },
+    )
+    projected = sim._project_routed_condensate(
+        route, "SiO", vapour_kg,
+        {"condensation_products_mol_per_mol_vapor": {"Si": 0.5, "SiO2": 0.5}},
+    )
+    assert projected == {"SiO2": pytest.approx(silica_kg)}
+    assert ledger.kg_by_account(_TRAIN).get("Si", 0.0) == 0.0
+    assert ledger.kg_by_account(_TRAIN).get("SiO2", 0.0) == pytest.approx(0.0)
+    residue = ledger.kg_by_account(ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT)
+    assert residue.get("SiO2", 0.0) == pytest.approx(silica_kg)
+    trap_idx = stage_index_for_visit_identity(
+        sim.train, K_TRAP_STAGE_NUMBER, K_TRAP_SUB_ORDER,
+    )
+    collected = sim.train.stages[trap_idx].collected_kg
+    assert collected.get("SiO2", 0.0) == pytest.approx(silica_kg)
+    assert collected.get("Si", 0.0) == 0.0
+
+
+def test_booked_chromia_is_projected_without_a_train_swing(formula_registry) -> None:
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        _CHROMIA,
+        {"Cr2O3": 0.5},
+        source="oxidative CrO booking",
+        material_origin="feedstock",
+    )
+    chromia_kg = ledger.kg_by_account(_CHROMIA)["Cr2O3"]
+    vapour_kg = resolve_species_formula(
+        "CrO", formula_registry,
+    ).molar_mass_kg_per_mol()
+    sim = _bare_projector(formula_registry, ledger)
+    sim._last_condensation_baffle_product_kg_by_account = {
+        _CHROMIA: {"Cr2O3": chromia_kg},
+    }
+    route = CondensationRouteResult(
+        condensed_by_stage_species={
+            STAGE_KEY_BY_NUMBER[2]: {"CrO": vapour_kg},
+        },
+        capture_kg_by_stage_identity={(2, 0): {"CrO": vapour_kg}},
+        wall_reaction_booking_by_species={
+            "CrO": {"baffle_products_mol": {"Cr2O3": 0.5}},
+        },
+    )
+    projected = sim._project_routed_condensate(
+        route, "CrO", vapour_kg, {},
+    )
+    assert projected == {"Cr2O3": pytest.approx(chromia_kg)}
+    assert ledger.kg_by_account(_TRAIN) == {}
+    assert ledger.kg_by_account(_CHROMIA)["Cr2O3"] == pytest.approx(chromia_kg)
+    stage_idx = stage_index_for_visit_identity(sim.train, 2, 0)
+    assert sim.train.stages[stage_idx].collected_kg["Cr2O3"] == pytest.approx(
+        chromia_kg,
+    )
+    assert sim._stage_collection_kg_by_source[
+        (_CHROMIA, stage_idx, "Cr2O3")
+    ] == pytest.approx(chromia_kg)
+
+
+def test_empty_booking_does_not_fall_through_to_the_static_silicon_split(
+    formula_registry,
+) -> None:
+    ledger = AtomLedger()
+    sim = _bare_projector(formula_registry, ledger)
+    sim._last_condensation_baffle_product_kg_by_account = {}
+    vapour_kg = MOLAR_MASS["SiO"] / 1000.0
+    route = CondensationRouteResult(
+        condensed_by_stage_species={K_TRAP_STAGE_KEY: {"SiO": vapour_kg}},
+        capture_kg_by_stage_identity={
+            (K_TRAP_STAGE_NUMBER, K_TRAP_SUB_ORDER): {"SiO": vapour_kg},
+        },
+        wall_reaction_booking_by_species={"SiO": {}},
+    )
+    projected = sim._project_routed_condensate(
+        route, "SiO", vapour_kg,
+        {"condensation_products_mol_per_mol_vapor": {"Si": 0.5, "SiO2": 0.5}},
+    )
+    assert projected == {}
+    assert ledger.kg_by_account() == {}
+    assert sim.train.total_by_species() == {}
+
+
+def test_stage_baffle_snapshot_keeps_train_and_chromia_solids(formula_registry) -> None:
+    sim = object.__new__(PyrolysisSimulator)
+    sim.species_formula_registry = formula_registry
+    proposal = type("Proposal", (), {})()
+    proposal.credits = {
+        _TRAIN: {"SiO2": 1.0, "O2": 0.1},
+        _CHROMIA: {"Cr2O3": 0.5},
+        "process.wall_deposit": {"SiO2": 0.2},
+        "process.overhead_gas": {"O2": 0.25},
+        "process.condensation_retained_holdup": {"SiO": 0.01},
+    }
+    snapped = sim._stage_baffle_product_kg_from_credits(proposal)
+    assert set(snapped) == {_TRAIN, _CHROMIA}
+    assert set(snapped[_TRAIN]) == {"SiO2"}
+    sio2 = resolve_species_formula("SiO2", formula_registry)
+    chromia = resolve_species_formula("Cr2O3", formula_registry)
+    assert snapped[_TRAIN]["SiO2"] == pytest.approx(sio2.molar_mass_kg_per_mol())
+    assert snapped[_CHROMIA]["Cr2O3"] == pytest.approx(
+        0.5 * chromia.molar_mass_kg_per_mol(),
+    )

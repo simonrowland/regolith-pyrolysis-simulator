@@ -1395,16 +1395,11 @@ class ExtractionMixin:
                 sp_data,
                 route_result,
             )
-            product_projection = self._condensed_products_kg(
-                species,
-                credited_condensed_kg,
-                sp_data,
-            )
-            self._project_condensed_stage_collection(
+            product_projection = self._project_routed_condensate(
                 route_result,
                 species,
                 credited_condensed_kg,
-                product_projection,
+                sp_data,
             )
             route_diagnostic[species] = {
                 'gas_product_kg': rate_kg_hr,

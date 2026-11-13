@@ -15,7 +15,18 @@ from simulator.alpha_kinetics import (
     parse_alpha_contract,
 )
 from simulator.accounting import AccountingError, resolve_species_formula
-from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.account_ids import (
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+)
+
+# Baffle solids the stage UI may show. Wall, overhead, retained holdup
+# and O2 stay off this projection: the swing withdraws whatever this
+# map names, and only these accounts received the winning solids.
+_STAGE_BAFFLE_PRODUCT_ACCOUNTS = frozenset({
+    "process.condensation_train",
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+})
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -4668,12 +4679,9 @@ class EvaporationMixin:
         credited_condensed_kg = self._dispatch_condensation_route(
             species, condensed_kg, sp_data, route_result,
         )
-
-        product_projection = self._condensed_products_kg(
-            species, credited_condensed_kg, sp_data)
-        self._project_condensed_stage_collection(
-            route_result, species, credited_condensed_kg,
-            product_projection)
+        self._project_routed_condensate(
+            route_result, species, credited_condensed_kg, sp_data,
+        )
 
         return {
             'credited_condensed_kg': float(credited_condensed_kg),
@@ -4742,14 +4750,8 @@ class EvaporationMixin:
                 route_status = 'partial_condensation'
             else:
                 route_status = 'committed'
-            product_projection = self._condensed_products_kg(
-                'Fe', credited_condensed_kg, fe_row,
-            )
-            self._project_condensed_stage_collection(
-                route_result,
-                'Fe',
-                credited_condensed_kg,
-                product_projection,
+            self._project_routed_condensate(
+                route_result, 'Fe', credited_condensed_kg, fe_row,
             )
             self._sync_oxygen_kg_counters()
             return {
@@ -4837,6 +4839,7 @@ class EvaporationMixin:
         actually deposited onto ``process.condensation_train``, used by
         the caller to drive ``_project_condensed_stage_collection``.
         """
+        self._last_condensation_baffle_product_kg_by_account = {}
         wall_deposit_fraction = float(
             route_result.wall_deposit_fraction_by_species.get(species, 0.0)
         )
@@ -4902,6 +4905,9 @@ class EvaporationMixin:
             route_result.stage3_reactive_alkali_by_species[species] = reaction
         self._record_wall_deposit_delta(species, diagnostic)
         self._record_wall_alkali_binding_diagnostic_state(diagnostic)
+        self._last_condensation_baffle_product_kg_by_account = (
+            self._stage_baffle_product_kg_from_credits(kernel_result.transition)
+        )
         return float(diagnostic.get('credited_condensed_kg', 0.0))
 
     def _apply_organic_tar_wall_deposit(self) -> None:
@@ -5265,9 +5271,97 @@ class EvaporationMixin:
     def _atom_moles_for_kg(self, species: str, kg: float) -> dict:
         return _atom_moles_for_kg(species, kg, self.species_formula_registry)
 
+    def _stage_baffle_product_kg_from_credits(self, proposal) -> dict:
+        """Kg of baffle solids on the train and the chromia terminal.
+
+        The proposal stores mol. Wall accounts, overhead O2 and retained
+        holdup are not stage condensate, so they are omitted.
+        """
+        credits = getattr(proposal, "credits", {}) or {}
+        out: dict[str, dict[str, float]] = {}
+        for account, species_mol in credits.items():
+            if account not in _STAGE_BAFFLE_PRODUCT_ACCOUNTS:
+                continue
+            product_kg: dict[str, float] = {}
+            for product, mol in species_mol.items():
+                if product == "O2":
+                    continue
+                mol_f = float(mol)
+                if not math.isfinite(mol_f) or mol_f <= 0.0:
+                    continue
+                formula = resolve_species_formula(
+                    product, self.species_formula_registry,
+                )
+                kg = mol_f * formula.molar_mass_kg_per_mol()
+                if kg <= 1e-12:
+                    continue
+                product_kg[str(product)] = kg
+            if product_kg:
+                out[str(account)] = product_kg
+        return out
+
+    def _project_routed_condensate(
+        self,
+        route_result,
+        species: str,
+        credited_condensed_kg: float,
+        sp_data: dict,
+    ) -> dict:
+        """Project this parcel onto the stage UI from the committed solids.
+
+        A wall-reaction booking has already credited its products. The
+        K-trap swing withdraws those solids from the train. The static
+        map stays the no-booking path: applying it after an oxidative
+        booking asks the train for elemental Si it does not hold.
+        """
+        bookings = getattr(
+            route_result, "wall_reaction_booking_by_species", {},
+        ) or {}
+        if species in bookings:
+            by_account = dict(
+                getattr(
+                    self, "_last_condensation_baffle_product_kg_by_account", {},
+                ) or {}
+            )
+            if not by_account:
+                return {}
+            train = "process.condensation_train"
+            ordered = []
+            if train in by_account:
+                ordered.append((train, True))
+            ordered.extend(
+                (account, False)
+                for account in by_account
+                if account != train
+            )
+            merged: dict[str, float] = {}
+            for account, swing in ordered:
+                product_kg = by_account[account]
+                for product, kg in product_kg.items():
+                    merged[product] = merged.get(product, 0.0) + kg
+                self._project_condensed_stage_collection(
+                    route_result,
+                    species,
+                    credited_condensed_kg,
+                    product_kg,
+                    source_account=account,
+                    swing_alkali_cartridge=swing,
+                )
+            return merged
+        product_projection = self._condensed_products_kg(
+            species, credited_condensed_kg, sp_data,
+        )
+        self._project_condensed_stage_collection(
+            route_result, species, credited_condensed_kg, product_projection,
+        )
+        return product_projection
+
     def _project_condensed_stage_collection(
         self, route_result, species: str, credited_condensed_kg: float,
         product_kg_by_species: dict | None = None,
+        *,
+        source_account: str = "process.condensation_train",
+        swing_alkali_cartridge: bool = True,
     ) -> None:
         if credited_condensed_kg <= 1e-12:
             return
@@ -5322,7 +5416,7 @@ class EvaporationMixin:
                         + stage_product_kg)
                 })
                 self._record_stage_collection_source(
-                    'process.condensation_train',
+                    source_account,
                     stage_idx,
                     product,
                     stage_product_kg,
@@ -5387,7 +5481,11 @@ class EvaporationMixin:
                                 cartridge_booked.get(product, 0.0)
                                 + product_kg
                             )
-            if cartridge_booked and cartridge_stage_idx is not None:
+            if (
+                swing_alkali_cartridge
+                and cartridge_booked
+                and cartridge_stage_idx is not None
+            ):
                 self._swing_alkali_freeze_out_cartridge(
                     cartridge_stage_idx,
                     cartridge_booked,
