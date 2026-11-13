@@ -1720,18 +1720,41 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
 
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     handle = open_battery_engine(engine.value)
+    using_recorded_result = not handle.available or handle.backend is None
     expected_nonempty_scorer_fields = {
-        Engine.ALPHAMELTS: ("liquid_composition_wt_pct", "fe_redox_split"),
-        Engine.THERMOENGINE: ("liquid_composition_wt_pct", "fe_redox_split"),
-        Engine.MAGEMIN: ("engine_status",),
-        Engine.VAPOROCK: ("gas_partial_pressures_Pa",),
+        Engine.ALPHAMELTS: (
+            "status",
+            "engine_status",
+            "liquid_composition_wt_pct",
+            "fe_redox_split",
+        ),
+        Engine.THERMOENGINE: (
+            "status",
+            "engine_status",
+            "liquid_composition_wt_pct",
+            "fe_redox_split",
+        ),
+        Engine.MAGEMIN: ("status", "engine_status"),
+        Engine.VAPOROCK: (
+            "status",
+            "engine_status",
+            "gas_partial_pressures_Pa",
+        ),
         Engine.OPENIMCC: (
+            "status",
+            "engine_status",
             "melt_activities",
             "melt_activity_coefficients",
             "melt_activity_coefficient_details",
         ),
     }[engine]
-    if not handle.available or handle.backend is None:
+    if using_recorded_result and engine is Engine.THERMOENGINE:
+        expected_nonempty_scorer_fields += (
+            "melt_activities",
+            "vapor_pressure_backend_status",
+            "vapor_pressure_backend_status_reason",
+        )
+    if using_recorded_result:
         missing_reason = missing_engine_reason(handle, engine.value)
         assert missing_reason is not None
         close_battery_engine_handle(handle)
@@ -1752,20 +1775,19 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
 
             recorded_result = _parse_alphamelts(load_melts_fixture())
         elif engine is Engine.THERMOENGINE:
-            from tests.battery.test_melts_fe_redox_known_engine_output import (
-                _FIXTURE as melts_fixture_path,
+            fixture_path = (
+                Path(__file__).resolve().parents[1]
+                / "fixtures"
+                / "engine_cache_cells"
+                / "thermoengine-mgo-sio2-40-60-1700K.json"
             )
-
-            fixture = json.loads(melts_fixture_path.read_text(encoding="utf-8"))
-            recorded_result = EquilibriumResult(
-                liquid_fraction=1.0,
-                liquid_composition_wt_pct=dict(
-                    fixture["thermoengine_liquid_composition_wt_pct"]
-                ),
+            fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+            recorded_result = EquilibriumResult.from_engine_cache_value(
+                fixture["backend_result"], engine_id=engine.value
             )
-            recorded_result.fe_redox_split = dict(
-                fixture["thermoengine_fe_redox_split"]
-            )
+            assert recorded_result.activity_coefficients
+            assert recorded_result.liquid_composition_wt_pct
+            assert recorded_result.fe_redox_split
         elif engine is Engine.MAGEMIN:
             from simulator.melt_backend.magemin import MAGEMinBackend
 
@@ -1782,33 +1804,15 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
                 {"phases": magemin._parse_subprocess_stdout(stdout)},
             )
         elif engine is Engine.VAPOROCK:
-            import yaml
-            from simulator.melt_backend.vaporock import VapoRockBackend
-
             fixture_path = (
                 Path(__file__).resolve().parents[1]
                 / "fixtures"
-                / "corpus"
-                / "wolf-2022-vaporock"
-                / "benchmark-fixture.yaml"
+                / "engine_cache_cells"
+                / "vaporock-mgo-sio2-40-60-1700K.json"
             )
-            fixture = yaml.safe_load(fixture_path.read_text(encoding="utf-8"))
-            anchor = fixture["expected"]["vapor_partial_pressures_Pa"]["anchors"][0]
-            backend = VapoRockBackend()
-            backend._available = True
-            backend._temperature_units = "C"
-            backend._vapor_pressure_units = "Pa"
-            backend._vaporock = SimpleNamespace(
-                calc_vapor_pressures=lambda **_kwargs: dict(
-                    anchor["vapor_partial_pressures_Pa"]
-                )
-            )
-            recorded_result = backend.equilibrate(
-                temperature_C=float(anchor["T_K"]) - 273.15,
-                composition_kg=dict(fixture["feedstock"]["composition_wt_pct"]),
-                fO2_log=float(anchor["fO2"]["fO2_log10_bar"]),
-                pressure_bar=1.0,
-                liquid_fraction=1.0,
+            fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+            recorded_result = EquilibriumResult.from_engine_cache_value(
+                fixture["backend_result"], engine_id=engine.value
             )
             assert recorded_result.vaporock_full_speciation_Pa
         else:
@@ -1899,7 +1903,15 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
                 engine_settings=normalize_engine_settings(engine.value, None),
             )
     pots, _metadata = load_binary_pots()
-    if engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
+    if using_recorded_result and engine in (Engine.THERMOENGINE, Engine.VAPOROCK):
+        pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
+        common = {
+            "temperature_K": 1700.0,
+            "po2": Po2Request(mode="engine_default", po2_bar=None),
+            "timeout_s": 90.0,
+            "isolated": False,
+        }
+    elif engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
         from simulator.diagnostic_helpers.binary_pot_battery import BinaryPot
         from tests.battery.test_melts_fe_redox_known_engine_output import (
             _FIXTURE as melts_fixture_path,
@@ -1988,6 +2000,10 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
 
     try:
         cache_off = equilibrate_cell(handle, pot, **common)
+        for name in expected_nonempty_scorer_fields:
+            value = getattr(cache_off, name)
+            assert value not in (None, "", {}, [], ())
+
         monkeypatch.setenv(
             "REGOLITH_ENGINE_CACHE", str(tmp_path / f"{engine.value}.sqlite")
         )
@@ -1999,9 +2015,6 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
 
         assert stable(cache_off) == stable(cold) == stable(warm)
         assert scorer_fields(cache_off) == scorer_fields(cold) == scorer_fields(warm)
-        for name in expected_nonempty_scorer_fields:
-            value = getattr(cache_off, name)
-            assert value not in (None, "", {}, [], ())
         assert engine_cache.engine_cache_counters(reset=True)[engine.value] == {
             "hits": 1,
             "misses": 1,
