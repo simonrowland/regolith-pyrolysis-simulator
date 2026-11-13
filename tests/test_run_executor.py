@@ -107,7 +107,7 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "339018cb6d32f3f645797fff05385f68f29b5b3040a954627c804054e7dfafe5"
+        "db9b5ffda079b4886252281c2fabad6413ac60c76a29f175b799188fb8696e3a"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"

@@ -22,7 +22,7 @@ without spinning up a child process.
 from __future__ import annotations
 
 import hashlib
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
 from dataclasses import replace
 import json
@@ -1165,11 +1165,13 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
         return run.run()
 
     flux_maps = []
+    flux_dispatch_temperatures = []
     dispatch = BuiltinEvaporationFluxProvider.dispatch
 
     def capture_flux_maps(provider, request):
         result = dispatch(provider, request)
         flux_maps.append((result.diagnostic or {}).get("evaporation_flux_kg_hr"))
+        flux_dispatch_temperatures.append(float(request.temperature_C))
         return result
 
     with patch.object(BuiltinEvaporationFluxProvider, "dispatch", capture_flux_maps):
@@ -1181,7 +1183,11 @@ def _run_scenario(scenario: dict, *, capture: bool = False):
         ],
         "final_state": payload["final_state"],
     }
-    return payload, {"flux_maps": flux_maps, "ledger_output": ledger_output}
+    return payload, {
+        "flux_maps": flux_maps,
+        "flux_dispatch_temperatures": flux_dispatch_temperatures,
+        "ledger_output": ledger_output,
+    }
 
 
 _LUNAR_C0_RESULT_BUILD_COUNT = 0
@@ -1207,7 +1213,48 @@ def lunar_c0_scenario_result(_lunar_c0_scenario_result_copy_factory):
     return _lunar_c0_scenario_result_copy_factory()
 
 
-def _flux_ledger_pins(capture: dict) -> dict[str, str]:
+def _assert_authoritative_flux_capture(payload: dict, capture: dict) -> None:
+    assert payload.get("status") == "ok", (
+        "runner output must complete successfully before its flux or ledger "
+        f"digests are accepted; status={payload.get('status')!r}, "
+        f"reason={payload.get('reason')!r}, "
+        f"error_message={payload.get('error_message')!r}"
+    )
+    flux_maps = capture.get("flux_maps")
+    assert flux_maps, (
+        "runner completed without any BuiltinEvaporationFluxProvider dispatch; "
+        "empty flux captures must not satisfy golden or digest pins"
+    )
+
+    dispatch_temperatures = capture.get("flux_dispatch_temperatures", ())
+    assert len(dispatch_temperatures) == len(flux_maps)
+    dispatched_by_temperature = Counter(dispatch_temperatures)
+    hours_by_temperature = Counter(
+        float(row["T_C"])
+        for row in payload["per_hour_summary"]
+        if int(
+            ((row.get("vapour_batch_summary") or {}).get("n_flux_active", 0))
+            or 0
+        )
+        > 0
+    )
+    missing_hours = {
+        temperature: count - dispatched_by_temperature[temperature]
+        for temperature, count in hours_by_temperature.items()
+        if dispatched_by_temperature[temperature] < count
+    }
+    assert not missing_hours, (
+        "the authoritative evaporation flux provider did not serve every "
+        f"runner hour: {missing_hours}"
+    )
+
+
+def _flux_ledger_pins(payload: dict, capture: dict) -> dict[str, str]:
+    _assert_authoritative_flux_capture(payload, capture)
+    assert capture["flux_maps"], (
+        "cannot calculate runner flux digest from an empty provider capture"
+    )
+
     def canonical_json(value):
         return json.dumps(
             value, sort_keys=True, separators=(",", ":"), allow_nan=False
@@ -2138,6 +2185,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     actual, capture, expected_text = runner_golden_loader(scenario)
     expected = json.loads(expected_text)
 
+    pins = _flux_ledger_pins(actual, capture)
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
     assert actual["status"] == "ok"
@@ -2152,7 +2200,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
         "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
-    assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
+    assert pins == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
     if scenario["name"] == "mars_basalt_C2A_12h":
         # Pin the merged d-137 envelope while keeping t-423's default carrier
         # covered. d-137 adds wall-deposit authority metadata to each row.

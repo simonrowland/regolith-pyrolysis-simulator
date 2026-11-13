@@ -781,7 +781,7 @@ def _source_header(path: Path) -> Mapping[str, Any] | None:
     if not lines or not schema_line:
         return None
     try:
-        parsed = yaml.safe_load(schema_line + "".join(lines))
+        parsed = migrate._load_yaml_text(schema_line + "".join(lines))
     except yaml.YAMLError:
         return None
     if (
