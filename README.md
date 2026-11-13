@@ -362,6 +362,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 **Start here**
 
 - [Getting Started](docs/getting-started.md)
+- [Environment Configuration](docs/configuration.md)
 - [FAQ](docs/faq.md) · [Glossary](docs/glossary.md) · [Concepts](docs/concepts.md)
 
 **What the model does, and what it does not**
