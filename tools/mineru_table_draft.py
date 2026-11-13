@@ -207,6 +207,8 @@ class _RawCell:
     superscript_depth: int = 0
     # Set on the start tag. An empty ``<sup></sup>`` has no text span.
     has_superscript: bool = False
+    # Tags included. Certification reads this before it strips spans.
+    raw_parts: list[str] = field(default_factory=list)
 
     @property
     def text(self) -> str:
@@ -232,6 +234,8 @@ class Cell:
     # no span; ``has_superscript`` records that the tag was present.
     superscript_spans: tuple[tuple[int, int], ...] = ()
     has_superscript: bool = False
+    # Cell source with ``<sup>`` tags still in place. ``text`` has them stripped.
+    raw_text: str = ""
     value_text: str = ""
     mark: str = ""
     numeric_value: float | None = None
@@ -261,12 +265,16 @@ class _TableParser(HTMLParser):
             # Presence, not text. An empty <sup></sup> never reaches handle_data.
             self.cell.has_superscript = True
             self.cell.superscript_depth += 1
+            raw = self.get_starttag_text()
+            if raw:
+                self.cell.raw_parts.append(raw)
         elif tag == "br" and self.cell is not None:
             self.cell.text_parts.append("\n")
 
     def handle_endtag(self, tag: str) -> None:
         if tag == "sup" and self.cell is not None:
             self.cell.superscript_depth = max(0, self.cell.superscript_depth - 1)
+            self.cell.raw_parts.append("</sup>")
         elif tag in {"td", "th"} and self.row is not None and self.cell is not None:
             self.row.append(self.cell)
             self.cell = None
@@ -278,6 +286,7 @@ class _TableParser(HTMLParser):
         if self.cell is not None:
             start = len(self.cell.text)
             self.cell.text_parts.append(data)
+            self.cell.raw_parts.append(data)
             if self.cell.superscript_depth:
                 self.cell.superscript_parts.append(data)
                 self.cell.superscript_spans.append((start, start + len(data)))
@@ -426,6 +435,7 @@ def parse_table_html(table_body: str) -> list[list[Cell]]:
                         superscript_text=raw_cell.superscript_text,
                         superscript_spans=tuple(raw_cell.superscript_spans),
                         has_superscript=raw_cell.has_superscript,
+                        raw_text="".join(raw_cell.raw_parts),
                     )
             row_count = max(row_count, row_index + raw_cell.rowspan)
             column_index += raw_cell.colspan

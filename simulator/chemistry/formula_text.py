@@ -7,9 +7,15 @@ also removes spaces or braces keeps that rule itself.
 signs that fold onto ASCII ``-`` and ``+``. Superscript and subscript plus
 and minus are in that class. Charge detection uses these same characters.
 Plus-minus is not here: it stays a distinct numeric sign.
+``is_superscripted`` is the one superscript test for a formula token or
+cell: a ``<sup>`` tag, a caret, or a Unicode name that contains
+SUPERSCRIPT or MODIFIER LETTER SMALL / MODIFIER LETTER CAPITAL.
 """
 
 from __future__ import annotations
+
+import re
+import unicodedata
 
 _SUBSCRIPT_DIGITS = "₀₁₂₃₄₅₆₇₈₉"
 _ASCII_DIGITS = "0123456789"
@@ -40,6 +46,35 @@ UNICODE_PLUS_SIGNS = (
     "\u208a"  # SUBSCRIPT PLUS
     "\u2795"  # HEAVY PLUS SIGN
 )
+
+
+# A ``<sup>`` tag, empty or not. The slash matches the closing tag.
+_SUP_TAG_RE = re.compile(r"<\s*/?\s*sup\b", re.IGNORECASE)
+
+
+def is_superscripted(text: str) -> bool:
+    """True when a formula token or cell carries a superscript.
+
+    A ``<sup>`` tag, a caret, a character whose Unicode name contains
+    SUPERSCRIPT, or a MODIFIER LETTER SMALL / MODIFIER LETTER CAPITAL.
+    The character test is ``unicodedata.name``, not a hand list. An empty
+    tag counts. Callers decide this on the raw token or cell, before
+    superscript spans are stripped.
+    """
+    if "^" in text or _SUP_TAG_RE.search(text):
+        return True
+    for character in text:
+        try:
+            name = unicodedata.name(character)
+        except ValueError:
+            continue
+        if (
+            "SUPERSCRIPT" in name
+            or "MODIFIER LETTER SMALL" in name
+            or "MODIFIER LETTER CAPITAL" in name
+        ):
+            return True
+    return False
 
 
 def fold_subscript_digits(text: str) -> str:

@@ -23,6 +23,7 @@ import math
 import os
 import re
 import sys
+import unicodedata
 from collections import Counter
 from decimal import Decimal, DecimalException
 from pathlib import Path
@@ -65,6 +66,7 @@ import validate_literature_extracts as vle  # noqa: E402
 from simulator.chemistry.formula_text import (  # noqa: E402
     UNICODE_MINUS_SIGNS,
     UNICODE_PLUS_SIGNS,
+    is_superscripted,
 )
 from tools.mineru_table_draft import (  # noqa: E402
     parse_table_html,
@@ -10572,7 +10574,8 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     )
     assert mineru_text.count("⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹") == 1
     assert "⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹" not in validator_text
-    assert "UNICODE_SUPERSCRIPTS" in validator_text
+    assert "UNICODE_SUPERSCRIPTS" not in validator_text
+    assert "is_superscripted" in validator_text
     assert vle._explicit_power_decimal("-10^2") == Decimal("-100")
     assert vle._explicit_power_decimal("-10^2") != Decimal("100")
     assert vle._explicit_power_decimal("--10^2") is None
@@ -11002,16 +11005,18 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     class does that, anywhere in the raw token: ``Cl−,``, ``SO₄−``,
     ``SO_{4}−``, and ``Fe-rich`` refuse the neutral label on prose, an
     HTML cell, CSV, and TSV. ``Cl`` certifies ``Cl``. ``-6.98``
-    certifies ``-6.98``. An unrelated formula miss is not that refusal.
-    The charged reason is the element symbols after the subscript fold,
-    lowercase letters included. ``SO₄−`` does not type ``SiO2``, ``F−``
-    does not type ``Fe``, and ``MnO−`` does not type ``MgO``: each is
-    ``cited_token_absent``. An empty ``<sup></sup>`` is still a
-    superscript. ``SiO<sup></sup>2`` does not certify ``SiO2``
-    (``charged_species_unsupported``) and ``Fe`` is
-    ``cited_token_absent``. ``Fe<sup>2</sup>`` is
-    ``charged_species_unsupported`` for ``Fe`` and ``Fe2``, not
-    ``superscript_in_cell``, and ``SiO2`` is ``cited_token_absent``.
+    certifies ``-6.98``. A charge sign that is not a superscript types
+    only the matching element symbols, lowercase letters included.
+    ``SO₄−`` does not type ``SiO2``, ``F−`` does not type ``Fe``, and
+    ``MnO−`` does not type ``MgO``: each is ``cited_token_absent``.
+    An empty ``<sup></sup>`` is still a superscript. A superscripted
+    token or cell certifies no formula label. The decision is the raw
+    text, before spans are stripped. ``SiO<sup></sup>2``,
+    ``<sup>SiO2</sup>``, ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` are
+    ``charged_species_unsupported`` for every formula label, including
+    an unrelated one. ``Fe<sup>2</sup>`` is
+    ``charged_species_unsupported`` for ``Fe``, ``Fe2``, and ``SiO2``,
+    not ``superscript_in_cell``.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -11198,7 +11203,7 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
         vle._charged_formula_miss(
             [sio_leaf], "Fe2", ((2, 3),), has_superscript=True
         )
-        is False
+        is True
     )
     assert (
         vle._charged_formula_miss([sio_leaf], "SiO2", (), has_superscript=True)
@@ -11206,7 +11211,7 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     )
     assert (
         vle._charged_formula_miss([fe_leaf], "SiO2", (), has_superscript=True)
-        is False
+        is True
     )
     # The flattened cell without superscript metadata is not that refusal.
     assert vle._charged_formula_miss([fe_leaf], "Fe2") is False
@@ -11548,8 +11553,9 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                     failures.append(
                         f"skeleton certify {kind} {key} {label!r}: {errors}"
                     )
-    # Empty <sup> is tag presence. Fe<sup>2</sup> is the same structured cell
-    # the guard sees, so the matching formula is charged, not cited.
+    # A superscripted cell certifies no formula label. An unrelated label
+    # on that cell is charged, not cited. A charge sign without a
+    # superscript still uses the symbol comparison above.
     html_sup_pins = (
         (
             "<table><tr><td>SiO<sup></sup>2</td></tr></table>\n",
@@ -11559,7 +11565,7 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
         (
             "<table><tr><td>SiO<sup></sup>2</td></tr></table>\n",
             "Fe",
-            "cited_token_absent",
+            "charged_species_unsupported",
         ),
         (
             "<table><tr><td>Fe<sup>2</sup></td></tr></table>\n",
@@ -11574,7 +11580,7 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
         (
             "<table><tr><td>Fe<sup>2</sup></td></tr></table>\n",
             "SiO2",
-            "cited_token_absent",
+            "charged_species_unsupported",
         ),
     )
     for source, label, expected in html_sup_pins:
@@ -11622,6 +11628,159 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                 and "charged_species_unsupported" in joined
             ):
                 failures.append(f"sup meta cited {key} {label!r}: {errors}")
+    assert failures == []
+
+
+def test_superscripted_token_or_cell_certifies_no_formula(tmp_path: Path):
+    """A superscript on the raw token or cell certifies no formula.
+
+    ``<sup>SiO2</sup>``, ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` refuse.
+    Plain ``SiO2`` still certifies. Every code point whose Unicode name
+    contains SUPERSCRIPT, appended to ``SiO2``, refuses. That walk is
+    ``unicodedata.name``, not ``is_superscripted``. A numeric power stays
+    on the power path: ``10<sup>3</sup>`` certifies 1000.
+    """
+    letter = parse_table_html(
+        "<table><tr><td><sup>SiO2</sup></td></tr></table>"
+    )[0][0]
+    assert letter.text == "SiO2"
+    assert letter.raw_text == "<sup>SiO2</sup>"
+    assert letter.has_superscript is True
+    assert is_superscripted(letter.raw_text) is True
+    assert is_superscripted(letter.text) is False
+    assert is_superscripted("SiO2") is False
+    assert is_superscripted("SiO₂") is False
+    assert vle._formula_cell_matches("SiO2", "SiO2") is True
+    assert vle._formula_cell_matches("SiO2", "SiO2ⁿ") is False
+    assert vle._formula_cell_matches("SiO2", "SiO2ᵃ") is False
+    assert vle._formula_cell_matches("Fe", "Fe^{x}") is False
+    assert vle._formula_label_in_text("SiO2", "SiO2ⁿ") is False
+    assert vle._formula_label_in_text("SiO2", "SiO2") is True
+    assert vle._formula_label_in_text("SiO2", "SiO₂") is True
+
+    failures: list[str] = []
+    html_address = {"table_row": 1, "table_column": 1}
+
+    def certify(label, source, relative, locator_extra, key):
+        doc = _html_source_document(
+            tmp_path,
+            label,
+            source,
+            key=key,
+            relative=relative,
+            locator_extra=locator_extra,
+        )
+        return vle.certify_extract_source_fidelity(
+            doc, label=f"{key}-{label}", artifact_root=tmp_path
+        )
+
+    def expect_charged(kind, label, source, relative, locator_extra):
+        for key in ("formula", "species"):
+            errors = certify(label, source, relative, locator_extra, key)
+            joined = "\n".join(errors)
+            if (
+                "charged_species_unsupported" not in joined
+                or "source_blind_pin" not in joined
+                or "superscript_in_cell" in joined
+            ):
+                failures.append(f"{kind} {key} {label!r}: {errors}")
+
+    def expect_accept(kind, label, source, relative, locator_extra, key):
+        errors = certify(label, source, relative, locator_extra, key)
+        if errors:
+            failures.append(f"accept {kind} {key} {label!r}: {errors}")
+
+    def surfaces(body: str, stem: str):
+        return (
+            ("prose", body + "\n", f"text/{stem}.md", None),
+            (
+                "html",
+                f"<table><tr><td>{body}</td></tr></table>\n",
+                f"text/{stem}.html",
+                html_address,
+            ),
+            ("csv", body + "\n", f"tables/{stem}.csv", None),
+            ("tsv", body + "\n", f"tables/{stem}.tsv", None),
+        )
+
+    for kind, source, relative, locator_extra in surfaces(
+        "<sup>SiO2</sup>", "letter-sup"
+    ):
+        expect_charged(kind, "SiO2", source, relative, locator_extra)
+    expect_charged(
+        "letter-sup-unrelated",
+        "Fe",
+        "<table><tr><td><sup>SiO2</sup></td></tr></table>\n",
+        "text/letter-sup-fe.html",
+        html_address,
+    )
+    for body, label, stem in (
+        ("SiO2ⁿ", "SiO2", "sio2-n"),
+        ("SiO2ᵃ", "SiO2", "sio2-mod"),
+        ("Fe^{x}", "Fe", "fe-caret"),
+    ):
+        for kind, source, relative, locator_extra in surfaces(body, stem):
+            expect_charged(kind, label, source, relative, locator_extra)
+    for kind, source, relative, locator_extra in surfaces("SiO2", "plain-sio2"):
+        for key in ("formula", "species"):
+            expect_accept(kind, "SiO2", source, relative, locator_extra, key)
+    expect_accept(
+        "neighbour",
+        "Fe",
+        "Fe SiO2ⁿ\n",
+        "text/neighbour-fe.md",
+        None,
+        "formula",
+    )
+    expect_accept(
+        "power",
+        1000,
+        "<table><tr><td>10<sup>3</sup></td></tr></table>\n",
+        "text/power-1000.html",
+        html_address,
+        "alpha",
+    )
+    empty_power = certify(
+        10,
+        "<table><tr><td>10<sup></sup></td></tr></table>\n",
+        "text/power-empty.html",
+        html_address,
+        "alpha",
+    )
+    empty_joined = "\n".join(empty_power)
+    if (
+        "superscript_in_cell" not in empty_joined
+        or "source_blind_pin" not in empty_joined
+        or "charged_species_unsupported" in empty_joined
+    ):
+        failures.append(f"empty power: {empty_power}")
+
+    characters: list[tuple[str, str]] = []
+    for code in range(sys.maxunicode + 1):
+        character = chr(code)
+        try:
+            name = unicodedata.name(character)
+        except ValueError:
+            continue
+        if "SUPERSCRIPT" in name:
+            characters.append((character, name))
+    assert any(character == "ⁿ" for character, _name in characters)
+    for character, name in characters:
+        source = "SiO2" + character
+        assert is_superscripted(source) is True
+        errors = certify(
+            "SiO2",
+            source + "\n",
+            "text/superscript-family.md",
+            None,
+            "formula",
+        )
+        joined = "\n".join(errors)
+        if (
+            "charged_species_unsupported" not in joined
+            or "source_blind_pin" not in joined
+        ):
+            failures.append(f"family {name}: {errors}")
     assert failures == []
 
 

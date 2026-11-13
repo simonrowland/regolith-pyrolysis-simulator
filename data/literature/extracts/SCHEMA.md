@@ -271,13 +271,18 @@ plus and minus included), anywhere in the token, before formula folding.
 label. `Cl` does. `-6.98` still certifies `-6.98`. That token, and an
 HTML, CSV, or TSV cell that contains it, certifies no formula or species
 label, neither the neutral prefix nor a charged label, and certifies no
-number. An unrelated formula miss stays `cited_token_absent`. The charged
+number. The charged
 reason compares element symbols, lowercase letters included, after the
 subscript fold. `SO₄−` does not type `SiO2`, `F−` does not type `Fe`, and
-`MnO−` does not type `MgO`. An empty `<sup></sup>` is still a superscript.
-`SiO<sup></sup>2` does not certify `SiO2`; the refusal is
-`charged_species_unsupported`. `Fe<sup>2</sup>` is
+`MnO−` does not type `MgO`. For a charge sign that is not a superscript,
+an unrelated formula miss stays `cited_token_absent`. An empty `<sup></sup>`
+is still a superscript. `SiO<sup></sup>2` does not certify `SiO2`; the
+refusal is `charged_species_unsupported`. `Fe<sup>2</sup>` is
 `charged_species_unsupported` for `Fe` and `Fe2`, not `cited_token_absent`.
+A `<sup>` tag whose content is letters, a Unicode superscript, or a modifier
+letter is decided on the raw token or cell before spans are stripped.
+`<sup>SiO2</sup>`, `SiO2ⁿ`, `SiO2ᵃ`, and `Fe^{x}` certify no formula or
+species label. The refusal is `charged_species_unsupported`.
 Formula
 and species labels take that guarded comparison first, on prose, an
 HTML cell, a CSV or TSV cell, and repository text, so an identical
