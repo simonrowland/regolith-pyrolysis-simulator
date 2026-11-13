@@ -2427,6 +2427,169 @@ def test_envelope_refusal_keeps_flagged_constant_gamma_prediction() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("activities_by_oxide", "warning_code"),
+    (
+        ({}, "openimcc_parent_activity_missing_table_fallback"),
+        (
+            {"Na2O": 0.0},
+            "openimcc_parent_activity_zero_table_fallback",
+        ),
+    ),
+)
+def test_openimcc_missing_or_zero_parent_uses_flagged_table_value(
+    activities_by_oxide, warning_code,
+) -> None:
+    composition = {"SiO2": 1.0, "Na2O": 0.2}
+    legacy = melt_oxide_activity("Na2O", composition, temperature_K=CAP_PLUS_T_K)
+
+    activity = vapor_pressure_module._high_t_activity_for_parent(
+        "Na2O",
+        composition,
+        temperature_K=CAP_PLUS_T_K,
+        authority={
+            "provider": "openimcc",
+            "activities_by_oxide": activities_by_oxide,
+        },
+    )
+
+    assert activity.activity == legacy.activity
+    assert activity.evidence_tier == "PREDICT_AND_FLAG"
+    assert warning_code in (activity.warning or "")
+    assert "parent_oxide=Na2O" in (activity.warning or "")
+    assert "reason=" in (activity.warning or "")
+    assert legacy.activity_model in (activity.warning or "")
+
+
+@pytest.mark.parametrize("activities_by_oxide", ({}, {"Na2O": 0.0}))
+def test_openimcc_absent_parent_keeps_zero_composition_activity(
+    activities_by_oxide,
+) -> None:
+    composition = {"SiO2": 1.0}
+    legacy = melt_oxide_activity("Na2O", composition, temperature_K=CAP_PLUS_T_K)
+
+    activity = vapor_pressure_module._high_t_activity_for_parent(
+        "Na2O",
+        composition,
+        temperature_K=CAP_PLUS_T_K,
+        authority={
+            "provider": "openimcc",
+            "activities_by_oxide": activities_by_oxide,
+        },
+    )
+
+    assert activity.activity == legacy.activity == 0.0
+    assert activity.warning == legacy.warning
+    assert activity.evidence_tier == legacy.evidence_tier
+
+
+@pytest.mark.parametrize(
+    ("returned_activity", "warning_code"),
+    (
+        (None, "openimcc_parent_activity_missing_table_fallback"),
+        (0.0, "openimcc_parent_activity_zero_table_fallback"),
+    ),
+)
+def test_openimcc_parent_fallback_propagates_to_diagnostics_and_run_notice(
+    monkeypatch, returned_activity, warning_code,
+) -> None:
+    real_evaluate_cleaned_melt = evaluate_cleaned_melt
+
+    def successful_but_incomplete(**kwargs):
+        cleaned = real_evaluate_cleaned_melt(**kwargs)
+        activities = dict(cleaned.single_cation_activities)
+        if returned_activity is None:
+            activities.pop("SiO2")
+        else:
+            activities["SiO2"] = returned_activity
+        return replace(cleaned, single_cation_activities=activities)
+
+    monkeypatch.setattr(
+        openimcc_bridge_module,
+        "evaluate_cleaned_melt",
+        successful_but_incomplete,
+    )
+    result = _provider().dispatch(
+        _request(BASE_MELT_MOL, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
+    )
+
+    authority = result.diagnostic["high_t_melt_activity"]
+    notice = next(
+        item
+        for item in authority["notices"]
+        if item.get("parent") == "SiO2" and item.get("code") == warning_code
+    )
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
+    assert warning_code in notice["message"]
+    assert notice["type"] == "typed_notice"
+    assert notice["evidence_tier"] == "PREDICT_AND_FLAG"
+    assert notice["reason"]
+    assert warning_code in provenance["melt_oxide_activity_warning"]
+    assert provenance["melt_oxide_activity_evidence_tier"] == "PREDICT_AND_FLAG"
+    assert notice["number_authority"] == provenance["melt_oxide_activity_model"]
+    assert provenance["melt_activity_fallback"] is True
+    assert any(warning_code in warning for warning in result.warnings)
+
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._high_t_melt_activity_fallback_steps = []
+    sim.melt = SimpleNamespace(hour=3, campaign=CampaignPhase.C2A)
+    sim._note_high_t_melt_activity_fallback(
+        authority, result.diagnostic["vapor_pressure_numerator_provenance"],
+    )
+    run_notice = sim.high_t_melt_activity_run_notice()
+    assert run_notice["reason"] == warning_code
+    assert any(item.get("code") == warning_code for item in run_notice["notices"])
+
+
+def test_openimcc_parent_fallback_warning_reaches_residual_activity_row() -> None:
+    from simulator.vapour_rail.activity import (
+        ActivityInputDeclaration,
+        ActivityVerdictKind,
+        CondensedPhaseActivityProvider,
+        StandardStateIdentity,
+    )
+
+    composition = {"SiO2": 1.0, "Na2O": 0.2}
+    activity = vapor_pressure_module._high_t_activity_for_parent(
+        "Na2O",
+        composition,
+        temperature_K=CAP_PLUS_T_K,
+        authority={"provider": "openimcc", "activities_by_oxide": {}},
+    )
+    standard_state = StandardStateIdentity(
+        convention="raoultian_pure_liquid_oxide",
+        phase="liquid",
+        reference_pressure_bar=1.0,
+        reference_temperature_K=1773.15,
+        component_basis="raoultian_pure_endmember",
+    )
+    residual_activity = (
+        CondensedPhaseActivityProvider().resolve_source_reaction_activity(
+            ActivityInputDeclaration(
+                component_id=activity.single_cation_component,
+                standard_state=standard_state,
+                activity_model="provider_reported_thermodynamic_activity",
+                allow_henrian_upper_bound=False,
+                require_assemblage_match=False,
+            ),
+            magemin=None,
+            thermoengine=None,
+            activity_exponent=1.0,
+            reported_activity=activity.activity,
+            reported_activity_provider="BuiltinVaporPressureProvider",
+            reported_activity_evidence_ref=activity.citation,
+            reported_activity_standard_state=standard_state,
+            reported_activity_provenance=activity.provenance(),
+        )
+    )
+
+    assert residual_activity.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert residual_activity.evidence_tier == "PREDICT_AND_FLAG"
+    assert "openimcc_parent_activity_missing_table_fallback" in (
+        residual_activity.detail or residual_activity.reason
+    )
+
+
 def test_fallback_status_remains_on_warning_without_authority_status_fields(
     monkeypatch,
 ) -> None:
