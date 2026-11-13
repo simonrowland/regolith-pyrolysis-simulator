@@ -905,6 +905,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         alkali_state_by_account = self._copy_alkali_state(
             controls.get("wall_alkali_binding_diagnostic_state_by_account")
         )
+        species_row = controls.get("sp_data")
+        declared_wall_reactions = None
+        if species == "SiO" and isinstance(species_row, Mapping):
+            from simulator.vapour_rail.wall_saturation import (
+                resolve_wall_saturation,
+                wall_reactions_declaration,
+            )
+
+            declared_wall_reactions = wall_reactions_declaration(species_row)
 
         for account, arrival_mol in wall_deposit_mol_by_account.items():
             if arrival_mol <= 0.0:
@@ -917,7 +926,25 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 "source": str(WALL_REACTIVITY_MATRIX_PATH),
             }
 
-            if species == "SiO":
+            if species == "SiO" and declared_wall_reactions is not None:
+                wall_temperature_K = self._wall_temperature_K(controls, account)
+                if wall_temperature_K is None:
+                    raise ValueError(
+                        "declared wall reaction requires wall temperature"
+                    )
+                reaction = resolve_wall_saturation(
+                    species_row,
+                    species_id=species,
+                    T_K=wall_temperature_K,
+                    pO2_Pa=None,
+                )
+                for product, ratio in reaction.products_mol_per_mol_vapour:
+                    products[str(product)] = arrival_mol * float(ratio)
+                diagnostic.update({
+                    "mechanism": reaction.reaction_id,
+                    "status": "DECLARED_WALL_REACTION",
+                })
+            elif species == "SiO":
                 reaction = self._matrix_reaction("SiO_disproportionation")
                 for product, ratio in dict(reaction["product_credits"]).items():
                     products[str(product)] = arrival_mol * float(ratio)
