@@ -10,6 +10,7 @@ derived from resolve_backend.
 from __future__ import annotations
 
 import hashlib
+import difflib
 import json
 import math
 import multiprocessing as mp
@@ -181,14 +182,16 @@ from simulator.battery.source_lineage import (
 )
 from simulator.battery.validate import (
     Ancestry,
+    _ValidationIndexes,
     ValidationIssue,
+    _BOUND_WORK_INPUTS,
     _asset_ids,
     _observation_lineage,
     observation_issue_location,
     _pressure_blocking_notices,
     _resolve_coefficient_sources,
-    _table_ids,
     _VAPOUR_EQUILIBRIUM,
+    _build_validation_indexes,
     validate_corpus,
 )
 from simulator.battery.validity import (
@@ -1308,6 +1311,95 @@ def no_headline_rail_reason(
     if quantity in KINETIC_YIELD_QUANTITIES:
         return "non_alkali_kinetic"
     return f"no_headline_rail:{quantity.value}"
+
+
+class SpeciesFilterError(ValueError):
+    """Base class for invalid species filters supplied to the scorer."""
+
+
+class UnknownSpeciesFilterError(SpeciesFilterError):
+    def __init__(self, query: str, near_matches: Sequence[str]) -> None:
+        self.query = query
+        self.near_matches = tuple(near_matches)
+        suggestions = ", ".join(self.near_matches) or "none"
+        super().__init__(
+            f"unknown species filter {query!r}; near matches: {suggestions}"
+        )
+
+
+class AmbiguousSpeciesFilterError(SpeciesFilterError):
+    def __init__(self, query: str, matches: Sequence[str]) -> None:
+        self.query = query
+        self.matches = tuple(matches)
+        candidates = ", ".join(self.matches)
+        super().__init__(
+            f"ambiguous species filter {query!r}; matching stored formulas: {candidates}"
+        )
+
+
+def normalize_species_filters(
+    context: ScoreContext, queries: Sequence[str] | None
+) -> tuple[str, ...]:
+    """Resolve query spellings against identity formulas without parsing them.
+
+    Queries are trimmed, exact stored spelling wins, and case-insensitive
+    spelling is accepted only when it names one stored formula. Results are
+    sorted and unique. Phase is a separate identity axis, so ``Mn`` also
+    selects gas-phase Mn while never matching ``MnO``.
+    """
+
+    if not queries:
+        return ()
+    formulas = sorted(
+        {
+            observation.identity.species.formula
+            for observation in context.observations.values()
+            if isinstance(observation.identity, Identity)
+            and observation.identity.species is not None
+        }
+    )
+    formulas_by_fold: dict[str, list[str]] = {}
+    for formula in formulas:
+        formulas_by_fold.setdefault(formula.casefold(), []).append(formula)
+
+    resolved: set[str] = set()
+    for raw_query in queries:
+        query = raw_query.strip()
+        if query in formulas:
+            resolved.add(query)
+            continue
+        if not query:
+            raise UnknownSpeciesFilterError(query, formulas[:5])
+        folded_matches = formulas_by_fold.get(query.casefold(), [])
+        if len(folded_matches) == 1:
+            resolved.add(folded_matches[0])
+            continue
+        if len(folded_matches) > 1:
+            raise AmbiguousSpeciesFilterError(query, folded_matches)
+        ranked = sorted(
+            formulas,
+            key=lambda formula: (
+                -difflib.SequenceMatcher(
+                    None, query.casefold(), formula.casefold()
+                ).ratio(),
+                formula,
+            ),
+        )
+        raise UnknownSpeciesFilterError(query, ranked[:5])
+    return tuple(sorted(resolved))
+
+
+def _matches_species_filter(
+    observation: Observation, species_formulas: set[str]
+) -> bool:
+    if not species_formulas:
+        return True
+    identity = observation.identity
+    return (
+        isinstance(identity, Identity)
+        and identity.species is not None
+        and identity.species.formula in species_formulas
+    )
 
 
 # Spellings written by residual_key. Readers parse them with residual_key_slots.
@@ -3927,20 +4019,45 @@ def _candidate_lineage_for_sources(
     works: Mapping[str, Work] | None = None,
     observations: Mapping[str, Observation] | None = None,
     experiments: Mapping[str, Experiment] | None = None,
+    _indexes: _ValidationIndexes | None = None,
 ) -> tuple[bool, Ancestry | None]:
+    source_key = tuple(sources)
+    indexes = _indexes
+    if (
+        indexes is not None
+        and observations is not None
+        and indexes.matches(works, observations, experiments)
+    ):
+        cached = indexes.candidate_lineages.get(source_key)
+        if cached is not None:
+            return cached
+
     lineage_sources = coefficient_lineage_sources(sources)
     if not lineage_sources:
-        return False, None
+        result = (False, None)
+        if indexes is not None:
+            indexes.candidate_lineages[source_key] = result
+        return result
     for src in lineage_sources:
         if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
-            return False, None
+            result = (False, None)
+            if indexes is not None:
+                indexes.candidate_lineages[source_key] = result
+            return result
     expanded = expand_coefficient_sources(lineage_sources)
     if works is None or observations is None:
         return True, None
+    if indexes is None or not indexes.matches(works, observations, experiments):
+        indexes = _build_validation_indexes(works, observations, experiments)
+    cached = indexes.candidate_lineages.get(source_key)
+    if cached is not None:
+        return cached
     candidate_lineage = _resolve_coefficient_sources(
-        expanded, observations, works, experiments
+        expanded, observations, works, experiments, _indexes=indexes
     )
-    return candidate_lineage.complete, candidate_lineage
+    result = (candidate_lineage.complete, candidate_lineage)
+    indexes.candidate_lineages[source_key] = result
+    return result
 
 
 def lineage_complete_for(
@@ -3975,20 +4092,45 @@ def resolve_source_relation(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
 ) -> SourceRelation:
+    return _resolve_source_relation_with_indexes(
+        reference,
+        coefficient_sources,
+        lineage_complete,
+        works=works,
+        observations=observations,
+        experiments=experiments,
+        _indexes=None,
+    )
+
+
+def _resolve_source_relation_with_indexes(
+    reference: Observation,
+    coefficient_sources: Sequence[str],
+    lineage_complete: bool,
+    *,
+    works: Mapping[str, Work],
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+    _indexes: _ValidationIndexes | None,
+) -> SourceRelation:
     if not lineage_complete:
         return SourceRelation.UNKNOWN
-    table_ids = _table_ids(works)
+    indexes = _indexes
+    if indexes is None or not indexes.matches(works, observations, experiments):
+        indexes = _build_validation_indexes(works, observations, experiments)
     reference_lineage = _observation_lineage(
         reference.observation_id,
         observations,
-        table_ids,
-        asset_ids=_asset_ids(works),
+        indexes.table_ids,
+        asset_ids=indexes.asset_ids,
+        _cache=indexes.observation_lineages,
     )
     candidate_lineage = _resolve_coefficient_sources(
         coefficient_lineage_sources(coefficient_sources),
         observations,
         works,
         experiments,
+        _indexes=indexes,
     )
     return _source_relation_from_lineages(reference_lineage, candidate_lineage)
 
@@ -4011,14 +4153,19 @@ def _source_relation_from_lineages(
 class _ScoringLineageResolver:
     """Reuse resolved ancestry and relations within one scoring run."""
 
-    def __init__(self, context: ScoreContext) -> None:
+    def __init__(
+        self,
+        context: ScoreContext,
+        indexes: _ValidationIndexes | None = None,
+    ) -> None:
         self.context = context
-        self.table_ids = _table_ids(context.works)
-        self.asset_ids = _asset_ids(context.works)
-        self._candidate_lineages: dict[
-            tuple[str, ...], tuple[bool, Ancestry | None]
-        ] = {}
-        self._reference_lineages: dict[str, Ancestry] = {}
+        self.indexes = indexes
+        if self.indexes is None or not self.indexes.matches(
+            context.works, context.observations, context.experiments
+        ):
+            self.indexes = _build_validation_indexes(
+                context.works, context.observations, context.experiments
+            )
         self._source_relations: dict[
             tuple[tuple[str, ...], tuple[str, ...]], SourceRelation
         ] = {}
@@ -4026,19 +4173,13 @@ class _ScoringLineageResolver:
     def _candidate_lineage(
         self, sources: Sequence[str]
     ) -> tuple[bool, Ancestry | None]:
-        source_key = tuple(sources)
-        cached = self._candidate_lineages.get(source_key)
-        if cached is not None:
-            return cached
-
-        result = _candidate_lineage_for_sources(
-            source_key,
+        return _candidate_lineage_for_sources(
+            sources,
             works=self.context.works,
             observations=self.context.observations,
             experiments=self.context.experiments,
+            _indexes=self.indexes,
         )
-        self._candidate_lineages[source_key] = result
-        return result
 
     def lineage_complete_for(self, sources: Sequence[str]) -> bool:
         return self._candidate_lineage(sources)[0]
@@ -4050,17 +4191,17 @@ class _ScoringLineageResolver:
         if not complete or candidate_lineage is None:
             return complete, SourceRelation.UNKNOWN
 
-        reference_lineage = self._reference_lineages.get(
+        reference_lineage = self.indexes.observation_lineages.get(
             reference.observation_id
         )
         if reference_lineage is None:
             reference_lineage = _observation_lineage(
                 reference.observation_id,
                 self.context.observations,
-                self.table_ids,
-                asset_ids=self.asset_ids,
+                self.indexes.table_ids,
+                asset_ids=self.indexes.asset_ids,
+                _cache=self.indexes.observation_lineages,
             )
-            self._reference_lineages[reference.observation_id] = reference_lineage
 
         if (
             not reference_lineage.complete
@@ -11955,6 +12096,24 @@ def _is_residue_worker_infrastructure_failure(reason: object) -> bool:
     return str(reason).startswith(("engine_timeout:", "engine_transport_error:"))
 
 
+def _residue_prediction_cache_entry(
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ],
+    source_id: str,
+    engine: Engine,
+    selected_experiment_ids: frozenset[str] | None = None,
+    *,
+    value: Mapping[str, object] | None = None,
+) -> Mapping[str, object] | None:
+    """Read or store the residue cache entry for one selection scope."""
+
+    key = (source_id, engine, selected_experiment_ids)
+    if value is not None:
+        cache[key] = value
+    return cache.get(key)
+
+
 def _hashimoto_engine_floor_inversion_notices(
     engine: Engine, diagnostics: object
 ) -> tuple[Notice, ...]:
@@ -11985,8 +12144,11 @@ def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
     engine: Engine,
-    cache: dict[tuple[str, Engine], Mapping[str, object]],
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ],
     *,
+    selected_experiment_ids: frozenset[str] | None = None,
     test_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
@@ -11995,11 +12157,18 @@ def _hashimoto_residue_prediction(
     quantity = quantity_token(reference.identity)
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
-    cache_key = (_HASHIMOTO_SOURCE_ID, engine)
+    cohort_selection = (
+        selected_experiment_ids
+        if selected_experiment_ids is not None
+        else test_experiment_ids
+    )
+    rows_by_key = _residue_prediction_cache_entry(
+        cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection
+    )
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
-        if cache_key not in cache:
+        if rows_by_key is None:
             from simulator.battery.residue import (
                 ResidueInventoryRefusal,
                 _predict_hashimoto_residue_cohort,
@@ -12060,11 +12229,18 @@ def _hashimoto_residue_prediction(
                 preform_dimensions_mm=geometry,
                 engine=engine.value,
                 _allow_partial_cohort_for_test=test_experiment_ids is not None,
+                selected_experiment_ids=cohort_selection,
             )
-            cache[cache_key] = {
+            rows_by_key = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
             }
-        rows_by_key = cache[cache_key]
+            _residue_prediction_cache_entry(
+                cache,
+                _HASHIMOTO_SOURCE_ID,
+                engine,
+                cohort_selection,
+                value=rows_by_key,
+            )
         if "__cohort_error__" in rows_by_key:
             raise ValueError(str(rows_by_key["__cohort_error__"]))
         primary_key = (
@@ -12268,8 +12444,20 @@ def _hashimoto_residue_prediction(
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
         infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
-        if cache_key not in cache and not infrastructure_failure:
-            cache[cache_key] = {"__cohort_error__": str(reason)}
+        if (
+            _residue_prediction_cache_entry(
+                cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection
+            )
+            is None
+            and not infrastructure_failure
+        ):
+            _residue_prediction_cache_entry(
+                cache,
+                _HASHIMOTO_SOURCE_ID,
+                engine,
+                cohort_selection,
+                value={"__cohort_error__": str(reason)},
+            )
         detail: dict[str, object] = {
             "reason": str(reason),
             "engine": engine.value,
@@ -12319,7 +12507,12 @@ _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 
 
 def _knudsen_residue_prediction(
-    context, reference, engine, cache=None
+    context,
+    reference,
+    engine,
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ] | None = None,
 ) -> EnginePrediction:
     """Translate the residue owner's extent result to the scoring contract."""
     quantity = quantity_token(reference.identity)
@@ -12335,16 +12528,26 @@ def _knudsen_residue_prediction(
 
     experiment = context.experiments.get(reference.experiment_id)
     try:
-        cache_key = (f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:{printed_source_pressure(reference)}", engine)
-        if cache is not None and cache_key in cache:
-            result = cache[cache_key]
+        cache_source_id = (
+            f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:"
+            f"{printed_source_pressure(reference)}"
+        )
+        cached_result = (
+            None
+            if cache is None
+            else _residue_prediction_cache_entry(cache, cache_source_id, engine)
+        )
+        if cached_result is not None:
+            result = cached_result
         else:
             result = predict_knudsen_residue_composition(
                 engine.value, reference, experiment, context.observations.values(),
                 _bench_for_score(experiment, context.benches) if experiment is not None else None,
             )
             if cache is not None:
-                cache[cache_key] = result
+                _residue_prediction_cache_entry(
+                    cache, cache_source_id, engine, value=result
+                )
         provenance = {k: v for k, v in result.items() if k != "notices"}
         if is_retention:
             definition, definition_record = _printed_fm_definition(
@@ -12442,8 +12645,11 @@ def _sossi_residue_prediction(
     context: ScoreContext,
     reference: Observation,
     engine: Engine,
-    cache: dict[tuple[str, Engine], Mapping[str, object]],
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ],
     *,
+    selected_experiment_ids: frozenset[str] | None = None,
     test_experiment_ids: frozenset[str] | None = None,
 ) -> EnginePrediction:
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
@@ -12453,6 +12659,11 @@ def _sossi_residue_prediction(
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     formula = reference.identity.species.formula
+    cohort_selection = (
+        selected_experiment_ids
+        if selected_experiment_ids is not None
+        else test_experiment_ids
+    )
     if formula not in {"Mn", "Ti"}:
         return EnginePrediction(
             engine=engine,
@@ -12470,7 +12681,9 @@ def _sossi_residue_prediction(
             },
             identity=reference.identity,
         )
-    cache_key = (_SOSSI_SOURCE_ID, engine)
+    cohort = _residue_prediction_cache_entry(
+        cache, _SOSSI_SOURCE_ID, engine, cohort_selection
+    )
     try:
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
@@ -12482,7 +12695,7 @@ def _sossi_residue_prediction(
 
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("sossi_engine_unsupported")
-        if cache_key not in cache:
+        if cohort is None:
             live_rows = [
                 row
                 for row in context.observations.values()
@@ -12556,14 +12769,22 @@ def _sossi_residue_prediction(
                 starting_trace_ppm_by_experiment=trace_ppm_by_experiment,
                 buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
                 engine=engine.value,
+                selected_experiment_ids=cohort_selection,
             )
-            cache[cache_key] = {
+            cohort = {
                 row.experiment_id: row for row in rows
             }
-        if "__cohort_error__" in cache[cache_key]:
-            raise ValueError(str(cache[cache_key]["__cohort_error__"]))
+            _residue_prediction_cache_entry(
+                cache,
+                _SOSSI_SOURCE_ID,
+                engine,
+                cohort_selection,
+                value=cohort,
+            )
+        if "__cohort_error__" in cohort:
+            raise ValueError(str(cohort["__cohort_error__"]))
         short_id = reference.experiment_id.rsplit("::", 1)[-1]
-        prediction = cache[cache_key].get(short_id)
+        prediction = cohort.get(short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
         run_refusal = prediction.provenance.get("run_refusal")
@@ -12726,8 +12947,20 @@ def _sossi_residue_prediction(
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
         infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
-        if cache_key not in cache and not infrastructure_failure:
-            cache[cache_key] = {"__cohort_error__": str(reason)}
+        if (
+            _residue_prediction_cache_entry(
+                cache, _SOSSI_SOURCE_ID, engine, cohort_selection
+            )
+            is None
+            and not infrastructure_failure
+        ):
+            _residue_prediction_cache_entry(
+                cache,
+                _SOSSI_SOURCE_ID,
+                engine,
+                cohort_selection,
+                value={"__cohort_error__": str(reason)},
+            )
         if infrastructure_failure:
             refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
         elif reason == "oxygen_condition_missing":
@@ -12946,8 +13179,23 @@ def _compile_residual_with_lineage(
     point_observations: Sequence[Observation] | None = None,
     fo2_mode: Fo2Mode | None = None,
     _source_relation_resolver: _ScoringLineageResolver | None = None,
+    _validation_indexes: _ValidationIndexes | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
+    validation_indexes = _validation_indexes
+    if validation_indexes is None:
+        # ``compile_residual`` callers do not pass the scorer's private index.
+        # During a bound score snapshot, reuse its matching index instead of
+        # rebuilding the printed-thermo and lineage indexes for every cell.
+        validation_indexes = _BOUND_WORK_INPUTS.get(
+            (id(context.observations), id(context.experiments))
+        )
+    if validation_indexes is None or not validation_indexes.matches(
+        context.works, context.observations, context.experiments
+    ):
+        validation_indexes = _build_validation_indexes(
+            context.works, context.observations, context.experiments
+        )
     precomputed_prediction = prediction is not None
     source_reference = reference
     sample_phase_detail = (
@@ -12984,7 +13232,15 @@ def _compile_residual_with_lineage(
         gates = run_validity_gates(
             experiment,
             gate_reference,
-            tables=_gate_tables(reference, context.observations, table_index),
+            tables=_gate_tables(
+                reference,
+                context.observations,
+                (
+                    validation_indexes.printed_thermo_index
+                    if table_index is None
+                    else table_index
+                ),
+            ),
             point_observations=point_observations,
         )
     else:
@@ -13544,12 +13800,13 @@ def _compile_residual_with_lineage(
     prediction_sources = tuple(prediction.coefficient_sources)
     expanded_sources = expand_coefficient_sources(prediction_sources)
     lineage_complete = (
-        lineage_complete_for(
+        _candidate_lineage_for_sources(
             prediction_sources,
             works=context.works,
             observations=context.observations,
             experiments=context.experiments,
-        )
+            _indexes=validation_indexes,
+        )[0]
         if _source_relation_resolver is None
         else _source_relation_resolver.lineage_complete_for(prediction_sources)
     )
@@ -13580,13 +13837,14 @@ def _compile_residual_with_lineage(
     if lineage_observation_id and lineage_observation_id != reference.observation_id:
         relation_reference = replace(reference, observation_id=lineage_observation_id)
     if _source_relation_resolver is None:
-        source_relation = resolve_source_relation(
+        source_relation = _resolve_source_relation_with_indexes(
             relation_reference,
             prediction.coefficient_sources,
             prediction.lineage_complete,
             works=context.works,
             observations=context.observations,
             experiments=context.experiments,
+            _indexes=validation_indexes,
         )
     else:
         _complete, source_relation = _source_relation_resolver.for_reference(
@@ -13603,14 +13861,16 @@ def _compile_residual_with_lineage(
         reference_lineage = _observation_lineage(
             relation_reference.observation_id,
             context.observations,
-            _table_ids(context.works),
-            asset_ids=_asset_ids(context.works),
+            validation_indexes.table_ids,
+            asset_ids=validation_indexes.asset_ids,
+            _cache=validation_indexes.observation_lineages,
         )
         coefficient_lineage = _resolve_coefficient_sources(
             coefficient_lineage_sources(prediction.coefficient_sources),
             context.observations,
             context.works,
             context.experiments,
+            _indexes=validation_indexes,
         )
         if reference_lineage.complete and coefficient_lineage.complete:
             attribution = (
@@ -14453,6 +14713,36 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
+def _observation_matches_run_filters(
+    context: ScoreContext,
+    observation: Observation,
+    *,
+    work_id: str | None = None,
+    rail: Rail | None = None,
+    observation_filter: Callable[[Observation], bool] | None = None,
+) -> bool:
+    """Apply scorer work/rail selection and an optional caller-owned filter."""
+
+    if work_id:
+        experiment = context.experiments.get(observation.experiment_id)
+        if (
+            (experiment is None or experiment.work_id != work_id)
+            and observation.source_id != work_id
+        ):
+            return False
+    if rail is not None:
+        identity = observation.identity
+        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+        formula = (
+            identity.species.formula
+            if isinstance(identity, Identity) and identity.species is not None
+            else ""
+        )
+        if rail_for_quantity(quantity, species_formula=formula) is not rail:
+            return False
+    return observation_filter is None or observation_filter(observation)
+
+
 def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
     """Compilation, ledger, and SF04 rows scored through diagnostic paths."""
 
@@ -14533,6 +14823,9 @@ class _PreparedScoreRun:
     kems_partial_pressure_band: DecisionBand | None
     series_point_counts: Mapping[str, int]
     test_experiment_ids: frozenset[str] | None
+    hashimoto_experiment_ids: frozenset[str]
+    sossi_experiment_ids: frozenset[str]
+    validation_indexes: _ValidationIndexes
 
 
 def _prepare_score_run(
@@ -14544,6 +14837,7 @@ def _prepare_score_run(
     limit: int | None,
     include_diagnostics: bool,
     measured_only: bool,
+    species_formulas: Sequence[str] = (),
     _test_experiment_ids: Sequence[str] | None = None,
 ) -> _PreparedScoreRun:
     """Build global score inputs once so spawned shards share one snapshot."""
@@ -14581,32 +14875,24 @@ def _prepare_score_run(
             if obs.evidence.class_.is_value
             and obs.evidence.class_.value in MEASURED_EVIDENCE
         ]
-    if work_id:
-        filtered: list[Observation] = []
-        for obs in refs:
-            experiment = context.experiments.get(obs.experiment_id)
-            if experiment is not None and experiment.work_id == work_id:
-                filtered.append(obs)
-            elif obs.source_id == work_id:
-                filtered.append(obs)
-        refs = filtered
-    if rail is not None:
-        kept: list[Observation] = []
-        for obs in refs:
-            quantity = (
-                quantity_token(obs.identity)
-                if isinstance(obs.identity, Identity)
-                else None
+    selected_species = set(species_formulas)
+    species_filter = (
+        (lambda observation: _matches_species_filter(observation, selected_species))
+        if selected_species
+        else None
+    )
+    if work_id or rail is not None or species_filter is not None:
+        refs = [
+            obs
+            for obs in refs
+            if _observation_matches_run_filters(
+                context,
+                obs,
+                work_id=work_id,
+                rail=rail,
+                observation_filter=species_filter,
             )
-            formula = (
-                obs.identity.species.formula
-                if isinstance(obs.identity, Identity)
-                and obs.identity.species is not None
-                else ""
-            )
-            if rail_for_quantity(quantity, species_formula=formula) is rail:
-                kept.append(obs)
-        refs = kept
+        ]
     # Test-only: bypasses cohort-size guards for bounded cache parity tests.
     selected_test_experiment_ids = (
         None
@@ -14622,9 +14908,23 @@ def _prepare_score_run(
     refs.sort(key=lambda o: o.observation_id)
     if limit is not None:
         refs = refs[: int(limit)]
-
+    hashimoto_experiment_ids = frozenset(
+        obs.experiment_id
+        for obs in refs
+        if obs.source_id == _HASHIMOTO_SOURCE_ID
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    sossi_experiment_ids = frozenset(
+        obs.experiment_id.rsplit("::", 1)[-1]
+        for obs in refs
+        if obs.source_id == _SOSSI_SOURCE_ID
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
     from simulator.battery.compilation_tier import _compilation_series_point_count
-    from simulator.battery.validate import build_printed_thermo_index
 
     observations = dict(context.observations)
     origins = context.origins
@@ -14632,7 +14932,10 @@ def _prepare_score_run(
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         observations.values()
     )
-    table_index = build_printed_thermo_index(observations)
+    validation_indexes = _build_validation_indexes(
+        context.works, observations, context.experiments
+    )
+    table_index = validation_indexes.printed_thermo_index
     ratchet_entries, ratchet_missing, _ratchet_history = _read_decision_band_ratchet(
         context.root
     )
@@ -14665,6 +14968,9 @@ def _prepare_score_run(
         kems_partial_pressure_band=kems_partial_pressure_band,
         series_point_counts=series_point_counts,
         test_experiment_ids=selected_test_experiment_ids,
+        hashimoto_experiment_ids=hashimoto_experiment_ids,
+        sossi_experiment_ids=sossi_experiment_ids,
+        validation_indexes=validation_indexes,
     )
 
 
@@ -14702,6 +15008,7 @@ def _score_store_with_decisions(
     *,
     engines: Sequence[Engine] | None = None,
     rail: Rail | None = None,
+    species_formulas: Sequence[str] = (),
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
@@ -14720,12 +15027,21 @@ def _score_store_with_decisions(
         context,
         engines=engines,
         rail=rail,
+        species_formulas=species_formulas,
         work_id=work_id,
         limit=limit,
         include_diagnostics=include_diagnostics,
         measured_only=measured_only,
         _test_experiment_ids=_test_experiment_ids,
     )
+    if _stream is not None and _prepared is None:
+        _stream.selected_reference_count = len(prepared.refs)
+        if species_formulas:
+            print(
+                f"species references selected={len(prepared.refs)} "
+                f"formulas={','.join(species_formulas)}",
+                flush=True,
+            )
     if prepared.context is not context:
         raise ValueError("prepared score context does not match the scoring context")
     engine_set = (
@@ -14752,14 +15068,15 @@ def _score_store_with_decisions(
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
-    from simulator.battery.validate import bound_work_inputs
+    from simulator.battery.validate import _bound_work_inputs
 
     provided_handles = dict(handles or {})
     resolved_handles = dict(provided_handles)
     residuals: list[Residual] | None = [] if _stream is None else None
     candidates: dict[str, Observation] = {}
+    validation_indexes = prepared.validation_indexes
     empirical_ids = comparison_ids
-    lineage_resolver = _ScoringLineageResolver(live_context)
+    lineage_resolver = _ScoringLineageResolver(live_context, validation_indexes)
     started = time.monotonic()
     last_progress = started
     done = 0
@@ -14783,9 +15100,16 @@ def _score_store_with_decisions(
         )
         last_progress = now
 
-    residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
+    residue_prediction_cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ] = {}
     try:
-        with bound_work_inputs(context.works, observations, context.experiments):
+        with _bound_work_inputs(
+            context.works,
+            observations,
+            context.experiments,
+            _indexes=validation_indexes,
+        ):
             for obs in refs:
                 origin = origins.get(obs.observation_id)
                 for point_index, point in enumerate(
@@ -14890,6 +15214,7 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                selected_experiment_ids=prepared.hashimoto_experiment_ids,
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
                         if (
@@ -14908,6 +15233,7 @@ def _score_store_with_decisions(
                                 point,
                                 engine,
                                 residue_prediction_cache,
+                                selected_experiment_ids=prepared.sossi_experiment_ids,
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
                         if (
@@ -14949,6 +15275,7 @@ def _score_store_with_decisions(
                                 else None
                             ),
                             _source_relation_resolver=lineage_resolver,
+                            _validation_indexes=validation_indexes,
                         )
                         if _shard_failure_reason is not None:
                             residual = _score_failed_shard_residual(
@@ -14988,7 +15315,7 @@ def _score_store_with_decisions(
                             )
                         ):
                             total += 1
-                            intrinsic_residual, intrinsic_candidate = compile_residual(
+                            intrinsic_residual, intrinsic_candidate = _compile_residual_with_lineage(
                                 point,
                                 engine,
                                 context=live_context,
@@ -15008,6 +15335,7 @@ def _score_store_with_decisions(
                                 ),
                                 predict=scoring_predict,
                                 fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+                                _validation_indexes=validation_indexes,
                             )
                             if _shard_failure_reason is not None:
                                 intrinsic_residual = _score_failed_shard_residual(
@@ -15343,6 +15671,7 @@ def _score_store_to_jsonl(
     root: Path | None = None,
     engines: Sequence[Engine] | None = None,
     rail: Rail | None = None,
+    species_formulas: Sequence[str] = (),
     work_id: str | None = None,
     limit: int | None = None,
     include_diagnostics: bool = True,
@@ -15379,6 +15708,7 @@ def _score_store_to_jsonl(
                 context,
                 engines=engines,
                 rail=rail,
+                species_formulas=species_formulas,
                 work_id=work_id,
                 limit=limit,
                 include_diagnostics=include_diagnostics,
@@ -15395,12 +15725,20 @@ def _score_store_to_jsonl(
                 context,
                 engines=engines,
                 rail=rail,
+                species_formulas=species_formulas,
                 work_id=work_id,
                 limit=limit,
                 include_diagnostics=include_diagnostics,
                 measured_only=measured_only,
                 _test_experiment_ids=_test_experiment_ids,
             )
+            stream.selected_reference_count = len(prepared.refs)
+            if species_formulas:
+                print(
+                    f"species references selected={len(prepared.refs)} "
+                    f"formulas={','.join(species_formulas)}",
+                    flush=True,
+                )
             chunks = _partition_score_refs(prepared.refs, workers=workers)
             populated_chunks = [
                 (index, chunk)
@@ -15546,6 +15884,7 @@ def _score_store_to_jsonl(
             engine_cache_runtime_identities=cache_runtime_identities,
             shard_failures=tuple(shard_failures),
             static_refusals=stream.static_refusals,
+            selected_reference_count=stream.selected_reference_count,
         )
     finally:
         stream.close()
@@ -15816,6 +16155,7 @@ class _ResidualReportMetadata:
     engine_cache_runtime_identities: Mapping[str, str] | None = None
     shard_failures: tuple[Mapping[str, object], ...] = ()
     static_refusals: Sequence[Mapping[str, object]] = ()
+    selected_reference_count: int = 0
 
 
 class _ResidualJsonlRows:
@@ -20739,6 +21079,7 @@ class _ResidualJsonlStream:
         ] = defaultdict(set)
         self.report_aggregate: _ScorePayloadAccumulator | None = None
         self.count = 0
+        self.selected_reference_count = 0
         self._last_flush = time.monotonic()
 
     @property
@@ -21950,12 +22291,26 @@ def _write_headline_summary_from_accumulator_json(
     *,
     store_stamp: Mapping[str, object] | None,
     shard_failures: Sequence[Mapping[str, object]] = (),
+    filters: Mapping[str, object] | None = None,
+    selected_references: int | None = None,
+    subset: bool = False,
 ) -> None:
     payload = aggregate.summary_payload(store_stamp)
     if shard_failures:
         payload["score_shard_failures"] = [
             dict(failure) for failure in shard_failures
         ]
+    if subset:
+        if filters is None or selected_references is None:
+            raise ValueError("subset summaries require filters and reference count")
+        payload = dict(payload)
+        payload["filters"] = dict(filters)
+        payload["subset"] = True
+        payload["selected_references"] = selected_references
+        payload["headline_aggregate_scope"] = "subset"
+        for record in payload.get("records", []):
+            if isinstance(record, dict):
+                record["aggregate_scope"] = "subset"
     _write_headline_summary_payload_json(payload, path)
 
 

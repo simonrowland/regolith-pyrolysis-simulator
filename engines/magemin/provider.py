@@ -193,6 +193,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         self._backend: Optional[Any] = backend
         self._backend_finalizer = None
         self._backend_initialised: bool = backend is not None
+        self._backend_initialization_error: Optional[Exception] = None
         self._parity_comparator: MAGEMinParityComparator = MAGEMinParityComparator()
 
     def capability_profile(self) -> CapabilityProfile:
@@ -521,14 +522,16 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         _ensure_close_reaper()
         if self._backend is not None:
             if not self._backend_initialised:
+                self._backend_initialization_error = None
                 try:
                     self._backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
-                except Exception:
-                    pass
+                except Exception as exc:
+                    self._backend_initialization_error = exc
                 self._backend_initialised = True
             return self._backend
         backend = None
         backend_finalizer = None
+        self._backend_initialization_error = None
         try:
             from simulator.melt_backend.magemin import MAGEMinBackend
             backend = MAGEMinBackend()
@@ -538,7 +541,8 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                     self, _enqueue_backend_close, close, os.getpid()
                 )
             backend.initialize(dict(_SHADOW_BACKEND_CONFIG))
-        except Exception:
+        except Exception as exc:
+            self._backend_initialization_error = exc
             if backend_finalizer is not None:
                 try:
                     backend_finalizer()

@@ -3324,9 +3324,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         temperature_C: float,
         pressure_kbar: float,
         fO2_log: float,
-        pure_phase_probe: bool = False,
+        capture_native_activities: bool = False,
     ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
-        """Build the canonical MAGEMin argv and resolved buffer values."""
+        """Build MAGEMin argv, optionally requesting native activities."""
         if self._binary_path is None:
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
         binary_path = self._binary_path.resolve()
@@ -3336,19 +3336,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         args = [
             str(binary_path),
-            '--Verb=1' if pure_phase_probe else '--Verb=0',
+            '--Verb=0',
             f'--db={self._effective_database()}',
             f'--Temp={temperature_C:.6f}',
             f'--Pres={pressure_kbar:.6f}',
             '--sys_in=wt',
-            '--Bulk=' + ','.join(
-                f'{value:.8g}' if pure_phase_probe else f'{value:.6f}'
-                for value in bulk_projection.vector
-            ),
+            '--Bulk=' + ','.join(f'{value:.6f}' for value in bulk_projection.vector),
             f'--buffer={buffer_name}',
             f'--buffer_n={buffer_n:.6f}',
         ]
-        if pure_phase_probe:
+        if capture_native_activities:
+            args = [
+                '--Verb=1' if item == '--Verb=0' else item
+                for item in args
+            ]
             args.append('--out_matlab=1')
         return args, buffer_name, buffer_n, tuple(buffer_warnings)
 
@@ -3390,6 +3391,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
+                capture_native_activities=capture_native_activities,
             )
         )
         solved_fO2_log: Optional[float]
@@ -3422,14 +3424,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status_reason': 'clamped_operating_point',
             })
 
-        if capture_native_activities:
-            # Same argv owner as the Verb=0 golden. Native activities only
-            # raise verbosity and request the matlab dump the parser reads.
-            args = [
-                '--Verb=1' if item == '--Verb=0' else item
-                for item in args
-            ]
-            args.append('--out_matlab=1')
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
         if call_timeout_s is None:
             timeout_s = configured_timeout_s
@@ -4046,11 +4040,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         temperature_C: float,
         pressure_kbar: float,
     ) -> Tuple[str, str, List[str]]:
-        """Run the binary at Verb=1 + out_matlab=1 for one stoich bulk.
+        """Run the binary through the shared native-activity argv builder.
 
-        Returns (stdout, matlab_output_text, buffer_warnings). Uses the
-        shared argv builder while preserving the probe's eight-significant-
-        digit bulk input and MATLAB output flags.
+        Returns (stdout, matlab_output_text, buffer_warnings).
         """
         if self._binary_path is None:
             raise PurePhaseAccessError('MAGEMin binary path not resolved')
@@ -4071,7 +4063,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
                 fO2_log=-9.0,
-                pure_phase_probe=True,
+                capture_native_activities=True,
             )
         )
         timeout_s = float(self._config.get('timeout_s', 60.0))
