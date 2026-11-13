@@ -548,11 +548,9 @@ def _migrate_real_extract(
 def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
     tmp_path: Path,
 ) -> None:
-    from simulator.battery.score import (
-        ScoreContext,
-        comparison_candidates,
-        rail_for_quantity,
-    )
+    from simulator.battery.migrate import wt_pct_to_mole_fraction
+    from simulator.battery.residue import _printed_fm_definition
+    from simulator.battery.score import rail_for_quantity
 
     result = _migrate_real_extract(
         tmp_path, "norris-2016-trace-volatility-thesis.yaml"
@@ -563,41 +561,81 @@ def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
         if observation.source_id == "norris-2016-trace-volatility-thesis"
         and observation.locator.table == "5.7"
     ]
-
-    assert len(rows) == 64
+    # Independently transcribed from the rendered Table 5.7, physical p.232 /
+    # folio 202: pairs are FM, printed sigma, in log fO2 order -7,-9,-11,-13.
+    printed = {
+        "Ag": "0.646 0.117 0.198 0.017 0.127 0.007 0.022 0.019",
+        "Bi": "0.227 0.080 0.170 0.078 0.074 0.007 0.008 0.007",
+        "Cd": "0.228 0.057 0.071 0.014 0.019 0.003 0.019 0.009",
+        "Cr": "1.021 0.179 1.192 0.179 0.998 0.150 1.171 0.265",
+        "Cu": "0.618 0.072 0.331 0.030 0.367 0.314 0.176 0.138",
+        "Ga": "1.454 0.432 1.217 0.361 1.314 0.388 0.669 0.380",
+        "Ge": "0.315 0.090 0.168 0.050 0.045 0.013 0.014 0.005",
+        "In": "0.816 0.095 0.622 0.074 0.621 0.068 0.192 0.142",
+        "Mo": "1.260 0.144 1.168 0.125 1.130 0.120 0.624 0.349",
+        "Pb": "1.030 0.087 0.646 0.069 0.365 0.022 0.116 0.099",
+        "Sb": "0.457 0.084 0.210 0.071 0.012 0.001 0.002 0.001",
+        "Sn": "0.471 0.031 0.194 0.017 0.201 0.009 0.038 0.035",
+        "Tl": "0.525 0.052 0.397 0.040 0.125 0.007 0.069 0.057",
+        "V": "1.219 0.141 1.226 0.139 1.179 0.134 1.112 0.125",
+        "W": "2.508 0.416 2.347 0.383 2.223 0.365 1.975 0.405",
+        "Zn": "1.038 0.069 0.617 0.053 0.488 0.021 0.130 0.087",
+    }
+    # Table 5.2, physical p.220 / folio 190. Use the existing conversion
+    # owner to bind the complete nine-oxide initial charge, without a second
+    # wt%-to-mole implementation in this regression.
+    charge = wt_pct_to_mole_fraction({
+        name: Decimal(amount) for name, amount in {
+            "SiO2": "50.66", "TiO2": "0.96", "Al2O3": "15.11",
+            "FeO": "9.69", "MnO": "0.20", "MgO": "8.90",
+            "CaO": "12.28", "Na2O": "1.96", "K2O": "0.07",
+        }.items()
+    })
+    runs = {"-7": "F008", "-9": "F014", "-11": "F018", "-13": "F019"}
+    expected = {
+        (element, log_fO2): (Decimal(cells[2 * index]), cells[2 * index + 1])
+        for element, printed_row in printed.items()
+        for cells in [printed_row.split()]
+        for index, log_fO2 in enumerate(runs)
+    }
+    assert len(rows) == len(expected) == 64
     assert not result.validation.hard_issues
     assert rail_for_quantity(Quantity.ELEMENT_RETENTION_RATIO) is Rail.RESIDUE_COMPOSITION
-    score_context = ScoreContext(
-        works=result.works,
-        experiments=result.experiments,
-        observations=result.observations,
-        benches=result.benches,
-    )
-    scored_norris_rows = [
-        observation
-        for observation in comparison_candidates(score_context)
-        if observation.source_id == "norris-2016-trace-volatility-thesis"
-        and observation.locator.table == "5.7"
-        and rail_for_quantity(
-            quantity_token(observation.identity),
-            species_formula=observation.identity.species.formula,
-        )
-        is Rail.RESIDUE_COMPOSITION
-    ]
-    assert len(scored_norris_rows) == 64
+    seen = set()
     for observation in rows:
+        element = observation.identity.species.formula
+        log_fO2 = observation.locator.row
+        key = (element, log_fO2)
+        assert key not in seen
+        seen.add(key)
+        fm, sigma = expected[key]
+        assert observation.locator.column == element
+        assert (observation.locator.page, observation.locator.published_page) == (232, 202)
         assert quantity_token(observation.identity) is Quantity.ELEMENT_RETENTION_RATIO
-        assert observation.identity.subtype.is_value
-        assert observation.identity.subtype.value == "concentration_retention"
-        assert observation.identity.temperature_K.is_value
-        assert observation.identity.composition.is_value
-        assert observation.point_conditions is not None
-        assert {"temperature_K", "fO2_log"} <= set(
-            observation.point_conditions
-        )
-        from simulator.battery.residue import _printed_fm_definition
-
-        located = observation.point_conditions["fm_definition"]
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == fm
+        assert observation.uncertainty.kind is UncertaintyKind.PRINTED
+        assert observation.uncertainty.verbatim == {
+            "kind": "standard_deviation", "value": sigma,
+            "units": "dimensionless", "verbatim": sigma,
+        }
+        assert observation.identity.subtype == State.of("concentration_retention")
+        assert observation.identity.temperature_K == State.of(Decimal("1573.15"))
+        assert observation.identity.composition.value.components == charge.components
+        assert observation.identity.composition.value.amount_basis == charge.amount_basis
+        assert observation.experiment_id.endswith(f"::volatile-loss-logfo2-neg{log_fO2[1:]}")
+        conditions = observation.point_conditions
+        assert conditions is not None
+        assert conditions["temperature_K"].state.value == Decimal("1573.15")
+        assert conditions["temperature_K"].locator.row == runs[log_fO2]
+        assert conditions["fO2_log"].state.value == Decimal(log_fO2)
+        assert conditions["fO2_log"].locator.row == log_fO2
+        assert conditions["composition"].state.value.components == charge.components
+        assert conditions["composition"].locator.table == "5.2"
+        assert conditions["composition"].locator.row == "EBT1"
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.thermal_schedule.total_duration_s.state.value.point == Decimal("3600")
+        located = conditions["fm_definition"]
         definition, record = _printed_fm_definition(located)
         assert definition == "concentration_retention"
         assert record["concentration_basis"] == "mole_fraction_single_cation_oxide"
@@ -612,6 +650,7 @@ def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
         assert record["concentration_basis_locator"] == {
             "page": 232, "pdf_page_index": 231, "published_page": 202, "equation": "5.1",
         }
+    assert seen == set(expected)
 
 
 def test_identity_equal_transition_temperature_conflict_and_green_unknown(
