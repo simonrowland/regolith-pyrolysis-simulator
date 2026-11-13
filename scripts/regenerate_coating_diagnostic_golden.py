@@ -27,6 +27,9 @@ PIN_RE = re.compile(
     r"(def test_coating_diagnostic_default_output_is_byte_identical_to_golden\b"
     r"[\s\S]*?"
     r"assert hashlib\.sha256\(actual_bytes\)\.hexdigest\(\) == \(\s*\n"
+    # Allow provenance comment lines between the opening paren and the pin
+    # (b-244 added one; the pattern must not require the hash on the next line).
+    r"(?:[ \t]*#[^\n]*\n)*"
     r'\s*")([0-9a-f]{64})(")',
     re.MULTILINE,
 )
