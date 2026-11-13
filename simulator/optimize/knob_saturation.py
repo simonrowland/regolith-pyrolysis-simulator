@@ -29,6 +29,8 @@ _ENERGY_COST_METRICS = (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     LEGACY_ENERGY_KWH_METRIC,
 )
+_CARRIER_COST_METRIC = "throughput_cost_owner_ratify_usd"
+_CARRIER_PRESSURE_CAMPAIGNS = frozenset({"C2A_continuous", "C2A_staged"})
 
 
 def compute_knob_saturation(
@@ -245,7 +247,18 @@ def _opposing_cost_metrics(
         path[:2] == ("campaigns", "C5") and path[-1] == "max_voltage_V"
     ):
         return tuple(metric for metric in _ENERGY_COST_METRICS if metric in active_metrics)
+    if _is_carrier_pressure_knob(path) and _CARRIER_COST_METRIC in active_metrics:
+        return (_CARRIER_COST_METRIC,)
     return ()
+
+
+def _is_carrier_pressure_knob(path: KeyPath) -> bool:
+    return (
+        len(path) >= 3
+        and path[0] == "campaigns"
+        and path[1] in _CARRIER_PRESSURE_CAMPAIGNS
+        and path[-1] in {"p_total_mbar", "p_total_mbar_default"}
+    )
 
 
 def _is_duration_knob(path: KeyPath) -> bool:

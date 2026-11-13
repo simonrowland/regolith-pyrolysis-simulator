@@ -635,7 +635,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert hashlib.sha256(actual_bytes).hexdigest() == (
         # b-244: Al/Ti operator T_cond overrides removed (report-only); 14 text/audit leaves, 0 numeric; Al crossing authority -> capture_threshold_fallback.
         # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
-        "3d0aa7260205121b501ca95d66ce010bd7817c71cf34a52fe664dc8afdc5efee"
+        "1cb18eeb837921245ba3e0a6bf20b5f175dddfab75e1b5afa3f17c063e969639"
     )
 
 

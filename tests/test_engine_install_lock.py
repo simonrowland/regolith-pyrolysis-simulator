@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -47,12 +49,77 @@ def _checked_extra_builds(
     }
 
 
+def _load_install_engines_module():
+    installer_path = LOCK_PATH.parents[1] / "install-engines.py"
+    spec = importlib.util.spec_from_file_location("install_engines_test", installer_path)
+    assert spec is not None and spec.loader is not None
+    installer = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(installer)
+    return installer
+
+
+def _patch_hunks(patch_file: Path) -> tuple[tuple[Path, int, bytes, bytes], ...]:
+    lines = patch_file.read_bytes().splitlines(keepends=True)
+    target: Path | None = None
+    hunks: list[tuple[Path, int, bytes, bytes]] = []
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        index += 1
+        if line.startswith(b"+++ b/"):
+            target = Path(line[len(b"+++ b/") :].rstrip(b"\r\n").decode())
+        elif line.startswith(b"@@ "):
+            old_spec, new_spec = line.split(b"@@", 2)[1].split()[:2]
+            old_range = old_spec[1:].split(b",", 1)
+            new_range = new_spec[1:].split(b",", 1)
+            old_start = int(old_range[0])
+            old_count = int(old_range[1]) if len(old_range) == 2 else 1
+            new_count = int(new_range[1]) if len(new_range) == 2 else 1
+            old_remaining = old_count
+            new_remaining = new_count
+            before = bytearray()
+            after = bytearray()
+            while old_remaining or new_remaining:
+                line = lines[index]
+                index += 1
+                if line.startswith(b" "):
+                    before.extend(line[1:])
+                    after.extend(line[1:])
+                    old_remaining -= 1
+                    new_remaining -= 1
+                elif line.startswith(b"-"):
+                    before.extend(line[1:])
+                    old_remaining -= 1
+                elif line.startswith(b"+"):
+                    after.extend(line[1:])
+                    new_remaining -= 1
+                elif line.startswith(b"\\"):
+                    continue
+                else:
+                    raise AssertionError(f"invalid hunk line in {patch_file}: {line!r}")
+            assert target is not None
+            assert len(before.splitlines(keepends=True)) == old_count
+            assert len(after.splitlines(keepends=True)) == new_count
+            hunks.append((target, old_start, bytes(before), bytes(after)))
+    assert hunks
+    return tuple(hunks)
+
+
 def test_engine_lock_contains_the_reviewed_studio_source_pins(
     tmp_path: Path,
 ) -> None:
     lock = load_engine_lock(LOCK_PATH)
 
     assert lock.engines["magemin"].pin == "40ed109d07d4246001cab59382596d33fed79086"
+    assert lock.engines["magemin"].patches == (
+        "0001-thermocalc-amgo-periclase-reference",
+        "0002-lp-iteration-cap-terminates-without-pc-recheck",
+        "0003-sb-feo-activity-keeps-four-cation-scaling",
+        "0004-headless-singleton-mpi-defaults",
+    )
+    assert lock.engines["magemin"].reference_sha256 == (
+        "52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1"
+    )
     assert lock.engines["thermoengine"].pin == "df7a5f4609116a83bf40a5a352a19e3826a822d9"
     assert lock.engines["vaporock"].pin == "0159678a8eefb51dfe3f12bb646dc38507a07230"
     assert lock.engines["pysulfsat"].pin == "ed7c4a03e2e03b327e962d83f7f07ebf418c7bb7"
@@ -79,6 +146,371 @@ def test_engine_lock_contains_the_reviewed_studio_source_pins(
         ) == canonical_root / alpha_pin.directory / asset.pin
 
 
+def test_build_magemin_applies_locked_patches_before_build_and_is_idempotent(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dataclasses import replace
+
+    installer = _load_install_engines_module()
+    lock = load_engine_lock(LOCK_PATH)
+    pin = lock.engines["magemin"]
+    patch_root = LOCK_PATH.parents[1] / "patches" / "magemin"
+    patch_hunks = tuple(
+        _patch_hunks(patch_root / f"{patch_name}.patch")
+        for patch_name in pin.patches
+    )
+    source_lines: dict[Path, list[bytes]] = {}
+    line_delta: dict[Path, int] = {}
+    padding = b"/* fixture padding */\r\n"
+    for hunks in patch_hunks:
+        for relative_path, old_start, before, after in hunks:
+            old_lines = before.splitlines(keepends=True)
+            for patch_bytes in (before, after):
+                assert b"\r\n" in patch_bytes
+                assert b"\n" not in patch_bytes.replace(b"\r\n", b"")
+            initial_start = old_start - 1 - line_delta.get(relative_path, 0)
+            assert initial_start >= 0
+            fixture = source_lines.setdefault(relative_path, [])
+            required_length = initial_start + len(old_lines)
+            if len(fixture) < required_length:
+                fixture.extend([padding] * (required_length - len(fixture)))
+            assert fixture[initial_start:required_length] == [padding] * len(old_lines)
+            fixture[initial_start:required_length] = old_lines
+        for relative_path in {hunk[0] for hunk in hunks}:
+            line_delta[relative_path] = line_delta.get(relative_path, 0) + sum(
+                len(after.splitlines(keepends=True)) - len(before.splitlines(keepends=True))
+                for path, _old_start, before, after in hunks
+                if path == relative_path
+            )
+
+    expected_lines = {
+        relative_path: list(lines)
+        for relative_path, lines in source_lines.items()
+    }
+    for hunks in patch_hunks:
+        for relative_path in {hunk[0] for hunk in hunks}:
+            target = expected_lines[relative_path]
+            for _path, old_start, before, after in sorted(
+                (hunk for hunk in hunks if hunk[0] == relative_path),
+                key=lambda hunk: hunk[1],
+                reverse=True,
+            ):
+                old_lines = before.splitlines(keepends=True)
+                start = old_start - 1
+                assert target[start : start + len(old_lines)] == old_lines
+                target[start : start + len(old_lines)] = after.splitlines(keepends=True)
+    expected = {
+        relative_path: b"".join(lines)
+        for relative_path, lines in expected_lines.items()
+    }
+
+    fixture_repo = tmp_path / "magemin-source-fixture"
+    for relative_path, lines in source_lines.items():
+        target = fixture_repo / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b"".join(lines))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    git_env = os.environ.copy()
+    git_env.update(
+        {
+            "GIT_AUTHOR_NAME": "Engine installer test",
+            "GIT_AUTHOR_EMAIL": "engine-test@example.invalid",
+            "GIT_COMMITTER_NAME": "Engine installer test",
+            "GIT_COMMITTER_EMAIL": "engine-test@example.invalid",
+        }
+    )
+    subprocess.run(
+        ["git", "-C", str(fixture_repo), "init", "--quiet"],
+        check=True,
+        env=git_env,
+    )
+    subprocess.run(
+        ["git", "-C", str(fixture_repo), "add", "--all"],
+        check=True,
+        env=git_env,
+    )
+    subprocess.run(
+        [
+            "git", "-C", str(fixture_repo), "commit", "--quiet", "-m",
+            "MAGEMin patch fixture",
+        ],
+        check=True,
+        env=git_env,
+    )
+    fixture_pin = subprocess.check_output(
+        ["git", "-C", str(fixture_repo), "rev-parse", "HEAD"],
+        text=True,
+        env=git_env,
+    ).strip()
+
+    monkeypatch.setattr(installer, "ROOT", LOCK_PATH.parents[1])
+    build_count = tmp_path / "build-invocations"
+    build_check = "import hashlib; from pathlib import Path; " + "; ".join(
+        f"assert hashlib.sha256(Path({str(path)!r}).read_bytes()).hexdigest() == {hashlib.sha256(data).hexdigest()!r}"
+        for path, data in expected.items()
+    ) + (
+        f"; counter = Path({str(build_count)!r}); "
+        "counter.write_text(str(int(counter.read_text()) + 1) if counter.exists() else '1'); "
+        "Path('build.ok').touch()"
+    )
+    lock = EngineLock(
+        engines={
+            **lock.engines,
+            "magemin": replace(
+                pin,
+                pin=fixture_pin,
+                build_commands=((sys.executable, "-c", build_check),),
+                artifacts=(),
+            ),
+        }
+    )
+    root = tmp_path / "engine-bin"
+    source = engine_install_path(lock, root, "magemin")
+    source.parent.mkdir(parents=True)
+    fixture_repo.rename(source)
+    root.mkdir(exist_ok=True)
+    outside_marker = root / "outside-magemin-source"
+    outside_marker.write_bytes(b"must survive MAGEMin clean")
+
+    installer.build_magemin(lock, root)
+    first_build = {
+        path: (source / path).read_bytes()
+        for path in expected
+    }
+    installer.build_magemin(lock, root)
+    second_build = {
+        path: (source / path).read_bytes()
+        for path in expected
+    }
+
+    assert first_build == expected
+    assert second_build == first_build
+    assert build_count.read_text() == "2"
+    assert (source / "build.ok").is_file()
+    assert outside_marker.read_bytes() == b"must survive MAGEMin clean"
+
+
+@pytest.mark.parametrize("patch_name", ("../x", "/abs", "a/b"))
+def test_apply_magemin_patches_rejects_path_shaped_names(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    patch_name: str,
+) -> None:
+    installer = _load_install_engines_module()
+    monkeypatch.setattr(installer, "ROOT", tmp_path)
+
+    with pytest.raises(ValueError, match="invalid MAGEMin patch name"):
+        installer._apply_magemin_patches(tmp_path, (patch_name,))
+
+
+def test_apply_magemin_patches_raises_for_missing_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    installer = _load_install_engines_module()
+    source = tmp_path / "source"
+    source.mkdir()
+    monkeypatch.setattr(installer, "ROOT", tmp_path)
+
+    with pytest.raises(FileNotFoundError, match="locked MAGEMin patch is missing"):
+        installer._apply_magemin_patches(source, ("missing",))
+
+
+@pytest.mark.parametrize(
+    ("patch_name", "source_text", "patch_text"),
+    (
+        (
+            "conflict",
+            "conflict\n",
+            "diff --git a/src/sample.c b/src/sample.c\n"
+            "--- a/src/sample.c\n+++ b/src/sample.c\n"
+            "@@ -1 +1 @@\n-before\n+after\n",
+        ),
+        (
+            "partial",
+            "after-one\nmiddle\nbefore-two\n",
+            "diff --git a/src/sample.c b/src/sample.c\n"
+            "--- a/src/sample.c\n+++ b/src/sample.c\n"
+            "@@ -1 +1 @@\n-before-one\n+after-one\n"
+            "@@ -3 +3 @@\n-before-two\n+after-two\n",
+        ),
+    ),
+)
+def test_apply_magemin_patches_raises_for_conflict_or_partial_apply(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    patch_name: str,
+    source_text: str,
+    patch_text: str,
+) -> None:
+    installer = _load_install_engines_module()
+    source = tmp_path / "source"
+    source.mkdir()
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    subprocess.run(
+        ["git", "-C", str(source), "init", "--quiet"],
+        check=True,
+        env=os.environ.copy(),
+    )
+    target = source / "src" / "sample.c"
+    target.parent.mkdir(parents=True)
+    target.write_text(source_text, encoding="utf-8")
+    patch_dir = tmp_path / "patches" / "magemin"
+    patch_dir.mkdir(parents=True)
+    (patch_dir / f"{patch_name}.patch").write_text(patch_text, encoding="utf-8")
+    monkeypatch.setattr(installer, "ROOT", tmp_path)
+
+    with pytest.raises(RuntimeError, match="cannot apply locked MAGEMin patch"):
+        installer._apply_magemin_patches(source, (patch_name,))
+
+    assert target.read_text(encoding="utf-8") == source_text
+
+
+def test_build_magemin_rejects_a_source_nested_in_another_repository(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    installer = _load_install_engines_module()
+    lock = load_engine_lock(LOCK_PATH)
+    root = tmp_path / "engine-bin"
+    source = engine_install_path(lock, root, "magemin")
+    source.mkdir(parents=True)
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    subprocess.run(
+        ["git", "-C", str(tmp_path), "init", "--quiet"],
+        check=True,
+        env=os.environ.copy(),
+    )
+    monkeypatch.setattr(installer, "checkout_matches_pin", lambda _pin, _source: True)
+    monkeypatch.setattr(installer, "_run", lambda *_args, **_kwargs: pytest.fail("git/build ran"))
+
+    with pytest.raises(RuntimeError, match="not its own Git repository root") as exc_info:
+        installer.build_magemin(lock, root)
+
+    assert str(source.resolve()) in str(exc_info.value)
+    assert str(tmp_path.resolve()) in str(exc_info.value)
+
+
+def test_build_magemin_accepts_case_variant_of_source_root(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dataclasses import replace
+
+    installer = _load_install_engines_module()
+    lock = load_engine_lock(LOCK_PATH)
+    pin = lock.engines["magemin"]
+    actual_root = tmp_path / "Engine-Bin"
+    source = engine_install_path(lock, actual_root, "magemin")
+    target = source / "src" / "sample.c"
+    target.parent.mkdir(parents=True)
+    target.write_text("before\n", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    git_env = os.environ.copy()
+    git_env.update(
+        {
+            "GIT_AUTHOR_NAME": "Engine installer test",
+            "GIT_AUTHOR_EMAIL": "engine-test@example.invalid",
+            "GIT_COMMITTER_NAME": "Engine installer test",
+            "GIT_COMMITTER_EMAIL": "engine-test@example.invalid",
+        }
+    )
+    subprocess.run(
+        ["git", "-C", str(source), "init", "--quiet"],
+        check=True,
+        env=git_env,
+    )
+    subprocess.run(["git", "-C", str(source), "add", "--all"], check=True, env=git_env)
+    subprocess.run(
+        ["git", "-C", str(source), "commit", "--quiet", "-m", "fixture"],
+        check=True,
+        env=git_env,
+    )
+    fixture_pin = subprocess.check_output(
+        ["git", "-C", str(source), "rev-parse", "HEAD"],
+        text=True,
+        env=git_env,
+    ).strip()
+    lock = EngineLock(
+        engines={
+            **lock.engines,
+            "magemin": replace(
+                pin,
+                pin=fixture_pin,
+                patches=("case-variant",),
+                build_commands=(),
+                artifacts=(),
+            ),
+        }
+    )
+    relocated_source = engine_install_path(lock, actual_root, "magemin")
+    if relocated_source != source:
+        relocated_source.parent.mkdir(parents=True, exist_ok=True)
+        source.rename(relocated_source)
+        source = relocated_source
+        target = source / "src" / "sample.c"
+
+    case_variant_root = actual_root.with_name(actual_root.name.lower())
+    if not case_variant_root.exists() or not os.path.samefile(actual_root, case_variant_root):
+        pytest.skip("case-variant path skipped because this filesystem is case-sensitive")
+
+    patch_dir = tmp_path / "patches" / "magemin"
+    patch_dir.mkdir(parents=True)
+    patch_name = "case-variant"
+    (patch_dir / f"{patch_name}.patch").write_text(
+        "diff --git a/src/sample.c b/src/sample.c\n"
+        "--- a/src/sample.c\n+++ b/src/sample.c\n"
+        "@@ -1 +1 @@\n-before\n+after\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(installer, "ROOT", tmp_path)
+
+    installer.build_magemin(lock, case_variant_root)
+
+    assert target.read_text(encoding="utf-8") == "after\n"
+
+
+def test_apply_magemin_patches_rejects_nested_parent_repository(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    installer = _load_install_engines_module()
+    parent = tmp_path / "parent-repository"
+    source = parent / "nested" / "source"
+    target = source / "src" / "sample.c"
+    target.parent.mkdir(parents=True)
+    target.write_text("before\n", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    subprocess.run(
+        ["git", "-C", str(parent), "init", "--quiet"],
+        check=True,
+        env=os.environ.copy(),
+    )
+    patch_dir = tmp_path / "patches" / "magemin"
+    patch_dir.mkdir(parents=True)
+    patch_name = "nested"
+    (patch_dir / f"{patch_name}.patch").write_text(
+        "diff --git a/src/sample.c b/src/sample.c\n"
+        "--- a/src/sample.c\n+++ b/src/sample.c\n"
+        "@@ -1 +1 @@\n-before\n+after\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(installer, "ROOT", tmp_path)
+
+    with pytest.raises(RuntimeError, match="not its own Git repository root") as exc_info:
+        installer._apply_magemin_patches(source, (patch_name,))
+
+    assert str(source.resolve()) in str(exc_info.value)
+    assert str(parent.resolve()) in str(exc_info.value)
+    assert target.read_text(encoding="utf-8") == "before\n"
+
+
 def test_engine_lock_rejects_short_git_commits(tmp_path: Path) -> None:
     source = LOCK_PATH.read_text(encoding="utf-8")
     invalid = source.replace(
@@ -97,14 +529,7 @@ def test_clone_locked_sources_refuses_a_wrong_commit(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import importlib.util
-
-    installer_path = LOCK_PATH.parents[1] / "install-engines.py"
-    spec = importlib.util.spec_from_file_location("install_engines_test", installer_path)
-    assert spec is not None and spec.loader is not None
-    installer = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(installer)
-
+    installer = _load_install_engines_module()
     lock = load_engine_lock(LOCK_PATH)
     root = tmp_path / "engine-bin"
     revisions: dict[Path, str] = {}
@@ -136,17 +561,12 @@ def test_engine_verify_fails_install_when_a_fresh_import_fails(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import importlib.util
     from contextlib import contextmanager
     from types import SimpleNamespace
     from simulator.melt_backend import alphamelts as alphamelts_backend
     from simulator.melt_backend import magemin as magemin_backend
 
-    installer_path = LOCK_PATH.parents[1] / "install-engines.py"
-    spec = importlib.util.spec_from_file_location("install_engines_verify_test", installer_path)
-    assert spec is not None and spec.loader is not None
-    installer = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(installer)
+    installer = _load_install_engines_module()
     lock = load_engine_lock(LOCK_PATH)
     root = tmp_path / "engine-bin"
     magemin = engine_install_path(lock, root, "magemin") / "MAGEMin"

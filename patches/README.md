@@ -148,8 +148,9 @@ Clean. No local patches.
 
 ### magemin — v1.9.6 / upstream `40ed109`
 
-Three fixes held as patches pending upstream, with a draft pull-request description in
-`patches/magemin/UPSTREAM-PR.md` (not yet filed):
+Four fixes held as patches pending upstream (not yet filed): `0001`-`0003` share the draft
+pull-request description in `patches/magemin/UPSTREAM-PR.md`; `0004` has its own draft in
+`patches/magemin/UPSTREAM-SUBMISSION.md`:
 
 - `0001` THERMOCALC `aMgO`: the `tc` branch of `compute_activities()` never stored the periclase
   `gbase`, so `aMgO` printed `exp(Gamma_MgO/RT)` (~1e-21). Until the adapter-side recompute
@@ -162,11 +163,18 @@ Three fixes held as patches pending upstream, with a draft pull-request descript
 - `0003` sb21 `aFeO`: the four-cation wustite scaling was computed and then overwritten
   (printed aFeO ~5.6e25 for a basaltic sb21 bulk; 0.473 after). sb24 has no `FeO` oxide; its
   `aFeO` comes from the later Fe+O block, which already divides by 4 and is not touched.
+- `0004` headless singleton MPI defaults: exclude hwloc's unused OpenCL probe and set local
+  transport defaults for standalone MPI launches. Draft issue and PR text are in
+  `patches/magemin/UPSTREAM-SUBMISSION.md`.
 
 The patch files keep MAGEMin's CRLF line endings: apply them with `git am --keep-cr` (or `git apply`),
 and edit them byte-safely. `enginepatch.sh` maps
-`magemin` to `../MAGEMin` (override with `MAGEMIN_CHECKOUT`). The engine's live binary is built
-from a separate, clean v1.9.6 tree, so none of these patches is in it; see `STATUS`.
+`magemin` to `../MAGEMin` (override with `MAGEMIN_CHECKOUT`); `STATUS` describes that sibling
+checkout. Studio runtime build C uses the engine lock and `install-engines.py` to apply patches
+0001–0004 in order. C adds 0001 and 0003 to B. Physics d-392 found C production-neutral: empty
+golden regen, byte-identical `sio_yield`, and zero scored battery rows move. It changes only
+native MAGEMin `aMgO` (Kume305: 1.287e-21 -> 0.466, measured 0.327), which only the battery
+scorer reads.
 
 ### alphamelts — bundled 2.3.1 arm64 artifact / upstream `957b8f5`
 

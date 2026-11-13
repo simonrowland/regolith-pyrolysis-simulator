@@ -16,6 +16,7 @@ from simulator.cost_parameters import (
     cost_parameter_values,
     cost_parameters_from_mapping,
     default_cost_parameters_block,
+    normalize_cost_parameters,
     recipe_cost_parameters_from_payload,
 )
 from simulator.optimize.evalspec import (
@@ -72,12 +73,90 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
     assert values["depreciation_expense_per_run"] > 0.0
     assert values["furnace_lifetime_cost_multiplier"] == pytest.approx(500.0)
     assert values["min_fouling_penalty"] == pytest.approx(1.0)
+    assert values["import_delivery_cost_per_kg"] == pytest.approx(10000.0)
+    assert values["carrier_gas_earth_price_per_kg"] == {
+        "Ar": pytest.approx(0.0),
+        "Kr": pytest.approx(290.0),
+        "N2": pytest.approx(0.0),
+    }
+    assert values["carrier_makeup_loss_fraction_per_run"] == pytest.approx(0.01)
     assert set(values["shuttle_reagent_replacement_cost_per_kg"]) == SHUTTLE_REAGENT_SPECIES
 
     defaulted = recipe_cost_parameters_from_payload({}, source="legacy.recipe.yaml")
     assert defaulted["provenance"]["defaults_applied"] is True
     assert "legacy.recipe.yaml" in defaulted["provenance"]["recipe_source"]
     assert cost_parameter_values(defaulted) == cost_parameter_values(block)
+
+
+def test_carrier_cost_inputs_share_yaml_and_owner_ratify_cost_metadata() -> None:
+    from simulator.cost_energy import (
+        CARRIER_GAS_KR_EARTH_USD_PER_KG,
+        CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN,
+        IMPORT_DELIVERY_USD_PER_KG,
+        owner_ratify_cost_placeholders,
+    )
+
+    raw = yaml.safe_load(DEFAULT_COST_PARAMETERS_PATH.read_text(encoding="utf-8"))
+    parameters = raw["parameters"]
+    parsed = cost_parameters_from_mapping(raw)
+
+    assert parsed.import_delivery_cost_per_kg == pytest.approx(10000.0)
+    assert parsed.carrier_gas_earth_price_per_kg["Kr"] == pytest.approx(290.0)
+    assert parsed.carrier_gas_earth_price_per_kg["N2"] == pytest.approx(0.0)
+    assert parsed.carrier_gas_earth_price_per_kg["Ar"] == pytest.approx(0.0)
+    assert parsed.carrier_makeup_loss_fraction_per_run == pytest.approx(0.01)
+    assert IMPORT_DELIVERY_USD_PER_KG.value == parameters[
+        "import_delivery_cost_per_kg"
+    ]["value"]
+    assert IMPORT_DELIVERY_USD_PER_KG.status == "owner-ratified"
+    assert CARRIER_GAS_KR_EARTH_USD_PER_KG.value == parameters[
+        "carrier_gas_earth_price_per_kg"
+    ]["values"]["Kr"]["value"]
+    assert CARRIER_GAS_KR_EARTH_USD_PER_KG.status == "owner-ratify-placeholder"
+    assert CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN.value == parameters[
+        "carrier_makeup_loss_fraction_per_run"
+    ]["value"]
+    assert CARRIER_MAKEUP_LOSS_FRACTION_PER_RUN.status == "owner-ratify-placeholder"
+    assert {
+        "carrier_gas_earth_price_per_kg.Kr",
+        "carrier_makeup_loss_fraction_per_run",
+    }.issubset({parameter.name for parameter in owner_ratify_cost_placeholders()})
+    assert parameters["carrier_gas_earth_price_per_kg"]["values"]["N2"][
+        "source_tag"
+    ] == "earth_price_pending_immaterial_vs_delivery"
+    assert parameters["carrier_gas_earth_price_per_kg"]["values"]["Ar"][
+        "source_tag"
+    ] == "earth_price_pending_immaterial_vs_delivery"
+
+
+def test_older_v1_recipe_cost_block_gets_new_carrier_cost_defaults() -> None:
+    current = default_cost_parameters_block()
+    older = copy.deepcopy(current)
+    for name in (
+        "import_delivery_cost_per_kg",
+        "carrier_gas_earth_price_per_kg",
+        "carrier_makeup_loss_fraction_per_run",
+    ):
+        older["parameters"].pop(name)
+
+    normalized = normalize_cost_parameters(
+        older,
+        source="older-v1.recipe.yaml",
+        defaults_applied=False,
+    )
+
+    assert cost_parameter_values(normalized) == cost_parameter_values(current)
+
+    kr_only = copy.deepcopy(current)
+    kr_only["parameters"]["carrier_gas_earth_price_per_kg"]["values"] = {
+        "Kr": {"value": 290.0}
+    }
+    normalized_kr_only = normalize_cost_parameters(
+        kr_only,
+        source="kr-only.recipe.yaml",
+        defaults_applied=False,
+    )
+    assert cost_parameter_values(normalized_kr_only) == cost_parameter_values(current)
 
 
 def test_report_and_optimizer_share_yaml_electricity_price_and_citation() -> None:

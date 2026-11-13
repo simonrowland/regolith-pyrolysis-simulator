@@ -3,6 +3,8 @@
 
 Writes data/battery/residuals.jsonl (generated), data/battery/score-summary.json,
 and data/battery/score-report.md.
+Filtered runs write their residuals, summary, report and compilation comparisons
+under data/battery/subsets/<filter-hash>/ instead of replacing those files.
 Pins are an independent baseline (data/battery/pins.yaml) and are never
 regenerated from residuals.
 """
@@ -55,8 +57,11 @@ from simulator.battery.score import (  # noqa: E402
     load_legacy_score_rows,
     load_residuals_stamp,
     load_score_context,
+    _matches_species_filter,
+    normalize_species_filters,
     render_score_report_from_payloads,
     _score_store_to_jsonl,
+    SpeciesFilterError,
     status_diff_rows,
     update_decision_band_ratchet,
     write_headline_summary_from_payloads_json,
@@ -65,8 +70,62 @@ from simulator.battery.score import (  # noqa: E402
 )
 
 STUDIO_HOST = "mac-studio-256-1"
-RESIDUALS_PATH = ROOT / "data" / "battery" / "residuals.jsonl"
-REPORT_PATH = ROOT / "data" / "battery" / "score-report.md"
+
+
+def _scoring_filter_record(
+    *,
+    engines,
+    rail,
+    work_id,
+    limit,
+    species_formulas,
+) -> dict[str, object]:
+    return {
+        "species": list(species_formulas),
+        "rail": None if rail is None else rail.value,
+        "work": work_id,
+        "limit": limit,
+        "engines": [engine.value for engine in engines],
+    }
+
+
+def _is_subset_run(filters: Mapping[str, object]) -> bool:
+    return (
+        bool(filters["species"])
+        or filters["rail"] is not None
+        or filters["work"] is not None
+        or filters["limit"] is not None
+        or set(filters["engines"])
+        != {engine.value for engine in SCORE_ENGINE_SET}
+    )
+
+
+def _scoring_output_directory(
+    root: Path, filters: Mapping[str, object], *, subset: bool
+) -> Path:
+    battery = root / "data" / "battery"
+    if not subset:
+        return battery
+    fingerprint = hashlib.sha256(
+        json.dumps(filters, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()[:12]
+    return battery / "subsets" / fingerprint
+
+
+def _label_subset_report(
+    report: str,
+    *,
+    filters: Mapping[str, object],
+    subset: bool,
+) -> str:
+    if subset:
+        heading, _separator, body = report.partition("\n")
+        label = (
+            "**SUBSET AGGREGATES:** This report covers only the selected references. "
+            f"Filters: `{json.dumps(filters, sort_keys=True, separators=(',', ':'))}`"
+        )
+        report = f"{heading}\n\n{label}\n\n{body.lstrip()}"
+    return report
 
 
 def _observation_store_hash(root: Path) -> str:
@@ -306,7 +365,12 @@ def _progress_wait(proc: subprocess.Popen[str], *, label: str) -> int:
 
 
 def _run_studio(
-    engines: list[str], extra: list[str], *, engine_cache_path: Path | None = None
+    engines: list[str],
+    extra: list[str],
+    *,
+    engine_cache_path: Path | None = None,
+    output_directory: Path,
+    remote_output_directory: Path,
 ) -> tuple[str | None, Path | None, dict[str, object] | None]:
     """Dispatch MELTS engines to Studio 1. Prints a progress line every 60 s."""
 
@@ -379,12 +443,14 @@ def _run_studio(
     if code != 0:
         print(f"studio score failed: {code}", flush=True)
         return hostname, None, None
+    remote_output = (Path(remote_root) / remote_output_directory).as_posix()
+    output_directory.mkdir(parents=True, exist_ok=True)
     subprocess.run(
         [
             "rsync",
             "-a",
-            f"{STUDIO_HOST}:{remote_root}/data/battery/residuals.jsonl",
-            str(RESIDUALS_PATH),
+            f"{STUDIO_HOST}:{remote_output}/residuals.jsonl",
+            str(output_directory / "residuals.jsonl"),
         ],
         check=False,
     )
@@ -392,8 +458,8 @@ def _run_studio(
         [
             "rsync",
             "-a",
-            f"{STUDIO_HOST}:{remote_root}/data/battery/score-report.md",
-            str(REPORT_PATH),
+            f"{STUDIO_HOST}:{remote_output}/score-report.md",
+            str(output_directory / "score-report.md"),
         ],
         check=False,
     )
@@ -407,7 +473,7 @@ def _run_studio(
         [
             "rsync",
             "-a",
-            f"{STUDIO_HOST}:{remote_root}/data/battery/compilation-comparisons.jsonl",
+            f"{STUDIO_HOST}:{remote_output}/compilation-comparisons.jsonl",
             str(studio_comparisons_path),
         ],
         check=False,
@@ -417,7 +483,7 @@ def _run_studio(
         studio_comparisons_path = None
     studio_cache_summary = None
     if remote_cache_path is not None:
-        remote_summary_path = f"{remote_root}/data/battery/score-summary.json"
+        remote_summary_path = f"{remote_output}/score-summary.json"
         summary = subprocess.run(
             [
                 "ssh",
@@ -504,12 +570,20 @@ def _attach_engine_cache_summary(
         local_runtime_identities,
     )
     path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
     )
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        epilog=(
+            "Filtered --work/--rail/--species/--limit/--engines runs write under "
+            "data/battery/subsets/<filter-hash>/ and do not refresh the published "
+            "headline files. Run an unfiltered score to refresh the published headline."
+        ),
+    )
     parser.add_argument(
         "--engines",
         default=",".join(e.value for e in SCORE_ENGINE_SET),
@@ -523,6 +597,11 @@ def main(argv: list[str] | None = None) -> int:
         type=int,
         default=1,
         help="spawn this many scorer processes (default: 1)",
+    )
+    parser.add_argument(
+        "--species",
+        default=None,
+        help="restrict to one or more stored species formulas (comma-separated)",
     )
     parser.add_argument(
         "--studio",
@@ -566,6 +645,11 @@ def main(argv: list[str] | None = None) -> int:
     engine_cache_path = (
         None if not cache_path_value else Path(cache_path_value).expanduser()
     )
+
+    if args.species is not None and (
+        args.update_band_ratchet or args.measured_headline or args.report_only
+    ):
+        parser.error("--species is only supported during normal scoring")
 
     if args.update_band_ratchet:
         context = load_score_context(args.root)
@@ -660,6 +744,31 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
+    run_started_wall = time.perf_counter()
+    run_started_cpu = time.process_time()
+    context = load_score_context(args.root)
+    try:
+        species_formulas = normalize_species_filters(
+            context,
+            None if args.species is None else args.species.split(","),
+        )
+    except SpeciesFilterError as exc:
+        parser.error(str(exc))
+    filters = _scoring_filter_record(
+        engines=engines,
+        rail=rail,
+        work_id=args.work,
+        limit=args.limit,
+        species_formulas=species_formulas,
+    )
+    subset = _is_subset_run(filters)
+    output_directory = _scoring_output_directory(
+        args.root, filters, subset=subset
+    )
+    residuals_path = output_directory / "residuals.jsonl"
+    report_path = output_directory / "score-report.md"
+    compilation_comparisons_path = output_directory / "compilation-comparisons.jsonl"
+
     melts = [e.value for e in engines if e.value in {"alphamelts", "thermoengine", "magemin"}]
     laptop = [e for e in engines if e.value not in {"alphamelts", "thermoengine", "magemin"}]
     studio_hostname = None
@@ -670,30 +779,46 @@ def main(argv: list[str] | None = None) -> int:
     if args.studio and melts and STUDIO_HOST not in host and "studio" not in host.lower():
         studio_routed = True
         extra = []
-        if args.rail:
-            extra.extend(["--rail", args.rail])
+        if rail is not None:
+            extra.extend(["--rail", rail.value])
         if args.work:
             extra.extend(["--work", args.work])
         if args.limit is not None:
             extra.extend(["--limit", str(args.limit)])
         if args.workers > 1:
             extra.extend(["--workers", str(args.workers)])
+        if species_formulas:
+            extra.extend(["--species", ",".join(species_formulas)])
+        remote_filters = _scoring_filter_record(
+            engines=engines_from_names(melts),
+            rail=rail,
+            work_id=args.work,
+            limit=args.limit,
+            species_formulas=species_formulas,
+        )
+        remote_output_directory = _scoring_output_directory(
+            ROOT, remote_filters, subset=_is_subset_run(remote_filters)
+        ).relative_to(ROOT)
         (
             studio_hostname,
             studio_comparisons_path,
             studio_cache_summary,
         ) = _run_studio(
-            melts, extra, engine_cache_path=engine_cache_path
+            melts,
+            extra,
+            engine_cache_path=engine_cache_path,
+            output_directory=output_directory,
+            remote_output_directory=remote_output_directory,
         )
         engines = tuple(laptop)
 
-    context = load_score_context(args.root)
     written, metadata = _score_store_to_jsonl(
         context,
         residuals_path,
         root=args.root,
         engines=engines,
         rail=rail,
+        species_formulas=species_formulas,
         work_id=args.work,
         limit=args.limit,
         workers=args.workers,
@@ -709,12 +834,18 @@ def main(argv: list[str] | None = None) -> int:
     live = derive_store_stamp(args.root)
     mismatch = emit_store_stamp_mismatch_warning(recorded, live)
 
-    summary_path = args.root / "data" / "battery" / "score-summary.json"
+    summary_path = output_directory / "score-summary.json"
     summary_partial_path = summary_path.with_name(summary_path.name + ".partial")
     report_partial_path = report_path.with_name(report_path.name + ".partial")
     compilation_comparisons_partial_path = compilation_comparisons_path.with_name(
         compilation_comparisons_path.name + ".partial"
     )
+    compilation_filter = None
+    if species_formulas:
+        selected_species = set(species_formulas)
+        compilation_filter = lambda observation: _matches_species_filter(
+            observation, selected_species
+        )
     failures: list[dict] = []
     unmapped: list[str] = []
     diffs: list[dict] = []
@@ -727,6 +858,13 @@ def main(argv: list[str] | None = None) -> int:
             compilation_comparisons_partial_path,
             engines=engines,
             invoke_pure_phase=not studio_routed,
+            work_id=args.work,
+            rail=rail,
+            **(
+                {"observation_filter": compilation_filter}
+                if compilation_filter is not None
+                else {}
+            ),
         )
         if studio_comparisons_path is not None:
             try:
@@ -783,11 +921,21 @@ def main(argv: list[str] | None = None) -> int:
             report,
             iter_compilation_comparisons_jsonl(compilation_comparisons_partial_path),
         )
+        summary_options = (
+            {
+                "filters": filters,
+                "selected_references": metadata.selected_reference_count,
+                "subset": True,
+            }
+            if subset
+            else {}
+        )
         _write_headline_summary_from_accumulator_json(
             report_aggregate,
             summary_partial_path,
             store_stamp=recorded,
             shard_failures=metadata.shard_failures,
+            **summary_options,
         )
         _attach_engine_cache_summary(
             summary_partial_path,
@@ -796,6 +944,11 @@ def main(argv: list[str] | None = None) -> int:
             metadata.engine_cache_counters,
             metadata.engine_cache_runtime_identities,
         )
+        report = _label_subset_report(
+            report,
+            filters=filters,
+            subset=subset,
+        )
         report_partial_path.write_text(report, encoding="utf-8")
         os.replace(summary_partial_path, summary_path)
         os.replace(report_partial_path, report_path)
@@ -803,10 +956,20 @@ def main(argv: list[str] | None = None) -> int:
         os.replace(compilation_comparisons_partial_path, compilation_comparisons_path)
     finally:
         compilation_comparisons_partial_path.unlink(missing_ok=True)
-    print(
-        f"residuals={written} scored={scored} "
-        f"pin_failures={len(failures)} host={context.hostname}"
-    )
+    if subset:
+        print(
+            f"residuals={written} scored={scored} "
+            f"references={metadata.selected_reference_count} "
+            f"wall_seconds={time.perf_counter() - run_started_wall:.3f} "
+            f"process_cpu_seconds={time.process_time() - run_started_cpu:.3f} "
+            f"subset=true output={output_directory} "
+            f"pin_failures={len(failures)} host={context.hostname}"
+        )
+    else:
+        print(
+            f"residuals={written} scored={scored} "
+            f"pin_failures={len(failures)} host={context.hostname}"
+        )
     return 0
 
 

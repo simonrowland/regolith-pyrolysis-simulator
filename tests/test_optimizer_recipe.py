@@ -726,7 +726,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-11-09 d-358: the explicit condenser-purity enforcement switch is
     # part of the physics constraint identity; this pin is recomputed by
     # cache_key(spec) with that default-off policy.
-    assert cache_key(spec) == "8ec42be7ccf3f217258b30d9d89a37c91ec24db925d51b054ce0e57081062749"
+    # 2026-11-12 b260: recomputed for t-1720 (d-389 carrier cost in the
+    # objective).
+    assert cache_key(spec) == "8d41af13498d7c9be4c2b39053f64c9c439e2d2ef109fac255f8d027cb4d8861"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import json
+from collections.abc import Mapping
 import math
 import os
 from hashlib import sha256
 from pathlib import Path
+import pickle
 import re
 import stat
 import tempfile
@@ -16,35 +17,102 @@ import yaml
 
 
 _CACHE_ENV = "REGOLITH_PARSED_YAML_CACHE_DIR"
-_CACHE_FORMAT = 2
+_CACHE_ENABLED_ENV = "REGOLITH_PARSED_YAML_CACHE"
+_CACHE_FORMAT = 3
+_YAML12_SCHEMA_ID = "yaml12-core-boolean-resolver-v1"
 _CACHE_MISS = object()
 
-
+# Use libyaml's C-backed reader/parser when it is installed. SafeLoader is the
+# pure-Python fallback for environments without libyaml.
 _YAML_BASE_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 
-class YAML12SafeLoader(_YAML_BASE_LOADER):
-    """SafeLoader with YAML 1.2 core-schema implicit booleans."""
+def _yaml12_safe_loader(base_loader: type) -> type:
+    """Build the same safe YAML 1.2 loader over either PyYAML implementation."""
 
-    # PyYAML's default resolver follows YAML 1.1 and turns chemistry/statistics
-    # tokens such as ``yes`` and ``NO`` into bools; YAML 1.2 core only does that
-    # for the six case variants of ``true`` and ``false``. Copy the resolver
-    # table so the C loader stays fast and its parent class remains untouched.
-    yaml_implicit_resolvers = {
-        key: [
-            (tag, regexp)
-            for tag, regexp in resolvers
-            if tag != "tag:yaml.org,2002:bool"
-        ]
-        for key, resolvers in _YAML_BASE_LOADER.yaml_implicit_resolvers.items()
-    }
+    class YAML12SafeLoader(base_loader):
+        # YAML 1.1 resolves chemistry tokens such as ``yes`` and ``NO`` as
+        # booleans. YAML 1.2 core only resolves true/false. Copy the table so
+        # changing this resolver never mutates PyYAML's shared loader class.
+        yaml_implicit_resolvers = {
+            key: [
+                (tag, regexp)
+                for tag, regexp in resolvers
+                if tag != "tag:yaml.org,2002:bool"
+            ]
+            for key, resolvers in base_loader.yaml_implicit_resolvers.items()
+        }
+
+    YAML12SafeLoader.__name__ = "YAML12SafeLoader"
+    YAML12SafeLoader.__qualname__ = "YAML12SafeLoader"
+    YAML12SafeLoader.add_implicit_resolver(
+        "tag:yaml.org,2002:bool",
+        re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$"),
+        list("tTfF"),
+    )
+    return YAML12SafeLoader
 
 
-YAML12SafeLoader.add_implicit_resolver(
-    "tag:yaml.org,2002:bool",
-    re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$"),
-    list("tTfF"),
-)
+YAML12SafeLoader = _yaml12_safe_loader(_YAML_BASE_LOADER)
+
+
+def _assert_type_exact_equal(left: object, right: object, seen=None) -> None:
+    """Assert that two parsed YAML values have identical types and contents."""
+
+    assert type(left) is type(right)
+    visited = seen if seen is not None else set()
+    pair = (id(left), id(right))
+    if pair in visited:
+        return
+    visited.add(pair)
+
+    if isinstance(left, Mapping):
+        assert isinstance(right, Mapping)
+        assert len(left) == len(right)
+        unmatched = list(right.items())
+        for left_key, left_value in left.items():
+            match = next(
+                (
+                    index
+                    for index, (right_key, _right_value) in enumerate(unmatched)
+                    if type(left_key) is type(right_key) and left_key == right_key
+                ),
+                None,
+            )
+            assert match is not None, f"mapping key differs: {left_key!r}"
+            right_key, right_value = unmatched.pop(match)
+            _assert_type_exact_equal(left_key, right_key, visited)
+            _assert_type_exact_equal(left_value, right_value, visited)
+        return
+
+    if isinstance(left, (list, tuple)):
+        assert isinstance(right, type(left))
+        assert len(left) == len(right)
+        for left_item, right_item in zip(left, right, strict=True):
+            _assert_type_exact_equal(left_item, right_item, visited)
+        return
+
+    if isinstance(left, (set, frozenset)):
+        assert isinstance(right, type(left))
+        assert len(left) == len(right)
+        unmatched = list(right)
+        for left_item in left:
+            match = next(
+                (
+                    index
+                    for index, right_item in enumerate(unmatched)
+                    if type(left_item) is type(right_item) and left_item == right_item
+                ),
+                None,
+            )
+            assert match is not None, f"set value differs: {left_item!r}"
+            _assert_type_exact_equal(left_item, unmatched.pop(match), visited)
+        return
+
+    if isinstance(left, float) and math.isnan(left):
+        assert math.isnan(right)
+        return
+    assert left == right
 
 
 def _format_yaml_source_path(path: tuple[object, ...]) -> str:
@@ -59,7 +127,7 @@ def _format_yaml_source_path(path: tuple[object, ...]) -> str:
 
 def _walk_yaml_mapping_source_issues(
     node: object,
-    loader: YAML12SafeLoader,
+    loader: Any,
     source: str,
     path: tuple[object, ...] = (),
 ) -> list[tuple[str, int, str]]:
@@ -159,36 +227,52 @@ def load_cached_safe_yaml(
     *,
     content_sha256: str | None = None,
 ) -> Any:
-    """Load YAML, reusing an exact-content JSON cache across processes.
+    """Load YAML, reusing an exact-content typed cache across processes.
 
-    The cache is only written when JSON can preserve every parsed type and no
-    YAML alias shares a mutable container. Unsupported trees keep the existing
-    loader behavior and simply skip process-shared reuse.
+    The pickle value preserves the safe loader's Python types and YAML aliases.
+    Set ``REGOLITH_PARSED_YAML_CACHE=off`` to bypass the process-shared cache;
+    ``REGOLITH_PARSED_YAML_CACHE_DIR`` selects its private root.
     """
 
     raw = payload.encode("utf-8") if isinstance(payload, str) else payload
     digest = sha256(raw).hexdigest()
     if content_sha256 is not None and content_sha256 != digest:
         raise ValueError("content_sha256 does not match YAML payload")
-    cache_path = _cache_path(digest)
-    cached = _read_cache(cache_path, digest)
+    if not _cache_enabled():
+        return yaml.load(payload, Loader=YAML12SafeLoader)
+
+    loader_identity = _loader_identity()
+    cache_path = _cache_path(digest, loader_identity)
+    cached = _read_cache(cache_path, digest, loader_identity)
     if cached is not _CACHE_MISS:
         return cached
 
     parsed = yaml.load(payload, Loader=YAML12SafeLoader)
-    if _json_roundtrip_safe(parsed):
-        _write_cache(cache_path, digest, parsed)
+    _write_cache(cache_path, digest, loader_identity, parsed)
     return parsed
 
 
-def _cache_path(content_sha256: str) -> Path:
+def _cache_enabled() -> bool:
+    value = os.environ.get(_CACHE_ENABLED_ENV, "").strip().casefold()
+    return value not in {"0", "false", "no", "off"}
+
+
+def _loader_identity() -> str:
+    base_identity = f"{_YAML_BASE_LOADER.__module__}.{_YAML_BASE_LOADER.__qualname__}"
+    return f"pyyaml={yaml.__version__};base={base_identity};schema={_YAML12_SCHEMA_ID}"
+
+
+def _cache_path(content_sha256: str, loader_identity: str | None = None) -> Path:
     root = _cache_root()
     loader_version = re.sub(r"[^A-Za-z0-9_.-]", "_", str(yaml.__version__))
+    identity = loader_identity or _loader_identity()
+    loader_token = sha256(identity.encode("utf-8")).hexdigest()
     return (
         root
         / f"pyyaml-{loader_version}"
+        / f"yaml12-{loader_token}"
         / f"v{_CACHE_FORMAT}"
-        / f"{content_sha256}.json"
+        / f"{content_sha256}.pickle"
     )
 
 
@@ -267,10 +351,20 @@ def _private_directory_metadata(metadata: os.stat_result) -> bool:
     return metadata.st_mode & 0o022 == 0
 
 
-def _read_cache(path: Path, content_sha256: str) -> Any:
+def _read_cache(path: Path, content_sha256: str, loader_identity: str) -> Any:
     try:
-        envelope = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
+        metadata = path.lstat()
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_mode & 0o077
+            or (hasattr(os, "getuid") and metadata.st_uid != os.getuid())
+        ):
+            return _CACHE_MISS
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        descriptor = os.open(path, flags)
+        with os.fdopen(descriptor, "rb") as handle:
+            envelope = pickle.load(handle)
+    except Exception:
         return _CACHE_MISS
     if not isinstance(envelope, dict):
         return _CACHE_MISS
@@ -278,66 +372,40 @@ def _read_cache(path: Path, content_sha256: str) -> Any:
         return _CACHE_MISS
     if envelope.get("content_sha256") != content_sha256:
         return _CACHE_MISS
+    if envelope.get("loader_identity") != loader_identity:
+        return _CACHE_MISS
     if "value" not in envelope:
         return _CACHE_MISS
-    value = envelope.get("value")
-    return value if _json_roundtrip_safe(value) else _CACHE_MISS
+    return envelope["value"]
 
 
-def _write_cache(path: Path, content_sha256: str, value: Any) -> None:
+def _write_cache(
+    path: Path, content_sha256: str, loader_identity: str, value: Any
+) -> None:
     envelope = {
         "cache_format": _CACHE_FORMAT,
         "content_sha256": content_sha256,
+        "loader_identity": loader_identity,
         "value": value,
     }
-    try:
-        encoded = json.dumps(
-            envelope,
-            allow_nan=False,
-            ensure_ascii=False,
-            separators=(",", ":"),
-        )
-        path.parent.mkdir(parents=True, exist_ok=True)
-    except (OSError, TypeError, ValueError):
-        return
-
     temp_path: Path | None = None
     try:
+        path.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.NamedTemporaryFile(
-            mode="w",
-            encoding="utf-8",
+            mode="wb",
             dir=path.parent,
             prefix=f".{path.stem}.",
             suffix=".tmp",
             delete=False,
         ) as handle:
-            handle.write(encoded)
             temp_path = Path(handle.name)
+            pickle.dump(envelope, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            handle.flush()
+            os.fsync(handle.fileno())
         os.replace(temp_path, path)
-    except OSError:
+    except Exception:
         if temp_path is not None:
             try:
                 temp_path.unlink()
             except OSError:
                 pass
-
-
-def _json_roundtrip_safe(value: Any, seen: set[int] | None = None) -> bool:
-    if value is None or type(value) in {str, bool, int}:
-        return True
-    if type(value) is float:
-        return math.isfinite(value)
-    if type(value) not in {dict, list}:
-        return False
-
-    visited = seen if seen is not None else set()
-    identity = id(value)
-    if identity in visited:
-        return False
-    visited.add(identity)
-    if type(value) is list:
-        return all(_json_roundtrip_safe(item, visited) for item in value)
-    return all(
-        type(key) is str and _json_roundtrip_safe(item, visited)
-        for key, item in value.items()
-    )
