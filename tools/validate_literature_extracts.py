@@ -280,7 +280,13 @@ LAB_PARAMETER_VOCABULARY_PATH = ROOT / "data" / "literature" / "lab_parameter_vo
 
 @lru_cache(maxsize=512)
 def _load_extract_yaml_cached(path: str, mtime_ns: int, size: int) -> Any:
-    return yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    text = Path(path).read_text(encoding="utf-8")
+    # Same YAML 1.1 safe schema as yaml.safe_load. The pure-Python loader
+    # is the corpus-validation CPU cost; libyaml parses these files the same.
+    loader = getattr(yaml, "CSafeLoader", None)
+    if loader is None:
+        return yaml.safe_load(text)
+    return yaml.load(text, Loader=loader)
 
 
 def load_extract_yaml(path: Path) -> Any:
