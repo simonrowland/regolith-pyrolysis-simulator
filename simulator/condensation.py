@@ -3874,9 +3874,13 @@ class CondensationModel:
         stage_route_by_species: dict[str, dict[str, Any]] = {}
         reactive_alkali: dict[str, dict[str, Any]] = {}
         wall_reaction_bookings: dict[str, dict[str, Any]] = {}
+        stream_po2_pa = self.wall_species_partial_pressures_pa.get("O2")
+        if stream_po2_pa is None and self.wall_species_partial_pressures_pa:
+            # The populated map is a complete mixture; omitted O2 is a known
+            # zero partial, while an unavailable mixture remains a refusal.
+            stream_po2_pa = 0.0
         stream_po2_bar = (
-            self.wall_species_partial_pressures_pa["O2"] / PA_PER_BAR
-            if "O2" in self.wall_species_partial_pressures_pa else None
+            None if stream_po2_pa is None else stream_po2_pa / PA_PER_BAR
         )
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             if (
@@ -5274,20 +5278,24 @@ class CondensationModel:
             raise DepositionInputRefusal('stage3_product_activity', product_mol,
                                          'silicate product composition required')
         a_oxide = activity.thermodynamic_parent_activity()
+        if stream_po2_bar is None:
+            raise DepositionInputRefusal(
+                'stage3_stream_pO2_bar', None,
+                'Dalton O2 partial pressure is unavailable',
+            )
         try:
             pressure_pa = _finite_nonnegative_value(
                 flowing_pressure_pa,
                 label=f'{species} partial pressure',
             )
-            # pO2_mbar is the incoming sweep command; zero commanded O2
-            # does not remove the co-evolved oxygen in the actual headspace.
             po2_bar = _finite_nonnegative_value(
-                melt.oxygen_reservoir.headspace_ledger_pO2_bar,
-                label='stage3 headspace pO2_bar')
+                stream_po2_bar,
+                label='stream Dalton pO2_bar',
+            )
         except ValueError as exc:
             raise DepositionInputRefusal('stage3_reaction_gas', species, str(exc)) from exc
-        if stream_po2_bar is not None:
-            po2_bar += stream_po2_bar
+        # This stream Dalton partial already includes committed overhead O2;
+        # the headspace ledger represents the same inventory and is not added.
         # Ellingham basis: 4 M(g) + O2 -> 2 M2O, standard pressure 1 bar.
         # ln(Q/K) = 2 ln(a_M2O) - 4 ln(p_M/bar) - ln(pO2/bar)
         #             + dG°/(R T). All log arguments are dimensionless;
@@ -5308,8 +5316,7 @@ class CondensationModel:
                          else po2_bar > 0.0 and pressure_pa > 0.0 and a_oxide == 0.0),
             'log_Q_over_K': log_q_over_k, 'temperature_K': temperature_K,
             'alkali_pressure_pa': pressure_pa, 'pO2_bar': po2_bar,
-            'pO2_source': ('retained_plus_evaporation_stream' if stream_po2_bar is not None
-                           else 'oxygen_reservoir.headspace_ledger_pO2_bar'),
+            'pO2_source': 'stream_dalton_o2_partial',
             **({'reference_state_notice': {
                 'status': 'authority_extrapolated',
                 'message': 'reference-state mismatch: pure-liquid KO0.5 activity vs crystalline K2O dG; no K2O fusion data; authority extrapolated',
