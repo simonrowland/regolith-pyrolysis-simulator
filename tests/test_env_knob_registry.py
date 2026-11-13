@@ -22,7 +22,10 @@ ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
-ENV_ACCESS_TOKEN_CEILING = 91
+# Exact b260 delta, confirmed with git log -S: simulator/yaml_cache.py:256
+# (ab04fd) and scripts/check_yaml_cache_parity.py:43,45,46 (2d044). Both
+# commits are ancestors of green 42044855e.
+ENV_ACCESS_TOKEN_CEILING = 95
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep
@@ -47,6 +50,7 @@ KNOWN_INTERNAL_ENV = {
     "REGOLITH_OPTIMIZER_WARM_WORKERS": "Controls optimizer worker reuse, an internal performance setting.",
     "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR": "Internal worker output handoff path.",
     "REGOLITH_PARSED_YAML_CACHE_DIR": "Selects the implementation cache directory for parsed YAML.",
+    "REGOLITH_PARSED_YAML_CACHE": "Toggles the process-shared parsed-YAML disk cache in simulator.yaml_cache; enabled by default.",
     "REGOLITH_REPO_ROOT": "Overrides the repository path for an internal cache validation script.",
     "REGOLITH_STUDIO_HOST": "Labels the Studio host in an internal battery scoring report.",
     "REGOLITH_THERMOENGINE_LOG_DIR": "Routes native engine diagnostics to a log directory.",
