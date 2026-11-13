@@ -74,9 +74,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   and does not certify as a plain formula or a plain number, so
   ``$O^{2-}$`` is not ``O2`` and ``$SiO^{2}$`` is not ``SiO2``.
   A raw token that carries ``^``, ``<sup>``, a Unicode superscript, or a
-  trailing charge sign is a charged species. It certifies no formula or
-  species label and no number, on prose, an HTML cell, a CSV or TSV
-  cell, and repository text. The refusal is
+  trailing charge sign is a charged species. The charge sign is
+  ``FORMULA_CHARGE_SIGNS``, so ``Cl−`` does not certify ``Cl``. It
+  certifies no formula or species label and no number, on prose, an HTML
+  cell, a CSV or TSV cell, and repository text. The refusal is
   ``charged_species_unsupported``. ``Fe`` is not ``$\\mathrm{Fe}^{2+}$``
   and ``Fe^{2+}`` is not an identical CSV cell.
   A plain numeric cell with no element symbol is still a power.
@@ -194,7 +195,7 @@ from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
     iter_unsupported_context_container_paths,
 )
-from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.chemistry.formula_text import FORMULA_CHARGE_SIGNS, fold_subscript_digits
 from simulator.state_types import StateTag
 from tools.mineru_table_draft import (
     UNICODE_SUPERSCRIPTS,
@@ -3332,8 +3333,11 @@ def _formula_run_char(ch: str) -> bool:
 _SUP_TAG_RE = re.compile(r"</?\s*sup\b[^>]*>", re.IGNORECASE)
 # The numeric times sign in ``1.5x10``. It is not an element symbol.
 _TIMES_X_RE = re.compile(r"(?<=\d)\s*[xX]\s*(?=10)")
-# A trailing + or - on a formula, optionally inside a closing ``$``.
-_TRAILING_FORMULA_CHARGE_RE = re.compile(r"[A-Za-z)\]]\d*\s*[+\-]\s*\$?\s*$")
+# A trailing charge sign on a formula, optionally inside a closing ``$``.
+# The sign is ``FORMULA_CHARGE_SIGNS``, not only ASCII plus and hyphen-minus.
+_TRAILING_FORMULA_CHARGE_RE = re.compile(
+    r"[A-Za-z)\]]\d*\s*[" + re.escape(FORMULA_CHARGE_SIGNS) + r"]\s*\$?\s*$"
+)
 
 
 def _raw_has_element_symbol(text: str) -> bool:
@@ -3345,8 +3349,9 @@ def _raw_has_element_symbol(text: str) -> bool:
 def _raw_token_is_charged_species(token: str) -> bool:
     """True before wrapper removal when this raw token is a charged species.
 
-    A caret, a ``<sup>``, a Unicode superscript, or a trailing ``+`` or
-    ``-`` on a formula. A closing brace between ``Fe`` and ``^{2+}`` does
+    A caret, a ``<sup>``, a Unicode superscript, or a trailing charge
+    sign from ``FORMULA_CHARGE_SIGNS``. ``Cl−`` is charged, so it does
+    not certify ``Cl``. A closing brace between ``Fe`` and ``^{2+}`` does
     not make ``Fe`` a neutral label. ``10<sup>3</sup>`` and
     ``1.5x10<sup>3</sup>`` have no element symbol, so they are not this.
     """

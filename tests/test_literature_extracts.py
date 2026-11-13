@@ -62,6 +62,7 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
+from simulator.chemistry.formula_text import FORMULA_CHARGE_SIGNS  # noqa: E402
 from tools.mineru_table_draft import printed_formula as draft_printed_formula  # noqa: E402
 from simulator.battery import migrate as battery_migrate  # noqa: E402
 from simulator.battery.waypoints import oxygen_condition  # noqa: E402
@@ -10699,6 +10700,13 @@ _FORMULA_COMPOUNDS = (
 # and Fe^{2+} all refuse. A separate neutral Fe in the same text still
 # certifies Fe. The mathrm form closes the brace before the charge.
 _CHARGED_SPECIES_LABELS = ("Fe", "Fe2", "Fe^{2+}")
+# Unicode charge signs. Each source refuses its neutral label.
+_UNICODE_CHARGE_SOURCES = (
+    ("Cl", "Cl\u2212"),
+    ("Cl", "Cl\u207b"),
+    ("Na", "Na\u207a"),
+    ("SO4", "SO\u2084\u00b2\u207b"),
+)
 _CHARGED_SPECIES_SOURCES = (
     ("dollar", "$Fe^{2+}$"),
     ("mathrm", "$\\mathrm{Fe}^{2+}$"),
@@ -10779,7 +10787,10 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     a Unicode superscript, or a trailing charge is unsupported.
     ``Fe``, ``Fe2``, and ``Fe^{2+}`` refuse with
     ``charged_species_unsupported``, including a CSV cell. A neutral
-    ``Fe`` elsewhere still certifies.
+    ``Fe`` elsewhere still certifies. A Unicode charge sign is that
+    same refusal: ``Cl−``, ``Cl⁻``, ``Na⁺``, and ``SO₄²⁻`` refuse
+    ``Cl``, ``Cl``, ``Na``, and ``SO4`` on prose, an HTML cell, CSV,
+    and TSV.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -11046,6 +11057,58 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                 failures.append(
                     f"charged csv neighbour {label!r} {kind}: {errors}"
                 )
+    assert FORMULA_CHARGE_SIGNS == (
+        "+-\u2212\u2013\u2012\ufe63\uff0b\uff0d\u207a\u207b\u208a\u208b"
+    )
+    assert "FORMULA_CHARGE_SIGNS" in inspect.getsource(vle)
+    charge_pattern = vle._TRAILING_FORMULA_CHARGE_RE.pattern
+    for sign in FORMULA_CHARGE_SIGNS:
+        assert sign in charge_pattern or re.escape(sign) in charge_pattern
+        if not vle._raw_token_is_charged_species(f"Cl{sign}"):
+            failures.append(f"charge sign {sign!r} does not charge Cl")
+        if vle._formula_label_in_text("Cl", f"Cl{sign}"):
+            failures.append(f"charge sign {sign!r} certifies Cl")
+    assert vle._raw_token_is_charged_species("Cl") is False
+    for neutral, source in _UNICODE_CHARGE_SOURCES:
+        surfaces = (
+            ("prose", source + "\n", "text/unicode-charge.md", None),
+            (
+                "html",
+                f"<table><tr><td>{source}</td></tr></table>\n",
+                "text/unicode-charge.html",
+                {"table_row": 1, "table_column": 1},
+            ),
+            ("csv", source + "\n", "tables/unicode-charge.csv", None),
+            ("tsv", source + "\n", "tables/unicode-charge.tsv", None),
+        )
+        for kind, text, relative, locator_extra in surfaces:
+            for key in ("formula", "species"):
+                doc = _html_source_document(
+                    tmp_path,
+                    neutral,
+                    text,
+                    key=key,
+                    relative=relative,
+                    locator_extra=locator_extra,
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"unicode-charge-{kind}-{key}-{neutral}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if "charged_species_unsupported" not in joined:
+                    failures.append(
+                        f"unicode charge {kind} {key} {neutral!r} ~ {source!r}: {errors}"
+                    )
+                if kind == "html" and "superscript_in_cell" in joined:
+                    failures.append(
+                        f"unicode charge html power {neutral!r} ~ {source!r}: {errors}"
+                    )
+                if kind != "html" and "source_blind_pin" not in joined:
+                    failures.append(
+                        f"unicode charge {kind} blind {neutral!r}: {errors}"
+                    )
     assert failures == []
 
 

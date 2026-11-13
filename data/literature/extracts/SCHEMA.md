@@ -250,8 +250,11 @@ contains `^` does not certify as a plain formula or a plain number, so
 and `$SiO^{2}$` does not certify `SiO2`. Charged or powered species
 labels are unsupported. Before any wrapper is removed, a raw token that
 carries `^`, `<sup>`, a Unicode superscript, or a trailing charge sign
-on a formula is charged. That token, and an HTML, CSV, or TSV cell
-that contains it, certifies no formula or species label, neither the
+on a formula is charged. The sign is one set: ASCII plus and
+hyphen-minus, minus sign, en dash, figure dash, small hyphen-minus,
+fullwidth plus and hyphen-minus, and superscript or subscript plus and
+minus. `Cl−` does not certify `Cl`. That token, and an HTML, CSV, or
+TSV cell that contains it, certifies no formula or species label, neither the
 neutral prefix nor a charged label, and certifies no number. Formula
 and species labels take that guarded comparison first, on prose, an
 HTML cell, a CSV or TSV cell, and repository text, so an identical
