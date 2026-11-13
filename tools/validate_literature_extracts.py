@@ -109,7 +109,8 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   cell before spans are stripped. That superscripted token or cell
   certifies no formula or species label, so ``<sup>SiO2</sup>``,
   ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` are
-  ``charged_species_unsupported``. A numeric token has no element letter,
+  ``charged_species_unsupported``. A superscript in another token of
+  the same cited span does not type an unrelated miss. A numeric token has no element letter,
   so ``-6.98`` still certifies ``-6.98``. ``Fe`` is not
   ``$\\mathrm{Fe}^{2+}$`` and ``Fe^{2+}`` is not an identical CSV cell.
   A plain numeric cell with no element symbol is still a power.
@@ -119,6 +120,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   run of element symbols, digits, parentheses, square brackets, and the
   charge marks ·, +, and -. ``SO4`` is not ``Fe₂(SO₄)₃``. ``Fe2(SO4)3``
   is. ``CaO·SiO2`` certifies only as that whole run, so ``SiO2`` does not.
+  A ``.`` followed by a digit, inside or right after a count, stays in
+  the run, including a folded ``_{2.5}``. ``SiO2.5`` and ``SiO_{2.5}``
+  do not certify ``SiO2``, and ``FeO1.5`` does not certify ``FeO``.
+  A period that is not followed by a digit is still a boundary, so
+  ``SiO2.`` at the end of a sentence certifies ``SiO2``.
   A token with no internal space, including
   ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``, goes through
   ``printed_formula``. A space always separates tokens, so ``SiO 2``
@@ -3390,8 +3396,9 @@ def _formula_cell_matches(leaf: str, cell: str) -> bool:
 
 
 # A formula run is element symbols, digits, parentheses, square brackets,
-# and the charge marks · U+00B7, +, and -. Whitespace or any other
-# character ends the run. Parentheses do not.
+# and the charge marks · U+00B7, +, and -. A '.' followed by a digit,
+# inside or right after a count, stays in the run. Any other character,
+# including a sentence period, ends it. Parentheses do not.
 _FORMULA_RUN_MARKS = "()[]+-\u00b7"
 
 
@@ -3569,11 +3576,13 @@ def _charged_formula_miss(
 
     A charged token elsewhere in the text does not type an unrelated
     miss. The label is charged, or a charged raw token's element symbols
-    are the label's. A superscripted token or cell is decided on the raw
-    text, before spans are stripped. It certifies no formula label, so
-    ``<sup>SiO2</sup>``, ``SiO2ⁿ``, and ``Fe<sup>2</sup>`` are
-    ``charged_species_unsupported`` for every formula label. Lowercase
-    letters stay on the charge-sign path, so ``SO₄−`` is not ``SiO2``.
+    are the label's. A superscripted token is that token, not the whole
+    cited span. One such token certifies no formula label. A superscript
+    in another token leaves an unrelated miss as
+    ``cited_token_absent``. ``has_superscript`` is the HTML cell, so
+    every formula label on that cell is charged, including an unrelated
+    one. Lowercase letters stay on the charge-sign path, so ``SO₄−``
+    is not ``SiO2``.
     """
     formula_miss = [
         leaf
@@ -3587,11 +3596,14 @@ def _charged_formula_miss(
         for leaf in formula_miss
     ):
         return True
-    if has_superscript or is_superscripted(text):
+    if has_superscript:
+        return True
+    tokens = re.findall(r"\S+", text)
+    if len(tokens) == 1 and is_superscripted(tokens[0]):
         return True
     charged = [
         token
-        for token in re.findall(r"\S+", text)
+        for token in tokens
         if _raw_token_is_charged_species(token)
     ]
     return any(
@@ -3605,10 +3617,15 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
     """True when the folded label equals one whole formula run.
 
     The run is a maximal span of element symbols, digits, parentheses,
-    square brackets, and the charge marks ·, +, and -. Whitespace, either
-    end of the text, or any other character delimits it. The stored label
-    matches only that whole run. ``SO4`` is not ``Fe2(SO4)3``. ``SiO2``
-    is not ``CaO·SiO2``. ``CO`` is not ``CO2``. A raw token that carries
+    square brackets, and the charge marks ·, +, and -. A ``.`` followed
+    by a digit, inside or right after a count, stays in the run, so
+    ``SiO2.5`` and a folded ``_{2.5}`` are one token and do not certify
+    ``SiO2``. ``FeO1.5`` does not certify ``FeO``. A period that is not
+    followed by a digit is still a boundary, so ``SiO2.`` certifies
+    ``SiO2``. Whitespace, either end of the text, or any other character
+    delimits the run. The stored label matches only that whole run.
+    ``SO4`` is not ``Fe2(SO4)3``. ``SiO2`` is not ``CaO·SiO2``. ``CO``
+    is not ``CO2``. A raw token that carries
     ``^``, ``<sup>``, a Unicode superscript, a modifier letter, or a
     charge sign beside an uppercase element letter is a charged species.
     It is dropped before this scan, so it certifies no formula, and a
@@ -3631,7 +3648,17 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
             start += 1
             continue
         end = start + 1
-        while end < limit and _formula_run_char(folded[end]):
+        while end < limit and (
+            _formula_run_char(folded[end])
+            or (
+                folded[end] == "."
+                and end + 1 < limit
+                and folded[end - 1].isascii()
+                and folded[end - 1].isdigit()
+                and folded[end + 1].isascii()
+                and folded[end + 1].isdigit()
+            )
+        ):
             end += 1
         if folded[start:end] == normalized:
             return True
@@ -4093,13 +4120,19 @@ def fidelity_source_warnings(
     a Unicode superscript, or a modifier letter is decided on the raw
     token or cell before spans are stripped. ``<sup>SiO2</sup>``,
     ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` certify no formula or species
-    label. The refusal is ``charged_species_unsupported``.
+    label. The refusal is ``charged_species_unsupported``. A superscript
+    in another token of the same cited span does not type an unrelated
+    miss; that miss stays ``cited_token_absent``.
     A subscript digit inside a formula token is not a number, so
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
     measurement still does. A formula label equals one whole run of
     element symbols, digits, parentheses, square brackets, and the
-    charge marks ·, +, and -. ``SO4`` is not ``Fe2(SO4)3``. ``SiO2``
-    is not ``CaO·SiO2``.
+    charge marks ·, +, and -. A ``.`` followed by a digit, inside or
+    right after a count, stays in the run. ``SiO2.5`` and ``SiO_{2.5}``
+    do not certify ``SiO2``. ``FeO1.5`` does not certify ``FeO``. A
+    period not followed by a digit is still a boundary, so ``SiO2.``
+    at the end of a sentence certifies ``SiO2``. ``SO4`` is not
+    ``Fe2(SO4)3``. ``SiO2`` is not ``CaO·SiO2``.
     ``printed_formula`` unwraps one token, including a
     ``\\mathrm`` / ``\\text`` / ``\\rm`` command, so
     ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$`` is ``Al2O3``. A space

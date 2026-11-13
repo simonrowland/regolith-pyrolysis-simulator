@@ -11013,8 +11013,9 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     token or cell certifies no formula label. The decision is the raw
     text, before spans are stripped. ``SiO<sup></sup>2``,
     ``<sup>SiO2</sup>``, ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` are
-    ``charged_species_unsupported`` for every formula label, including
-    an unrelated one. ``Fe<sup>2</sup>`` is
+    ``charged_species_unsupported`` for every formula label on that
+    token or cell, including an unrelated one. A superscript in another
+    token of the same cited span does not type that miss. ``Fe<sup>2</sup>`` is
     ``charged_species_unsupported`` for ``Fe``, ``Fe2``, and ``SiO2``,
     not ``superscript_in_cell``.
     """
@@ -11781,6 +11782,119 @@ def test_superscripted_token_or_cell_certifies_no_formula(tmp_path: Path):
             or "source_blind_pin" not in joined
         ):
             failures.append(f"family {name}: {errors}")
+    assert failures == []
+
+
+def test_decimal_stoichiometry_is_part_of_the_formula_run(tmp_path: Path):
+    """A decimal count stays inside one formula run.
+
+    ``SiO2.5`` and ``SiO_{2.5}`` are the token ``SiO2.5`` and do not
+    certify ``SiO2``. ``FeO1.5`` does not certify ``FeO``. A period
+    that is not followed by a digit is still a boundary, so ``SiO2.``
+    at the end of a sentence certifies ``SiO2``.
+    """
+    assert vle._formula_label_in_text("SiO2", "SiO2.5") is False
+    assert vle._formula_label_in_text("SiO2", "SiO_{2.5}") is False
+    assert vle._formula_label_in_text("SiO2.5", "SiO2.5") is True
+    assert vle._formula_label_in_text("SiO2.5", "SiO_{2.5}") is True
+    assert vle._formula_label_in_text("FeO", "FeO1.5") is False
+    assert vle._formula_label_in_text("SiO2", "The oxide is SiO2.") is True
+    assert vle._formula_label_in_text("SiO2", "SiO2. Next") is True
+    assert vle._formula_label_in_text("Fe2O3", "6.98 Fe_{2}O_{3}") is True
+    failures: list[str] = []
+    refusals = (
+        ("SiO2.5\n", "SiO2", "text/sio2-decimal.md"),
+        ("SiO_{2.5}\n", "SiO2", "text/sio2-latex-decimal.md"),
+        ("FeO1.5\n", "FeO", "text/feo-decimal.md"),
+    )
+    for source, label, relative in refusals:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path, label, source, key=key, relative=relative
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc, label=f"decimal-{key}-{label}", artifact_root=tmp_path
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {"cited_token_absent"}:
+                failures.append(f"refuse {key} {label!r} ~ {source!r}: {codes}")
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"decimal-cert-{key}-{label}", artifact_root=tmp_path
+            )
+            joined = "\n".join(errors)
+            if (
+                "source_blind_pin" not in joined
+                or "charged_species_unsupported" in joined
+            ):
+                failures.append(f"certify {key} {label!r}: {errors}")
+    for key in ("formula", "species"):
+        doc = _html_source_document(
+            tmp_path,
+            "SiO2",
+            "The oxide is SiO2.\n",
+            key=key,
+            relative="text/sio2-sentence.md",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"sentence-{key}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"sentence {key}: {errors}")
+    assert failures == []
+
+
+def test_superscript_span_does_not_type_an_unrelated_formula(tmp_path: Path):
+    """A superscript types its own token or cell, not the cited span.
+
+    ``oxide SiO2ⁿ end`` refuses ``SiO2`` as charged and refuses
+    ``Al2O3`` as cited. The lone token ``SiO2ⁿ`` refuses ``Fe``.
+    """
+    sio = vle._PinnedLeaf("SiO2", True)
+    fe = vle._PinnedLeaf("Fe", True)
+    al = vle._PinnedLeaf("Al2O3", True)
+    assert vle._charged_formula_miss([sio], "oxide SiO2ⁿ end") is True
+    assert vle._charged_formula_miss([al], "oxide SiO2ⁿ end") is False
+    assert vle._charged_formula_miss([fe], "SiO2ⁿ") is True
+    assert vle._charged_formula_miss([sio], "SO\u2084\u2212") is False
+    assert (
+        vle._charged_formula_miss([fe], "SiO2", (), has_superscript=True) is True
+    )
+    failures: list[str] = []
+    cases = (
+        ("oxide SiO2ⁿ end\n", "SiO2", "charged_species_unsupported"),
+        ("oxide SiO2ⁿ end\n", "Al2O3", "cited_token_absent"),
+        ("SiO2ⁿ\n", "Fe", "charged_species_unsupported"),
+    )
+    for source, label, expected in cases:
+        doc = _html_source_document(
+            tmp_path,
+            label,
+            source,
+            key="formula",
+            relative="text/span-superscript.md",
+        )
+        warnings = vle.fidelity_source_warnings(
+            doc, label=f"span-{label}", artifact_root=tmp_path
+        )
+        blind = [
+            warning for warning in warnings if warning.kind == "source_blind_pin"
+        ]
+        codes = (
+            set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+            if blind and blind[0].reason_codes_by_pin
+            else set()
+        )
+        if codes != {expected}:
+            failures.append(f"{label!r} ~ {source!r}: {codes} != {expected}")
     assert failures == []
 
 
