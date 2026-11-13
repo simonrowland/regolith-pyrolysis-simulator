@@ -4486,15 +4486,20 @@ def _exercise_sossi_row(_tmp_path, monkeypatch) -> None:
     """Warm the scorer cache in run A and read it through the production scorer."""
 
     from simulator.battery.enums import Engine, ExecutionState
-    from simulator.battery.score import _SOSSI_SOURCE_ID, _sossi_residue_prediction
+    from simulator.battery.score import (
+        _SOSSI_SOURCE_ID,
+        _residue_prediction_cache_key,
+        _sossi_residue_prediction,
+    )
 
     row = _one_internal_analytical_sossi_row(monkeypatch)
     assert "run_refusal" not in row.provenance
     raw = row.provenance["law_disclosures"]
     assert isinstance(raw, list) and raw
-    cache = {
-        (_SOSSI_SOURCE_ID, Engine.INTERNAL_ANALYTICAL): {row.experiment_id: row}
-    }
+    cache_key = _residue_prediction_cache_key(
+        _SOSSI_SOURCE_ID, Engine.INTERNAL_ANALYTICAL
+    )
+    cache = {cache_key: {row.experiment_id: row}}
     reference = _sossi_reference(row.experiment_id)
     with disclosure_scope(inherit=False) as run_b:
         prediction = _sossi_residue_prediction(
@@ -4516,11 +4521,7 @@ def _exercise_sossi_row(_tmp_path, monkeypatch) -> None:
             if key != "law_disclosures"
         },
     )
-    unknown_cache = {
-        (_SOSSI_SOURCE_ID, Engine.INTERNAL_ANALYTICAL): {
-            row.experiment_id: stripped
-        }
-    }
+    unknown_cache = {cache_key: {row.experiment_id: stripped}}
     with disclosure_scope(inherit=False) as run_unknown:
         refused = _sossi_residue_prediction(
             SimpleNamespace(observations={}),
@@ -5547,31 +5548,45 @@ def test_every_published_extrapolation_class_is_disclosed(
         assert pressures["SiO"] > 0.0
         for species in published:
             notice = records[species]
+            expected_law_id = {
+                "FeO_association_gas": _FE_ASSOCIATION_LAW_ID,
+                "SiO": _SIO_PUBLISHED_LAW_ID,
+            }.get(species)
+            law_species = (
+                expected_law_id.split(":", 1)[0]
+                if expected_law_id is not None
+                else species
+            )
             rows = [
                 item
                 for item in snapshot
-                if str(item.get("law_id") or "").split(":", 1)[0] == species
+                if str(item.get("law_id") or "").split(":", 1)[0] == law_species
             ]
             if not rows:
                 problems.append(f"{species}: no disclosure")
                 continue
             row = rows[0]
-            if species == "SiO":
+            if expected_law_id is not None:
                 chosen = next(
                     (
                         item
                         for item in rows
-                        if item.get("law_id") == _SIO_PUBLISHED_LAW_ID
+                        if item.get("law_id") == expected_law_id
                     ),
                     None,
                 )
                 if chosen is None:
                     problems.append(
-                        f"SiO laws {[item.get('law_id') for item in rows]}"
+                        f"{species} laws {[item.get('law_id') for item in rows]}"
                     )
                     continue
                 row = chosen
-            if row.get("authority") != "extrapolated":
+            expected_authority = (
+                "diagnostic/extrapolated"
+                if row.get("law_id") == _FE_ASSOCIATION_LAW_ID
+                else "extrapolated"
+            )
+            if row.get("authority") != expected_authority:
                 problems.append(f"{species}: authority {row.get('authority')}")
             reason = str(notice.get("reason") or "")
             row_provenance = str(row.get("provenance") or "")

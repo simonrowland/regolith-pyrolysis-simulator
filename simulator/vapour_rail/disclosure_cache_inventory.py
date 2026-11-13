@@ -1197,6 +1197,20 @@ def _extra_cache_line(
             "Parameter of the per-hour summary scratch. It does not store a vapour-law disclosure.",
             None,
         )
+    if path == "simulator/battery/score.py" and "observation_lineages" in stripped:
+        return (
+            "inert",
+            "Ancestry index memo passed to lineage resolution. It stores no vapour-law result or disclosure.",
+            None,
+        )
+    if path == "simulator/battery/validate.py" and stripped.startswith(
+        "lineage_cache: dict[str, Ancestry]"
+    ):
+        return (
+            "inert",
+            "Optional ancestry memo for source-lineage resolution. It stores no vapour-law result or disclosure.",
+            None,
+        )
     if "reduced_real_cache" in stripped or "REDUCED_REAL_CACHE" in stripped:
         return (
             "inert",
