@@ -959,6 +959,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     "mechanism": reaction.reaction_id,
                     "status": "DECLARED_WALL_REACTION",
                     "source": "sp_data.wall_reactions",
+                    "notices": tuple(reaction.notices),
                 })
             elif species == "Mg":
                 reaction = self._matrix_reaction("Mg_silica_reduction")

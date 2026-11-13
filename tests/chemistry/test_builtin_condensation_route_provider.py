@@ -2034,11 +2034,15 @@ def test_provider_sio_wall_plan_matches_declared_free_reaction(
     )
 
     assert expected.reaction_id == "disproportionation"
+    assert expected.notices == ("wall_pO2_unknown_pO2_free_route_used",)
     assert result.status == "ok"
     assert result.transition is not None
     assert result.transition.credits["process.wall_deposit"] == pytest.approx(
         dict(expected.products_mol_per_mol_vapour)
     )
+    assert result.diagnostic["wall_reaction_diagnostics_by_account"][
+        "process.wall_deposit"
+    ]["notices"] == expected.notices
 
 
 def test_provider_cro_wall_plan_uses_its_declared_free_reaction(
@@ -2072,11 +2076,15 @@ def test_provider_cro_wall_plan_uses_its_declared_free_reaction(
     )
 
     assert expected.reaction_id == "disproportionation"
+    assert expected.notices == ("wall_pO2_unknown_pO2_free_route_used",)
     assert result.status == "ok"
     assert result.transition is not None
     assert result.transition.credits["process.wall_deposit"] == pytest.approx(
         dict(expected.products_mol_per_mol_vapour)
     )
+    assert result.diagnostic["wall_reaction_diagnostics_by_account"][
+        "process.wall_deposit"
+    ]["notices"] == expected.notices
 
 
 def test_provider_folds_only_same_species_subfloor_baffle_product_into_wall(
