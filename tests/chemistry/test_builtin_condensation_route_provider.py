@@ -53,6 +53,7 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation import (
     C4B_WALL_ROUTE_ORDER,
     CondensationRouteResult,
+    _species_vapor_data,
     _wall_route_species_order,
 )
 from simulator.diagnostics import wall_deposit_sticking_authority_status
@@ -1995,6 +1996,44 @@ def test_provider_splits_baffle_product_from_wall_deposit(
     )
     for element, net in dict(proposal.atom_balance_proof).items():
         assert abs(net) < 1e-9
+
+
+def test_provider_sio_wall_plan_matches_declared_free_reaction(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
+
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    sp_data = _species_vapor_data(
+        "SiO", vapor_pressure_data=vapor_pressure_data,
+    )
+    expected = resolve_wall_saturation(
+        sp_data, species_id="SiO", T_K=1100.0, pO2_Pa=None,
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(
+            sim,
+            species="SiO",
+            sp_data=dict(sp_data),
+            controls={
+                "wall_deposit_fraction": 1.0,
+                "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
+                "wall_temperature_K": 1100.0,
+                "wall_deposit_account_temperatures_K": {
+                    "process.wall_deposit": 1100.0,
+                },
+            },
+        )
+    )
+
+    assert expected.reaction_id == "disproportionation"
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.transition.credits["process.wall_deposit"] == pytest.approx(
+        dict(expected.products_mol_per_mol_vapour)
+    )
 
 
 def test_provider_folds_only_same_species_subfloor_baffle_product_into_wall(
