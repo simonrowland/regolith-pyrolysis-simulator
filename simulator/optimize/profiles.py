@@ -30,11 +30,8 @@ from simulator.optimize.objective import (
     canonical_objective_metric,
     declared_objective_definitions,
     normalize_composition_target_objective,
-    objective_definitions,
     objective_importance_evidence,
     objective_type,
-    profile_with_resolved_execution,
-    resolved_execution_identity,
 )
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.product_pools import forbidden_gates_for_pool, product_pool_class
@@ -335,15 +332,13 @@ def validate_profile(
             f"{source}: feedstock {profile['feedstock']!r} does not match {expected_feedstock!r}"
         )
 
-    scoring_identity = None
+    # Remaining-weight admission is admit_executed_objective_weight, after
+    # the candidate rewrite. The name is still resolved here so a fidelity
+    # token is folded the same way as before. It does not withhold products
+    # before a candidate exists.
     if scoring_fidelity is not None:
-        canonical_fidelity = canonical_backend_name(scoring_fidelity)
-        if canonical_fidelity is not None:
-            scoring_identity = resolved_execution_identity(
-                profile,
-                str(canonical_fidelity),
-            )
-    _validate_objectives(profile, source=source, scoring_identity=scoring_identity)
+        canonical_backend_name(scoring_fidelity)
+    _validate_objectives(profile, source=source)
     _validate_constraints(profile["constraints"], source=source)
     _validate_pool_scoped_constraints(profile, source=source)
     _validate_study_constraints(profile.get("study_constraints"), source=source)
@@ -567,7 +562,6 @@ def _validate_objectives(
     profile: Mapping[str, Any],
     *,
     source: str | Path,
-    scoring_identity: Mapping[str, Any] | None = None,
 ) -> None:
     raw_objectives = profile["objectives"]
     if not isinstance(raw_objectives, list) or not raw_objectives:
@@ -616,20 +610,12 @@ def _validate_objectives(
     if isinstance(profile, dict):
         profile["objectives"] = normalized_objectives
     # Structure of every declared row, including products a campaign will
-    # withhold. The remaining-weight refusal is an evaluation: it uses the
-    # campaign the selected fidelity executes. A load that has not selected
-    # a fidelity is not that evaluation. Refusing here on the authored
-    # campaign rejects a file whose executed campaign claims the product.
+    # withhold. Remaining weight is not a structural check: a voltage cap
+    # can restore a product this fidelity would withhold. Admission is
+    # admit_executed_objective_weight on the candidate's resolved triple.
     try:
         objective_importance_evidence(profile)
         declared_objective_definitions(profile)
-    except ObjectiveProfileError as exc:
-        raise ProfileValidationError(f"{source}: {exc}") from exc
-    if scoring_identity is None:
-        return
-    check_profile = profile_with_resolved_execution(profile, scoring_identity)
-    try:
-        objective_definitions(check_profile)
     except ObjectiveProfileError as exc:
         raise ProfileValidationError(f"{source}: {exc}") from exc
 

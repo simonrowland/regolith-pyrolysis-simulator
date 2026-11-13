@@ -69,9 +69,14 @@ from simulator.optimize.evaluate import (
 from simulator.optimize.evalspec import DEFAULT_VAPOR_PRESSURE_PROVIDER_ID, cache_key
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    ObjectiveProfileError,
+    cost_adjusted_objective_scores,
+    declared_objective_definitions,
     objective_definitions,
+    objective_importance_evidence,
     profile_scored_at_fidelity,
     resolved_execution_identity,
+    scoring_profile_for_executed_spec,
     unrenormalized_study_scalar_weights,
 )
 from simulator.optimize.physics import PhysicsConstraintSet
@@ -81,6 +86,8 @@ from simulator.optimize.recipe import (
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     RecipePatch,
     RecipeSchema,
+    c5_sampler_context,
+    conditional_context_metadata,
 )
 from simulator.optimize.results_store import (
     ResultStore,
@@ -1045,6 +1052,11 @@ class ProductionMassBalanceRealPathExecutor:
 
     def execute(self, config: object) -> object:
         self.calls += 1
+        # The breach is marked on the first snapshot of the authored window.
+        # A C0 start would otherwise drive every later step, same as the
+        # replay executor above.
+        if getattr(config, "until_campaign_complete", False):
+            config = replace(config, until_campaign_complete=False)
         config = _with_prototype_crmn_alpha_fallback(config)
         session = SimSession()
         session.start(config)
@@ -7532,6 +7544,336 @@ def test_voltage_cap_c5_overrides_the_fidelity_for_scoring() -> None:
     assert cleared.eval_spec is not None and cleared.eval_spec.c5_enabled is False
     assert cleared.objectives is not None
     assert "pure_silica_glass_kg" in cleared.objectives.as_mapping()
+
+
+# Every rewrite that can change the execution triple, on every track this
+# ticket distinguishes. pin-off is the conditional-pin writer. It is legal
+# only when the parent state is already inactive; an active parent refuses
+# the mask instead of scoring the pre-cap profile.
+_EXECUTION_REWRITES = ("none", "cap-0", "cap-2.5", "pin-off")
+
+
+class _RewriteStrategy:
+    name = "rewrite"
+    seed = 0
+
+    def __init__(self, patch: RecipePatch, metadata: dict | None = None) -> None:
+        self._pending = [
+            study_module.Candidate(
+                id="rewrite-000000",
+                patch=patch,
+                metadata=metadata or {},
+            )
+        ]
+
+    def ask(self, n: int) -> list:
+        batch = self._pending[:n]
+        self._pending = self._pending[n:]
+        return batch
+
+    def tell(self, results) -> None:
+        return None
+
+
+def _rewrite_patch(rewrite: str) -> RecipePatch:
+    values = dict(_valid_patch().values)
+    if rewrite == "cap-0":
+        values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = 0.0
+    elif rewrite == "cap-2.5":
+        values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = 2.5
+    return RecipePatch(values)
+
+
+def _rewrite_context(rewrite: str):
+    if rewrite != "pin-off":
+        return None
+    return c5_sampler_context(RecipeSchema(), active=False)
+
+
+def _executed_c5(fidelity_c5: bool, rewrite: str) -> bool:
+    if rewrite in {"cap-0", "pin-off"}:
+        return False
+    if rewrite == "cap-2.5":
+        return True
+    return fidelity_c5
+
+
+def _with_available_furnace(result):
+    reference = result.run_reference
+    if reference is None:
+        return result
+    summary = dict(reference.product_summary or {})
+    summary["furnace_amortization_status"] = "available"
+    summary["furnace_amortization_batch_cost_equivalents"] = 0.0
+    return replace(result, run_reference=replace(reference, product_summary=summary))
+
+
+def _executed_scoring_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile,
+    candidate_id: str | None = None,
+    **kwargs,
+):
+    result = evaluate(
+        patch,
+        feedstock,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        executor=FakeExecutor(_execution()),
+        schema=kwargs.get("schema"),
+        constraints=kwargs.get("constraints"),
+        conditional_context=kwargs.get("conditional_context"),
+    )
+    return _with_available_furnace(result)
+
+
+def _ask_time_scoring(profile):
+    stamped = profile_scored_at_fidelity(profile, "fast")
+    try:
+        return (
+            objective_definitions(stamped),
+            unrenormalized_study_scalar_weights(stamped),
+            stamped,
+        )
+    except ObjectiveProfileError:
+        return (
+            declared_objective_definitions(stamped),
+            tuple(row.weight for row in objective_importance_evidence(stamped)),
+            stamped,
+        )
+
+
+@pytest.mark.parametrize("track", _EXECUTION_TRACKS)
+@pytest.mark.parametrize("c5_enabled", _EXECUTION_C5)
+@pytest.mark.parametrize("rewrite", _EXECUTION_REWRITES)
+def test_scoring_follows_the_executed_spec(
+    track: str,
+    c5_enabled: bool,
+    rewrite: str,
+    tmp_path,
+) -> None:
+    """Eligibility is the EvalSpec triple, for every track, c5, and rewrite.
+
+    Study scoring, honest-result checks, Optuna metric extraction, and the
+    staged score key read that triple. A missing withheld objective is not
+    an abort and not a zero. Its weight stays out of the scalar.
+    """
+
+    from simulator.optimize.strategy.bayesian import OptunaTPEStrategy
+    from simulator.optimize.strategy.genetic import OptunaNSGA2Strategy
+    from simulator.optimize.strategy.staged import _score_key
+
+    profile = _profile_with_execution(track, c5_enabled)
+    patch = _rewrite_patch(rewrite)
+    context = _rewrite_context(rewrite)
+    schema = RecipeSchema()
+    try:
+        spec, _run_config = evaluate_module._build_eval_inputs(
+            patch,
+            "lunar_mare_low_ti",
+            "fast",
+            profile,
+            schema,
+            conditional_context=context,
+        )
+    except EvaluationInputError as exc:
+        assert rewrite == "pin-off" and c5_enabled
+        assert "conditional_mask" in str(exc)
+        return
+    assert spec.track == track
+    assert spec.c5_enabled is _executed_c5(c5_enabled, rewrite)
+    executed_profile = scoring_profile_for_executed_spec(profile, spec)
+    executed_definitions = objective_definitions(executed_profile)
+    executed_weights = unrenormalized_study_scalar_weights(executed_profile)
+    executed_metrics = tuple(item.metric for item in executed_definitions)
+    glass = track == "pyrolysis" and not spec.c5_enabled
+    assert ("pure_silica_glass_kg" in executed_metrics) is glass
+    direct = _executed_scoring_evaluator(
+        patch,
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        schema=schema,
+        conditional_context=context,
+    )
+    assert direct.eval_spec is not None
+    assert direct.objectives is not None
+    assert tuple(direct.objectives.as_mapping()) == executed_metrics
+    ask_definitions, ask_weights, stamped = _ask_time_scoring(profile)
+    study_module._assert_honest_result(
+        direct,
+        ask_definitions,
+        profile=profile,
+    )
+    for strategy_type in (OptunaTPEStrategy, OptunaNSGA2Strategy):
+        strategy = strategy_type(
+            schema,
+            seed=0,
+            objective_profile=stamped,
+            **({"budget": 4} if strategy_type is OptunaTPEStrategy else {}),
+        )
+        values = strategy._objective_values(direct)
+        assert values is not None
+        assert len(values) == len(executed_definitions)
+    score_key = _score_key(
+        study_module.Candidate(id="rewrite-000000", patch=patch),
+        direct,
+        ask_definitions,
+        profile=stamped,
+    )
+    assert score_key[1:1 + len(executed_metrics)] == executed_metrics
+    metadata = conditional_context_metadata(context) if context is not None else {}
+    result = study_module.run(
+        profile,
+        "lunar_mare_low_ti",
+        _RewriteStrategy(patch, metadata),
+        "fast",
+        1,
+        1,
+        tmp_path,
+        seed=0,
+        evaluator=_executed_scoring_evaluator,
+        schema=schema,
+    )
+    assert result.records
+    record = result.records[0]
+    assert tuple(record.objectives) == executed_metrics
+    scalar, _signature = study_module._study_progress(
+        result.records,
+        ask_definitions,
+        ask_weights,
+        profile=profile,
+    )
+    scores = cost_adjusted_objective_scores(
+        record.objectives,
+        executed_definitions,
+        product_summary=record.product_summary,
+    )
+    expected = math.fsum(
+        weight * score
+        for weight, score in zip(executed_weights, scores, strict=True)
+    )
+    assert scalar == expected
+    if record.feasible:
+        assert result.winner is not None
+
+
+def _glass_only_profile(c5_enabled: bool) -> dict:
+    profile = _profile_with_execution("pyrolysis", c5_enabled)
+    profile["objectives"] = [
+        row
+        for row in profile["objectives"]
+        if row["metric"] == "pure_silica_glass_kg"
+    ]
+    assert len(profile["objectives"]) == 1
+    return profile
+
+
+@pytest.mark.parametrize("c5_enabled", _EXECUTION_C5)
+@pytest.mark.parametrize("rewrite", _EXECUTION_REWRITES)
+def test_remaining_weight_follows_the_candidate_rewrite(
+    c5_enabled: bool,
+    rewrite: str,
+) -> None:
+    """A glass-only profile is admitted only after the candidate rewrite."""
+
+    profile = _glass_only_profile(c5_enabled)
+    from simulator.optimize.profiles import validate_profile
+
+    validate_profile(
+        copy.deepcopy(profile),
+        expected_feedstock="lunar_mare_low_ti",
+        scoring_fidelity="fast",
+    )
+    study_module.resolve_profile(
+        copy.deepcopy(profile),
+        expected_feedstock="lunar_mare_low_ti",
+        scoring_fidelity="fast",
+    )
+    patch = _rewrite_patch(rewrite)
+    context = _rewrite_context(rewrite)
+    try:
+        spec, _run_config = evaluate_module._build_eval_inputs(
+            patch,
+            "lunar_mare_low_ti",
+            "fast",
+            profile,
+            RecipeSchema(),
+            conditional_context=context,
+        )
+    except EvaluationInputError as exc:
+        assert rewrite == "pin-off" and c5_enabled
+        assert "conditional_mask" in str(exc)
+        return
+    except ProfileValidationError as exc:
+        assert "no remaining objective weight" in str(exc)
+        assert _executed_c5(c5_enabled, rewrite) is True
+        return
+    assert spec.c5_enabled is False
+    assert _executed_c5(c5_enabled, rewrite) is False
+    metrics = tuple(
+        item.metric
+        for item in objective_definitions(
+            scoring_profile_for_executed_spec(profile, spec)
+        )
+    )
+    assert metrics == ("pure_silica_glass_kg",)
+
+
+def test_glass_only_cap_restores_the_study_scalar(tmp_path) -> None:
+    """Cap 0 disables C5 and puts the restored glass weight back in the scalar."""
+
+    from simulator.optimize.strategy.bayesian import OptunaTPEStrategy
+    from simulator.optimize.strategy.genetic import OptunaNSGA2Strategy
+    from simulator.optimize.strategy.staged import StagedStrategy
+
+    profile = _glass_only_profile(True)
+    stamped = profile_scored_at_fidelity(profile, "fast")
+    with pytest.raises(ObjectiveProfileError, match="no remaining objective weight"):
+        objective_definitions(stamped)
+    schema = RecipeSchema()
+    OptunaTPEStrategy(schema, seed=0, objective_profile=stamped, budget=4)
+    OptunaNSGA2Strategy(schema, seed=0, objective_profile=stamped)
+    StagedStrategy(schema, seed=0, objective_profile=stamped)
+    patch = _rewrite_patch("cap-0")
+    result = study_module.run(
+        profile,
+        "lunar_mare_low_ti",
+        _RewriteStrategy(patch),
+        "fast",
+        1,
+        1,
+        tmp_path,
+        seed=0,
+        evaluator=_executed_scoring_evaluator,
+        schema=schema,
+    )
+    assert result.records
+    record = result.records[0]
+    assert "pure_silica_glass_kg" in record.objectives
+    _ask_definitions, ask_weights, _stamped = _ask_time_scoring(profile)
+    # The ask-time fallback is the declared glass row. The executed triple
+    # claims it, so the scalar uses that weight and no other.
+    assert ask_weights == (0.4,)
+    scalar, _signature = study_module._study_progress(
+        result.records,
+        _ask_definitions,
+        ask_weights,
+        profile=profile,
+    )
+    assert scalar is not None
+    scores = cost_adjusted_objective_scores(
+        record.objectives,
+        objective_definitions(scoring_profile_for_executed_spec(profile, record.eval_spec)),
+        product_summary=record.product_summary,
+    )
+    assert scalar == math.fsum(0.4 * score for score in scores)
+    if record.feasible:
+        assert result.winner is not None
 
 
 def test_composition_constraints_refuse_a_partial_execution_identity() -> None:

@@ -7,22 +7,25 @@ import logging
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
-from simulator.optimize.objective import ObjectiveDefinition, objective_definitions
+from simulator.optimize.objective import (
+    ObjectiveDefinition,
+    ask_time_objective_definitions,
+)
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.strategy.bayesian import (
     _CANDIDATE_ID_ATTR,
     _CONSTRAINT_NAMES_ATTR,
     _CONSTRAINT_VALUES_ATTR,
     _INFEASIBLE_ATTR,
-    _UNSCOREABLE_OBJECTIVES_ATTR,
     _constraint_values,
     _constraints_for_trial,
     _couple_suggested_pressure_defaults,
-    _failed_trial_state,
-    _objective_values_for_definitions,
     _optuna_params_from_seed,
     _suggest_value,
     _sync_conditioned_trial_params,
+    _tell_optuna_trial,
+    executed_definitions_for_scored,
+    objective_values_for_executed_spec,
 )
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
@@ -73,7 +76,9 @@ class OptunaNSGA2Strategy:
         self.schema = schema or RecipeSchema()
         self._seed = seed
         self.objective_profile = MappingProxyType(dict(active_profile))
-        self._objective_definitions = objective_definitions(self.objective_profile)
+        self._objective_definitions = ask_time_objective_definitions(
+            self.objective_profile
+        )
         self._directions = tuple(
             definition.sense for definition in self._objective_definitions
         )
@@ -275,17 +280,27 @@ class OptunaNSGA2Strategy:
                 _INFEASIBLE_ATTR,
                 not bool(getattr(scored, "feasible", False)),
             )
-            if values is None:
-                trial.set_user_attr(_UNSCOREABLE_OBJECTIVES_ATTR, True)
-                self._study.tell(trial, state=_failed_trial_state())
-            else:
-                self._study.tell(trial, values=values)
+            _tell_optuna_trial(
+                self._study,
+                trial,
+                values=values,
+                executed_definitions=executed_definitions_for_scored(
+                    self.objective_profile,
+                    self._objective_definitions,
+                    scored,
+                ),
+                frozen_definitions=self._objective_definitions,
+            )
             self._result_by_id[candidate.id] = scored
             self._results.append((candidate, scored))
             self._tell_count += 1
 
     def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...] | None:
-        return _objective_values_for_definitions(scored, self._objective_definitions)
+        return objective_values_for_executed_spec(
+            self.objective_profile,
+            self._objective_definitions,
+            scored,
+        )
 
 
 def _require_optuna() -> Any:

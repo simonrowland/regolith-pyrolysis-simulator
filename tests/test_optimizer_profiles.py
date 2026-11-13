@@ -10,7 +10,12 @@ import yaml
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.feedstock_guard import is_blocked_feedstock
-from simulator.optimize.objective import composition_target_eval_metadata
+from simulator.optimize.objective import (
+    ObjectiveProfileError,
+    composition_target_eval_metadata,
+    objective_definitions,
+    profile_scored_at_fidelity,
+)
 from simulator.optimize import profiles
 from simulator.optimize import study
 from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet
@@ -1066,8 +1071,10 @@ def _composition_profile() -> dict:
 def test_validate_profile_weight_check_uses_the_fidelity_campaign() -> None:
     """Authored C2B keeps the melt target. A C0 fidelity overlay withholds it.
 
-    The returned profile keeps the authored campaign, so the digest does not
-    absorb the overlay. EvalSpec.campaign records it separately.
+    Structural validation does not refuse remaining weight: a candidate cap
+    can restore the product. The pre-candidate stamp still withholds the
+    composition row. The returned profile keeps the authored campaign, so
+    the digest does not absorb the overlay.
     """
 
     authored = _composition_profile()
@@ -1084,13 +1091,14 @@ def test_validate_profile_weight_check_uses_the_fidelity_campaign() -> None:
         "campaign": "C0",
     }
     overlaid["fidelities"] = fidelities
-    with pytest.raises(ProfileValidationError, match="no remaining objective weight"):
-        validate_profile(
-            overlaid,
-            expected_feedstock="lunar_mare_low_ti",
-            scoring_fidelity="internal-analytical",
-        )
-    # Without the fidelity argument the authored campaign still validates,
-    # and the returned run campaign is the authored one.
+    checked = validate_profile(
+        overlaid,
+        expected_feedstock="lunar_mare_low_ti",
+        scoring_fidelity="internal-analytical",
+    )
+    assert checked["run"]["campaign"] == "C2B"
+    stamped = profile_scored_at_fidelity(checked, "internal-analytical")
+    with pytest.raises(ObjectiveProfileError, match="no remaining objective weight"):
+        objective_definitions(stamped)
     kept = validate_profile(overlaid, expected_feedstock="lunar_mare_low_ti")
     assert kept["run"]["campaign"] == "C2B"

@@ -30,7 +30,8 @@ energy-per-product intensity is not a ledger species. Its denominator is
 ``metals_plus_O2.class_total_kg``, so it is claimed only when the campaign
 claims ``O2`` and a metal key (``Fe``, ``Mg``, or ``Ti``). Energy and
 duration stay. File load is not an evaluation: the remaining-weight refusal
-waits until the selected fidelity's campaign is known.
+waits until the candidate's resolved execution, after the voltage
+cap and conditional pins. The fidelity alone does not refuse.
 """
 
 from __future__ import annotations
@@ -69,6 +70,7 @@ from simulator.optimize.objective import (
     composition_targets_require_stage0_exit,
     composition_targets_require_terminal_rump,
     compute_objectives,
+    ObjectiveProfileError,
     executed_campaign_id,
     objective_definitions,
     objective_importance_evidence,
@@ -1740,12 +1742,12 @@ def test_file_load_waits_for_the_executed_campaign(
     campaign: str,
     tmp_path: Path,
 ) -> None:
-    """A glass-only file authored as C0 loads. The selected fidelity decides.
+    """A glass-only file authored as C0 loads. Admission waits for a candidate.
 
-    ``load_profile`` and the study file entry do not know the fidelity yet.
-    They must not refuse ``no remaining objective weight`` on the authored
-    C0 campaign. ``resolve_profile`` at that fidelity refuses only when the
-    executed campaign does not claim ``SiO2_glass``.
+    ``load_profile``, the study file entry, and ``resolve_profile`` do not
+    refuse ``no remaining objective weight``. A voltage cap can still change
+    ``c5_enabled`` after the fidelity merge. The pre-candidate stamp refuses
+    only when that fidelity's campaign does not claim ``SiO2_glass``.
     """
 
     raw = _glass_only_authored_c0(fidelity, campaign)
@@ -1755,18 +1757,6 @@ def test_file_load_waits_for_the_executed_campaign(
     via_study = _load_profile_for_study(str(path))
     assert loaded["run"]["campaign"] == "C0"
     assert via_study["run"]["campaign"] == "C0"
-    claimed = _oracle_claims_metric(
-        "pure_silica_glass_kg",
-        _scoring_claim_keys(campaign),
-    )
-    if not claimed:
-        with pytest.raises(ProfileValidationError, match="no remaining objective weight"):
-            resolve_profile(
-                via_study,
-                expected_feedstock="lunar_highland",
-                scoring_fidelity=fidelity,
-            )
-        return
     resolved = resolve_profile(
         via_study,
         expected_feedstock="lunar_highland",
@@ -1775,6 +1765,14 @@ def test_file_load_waits_for_the_executed_campaign(
     assert resolved["run"]["campaign"] == "C0"
     assert executed_campaign_id(resolved, fidelity=fidelity) == campaign
     stamped = profile_scored_at_fidelity(resolved, fidelity)
+    claimed = _oracle_claims_metric(
+        "pure_silica_glass_kg",
+        _scoring_claim_keys(campaign),
+    )
+    if not claimed:
+        with pytest.raises(ObjectiveProfileError, match="no remaining objective weight"):
+            objective_definitions(stamped)
+        return
     scored = {definition.metric for definition in objective_definitions(stamped)}
     assert "pure_silica_glass_kg" in scored
     assert unclaimed_product_withheld_objective_note(stamped) is None

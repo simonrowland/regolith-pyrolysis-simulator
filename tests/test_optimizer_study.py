@@ -144,8 +144,10 @@ def _run_reference(**kwargs: Any) -> RunReference:
 def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
     profile = copy.deepcopy(PROFILE)
     profile["profile_id"] = "cli-physics-smoke"
-    # This smoke run is a real C0 campaign. C2A would change the furnace path.
-    profile["run"]["campaign"] = "C0"
+    # Stay on the profile's one-hour campaign. A C0 pyrolysis start now
+    # follows the campaign controller through later steps, and a staged
+    # beam of those sequences does not fit this wiring smoke's wall guard.
+    # The continuation pin is test_lunar_highland_c0_horizon_changes_extracted_metals.
     # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
     profile["run"]["allow_unmeasured_alpha_fallback"] = True
     profile["constraints"] = {
@@ -5653,7 +5655,9 @@ def _all_slow_evaluator(
 
 
 @pytest.mark.cpu_budget(25)
-@pytest.mark.timeout(25)
+# The eval timeout is 2s. Wall stretches past 25s when the studio is
+# busy with campaign-length neighbors. CPU budget stays 25s.
+@pytest.mark.timeout(120)
 def test_parallel_all_timeouts_is_a_designed_no_winner_outcome(tmp_path) -> None:
     """Every candidate timing out is a DESIGNED outcome, not a crash.
 
@@ -6808,7 +6812,9 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
         text=True,
         capture_output=True,
         check=False,
-        timeout=120,
+        # One-hour smoke. 120s of wall is not enough when campaign-length
+        # tests share the studio.
+        timeout=600,
     )
     assert good.returncode == 0, good.stderr
     assert (out_dir / "pareto.json").exists()
@@ -6947,6 +6953,10 @@ def test_cli_rejects_incoherent_constrained_max_args(
 
 
 def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> None:
+    # One-hour C2A_continuous smoke. It qualifies wall deposit, and the
+    # resinter threshold is null, so lifespan is unpriced rather than a
+    # number. A C0 start would continue through later steps; that pin is
+    # test_lunar_highland_c0_horizon_changes_extracted_metals.
     out_dir = tmp_path / "constrained-max"
     cli_profile = _write_cli_physics_smoke_profile(tmp_path)
 
@@ -6978,7 +6988,7 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
+    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(

@@ -107,8 +107,16 @@ _MASS_OBJECTIVE_METRICS = frozenset(
 # credit O2 to a terminal account (evaporation coproduct or electrolysis
 # anode). The products map alone is a hand list and omits that by-product.
 # The executed options are the triple (campaign, track, c5_enabled).
-# Study scoring stamps the fidelity merge. A per-eval vector stamps the
-# EvalSpec triple after the MRE voltage cap. `_merged_run_for_fidelity`
+# INVARIANT: once a candidate exists, every scoring consumer reads that
+# triple from the EvalSpec the candidate will run. The fidelity merge is
+# only the identity before a candidate. The MRE voltage cap and conditional
+# pins can change c5_enabled after the merge, and both land on the spec
+# before scoring. Study definitions, study weights, remaining-weight
+# admission, honest-result checks, and strategy metrics all go through
+# ``scoring_profile_for_executed_spec`` for that spec. A consumer that
+# freezes the pre-cap profile drops a voltage-cap candidate out of the
+# scalar, or aborts a feasible result for an objective the execution
+# withheld. `_merged_run_for_fidelity`
 # folds the requested fidelity and every profile key through
 # `canonical_backend_name` before that triple is read. `stub` and
 # `internal-analytical` are one fidelity: an alias spelling cannot give
@@ -1609,12 +1617,82 @@ def profile_scored_at_fidelity(
     profile: Mapping[str, Any],
     fidelity: str | None,
 ) -> Mapping[str, Any]:
-    """Scoring copy whose run options are the ones ``fidelity`` executes."""
+    """Pre-candidate identity: the triple ``fidelity`` executes before a patch.
+
+    A voltage cap or conditional pin can still change ``c5_enabled``. Result
+    scoring uses ``scoring_profile_for_executed_spec``, not this copy.
+    """
 
     return profile_with_resolved_execution(
         profile,
         resolved_execution_identity(profile, fidelity),
     )
+
+
+def scoring_profile_for_executed_spec(
+    profile: Mapping[str, Any],
+    spec: Any,
+) -> Mapping[str, Any]:
+    """Scoring copy whose run triple is the one ``spec`` executed.
+
+    This is the chokepoint for a candidate. Objective definitions, the study
+    scalar, remaining-weight admission, honest-result checks, and strategy
+    metric extraction all read this profile once an EvalSpec exists. Callers
+    do not re-derive the triple: the fidelity merge, the conditional pin, and
+    the MRE voltage cap have already been written onto ``spec``.
+
+    The objective vector an evaluation returns already used this triple, so
+    this function does not add a cache-key dimension and does not bump
+    VERSION again. EvalSpec keys stay VERSION-scoped (evalspec.py).
+    corpus_version stays at the green tag.
+    """
+
+    campaign = getattr(spec, "campaign", None)
+    track = getattr(spec, "track", None)
+    c5_enabled = getattr(spec, "c5_enabled", None)
+    if campaign is None or track is None or not isinstance(c5_enabled, bool):
+        raise ObjectiveProfileError(
+            "executed scoring profile requires spec campaign, track, and "
+            "c5_enabled"
+        )
+    return profile_with_resolved_execution(
+        profile,
+        {
+            "campaign": campaign,
+            "track": track,
+            "c5_enabled": c5_enabled,
+        },
+    )
+
+
+def admit_executed_objective_weight(profile: Mapping[str, Any]) -> None:
+    """Refuse a resolved execution whose declared weight was all withheld.
+
+    Structural profile checks happen before the candidate rewrite. This
+    admission runs only on the profile whose run triple is the execution
+    that candidate will run. It is ``objective_definitions``: an empty
+    scoring list raises, and a retained row does not.
+    """
+
+    objective_definitions(profile)
+
+
+def ask_time_objective_definitions(
+    profile: Mapping[str, Any],
+) -> tuple[ObjectiveDefinition, ...]:
+    """Definitions before a candidate exists.
+
+    The fidelity triple can still be rewritten by a voltage cap or a
+    conditional pin. When that pre-candidate triple withholds every declared
+    product, the declared rows let the sampler start. They are not scores
+    and they are not renormalised. Result scoring uses
+    ``scoring_profile_for_executed_spec``.
+    """
+
+    try:
+        return objective_definitions(profile)
+    except ObjectiveProfileError:
+        return declared_objective_definitions(profile)
 
 
 @lru_cache(maxsize=1)

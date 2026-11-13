@@ -22,10 +22,13 @@ from simulator.optimize.evaluate import RunReference, ScoredResult
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveDefinition,
+    ObjectiveProfileError,
+    ask_time_objective_definitions,
     cost_adjusted_objective_scores,
     objective_definitions,
     objective_scores,
     pareto_front,
+    scoring_profile_for_executed_spec,
 )
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.recipe import (
@@ -331,7 +334,7 @@ class StagedStrategy:
             stage_count=len(self._stages),
             max_backward_passes=self.max_backward_passes,
         )
-        self._definitions = objective_definitions(self.objective_profile)
+        self._definitions = ask_time_objective_definitions(self.objective_profile)
         self._stage_index = 0
         self._topology_patch = _patch_for_topology(self.topology).validated(self.schema)
         self._frontier = (
@@ -661,6 +664,7 @@ class StagedStrategy:
                 if self._stage_index == 0
                 else self.beam_width
             ),
+            profile=self.objective_profile,
         )
         if self._stage_index == 0:
             ranked = _apply_stage0_seed_exploration_floor(ranked, self.beam_width)
@@ -677,8 +681,10 @@ class StagedStrategy:
                     self._definitions,
                     self.schema,
                     joint_refine_trace_signals=self._stage_joint_refine_trace_signals,
+                    profile=self.objective_profile,
                 ),
                 self._definitions,
+                profile=self.objective_profile,
             )
             if self._archive:
                 self._frontier = tuple(member.node for member in self._archive)
@@ -690,6 +696,7 @@ class StagedStrategy:
             self._stage_results.values(),
             self._definitions,
             beam_width=len(self._stage_results),
+            profile=self.objective_profile,
         )
         children = tuple(
             _ArchiveMember(
@@ -704,7 +711,11 @@ class StagedStrategy:
             for score_key, candidate, scored in ranked
             if scored.objectives is not None
         )
-        self._archive = _pareto_archive((*self._archive, *children), self._definitions)
+        self._archive = _pareto_archive(
+            (*self._archive, *children),
+            self._definitions,
+            profile=self.objective_profile,
+        )
         self._frontier = tuple(member.node for member in self._archive)
         self._expected_stage_ids = set()
         self._stage_results = {}
@@ -905,6 +916,7 @@ def _rank_stage_results(
     definitions: Sequence[ObjectiveDefinition],
     *,
     beam_width: int,
+    profile: Mapping[str, Any] | None = None,
 ) -> tuple[tuple[tuple[Any, ...], Candidate, ScoredResult], ...]:
     seen_keys: dict[str, str] = {}
     ranked: list[tuple[tuple[Any, ...], Candidate, ScoredResult]] = []
@@ -918,7 +930,7 @@ def _rank_stage_results(
                 f"duplicate staged cache_key {key!r}: {prior!r} and {candidate.id!r}"
             )
         seen_keys[key] = candidate.id
-        score_key = _score_key(candidate, scored, definitions)
+        score_key = _score_key(candidate, scored, definitions, profile=profile)
         ranked.append((score_key, candidate, scored))
     ranked.sort(key=lambda item: item[0])
     return tuple(ranked[:beam_width])
@@ -949,12 +961,13 @@ def _archive_members_from_results(
     schema: RecipeSchema,
     *,
     joint_refine_trace_signals: Mapping[str, tuple[str, ...]] | None = None,
+    profile: Mapping[str, Any] | None = None,
 ) -> tuple[_ArchiveMember, ...]:
     members: list[_ArchiveMember] = []
     for candidate, scored in results:
         if not scored.feasible or scored.objectives is None:
             continue
-        score_key = _score_key(candidate, scored, definitions)
+        score_key = _score_key(candidate, scored, definitions, profile=profile)
         trace_signals = (
             ()
             if joint_refine_trace_signals is None
@@ -974,12 +987,41 @@ def _archive_members_from_results(
 def _pareto_archive(
     members: Sequence[_ArchiveMember],
     definitions: Sequence[ObjectiveDefinition],
+    *,
+    profile: Mapping[str, Any] | None = None,
 ) -> tuple[_ArchiveMember, ...]:
     scoreable = tuple(
         member
         for member in members
         if member.scored.objectives is not None
     )
+    if profile is not None and not _members_share_definitions(
+        scoreable,
+        definitions,
+        profile,
+    ):
+        grouped: dict[tuple[str, ...], list[_ArchiveMember]] = {}
+        for member in scoreable:
+            active = _active_definitions(member.scored, definitions, profile)
+            grouped.setdefault(
+                tuple(item.metric for item in active),
+                [],
+            ).append(member)
+        front_members: list[_ArchiveMember] = []
+        for group in grouped.values():
+            active = _active_definitions(group[0].scored, definitions, profile)
+            front_members.extend(_pareto_archive(tuple(group), active))
+        return tuple(
+            sorted(
+                front_members,
+                key=lambda member: _score_key(
+                    member.candidate,
+                    member.scored,
+                    definitions,
+                    profile=profile,
+                ),
+            )
+        )
     front = pareto_front(
         scoreable,
         definitions,
@@ -1044,18 +1086,58 @@ def _recipe_ids_from_metadata(candidate: Candidate, schema: RecipeSchema) -> tup
     )
 
 
+def _active_definitions(
+    scored: ScoredResult,
+    definitions: Sequence[ObjectiveDefinition],
+    profile: Mapping[str, Any] | None,
+) -> Sequence[ObjectiveDefinition]:
+    if profile is None or scored.eval_spec is None:
+        return definitions
+    try:
+        return objective_definitions(
+            scoring_profile_for_executed_spec(profile, scored.eval_spec)
+        )
+    except ObjectiveProfileError:
+        return definitions
+
+
+def _members_share_definitions(
+    members: Sequence[_ArchiveMember],
+    definitions: Sequence[ObjectiveDefinition],
+    profile: Mapping[str, Any],
+) -> bool:
+    fallback = tuple(item.metric for item in definitions)
+    return all(
+        tuple(
+            item.metric
+            for item in _active_definitions(member.scored, definitions, profile)
+        )
+        == fallback
+        for member in members
+    )
+
+
 def _score_key(
     candidate: Candidate,
     scored: ScoredResult,
     definitions: Sequence[ObjectiveDefinition],
+    *,
+    profile: Mapping[str, Any] | None = None,
 ) -> tuple[Any, ...]:
+    active = _active_definitions(scored, definitions, profile)
+    prefix: tuple[str, ...] = ()
+    if profile is not None:
+        # Same shape for every profile-scoped key, so mixed executed spaces
+        # stay comparable. A shared tuple does not change beam order.
+        prefix = tuple(item.metric for item in active)
     scores = (
-        _scored_objective_scores(scored, definitions)
+        _scored_objective_scores(scored, active)
         if scored.objectives is not None
-        else (None,) * len(definitions)
+        else (None,) * len(active)
     )
     return (
         0 if scored.feasible else 1,
+        *prefix,
         *_score_key_components(scores),
         scored.cache_key or "",
         candidate.id,

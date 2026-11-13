@@ -94,8 +94,10 @@ from simulator.fidelity_vocabulary import (
 )
 from simulator.optimize.objective import (
     ObjectiveComputationError,
+    ObjectiveProfileError,
     ObjectiveVector,
     _merged_run_for_fidelity,
+    admit_executed_objective_weight,
     composition_target_eval_metadata,
     composition_target_infeasible_reason,
     composition_target_specs,
@@ -104,6 +106,7 @@ from simulator.optimize.objective import (
     composition_targets_require_terminal_rump,
     profile_with_resolved_execution,
     resolved_execution_identity,
+    scoring_profile_for_executed_spec,
     unclaimed_product_withheld_objective_note,
     compute_objectives,
     product_summary,
@@ -3173,7 +3176,6 @@ def _build_eval_inputs_impl(
         expected_feedstock=feedstock_id,
         source="<profile>",
         schema=schema,
-        scoring_fidelity=fidelity,
     )
     base_run_options = _run_options(profile, fidelity)
     run_options = _thermal_scheduled_run_options(
@@ -3231,6 +3233,12 @@ def _build_eval_inputs_impl(
             "c5_enabled": bool(run_options["c5_enabled"]),
         },
     )
+    # Structural checks ran before the voltage cap and conditional pins.
+    # Remaining weight uses this triple, the one the EvalSpec will store.
+    try:
+        admit_executed_objective_weight(gate_profile)
+    except ObjectiveProfileError as exc:
+        raise ProfileValidationError(str(exc)) from exc
     target_metadata = composition_target_eval_metadata(gate_profile)
     stop_at_stage0_exit = composition_targets_require_stage0_exit(gate_profile)
     setpoints_patch = schema.to_setpoints_patch(patch)
@@ -4408,19 +4416,24 @@ def _objective_profile_for_spec(
     profile: Mapping[str, Any],
     spec: EvalSpec,
 ) -> Mapping[str, Any]:
-    # Score against the EvalSpec triple. Fidelity options and the voltage
-    # cap both land on the spec before this copy. The digested profile is
-    # the caller's object; this copy is scoring-only.
-    profile = profile_with_resolved_execution(
-        profile,
-        {
-            "campaign": spec.campaign,
-            "track": spec.track,
-            "c5_enabled": spec.c5_enabled,
-        },
-    )
+    # Score against the EvalSpec triple. Fidelity options, conditional pins,
+    # and the voltage cap all land on the spec before this copy. Hours and
+    # the thermal window below do not change product claims. The digested
+    # profile is the caller's object; this copy is scoring-only.
+    profile = scoring_profile_for_executed_spec(profile, spec)
     run = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
     changed = False
+    # profile_with_resolved_execution returns the authored object when the
+    # default track (pyrolysis) and default c5 (false) already match the spec.
+    # Claim readers use those defaults, but this scoring copy stores the keys
+    # the spec recorded. The authored profile is not mutated.
+    resolved_track = str(spec.track or "pyrolysis")
+    if run.get("track") != resolved_track:
+        run["track"] = resolved_track
+        changed = True
+    if run.get("c5_enabled") is not spec.c5_enabled:
+        run["c5_enabled"] = spec.c5_enabled
+        changed = True
     try:
         configured_hours = int(run.get("hours"))
     except (TypeError, ValueError):
