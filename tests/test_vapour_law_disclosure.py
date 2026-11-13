@@ -1069,6 +1069,99 @@ _FLOOR_LAW_EXPONENTS = {
     "K2O_gas": (1.0, 0.0, 1.0),
     "Na2O_gas": (1.0, 0.0, 1.0),
 }
+# Absolute log10(P/Pa) at those floor conditions. The equilibrium log is
+# the pressure expectation. It is not evaluate()'s reference pressure.
+#
+# Form, P° = 1e5 Pa. The composite reference is unit activity at pO2_ref.
+#   log10(P_base/Pa) = A - B/(T+C)
+#   log10(r_base) = log10(P_base/Pa) - 5
+#   G/(RT) is the NASA-9 Glenn ratio on the 1000–6000 K segment
+#   log10 K_ex = -(Σ ν_i G_i/(RT)) / ln(10)
+#   log10(r_v) = log10 K_ex + m log10(r_base) + n log10(pO2_ref/P°)
+#   log10(P_ref/Pa) = log10(r_v) + 5
+#   log10(P/Pa) = log10(P_ref/Pa) + e_a log10(1e-300) + e_O2 log10(1e-9/1)
+# At pO2_ref = 1 bar, log10(pO2_ref/P°) = 0, so an exchange oxygen
+# stoichiometry does not move the reference ratio.
+#
+# K2 and K2O_gas at 1400 K. Base K Antoine A 10.641294, B 9965.408779,
+# C -123.001. T+C = 1276.999.
+#   log10(P_K/Pa) = 10.641294 - 9965.408779/1276.999 = 2.8375222045639825
+#   log10(r_K) = -2.1624777954360175
+# NASA-9 G/(RT) at 1400 K: K -13.538042257969181, K2 -22.67512110311594,
+# O2 -27.562042873308478, K2O -45.98113213831271.
+# K2 is 2 K -> K2. ΔG/RT = 4.400963412822421, log10 K_ex = -1.91131412524688,
+# log10(P_ref/Pa) = -1.2362697161189153, and the floor subtracts 295.5 dex:
+#   log10(P/Pa) = -296.7362697161189
+#   P = 1.8353981257509323e-297 Pa
+# K2O_gas is 2 K + 0.5 O2 -> K2O, with e_O2 = 0.
+# ΔG/RT = -5.124026185720105, log10 K_ex = 2.2253362975860083,
+# log10(P_ref/Pa) = 2.9003807067139733, and the floor subtracts 300 dex:
+#   log10(P/Pa) = -297.099619293286
+#   P = 7.950248557716283e-298 Pa
+#
+# Na2 and Na2O_gas at 1500 K. Base Na Antoine A 11.342243, B 12140.316409,
+# C -163.701. T+C = 1336.299.
+#   log10(P_Na/Pa) = 11.342243 - 12140.316409/1336.299 = 2.2572130710694243
+#   log10(r_Na) = -2.7427869289305757
+# NASA-9 G/(RT) at 1500 K: Na -11.904381387346385, Na2 -20.043545482131663,
+# O2 -27.78396208243536, Na2O -39.82357750900803.
+# Na2 is 2 Na -> Na2. ΔG/RT = 3.7652172925611076,
+# log10 K_ex = -1.6352130933259907, log10(P_ref/Pa) = -2.120786951187142:
+#   log10(P/Pa) = -297.62078695118714
+#   P = 2.3944901166373193e-298 Pa
+# Na2O_gas is 2 Na + 0.5 O2 -> Na2O, with e_O2 = 0.
+# ΔG/RT = -2.122833693097583, log10 K_ex = 0.9219349589105813,
+# log10(P_ref/Pa) = 0.43636110104942993:
+#   log10(P/Pa) = -299.56363889895056
+#   P = 2.731247778339748e-300 Pa
+#
+# Tuple: (T_K, log10(P_ref/Pa), log10(P/Pa)).
+_HAND_ABSOLUTE_LOG10_PA_AT_FLOOR = {
+    "K2": (1400.0, -1.2362697161189153, -296.7362697161189),
+    "Na2": (1500.0, -2.120786951187142, -297.62078695118714),
+    "K2O_gas": (1400.0, 2.9003807067139733, -297.099619293286),
+    "Na2O_gas": (1500.0, 0.43636110104942993, -299.56363889895056),
+}
+
+
+def _absolute_floor_pressure_problems(
+    name: str,
+    temperature_K: float,
+    published: float,
+    reference_pa,
+) -> list[str] | None:
+    """Compare one floor pin with its hand absolute logs.
+
+    Returns None when ``name`` has no absolute literal, so the caller
+    keeps the mass-action ratio check. The equilibrium expectation is
+    the hand log. ``reference_pa`` is the actual unit-activity pressure
+    and is compared with the hand reference; it does not build the
+    equilibrium expectation.
+    """
+
+    pin = _HAND_ABSOLUTE_LOG10_PA_AT_FLOOR.get(name)
+    if pin is None:
+        return None
+    temperature, log_ref, log_eq = pin
+    problems: list[str] = []
+    if temperature_K != temperature:
+        problems.append(f"temperature {temperature_K} != pin {temperature}")
+    ratio = _HAND_LOG10_RATIO_AT_FLOOR[name]
+    # The two hand logs are the dex offset. This does not read evaluate().
+    if log_eq - log_ref != ratio:
+        problems.append(f"hand logs differ by {log_eq - log_ref}, not {ratio}")
+    try:
+        reference = float(reference_pa)
+    except (TypeError, ValueError):
+        problems.append(f"reference pressure {reference_pa!r}")
+    else:
+        reference_problem = _pressure_versus_hand_log(reference, log_ref)
+        if reference_problem:
+            problems.append(f"reference {reference_problem}")
+    pressure_problem = _pressure_versus_hand_log(published, log_eq)
+    if pressure_problem:
+        problems.append(pressure_problem)
+    return problems
 
 
 def _floor_activity_dispatch(
@@ -1138,9 +1231,11 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
     Antoine. TiO at 2100 K is the reviewer point: oxygen is inside the
     evaluator band, TiO2 activity is below the floor, and the executed law
     is nasa_cea_9 on [1923.15, 2273.15] K. Every other compiled parent-oxide
-    law is the same arm at its own band midpoint. Cold dispatch and cache
-    replay publish the same law id, band, and count. The pressure stays the
-    floored evaluation.
+    law is the same arm at its own band midpoint. K2, Na2, K2O_gas and
+    Na2O_gas are evaluated at the temperatures of their hand absolute
+    pressure literals. Cold dispatch and cache replay publish the same law
+    id, band, and count. Those four pressures match the literals. The other
+    species still check the mass-action ratio against the published reference.
     """
 
     from engines.builtin.vapor_pressure import (
@@ -1164,7 +1259,10 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
     for name, parent, evaluator in species_rows:
         low, high = evaluator.valid_temperature_K
         band = [float(low), float(high)]
-        if name == "TiO":
+        pin = _HAND_ABSOLUTE_LOG10_PA_AT_FLOOR.get(name)
+        if pin is not None:
+            temperature_K = pin[0]
+        elif name == "TiO":
             assert evaluator.evaluator_family == "nasa_cea_9"
             assert band == [1923.15, 2273.15]
             temperature_K = 2100.0
@@ -1172,6 +1270,11 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
             temperature_K = (float(low) + float(high)) / 2.0
         # Below 400 K the provider returns before the oxide loop.
         if temperature_K < 400.0:
+            continue
+        if pin is not None and not (float(low) <= temperature_K <= float(high)):
+            mismatches.append(
+                f"{name}: pin temperature {temperature_K} outside {band}"
+            )
             continue
         checked.add(name)
         law_id = f"{name}:{evaluator.evaluator_family}"
@@ -1301,34 +1404,43 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
             pO2_exponent = float(evaluator.pO2_exponent)
             pO2_reference_bar = float(evaluator.pO2_reference_bar)
         p_reference = provenance.get("P_reference_Antoine_Pa")
-        try:
-            p_reference_pa = float(p_reference)
-        except (TypeError, ValueError):
-            problems.append(f"reference pressure {p_reference!r}")
-        else:
-            if not (p_reference_pa > 0.0 and math.isfinite(p_reference_pa)):
-                problems.append(f"reference pressure {p_reference_pa!r}")
-            elif oxygen != 1.0e-9:
+        absolute = _absolute_floor_pressure_problems(
+            name,
+            temperature_K,
+            pressures[name],
+            p_reference,
+        )
+        if absolute is not None:
+            # Equilibrium expectation is the hand log, not P_reference.
+            if oxygen != 1.0e-9:
                 problems.append(f"request pO2 {oxygen} != 1e-9")
+            problems.extend(absolute)
+        else:
+            try:
+                p_reference_pa = float(p_reference)
+            except (TypeError, ValueError):
+                problems.append(f"reference pressure {p_reference!r}")
             else:
-                log_expected = _hand_compiled_log10_pressure(
-                    p_reference_pa=p_reference_pa,
-                    activity_exponent=activity_exponent,
-                    activity_used=COMPILED_SOURCE_ACTIVITY_FLOOR,
-                    pO2_exponent=pO2_exponent,
-                    pO2_bar=1.0e-9,
-                    pO2_reference_bar=pO2_reference_bar,
-                )
-                literal = _HAND_LOG10_RATIO_AT_FLOOR.get(name)
-                if literal is not None:
-                    delta = log_expected - math.log10(p_reference_pa)
-                    if delta != literal:
-                        problems.append(f"hand delta {delta} != {literal}")
-                pressure_problem = _pressure_versus_hand_log(
-                    pressures[name], log_expected
-                )
-                if pressure_problem:
-                    problems.append(pressure_problem)
+                if not (p_reference_pa > 0.0 and math.isfinite(p_reference_pa)):
+                    problems.append(f"reference pressure {p_reference_pa!r}")
+                elif oxygen != 1.0e-9:
+                    problems.append(f"request pO2 {oxygen} != 1e-9")
+                else:
+                    # No hand absolute pressure for this species. The check
+                    # is the mass-action ratio against the published reference.
+                    log_expected = _hand_compiled_log10_pressure(
+                        p_reference_pa=p_reference_pa,
+                        activity_exponent=activity_exponent,
+                        activity_used=COMPILED_SOURCE_ACTIVITY_FLOOR,
+                        pO2_exponent=pO2_exponent,
+                        pO2_bar=1.0e-9,
+                        pO2_reference_bar=pO2_reference_bar,
+                    )
+                    pressure_problem = _pressure_versus_hand_log(
+                        pressures[name], log_expected
+                    )
+                    if pressure_problem:
+                        problems.append(pressure_problem)
         if cold_snapshot != one:
             problems.append("run snapshot is not the computation")
         with disclosure_scope(inherit=False) as warm:
@@ -1351,6 +1463,8 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
     assert {"K2", "Na2"} <= hot_parent_basis
     assert hot_parent_basis <= checked
     assert "TiO" in checked
+    assert set(_HAND_ABSOLUTE_LOG10_PA_AT_FLOOR) == set(_HAND_LOG10_RATIO_AT_FLOOR)
+    assert set(_HAND_ABSOLUTE_LOG10_PA_AT_FLOOR) <= checked
     assert mismatches == []
 
 
@@ -1427,7 +1541,8 @@ def test_parent_oxide_underflow_above_the_floor_uses_the_evaluator_floor() -> No
     ``source_activity_floor_notice``. It does not evaluate at a(single).
     The input class is every hot compiled parent-oxide species. K2 and Na2
     are the pressure pin: activity exponent 1, so 1e-200 versus the floor
-    is 100 dex. The expected dex is the hand literal, not ``evaluate()``.
+    is 100 dex. Their expected pressures are the hand absolute logs at
+    1400 K and 1500 K, not ``evaluate()`` and not its reference pressure.
     """
 
     from engines.builtin.vapor_pressure import (
@@ -1447,8 +1562,18 @@ def test_parent_oxide_underflow_above_the_floor_uses_the_evaluator_floor() -> No
         if row.get("source_activity_basis") != "parent_oxide":
             continue
         low, high = evaluator.valid_temperature_K
-        temperature_K = (float(low) + float(high)) / 2.0
+        pin = _HAND_ABSOLUTE_LOG10_PA_AT_FLOOR.get(name)
+        if pin is not None:
+            temperature_K = pin[0]
+        else:
+            temperature_K = (float(low) + float(high)) / 2.0
         if temperature_K < 400.0:
+            continue
+        if pin is not None and not (float(low) <= temperature_K <= float(high)):
+            mismatches.append(
+                f"{name}: pin temperature {temperature_K} outside "
+                f"[{low}, {high}]"
+            )
             continue
         cations = float(MELT_OXIDE_CATIONS_PER_FORMULA.get(parent, 1.0))
         expected_parent = _parent_power(injected, cations)
@@ -1526,6 +1651,19 @@ def test_parent_oxide_underflow_above_the_floor_uses_the_evaluator_floor() -> No
                 continue
             activity_used = expected_parent
         p_reference = provenance.get("P_reference_Antoine_Pa")
+        absolute = _absolute_floor_pressure_problems(
+            name,
+            temperature_K,
+            pressures[name],
+            p_reference,
+        )
+        if absolute is not None:
+            oxygen = provenance.get("pO2_bar")
+            if oxygen != 1.0e-9:
+                mismatches.append(f"{name}: request pO2 {oxygen!r} != 1e-9")
+            if absolute:
+                mismatches.append(f"{name}: {', '.join(absolute)}")
+            continue
         try:
             p_reference_pa = float(p_reference)
         except (TypeError, ValueError):
@@ -1539,6 +1677,8 @@ def test_parent_oxide_underflow_above_the_floor_uses_the_evaluator_floor() -> No
                 f"{name}: pO2 {oxygen!r} reference {p_reference_pa!r}"
             )
             continue
+        # No hand absolute pressure for this species. The check is the
+        # mass-action ratio against the published reference.
         log_expected = _hand_compiled_log10_pressure(
             p_reference_pa=p_reference_pa,
             activity_exponent=activity_exponent,
@@ -1547,18 +1687,14 @@ def test_parent_oxide_underflow_above_the_floor_uses_the_evaluator_floor() -> No
             pO2_bar=1.0e-9,
             pO2_reference_bar=pO2_reference_bar,
         )
-        literal = _HAND_LOG10_RATIO_AT_FLOOR.get(name)
-        if literal is not None:
-            delta = log_expected - math.log10(p_reference_pa)
-            if delta != literal:
-                mismatches.append(f"{name}: hand delta {delta} != {literal}")
-                continue
         pressure_problem = _pressure_versus_hand_log(
             pressures[name], log_expected
         )
         if pressure_problem:
             mismatches.append(f"{name}: {pressure_problem}")
     assert {"K2", "Na2", "K2O_gas", "Na2O_gas"} <= checked
+    assert set(_HAND_ABSOLUTE_LOG10_PA_AT_FLOOR) == set(_HAND_LOG10_RATIO_AT_FLOOR)
+    assert set(_HAND_ABSOLUTE_LOG10_PA_AT_FLOOR) <= checked
     assert mismatches == []
 
 
