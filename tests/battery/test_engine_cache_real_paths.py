@@ -1720,6 +1720,17 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
 
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     handle = open_battery_engine(engine.value)
+    expected_nonempty_scorer_fields = {
+        Engine.ALPHAMELTS: ("liquid_composition_wt_pct", "fe_redox_split"),
+        Engine.THERMOENGINE: ("liquid_composition_wt_pct", "fe_redox_split"),
+        Engine.MAGEMIN: ("engine_status",),
+        Engine.VAPOROCK: ("gas_partial_pressures_Pa",),
+        Engine.OPENIMCC: (
+            "melt_activities",
+            "melt_activity_coefficients",
+            "melt_activity_coefficient_details",
+        ),
+    }[engine]
     if not handle.available or handle.backend is None:
         missing_reason = missing_engine_reason(handle, engine.value)
         assert missing_reason is not None
@@ -1772,6 +1783,7 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             )
         elif engine is Engine.VAPOROCK:
             import yaml
+            from simulator.melt_backend.vaporock import VapoRockBackend
 
             fixture_path = (
                 Path(__file__).resolve().parents[1]
@@ -1782,14 +1794,25 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             )
             fixture = yaml.safe_load(fixture_path.read_text(encoding="utf-8"))
             anchor = fixture["expected"]["vapor_partial_pressures_Pa"]["anchors"][0]
-            recorded_result = EquilibriumResult(
-                phase_assemblage_available=False,
-                vapor_pressures_Pa=dict(anchor["vapor_partial_pressures_Pa"]),
+            backend = VapoRockBackend()
+            backend._available = True
+            backend._temperature_units = "C"
+            backend._vapor_pressure_units = "Pa"
+            backend._vaporock = SimpleNamespace(
+                calc_vapor_pressures=lambda **_kwargs: dict(
+                    anchor["vapor_partial_pressures_Pa"]
+                )
             )
+            recorded_result = backend.equilibrate(
+                temperature_C=float(anchor["T_K"]) - 273.15,
+                composition_kg=dict(fixture["feedstock"]["composition_wt_pct"]),
+                fO2_log=float(anchor["fO2"]["fO2_log10_bar"]),
+                pressure_bar=1.0,
+                liquid_fraction=1.0,
+            )
+            assert recorded_result.vaporock_full_speciation_Pa
         else:
             from simulator.melt_backend import openimcc_bridge
-            from simulator.melt_backend.imcc_adapter_labels import ImccAdapterLabels
-            from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
 
             fixture_path = (
                 Path(__file__).resolve().parents[1]
@@ -1798,29 +1821,46 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             )
             fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
             record = fixture["records"]["c2b7b4e:62"]
-            activities = dict(
-                zip(record["parent_oxides"], record["parent_activity"], strict=True)
-            )
-            recorded_openimcc_result = OpenImccBridgeResult(
-                parent_oxide_activities=activities,
+            package_result = SimpleNamespace(
                 parent_oxides=tuple(record["parent_oxides"]),
-                flags=(),
-                notices=(),
-                acid_sink_ratio=None,
-                pack_model_id="openimcc-recorded-fixture",
-                pack_version="recorded",
-                pack_digest=fixture["provenance"],
-                openimcc_version="recorded",
-                envelope_status="inside",
-                extrapolated=False,
-                labels=ImccAdapterLabels(
-                    identity={},
+                parent_activity=tuple(record["parent_activity"]),
+                parent_x=None,
+                parent_x_star=None,
+                labels=SimpleNamespace(
+                    identity={
+                        "model_id": "openimcc-recorded-fixture",
+                        "datapack_version": "recorded",
+                    },
                     coverage={},
-                    trust="internal-analytical",
-                    envelope_status="inside",
+                    flags=(),
+                    notices=(),
+                    acid_sink_ratio=None,
                 ),
-                coverage={},
-                activity_coefficients={},
+                extrapolated=False,
+            )
+            package = SimpleNamespace(
+                __version__="recorded",
+                evaluate=lambda *_args, **_kwargs: package_result,
+            )
+            monkeypatch.setattr(openimcc_bridge, "_require_openimcc", lambda: package)
+            monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _pack: object())
+            monkeypatch.setattr(
+                openimcc_bridge,
+                "_pack_digest",
+                lambda _pack: fixture["provenance"],
+            )
+            recorded_openimcc_result = openimcc_bridge._evaluate_uncached(
+                composition_mol=record["composition"],
+                temperature_K=record["T_K"],
+                pack="default",
+            )
+            assert recorded_openimcc_result.parent_oxide_activities
+            assert recorded_openimcc_result.activity_coefficients
+            assert all(
+                row["value"] > 0.0
+                and row["coefficient_basis"] == "single_cation"
+                and row["standard_state"]
+                for row in recorded_openimcc_result.activity_coefficients.values()
             )
             monkeypatch.setattr(
                 openimcc_bridge,
@@ -1859,31 +1899,65 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
                 engine_settings=normalize_engine_settings(engine.value, None),
             )
     pots, _metadata = load_binary_pots()
-    if engine is Engine.ALPHAMELTS:
+    if engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
+        from simulator.diagnostic_helpers.binary_pot_battery import BinaryPot
+        from tests.battery.test_melts_fe_redox_known_engine_output import (
+            _FIXTURE as melts_fixture_path,
+        )
+
+        fixture = json.loads(melts_fixture_path.read_text(encoding="utf-8"))
+        conditions = fixture["provenance"]["conditions"]
+        pot = BinaryPot(
+            pot_id=f"{engine.value}_recorded_fe_cache_case",
+            kato_1993_table4_system=None,
+            why="Captured liquid-forming MELTS Fe-redox fixture composition.",
+            composition_wt_pct=dict(conditions["composition_wt_pct"]),
+        )
+        common = {
+            "temperature_K": float(conditions["temperature_C"]) + 273.15,
+            "po2": Po2Request(
+                mode="commanded",
+                po2_bar=10.0 ** float(conditions["fO2_log"]),
+            ),
+            "timeout_s": 90.0,
+            "isolated": False,
+        }
+    elif engine is Engine.VAPOROCK:
+        import yaml
         from simulator.diagnostic_helpers.binary_pot_battery import BinaryPot
 
-        pot = BinaryPot(
-            pot_id="alphamelts_cache_in_domain",
-            kato_1993_table4_system=None,
-            why="Known liquid-forming AlphaMELTS fixture composition.",
-            composition_wt_pct={
-                "SiO2": 49.0,
-                "Al2O3": 15.0,
-                "FeO": 10.0,
-                "Fe2O3": 1.0,
-                "MgO": 10.0,
-                "CaO": 10.0,
-                "Na2O": 5.0,
-            },
+        fixture_path = (
+            Path(__file__).resolve().parents[1]
+            / "fixtures"
+            / "corpus"
+            / "wolf-2022-vaporock"
+            / "benchmark-fixture.yaml"
         )
+        fixture = yaml.safe_load(fixture_path.read_text(encoding="utf-8"))
+        anchor = fixture["expected"]["vapor_partial_pressures_Pa"]["anchors"][0]
+        pot = BinaryPot(
+            pot_id="vaporock_recorded_bse_cache_case",
+            kato_1993_table4_system=None,
+            why="Captured Wolf et al. VapoRock BSE fixture composition.",
+            composition_wt_pct=dict(fixture["feedstock"]["composition_wt_pct"]),
+        )
+        common = {
+            "temperature_K": float(anchor["T_K"]),
+            "po2": Po2Request(
+                mode="commanded",
+                po2_bar=10.0 ** float(anchor["fO2"]["fO2_log10_bar"]),
+            ),
+            "timeout_s": 90.0,
+            "isolated": False,
+        }
     else:
         pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
-    common = {
-        "temperature_K": 1700.0,
-        "po2": Po2Request(mode="engine_default", po2_bar=None),
-        "timeout_s": 90.0,
-        "isolated": False,
-    }
+        common = {
+            "temperature_K": 1700.0,
+            "po2": Po2Request(mode="engine_default", po2_bar=None),
+            "timeout_s": 90.0,
+            "isolated": False,
+        }
 
     def stable(cell: Any) -> Any:
         return cell.to_engine_cache_value()
@@ -1925,6 +1999,9 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
 
         assert stable(cache_off) == stable(cold) == stable(warm)
         assert scorer_fields(cache_off) == scorer_fields(cold) == scorer_fields(warm)
+        for name in expected_nonempty_scorer_fields:
+            value = getattr(cache_off, name)
+            assert value not in (None, "", {}, [], ())
         assert engine_cache.engine_cache_counters(reset=True)[engine.value] == {
             "hits": 1,
             "misses": 1,
