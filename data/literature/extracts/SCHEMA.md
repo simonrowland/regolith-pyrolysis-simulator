@@ -274,7 +274,11 @@ label, neither the neutral prefix nor a charged label, and certifies no
 number. An unrelated formula miss stays `cited_token_absent`. The charged
 reason compares element symbols, lowercase letters included, after the
 subscript fold. `SO₄−` does not type `SiO2`, `F−` does not type `Fe`, and
-`MnO−` does not type `MgO`. Formula
+`MnO−` does not type `MgO`. An empty `<sup></sup>` is still a superscript.
+`SiO<sup></sup>2` does not certify `SiO2`; the refusal is
+`charged_species_unsupported`. `Fe<sup>2</sup>` is
+`charged_species_unsupported` for `Fe` and `Fe2`, not `cited_token_absent`.
+Formula
 and species labels take that guarded comparison first, on prose, an
 HTML cell, a CSV or TSV cell, and repository text, so an identical
 `Fe^{2+}` cell does not certify. The refusal is

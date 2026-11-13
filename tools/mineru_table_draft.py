@@ -205,6 +205,8 @@ class _RawCell:
     colspan: int = 1
     is_header: bool = False
     superscript_depth: int = 0
+    # Set on the start tag. An empty ``<sup></sup>`` has no text span.
+    has_superscript: bool = False
 
     @property
     def text(self) -> str:
@@ -226,8 +228,10 @@ class Cell:
     is_header: bool = False
     superscript_text: str = ""
     # Character spans of ``<sup>`` text inside ``text``. Certification uses
-    # these so a power is not the concatenated digits.
+    # these so a power is not the concatenated digits. An empty tag has
+    # no span; ``has_superscript`` records that the tag was present.
     superscript_spans: tuple[tuple[int, int], ...] = ()
+    has_superscript: bool = False
     value_text: str = ""
     mark: str = ""
     numeric_value: float | None = None
@@ -254,6 +258,8 @@ class _TableParser(HTMLParser):
                 is_header=tag == "th",
             )
         elif tag == "sup" and self.cell is not None:
+            # Presence, not text. An empty <sup></sup> never reaches handle_data.
+            self.cell.has_superscript = True
             self.cell.superscript_depth += 1
         elif tag == "br" and self.cell is not None:
             self.cell.text_parts.append("\n")
@@ -419,6 +425,7 @@ def parse_table_html(table_body: str) -> list[list[Cell]]:
                         is_header=raw_cell.is_header,
                         superscript_text=raw_cell.superscript_text,
                         superscript_spans=tuple(raw_cell.superscript_spans),
+                        has_superscript=raw_cell.has_superscript,
                     )
             row_count = max(row_count, row_index + raw_cell.rowspan)
             column_index += raw_cell.colspan

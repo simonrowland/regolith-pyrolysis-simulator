@@ -98,6 +98,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   element symbols, lowercase letters included, after the subscript fold.
   ``SO₄−`` does not type ``SiO2``, ``F−`` does not type ``Fe``, and
   ``MnO−`` does not type ``MgO``; those misses stay
+  ``cited_token_absent``. An empty ``<sup></sup>`` is still a superscript
+  tag. ``SiO<sup></sup>2`` does not certify ``SiO2``; that refusal is
+  ``charged_species_unsupported``. ``Fe<sup>2</sup>`` is
+  ``charged_species_unsupported`` for ``Fe`` and ``Fe2``, not
   ``cited_token_absent``. A numeric token has no element letter,
   so ``-6.98`` still certifies ``-6.98``. ``Fe`` is not
   ``$\\mathrm{Fe}^{2+}$`` and ``Fe^{2+}`` is not an identical CSV cell.
@@ -864,8 +868,10 @@ def _html_table_grid(
 ) -> tuple[list[list[Cell]] | None, str | None]:
     """One table from ``parse_table_html``, which owns rowspan and colspan.
 
-    Certification reads ``Cell.text`` and ``Cell.superscript_spans``. The
-    text keeps formula markup. The draft's split numeric value is not used.
+    Certification reads ``Cell.text``, ``Cell.superscript_spans``, and
+    ``Cell.has_superscript``. An empty ``<sup></sup>`` still sets the
+    flag. The text keeps formula markup. The draft's split numeric
+    value is not used.
     """
     try:
         grid = parse_table_html(table_html)
@@ -1150,35 +1156,36 @@ def _cited_prose_outside_html_tables(text: str, locator: Mapping[str, Any]) -> s
 
 def _cited_html_cell(
     text: str, locator: Mapping[str, Any]
-) -> tuple[str | None, tuple[tuple[int, int], ...], str | None]:
+) -> tuple[str | None, tuple[tuple[int, int], ...], str | None, bool]:
     """The one cited cell, after the complete table is parsed.
 
-    The second item is the cell's superscript spans. ``line_range`` selects
-    tables that lie entirely inside it. A span that cuts a table is
-    source-blind. More than one table in the cited span is source-blind.
-    The sliced line is not searched as prose.
+    The second item is the cell's superscript spans. The fourth is tag
+    presence, true for an empty ``<sup></sup>`` that has no span.
+    ``line_range`` selects tables that lie entirely inside it. A span
+    that cuts a table is source-blind. More than one table in the cited
+    span is source-blind. The sliced line is not searched as prose.
     """
     address, address_error = _html_cell_address(locator)
     if address_error:
-        return None, (), address_error
+        return None, (), address_error, False
     if address is None:
         return None, (), (
             "html_cell_address_incomplete: table_row and table_column "
             "are both required"
-        )
+        ), False
     row, column = address
     span: tuple[int, int] | None = None
     if "line_range" in locator and locator.get("line_range") is not None:
         span = _parse_line_range(locator.get("line_range"))
         if span is None:
-            return None, (), "line_range is not a line number or start-end span"
+            return None, (), "line_range is not a line number or start-end span", False
         start, end = span
         line_count = len(text.splitlines())
         if end > line_count:
             return None, (), (
                 f"line_range {start}-{end} is outside the artifact "
                 f"({line_count} lines)"
-            )
+            ), False
     chosen: list[str] = []
     for match in _HTML_TABLE_RE.finditer(text):
         start_line, end_line = _html_table_line_bounds(text, match)
@@ -1192,26 +1199,28 @@ def _cited_html_cell(
             return None, (), (
                 f"line_range {range_start}-{range_end} cuts through an HTML "
                 f"table on lines {start_line}-{end_line}"
-            )
+            ), False
         if covers:
             chosen.append(match.group(0))
     if not chosen:
-        return None, (), "html_table_absent: cited span has no HTML table"
+        return None, (), "html_table_absent: cited span has no HTML table", False
     if len(chosen) > 1:
         return None, (), (
             f"html_table_ambiguous: cited span has {len(chosen)} HTML tables"
-        )
+        ), False
     grid, grid_error = _html_table_grid(chosen[0])
     if grid_error or not grid:
-        return None, (), grid_error or "html_table_unparsed: HTML table has no rows"
+        return None, (), (
+            grid_error or "html_table_unparsed: HTML table has no rows"
+        ), False
     width = len(grid[row - 1]) if row <= len(grid) else 0
     if row > len(grid) or column > width:
         return None, (), (
             f"html_cell_outside_table: table_row {row} table_column {column} "
             f"is outside the table ({len(grid)} rows, {width} columns)"
-        )
+        ), False
     cited = grid[row - 1][column - 1]
-    return cited.text, cited.superscript_spans, None
+    return cited.text, cited.superscript_spans, None, cited.has_superscript
 
 
 def _html_blind_code(message: str) -> str:
@@ -3456,13 +3465,36 @@ def _text_outside_superscript_spans(
     return "".join(pieces)
 
 
-def _html_cell_is_charged_species(
-    cell: str, spans: tuple[tuple[int, int], ...]
+def _superscript_marks_formula(
+    text: str,
+    spans: tuple[tuple[int, int], ...],
+    has_superscript: bool,
 ) -> bool:
-    """True when the cell holds a charged formula, not a numeric power."""
-    if spans and _raw_has_element_symbol(
-        _text_outside_superscript_spans(cell, spans)
-    ):
+    """True when a ``<sup>`` leaves an element letter in the cell.
+
+    Tag presence counts when the tag is empty and has no span. The
+    letter is the text outside the spans, so ``10<sup>3</sup>`` and
+    ``10<sup></sup>`` are not formulas. A leading ``x`` that is not the
+    times sign in ``1.5x10`` is a letter.
+    """
+    if not has_superscript and not spans:
+        return False
+    return _raw_has_element_symbol(_text_outside_superscript_spans(text, spans))
+
+
+def _html_cell_is_charged_species(
+    cell: str,
+    spans: tuple[tuple[int, int], ...] = (),
+    *,
+    has_superscript: bool = False,
+) -> bool:
+    """True when the cell holds a charged formula, not a numeric power.
+
+    Any ``<sup>``, including an empty one, makes a formula cell charged.
+    ``SiO<sup></sup>2`` is charged. ``10<sup>3</sup>`` and
+    ``10<sup></sup>`` have no element letter outside the superscript.
+    """
+    if _superscript_marks_formula(cell, spans, has_superscript):
         return True
     return _raw_token_is_charged_species(cell)
 
@@ -3511,12 +3543,22 @@ def _charged_token_carries_label(token: str, label: str) -> bool:
     return _formula_element_symbols(token) == wanted
 
 
-def _charged_formula_miss(missing: Sequence[_PinnedLeaf], text: str) -> bool:
+def _charged_formula_miss(
+    missing: Sequence[_PinnedLeaf],
+    text: str,
+    spans: tuple[tuple[int, int], ...] = (),
+    *,
+    has_superscript: bool = False,
+) -> bool:
     """True when a formula miss is the unsupported charged-species refusal.
 
     A charged token elsewhere in the text does not type an unrelated
     miss. The label is charged, or a charged raw token's element symbols
-    are the label's. Lowercase letters stay, so ``SO₄−`` is not ``SiO2``.
+    are the label's. An HTML cell passes the same superscript metadata
+    the guard saw. The text outside those spans is the formula, so
+    ``Fe<sup>2</sup>`` carries ``Fe`` and ``Fe2``, and
+    ``SiO<sup></sup>2`` carries ``SiO2``. Lowercase letters stay, so
+    ``SO₄−`` is not ``SiO2``.
     """
     formula_miss = [
         leaf
@@ -3532,10 +3574,17 @@ def _charged_formula_miss(missing: Sequence[_PinnedLeaf], text: str) -> bool:
         for token in re.findall(r"\S+", text)
         if _raw_token_is_charged_species(token)
     ]
-    return any(
+    if any(
         _charged_token_carries_label(token, leaf.value)
         for leaf in formula_miss
         for token in charged
+    ):
+        return True
+    if not _superscript_marks_formula(text, spans, has_superscript):
+        return False
+    outside = _text_outside_superscript_spans(text, spans)
+    return any(
+        _charged_token_carries_label(outside, leaf.value) for leaf in formula_miss
     )
 
 
@@ -3764,8 +3813,8 @@ def _locator_source_blind_reason(
             if delimiter is None and _locator_has_html_cell_address(locator):
                 # One parsed cell. A miss is source-blind, not a prose search
                 # of the same line.
-                cell, superscript_spans, span_error = _cited_html_cell(
-                    text, locator
+                cell, superscript_spans, span_error, has_superscript = (
+                    _cited_html_cell(text, locator)
                 )
                 if cell is None:
                     candidate_reasons.append(
@@ -3776,7 +3825,9 @@ def _locator_source_blind_reason(
                     )
                     break
                 charge_text = cell
-                if _html_cell_is_charged_species(cell, superscript_spans):
+                if _html_cell_is_charged_species(
+                    cell, superscript_spans, has_superscript=has_superscript
+                ):
                     # Same attribution as prose. An unrelated formula is
                     # cited_token_absent. A number, or the matching formula,
                     # stays charged and does not fall through to the power path.
@@ -3787,7 +3838,12 @@ def _locator_source_blind_reason(
                         leaf.formula_label and isinstance(leaf.value, str)
                         for leaf in leaves
                     )
-                    if formula_only and not _charged_formula_miss(leaves, cell):
+                    if formula_only and not _charged_formula_miss(
+                        leaves,
+                        cell,
+                        superscript_spans,
+                        has_superscript=has_superscript,
+                    ):
                         candidate_reasons.append(
                             "opened "
                             f"{path.name} but the resolved extract value is not in "
@@ -3802,7 +3858,7 @@ def _locator_source_blind_reason(
                         )
                         candidate_reason_codes.add("charged_species_unsupported")
                     break
-                if superscript_spans:
+                if superscript_spans or has_superscript:
                     missing = []
                     for leaf in leaves:
                         if leaf.formula_label and isinstance(leaf.value, str):
@@ -3980,6 +4036,10 @@ def fidelity_source_warnings(
     element symbols, lowercase letters included, after the subscript
     fold. ``SO₄−`` does not type ``SiO2``, ``F−`` does not type ``Fe``,
     and ``MnO−`` does not type ``MgO``. An unrelated formula miss stays
+    ``cited_token_absent``. An empty ``<sup></sup>`` is still a
+    superscript. ``SiO<sup></sup>2`` does not certify ``SiO2``; that
+    refusal is ``charged_species_unsupported``. ``Fe<sup>2</sup>`` is
+    ``charged_species_unsupported`` for ``Fe`` and ``Fe2``, not
     ``cited_token_absent``.
     A subscript digit inside a formula token is not a number, so
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring

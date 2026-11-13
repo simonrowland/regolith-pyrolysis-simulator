@@ -66,7 +66,10 @@ from simulator.chemistry.formula_text import (  # noqa: E402
     UNICODE_MINUS_SIGNS,
     UNICODE_PLUS_SIGNS,
 )
-from tools.mineru_table_draft import printed_formula as draft_printed_formula  # noqa: E402
+from tools.mineru_table_draft import (  # noqa: E402
+    parse_table_html,
+    printed_formula as draft_printed_formula,
+)
 from simulator.battery import migrate as battery_migrate  # noqa: E402
 from simulator.battery.waypoints import oxygen_condition  # noqa: E402
 from tests.battery import factories as battery_factories  # noqa: E402
@@ -10381,7 +10384,10 @@ def test_superscript_cell_family_certifies_or_refuses(tmp_path: Path):
     ``10<sup>-1000</sup>`` refuses 0. ``1.5×10<sup>3</sup>`` certifies
     1500. The sign comparison is ``_same_signed_decimal`` on both the
     plain-cell path and the two superscript equalities. The expected
-    sign bits come from ``Decimal``, not from the gate.
+    sign bits come from ``Decimal``, not from the gate. Pin 1 certifies
+    none of the product. A leading ``x`` with an empty base is an element
+    letter, so that cell refuses with ``charged_species_unsupported``.
+    Every other shape refuses with ``superscript_in_cell``.
     """
     reader = inspect.getsource(vle._read_superscript_power)
     assert 'prefix[:1] in {"+", "-"}' in reader
@@ -10461,7 +10467,47 @@ def test_superscript_cell_family_certifies_or_refuses(tmp_path: Path):
     family = _superscript_cell_family()
     assert "<table><tr><td><sup>2</sup></td></tr></table>\n" in family
     assert "<table><tr><td>0<sup>2</sup></td></tr></table>\n" in family
-    for cell in family:
+    # Pin 1 is not a power in this product. The typed reason is structural:
+    # a leading x and an empty base is an element letter; everything else
+    # is a superscript cell. 6 signs * 4 exponents = 24 charged cells.
+    # The product is 6*5*4*4 = 480. The other 456, plus ``10<sup>3</sup>2``,
+    # are 457.
+    built: list[str] = []
+    charged_count = 0
+    superscript_count = 0
+    family_failures: list[str] = []
+    shapes = list(
+        itertools.product(
+            _SUPERSCRIPT_CELL_SIGNS,
+            _SUPERSCRIPT_CELL_BASES,
+            _SUPERSCRIPT_CELL_TIMES,
+            _SUPERSCRIPT_CELL_EXPONENTS,
+        )
+    )
+    shapes.append(("", "10", "", "3-trailing"))
+    for sign, base, times, exponent in shapes:
+        if exponent == "3-trailing":
+            cell = "<table><tr><td>10<sup>3</sup>2</td></tr></table>\n"
+            expected = "superscript_in_cell"
+        else:
+            marked = f"{times}10" if times else ""
+            inner = f"{sign}{base}{marked}<sup>{exponent}</sup>"
+            cell = f"<table><tr><td>{inner}</td></tr></table>\n"
+            expected = (
+                "charged_species_unsupported"
+                if times == "x" and base == ""
+                else "superscript_in_cell"
+            )
+        built.append(cell)
+        if expected == "charged_species_unsupported":
+            charged_count += 1
+        else:
+            superscript_count += 1
+        other = (
+            "superscript_in_cell"
+            if expected == "charged_species_unsupported"
+            else "charged_species_unsupported"
+        )
         doc = _html_source_document(
             tmp_path,
             1,
@@ -10471,7 +10517,18 @@ def test_superscript_cell_family_certifies_or_refuses(tmp_path: Path):
         errors = vle.certify_extract_source_fidelity(
             doc, label="sup-family", artifact_root=tmp_path
         )
-        assert isinstance(errors, list), (cell, errors)
+        joined = "\n".join(errors)
+        if (
+            not errors
+            or expected not in joined
+            or other in joined
+            or "source_blind_pin" not in joined
+        ):
+            family_failures.append(f"{expected} {cell!r}: {errors}")
+    assert built == family
+    assert family_failures == []
+    assert charged_count == 24
+    assert superscript_count == 457
 
 
 def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
@@ -10949,7 +11006,12 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     The charged reason is the element symbols after the subscript fold,
     lowercase letters included. ``SO₄−`` does not type ``SiO2``, ``F−``
     does not type ``Fe``, and ``MnO−`` does not type ``MgO``: each is
-    ``cited_token_absent``.
+    ``cited_token_absent``. An empty ``<sup></sup>`` is still a
+    superscript. ``SiO<sup></sup>2`` does not certify ``SiO2``
+    (``charged_species_unsupported``) and ``Fe`` is
+    ``cited_token_absent``. ``Fe<sup>2</sup>`` is
+    ``charged_species_unsupported`` for ``Fe`` and ``Fe2``, not
+    ``superscript_in_cell``, and ``SiO2`` is ``cited_token_absent``.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -11101,6 +11163,53 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     assert vle._html_cell_is_charged_species("Fe2+", ((2, 4),)) is True
     assert vle._html_cell_is_charged_species("103", ((2, 3),)) is False
     assert vle._html_cell_is_charged_species("1.5x103", ((6, 7),)) is False
+    assert (
+        vle._html_cell_is_charged_species("SiO2", (), has_superscript=True) is True
+    )
+    assert vle._html_cell_is_charged_species("10", (), has_superscript=True) is False
+    empty_sup = parse_table_html(
+        "<table><tr><td>SiO<sup></sup>2</td></tr></table>"
+    )[0][0]
+    assert empty_sup.text == "SiO2"
+    assert empty_sup.superscript_spans == ()
+    assert empty_sup.has_superscript is True
+    powered_fe = parse_table_html(
+        "<table><tr><td>Fe<sup>2</sup></td></tr></table>"
+    )[0][0]
+    assert powered_fe.text == "Fe2"
+    assert powered_fe.superscript_spans == ((2, 3),)
+    assert powered_fe.has_superscript is True
+    fe_leaf = vle._PinnedLeaf("Fe", True)
+    fe2_leaf = vle._PinnedLeaf("Fe2", True)
+    sio_leaf = vle._PinnedLeaf("SiO2", True)
+    assert (
+        vle._charged_formula_miss(
+            [fe_leaf], "Fe2", ((2, 3),), has_superscript=True
+        )
+        is True
+    )
+    assert (
+        vle._charged_formula_miss(
+            [fe2_leaf], "Fe2", ((2, 3),), has_superscript=True
+        )
+        is True
+    )
+    assert (
+        vle._charged_formula_miss(
+            [sio_leaf], "Fe2", ((2, 3),), has_superscript=True
+        )
+        is False
+    )
+    assert (
+        vle._charged_formula_miss([sio_leaf], "SiO2", (), has_superscript=True)
+        is True
+    )
+    assert (
+        vle._charged_formula_miss([fe_leaf], "SiO2", (), has_superscript=True)
+        is False
+    )
+    # The flattened cell without superscript metadata is not that refusal.
+    assert vle._charged_formula_miss([fe_leaf], "Fe2") is False
     for kind, source in _CHARGED_SPECIES_SOURCES:
         for key in ("formula", "species"):
             for label in _CHARGED_SPECIES_LABELS:
@@ -11439,6 +11548,80 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                     failures.append(
                         f"skeleton certify {kind} {key} {label!r}: {errors}"
                     )
+    # Empty <sup> is tag presence. Fe<sup>2</sup> is the same structured cell
+    # the guard sees, so the matching formula is charged, not cited.
+    html_sup_pins = (
+        (
+            "<table><tr><td>SiO<sup></sup>2</td></tr></table>\n",
+            "SiO2",
+            "charged_species_unsupported",
+        ),
+        (
+            "<table><tr><td>SiO<sup></sup>2</td></tr></table>\n",
+            "Fe",
+            "cited_token_absent",
+        ),
+        (
+            "<table><tr><td>Fe<sup>2</sup></td></tr></table>\n",
+            "Fe",
+            "charged_species_unsupported",
+        ),
+        (
+            "<table><tr><td>Fe<sup>2</sup></td></tr></table>\n",
+            "Fe2",
+            "charged_species_unsupported",
+        ),
+        (
+            "<table><tr><td>Fe<sup>2</sup></td></tr></table>\n",
+            "SiO2",
+            "cited_token_absent",
+        ),
+    )
+    for source, label, expected in html_sup_pins:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path,
+                label,
+                source,
+                key=key,
+                relative="text/empty-sup.html",
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc, label=f"sup-meta-{key}-{label}", artifact_root=tmp_path
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {expected}:
+                failures.append(
+                    f"sup meta {key} {label!r} ~ {source!r}: {codes} != {expected}"
+                )
+            errors = vle.certify_extract_source_fidelity(
+                doc,
+                label=f"sup-meta-cert-{key}-{label}",
+                artifact_root=tmp_path,
+            )
+            joined = "\n".join(errors)
+            if "source_blind_pin" not in joined or "superscript_in_cell" in joined:
+                failures.append(f"sup meta certify {key} {label!r}: {errors}")
+            if (
+                expected == "charged_species_unsupported"
+                and "charged_species_unsupported" not in joined
+            ):
+                failures.append(f"sup meta charged {key} {label!r}: {errors}")
+            if (
+                expected == "cited_token_absent"
+                and "charged_species_unsupported" in joined
+            ):
+                failures.append(f"sup meta cited {key} {label!r}: {errors}")
     assert failures == []
 
 
