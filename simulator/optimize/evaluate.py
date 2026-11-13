@@ -2024,8 +2024,9 @@ INVENTORY_CAPPED = "inventory_capped"
 # A refused bound whose parent oxide was never recorded. Not a kinetic mass
 # and not a zero. The species stays out of the supply map.
 MISSING_PARENT_OXIDE_INVENTORY = "missing_parent_oxide_inventory"
-# Parent or kilogram ratio missing, and the evaporation-stoich owner has
-# no ratio either. Not a kinetic mass and not a zero.
+# A conservation operand is missing: the parent, the kilogram ratio, or
+# both, after the evaporation-stoich owner has been asked. The kinetic
+# ceiling is not the supply. The species stays out of the supply map.
 MISSING_PARENT_OXIDE_STOICHIOMETRY = "missing_parent_oxide_stoichiometry"
 # Species omitted from the supply map, each with the typed reason.
 SUPPLY_UNAVAILABLE = "supply_unavailable"
@@ -2962,10 +2963,12 @@ class _ParentOxideDebit:
     """One carrier's parent-oxide conservation operands.
 
     ``resolved`` carries the parent and the kilograms of oxide per
-    kilogram of vapour. ``unparented`` is a carrier with no parent and
-    no ratio: it is not in a shared oxide budget. ``missing_stoichiometry``
-    is a parent without a ratio, or a ratio without a parent, after the
-    evaporation-stoich owner has been asked. That is not a number.
+    kilogram of vapour. ``unparented`` is a carrier with neither parent
+    nor ratio after the record, the catalog, and the evaporation-stoich
+    owner have been asked. That absence is not an exemption: a refused
+    bound stays typed unavailable. A computed rate with neither operand
+    is not an oxide debit. ``missing_stoichiometry`` is a parent without
+    a ratio, or a ratio without a parent. That is not a number.
     """
 
     status: str
@@ -3009,7 +3012,9 @@ def _parent_oxide_debit_per_vapour_kg(
     A parent without a ratio the owner can supply, or a ratio without
     a parent, is ``missing_stoichiometry``. The kinetic ceiling is not
     a stand-in for that operand. A carrier with neither parent nor
-    ratio is ``unparented`` and is not in this budget.
+    ratio is ``unparented``. Missing metadata does not prove the
+    carrier is outside the oxide budget, so a refused bound of that
+    carrier is typed unavailable rather than the kinetic ceiling.
     """
 
     catalog = _bound_vapour_catalog(snapshot, catalog)
@@ -3148,12 +3153,15 @@ class _ComputedOxideDraws:
 
     ``missing_stoich_species`` had a computed rate and no conservation
     ratio. ``unreservable_parents`` are the oxides those rates debit.
-    A missing ratio is not recorded as a zero debit.
+    ``unattributed_oxide_debit`` is a computed rate that carries a
+    ratio and no parent: the atoms were spent, and no oxide can be
+    named. A missing ratio is not recorded as a zero debit.
     """
 
     oxide_kg: Mapping[str, float]
     missing_stoich_species: frozenset[str]
     unreservable_parents: frozenset[str]
+    unattributed_oxide_debit: bool = False
 
 
 def _empty_oxide_draws() -> _ComputedOxideDraws:
@@ -3172,9 +3180,11 @@ def _computed_parent_oxide_draws(
     a debit, including a rate of a species whose supply integral is
     withheld. Withholding drops the unpublished partial sum. It does
     not return those atoms to the melt, and a sibling must not spend
-    them again. An unparented carrier is not in this budget. A parented
-    carrier whose ratio the owner cannot supply is not a zero debit:
-    the parent is unreservable.
+    them again. A carrier with neither parent nor ratio is not an oxide
+    debit: there is no ratio to reserve. A parented carrier whose ratio
+    the owner cannot supply is not a zero debit: the parent is
+    unreservable. A ratio with no parent is the same hole with the
+    oxide unnamed, so every refused sibling is unreservable.
     """
 
     rates = _snapshot_refused_flux_rates(snapshot)
@@ -3186,26 +3196,36 @@ def _computed_parent_oxide_draws(
     draws: dict[str, float] = {}
     missing: set[str] = set()
     unreservable: set[str] = set()
+    unattributed = False
     for name, raw in rates.items():
         species = str(name)
         rate_kg_hr = _require_vapour_supply_rate(raw, species)
         debit = _parent_oxide_debit_per_vapour_kg(snapshot, species, catalog)
         if debit.status == "unparented":
             continue
-        if debit.status != "resolved" or debit.parent is None:
+        if (
+            debit.status != "resolved"
+            or debit.parent is None
+            or debit.oxide_per_vapour_kg is None
+        ):
             missing.add(species)
             if debit.parent:
                 unreservable.add(debit.parent)
-            continue
-        if debit.oxide_per_vapour_kg is None:
-            missing.add(species)
-            unreservable.add(debit.parent)
+            elif debit.oxide_per_vapour_kg is not None:
+                # Ratio without a parent. The debit is real and cannot
+                # be assigned, so a sibling must not spend any charge.
+                unattributed = True
             continue
         draws[debit.parent] = (
             draws.get(debit.parent, 0.0)
             + rate_kg_hr * duration_h * debit.oxide_per_vapour_kg
         )
-    return _ComputedOxideDraws(draws, frozenset(missing), frozenset(unreservable))
+    return _ComputedOxideDraws(
+        draws,
+        frozenset(missing),
+        frozenset(unreservable),
+        unattributed,
+    )
 
 
 def _pre_evaporation_oxide_kg(snapshot: Any) -> dict[str, float] | None:
@@ -3238,6 +3258,7 @@ class _OxideWindowBudget:
     computed_kg: Mapping[str, float]
     missing_stoich_species: frozenset[str]
     unreservable_parents: frozenset[str]
+    unattributed_oxide_debit: bool = False
 
 
 def _window_parent_oxide_budget(
@@ -3251,48 +3272,43 @@ def _window_parent_oxide_budget(
     that debit, so the first snapshot's ``pre_evaporation_melt_oxide_kg``
     is the charge and its ``melt_oxide_kg`` is the remainder. Using the
     remainder and then subtracting the same debit counts the first hour
-    twice. A snapshot with no pre-evaporation map still contributes the
-    first recorded inventory of each oxide: that record is the charge.
-    A later snapshot does not replace either charge. Computed draws
-    anywhere in the window are one debit against it, including a draw
-    by a species the integral will not publish.
+    twice. The first recorded map is the whole charge. An oxide absent
+    from that map, including every oxide when the map is empty, is a
+    charge of zero. A later snapshot does not add an oxide and does not
+    replace one. Computed draws anywhere in the window are one debit
+    against it, including a draw by a species the integral will not
+    publish. A computed ratio with no parent marks the debit
+    unattributed.
     """
 
-    charge: dict[str, float] = {}
+    charge: dict[str, float] | None = None
     computed: dict[str, float] = {}
     missing: set[str] = set()
     unreservable: set[str] = set()
-    started = False
-    locked_by_pre_evaporation = False
+    unattributed = False
     for snapshot in snapshots:
-        pre = _pre_evaporation_oxide_kg(snapshot)
-        post = _snapshot_oxide_inventory_kg(snapshot)
-        if not started:
+        if charge is None:
+            pre = _pre_evaporation_oxide_kg(snapshot)
             if pre is not None:
+                # Empty included. Absent oxides stay absent, which the
+                # cap reads as zero once any map has been recorded.
                 charge = dict(pre)
-                started = True
-                locked_by_pre_evaporation = True
-            elif post is not None:
-                charge.update(post)
-                started = True
-        elif (
-            not locked_by_pre_evaporation
-            and pre is None
-            and post is not None
-        ):
-            for parent, kg in post.items():
-                if parent not in charge:
-                    charge[parent] = kg
+            else:
+                post = _snapshot_oxide_inventory_kg(snapshot)
+                if post is not None:
+                    charge = dict(post)
         draw = _computed_parent_oxide_draws(snapshot, catalog)
         for parent, kg in draw.oxide_kg.items():
             computed[parent] = computed.get(parent, 0.0) + kg
         missing.update(draw.missing_stoich_species)
         unreservable.update(draw.unreservable_parents)
+        unattributed = unattributed or draw.unattributed_oxide_debit
     return _OxideWindowBudget(
-        charge,
+        {} if charge is None else charge,
         computed,
         frozenset(missing),
         frozenset(unreservable),
+        unattributed,
     )
 
 
@@ -3357,9 +3373,11 @@ def _inventory_cap_upper_bounds(
     count a post-debit drop twice when S is already the remainder and
     C is the pre-evaporation charge. When the map is not debited, S = C
     and available = C - D - B. Two carriers split that remainder in
-    proportion to oxide demand. Species order does not change D. An
-    unparented carrier has no shared budget; its mass is the kinetic
-    ceiling. A parented carrier with no ratio is not given that ceiling.
+    proportion to oxide demand. Species order does not change D. A
+    carrier with neither parent nor ratio is not given that ceiling:
+    missing metadata is not an exemption, and the allocator withholds
+    it before this function. A parented carrier with no ratio is not
+    given the ceiling either.
 
     Sanity value. 1 kg of K2O, stoich 1. Hour 1 computes 0.25 kg of
     K2O_gas and refuses K2. Hour 2 has no flux law for K2O_gas, so
@@ -3383,9 +3401,9 @@ def _inventory_cap_upper_bounds(
             )
         kinetic_kg = float(contribution.rate_kg_hr) * duration_h
         debit = _parent_oxide_debit_per_vapour_kg(snapshot, species, catalog)
-        if debit.status == "unparented":
-            replacements[species] = kinetic_kg
-            continue
+        # Neither operand, or one operand, is not a kinetic mass. The
+        # allocator withholds those carriers. Publishing ``kinetic_kg``
+        # here would spend an empty melt.
         if (
             debit.status != "resolved"
             or debit.parent is None
@@ -3500,23 +3518,25 @@ def _allocate_parent_oxide_supply(
     the pre-evaporation charge. The first snapshot's post-debit
     remainder is not the charge: snapshots are taken after evaporation.
     A recorded map that never names the oxide, including an empty melt,
-    is a charge of zero. The charge is unknown only when the window
-    recorded no inventory map and no pre-evaporation map at all. Let D
-    be the oxide-equivalent of every computed vapour rate, including a
-    rate of a species that is not published. A refused bound then
-    receives only what remains after D and after refused oxide already
-    allocated. A snapshot that omits its inventory does not make the
-    remainder infinite.
+    is a charge of zero. That map is the first one recorded. A later
+    snapshot cannot add an oxide the first map omitted. The charge is
+    unknown only when the window recorded no inventory map and no
+    pre-evaporation map at all. Let D be the oxide-equivalent of every
+    computed vapour rate, including a rate of a species that is not
+    published. A refused bound then receives only what remains after D
+    and after refused oxide already allocated. A snapshot that omits
+    its inventory does not make the remainder infinite.
 
     A missing conservation operand is not a number. No parent-oxide
     inventory is ``missing_parent_oxide_inventory``. A parent without a
     ratio, or a ratio without a parent, after the evaporation-stoich
     owner has been asked, is ``missing_parent_oxide_stoichiometry``.
-    The same gap on a computed rate makes that parent unreservable:
-    every refused carrier of the parent is withheld, because a skipped
-    debit would let them spend the charge again. An unparented carrier
-    keeps the kinetic ceiling. Species order does not change the
-    kilograms.
+    Neither operand is the same typed gap: missing metadata is not an
+    exemption, and the kinetic ceiling is not the supply. The same gap
+    on a computed rate makes that parent unreservable. A computed ratio
+    with no parent cannot name the oxide, so every refused bound in
+    the window is withheld: a sibling must not spend atoms the debit
+    may already have taken. Species order does not change the kilograms.
     """
 
     unavailable: dict[str, str] = {}
@@ -3554,7 +3574,16 @@ def _allocate_parent_oxide_supply(
                 species,
                 catalog,
             )
-            if debit.status == "missing_stoichiometry":
+            if budget.unattributed_oxide_debit:
+                # The computed debit has a ratio and no parent. It may
+                # belong to any oxide, so no refused bound is provable.
+                withheld.add(species)
+                unavailable.setdefault(
+                    species,
+                    MISSING_PARENT_OXIDE_STOICHIOMETRY,
+                )
+                continue
+            if debit.status in {"missing_stoichiometry", "unparented"}:
                 withheld.add(species)
                 unavailable.setdefault(
                     species,
@@ -3649,7 +3678,12 @@ def _optimizer_refused_flux_bounds(
     species this map does not publish. The refused bound then receives
     only what remains of the pre-evaporation inventory at the window
     start (d-401 amendment 2). The first snapshot's post-debit remainder
-    is not that charge. A snapshot with no inventory does not bypass it.
+    is not that charge. The first recorded oxide map is the whole
+    charge: an oxide it omits stays zero, and a later map cannot add
+    one. A snapshot with no inventory does not bypass it. A refused
+    bound with no parent, or with a ratio and no parent, is typed
+    unavailable. A computed ratio with no parent withholds every
+    refused bound in the window.
     ``inventory_capped`` names the species for which the limit bound.
     ``supply_unavailable`` names a species omitted from the map and the
     typed reason. ``supply_interval_upper_bound_used`` counts the
