@@ -9,6 +9,7 @@ from hashlib import sha256
 from pathlib import Path
 import pickle
 import re
+import shutil
 import stat
 import tempfile
 from typing import Any
@@ -18,6 +19,12 @@ import yaml
 
 _CACHE_ENV = "REGOLITH_PARSED_YAML_CACHE_DIR"
 _CACHE_ENABLED_ENV = "REGOLITH_PARSED_YAML_CACHE"
+_CACHE_MAX_BYTES_ENV = "REGOLITH_PARSED_YAML_CACHE_MAX_BYTES"
+_DEFAULT_CACHE_MAX_BYTES = 1536 * 1024 * 1024
+# A full-root sweep every 32 writes keeps hit paths scan-free while limiting
+# how much ordinary write traffic can exceed the cap between sweeps.
+_CACHE_EVICTION_WRITE_INTERVAL = 32
+_CACHE_WRITES_SINCE_EVICTION = 0
 _CACHE_FORMAT = 3
 _YAML12_SCHEMA_ID = "yaml12-core-boolean-resolver-v1"
 _CACHE_MISS = object()
@@ -231,7 +238,9 @@ def load_cached_safe_yaml(
 
     The pickle value preserves the safe loader's Python types and YAML aliases.
     Set ``REGOLITH_PARSED_YAML_CACHE=off`` to bypass the process-shared cache;
-    ``REGOLITH_PARSED_YAML_CACHE_DIR`` selects its private root.
+    ``REGOLITH_PARSED_YAML_CACHE_DIR`` selects its private root, and
+    ``REGOLITH_PARSED_YAML_CACHE_MAX_BYTES`` sets its byte cap (``off`` removes
+    the cap without changing the cache enable switch).
     """
 
     raw = payload.encode("utf-8") if isinstance(payload, str) else payload
@@ -241,6 +250,7 @@ def load_cached_safe_yaml(
     if not _cache_enabled():
         return yaml.load(payload, Loader=YAML12SafeLoader)
 
+    max_bytes = _cache_max_bytes()
     loader_identity = _loader_identity()
     cache_path = _cache_path(digest, loader_identity)
     cached = _read_cache(cache_path, digest, loader_identity)
@@ -248,13 +258,34 @@ def load_cached_safe_yaml(
         return cached
 
     parsed = yaml.load(payload, Loader=YAML12SafeLoader)
-    _write_cache(cache_path, digest, loader_identity, parsed)
+    if _write_cache(cache_path, digest, loader_identity, parsed):
+        _evict_after_write(cache_path, max_bytes)
     return parsed
 
 
 def _cache_enabled() -> bool:
     value = os.environ.get(_CACHE_ENABLED_ENV, "").strip().casefold()
     return value not in {"0", "false", "no", "off"}
+
+
+def _cache_max_bytes() -> int | None:
+    value = os.environ.get(_CACHE_MAX_BYTES_ENV)
+    if value is None:
+        return _DEFAULT_CACHE_MAX_BYTES
+    normalized = value.strip().casefold()
+    if normalized == "off":
+        return None
+    try:
+        max_bytes = int(normalized, 10)
+    except ValueError as exc:
+        raise ValueError(
+            f"{_CACHE_MAX_BYTES_ENV} must be a non-negative integer or 'off'"
+        ) from exc
+    if max_bytes < 0:
+        raise ValueError(
+            f"{_CACHE_MAX_BYTES_ENV} must be a non-negative integer or 'off'"
+        )
+    return max_bytes or None
 
 
 def _loader_identity() -> str:
@@ -376,12 +407,17 @@ def _read_cache(path: Path, content_sha256: str, loader_identity: str) -> Any:
         return _CACHE_MISS
     if "value" not in envelope:
         return _CACHE_MISS
+    try:
+        os.utime(path, None)
+    except OSError:
+        # A concurrent evictor may unlink the entry after it was read.
+        pass
     return envelope["value"]
 
 
 def _write_cache(
     path: Path, content_sha256: str, loader_identity: str, value: Any
-) -> None:
+) -> bool:
     envelope = {
         "cache_format": _CACHE_FORMAT,
         "content_sha256": content_sha256,
@@ -403,9 +439,108 @@ def _write_cache(
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temp_path, path)
+        return True
     except Exception:
         if temp_path is not None:
             try:
                 temp_path.unlink()
             except OSError:
                 pass
+        return False
+
+
+def _evict_after_write(path: Path, max_bytes: int | None) -> None:
+    global _CACHE_WRITES_SINCE_EVICTION
+    _CACHE_WRITES_SINCE_EVICTION += 1
+    if _CACHE_WRITES_SINCE_EVICTION < _CACHE_EVICTION_WRITE_INTERVAL:
+        return
+    _CACHE_WRITES_SINCE_EVICTION = 0
+
+    # The cache path is root/version/loader-token/format/file.pickle.
+    _evict_cache(
+        root=path.parents[3],
+        current_loader_dir=path.parents[1],
+        just_written=path,
+        max_bytes=max_bytes,
+    )
+
+
+def _evict_cache(
+    *,
+    root: Path,
+    current_loader_dir: Path,
+    just_written: Path,
+    max_bytes: int | None,
+) -> None:
+    _remove_stale_loader_directories(root, current_loader_dir)
+    if max_bytes is None:
+        return
+
+    entries: list[tuple[int, Path, int]] = []
+    try:
+        for path in root.rglob("*.pickle"):
+            try:
+                metadata = path.lstat()
+            except OSError:
+                continue
+            if stat.S_ISREG(metadata.st_mode):
+                entries.append((metadata.st_mtime_ns, path, metadata.st_size))
+    except OSError:
+        return
+
+    total_bytes = sum(size for _mtime_ns, _path, size in entries)
+    target_bytes = max_bytes * 9 // 10
+    if total_bytes <= target_bytes:
+        return
+
+    entries.sort(key=lambda entry: (entry[0], str(entry[1])))
+    for _mtime_ns, path, size in entries:
+        if total_bytes <= target_bytes:
+            break
+        if path == just_written:
+            continue
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            # Another process removed the entry after the directory scan.
+            total_bytes -= size
+        except OSError:
+            continue
+        else:
+            total_bytes -= size
+
+
+def _remove_stale_loader_directories(
+    root: Path,
+    current_loader_dir: Path,
+) -> None:
+    try:
+        version_directories = list(root.iterdir())
+    except OSError:
+        return
+
+    for version_dir in version_directories:
+        try:
+            metadata = version_dir.lstat()
+        except OSError:
+            continue
+        if not stat.S_ISDIR(metadata.st_mode) or not version_dir.name.startswith(
+            "pyyaml-"
+        ):
+            continue
+        try:
+            loader_directories = list(version_dir.iterdir())
+        except OSError:
+            continue
+        for loader_dir in loader_directories:
+            try:
+                metadata = loader_dir.lstat()
+            except OSError:
+                continue
+            if (
+                stat.S_ISDIR(metadata.st_mode)
+                and loader_dir.name.startswith("yaml12-")
+                and loader_dir != current_loader_dir
+            ):
+                # Retired tokens cannot produce hits; ignore concurrent removals.
+                shutil.rmtree(loader_dir, ignore_errors=True)

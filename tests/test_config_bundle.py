@@ -3,6 +3,7 @@ from __future__ import annotations
 from hashlib import sha256
 from datetime import date
 from pathlib import Path
+import pickle
 import shutil
 import subprocess
 import sys
@@ -29,6 +30,10 @@ REQUIRED_CONFIGS = {
     "species_catalog": "species_catalog.yaml",
 }
 FUNCTIONAL_DATA_CONFIGS = {"setpoints", "vapor_pressures"}
+
+
+def _unique_cache_payload(index: int) -> bytes:
+    return f"value: item-{index:064d}\n".encode("ascii")
 
 
 def _write_minimal_config_bundle(root: Path) -> None:
@@ -219,6 +224,165 @@ def test_corrupt_parsed_yaml_cache_entry_is_a_miss(
 
     assert first["value"] == "cached"
     assert second == first
+
+
+def test_parsed_yaml_cache_obeys_byte_cap_after_many_writes(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    cache_root = tmp_path / "yaml-cache"
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "2048")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+
+    for index in range(2 * yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL):
+        load_cached_safe_yaml(_unique_cache_payload(index))
+
+    cache_entries = list(cache_root.rglob("*.pickle"))
+    assert cache_entries
+    assert sum(path.stat().st_size for path in cache_entries) <= 2048
+
+
+def test_parsed_yaml_cache_hit_refreshes_lru_mtime(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    cache_root = tmp_path / "yaml-cache"
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+
+    payloads = [
+        _unique_cache_payload(index)
+        for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL)
+    ]
+    first_result = load_cached_safe_yaml(payloads[0])
+    first_path = yaml_cache_module._cache_path(sha256(payloads[0]).hexdigest())
+    old_mtime_ns = first_path.stat().st_mtime_ns - 10_000_000_000
+    yaml_cache_module.os.utime(first_path, ns=(old_mtime_ns, old_mtime_ns))
+    monkeypatch.setenv(
+        "REGOLITH_PARSED_YAML_CACHE_MAX_BYTES",
+        str(first_path.stat().st_size * 4),
+    )
+    for payload in payloads[1:-1]:
+        load_cached_safe_yaml(payload)
+
+    assert load_cached_safe_yaml(payloads[0]) == first_result
+    assert first_path.stat().st_mtime_ns > old_mtime_ns
+    load_cached_safe_yaml(payloads[-1])
+
+    second_path = yaml_cache_module._cache_path(sha256(payloads[1]).hexdigest())
+    assert first_path.exists()
+    assert not second_path.exists()
+
+
+def test_parsed_yaml_cache_removes_stale_loader_token_directories(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    cache_root = tmp_path / "yaml-cache"
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", raising=False)
+    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+
+    stale_path = yaml_cache_module._cache_path("a" * 64, "retired-loader")
+    stale_path.parent.mkdir(parents=True)
+    stale_path.write_bytes(b"retired")
+    stale_loader_dir = stale_path.parent.parent
+
+    for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL):
+        load_cached_safe_yaml(_unique_cache_payload(index))
+
+    assert not stale_loader_dir.exists()
+
+
+def test_parsed_yaml_cache_rejects_unparseable_byte_cap(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "a lot")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+
+    with pytest.raises(
+        ValueError,
+        match="REGOLITH_PARSED_YAML_CACHE_MAX_BYTES",
+    ):
+        load_cached_safe_yaml(b"value: valid\n")
+
+
+def test_parsed_yaml_cache_eviction_ignores_racing_deleted_file(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    cache_root = tmp_path / "yaml-cache"
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "1")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+
+    payloads = [
+        _unique_cache_payload(index)
+        for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL)
+    ]
+    for payload in payloads[:-1]:
+        load_cached_safe_yaml(payload)
+    raced_path = yaml_cache_module._cache_path(sha256(payloads[0]).hexdigest())
+    original_unlink = Path.unlink
+    raced = False
+
+    def unlink_with_race(path: Path, *args, **kwargs) -> None:
+        nonlocal raced
+        if path == raced_path and not raced:
+            raced = True
+            original_unlink(path, *args, **kwargs)
+            raise FileNotFoundError(path)
+        original_unlink(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "unlink", unlink_with_race)
+    load_cached_safe_yaml(payloads[-1])
+
+    assert raced
+
+
+def test_evicted_yaml_cache_entry_reparses_to_same_bytes_as_cache_off(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    cache_root = tmp_path / "yaml-cache"
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "1")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+
+    payloads = [
+        _unique_cache_payload(index)
+        for index in range(yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL)
+    ]
+    for payload in payloads:
+        load_cached_safe_yaml(payload)
+    evicted_path = yaml_cache_module._cache_path(sha256(payloads[0]).hexdigest())
+    assert not evicted_path.exists()
+
+    original_yaml_load = yaml_cache_module.yaml.load
+    parse_calls = 0
+
+    def counted_yaml_load(value: str | bytes, *args, **kwargs) -> object:
+        nonlocal parse_calls
+        parse_calls += 1
+        return original_yaml_load(value, *args, **kwargs)
+
+    monkeypatch.setattr(yaml_cache_module.yaml, "load", counted_yaml_load)
+    after_eviction = load_cached_safe_yaml(payloads[0])
+    assert parse_calls == 1
+
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE", "off")
+    with_cache_off = load_cached_safe_yaml(payloads[0])
+
+    assert parse_calls == 2
+    assert pickle.dumps(after_eviction) == pickle.dumps(with_cache_off)
 
 
 def test_parsed_yaml_cache_is_reused_by_fresh_process(
