@@ -343,6 +343,14 @@ def test_zero_byte_yaml_cache_budget_keeps_only_the_just_written_entry(
         "_CACHE_WRITES_SINCE_EVICTION",
         yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL,
     )
+    previous_entries = [
+        cache_root / "pyyaml-old" / "yaml12-old" / "v1" / f"entry-{index}.pickle"
+        for index in range(3)
+    ]
+    for path in previous_entries:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"older cache entry")
+        yaml_cache_module.os.utime(path, ns=(1_000_000_000, 1_000_000_000))
     payload = _unique_cache_payload(0)
 
     load_cached_safe_yaml(payload)
@@ -350,6 +358,7 @@ def test_zero_byte_yaml_cache_budget_keeps_only_the_just_written_entry(
     cache_entries = list(cache_root.rglob("*.pickle"))
     just_written = yaml_cache_module._cache_path(sha256(payload).hexdigest())
     assert cache_entries == [just_written]
+    assert all(not path.exists() for path in previous_entries)
 
 
 @pytest.mark.parametrize("value", ["a lot", "-1"])
