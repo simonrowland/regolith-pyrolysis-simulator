@@ -38,6 +38,7 @@ from simulator.vapour_rail.batch import (
 )
 import simulator.optimize.evaluate as evaluate_module
 from simulator.optimize.evaluate import (
+    INVENTORY_CAPPED,
     SUPPLY_INTERVAL_UPPER_BOUND_USED,
     RunReference,
     ScoredResult,
@@ -3867,6 +3868,321 @@ def test_refused_interval_contributes_the_activity_one_bound() -> None:
     )
     assert zero_bounds[species] == 0.0
     assert zero_bounds.supply_interval_upper_bound_used == {species: 1}
+
+
+# Sanity value from the parent-oxide debit. M(K) = 39.0983 g/mol and
+# M(K2O) = 94.1956 g/mol, so 1 kg of K2O is 0.8301513021839662 kg of K.
+_K_SANITY_OXIDE_PER_VAPOUR = 94.1956 / (2.0 * 39.0983)
+_K_SANITY_ELEMENT_FRACTION = (2.0 * 39.0983) / 94.1956
+
+
+def _alkali_inventory_channel(
+    species: str,
+    *,
+    pressure_pa: float,
+    parent_oxide: str,
+    stoich_oxide_per_vapor: float | None,
+) -> dict[str, object]:
+    record = _transport_refusal_channel(species)
+    record["activity_one_psat_pa"] = pressure_pa
+    record["molar_mass_kg_per_mol"] = _ACTIVITY_ONE_MASS_KG_PER_MOL
+    record["parent_oxide"] = parent_oxide
+    if stoich_oxide_per_vapor is not None:
+        record["stoich_oxide_per_vapor"] = stoich_oxide_per_vapor
+    return record
+
+
+def _alkali_inventory_snapshot(
+    hour: int,
+    channels: Mapping[str, Mapping[str, object]],
+    melt_oxide_kg: Mapping[str, float],
+) -> SimpleNamespace:
+    """Refused carriers over one melt inventory. The map is not debited."""
+
+    return SimpleNamespace(
+        hour=hour,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        inventory=SimpleNamespace(melt_oxide_kg=dict(melt_oxide_kg)),
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={},
+            species_kg_hr={},
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={
+                species: dict(record) for species, record in channels.items()
+            },
+        ),
+    )
+
+
+def test_shared_k_budget_never_exceeds_the_charge_potassium() -> None:
+    """K2O_gas, K2, and K spend one K2O inventory (d-401 amendment 2).
+
+    The kinetic ceiling is the same for each carrier and is far above the
+    charge, so an uncapped integral would book the ceiling three times.
+    The oxide is split in proportion to each carrier's oxide demand.
+    Elemental K has no stored stoich: the parent-oxide debit derives
+    M(K2O) / (2 * M(K)). K2 carries that same ratio explicitly. K2O_gas
+    is 1 kg oxide per kg vapour. Their element sum is the potassium in
+    the charge, and a second hour that still shows the undepleted melt
+    cannot spend it again. Na2O is a separate budget. SiO2 stays above
+    its own demand, so SiO keeps the kinetic mass and is not flagged.
+    """
+
+    from simulator.state import MOLAR_MASS
+
+    stoich_k = float(MOLAR_MASS["K2O"]) / (2.0 * float(MOLAR_MASS["K"]))
+    element_fraction = (2.0 * float(MOLAR_MASS["K"])) / float(MOLAR_MASS["K2O"])
+    assert stoich_k == pytest.approx(_K_SANITY_OXIDE_PER_VAPOUR, rel=1e-12)
+    assert element_fraction == pytest.approx(_K_SANITY_ELEMENT_FRACTION, rel=1e-12)
+    pressure_pa = 1.0
+    kinetic_kg_hr = _activity_one_j_max_kg_hr(pressure_pa=pressure_pa)
+    k2o_kg = 0.01
+    na2o_kg = 0.02
+    sio2_kg = 100.0
+    assert kinetic_kg_hr * (1.0 + 2.0 * stoich_k) > k2o_kg
+    assert kinetic_kg_hr > na2o_kg
+    assert 2.0 * kinetic_kg_hr * 2.0 < sio2_kg
+    channels = {
+        # No stoich_oxide_per_vapor: elemental K uses the derived ratio.
+        "K": _alkali_inventory_channel(
+            "K",
+            pressure_pa=pressure_pa,
+            parent_oxide="K2O",
+            stoich_oxide_per_vapor=None,
+        ),
+        "K2": _alkali_inventory_channel(
+            "K2",
+            pressure_pa=pressure_pa,
+            parent_oxide="K2O",
+            stoich_oxide_per_vapor=stoich_k,
+        ),
+        "K2O_gas": _alkali_inventory_channel(
+            "K2O_gas",
+            pressure_pa=pressure_pa,
+            parent_oxide="K2O",
+            stoich_oxide_per_vapor=1.0,
+        ),
+        "Na2O_gas": _alkali_inventory_channel(
+            "Na2O_gas",
+            pressure_pa=pressure_pa,
+            parent_oxide="Na2O",
+            stoich_oxide_per_vapor=1.0,
+        ),
+        "SiO": _alkali_inventory_channel(
+            "SiO",
+            pressure_pa=pressure_pa,
+            parent_oxide="SiO2",
+            stoich_oxide_per_vapor=2.0,
+        ),
+    }
+    inventory = {"K2O": k2o_kg, "Na2O": na2o_kg, "SiO2": sio2_kg}
+    snapshots = (
+        _alkali_inventory_snapshot(1, channels, inventory),
+        _alkali_inventory_snapshot(2, channels, inventory),
+    )
+    order = ("K2O_gas", "K2", "K", "Na2O_gas", "SiO")
+    forward = _optimizer_refused_flux_bounds(
+        snapshots,
+        order,
+        campaigns_elapsed=1.0,
+    )
+    reverse = _optimizer_refused_flux_bounds(
+        snapshots,
+        tuple(reversed(order)),
+        campaigns_elapsed=1.0,
+    )
+    shared_vapour_kg = k2o_kg / (1.0 + 2.0 * stoich_k)
+    expected = {
+        "K": shared_vapour_kg,
+        "K2": shared_vapour_kg,
+        "K2O_gas": shared_vapour_kg,
+        "Na2O_gas": na2o_kg,
+        "SiO": 2.0 * kinetic_kg_hr,
+    }
+    for bounds in (forward, reverse):
+        for species, mass_kg in expected.items():
+            assert bounds[species] == _approx_kg(mass_kg)
+        potassium_kg = (
+            bounds["K"] + bounds["K2"] + bounds["K2O_gas"] * element_fraction
+        )
+        assert potassium_kg == _approx_kg(k2o_kg * element_fraction)
+        oxide_kg = (
+            bounds["K"] * stoich_k
+            + bounds["K2"] * stoich_k
+            + bounds["K2O_gas"]
+        )
+        assert oxide_kg == _approx_kg(k2o_kg)
+        assert bounds.inventory_capped == {
+            "K": True,
+            "K2": True,
+            "K2O_gas": True,
+            "Na2O_gas": True,
+        }
+        assert bounds.supply_interval_upper_bound_used == {
+            species: 2 for species in order
+        }
+    one_hour = _optimizer_refused_flux_bounds(
+        snapshots[:1],
+        order,
+        campaigns_elapsed=1.0,
+    )
+    for species in ("K", "K2", "K2O_gas", "Na2O_gas"):
+        assert forward[species] == _approx_kg(one_hour[species])
+    assert forward["SiO"] == _approx_kg(2.0 * one_hour["SiO"])
+    per_campaign = _optimizer_refused_flux_bounds(
+        snapshots,
+        order,
+        campaigns_elapsed=2.0,
+    )
+    assert per_campaign["K2O_gas"] == _approx_kg(forward["K2O_gas"] / 2.0)
+    assert per_campaign.supply_interval_upper_bound_used == {
+        species: 2 for species in order
+    }
+    alone = _alkali_inventory_snapshot(
+        1,
+        {"K2O_gas": channels["K2O_gas"]},
+        {"K2O": k2o_kg},
+    )
+    alone_bounds = _optimizer_refused_flux_bounds(
+        (alone,),
+        ("K2O_gas",),
+        campaigns_elapsed=1.0,
+    )
+    assert alone_bounds["K2O_gas"] == _approx_kg(k2o_kg)
+    assert alone_bounds["K2O_gas"] > forward["K2O_gas"]
+    assert alone_bounds.inventory_capped == {"K2O_gas": True}
+    execution = _refused_supply_execution(
+        snapshots,
+        tuple((species, "hot_wall") for species in order),
+    )
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        {},
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    assert booked["notice_authority"][INVENTORY_CAPPED] == {
+        "K": True,
+        "K2": True,
+        "K2O_gas": True,
+        "Na2O_gas": True,
+    }
+
+
+def test_computed_activity_beats_activity_one_and_the_cap_is_the_floor() -> None:
+    """A computed activity replaces activity 1. The inventory cap does not.
+
+    The catalog law is ``P = P_unit * a^n`` with n = 1 and no oxygen
+    dependence, so activity 0.25 is a quarter of the activity-1 Hertz-
+    Knudsen rate. A K2O inventory above that rate leaves the estimate.
+    An inventory below it binds, flags ``inventory_capped``, and books
+    the oxide rather than the activity-scaled ceiling. A refusal is not
+    an activity. An explicit ceiling with no activity exponent stays at
+    activity 1, because ``a^n`` is not defined.
+    """
+
+    species = "K2O_gas"
+    activity = 0.25
+    activity_one = _activity_one_j_max_kg_hr()
+    scaled = activity * activity_one
+    oxide_cap_kg = 1.0e-5
+    assert scaled > oxide_cap_kg
+    catalog = _CeilingCatalog(
+        {
+            species: _CeilingLaw(
+                activity_exponent=1.0,
+                pO2_exponent=0.0,
+                pO2_reference_bar=1.0,
+                p_unit_pa=_ACTIVITY_ONE_PSAT_PA,
+            )
+        },
+        {species: _ACTIVITY_ONE_MASS_KG_PER_MOL * 1000.0},
+    )
+
+    def snapshot(
+        *,
+        activity_payload: Mapping[str, object] | None,
+        inventory_kg: float | None = None,
+    ) -> SimpleNamespace:
+        record = _transport_refusal_channel(species)
+        record["molar_mass_kg_per_mol"] = _ACTIVITY_ONE_MASS_KG_PER_MOL
+        if activity_payload is not None:
+            record["source_reaction_activity"] = dict(activity_payload)
+        if inventory_kg is not None:
+            record["parent_oxide"] = "K2O"
+            record["stoich_oxide_per_vapor"] = 1.0
+        built = SimpleNamespace(
+            hour=1,
+            duration_h=1.0,
+            temperature_C=_ACTIVITY_ONE_T_C,
+            vapour_catalog=catalog,
+            evap_flux=SimpleNamespace(
+                published_species_kg_hr={},
+                species_kg_hr={},
+                melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+                carrier_authority_by_species={species: record},
+            ),
+        )
+        if inventory_kg is not None:
+            built.inventory = SimpleNamespace(
+                melt_oxide_kg={"K2O": inventory_kg},
+            )
+        return built
+
+    point = {"verdict": "Point", "value": activity}
+    interval = _classify_wall_supply_interval(snapshot(activity_payload=point), species)
+    assert interval.kind == "supply_interval_upper_bound"
+    assert interval.rate_kg_hr == _approx_kg(scaled)
+    unbounded = _optimizer_refused_flux_bounds(
+        (snapshot(activity_payload=point),),
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert unbounded[species] == _approx_kg(scaled)
+    assert unbounded[species] < activity_one
+    assert unbounded.inventory_capped == {}
+    at_activity_one = _optimizer_refused_flux_bounds(
+        (snapshot(activity_payload=None),),
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert at_activity_one[species] == _approx_kg(activity_one)
+    loose = _optimizer_refused_flux_bounds(
+        (snapshot(activity_payload=point, inventory_kg=1.0),),
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert loose[species] == _approx_kg(scaled)
+    assert loose.inventory_capped == {}
+    capped = _optimizer_refused_flux_bounds(
+        (snapshot(activity_payload=point, inventory_kg=oxide_cap_kg),),
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert capped[species] == _approx_kg(oxide_cap_kg)
+    assert capped[species] < scaled
+    assert capped.inventory_capped == {species: True}
+    refused_activity = _optimizer_refused_flux_bounds(
+        (
+            snapshot(
+                activity_payload={"verdict": "Refusal", "value": activity},
+            ),
+        ),
+        (species,),
+        campaigns_elapsed=1.0,
+    )
+    assert refused_activity[species] == _approx_kg(activity_one)
+    explicit = _activity_one_refusal_snapshot(species, hour=1)
+    explicit_record = explicit.evap_flux.carrier_authority_by_species[species]
+    explicit_record["computed_activity"] = activity
+    explicit_record["activity_exponent"] = 1.0
+    explicit_interval = _classify_wall_supply_interval(explicit, species)
+    assert explicit_interval.rate_kg_hr == _approx_kg(scaled)
+    unknown_exponent = _activity_one_refusal_snapshot(species, hour=1)
+    unknown_record = unknown_exponent.evap_flux.carrier_authority_by_species[species]
+    unknown_record["computed_activity"] = activity
+    unknown_interval = _classify_wall_supply_interval(unknown_exponent, species)
+    assert unknown_interval.rate_kg_hr == _approx_kg(activity_one)
 
 
 def test_one_refused_interval_among_computed_hours_is_booked() -> None:

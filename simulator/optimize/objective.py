@@ -4811,7 +4811,10 @@ def _book_wall_deposits_at_vapour_supply(
             "notice_authority": notice_authority,
             "bookings": (),
         }
-    from simulator.optimize.evaluate import SUPPLY_INTERVAL_UPPER_BOUND_USED
+    from simulator.optimize.evaluate import (
+        INVENTORY_CAPPED,
+        SUPPLY_INTERVAL_UPPER_BOUND_USED,
+    )
 
     resolution_kg = _mass_balance_ledger_resolution_kg(charge_kg)
     notice_authority[
@@ -4834,6 +4837,13 @@ def _book_wall_deposits_at_vapour_supply(
     }
     if interval_counts:
         notice_authority[SUPPLY_INTERVAL_UPPER_BOUND_USED] = interval_counts
+    raw_capped = getattr(supply_kg, INVENTORY_CAPPED, None)
+    if isinstance(raw_capped, Mapping) and raw_capped:
+        notice_authority[INVENTORY_CAPPED] = {
+            str(species): True
+            for species in raw_capped
+            if species in supply_kg
+        }
     booked_deposit = dict(wall_deposit)
     bookings: list[dict[str, Any]] = []
     booked_species: set[str] = set()

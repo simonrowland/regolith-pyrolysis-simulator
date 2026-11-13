@@ -1895,6 +1895,12 @@ def _trace_with_optimizer_coating_report(
                 str(species): int(count)
                 for species, count in bound_counts.items()
             }
+        capped = getattr(refused_flux_bounds, INVENTORY_CAPPED, None)
+        if capped:
+            report[INVENTORY_CAPPED] = {
+                str(species): True
+                for species in capped
+            }
     if threshold_parametric:
         raw_rate = runner_report.get("wall_deposit_kg_per_campaign", 0.0)
         if raw_rate is None:
@@ -2006,6 +2012,8 @@ _WALL_SUPPLY_OUTSIDE = "outside_window"
 # The evidence string is the flag the booking copies, with the count.
 _WALL_SUPPLY_UPPER_BOUND = "supply_interval_upper_bound"
 SUPPLY_INTERVAL_UPPER_BOUND_USED = "supply_interval_upper_bound_used"
+# The parent-oxide inventory, not the kinetic ceiling, limited this species.
+INVENTORY_CAPPED = "inventory_capped"
 
 
 @dataclass(frozen=True)
@@ -2018,22 +2026,28 @@ class _WallSupplyInterval:
 
 
 class _WallSupplyIntegral(dict):
-    """Species kilogram map plus how many refused intervals used the bound.
+    """Species kilogram map plus the bound count and inventory-cap flag.
 
-    Dict equality ignores the count. Callers that persist the map copy
-    the kilograms into a plain dict and the count beside it.
+    Dict equality ignores both attributes. Callers that persist the map
+    copy the kilograms into a plain dict and each attribute beside it.
     """
 
     def __init__(
         self,
         masses: Mapping[str, float],
         counts: Mapping[str, int] | None = None,
+        inventory_capped: Mapping[str, bool] | None = None,
     ) -> None:
         super().__init__(masses)
         self.supply_interval_upper_bound_used = {
             str(species): int(count)
             for species, count in (counts or {}).items()
             if int(count) > 0 and str(species) in self
+        }
+        self.inventory_capped = {
+            str(species): True
+            for species, flagged in (inventory_capped or {}).items()
+            if flagged and str(species) in self
         }
 
 
@@ -2419,15 +2433,17 @@ def _catalog_activity_one_ceiling_pa(
     temperature_K: float,
     hour_pO2_bar: float | None,
     recorded_pO2_bar: Sequence[float] = (),
+    source_activity: float = 1.0,
 ) -> tuple[float | None, str]:
-    """Activity-1 ceiling pressure, or ``(None, evidence)``.
+    """Ceiling pressure at ``source_activity``, or ``(None, evidence)``.
 
-    ``P = P_unit(T) * a^n * (pO2 / p_ref)^e``. For ``n >= 0`` the
-    activity factor is largest at ``a = 1``. For ``n < 0`` the pressure
-    grows as activity falls, so there is no finite activity ceiling.
-    The oxygen state is ``_oxygen_bar_for_activity_one_ceiling`` (d-401).
-    A missing row, an inapplicable hot-train row, or a refused
-    evaluation is no law.
+    ``P = P_unit(T) * a^n * (pO2 / p_ref)^e``. ``source_activity`` is 1
+    unless the interval still has a computed activity (d-401 amendment
+    2). For ``n >= 0`` that activity is at most 1, so it cannot raise
+    the activity-1 ceiling. For ``n < 0`` the pressure grows as activity
+    falls, so there is no finite activity ceiling. The oxygen state is
+    ``_oxygen_bar_for_activity_one_ceiling`` (d-401). A missing row, an
+    inapplicable hot-train row, or a refused evaluation is no law.
     """
 
     from simulator.vapour_rail.catalog import CatalogCompileError
@@ -2456,6 +2472,22 @@ def _catalog_activity_one_ceiling_pa(
         return None, "no_flux_law_and_no_psat"
     if activity_exponent < 0.0:
         return None, "no_finite_activity_ceiling"
+    if (
+        isinstance(source_activity, bool)
+        or not isinstance(source_activity, int | float)
+        or not math.isfinite(source_activity)
+        or source_activity < 0.0
+        or source_activity > 1.0
+    ):
+        raise CoatingFeasibilityReportError(
+            "computed activity must be finite and in [0, 1]"
+        )
+    # n > 0 and a computed activity of 0 is a zero pressure. The
+    # evaluator rejects a non-positive activity, so this does not call it.
+    if activity_exponent > 0.0 and float(source_activity) == 0.0:
+        return 0.0, ""
+    if activity_exponent == 0.0:
+        source_activity = 1.0
     oxygen_bar, oxygen_evidence = _oxygen_bar_for_activity_one_ceiling(
         oxygen_exponent=oxygen_exponent,
         reference_pO2_bar=reference_pO2_bar,
@@ -2467,7 +2499,7 @@ def _catalog_activity_one_ceiling_pa(
     try:
         evaluation = evaluator.evaluate(
             temperature_K,
-            source_activity=1.0,
+            source_activity=float(source_activity),
             pO2_bar=oxygen_bar,
         )
     except (
@@ -2615,18 +2647,38 @@ def _activity_one_refused_supply_interval(
             _WALL_SUPPLY_UNAVAILABLE,
             evidence="missing_melt_surface_area",
         )
+    # Activity 1 is the ceiling only when this interval has no computed
+    # activity. A computed activity replaces it (d-401 amendment 2).
+    activity = _computed_source_activity(record)
+    if activity is None:
+        activity = 1.0
+    bound_catalog = _bound_vapour_catalog(snapshot, catalog)
     if record is not None and "activity_one_psat_pa" in record:
         pressure_pa = _explicit_activity_one_psat_pa(record)
         pressure_evidence = (
             "" if pressure_pa is not None else "no_flux_law_and_no_psat"
         )
+        if pressure_pa is not None and activity < 1.0 and pressure_pa > 0.0:
+            exponent = _ceiling_activity_exponent(
+                record,
+                bound_catalog,
+                species,
+            )
+            if exponent is not None and exponent < 0.0:
+                return _WallSupplyInterval(
+                    _WALL_SUPPLY_UNAVAILABLE,
+                    evidence="no_finite_activity_ceiling",
+                )
+            if exponent is not None and exponent > 0.0:
+                pressure_pa = pressure_pa * (activity ** exponent)
     else:
         pressure_pa, pressure_evidence = _catalog_activity_one_ceiling_pa(
-            _bound_vapour_catalog(snapshot, catalog),
+            bound_catalog,
             species,
             temperature_K,
             _snapshot_transport_pO2_bar(snapshot),
             recorded_pO2_bar,
+            source_activity=activity,
         )
     if pressure_pa is None:
         return _WallSupplyInterval(
@@ -2637,7 +2689,7 @@ def _activity_one_refused_supply_interval(
         molar_mass = _explicit_molar_mass_kg_per_mol(record)
     else:
         molar_mass = _catalog_molar_mass_kg_per_mol(
-            _bound_vapour_catalog(snapshot, catalog),
+            bound_catalog,
             species,
         )
     if molar_mass is None:
@@ -2687,9 +2739,10 @@ def _classify_wall_supply_interval(
       species when the certificate does not.
     - ``supply_interval_upper_bound``: there is no computed rate and no
       covering zero, and an activity-1 ceiling can be formed. The rate
-      is the Hertz-Knudsen flux at that ceiling. The ceiling is an
-      explicit ``activity_one_psat_pa`` or the run catalog at activity
-      1. An oxygen-dependent law uses the transport pO2 this hour's
+      is the Hertz-Knudsen flux at that ceiling. A computed activity on
+      the interval replaces activity 1. The ceiling is an explicit
+      ``activity_one_psat_pa`` or the run catalog. An oxygen-dependent
+      law uses the transport pO2 this hour's
       vapour evaluation consumed, preserved on the interval. The
       snapshot reservoir is a later state and is not that pressure.
       When this hour recorded none, the run pO2 that maximises P is
@@ -2745,6 +2798,380 @@ def _classify_wall_supply_interval(
     )
 
 
+_ACTIVITY_VERDICTS_THAT_BOUND_PRESSURE = frozenset({
+    "Point",
+    "StatusBearingValue",
+    "UpperBound",
+})
+
+
+def _computed_source_activity(
+    record: Mapping[str, Any] | None,
+) -> float | None:
+    """Computed activity on this interval, or None to keep activity 1.
+
+    A point, a status-bearing value, or an upper bound on the activity
+    replaces activity 1. A lower bound is not an upper bound on
+    pressure. A refusal is not an activity. A value above 1 does not
+    raise the activity-1 ceiling (d-369).
+    """
+
+    if record is None:
+        return None
+    raw: Any = None
+    present = False
+    if "computed_activity" in record:
+        present = True
+        raw = record.get("computed_activity")
+    else:
+        payload = record.get("source_reaction_activity")
+        if isinstance(payload, MappingABC):
+            verdict = str(payload.get("verdict") or "")
+            if (
+                verdict in _ACTIVITY_VERDICTS_THAT_BOUND_PRESSURE
+                and "value" in payload
+            ):
+                present = True
+                raw = payload.get("value")
+        if not present:
+            extra = record.get("extra")
+            if isinstance(extra, MappingABC) and "source_activity" in extra:
+                present = True
+                raw = extra.get("source_activity")
+    if not present or raw is None:
+        return None
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        raise CoatingFeasibilityReportError(
+            "computed activity must be numeric"
+        )
+    activity = float(raw)
+    if not math.isfinite(activity) or activity < 0.0:
+        raise CoatingFeasibilityReportError(
+            "computed activity must be finite and non-negative"
+        )
+    if activity > 1.0:
+        return 1.0
+    return activity
+
+
+def _ceiling_activity_exponent(
+    record: Mapping[str, Any] | None,
+    catalog: Any | None,
+    species: str,
+) -> float | None:
+    """Activity exponent for an explicit activity-1 pressure."""
+
+    if record is not None and "activity_exponent" in record:
+        raw = record.get("activity_exponent")
+        if isinstance(raw, bool) or not isinstance(raw, int | float):
+            raise CoatingFeasibilityReportError(
+                "activity exponent must be numeric"
+            )
+        exponent = float(raw)
+        if not math.isfinite(exponent):
+            raise CoatingFeasibilityReportError(
+                "activity exponent must be finite"
+            )
+        return exponent
+    if catalog is None or not hasattr(catalog, "evaluator_for_hot_train"):
+        return None
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    try:
+        evaluator = catalog.evaluator_for_hot_train(species)
+        exponent = float(getattr(evaluator, "activity_exponent", 0.0))
+    except (
+        CatalogCompileError,
+        VaporPressureNumericalOverflowError,
+        VaporPressureRangeError,
+        OverflowError,
+        ValueError,
+        TypeError,
+        AttributeError,
+    ):
+        return None
+    if not math.isfinite(exponent):
+        return None
+    return exponent
+
+
+def _legacy_vapour_row(
+    catalog: Any | None,
+    species: str,
+) -> Mapping[str, Any] | None:
+    """Publisher species row, metals first, as the molar-mass lookup does."""
+
+    if catalog is None or not hasattr(catalog, "legacy_view"):
+        return None
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    try:
+        legacy = catalog.legacy_view()
+    except CatalogCompileError:
+        return None
+    if not isinstance(legacy, MappingABC):
+        return None
+    for group in ("metals", "oxide_vapors"):
+        rows = legacy.get(group) or {}
+        if not isinstance(rows, MappingABC):
+            continue
+        row = rows.get(species)
+        if isinstance(row, MappingABC) and row:
+            return row
+    return None
+
+
+def _positive_kg_per_kg(raw: Any, label: str) -> float | None:
+    if raw is None:
+        return None
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        raise CoatingFeasibilityReportError(f"{label} must be numeric")
+    value = float(raw)
+    if not math.isfinite(value) or value <= 0.0:
+        raise CoatingFeasibilityReportError(
+            f"{label} must be finite and positive"
+        )
+    return value
+
+
+def _parent_oxide_debit_per_vapour_kg(
+    snapshot: Any,
+    species: str,
+    catalog: Any | None,
+) -> tuple[str, float] | None:
+    """Kilograms of parent oxide consumed per kilogram of this vapour.
+
+    Premise. One parent-oxide inventory is the element budget. K2O_gas,
+    K2, and K all debit K2O, so the potassium in the three of them cannot
+    exceed the potassium in that oxide. Na2O_gas, Na2, and Na debit Na2O
+    the same way. ``stoich_oxide_per_vapor`` is the publisher kilogram
+    ratio. An elemental carrier with no stored ratio uses the reaction
+    that releases ``n_metal`` metal atoms from one oxide formula.
+
+    Algebra. ``vapour_kg = oxide_kg / stoich_oxide_per_vapor``. For
+    elemental K, ``stoich = M(K2O) / (2 * M(K))``. Carriers of one oxide
+    split that oxide in proportion to their kinetic oxide demand. They
+    do not each receive the whole inventory.
+
+    Unit check. ``stoich`` is kg oxide / kg vapour. Dividing a kilogram
+    inventory by it returns kilograms of vapour.
+
+    Sanity value. M(K) = 39.0983 g/mol and M(K2O) = 94.1956 g/mol, so
+    K and K2 have stoich = 94.1956 / (2 * 39.0983) = 1.204599688477504.
+    1 kg of K2O becomes 0.8301513021839662 kg of K or of K2, or 1 kg of
+    K2O_gas. Spending that kilogram on K2O_gas leaves none for K or K2.
+    """
+
+    record = _carrier_channel(snapshot, species)
+    parent: str | None = None
+    ratio: float | None = None
+    if record is not None:
+        raw_parent = record.get("parent_oxide")
+        if isinstance(raw_parent, str) and raw_parent.strip():
+            parent = raw_parent.strip()
+        if "stoich_oxide_per_vapor" in record:
+            ratio = _positive_kg_per_kg(
+                record.get("stoich_oxide_per_vapor"),
+                "stoich_oxide_per_vapor",
+            )
+    row = _legacy_vapour_row(catalog, species)
+    if row is not None:
+        if parent is None:
+            raw_parent = row.get("parent_oxide")
+            if isinstance(raw_parent, str) and raw_parent.strip():
+                parent = raw_parent.strip()
+        if ratio is None and row.get("stoich_oxide_per_vapor") is not None:
+            ratio = _positive_kg_per_kg(
+                row.get("stoich_oxide_per_vapor"),
+                "stoich_oxide_per_vapor",
+            )
+    if parent is None:
+        return None
+    if ratio is not None:
+        return parent, ratio
+    from simulator.evaporation import production_vapor_molar_mass_g_per_mol
+    from simulator.state import MOLAR_MASS, OXIDE_TO_METAL
+
+    metal, n_metal, _n_oxygen = OXIDE_TO_METAL.get(parent, ("", 0, 0))
+    if species != metal or n_metal <= 0:
+        return None
+    oxide_g = MOLAR_MASS.get(parent)
+    if isinstance(oxide_g, bool) or not isinstance(oxide_g, int | float):
+        return None
+    legacy: Mapping[str, Any] | None = None
+    if catalog is not None and hasattr(catalog, "legacy_view"):
+        from simulator.vapour_rail.catalog import CatalogCompileError
+
+        try:
+            viewed = catalog.legacy_view()
+        except CatalogCompileError:
+            viewed = None
+        if isinstance(viewed, MappingABC):
+            legacy = viewed
+    vapour_g = production_vapor_molar_mass_g_per_mol(legacy, species)
+    if isinstance(vapour_g, bool) or not isinstance(vapour_g, int | float):
+        return None
+    oxide_mass = float(oxide_g)
+    vapour_mass = float(vapour_g)
+    if (
+        not math.isfinite(oxide_mass)
+        or oxide_mass <= 0.0
+        or not math.isfinite(vapour_mass)
+        or vapour_mass <= 0.0
+    ):
+        return None
+    return parent, (oxide_mass / float(n_metal)) / vapour_mass
+
+
+def _oxide_inventory_kg_map(oxides: Mapping[str, Any]) -> dict[str, float]:
+    parsed: dict[str, float] = {}
+    for oxide, raw in oxides.items():
+        if isinstance(raw, bool) or not isinstance(raw, int | float):
+            raise CoatingFeasibilityReportError(
+                f"parent-oxide inventory {oxide!r} must be numeric"
+            )
+        kg = float(raw)
+        if not math.isfinite(kg) or kg < 0.0:
+            raise CoatingFeasibilityReportError(
+                f"parent-oxide inventory {oxide!r} must be finite and "
+                "non-negative"
+            )
+        parsed[str(oxide)] = kg
+    return parsed
+
+
+def _snapshot_oxide_inventory_kg(snapshot: Any) -> dict[str, float] | None:
+    """Parent-oxide kilograms still in the melt, or None if unrecorded.
+
+    ``inventory.melt_oxide_kg`` is that inventory. A composition and a
+    melt mass are the same inventory when the kilogram map was not
+    copied. An empty recorded map is an empty melt. No inventory and no
+    composition is a missing operand: the kinetic bound stays unchanged.
+    """
+
+    inventory = getattr(snapshot, "inventory", None)
+    oxides: Any = None
+    if isinstance(inventory, MappingABC):
+        oxides = inventory.get("melt_oxide_kg")
+    elif inventory is not None:
+        oxides = getattr(inventory, "melt_oxide_kg", None)
+    if isinstance(oxides, MappingABC) and oxides:
+        return _oxide_inventory_kg_map(oxides)
+    composition = getattr(snapshot, "composition_wt_pct", None)
+    melt_mass = getattr(snapshot, "melt_mass_kg", None)
+    if (
+        isinstance(composition, MappingABC)
+        and composition
+        and isinstance(melt_mass, int | float)
+        and not isinstance(melt_mass, bool)
+    ):
+        mass = float(melt_mass)
+        if math.isfinite(mass) and mass > 0.0:
+            converted: dict[str, float] = {}
+            for oxide, raw_pct in composition.items():
+                if isinstance(raw_pct, bool) or not isinstance(
+                    raw_pct, int | float
+                ):
+                    raise CoatingFeasibilityReportError(
+                        "composition_wt_pct must be numeric for the "
+                        "inventory cap"
+                    )
+                pct = float(raw_pct)
+                if not math.isfinite(pct) or pct < 0.0:
+                    raise CoatingFeasibilityReportError(
+                        "composition_wt_pct must be finite and non-negative "
+                        "for the inventory cap"
+                    )
+                converted[str(oxide)] = mass * pct / 100.0
+            if converted:
+                return converted
+    if isinstance(oxides, MappingABC):
+        return {}
+    return None
+
+
+def _inventory_cap_upper_bounds(
+    snapshot: Any,
+    classified: Sequence[tuple[str, _WallSupplyInterval]],
+    catalog: Any | None,
+    booked_oxide_kg: dict[str, float],
+    initial_oxide_kg: dict[str, float],
+) -> tuple[dict[str, float], set[str]]:
+    """Cap refused upper bounds that share one parent-oxide inventory.
+
+    The returned map is kilograms, already multiplied by the interval
+    duration. A species left out of it keeps its kinetic mass. Computed
+    rates are not rewritten: the snapshot inventory is what remains
+    after those rates. Refused bounds were not debited there, so
+    ``booked_oxide_kg`` removes the oxide already assigned. Later
+    intervals cannot spend it again, and the run total cannot exceed
+    the first recorded inventory of that oxide.
+    """
+
+    inventory = _snapshot_oxide_inventory_kg(snapshot)
+    if inventory is None:
+        return {}, set()
+    duration_h = _snapshot_duration_h(snapshot)
+    grouped: dict[str, list[tuple[str, float, float]]] = {}
+    for species, contribution in classified:
+        if contribution.kind != _WALL_SUPPLY_UPPER_BOUND:
+            continue
+        if contribution.rate_kg_hr is None:
+            continue
+        stoich = _parent_oxide_debit_per_vapour_kg(snapshot, species, catalog)
+        if stoich is None:
+            continue
+        parent, oxide_per_vapour = stoich
+        grouped.setdefault(parent, []).append(
+            (
+                species,
+                float(contribution.rate_kg_hr) * duration_h,
+                oxide_per_vapour,
+            )
+        )
+    replacements: dict[str, float] = {}
+    capped: set[str] = set()
+    for parent, rows in grouped.items():
+        snapshot_kg = inventory.get(parent, 0.0)
+        if parent not in initial_oxide_kg:
+            initial_oxide_kg[parent] = snapshot_kg
+        booked = booked_oxide_kg.get(parent, 0.0)
+        available = min(snapshot_kg, initial_oxide_kg[parent]) - booked
+        if available < 0.0:
+            available = 0.0
+        demands = {
+            species: vapour_kg * oxide_per_vapour
+            for species, vapour_kg, oxide_per_vapour in rows
+        }
+        total_demand = sum(demands.values())
+        if total_demand <= 0.0:
+            continue
+        if total_demand <= available or math.isclose(
+            total_demand,
+            available,
+            rel_tol=1e-12,
+            abs_tol=1e-15,
+        ):
+            scale = 1.0
+        else:
+            scale = available / total_demand
+        used = 0.0
+        for species, _vapour_kg, oxide_per_vapour in rows:
+            demand = demands[species]
+            allocated = demand * scale
+            used += allocated
+            replacements[species] = allocated / oxide_per_vapour
+            if allocated < demand and not math.isclose(
+                allocated,
+                demand,
+                rel_tol=1e-12,
+                abs_tol=1e-15,
+            ):
+                capped.add(species)
+        booked_oxide_kg[parent] = booked + used
+    return replacements, capped
+
+
 def _optimizer_refused_flux_bounds(
     snapshots: Any,
     refused_species: tuple[str, ...],
@@ -2759,14 +3186,17 @@ def _optimizer_refused_flux_bounds(
     Each positive-duration interval is classified by
     ``_classify_wall_supply_interval`` and is not re-read here.
 
-    A returned number sums computed rates and activity-1 supply bounds.
-    ``supply_interval_upper_bound_used`` counts the bounded refused
-    intervals. That count is not divided by ``campaigns_elapsed``. An
-    evidenced physical zero adds nothing and keeps the species observed.
-    One unavailable interval drops that species: the partial sum of the
-    other intervals is not a supply, and the wall refusal stays. A
-    sibling with a complete integral is still returned. Species order
-    does not change the values.
+    A returned number sums computed rates and activity-scaled supply
+    bounds. A refused interval is then limited by the parent-oxide
+    inventory still available, shared by every carrier of that element
+    (d-401 amendment 2). ``inventory_capped`` names the species for which
+    that limit bound. ``supply_interval_upper_bound_used`` counts the
+    bounded refused intervals. That count is not divided by
+    ``campaigns_elapsed``. An evidenced physical zero adds nothing and
+    keeps the species observed. One unavailable interval drops that
+    species: the partial sum of the other intervals is not a supply, and
+    the wall refusal stays. A sibling with a complete integral is still
+    returned. Species order does not change the values.
 
     A species absent from every contributing interval is not given a
     fabricated zero. Ledger resolution is not applied here. Booking
@@ -2784,22 +3214,56 @@ def _optimizer_refused_flux_bounds(
     observed: set[str] = set()
     withheld: set[str] = set()
     bound_counts = {species: 0 for species in refused_species}
+    inventory_capped: set[str] = set()
     # One recorded-pO2 set for the window. The classifier chooses the
     # hour's own value, or the extremum that maximises P. This scan
     # does not read a flux map.
-    recorded_pO2_bar = _recorded_transport_pO2_bar(snapshots)
-    for snapshot in tuple(snapshots or ()):
-        for species in refused_species:
-            contribution = _classify_wall_supply_interval(
-                snapshot,
+    window = tuple(snapshots or ())
+    recorded_pO2_bar = _recorded_transport_pO2_bar(window)
+    classified_window: list[
+        tuple[Any, tuple[tuple[str, _WallSupplyInterval], ...]]
+    ] = []
+    for snapshot in window:
+        classified = tuple(
+            (
                 species,
-                catalog,
-                recorded_pO2_bar,
+                _classify_wall_supply_interval(
+                    snapshot,
+                    species,
+                    catalog,
+                    recorded_pO2_bar,
+                ),
             )
+            for species in refused_species
+        )
+        for _species, contribution in classified:
+            if contribution.kind == _WALL_SUPPLY_UNAVAILABLE:
+                withheld.add(_species)
+        classified_window.append((snapshot, classified))
+    booked_oxide_kg: dict[str, float] = {}
+    initial_oxide_kg: dict[str, float] = {}
+    for snapshot, classified in classified_window:
+        # A species withheld by a later gap does not spend the shared
+        # inventory. Its partial sum is not a supply.
+        eligible = tuple(
+            (species, contribution)
+            for species, contribution in classified
+            if species not in withheld
+        )
+        capped_kg, capped_species = _inventory_cap_upper_bounds(
+            snapshot,
+            eligible,
+            catalog,
+            booked_oxide_kg,
+            initial_oxide_kg,
+        )
+        inventory_capped.update(capped_species)
+        for species, contribution in classified:
             if contribution.kind == _WALL_SUPPLY_OUTSIDE:
                 continue
             if contribution.kind == _WALL_SUPPLY_UNAVAILABLE:
-                withheld.add(species)
+                continue
+            if species in withheld:
                 continue
             if contribution.kind == _WALL_SUPPLY_PHYSICAL_ZERO:
                 observed.add(species)
@@ -2812,8 +3276,11 @@ def _optimizer_refused_flux_bounds(
                     "wall-supply interval classifier returned "
                     f"{contribution.kind!r} for {species!r}"
                 )
-            duration_h = _snapshot_duration_h(snapshot)
-            totals[species] += float(contribution.rate_kg_hr) * duration_h
+            if species in capped_kg:
+                totals[species] += capped_kg[species]
+            else:
+                duration_h = _snapshot_duration_h(snapshot)
+                totals[species] += float(contribution.rate_kg_hr) * duration_h
             observed.add(species)
             if contribution.kind == _WALL_SUPPLY_UPPER_BOUND:
                 bound_counts[species] += 1
@@ -2822,7 +3289,11 @@ def _optimizer_refused_flux_bounds(
         for species in refused_species
         if species in observed and species not in withheld
     }
-    return _WallSupplyIntegral(masses, bound_counts)
+    return _WallSupplyIntegral(
+        masses,
+        bound_counts,
+        {species: True for species in inventory_capped},
+    )
 
 
 def _knudsen_summary_from_eval_inputs(
