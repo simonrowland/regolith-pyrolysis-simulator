@@ -2945,23 +2945,30 @@ def _parent_oxide_debit_per_vapour_kg(
     K2, and K all debit K2O, so the potassium in the three of them cannot
     exceed the potassium in that oxide. Na2O_gas, Na2, and Na debit Na2O
     the same way. ``stoich_oxide_per_vapor`` is the publisher kilogram
-    ratio. An elemental carrier with no stored ratio uses the reaction
-    that releases ``n_metal`` metal atoms from one oxide formula.
+    ratio. An elemental carrier with no stored ratio uses
+    ``EvaporationMixin._evaporation_stoich`` (``STOICH_RATIOS``). The
+    catalog resolved here is the same one the activity-1 ceiling uses,
+    including a catalog that exists only on the snapshot.
 
-    Algebra. ``vapour_kg = oxide_kg / stoich_oxide_per_vapor``. For
-    elemental K, ``stoich = M(K2O) / (2 * M(K))``. Carriers of one oxide
-    split that oxide in proportion to their kinetic oxide demand. They
-    do not each receive the whole inventory.
+    Algebra. ``vapour_kg = oxide_kg / stoich``. A stored
+    ``stoich_oxide_per_vapor`` is that ratio. The elemental fallback is
+    the owner's ``oxide_per_product_kg``, not a second formula built
+    from a catalog molar mass. Carriers of one oxide split that oxide
+    in proportion to their kinetic oxide demand. They do not each
+    receive the whole inventory.
 
     Unit check. ``stoich`` is kg oxide / kg vapour. Dividing a kilogram
     inventory by it returns kilograms of vapour.
 
-    Sanity value. M(K) = 39.0983 g/mol and M(K2O) = 94.1956 g/mol, so
-    K and K2 have stoich = 94.1956 / (2 * 39.0983) = 1.204599688477504.
-    1 kg of K2O becomes 0.8301513021839662 kg of K or of K2, or 1 kg of
-    K2O_gas. Spending that kilogram on K2O_gas leaves none for K or K2.
+    Sanity value. The owner returns ``M(K2O) / (2 * M(K))`` from
+    ``STOICH_RATIOS``. M(K) = 39.0983 g/mol and M(K2O) = 94.1956 g/mol,
+    so the ratio is 1.204599688477504. 1 kg of K2O becomes
+    0.8301513021839662 kg of K. K2 and K2O_gas keep their stored ratios.
+    Spending that kilogram on one carrier leaves none for the others.
+    A catalog mass for K is not an input to this ratio.
     """
 
+    catalog = _bound_vapour_catalog(snapshot, catalog)
     record = _carrier_channel(snapshot, species)
     parent: str | None = None
     ratio: float | None = None
@@ -2989,38 +2996,38 @@ def _parent_oxide_debit_per_vapour_kg(
         return None
     if ratio is not None:
         return parent, ratio
-    from simulator.evaporation import production_vapor_molar_mass_g_per_mol
-    from simulator.state import MOLAR_MASS, OXIDE_TO_METAL
+    owner_ratio = _elemental_oxide_per_vapour_kg(parent, species)
+    if owner_ratio is None:
+        return None
+    return parent, owner_ratio
 
-    metal, n_metal, _n_oxygen = OXIDE_TO_METAL.get(parent, ("", 0, 0))
-    if species != metal or n_metal <= 0:
-        return None
-    oxide_g = MOLAR_MASS.get(parent)
-    if isinstance(oxide_g, bool) or not isinstance(oxide_g, int | float):
-        return None
-    legacy: Mapping[str, Any] | None = None
-    if catalog is not None and hasattr(catalog, "legacy_view"):
-        from simulator.vapour_rail.catalog import CatalogCompileError
 
-        try:
-            viewed = catalog.legacy_view()
-        except CatalogCompileError:
-            viewed = None
-        if isinstance(viewed, MappingABC):
-            legacy = viewed
-    vapour_g = production_vapor_molar_mass_g_per_mol(legacy, species)
-    if isinstance(vapour_g, bool) or not isinstance(vapour_g, int | float):
+def _elemental_oxide_per_vapour_kg(parent: str, species: str) -> float | None:
+    """Owner ratio for the elemental metal of ``parent``, or None.
+
+    ``EvaporationMixin._evaporation_stoich`` is the production debit.
+    Its elemental fallback is ``STOICH_RATIOS``. A catalog molar mass
+    is a different operand and must not allocate the same atoms twice
+    under another number. A carrier that is not that metal has no
+    elemental fallback; the stored ``stoich_oxide_per_vapor`` is its
+    ratio, and a missing one is not invented here.
+    """
+
+    from simulator.accounting import AccountingError
+    from simulator.evaporation import EvaporationMixin
+
+    host = EvaporationMixin.__new__(EvaporationMixin)
+    host.species_formula_registry = {}
+    try:
+        stoich = host._evaporation_stoich(species, {"parent_oxide": parent})
+    except AccountingError:
         return None
-    oxide_mass = float(oxide_g)
-    vapour_mass = float(vapour_g)
-    if (
-        not math.isfinite(oxide_mass)
-        or oxide_mass <= 0.0
-        or not math.isfinite(vapour_mass)
-        or vapour_mass <= 0.0
-    ):
+    if not isinstance(stoich, MappingABC):
         return None
-    return parent, (oxide_mass / float(n_metal)) / vapour_mass
+    return _positive_kg_per_kg(
+        stoich.get("oxide_per_product_kg"),
+        "oxide_per_product_kg",
+    )
 
 
 def _oxide_inventory_kg_map(oxides: Mapping[str, Any]) -> dict[str, float]:
@@ -3090,22 +3097,115 @@ def _snapshot_oxide_inventory_kg(snapshot: Any) -> dict[str, float] | None:
     return None
 
 
+def _computed_parent_oxide_draws(
+    snapshot: Any,
+    catalog: Any | None,
+    *,
+    skip_species: AbstractSet[str] | None = None,
+) -> dict[str, float]:
+    """Oxide kilograms this interval's computed vapour rates consume.
+
+    The rate map is the computed draw. A refused carrier is absent from
+    it, so this does not reserve the bound that the cap still has to
+    allocate. ``skip_species`` are withheld: their partial sum is not a
+    supply, and they do not spend the shared inventory. A carrier with
+    no parent-oxide ratio contributes nothing here; it is not given a
+    zero debit.
+    """
+
+    rates = _snapshot_refused_flux_rates(snapshot)
+    if not isinstance(rates, MappingABC):
+        return {}
+    duration_h = _snapshot_duration_h(snapshot)
+    if duration_h == 0.0:
+        return {}
+    skipped = skip_species or frozenset()
+    draws: dict[str, float] = {}
+    for name, raw in rates.items():
+        species = str(name)
+        if species in skipped:
+            continue
+        rate_kg_hr = _require_vapour_supply_rate(raw, species)
+        stoich = _parent_oxide_debit_per_vapour_kg(snapshot, species, catalog)
+        if stoich is None:
+            continue
+        parent, oxide_per_vapour = stoich
+        draws[parent] = (
+            draws.get(parent, 0.0) + rate_kg_hr * duration_h * oxide_per_vapour
+        )
+    return draws
+
+
+def _window_parent_oxide_budget(
+    snapshots: Sequence[Any],
+    catalog: Any | None,
+    withheld: AbstractSet[str],
+) -> tuple[dict[str, float], dict[str, float]]:
+    """First recorded inventory and the window's computed oxide debit.
+
+    The charge is the first snapshot that records that oxide. Computed
+    draws anywhere in the window, including a later hour, are one debit
+    against it. See ``_inventory_cap_upper_bounds``.
+    """
+
+    charge: dict[str, float] = {}
+    computed: dict[str, float] = {}
+    for snapshot in snapshots:
+        inventory = _snapshot_oxide_inventory_kg(snapshot)
+        if inventory is not None:
+            for parent, kg in inventory.items():
+                if parent not in charge:
+                    charge[parent] = kg
+        for parent, kg in _computed_parent_oxide_draws(
+            snapshot,
+            catalog,
+            skip_species=withheld,
+        ).items():
+            computed[parent] = computed.get(parent, 0.0) + kg
+    return charge, computed
+
+
 def _inventory_cap_upper_bounds(
     snapshot: Any,
     classified: Sequence[tuple[str, _WallSupplyInterval]],
     catalog: Any | None,
     booked_oxide_kg: dict[str, float],
-    initial_oxide_kg: dict[str, float],
+    charge_oxide_kg: Mapping[str, float],
+    computed_oxide_kg: Mapping[str, float],
 ) -> tuple[dict[str, float], set[str]]:
     """Cap refused upper bounds that share one parent-oxide inventory.
 
-    The returned map is kilograms, already multiplied by the interval
-    duration. A species left out of it keeps its kinetic mass. Computed
-    rates are not rewritten: the snapshot inventory is what remains
-    after those rates. Refused bounds were not debited there, so
-    ``booked_oxide_kg`` removes the oxide already assigned. Later
-    intervals cannot spend it again, and the run total cannot exceed
-    the first recorded inventory of that oxide.
+    The returned map is kilograms of vapour, already multiplied by the
+    interval duration. Computed rates are not rewritten. They are
+    reserved first, across the whole window, including a computed hour
+    that comes later and a computed carrier of the same element.
+
+    Invariant. For one parent oxide, the oxide-equivalent of the booked
+    supply — computed vapour plus refused upper bounds, across every
+    carrier of that oxide — does not exceed the first recorded
+    inventory, except when the computed draw alone already exceeds it.
+
+    Derivation. A refused hour can still show the undepleted melt. The
+    cap used to allocate against that snapshot and then add the computed
+    mass, so 1 kg of K2O became 1 kg of refused K2O_gas plus another
+    kilogram of computed vapour (d-401 amendment 2). The same hole
+    exists when the computed hour is earlier and the inventory map was
+    not debited. Let C be the first recorded inventory, D the
+    oxide-equivalent of every computed rate in the window, S the
+    inventory on this snapshot, and B the refused oxide already
+    allocated:
+
+        available = min(S, max(0, C - D)) - B, floored at 0.
+
+    C - D is the charge after the computed reserve. S is a tighter cap
+    when this snapshot already shows a smaller melt. Subtracting D from
+    S as well would count a post-debit drop twice. When the map is not
+    debited, S = C and available = C - D - B. Two carriers split that
+    remainder in proportion to oxide demand. Species order does not
+    change D. A computed debit already folded into a first snapshot
+    that never shows a higher inventory cannot be told apart from an
+    undepleted map; over-booking is the forbidden outcome, so that
+    draw stays inside D.
     """
 
     inventory = _snapshot_oxide_inventory_kg(snapshot)
@@ -3133,10 +3233,13 @@ def _inventory_cap_upper_bounds(
     capped: set[str] = set()
     for parent, rows in grouped.items():
         snapshot_kg = inventory.get(parent, 0.0)
-        if parent not in initial_oxide_kg:
-            initial_oxide_kg[parent] = snapshot_kg
+        charge = charge_oxide_kg.get(parent, snapshot_kg)
+        computed = computed_oxide_kg.get(parent, 0.0)
+        ceiling = charge - computed
+        if ceiling < 0.0:
+            ceiling = 0.0
         booked = booked_oxide_kg.get(parent, 0.0)
-        available = min(snapshot_kg, initial_oxide_kg[parent]) - booked
+        available = min(snapshot_kg, ceiling) - booked
         if available < 0.0:
             available = 0.0
         demands = {
@@ -3187,10 +3290,13 @@ def _optimizer_refused_flux_bounds(
     ``_classify_wall_supply_interval`` and is not re-read here.
 
     A returned number sums computed rates and activity-scaled supply
-    bounds. A refused interval is then limited by the parent-oxide
-    inventory still available, shared by every carrier of that element
-    (d-401 amendment 2). ``inventory_capped`` names the species for which
-    that limit bound. ``supply_interval_upper_bound_used`` counts the
+    bounds. Computed parent-oxide draws in the window are reserved
+    before any refused bound is allocated, including a draw on a later
+    hour and a draw by another carrier of that element. The refused
+    bound then receives only what remains of the first recorded
+    inventory (d-401 amendment 2). ``inventory_capped`` names the species
+    for which that limit bound. ``supply_interval_upper_bound_used``
+    counts the
     bounded refused intervals. That count is not divided by
     ``campaigns_elapsed``. An evidenced physical zero adds nothing and
     keeps the species observed. One unavailable interval drops that
@@ -3240,11 +3346,16 @@ def _optimizer_refused_flux_bounds(
             if contribution.kind == _WALL_SUPPLY_UNAVAILABLE:
                 withheld.add(_species)
         classified_window.append((snapshot, classified))
+    # Computed draws are reserved once for the window, then refused
+    # bounds spend only the remainder. A withheld species is not part
+    # of that reserve: its partial sum is not a supply.
+    charge_oxide_kg, computed_oxide_kg = _window_parent_oxide_budget(
+        window,
+        catalog,
+        withheld,
+    )
     booked_oxide_kg: dict[str, float] = {}
-    initial_oxide_kg: dict[str, float] = {}
     for snapshot, classified in classified_window:
-        # A species withheld by a later gap does not spend the shared
-        # inventory. Its partial sum is not a supply.
         eligible = tuple(
             (species, contribution)
             for species, contribution in classified
@@ -3255,7 +3366,8 @@ def _optimizer_refused_flux_bounds(
             eligible,
             catalog,
             booked_oxide_kg,
-            initial_oxide_kg,
+            charge_oxide_kg,
+            computed_oxide_kg,
         )
         inventory_capped.update(capped_species)
         for species, contribution in classified:

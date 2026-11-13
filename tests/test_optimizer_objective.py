@@ -4069,6 +4069,623 @@ def test_shared_k_budget_never_exceeds_the_charge_potassium() -> None:
     }
 
 
+# Invariant. Computed vapour and refused upper bounds that share a parent
+# oxide spend that oxide once. The charge is the first recorded inventory.
+# D is the oxide-equivalent of every computed rate in the window. At a
+# refused interval whose snapshot still holds S, with B already allocated:
+# available = min(S, max(0, C - D)) - B, floored at 0. The oracle below
+# is that sentence. It does not call the supply integral or its helpers.
+_OXIDE_HK_PRESSURE_PA = 10.0
+_OXIDE_HK_R_J_MOL_K = 8.314462618
+
+
+def _oracle_hk_kg_hr(pressure_pa: float) -> float:
+    """Handwritten activity-1 Hertz-Knudsen rate. R is written out."""
+
+    coefficient = math.sqrt(
+        _ACTIVITY_ONE_MASS_KG_PER_MOL
+        / (2.0 * math.pi * _OXIDE_HK_R_J_MOL_K * _ACTIVITY_ONE_T_K)
+    )
+    return pressure_pa * coefficient * _ACTIVITY_ONE_AREA_M2 * 3600.0
+
+
+def _oracle_shared_oxide_vapour(case: Mapping[str, object]) -> dict[str, float]:
+    """Allocate one parent-oxide charge from the invariant above."""
+
+    stoich = dict(case["stoich"])
+    parent_of = dict(case["parent"])
+    charge: dict[str, float] = {}
+    computed_oxide: dict[str, float] = {}
+    computed_vapour = {name: 0.0 for name in stoich}
+    refused_vapour = {name: 0.0 for name in stoich}
+    refused_groups: list[tuple[Mapping[str, float], list[tuple[str, float, float, str]]]] = []
+    for interval in case["intervals"]:
+        inventory = dict(interval["inventory"])
+        for oxide, kg in inventory.items():
+            if oxide not in charge:
+                charge[oxide] = float(kg)
+        group: list[tuple[str, float, float, str]] = []
+        duration_h = float(interval["duration_h"])
+        for name, pressure in interval["refused_pressure_pa"].items():
+            vapour = _oracle_hk_kg_hr(float(pressure)) * duration_h
+            group.append((name, vapour, float(stoich[name]), parent_of[name]))
+        refused_groups.append((inventory, group))
+        for name, rate in interval["computed"].items():
+            vapour = float(rate) * duration_h
+            computed_vapour[name] += vapour
+            parent = parent_of[name]
+            computed_oxide[parent] = (
+                computed_oxide.get(parent, 0.0) + vapour * float(stoich[name])
+            )
+    booked = {oxide: 0.0 for oxide in charge}
+    for inventory, group in refused_groups:
+        by_parent: dict[str, list[tuple[str, float, float]]] = {}
+        for name, vapour, ratio, parent in group:
+            by_parent.setdefault(parent, []).append((name, vapour, ratio))
+        for parent, rows in by_parent.items():
+            snapshot_kg = float(inventory.get(parent, 0.0))
+            ceiling = charge.get(parent, snapshot_kg) - computed_oxide.get(parent, 0.0)
+            if ceiling < 0.0:
+                ceiling = 0.0
+            available = min(snapshot_kg, ceiling) - booked.get(parent, 0.0)
+            if available < 0.0:
+                available = 0.0
+            demands = [
+                (name, vapour * ratio, ratio) for name, vapour, ratio in rows
+            ]
+            total = sum(demand for _name, demand, _ratio in demands)
+            if total <= 0.0:
+                continue
+            if total <= available or math.isclose(
+                total, available, rel_tol=1e-12, abs_tol=1e-15
+            ):
+                scale = 1.0
+            else:
+                scale = available / total
+            used = 0.0
+            for name, demand, ratio in demands:
+                allocated = demand * scale
+                used += allocated
+                refused_vapour[name] += allocated / ratio
+            booked[parent] = booked.get(parent, 0.0) + used
+    return {
+        name: computed_vapour[name] + refused_vapour[name] for name in stoich
+    }
+
+
+def _shared_oxide_snapshots(case: Mapping[str, object]) -> tuple[SimpleNamespace, ...]:
+    stoich = dict(case["stoich"])
+    parent_of = dict(case["parent"])
+    built: list[SimpleNamespace] = []
+    for index, interval in enumerate(case["intervals"], start=1):
+        refused = dict(interval["refused_pressure_pa"])
+        computed = dict(interval["computed"])
+        rates: dict[str, float] = {}
+        channels: dict[str, dict[str, object]] = {}
+        for name, ratio in stoich.items():
+            channels[name] = _alkali_inventory_channel(
+                name,
+                pressure_pa=float(refused.get(name, _OXIDE_HK_PRESSURE_PA)),
+                parent_oxide=parent_of[name],
+                stoich_oxide_per_vapor=float(ratio),
+            )
+            if name in refused:
+                continue
+            rates[name] = float(computed.get(name, 0.0))
+        built.append(
+            SimpleNamespace(
+                hour=index,
+                duration_h=float(interval["duration_h"]),
+                temperature_C=_ACTIVITY_ONE_T_C,
+                inventory=SimpleNamespace(
+                    melt_oxide_kg=dict(interval["inventory"])
+                ),
+                evap_flux=SimpleNamespace(
+                    published_species_kg_hr=rates,
+                    species_kg_hr=dict(rates),
+                    melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+                    carrier_authority_by_species=channels,
+                ),
+            )
+        )
+    return tuple(built)
+
+
+def _parent_oxide_kg(
+    masses: Mapping[str, float],
+    case: Mapping[str, object],
+    parent: str,
+) -> float:
+    stoich = case["stoich"]
+    parent_of = case["parent"]
+    return sum(
+        float(masses[name]) * float(stoich[name])
+        for name, oxide in parent_of.items()
+        if oxide == parent
+    )
+
+
+_SHARED_OXIDE_CASES = (
+    {
+        "name": "refused_then_computed",
+        "stoich": {"K2O_gas": 1.0},
+        "parent": {"K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": ("K2O",),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {"K2O_gas": 0.25},
+                "refused_pressure_pa": {},
+            },
+        ),
+    },
+    {
+        "name": "computed_then_refused",
+        "stoich": {"K2O_gas": 1.0},
+        "parent": {"K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": ("K2O",),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {"K2O_gas": 0.25},
+                "refused_pressure_pa": {},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+        ),
+    },
+    {
+        "name": "refused_computed_refused",
+        "stoich": {"K2O_gas": 1.0},
+        "parent": {"K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": ("K2O",),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {"K2O_gas": 0.25},
+                "refused_pressure_pa": {},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+        ),
+    },
+    {
+        "name": "computed_duration_reserves_rate_times_dt",
+        "stoich": {"K2O_gas": 1.0},
+        "parent": {"K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": ("K2O",),
+        "intervals": (
+            {
+                "duration_h": 2.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {"K2O_gas": 0.25},
+                "refused_pressure_pa": {},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+        ),
+    },
+    {
+        "name": "same_hour_computed_k2_and_refused_k2o",
+        "stoich": {"K2": 2.0, "K2O_gas": 1.0},
+        "parent": {"K2": "K2O", "K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": ("K2O",),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {"K2": 0.25},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+        ),
+    },
+    {
+        "name": "k2_computed_then_k2o_refused",
+        "stoich": {"K2": 2.0, "K2O_gas": 1.0},
+        "parent": {"K2": "K2O", "K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": ("K2O",),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {"K2": 0.25},
+                "refused_pressure_pa": {},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+        ),
+    },
+    {
+        "name": "k2o_refused_then_k2_computed",
+        "stoich": {"K2": 2.0, "K2O_gas": 1.0},
+        "parent": {"K2": "K2O", "K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": ("K2O",),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {"K2": 0.25},
+                "refused_pressure_pa": {},
+            },
+        ),
+    },
+    {
+        "name": "remainder_split_across_two_refused_carriers",
+        "stoich": {"K2": 2.0, "K2O_gas": 1.0},
+        "parent": {"K2": "K2O", "K2O_gas": "K2O"},
+        "capped": ("K2", "K2O_gas"),
+        "mutation_exceeds": ("K2O",),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {
+                    "K2": _OXIDE_HK_PRESSURE_PA,
+                    "K2O_gas": _OXIDE_HK_PRESSURE_PA,
+                },
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {"K2O_gas": 0.25},
+                "refused_pressure_pa": {},
+            },
+        ),
+    },
+    {
+        "name": "refused_only",
+        "stoich": {"K2O_gas": 1.0},
+        "parent": {"K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": (),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+        ),
+    },
+    {
+        "name": "computed_only",
+        "stoich": {"K2O_gas": 1.0},
+        "parent": {"K2O_gas": "K2O"},
+        "capped": (),
+        "mutation_exceeds": (),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {"K2O_gas": 0.25},
+                "refused_pressure_pa": {},
+            },
+        ),
+    },
+    {
+        "name": "na_computed_does_not_spend_k",
+        "stoich": {"K2O_gas": 1.0, "Na2O_gas": 1.0},
+        "parent": {"K2O_gas": "K2O", "Na2O_gas": "Na2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": (),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0, "Na2O": 0.5},
+                "computed": {"Na2O_gas": 0.2},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+        ),
+    },
+    {
+        "name": "depleted_snapshot_is_not_charged_twice",
+        "stoich": {"K2O_gas": 1.0},
+        "parent": {"K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": (),
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 1.0},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": 0.0},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 0.6},
+                "computed": {"K2O_gas": 0.4},
+                "refused_pressure_pa": {},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 0.6},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+        ),
+    },
+)
+
+
+@pytest.mark.parametrize(
+    "case",
+    _SHARED_OXIDE_CASES,
+    ids=[case["name"] for case in _SHARED_OXIDE_CASES],
+)
+def test_computed_parent_oxide_is_reserved_before_refused_bounds(
+    case: Mapping[str, object],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Refused bounds cannot spend oxide a computed draw already claimed.
+
+    The kinetic ceiling is above the charge, so an allocator that ignores
+    the computed draw books more parent oxide than the melt held. Dropping
+    the computed reserve is the mutation: every kind that mixes a computed
+    draw with a refused demand then exceeds the charge. A post-debit
+    snapshot is not charged a second time. Na2O does not spend K2O.
+    Species order does not change the kilograms.
+    """
+
+    assert _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA) > 1.0
+    bare = _activity_one_refusal_snapshot(
+        "K2O_gas",
+        hour=1,
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+    )
+    bare_bounds = _optimizer_refused_flux_bounds((bare,), ("K2O_gas",))
+    assert bare_bounds["K2O_gas"] == _approx_kg(
+        _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA)
+    )
+    snapshots = _shared_oxide_snapshots(case)
+    species = tuple(case["stoich"])
+    oracle = _oracle_shared_oxide_vapour(case)
+    orders = (species, tuple(reversed(species)))
+    for order in orders:
+        bounds = _optimizer_refused_flux_bounds(snapshots, order)
+        assert set(bounds) == set(species)
+        for name, mass_kg in oracle.items():
+            assert bounds[name] == _approx_kg(mass_kg)
+        assert bounds.inventory_capped == {name: True for name in case["capped"]}
+        for parent in set(case["parent"].values()):
+            assert _parent_oxide_kg(bounds, case, parent) <= (
+                float(case["intervals"][0]["inventory"].get(parent, 0.0)) + 1e-12
+            )
+    monkeypatch.setattr(
+        evaluate_module,
+        "_computed_parent_oxide_draws",
+        lambda *args, **kwargs: {},
+    )
+    for order in orders:
+        mutated = _optimizer_refused_flux_bounds(snapshots, order)
+        if case["mutation_exceeds"]:
+            for parent in case["mutation_exceeds"]:
+                charge = float(case["intervals"][0]["inventory"][parent])
+                assert _parent_oxide_kg(mutated, case, parent) > charge
+        else:
+            for name, mass_kg in oracle.items():
+                assert mutated[name] == _approx_kg(mass_kg)
+
+
+class _SnapshotParentCatalog:
+    """Vapour law and parent stoich live only on the snapshot catalog."""
+
+    def __init__(self) -> None:
+        self._law = _CeilingLaw(
+            activity_exponent=0.0,
+            pO2_exponent=0.0,
+            pO2_reference_bar=1.0,
+            p_unit_pa=_OXIDE_HK_PRESSURE_PA,
+        )
+
+    def evaluator_for_hot_train(self, species: str) -> _CeilingLaw:
+        if species != "K2O_gas":
+            raise ValueError(species)
+        return self._law
+
+    def legacy_view(self) -> dict[str, dict[str, dict[str, float | str]]]:
+        return {
+            "oxide_vapors": {
+                "K2O_gas": {
+                    "parent_oxide": "K2O",
+                    "stoich_oxide_per_vapor": 1.0,
+                    "molar_mass_g_mol": _ACTIVITY_ONE_MASS_KG_PER_MOL * 1000.0,
+                }
+            }
+        }
+
+
+def _snapshot_catalog_hour(
+    hour: int,
+    *,
+    computed_kg_hr: float | None,
+    inventory_kg: float,
+    catalog: _SnapshotParentCatalog,
+) -> SimpleNamespace:
+    """Bare refusal channel: no parent, no stoich, no explicit ceiling."""
+
+    rates = {} if computed_kg_hr is None else {"K2O_gas": computed_kg_hr}
+    return SimpleNamespace(
+        hour=hour,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        vapour_catalog=catalog,
+        inventory=SimpleNamespace(melt_oxide_kg={"K2O": inventory_kg}),
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr=rates,
+            species_kg_hr=dict(rates),
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={
+                "K2O_gas": _transport_refusal_channel("K2O_gas"),
+            },
+        ),
+    )
+
+
+def test_snapshot_catalog_stoich_caps_a_refused_to_computed_transition() -> None:
+    """Parent and stoich are on the snapshot catalog, not the carrier.
+
+    Pressure bounding already reads that catalog. The inventory cap must
+    use the same object, or a refused hour books the whole charge and the
+    later computed hour books it again. Both interval orders stay inside
+    the 1 kg of K2O. The kinetic ceiling is the handwritten rate above.
+    """
+
+    catalog = _SnapshotParentCatalog()
+    kinetic = _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA)
+    assert kinetic > 1.0
+    charge = 1.0
+    computed = 0.25
+    orders = (
+        (
+            _snapshot_catalog_hour(
+                1, computed_kg_hr=None, inventory_kg=charge, catalog=catalog
+            ),
+            _snapshot_catalog_hour(
+                2, computed_kg_hr=computed, inventory_kg=charge, catalog=catalog
+            ),
+        ),
+        (
+            _snapshot_catalog_hour(
+                1, computed_kg_hr=computed, inventory_kg=charge, catalog=catalog
+            ),
+            _snapshot_catalog_hour(
+                2, computed_kg_hr=None, inventory_kg=charge, catalog=catalog
+            ),
+        ),
+    )
+    for snapshots in orders:
+        bounds = _optimizer_refused_flux_bounds(snapshots, ("K2O_gas",))
+        assert bounds["K2O_gas"] == _approx_kg(charge)
+        assert bounds["K2O_gas"] < kinetic
+        assert bounds.inventory_capped == {"K2O_gas": True}
+
+
+class _WrongElementalMassCatalog:
+    """Accepted bound catalog whose K mass is not the stoich owner's."""
+
+    def evaluator_for_hot_train(self, species: str) -> _CeilingLaw:
+        raise ValueError(species)
+
+    def legacy_view(self) -> dict[str, dict[str, dict[str, float]]]:
+        return {"metals": {"K": {"molar_mass_g_mol": 50.0}}}
+
+
+def test_elemental_inventory_cap_uses_evaporation_stoich_not_catalog_mass() -> None:
+    """Elemental K debits K2O through ``_evaporation_stoich``.
+
+    The catalog row says K is 50 g/mol. Production routing does not.
+    The owner's ratio is ``STOICH_RATIOS`` for K2O, the handwritten
+    M(K2O) / (2 * M(K)). A computed K2O_gas draw is reserved first, and
+    the remaining oxide is converted to K with that ratio, not with 50.
+    """
+
+    host = EvaporationMixin.__new__(EvaporationMixin)
+    host.species_formula_registry = {}
+    owned = host._evaporation_stoich("K", {"parent_oxide": "K2O"})
+    owner_ratio = float(owned["oxide_per_product_kg"])
+    assert owner_ratio == pytest.approx(_K_SANITY_OXIDE_PER_VAPOUR, rel=1e-12)
+    catalog_ratio = (94.1956 / 2.0) / 50.0
+    assert catalog_ratio != pytest.approx(owner_ratio, rel=1e-6)
+    charge = 0.01
+    computed_oxide = 0.004
+    remainder = charge - computed_oxide
+    assert _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA) > remainder / owner_ratio
+    catalog = _WrongElementalMassCatalog()
+    k_channel = _alkali_inventory_channel(
+        "K",
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide="K2O",
+        stoich_oxide_per_vapor=None,
+    )
+    k2o_channel = _alkali_inventory_channel(
+        "K2O_gas",
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide="K2O",
+        stoich_oxide_per_vapor=1.0,
+    )
+    snapshot = SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        vapour_catalog=catalog,
+        inventory=SimpleNamespace(melt_oxide_kg={"K2O": charge}),
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={"K2O_gas": computed_oxide},
+            species_kg_hr={"K2O_gas": computed_oxide},
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={
+                "K": k_channel,
+                "K2O_gas": k2o_channel,
+            },
+        ),
+    )
+    expected_k = remainder / owner_ratio
+    catalog_k = remainder / catalog_ratio
+    for order in (("K", "K2O_gas"), ("K2O_gas", "K")):
+        bounds = _optimizer_refused_flux_bounds(
+            (snapshot,),
+            order,
+            catalog=catalog,
+        )
+        assert bounds["K2O_gas"] == _approx_kg(computed_oxide)
+        assert bounds["K"] == _approx_kg(expected_k)
+        assert bounds["K"] != _approx_kg(catalog_k)
+        oxide_kg = bounds["K"] * owner_ratio + bounds["K2O_gas"]
+        assert oxide_kg == _approx_kg(charge)
+        assert bounds.inventory_capped == {"K": True}
+
+
 def test_computed_activity_beats_activity_one_and_the_cap_is_the_floor() -> None:
     """A computed activity replaces activity 1. The inventory cap does not.
 
