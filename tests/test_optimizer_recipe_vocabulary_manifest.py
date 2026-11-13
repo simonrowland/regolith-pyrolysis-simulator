@@ -26,11 +26,12 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     digest = payload.pop("payload_digest")
     # b-282: upstream wall knobs search down to the coldest downstream
     # collector interface (20 C) instead of the SiO-quiescent 1400 C figure.
+    # Regenerated from the merged schema (b261 wall floor + constackfix routes).
     # Conditional subspace dimensions stay unchanged.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "c97b737996a4f35521a03926691649d0f72e4097fd220a7ddc7097ea539aaa4d"
+        "36c51c35fc374986022dff805db288fbf2ef09d63f49f04ef6990d66064d0698"
     )
-    assert digest == "b01c7966a0c21eccbfb87c5b9cbc1ea776ff740b294c88d20953a0109f73fc8d"
+    assert digest == "5a830cfc005bc6674cec2895d92bd80bca5ce151e10d436ce7af0c93eaf02e8b"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
