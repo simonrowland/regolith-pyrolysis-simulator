@@ -1,0 +1,137 @@
+{
+  "backend_result": [
+    "ok",
+    0.005733509809835116,
+    null,
+    {
+      "Al2O3": 9.63315029430273e-10,
+      "Ca3(PO4)2": 5.483536746159934e-07,
+      "CaSiO3": 1.0415874496748264e-08,
+      "CoSi0.5O2": 3.1852409438683e-08,
+      "Fe2O3": 1.2807495908545925e-08,
+      "Fe2SiO4": 4.535523703749395e-08,
+      "H2O": 2.0166066254814943e-15,
+      "KAlSiO4": 2.1587331066922367e-09,
+      "Mg2SiO4": 0.14946037233260556,
+      "MgCr2O4": 1.224766350241236e-07,
+      "MnSi0.5O2": 4.048000668632783e-08,
+      "Na2SiO3": 2.1723316207859552e-11,
+      "NiSi0.5O2": 5.7452452252301524e-08,
+      "SiO2": 0.8791774689228926,
+      "TiO2": 7.127042368421004e-08
+    },
+    {},
+    [],
+    {},
+    {},
+    {},
+    {
+      "MgO": 14.2752928205477,
+      "SiO2": 85.7247071794523
+    },
+    {
+      "Fe2O3_wt_pct": 0.0,
+      "FeO_wt_pct": 0.0
+    },
+    {
+      "diagnostics": {
+        "authoritative_for_requested_vapor_pressure": false,
+        "vapor_pressure_backend_status": "refused",
+        "vapor_pressure_backend_status_reason": "undefined_fO2"
+      },
+      "notice_codes": [],
+      "notice_values": [],
+      "warning_codes": [
+        90,
+        90,
+        90,
+        90,
+        90,
+        90,
+        90,
+        90,
+        90,
+        90,
+        90,
+        90,
+        90
+      ],
+      "warning_values": [
+        {
+          "position": 0,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='TiO2' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 1,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='Al2O3' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 2,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='FeO' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 3,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='Fe2O3' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 4,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='CaO' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 5,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='Na2O' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 6,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='K2O' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 7,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='Cr2O3' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 8,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='MnO' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 9,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='P2O5' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 10,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='NiO' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 11,
+          "text": "SR15:alphamelts_composition_mapping_repaired producer=AlphaMELTS field=composition_melts_wt_pct species='CoO' action=dropped reason=nonpositive"
+        },
+        {
+          "position": 12,
+          "text": "ThermoEngine status: success, Optimal residual norm."
+        }
+      ]
+    }
+  ],
+  "engine": "thermoengine",
+  "provenance": {
+    "captured_at_utc": "2026-11-13T13:13:59.826710+00:00",
+    "engine_identity": {
+      "backend_class": "ThermoEngineBackend",
+      "backend_module": "simulator.melt_backend.thermoengine",
+      "configured_identity": {
+        "digest": "sha256:e7f3f959424820e0ebe712b95b5d66b7a4e23a29b9869dd1e2a484affe409f74",
+        "name": "thermoengine",
+        "version": "thermoengine MELTS 1.0.2 (liq_mod v1.0)"
+      }
+    },
+    "engine_version": "thermoengine MELTS 1.0.2 (liq_mod v1.0) (digest=sha256:e7f3f959424820e0ebe712b95b5d66b7a4e23a29b9869dd1e2a484affe409f74) (adapter=regolith-thermoengine-v2)",
+    "engine_version_source": "backend.get_engine_version",
+    "git_sha": "ae671a9ddca3e9690dcfb4ea648898761b785d57",
+    "host": "Mac-Studio-256-3.local"
+  },
+  "request": {
+    "po2_mode": "engine_default",
+    "pot_id": "mgo_sio2_40_60",
+    "temperature_K": 1700.0
+  }
+}
