@@ -545,6 +545,58 @@ def _migrate_real_extract(
     return migrate(root, write=write)
 
 
+def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import (
+        ScoreContext,
+        comparison_candidates,
+        rail_for_quantity,
+    )
+
+    result = _migrate_real_extract(
+        tmp_path, "norris-2016-trace-volatility-thesis.yaml"
+    )
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "norris-2016-trace-volatility-thesis"
+        and observation.locator.table == "5.7"
+    ]
+
+    assert len(rows) == 64
+    assert not result.validation.hard_issues
+    assert rail_for_quantity(Quantity.ELEMENT_RETENTION_RATIO) is Rail.RESIDUE_COMPOSITION
+    score_context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+        benches=result.benches,
+    )
+    scored_norris_rows = [
+        observation
+        for observation in comparison_candidates(score_context)
+        if observation.source_id == "norris-2016-trace-volatility-thesis"
+        and observation.locator.table == "5.7"
+        and rail_for_quantity(
+            quantity_token(observation.identity),
+            species_formula=observation.identity.species.formula,
+        )
+        is Rail.RESIDUE_COMPOSITION
+    ]
+    assert len(scored_norris_rows) == 64
+    for observation in rows:
+        assert quantity_token(observation.identity) is Quantity.ELEMENT_RETENTION_RATIO
+        assert observation.identity.subtype.is_value
+        assert observation.identity.subtype.value == "concentration_retention"
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.composition.is_value
+        assert observation.point_conditions is not None
+        assert {"temperature_K", "fO2_log"} <= set(
+            observation.point_conditions
+        )
+
+
 def test_identity_equal_transition_temperature_conflict_and_green_unknown(
     tmp_path: Path,
 ) -> None:
