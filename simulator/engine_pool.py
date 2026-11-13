@@ -643,6 +643,10 @@ class _EngineWorkerLaunch:
         self.process_start_finished = threading.Event()
         self.started = threading.Event()
         self.finished = threading.Event()
+        # start() sets this after the ready-frame read. The owner waits
+        # before it drops the parent pipe; see
+        # _wait_for_handshake_before_release.
+        self.handshake_released = threading.Event()
         self.start_error: BaseException | None = None
         self.graceful_cancel = False
         self.diagnostic_cancel = False
@@ -1046,6 +1050,29 @@ class WarmEngineWorker:
     def _launch_thread_name(self) -> str:
         return f'{self.name} launch owner'
 
+    def _wait_for_handshake_before_release(
+        self,
+        launch: _EngineWorkerLaunch,
+    ) -> None:
+        """Hold the parent pipe until ``start`` finishes the ready read.
+
+        The child can ``os._exit`` after ``launch.started`` and before the
+        handshake thread runs. The owner reaps that child immediately. If
+        it then closes the parent connection and clears ``self.process``
+        and ``self.connection``, ``start`` sees a missing launch plus a
+        stored exit code and raises ``EOFError("<name> worker exited
+        before its ready frame")`` instead of the pipe's empty
+        ``EOFError``. A pre-ready restart death is that empty pipe EOF.
+        """
+        # A partial-frame timeout requests cleanup inside the ready read.
+        # Cancellation must release this hold, or that reader waits for
+        # the owner while the owner waits for the reader to return.
+        while not launch.cancel_requested.is_set():
+            if launch.handshake_released.wait(
+                timeout=ENGINE_WORKER_CANCEL_POLL_S,
+            ):
+                break
+
     def _own_process_until_done(self, launch: _EngineWorkerLaunch) -> None:
         process = launch.process
         while process.is_alive():
@@ -1165,6 +1192,7 @@ class WarmEngineWorker:
                     process.join(timeout=ENGINE_WORKER_CANCEL_POLL_S)
             if started:
                 process.join(timeout=0.0)
+                self._wait_for_handshake_before_release(launch)
             self._close_connection_or_defer(launch.connection)
             self._release_process_records(
                 process,
@@ -1349,6 +1377,7 @@ class WarmEngineWorker:
                 self.process = None
                 self.connection = None
             raise
+        handshake_exc: BaseException | None = None
         try:
             if not launch.started.wait(
                 timeout=startup_timeout + ENGINE_WORKER_SPAWN_SLACK_S
@@ -1422,6 +1451,13 @@ class WarmEngineWorker:
                 abort_event=abort_event,
             )
         except (EOFError, OSError, TimeoutError) as exc:
+            handshake_exc = exc
+        finally:
+            # Before any discard waits for the owner. The owner is
+            # blocked in _wait_for_handshake_before_release until then,
+            # so the ready read still sees this launch.
+            launch.handshake_released.set()
+        if handshake_exc is not None:
             self._discard_current(
                 diagnostic=False,
                 expected_process=process,
@@ -1431,13 +1467,15 @@ class WarmEngineWorker:
             # OSError (including BlockingIOError) stays itself so a
             # respawn records that type. EOF and a dead pipe are the
             # worker exiting before ready.
-            if isinstance(exc, TimeoutError) or exc is launch.start_error:
-                raise
+            if isinstance(handshake_exc, TimeoutError) or (
+                handshake_exc is launch.start_error
+            ):
+                raise handshake_exc
             raise EngineWorkerDied(
                 'start',
-                f'{type(exc).__name__}: {exc}',
+                f'{type(handshake_exc).__name__}: {handshake_exc}',
                 returncode=getattr(process, 'exitcode', None),
-            ) from exc
+            ) from handshake_exc
         if message[0] == 'timeout':
             self._discard_current(
                 diagnostic=False,
