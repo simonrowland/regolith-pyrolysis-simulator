@@ -39,6 +39,7 @@ from simulator.diagnostic_helpers.gibbs_battery import (
     formation_subtraction_kJ_mol,
 )
 from simulator.reference_data.janaf import formula_composition
+from simulator.physical_constants import ATM_PA_DECIMAL, BAR_PA_DECIMAL
 from simulator.vapour_rail.nasa_cea import Nasa9Segment, R_J_PER_MOL_K
 
 REFERENCE_T_K = 298.15
@@ -127,8 +128,8 @@ def source_pressure_Pa(record: Mapping[str, Any]) -> float | None:
     scale = {
         "MPa": Decimal("1e6"),
         "kPa": Decimal("1e3"),
-        "bar": Decimal("1e5"),
-        "atm": Decimal("101325"),
+        "bar": BAR_PA_DECIMAL,
+        "atm": ATM_PA_DECIMAL,
         "Pa": Decimal(1),
     }[match.group(2)]
     return float(amount * scale)

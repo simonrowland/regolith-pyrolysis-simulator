@@ -932,6 +932,38 @@ def test_provider_liquidus_exception_surfaces_status_reason(intent):
         ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
     ],
 )
+def test_provider_unknown_liquidus_exception_is_raised(intent):
+    from simulator.melt_backend.base import MeltBackendError
+
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    failure = MeltBackendError('unclassified liquidus failure')
+
+    def fail_liquidus(**_kwargs):
+        raise failure
+
+    backend.find_liquidus_solidus = fail_liquidus
+    provider = AlphaMELTSProvider(backend=backend)
+    request = _make_request(
+        intent,
+        composition_mol=_basalt_species_mol(),
+    )
+
+    with pytest.raises(MeltBackendError, match='unclassified liquidus failure') as exc:
+        provider.dispatch(request)
+
+    assert exc.value is failure
+
+
+@pytest.mark.parametrize(
+    'intent',
+    [
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+    ],
+)
 @pytest.mark.parametrize(
     ('cause_name', 'expected_status'),
     [

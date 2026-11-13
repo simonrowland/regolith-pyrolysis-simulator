@@ -43,6 +43,17 @@ table:
     state: l
   title_as_published: Magnesium (Mg)  |  Mg1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  fusion_transition:
+    temperature:
+      value: 923
+      uncertainty: 1
+      unit: K
+      locator: "JANAF 4th ed. p. 1531 (PDF p. 1542), T_fus = 923 ± 1 K"
+    enthalpy:
+      value: 8.477
+      uncertainty: 0.418
+      unit: kJ mol^-1
+      locator: "JANAF 4th ed. p. 1531 (PDF p. 1542), Δ_fusH°(923 K) = 8.477 ± 0.418 kJ mol^-1"
   units_as_published:
     temperature: K
     heat_capacity: J K^-1 mol^-1

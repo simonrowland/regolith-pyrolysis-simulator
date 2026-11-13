@@ -11,7 +11,6 @@ from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
-from simulator.yaml_cache import load_cached_safe_yaml
 try:
     from flask import request, session as flask_session
 except ModuleNotFoundError:
@@ -96,7 +95,6 @@ from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
 # owns that runner-format summary and returns it in ``StepResult``; this
 # adapter only emits it alongside the legacy ``simulation_tick`` payload.
 from web.feedstock_data import load_visible_feedstocks
-from simulator.config import _load_setpoints_file
 from web.advisory import (
     active_wall_species_from_flue,
     ceramic_rump_payload,
@@ -108,19 +106,14 @@ from web.advisory import (
     wall_advisory_payload,
 )
 from web.run_store import get_run_store, persist_run_artifact
+from web.yaml_data import load_yaml as _load_web_yaml
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
 
 
 def _load_yaml(filename):
-    path = DATA_DIR / filename
-    if filename == 'setpoints.yaml':
-        return _load_setpoints_file(path)
-    if not path.exists():
-        return {}
-    with open(path) as f:
-        return load_cached_safe_yaml(f.read()) or {}
+    return _load_web_yaml(filename, DATA_DIR)
 
 
 # Active simulations keyed by session ID

@@ -31,9 +31,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Figure 16, second-law vaporization fit
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source admission_status=rejected_no_figure_reading
@@ -55,6 +54,32 @@ observations:
     figure: '16'
     note: van't Hoff plot for enthalpy of vaporization of Au
   read_from: pdf:kems-139-jacobson-2024
+  derivation:
+    relation: Second-law enthalpy from the van't Hoff slope in Equation (23b) for the Au vaporization plot.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 24
+        published_page: 23
+        figure: '16'
+        note: Figure 16 shows the van't Hoff fit but does not tabulate the underlying measurements.
+    method:
+      state:
+        tag: value
+        value: Van't Hoff second-law fit of the Au vaporization data using Equation (23b).
+      locator:
+        page: 23
+        published_page: 22
+        section: 3.1.1 Second law thermodynamic method
+        equation: 23b
+    references: []
+  provenance:
+    printed_phase: Au
 - observation_id: kems-139-jacobson-2024::jacobson_2024_hfo_delta_fH_kems_vs_ccsdt
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -99,6 +124,8 @@ observations:
     pdf_page_index: 23
     paragraph: The computed enthalpy of formation of HfO(g) using CCSD(T)
   read_from: pdf:kems-139-jacobson-2024
+  provenance:
+    printed_phase: HfO_gas
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t1_demaria_observed_species
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -142,610 +169,87 @@ observations:
     table: '1'
     note: Vapors observed (De Maria et al. 118) column; checkmarks and extra names Cr, AlO, Al2O
   read_from: pdf:kems-139-jacobson-2024
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=0d961a132e64
+  provenance:
+    printed_phase: Apollo_12_lunar_basalt_12022
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=085f26e0548b
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: K
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
       tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=0e35afbec232
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: O
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=22a6308ffb70
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: P
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=30ff34758a56
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: K2
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=3572ac165c05
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: SiO
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=42696be8be5a
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: Ti
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4c03a6797e19
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: CaO
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4de3eec4d492
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: O2
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=69c8c69b6bb4
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: TiO
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=724db990a5f0
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: Fe
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=74d5773621a8
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
+      value: p_partial
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '456.9408'
     approximate: false
   uncertainty:
     kind: printed
@@ -754,13 +258,18 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=085f26e0548b
   source_id: kems-139-jacobson-2024
   locator:
     page: 19
@@ -780,30 +289,166 @@ observations:
         pdf_page_index: 18
         table: '1'
         note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=87bebe4f0dc4
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.004569408'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.004569408'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=0d79c9a815ce
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
+      tag: value
+      value: p_partial
     species:
-      formula: Si
+      formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '11.6427'
     approximate: false
   uncertainty:
     kind: printed
@@ -812,13 +457,18 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=0d79c9a815ce
   source_id: kems-139-jacobson-2024
   locator:
     page: 19
@@ -838,204 +488,166 @@ observations:
         pdf_page_index: 18
         table: '1'
         note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=8909c73dbda3
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: Ca
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000116427'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000116427'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
       state:
         tag: value
-        value: '2500'
+        value: not_printed
       locator:
         page: 19
         published_page: 18
-        pdf_page_index: 18
         table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=8a4250e30775
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: SiO2
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
       state:
         tag: value
-        value: '2500'
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
       locator:
         page: 19
         published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=8e91d02ef91b
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=148d76c37466
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: Na
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
       tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=9068cb979358
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
+      value: p_partial
     species:
       formula: PO
       phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '192.5179'
     approximate: false
   uncertainty:
     kind: printed
@@ -1044,13 +656,18 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=148d76c37466
   source_id: kems-139-jacobson-2024
   locator:
     page: 19
@@ -1070,262 +687,166 @@ observations:
         pdf_page_index: 18
         table: '1'
         note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c048d1e20a62
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: KO
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.001925179'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.001925179'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
       state:
         tag: value
-        value: '2500'
+        value: not_printed
       locator:
         page: 19
         published_page: 18
-        pdf_page_index: 18
         table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c19469749fc3
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: TiO2
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
       state:
         tag: value
-        value: '2500'
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
       locator:
         page: 19
         published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=dc8fb3e575aa
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=2d4b37a0d102
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: Al
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
       tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=e0c484f68fb4
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
-    species:
-      formula: FeO
-      phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '2500'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none stated; FactSage model output
-  evidence:
-    class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-139-jacobson-2024
-  locator:
-    page: 19
-    published_page: 18
-    pdf_page_index: 18
-    table: '1'
-    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-  read_from: pdf:kems-139-jacobson-2024
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2500'
-      locator:
-        page: 19
-        published_page: 18
-        pdf_page_index: 18
-        table: '1'
-        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
-- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=f9397cac3476
-  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'predicted_partial_pressure'
+      value: p_partial
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'lunar_basalt_12022_factsage_slag' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '10.7833'
     approximate: false
   uncertainty:
     kind: printed
@@ -1334,13 +855,18 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=2d4b37a0d102
   source_id: kems-139-jacobson-2024
   locator:
     page: 19
@@ -1360,6 +886,3470 @@ observations:
         pdf_page_index: 18
         table: '1'
         note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000107833'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000107833'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=3ae0551751df
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '6.14219'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=3ae0551751df
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000614219'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000614219'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4b6ce02b825e
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.010955'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4b6ce02b825e
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000010955'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000010955'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4ff270e9de2a
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '280.0994'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=4ff270e9de2a
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.002800994'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.002800994'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=57cfb9138d04
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Si
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000317871'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=57cfb9138d04
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000317871'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000000317871'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=682e0f735071
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '15.6368'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=682e0f735071
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000156368'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000156368'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=7311d06d4287
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '454.1139'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=7311d06d4287
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.004541139'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.004541139'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=a99d70dd4b6e
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.385922'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=a99d70dd4b6e
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000385922'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000385922'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=ad7c133d4729
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: K2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000801489'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=ad7c133d4729
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000801489'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000000801489'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=bb79cf1e67d5
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0018925'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=bb79cf1e67d5
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000018925'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000018925'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c4adc883eeef
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ti
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00000185167'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c4adc883eeef
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000000185167'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000000000185167'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c564bd713c6a
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: TiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0200284'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=c564bd713c6a
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000200284'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000000200284'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=cfdd19c7d49a
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '331.7841'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=cfdd19c7d49a
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.003317841'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.003317841'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=e5c404b90049
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.734285'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=e5c404b90049
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000734285'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000734285'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=e80d9dad209f
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '79.4608'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=e80d9dad209f
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000794608'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000794608'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=f445a58be450
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: KO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.108059'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=f445a58be450
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000108059'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000108059'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=fb6a7a9f0c30
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '31.189'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=fb6a7a9f0c30
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00031189'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00031189'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
+- observation_id: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=fc35c8185985
+  experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000366595'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; FactSage model output
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat::T=2500.0:h=fc35c8185985
+  source_id: kems-139-jacobson-2024
+  locator:
+    page: 19
+    published_page: 18
+    pdf_page_index: 18
+    table: '1'
+    note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  read_from: pdf:kems-139-jacobson-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 19
+        published_page: 18
+        pdf_page_index: 18
+        table: '1'
+        note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+  derivation:
+    relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database
+      in FactSage at 2500 K.
+    inputs: []
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000366595'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000000366595'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                page: 19
+                published_page: 18
+                pdf_page_index: 18
+                table: '1'
+                note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+          output_unit: Pa
+          references: []
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          page: 19
+          published_page: 18
+          pdf_page_index: 18
+          table: '1'
+          note: Predicted vapor species of a lunar basalt at 2500 K (from FactSage ref. 115 calculations)
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 19
+        published_page: 18
+        table: '1'
+        note: Table 1 prints the basalt composition, but the paper does not give the full FactSage input set or intermediate
+          calculation inputs.
+    method:
+      state:
+        tag: value
+        value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+      locator:
+        page: 19
+        published_page: 18
+        section: '2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated
+          vapor pressures for the condensed phase in the Knudsen cell'
+        note: For a complex system with multiple vapor species, a Gibbs free energy minimization code can predict many of
+          the expected species. As an example, take a complex lunar basalt [117] and calculate the expected vapor species
+          using the SLAG database in FactSage [115] at 2500 K.
+    references:
+    - Bale et al. [115]
+    - Snyder et al. [117]
+  provenance:
+    printed_phase: gas
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t1_snyder_12022_composition
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1403,6 +4393,8 @@ observations:
     table: '1'
     note: Chemical analysis (Snyder et al. 117) of lunar basalt sample 12022
   read_from: pdf:kems-139-jacobson-2024
+  provenance:
+    printed_phase: lunar_basalt_12022
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_second_law_narrative
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1461,6 +4453,8 @@ observations:
         published_page: 23
         pdf_page_index: 23
         paragraph: A second law plot of ln(IT) versus 1/T
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_average_narrative
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1508,6 +4502,8 @@ observations:
     pdf_page_index: 23
     paragraph: The average of the third law enthalpies of reaction
   read_from: pdf:kems-139-jacobson-2024
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_compilation::T=1934.0:h=d5d831056579
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1565,6 +4561,8 @@ observations:
         pdf_page_index: 23
         table: '2'
         note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_compilation::T=1945.0:h=1c3a54cbd68f
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1622,6 +4620,8 @@ observations:
         pdf_page_index: 23
         table: '2'
         note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_compilation::T=1952.0:h=8df6c39de2b4
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1679,6 +4679,8 @@ observations:
         pdf_page_index: 23
         table: '2'
         note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_compilation::T=1957.0:h=8b66451776d1
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1736,6 +4738,8 @@ observations:
         pdf_page_index: 23
         table: '2'
         note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_compilation::T=1986.0:h=8dd2eb021923
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1793,6 +4797,8 @@ observations:
         pdf_page_index: 23
         table: '2'
         note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_compilation::T=1994.0:h=9078bc249cef
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1850,6 +4856,8 @@ observations:
         pdf_page_index: 23
         table: '2'
         note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_compilation::T=2004.0:h=c9c726000544
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1907,6 +4915,8 @@ observations:
         pdf_page_index: 23
         table: '2'
         note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant
 - observation_id: kems-139-jacobson-2024::jacobson_2024_t2_hfo_third_law_compilation::T=2034.0:h=06f28217fb4e
   experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
   identity:
@@ -1964,3 +4974,5 @@ observations:
         pdf_page_index: 23
         table: '2'
         note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+  provenance:
+    printed_phase: Hf_plus_HfO2_univariant

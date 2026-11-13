@@ -3228,6 +3228,7 @@ observations:
       note: Stull is a compiled multi-source table. Phase purity (solid vs liquid; arsenolite vs claudetite) across 485.7–730.4
         K is not licensed from this extract; gap 421.69–485.7 K is not interpolated. Locator is the NIST Antoine row for 485.7–730.4
         K (NIST_Stull47_As2O3_highT).
+    printed_phase: highT_compiled
 - observation_id: nist-webbook::NIST_Stull_Se_total_P
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::nist-webbook
   identity:
@@ -3272,6 +3273,8 @@ observations:
     note: NIST_Stull_Se_total_P
     record: NIST_Stull_Se_total_P
   read_from: unknown:nist-webbook
+  provenance:
+    printed_phase: liquid
 - observation_id: nist-webbook::NO2_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::nist-webbook
   identity:
@@ -3845,6 +3848,8 @@ observations:
     note: NIST-WB Selenium critical constants citing Rau 1974
     record: Rau74_critical_constants
   read_from: unknown:nist-webbook
+  provenance:
+    printed_phase: gas
 - observation_id: nist-webbook::SO2_melting_point
   experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::nist-webbook
   identity:

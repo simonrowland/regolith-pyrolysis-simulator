@@ -2,7 +2,7 @@
 
 Status: owner-gated draft; not filed.
 
-Patches in this directory, in order: 0001, 0002, 0003, each formatted with `git format-patch` against
+This draft covers patches 0001, 0002 and 0003 (0004 has its own draft in UPSTREAM-SUBMISSION.md), each formatted with `git format-patch` against
 `40ed109` (tag v1.9.6). MAGEMin's sources use CRLF line endings, so apply with `git am --keep-cr`.
 The text below is the proposed pull-request description.
 

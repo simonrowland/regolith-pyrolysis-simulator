@@ -17,7 +17,7 @@ stored_observation:
   - Na2O
   method_class: measured_reduced for Eq. [4] Na pressure and Eq. [6] Na2O activity; measured_direct typed-refused
     bundle preserves printed Table I inputs
-  conditions: row-specific T_C, binary composition, pure CO carrier gas and P (atm); no numeric O2/fO2 condition
+  conditions: row-specific T_C, analyzed binary melt composition (datum_state; printed mol%), CO carrier, graphite C-CO buffer, and printed per-run total P (atm); no numeric per-run P_CO or printed fO2; no run-specific starting-charge composition
   standard_state: pure liquid Na2O, as printed in the abstract
 render_audit:
   result: 31 experimental rows (15 at 1300 C and 16 at 1400 C); six printed columns; two merged temperature headings

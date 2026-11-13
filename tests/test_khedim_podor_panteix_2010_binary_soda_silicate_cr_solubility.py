@@ -214,8 +214,14 @@ def test_isolated_migration_keeps_all_table2_points_and_conditions(tmp_path: Pat
         ]
         assert len(matches) == 1, row["observation_id"]
         observation = matches[0]
-        assert observation.value.kind.value == "point"
-        assert observation.value.point == row["component_amount"]
+        # 20d0c11e7 (t-1600) refuses at.% because the atom_fraction basis does
+        # not exist. The printed amount is not stored as a mole fraction.
+        # The printed one-sigma width is still the published parenthetical.
+        assert observation.value.kind.value == "unavailable"
+        assert observation.value.unavailable_reason == (
+            "at.% requires the missing atom_fraction basis; "
+            "it cannot be stored as mole_fraction"
+        )
         assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         assert observation.identity.species.formula == "Cr"
         assert observation.identity.species.phase.value is Phase.L

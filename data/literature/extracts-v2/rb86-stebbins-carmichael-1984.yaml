@@ -51,7 +51,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -183,6 +183,8 @@ observations:
         note: The capsule-wall iron concentration is described spatially and integrated to an estimated 1–2% iron loss as
           FeO; the underlying spatial measurements and integration are not tabulated.
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_equation6_liquid_enthalpy_fit
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -286,6 +288,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_hypothetical_congruent_fusion
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_fusion_enthalpy_calculation
   identity:
@@ -437,6 +441,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_incongruent_fusion_1490k_1bar
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_incongruent_fusion_1490k_1bar
   identity:
@@ -582,6 +588,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_liquid_fit_coefficients
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -685,6 +693,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run198_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -786,6 +796,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 198; table_row_number=8; table_column_number=3; column=ΔH; phase=solid
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run199_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -887,6 +899,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 199; table_row_number=9; table_column_number=3; column=ΔH; phase=solid
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run202_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -988,6 +1002,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 202; table_row_number=10; table_column_number=3; column=ΔH; phase=solid
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run205_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1089,6 +1105,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 205; table_row_number=12; table_column_number=3; column=ΔH; phase=solid
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run208_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1190,6 +1208,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 208; table_row_number=13; table_column_number=3; column=ΔH; phase=solid
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run210_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1290,6 +1310,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 210; table_row_number=8; table_column_number=6; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run211_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1390,6 +1412,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 211; table_row_number=9; table_column_number=6; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run213_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1490,6 +1514,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 213; table_row_number=10; table_column_number=6; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run215_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1590,6 +1616,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 215; table_row_number=11; table_column_number=6; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run218_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1690,6 +1718,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 218; table_row_number=12; table_column_number=6; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run219_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1790,6 +1820,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 219; table_row_number=14; table_column_number=6; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run221_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1890,6 +1922,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 221; table_row_number=15; table_column_number=6; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run223_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -1991,6 +2025,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 223; table_row_number=14; table_column_number=3; column=ΔH; phase=solid; run_footnote_as_printed=2
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run226_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -2092,6 +2128,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 226; table_row_number=15; table_column_number=3; column=ΔH; phase=solid; run_footnote_as_printed=2
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run230_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -2192,6 +2230,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 230; table_row_number=16; table_column_number=6; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c1_run294_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1
   identity:
@@ -2293,6 +2333,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 294; table_row_number=11; table_column_number=3; column=ΔH; phase=solid
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c2_run238_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c2
   identity:
@@ -2393,6 +2435,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 238; table_row_number=3; table_column_number=3; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c2_run241_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c2
   identity:
@@ -2493,6 +2537,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 241; table_row_number=4; table_column_number=3; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table1_c2_run242_enthalpy_increment
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c2
   identity:
@@ -2593,6 +2639,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=run 242; table_row_number=5; table_column_number=3; column=ΔH; phase=liquid
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_fe2o3_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -2690,6 +2738,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_femetallic_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -2776,6 +2826,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_feo_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -2862,6 +2914,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_feotot_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -2948,6 +3002,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_after_calorimetry_sio2_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3034,6 +3090,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_fe2o3_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3131,6 +3189,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_femetallic_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3217,6 +3277,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_feo_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3303,6 +3365,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_feotot_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3389,6 +3453,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c1_starting_material_sio2_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3475,6 +3541,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_fe2o3_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3576,6 +3644,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_femetallic_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3673,6 +3743,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feo_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3778,6 +3850,8 @@ observations:
         note: The individual chemical assay readings are not separately printed; 62.3 wt.% is the published C-2 post-calorimetry
           FeO composition.
     references: []
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_feotot_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3864,6 +3938,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_calorimetry_sio2_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3950,6 +4026,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_after_equilibrium_liquid_fe2o3
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -3999,7 +4077,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4115,6 +4193,8 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_fe2o3_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -4218,6 +4298,8 @@ observations:
         table: '2'
         note: The electron-microprobe input totals used in this reduction are not separately printed.
     references: []
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_femetallic_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -4304,6 +4386,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_feo_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -4407,6 +4491,8 @@ observations:
         table: '2'
         note: The electron-microprobe input totals used in this reduction are not separately printed.
     references: []
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_feotot_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -4493,6 +4579,8 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr
 - observation_id: rb86-stebbins-carmichael-1984::sc1984_table2_c2_starting_material_sio2_bulk_analysis
   experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses
   identity:
@@ -4579,3 +4667,5 @@ observations:
         pdf_page_index: 2
         table: '2'
         note: The chemical-analysis measurement temperature is not printed.
+  provenance:
+    printed_phase: cr

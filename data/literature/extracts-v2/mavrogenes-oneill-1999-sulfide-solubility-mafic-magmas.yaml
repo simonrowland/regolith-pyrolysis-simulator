@@ -65,9 +65,10 @@ observations:
         - - K2O
           - '0.004563156628449429033272838923'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000001168368280693266865021975899'
     total_pressure_Pa:
       tag: value
       value: '1500000000'
@@ -126,6 +127,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav10_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.72; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=15000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav10_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.72 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-10.932420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav10_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.72 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-10.932420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav10_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -340,9 +366,10 @@ observations:
         - - K2O
           - '0.008655816818333936230834028641'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000001466564041279602353317145914'
     total_pressure_Pa:
       tag: value
       value: '2500000000'
@@ -401,6 +428,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav12_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.95; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=25000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav12_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.95 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=25000
+      authority=extrapolated band_dex=0.814 log10_fO2_bar=-10.833698967687126 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav12_s_in_quenched_glass
+    band: '0.814'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.95 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=25000
+      authority=extrapolated band_dex=0.814 log10_fO2_bar=-10.833698967687126 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav12_s_in_quenched_glass
+    band: '0.814'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -615,9 +667,10 @@ observations:
         - - K2O
           - '0.006193544101111057182094149546'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.0000008574703681760905542528750733'
     total_pressure_Pa:
       tag: value
       value: '1000000000'
@@ -676,6 +729,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav14_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.69; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=10000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav14_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.69 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=10000
+      authority=extrapolated band_dex=0.3209 log10_fO2_bar=-11.066780879051918 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav14_s_in_quenched_glass
+    band: '0.3209'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.69 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=10000
+      authority=extrapolated band_dex=0.3209 log10_fO2_bar=-11.066780879051918 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav14_s_in_quenched_glass
+    band: '0.3209'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -890,9 +968,10 @@ observations:
         - - K2O
           - '0.008228288933787354902850545686'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.0000007922431335888311425486762051'
     total_pressure_Pa:
       tag: value
       value: '500000000'
@@ -951,6 +1030,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav1_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.56; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=5000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav1_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.56 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=5000
+      authority=extrapolated band_dex=0.1565 log10_fO2_bar=-11.101141516173514 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav1_s_in_quenched_glass
+    band: '0.1565'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.56 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=5000
+      authority=extrapolated band_dex=0.1565 log10_fO2_bar=-11.101141516173514 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav1_s_in_quenched_glass
+    band: '0.1565'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -1165,9 +1269,10 @@ observations:
         - - K2O
           - '0.005932701787633088939293350966'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.004340899768372424953280803399'
     total_pressure_Pa:
       tag: value
       value: '1500000000'
@@ -1226,6 +1331,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav26_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.85; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=15000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav26_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.85 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-7.362420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav26_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.85 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-7.362420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav26_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -1440,9 +1570,10 @@ observations:
         - - K2O
           - '0.005370988992851898909664870798'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00203637840950432115788721798'
     total_pressure_Pa:
       tag: value
       value: '500000000'
@@ -1501,6 +1632,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav27_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.85; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=5000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav27_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.85 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=5000
+      authority=extrapolated band_dex=0.1565 log10_fO2_bar=-7.691141516173514 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav27_s_in_quenched_glass
+    band: '0.1565'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.85 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=5000
+      authority=extrapolated band_dex=0.1565 log10_fO2_bar=-7.691141516173514 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav27_s_in_quenched_glass
+    band: '0.1565'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -1715,9 +1871,10 @@ observations:
         - - K2O
           - '0.005343532105221793810322097625'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.01693457448960765173631189258'
     total_pressure_Pa:
       tag: value
       value: '1500000000'
@@ -1776,6 +1933,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav29_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.55; calibration=oneill_1988_ammin_73_eq11; T=1773.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0144502 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=15000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav29_s_in_quenched_glass
+    band: ±0.0144502 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.55 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=15000
+      authority=extrapolated band_dex=0.457 log10_fO2_bar=-6.771225711280174 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav29_s_in_quenched_glass
+    band: '0.457'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.55 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=15000
+      authority=extrapolated band_dex=0.457 log10_fO2_bar=-6.771225711280174 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav29_s_in_quenched_glass
+    band: '0.457'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -1990,9 +2172,10 @@ observations:
         - - K2O
           - '0.008165855479151869186149880549'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000001728143324443077691851365097'
     total_pressure_Pa:
       tag: value
       value: '1500000000'
@@ -2051,6 +2234,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav2_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.55; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=15000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav2_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.55 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-10.762420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav2_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.55 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-10.762420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav2_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -2265,9 +2473,10 @@ observations:
         - - K2O
           - '0.004942999238262046725883291708'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.02393077328586312911840318291'
     total_pressure_Pa:
       tag: value
       value: '2500000000'
@@ -2326,6 +2535,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav31_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.39; calibration=oneill_1988_ammin_73_eq11; T=1773.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0144502 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=25000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav31_s_in_quenched_glass
+    band: ±0.0144502 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.39 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=25000
+      authority=extrapolated band_dex=0.7672 log10_fO2_bar=-6.621043267606485 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav31_s_in_quenched_glass
+    band: '0.7672'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.39 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=25000
+      authority=extrapolated band_dex=0.7672 log10_fO2_bar=-6.621043267606485 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav31_s_in_quenched_glass
+    band: '0.7672'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -2540,9 +2774,10 @@ observations:
         - - K2O
           - '0.004751080581617642409963867141'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.007737342916019328762531702178'
     total_pressure_Pa:
       tag: value
       value: '500000000'
@@ -2601,6 +2836,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav32_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.52; calibration=oneill_1988_ammin_73_eq11; T=1773.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0144502 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=5000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav32_s_in_quenched_glass
+    band: ±0.0144502 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.52 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=5000
+      authority=extrapolated band_dex=0.1469 log10_fO2_bar=-7.111408154953862 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav32_s_in_quenched_glass
+    band: '0.1469'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.52 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=5000
+      authority=extrapolated band_dex=0.1469 log10_fO2_bar=-7.111408154953862 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav32_s_in_quenched_glass
+    band: '0.1469'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -2815,9 +3075,10 @@ observations:
         - - K2O
           - '0.002131565673794470146879749804'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.01344596093177649894855983536'
     total_pressure_Pa:
       tag: value
       value: '500000000'
@@ -2876,6 +3137,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav34_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.76; calibration=oneill_1988_ammin_73_eq11; T=1773.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0144502 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=5000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav34_s_in_quenched_glass
+    band: ±0.0144502 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.76 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=5000
+      authority=extrapolated band_dex=0.1469 log10_fO2_bar=-6.871408154953862 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav34_s_in_quenched_glass
+    band: '0.1469'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.76 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=5000
+      authority=extrapolated band_dex=0.1469 log10_fO2_bar=-6.871408154953862 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav34_s_in_quenched_glass
+    band: '0.1469'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -3090,9 +3376,10 @@ observations:
         - - K2O
           - '0.002076439960435268098501734777'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.04253772788383373325980745035'
     total_pressure_Pa:
       tag: value
       value: '1500000000'
@@ -3151,6 +3438,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav36_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.95; calibration=oneill_1988_ammin_73_eq11; T=1773.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0144502 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=15000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav36_s_in_quenched_glass
+    band: ±0.0144502 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.95 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=15000
+      authority=extrapolated band_dex=0.457 log10_fO2_bar=-6.371225711280174 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav36_s_in_quenched_glass
+    band: '0.457'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.95 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=15000
+      authority=extrapolated band_dex=0.457 log10_fO2_bar=-6.371225711280174 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav36_s_in_quenched_glass
+    band: '0.457'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -3365,9 +3677,10 @@ observations:
         - - K2O
           - '0.0021360073389828463048116386'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.02337622015319983218589965865'
     total_pressure_Pa:
       tag: value
       value: '1500000000'
@@ -3426,6 +3739,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav42_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.69; calibration=oneill_1988_ammin_73_eq11; T=1773.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0144502 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=15000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav42_s_in_quenched_glass
+    band: ±0.0144502 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.69 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=15000
+      authority=extrapolated band_dex=0.457 log10_fO2_bar=-6.631225711280174 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav42_s_in_quenched_glass
+    band: '0.457'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.69 calibration=oneill_1988_ammin_73_eq11 T_K=1773.15 P_bar=15000
+      authority=extrapolated band_dex=0.457 log10_fO2_bar=-6.631225711280174 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav42_s_in_quenched_glass
+    band: '0.457'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -3640,9 +3978,10 @@ observations:
         - - K2O
           - '0.004024280271111223637706041777'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '17.46943702617842627772298626'
     total_pressure_Pa:
       tag: value
       value: '9000000000'
@@ -3701,6 +4040,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav45_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=0.43; calibration=oneill_1988_ammin_73_eq11; T=2073.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0178329 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=90000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting,phase_boundary_extrapolation_above_1811_K_Fe_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav45_s_in_quenched_glass
+    band: ±0.0178329 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.43 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=90000
+      authority=extrapolated band_dex=2.3785 log10_fO2_bar=-3.75772109045861 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav45_s_in_quenched_glass
+    band: '2.3785'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.43 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=90000
+      authority=extrapolated band_dex=2.3785 log10_fO2_bar=-3.75772109045861 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav45_s_in_quenched_glass
+    band: '2.3785'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -3915,9 +4279,10 @@ observations:
         - - K2O
           - '0.008478618011693519962833398603'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000001223431781351066366148983251'
     total_pressure_Pa:
       tag: value
       value: '1500000000'
@@ -3976,6 +4341,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav4_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.7; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=15000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav4_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.7 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-10.912420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav4_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.7 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-10.912420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav4_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -4190,9 +4580,10 @@ observations:
         - - K2O
           - '0.002439357333858913075644265814'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '3.513945783218510144791452491'
     total_pressure_Pa:
       tag: value
       value: '4000000000'
@@ -4251,6 +4642,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav52_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.06; calibration=oneill_1988_ammin_73_eq11; T=2073.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0178329 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=40000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting,phase_boundary_extrapolation_above_1811_K_Fe_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav52_s_in_quenched_glass
+    band: ±0.0178329 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.06 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=40000
+      authority=extrapolated band_dex=1.052 log10_fO2_bar=-4.454204943532435 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav52_s_in_quenched_glass
+    band: '1.052'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.06 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=40000
+      authority=extrapolated band_dex=1.052 log10_fO2_bar=-4.454204943532435 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav52_s_in_quenched_glass
+    band: '1.052'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -4465,9 +4881,10 @@ observations:
         - - K2O
           - '0.005405327944904303806439666772'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.4542096525579076585675194029'
     total_pressure_Pa:
       tag: value
       value: '500000000'
@@ -4526,6 +4943,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav54_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.1; calibration=oneill_1988_ammin_73_eq11; T=2073.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0178329 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=5000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting,phase_boundary_extrapolation_above_1811_K_Fe_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav54_s_in_quenched_glass
+    band: ±0.0178329 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.1 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=5000
+      authority=extrapolated band_dex=0.1234 log10_fO2_bar=-5.342743640684113 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav54_s_in_quenched_glass
+    band: '0.1234'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.1 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=5000
+      authority=extrapolated band_dex=0.1234 log10_fO2_bar=-5.342743640684113 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav54_s_in_quenched_glass
+    band: '0.1234'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -4740,9 +5182,10 @@ observations:
         - - K2O
           - '0.005014562580594486289946484159'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '3.204756643204273095013596743'
     total_pressure_Pa:
       tag: value
       value: '4000000000'
@@ -4801,6 +5244,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav55_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.02; calibration=oneill_1988_ammin_73_eq11; T=2073.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0178329 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=40000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting,phase_boundary_extrapolation_above_1811_K_Fe_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav55_s_in_quenched_glass
+    band: ±0.0178329 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.02 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=40000
+      authority=extrapolated band_dex=1.052 log10_fO2_bar=-4.494204943532435 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav55_s_in_quenched_glass
+    band: '1.052'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.02 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=40000
+      authority=extrapolated band_dex=1.052 log10_fO2_bar=-4.494204943532435 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav55_s_in_quenched_glass
+    band: '1.052'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -5015,9 +5483,10 @@ observations:
         - - K2O
           - '0.002343524706857729812990055073'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '1.229998961111260639892580714'
     total_pressure_Pa:
       tag: value
       value: '1000000000'
@@ -5076,6 +5545,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav58a_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=1.4; calibration=oneill_1988_ammin_73_eq11; T=2073.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0178329 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=10000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting,phase_boundary_extrapolation_above_1811_K_Fe_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav58a_s_in_quenched_glass
+    band: ±0.0178329 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.4 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=10000
+      authority=extrapolated band_dex=0.2561 log10_fO2_bar=-4.91009525537673 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav58a_s_in_quenched_glass
+    band: '0.2561'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=1.4 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=10000
+      authority=extrapolated band_dex=0.2561 log10_fO2_bar=-4.91009525537673 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav58a_s_in_quenched_glass
+    band: '0.2561'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -5290,9 +5784,10 @@ observations:
         - - K2O
           - '0.009004887915219348346872596456'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000004428952599542068628740518124'
     total_pressure_Pa:
       tag: value
       value: '2500000000'
@@ -5351,6 +5846,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav5_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.47; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=25000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav5_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.47 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=25000
+      authority=extrapolated band_dex=0.814 log10_fO2_bar=-10.353698967687126 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav5_s_in_quenched_glass
+    band: '0.814'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.47 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=25000
+      authority=extrapolated band_dex=0.814 log10_fO2_bar=-10.353698967687126 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav5_s_in_quenched_glass
+    band: '0.814'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -5565,9 +6085,10 @@ observations:
         - - K2O
           - '0.006068857649776368201093192101'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.0001041309326253585418616878825'
     total_pressure_Pa:
       tag: value
       value: '1500000000'
@@ -5626,6 +6147,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav64_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=0.23; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=15000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav64_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.23 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-8.982420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav64_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.23 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-8.982420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav64_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -5840,9 +6386,10 @@ observations:
         - - K2O
           - '0.006529784889937266258640831486'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00004773736946455382019451877987'
     total_pressure_Pa:
       tag: value
       value: '500000000'
@@ -5901,6 +6448,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav65_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=0.22; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=5000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav65_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.22 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=5000
+      authority=extrapolated band_dex=0.1565 log10_fO2_bar=-9.321141516173514 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav65_s_in_quenched_glass
+    band: '0.1565'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.22 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=5000
+      authority=extrapolated band_dex=0.1565 log10_fO2_bar=-9.321141516173514 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav65_s_in_quenched_glass
+    band: '0.1565'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -6115,9 +6687,10 @@ observations:
         - - K2O
           - '0.003773932636249161571821950533'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.528623749939284176868727372'
     total_pressure_Pa:
       tag: value
       value: '3500000000'
@@ -6176,6 +6749,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav68_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=0.37; calibration=oneill_1988_ammin_73_eq11; T=2073.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0178329 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=35000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting,phase_boundary_extrapolation_above_1811_K_Fe_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav68_s_in_quenched_glass
+    band: ±0.0178329 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.37 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=35000
+      authority=extrapolated band_dex=0.9193 log10_fO2_bar=-5.276853328839818 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav68_s_in_quenched_glass
+    band: '0.9193'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.37 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=35000
+      authority=extrapolated band_dex=0.9193 log10_fO2_bar=-5.276853328839818 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav68_s_in_quenched_glass
+    band: '0.9193'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -6390,9 +6988,10 @@ observations:
         - - K2O
           - '0.006083043879381339609324523912'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '1.562212873780802641787995164'
     total_pressure_Pa:
       tag: value
       value: '5500000000'
@@ -6451,6 +7050,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav69_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=0.31; calibration=oneill_1988_ammin_73_eq11; T=2073.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.0178329 dex; band_basis=absolute canonical-to-Frost
+      1991 spread; pressure=55000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting,phase_boundary_extrapolation_above_1811_K_Fe_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav69_s_in_quenched_glass
+    band: ±0.0178329 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.31 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=55000
+      authority=extrapolated band_dex=1.4499 log10_fO2_bar=-4.8062597876102875 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav69_s_in_quenched_glass
+    band: '1.4499'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=0.31 calibration=oneill_1988_ammin_73_eq11 T_K=2073.15 P_bar=55000
+      authority=extrapolated band_dex=1.4499 log10_fO2_bar=-4.8062597876102875 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav69_s_in_quenched_glass
+    band: '1.4499'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -6665,9 +7289,10 @@ observations:
         - - K2O
           - '0.005389216404152076867205438965'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000006095682055314941944166876372'
     total_pressure_Pa:
       tag: value
       value: '3500000000'
@@ -6726,6 +7351,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav6_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.66; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=35000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav6_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.66 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=35000
+      authority=extrapolated band_dex=1.1427 log10_fO2_bar=-10.214977693443933 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav6_s_in_quenched_glass
+    band: '1.1427'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.66 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=35000
+      authority=extrapolated band_dex=1.1427 log10_fO2_bar=-10.214977693443933 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav6_s_in_quenched_glass
+    band: '1.1427'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -6940,9 +7590,10 @@ observations:
         - - K2O
           - '0.008102505651723761479896392393'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000005309117126127961946527040759'
     total_pressure_Pa:
       tag: value
       value: '3500000000'
@@ -7001,6 +7652,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav7_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.72; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=35000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav7_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.72 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=35000
+      authority=extrapolated band_dex=1.1427 log10_fO2_bar=-10.274977693443933 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav7_s_in_quenched_glass
+    band: '1.1427'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.72 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=35000
+      authority=extrapolated band_dex=1.1427 log10_fO2_bar=-10.274977693443933 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav7_s_in_quenched_glass
+    band: '1.1427'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -7215,9 +7891,10 @@ observations:
         - - K2O
           - '0.005917641223159678249396633011'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000003208492528575881484353470756'
     total_pressure_Pa:
       tag: value
       value: '2500000000'
@@ -7276,6 +7953,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav8_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.61; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=25000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav8_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.61 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=25000
+      authority=extrapolated band_dex=0.814 log10_fO2_bar=-10.493698967687126 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav8_s_in_quenched_glass
+    band: '0.814'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.61 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=25000
+      authority=extrapolated band_dex=0.814 log10_fO2_bar=-10.493698967687126 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav8_s_in_quenched_glass
+    band: '0.814'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -7490,9 +8192,10 @@ observations:
         - - K2O
           - '0.00596156942424065212675177709'
         amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000001768396953559367082222223414'
     total_pressure_Pa:
       tag: value
       value: '1500000000'
@@ -7551,6 +8254,31 @@ observations:
     - equilibrium_phase_composition
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav9_s_in_quenched_glass
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer_relative_fO2_converted: buffer=IW; offset_as_printed=-1.54; calibration=oneill_1988_ammin_73_eq11; T=1673.15
+      K; authority=primary_EMF; calibration_range=833–1450 K; band=±0.02202 dex; band_basis=absolute canonical-to-Frost 1991
+      spread; pressure=15000 bar; pressure correction=Frost 1991 molar-volume ΔV term; relative_definition_notice=delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7;
+      source definition: log fO2 = -ΔG°(11)/22.3RT + 2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO; prediction_flags=predict_and_flag_outside_range_833_1450_K,phase_boundary_extrapolation_above_1650_K_FeO_melting'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav9_s_in_quenched_glass
+    band: ±0.02202 dex; outside calibration range 833–1450 K
+  - kind: buffer_calibration_not_printed_canonical_used
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.54 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-10.752420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav9_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
+  - kind: out_of_certified_band
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'buffer-relative fO2 converted: buffer=IW offset=-1.54 calibration=oneill_1988_ammin_73_eq11 T_K=1673.15 P_bar=15000
+      authority=extrapolated band_dex=0.4853 log10_fO2_bar=-10.752420241930321 provenance=primary_emf buffer_as_printed=delta_IW'
+    origin: mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas::mavrogenes_oneill_1999_mav9_s_in_quenched_glass
+    band: '0.4853'
+    authority: extrapolated
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition

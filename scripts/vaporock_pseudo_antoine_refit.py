@@ -30,6 +30,7 @@ from simulator.melt_backend.melt_envelope import (
     melt_extrapolation_diagnostic,
 )
 from simulator.state import GAS_CONSTANT
+from simulator.physical_constants import PA_PER_BAR  # noqa: E402
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -165,7 +166,7 @@ def vaporock_pressures_pa(
             log10_bar = float(result.loc[f"{name}(g)"].iloc[0])
         except Exception:  # noqa: BLE001 - upstream table boundary
             continue
-        pressure_pa = 10.0**log10_bar * 1.0e5
+        pressure_pa = 10.0**log10_bar * PA_PER_BAR
         if math.isfinite(pressure_pa) and pressure_pa > 0.0:
             pressures[name] = pressure_pa
     return logfo2, pressures, melt_diagnostic

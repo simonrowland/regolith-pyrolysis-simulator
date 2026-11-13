@@ -59,6 +59,8 @@ observations:
     figure: '5'
     note: Fig. 5a-c P(T) of Ga2O, Ga, GaO; no numeric table besides printed 1752 K points
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_fig5_ga_psat_figure_only_deep4_quoted
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
@@ -118,6 +120,8 @@ observations:
     note: quote=Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined within
       a temperature range of 1510–1752 K.
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
@@ -172,6 +176,8 @@ observations:
     pdf_page_index: 10
     figure: '6'
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_In2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only_deep4_quoted
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
@@ -230,6 +236,8 @@ observations:
     note: quote=Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified within
       a temperature range of 1210–1611 K.
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_In2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_fig7_11_lnK_figure_only
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
@@ -285,6 +293,8 @@ observations:
     note: also Figs 8-11 ln(K) and Delta_r H vs 1/T; quote=ln(K) for the reactions of Ga2O3 into a) Ga2O, b) Ga and c) GaO
       plotted vs. reciprocal T for measured and literature data.
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_M2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_fragmentation_f_i
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -331,6 +341,8 @@ observations:
     paragraph: ionisation_efficiency
     note: quote=a correction factor fi of 0.14 for Ga+ and of 0.19 for In+
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: method_calibration
 - observation_id: kems-138-bischof-2023::bischof_2023_kems_ir_cell_geometry
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -379,7 +391,9 @@ observations:
     note: quote=The iridium KC contains the sample to be analysed and is composed of a crucible 8.5 mm high with an outer
       diameter of 7.8 mm and 0.2 mm wall thickness, and a lid with a 0.4 mm orifice at its centre.
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_ga2o_1752k::T=1752.0:h=e9b083c235d7
+  provenance:
+    printed_phase: solid_Ga2O3_In2O3_KEMS
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_ga2o_1752k::T=1752.0:h=f94c75914e2a
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
     quantity:
@@ -448,6 +462,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
+      confidence_level: not_stated
+      note: Printed ± width; source does not state its confidence convention.
       P_Pa: '0.3'
       as_printed: 0.79 ± 0.3 Pa
   evidence:
@@ -463,11 +479,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_psat_ga2o_1752k::T=1752.0:h=e9b083c235d7
+    origin: kems-138-bischof-2023::bischof_2023_psat_ga2o_1752k::T=1752.0:h=f94c75914e2a
   source_id: kems-138-bischof-2023
   locator:
+    page: 8
     published_page: 7
-    pdf_page_index: 8
+    pdf_page_index: 7
     paragraph: results_polytherm
     note: quote=Ga2O exhibits by far the highest partial pressures (0.79 ± 0.3 Pa at 1752 K)
   read_from: pdf:kems-138-bischof-2023
@@ -475,12 +492,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1752'
+        value:
+          kind: point
+          point: '1752'
+          approximate: false
       locator:
-        published_page: 7
-        pdf_page_index: 8
-        paragraph: results_polytherm
-        note: quote=Ga2O exhibits by far the highest partial pressures (0.79 ± 0.3 Pa at 1752 K)
+        page: 8
+        paragraph: results pressure statement
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -488,7 +530,9 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_ga_1752k::T=1752.0:h=e52a5f22cf4f
+  provenance:
+    printed_phase: gas
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_ga_1752k::T=1752.0:h=5b83e0c4c22e
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
     quantity:
@@ -557,6 +601,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
+      confidence_level: not_stated
+      note: Printed ± width; source does not state its confidence convention.
       P_Pa: '0.016'
       as_printed: 0.11 ± 0.016 Pa
   evidence:
@@ -572,11 +618,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_psat_ga_1752k::T=1752.0:h=e52a5f22cf4f
+    origin: kems-138-bischof-2023::bischof_2023_psat_ga_1752k::T=1752.0:h=5b83e0c4c22e
   source_id: kems-138-bischof-2023
   locator:
+    page: 8
     published_page: 7
-    pdf_page_index: 8
+    pdf_page_index: 7
     paragraph: results_polytherm
     note: quote=followed by Ga, whose partial pressure is lower by a factor of 7 (0.11 ± 0.016 Pa at 1752 K)
   read_from: pdf:kems-138-bischof-2023
@@ -584,12 +631,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1752'
+        value:
+          kind: point
+          point: '1752'
+          approximate: false
       locator:
-        published_page: 7
-        pdf_page_index: 8
-        paragraph: results_polytherm
-        note: quote=followed by Ga, whose partial pressure is lower by a factor of 7 (0.11 ± 0.016 Pa at 1752 K)
+        page: 8
+        paragraph: results pressure statement
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -597,7 +669,9 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_gao_1752k::T=1752.0:h=3dc85fcdbd6b
+  provenance:
+    printed_phase: gas
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_gao_1752k::T=1752.0:h=5c803fbb37fa
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
     quantity:
@@ -666,6 +740,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
+      confidence_level: not_stated
+      note: Printed ± width; source does not state its confidence convention.
       P_Pa: '0.002'
       as_printed: 0.007 ± 0.002 Pa
   evidence:
@@ -681,11 +757,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_psat_gao_1752k::T=1752.0:h=3dc85fcdbd6b
+    origin: kems-138-bischof-2023::bischof_2023_psat_gao_1752k::T=1752.0:h=5c803fbb37fa
   source_id: kems-138-bischof-2023
   locator:
+    page: 8
     published_page: 7
-    pdf_page_index: 8
+    pdf_page_index: 7
     paragraph: results_polytherm
     note: quote=The partial pressures of GaO (0.007 ± 0.002 Pa) are several orders of magnitude lower again at the same temperature.
   read_from: pdf:kems-138-bischof-2023
@@ -693,13 +770,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1752'
+        value:
+          kind: point
+          point: '1752'
+          approximate: false
       locator:
-        published_page: 7
-        pdf_page_index: 8
-        paragraph: results_polytherm
-        note: quote=The partial pressures of GaO (0.007 ± 0.002 Pa) are several orders of magnitude lower again at the same
-          temperature.
+        page: 8
+        paragraph: results pressure statement
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -707,7 +808,9 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_in2o_1611k::T=1611.0:h=64802d09a53c
+  provenance:
+    printed_phase: gas
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_in2o_1611k::T=1611.0:h=f57d843e6f7f
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -776,6 +879,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
+      confidence_level: not_stated
+      note: Printed ± width; source does not state its confidence convention.
       P_Pa: '0.52'
       as_printed: 1.41 ± 0.52 Pa
   evidence:
@@ -791,11 +896,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_psat_in2o_1611k::T=1611.0:h=64802d09a53c
+    origin: kems-138-bischof-2023::bischof_2023_psat_in2o_1611k::T=1611.0:h=f57d843e6f7f
   source_id: kems-138-bischof-2023
   locator:
+    page: 9
     published_page: 8
-    pdf_page_index: 9
+    pdf_page_index: 8
     paragraph: results_In
     note: quote=from In2O (1.41 ± 0.52 Pa at 1611 K)
   read_from: pdf:kems-138-bischof-2023
@@ -803,12 +909,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1611'
+        value:
+          kind: point
+          point: '1611'
+          approximate: false
       locator:
-        published_page: 8
-        pdf_page_index: 9
-        paragraph: results_In
-        note: quote=from In2O (1.41 ± 0.52 Pa at 1611 K)
+        page: 9
+        paragraph: results pressure statement
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -816,7 +947,9 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_in_1611k::T=1611.0:h=ea09c1396f8a
+  provenance:
+    printed_phase: gas
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_in_1611k::T=1611.0:h=e44234e3b4fa
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -885,6 +1018,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
+      confidence_level: not_stated
+      note: Printed ± width; source does not state its confidence convention.
       P_Pa: '0.05'
       as_printed: 0.30 ± 0.05 Pa
   evidence:
@@ -900,11 +1035,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_psat_in_1611k::T=1611.0:h=ea09c1396f8a
+    origin: kems-138-bischof-2023::bischof_2023_psat_in_1611k::T=1611.0:h=e44234e3b4fa
   source_id: kems-138-bischof-2023
   locator:
+    page: 9
     published_page: 8
-    pdf_page_index: 9
+    pdf_page_index: 8
     paragraph: results_In
     note: quote=then In (0.30 ± 0.05 Pa) to InO (0.0036 ± 0.001 Pa)
   read_from: pdf:kems-138-bischof-2023
@@ -912,12 +1048,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1611'
+        value:
+          kind: point
+          point: '1611'
+          approximate: false
       locator:
-        published_page: 8
-        pdf_page_index: 9
-        paragraph: results_In
-        note: quote=then In (0.30 ± 0.05 Pa) to InO (0.0036 ± 0.001 Pa)
+        page: 9
+        paragraph: results pressure statement
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -925,7 +1086,9 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_ino_1611k::T=1611.0:h=eb933846adb8
+  provenance:
+    printed_phase: gas
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_ino_1611k::T=1611.0:h=c30583a02165
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -994,6 +1157,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
+      confidence_level: not_stated
+      note: Printed ± width; source does not state its confidence convention.
       P_Pa: '0.001'
       as_printed: 0.0036 ± 0.001 Pa
   evidence:
@@ -1009,11 +1174,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_psat_ino_1611k::T=1611.0:h=eb933846adb8
+    origin: kems-138-bischof-2023::bischof_2023_psat_ino_1611k::T=1611.0:h=c30583a02165
   source_id: kems-138-bischof-2023
   locator:
+    page: 9
     published_page: 8
-    pdf_page_index: 9
+    pdf_page_index: 8
     paragraph: results_In
     note: quote=InO (0.0036 ± 0.001 Pa)
   read_from: pdf:kems-138-bischof-2023
@@ -1021,12 +1187,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1611'
+        value:
+          kind: point
+          point: '1611'
+          approximate: false
       locator:
-        published_page: 8
-        pdf_page_index: 9
-        paragraph: results_In
-        note: quote=InO (0.0036 ± 0.001 Pa)
+        page: 9
+        paragraph: results pressure statement
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -1034,6 +1225,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: kems-138-bischof-2023::bischof_2023_sigma_O2
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
@@ -1080,6 +1273,8 @@ observations:
     paragraph: ionisation_cross_section
     note: quote=For molecular oxygen, not listed in Table 4 or 5, a cross section of sigma(O2) = 2.8 is used [32].
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: method_calibration
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_ga2o_delta_f_3rd_recommended
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -1127,6 +1322,8 @@ observations:
     paragraph: abstract
     note: quote=Delta_f H298, 3rd (Ga2O(g)) = -68966 ± 7442 Jmol-1
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -1160,7 +1357,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Bischof et al. (2023), quoting Petsalakis et al. (2004) and FactSage
+    attribution: Petsalakis et al. [41] and FACTSG, as named by Table 10.
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
@@ -1191,6 +1388,8 @@ observations:
         pdf_page_index: 15
         table: '10'
         note: quote=GaO(g) = Ga(g) + O(g) 129404 Pets04, FACTSG
+  provenance:
+    printed_phase: gas
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio_deep4_quoted
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
@@ -1221,7 +1420,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Bischof et al. (2023), quoting Petsalakis et al. (2004) and FactSage
+    attribution: Petsalakis et al. [41] and FACTSG, as named by Table 10.
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -1233,6 +1432,8 @@ observations:
     table: '10'
     note: Pets04, FACTSG column; GaO(g) = Ga(g) + O(g) row; quote=129404
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: gas
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_gao_delta_f_3rd_recommended
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -1279,6 +1480,8 @@ observations:
     table: '10'
     note: quote=148816 ± 993 Mean
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table11_in2o_delta_f_3rd_recommended
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
@@ -1326,6 +1529,8 @@ observations:
     paragraph: abstract
     note: quote=Delta_f H298, 3rd (In2O(g)) = -22245 ± 964 Jmol-1
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_In2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table11_ino_delta_f_3rd_recommended
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
@@ -1373,7 +1578,9 @@ observations:
     paragraph: abstract
     note: quote=Delta_f H298, 3rd (InO(g)) = 157744 ± 3681 Jmol-1
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1425.0:h=df7f4c4aeca7
+  provenance:
+    printed_phase: vapor_over_solid_In2O3
+- observation_id: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1425.0:row=oct2019:h=d6e39f262a2c
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -1456,11 +1663,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1425.0:h=df7f4c4aeca7
+    origin: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1425.0:row=oct2019:h=d6e39f262a2c
   source_id: kems-138-bischof-2023
   locator:
+    page: 17
     published_page: 16
-    pdf_page_index: 17
+    pdf_page_index: 16
     table: '12'
     note: quote=p(In2O) [Pa] 0.014 0.327
   read_from: pdf:kems-138-bischof-2023
@@ -1468,12 +1676,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1425'
+        value:
+          kind: point
+          point: '1425'
+          approximate: false
       locator:
-        published_page: 16
-        pdf_page_index: 17
+        page: 17
         table: '12'
-        note: quote=p(In2O) [Pa] 0.014 0.327
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -1481,7 +1714,9 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
-- observation_id: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1550.0:h=b96eb8daeeb2
+  provenance:
+    printed_phase: gas
+- observation_id: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1550.0:row=oct2019:h=e89da9c0a1be
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -1564,11 +1799,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1550.0:h=b96eb8daeeb2
+    origin: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1550.0:row=oct2019:h=e89da9c0a1be
   source_id: kems-138-bischof-2023
   locator:
+    page: 17
     published_page: 16
-    pdf_page_index: 17
+    pdf_page_index: 16
     table: '12'
     note: quote=p(In2O) [Pa] 0.014 0.327
   read_from: pdf:kems-138-bischof-2023
@@ -1576,12 +1812,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1550'
+        value:
+          kind: point
+          point: '1550'
+          approximate: false
       locator:
-        published_page: 16
-        pdf_page_index: 17
+        page: 17
         table: '12'
-        note: quote=p(In2O) [Pa] 0.014 0.327
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -1589,7 +1850,9 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
-- observation_id: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1425.0:h=d5c3844ce072
+  provenance:
+    printed_phase: gas
+- observation_id: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1425.0:row=oct2019:h=d4f873b18c23
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -1672,11 +1935,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1425.0:h=d5c3844ce072
+    origin: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1425.0:row=oct2019:h=d4f873b18c23
   source_id: kems-138-bischof-2023
   locator:
+    page: 17
     published_page: 16
-    pdf_page_index: 17
+    pdf_page_index: 16
     table: '12'
     note: quote=p(In) [Pa] 0.003 0.072
   read_from: pdf:kems-138-bischof-2023
@@ -1684,12 +1948,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1425'
+        value:
+          kind: point
+          point: '1425'
+          approximate: false
       locator:
-        published_page: 16
-        pdf_page_index: 17
+        page: 17
         table: '12'
-        note: quote=p(In) [Pa] 0.003 0.072
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -1697,7 +1986,9 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
-- observation_id: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1550.0:h=032e484e3793
+  provenance:
+    printed_phase: gas
+- observation_id: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1550.0:row=oct2019:h=c3ed2b02d18d
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -1780,11 +2071,12 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1550.0:h=032e484e3793
+    origin: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1550.0:row=oct2019:h=c3ed2b02d18d
   source_id: kems-138-bischof-2023
   locator:
+    page: 17
     published_page: 16
-    pdf_page_index: 17
+    pdf_page_index: 16
     table: '12'
     note: quote=p(In) [Pa] 0.003 0.072
   read_from: pdf:kems-138-bischof-2023
@@ -1792,12 +2084,37 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1550'
+        value:
+          kind: point
+          point: '1550'
+          approximate: false
       locator:
-        published_page: 16
-        pdf_page_index: 17
+        page: 17
         table: '12'
-        note: quote=p(In) [Pa] 0.003 0.072
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: true
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: 2.2 KEMS
+    composition:
+      state:
+        tag: unknown
+        reason: exact composition is not published; sample purity is reported only as greater than 99.9 percent
+      locator:
+        page: 3
+        section: 2.1 Sample preparation
   derivation:
     relation: identity:Pa
     inputs:
@@ -1805,6 +2122,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: kems-138-bischof-2023::bischof_2023_table12_o2_psat_derived
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
@@ -1850,6 +2169,8 @@ observations:
     table: '12'
     note: quote=p(O2) [Pa] 0.006 0.147
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: gas
 - observation_id: kems-138-bischof-2023::bischof_2023_table13_ga2o_2nd_law_factsage
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -1882,10 +2203,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: Bischof et al. (2023), quoting the HCM778 FactSage result based on Hultgren et al. [39], Chaplygin [37],
       and Medvedev et al. [38]
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -1897,6 +2219,38 @@ observations:
     table: '13'
     note: quote=523647 HCM778
   read_from: pdf:kems-138-bischof-2023
+  derivation:
+    relation: Third-law enthalpy calculated with Eq. (30) using reaction Gibbs-energy functions estimated from FACTSAGE (Eqs.
+      (27) and (28)) and HCM778 reference partial pressures.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 18
+        published_page: 17
+        pdf_page_index: 18
+        table: '13'
+        note: HCM778 reference partial-pressure inputs are not tabulated here.
+    method:
+      state:
+        tag: value
+        value: Third-law method (Eq. (30)) based on reaction Gibbs-energy functions estimated from the FACTSAGE database (Eqs.
+          (27) and (28)).
+      locator:
+        page: 8
+        published_page: 8
+        section: 4.3.3. Enthalpy and entropy of reaction
+        equation: 27–30
+    references:
+    - Hultgren et al. [39]
+    - Chaplygin [37]
+    - Medvedev et al. [38]
+  provenance:
+    printed_phase: homogeneous_gas
 - observation_id: kems-138-bischof-2023::bischof_2023_table13_ga2o_homogeneous_3rd
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -1943,6 +2297,8 @@ observations:
     table: '13'
     note: quote=MEAN 500155 ± 6169
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: homogeneous_gas
 - observation_id: kems-138-bischof-2023::bischof_2023_table13_in2o_homogeneous_3rd
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
@@ -1989,6 +2345,8 @@ observations:
     table: '13'
     note: quote=MEAN 440627 ± 3044
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: homogeneous_gas
 - observation_id: kems-138-bischof-2023::bischof_2023_table3_ga2o3_runs
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -2034,6 +2392,8 @@ observations:
     table: '3'
     note: quote=alpha-Ga2O3 (s) 2019 41.4 39.2 1622 12 1510-1750
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: solid_alpha_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table3_in2o3_runs
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
@@ -2079,6 +2439,8 @@ observations:
     table: '3'
     note: quote=alpha-In2O3 (s) 2019 42.6 20.3 1210-1610
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: solid_alpha_In2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table6_po2_equations
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
@@ -2126,6 +2488,8 @@ observations:
     equation: '15'
     note: quote=pGa(O2) = 0.51 p(Ga)
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_M2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table7_ga_isotherm_intensities
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -2230,6 +2594,8 @@ observations:
         pdf_page_index: 8
         table: '7'
         note: quote=Ga+ 57061 1569
+  provenance:
+    printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table8_ga_2nd_law_and_factsage
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -2276,6 +2642,36 @@ observations:
     table: '8'
     note: quote=Mean 1753218 ± 126122
   read_from: pdf:kems-138-bischof-2023
+  derivation:
+    relation: The authors derive second-law enthalpies from van't Hoff regressions and report third-law comparison values
+      using reference reaction Gibbs-energy functions.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 9
+        published_page: 9
+        figure: '7'
+        note: The underlying equilibrium-constant data are plotted, not tabulated.
+    method:
+      state:
+        tag: value
+        value: Van't Hoff regression of equilibrium constants (Eq. (21)); second-law reference enthalpies (Eq. (29)) and third-law
+          values from FACTSAGE Gibbs-energy functions (Eqs. (27), (28), and (30)).
+      locator:
+        page: 8
+        published_page: 8
+        section: 4.3.3. Enthalpy and entropy of reaction
+        equation: 21, 27–30
+    references:
+    - Hultgren et al. [39]
+    - FACTSAGE database
+  provenance:
+    printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table8_ga_3rd_law_this_work
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
@@ -2322,6 +2718,8 @@ observations:
     table: '8'
     note: quote=Mean 1654037 ± 2365
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table9_in_2nd_law_and_factsage
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
@@ -2368,6 +2766,38 @@ observations:
     table: '9'
     note: quote=1509511 ± 132368 Mean
   read_from: pdf:kems-138-bischof-2023
+  derivation:
+    relation: The authors derive second-law enthalpies from van't Hoff regressions and recalculate literature comparisons
+      using reference Gibbs-energy functions.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 9
+        published_page: 9
+        figure: '8'
+        note: The underlying equilibrium-constant data are plotted, not tabulated.
+    method:
+      state:
+        tag: value
+        value: Van't Hoff regression of equilibrium constants (Eq. (21)); second-law reference enthalpies (Eq. (29)) and third-law
+          values from FACTSAGE Gibbs-energy functions (Eqs. (27), (28), and (30)).
+      locator:
+        page: 8
+        published_page: 8
+        section: 4.3.3. Enthalpy and entropy of reaction
+        equation: 21, 27–30
+    references:
+    - Gomez et al. [9]
+    - Smirnov et al. [10]
+    - Hultgren et al. [39]
+    - FACTSAGE database
+  provenance:
+    printed_phase: vapor_over_solid_In2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table9_in_3rd_law_this_work
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
@@ -2414,3 +2844,5 @@ observations:
     table: '9'
     note: quote=Mean 1457625 ± 6908
   read_from: pdf:kems-138-bischof-2023
+  provenance:
+    printed_phase: vapor_over_solid_In2O3

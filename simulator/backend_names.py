@@ -78,6 +78,34 @@ ANALYTICAL_BACKEND_QUALIFIED_CLASS_NAME = (
 LEGACY_ANALYTICAL_BACKEND_CLASS_DISPLAY_NAMES = frozenset({"StubBackend"})
 LEGACY_ANALYTICAL_FIDELITY_DIAGNOSTIC_ENV = "FIDELITY_DIAGNOSTIC_STUB_HIGH"
 
+PROPRIETARY_ENGINE_NAME = "proprietary_remote"
+PROPRIETARY_ENGINE_REFUSAL_CODE = "proprietary_engine_excluded"
+
+
+def is_proprietary_engine(engine: object) -> bool:
+    """Return whether a runtime engine identity requires aggregate-only use."""
+    return str(getattr(engine, "value", engine)) == PROPRIETARY_ENGINE_NAME
+
+
+class ProprietaryEngineRefusal(ValueError):
+    """Typed refusal when a proprietary engine enters a row or grind workflow."""
+
+    def __init__(self, engine: object, *, mode: str):
+        self.engine = engine
+        self.mode = str(mode)
+        self.code = PROPRIETARY_ENGINE_REFUSAL_CODE
+        self.reason = PROPRIETARY_ENGINE_REFUSAL_CODE
+        engine_name = getattr(engine, "value", engine)
+        super().__init__(
+            f"{self.code}: engine={str(engine_name)!r} is not allowed in {self.mode}"
+        )
+
+
+def refuse_proprietary_engine_use(engine: object, *, mode: str) -> None:
+    """Reject proprietary identities from runtime workflows that expose rows."""
+    if is_proprietary_engine(engine):
+        raise ProprietaryEngineRefusal(engine, mode=mode)
+
 
 def canonical_backend_name(backend_name: str | None) -> str | None:
     """Fold legacy analytical aliases; keep ratified vapour tokens self-identity.

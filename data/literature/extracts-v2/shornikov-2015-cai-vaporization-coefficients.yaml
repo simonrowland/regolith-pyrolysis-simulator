@@ -77,11 +77,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Shornikov (2015) recommendation from the Table 3 compilation and the discussion of the melting jump. Per-row
-      inputs are the table, already stored, but this sentence is the author's recommended value rather than one experimental
-      cell.
+      value: compilation_assessed
+    original_method_class: compilation_assessed
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -100,6 +97,8 @@ observations:
     note: 600 dpi render of PDF p. 4. Abstract (PDF p. 1) and conclusions (published p. 1087) repeat 0.33 ± 0.02. Table 5
       prints 0.32 ± 0.02. Both printed numbers are kept.
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -236,6 +235,8 @@ observations:
         note: The table footnote identifies the method; no row-specific equation is printed.
     references:
     - Knyazeva and Vasil'ev, 1972
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -333,6 +334,8 @@ observations:
         note: The table footnote identifies the method; no row-specific equation is printed.
     references:
     - Claasen and Veenemans, 1933
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r04_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -433,6 +436,8 @@ observations:
       zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.; row_label=1773–2173;
       column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r05_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -531,6 +536,8 @@ observations:
       zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.; row_label=1873–2173;
       column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r02_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -631,6 +638,8 @@ observations:
       zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.; row_label=1621–2133;
       column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r03_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -730,6 +739,8 @@ observations:
       this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The melting
       temperature in another column is not used.; row_label=1673–2073; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r04_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -830,6 +841,8 @@ observations:
       zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.; row_label=1685–2089;
       column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r05_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -930,6 +943,8 @@ observations:
       zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.; row_label=1800–1900;
       column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r06_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -1028,6 +1043,8 @@ observations:
       zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.; row_label=1820–1960;
       column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r07_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -1127,6 +1144,8 @@ observations:
       this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The melting
       temperature in another column is not used.; row_label=1873–2173; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r08_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -1240,6 +1259,8 @@ observations:
           in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored
           as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.;
           row_label=2273; column_header=αvap
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r09_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -1378,6 +1399,8 @@ observations:
         note: The table footnote identifies the method; no row-specific equation is printed.
     references:
     - Lukin and Poluboyarinov, 1964
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r02_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -1576,6 +1599,8 @@ observations:
       The gas-phase component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The
       melting temperature in another column is not used.; row_label=1873–2063; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r04_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -3177,6 +3202,8 @@ observations:
           not print a temperature for αvap. The melting temperature in another column is not used. MinerU math wrappers in
           the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page
           en dashes.; row_label=2318; column_header=αvap
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r19_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -3276,6 +3303,8 @@ observations:
       or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.; row_label=2327–2594;
       column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r20_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -3476,6 +3505,8 @@ observations:
       the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en
       dashes.; row_label=1692–1739; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r03_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -3577,6 +3608,8 @@ observations:
       the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en
       dashes.; row_label=1700–1950; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r04_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -3677,6 +3710,8 @@ observations:
       the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en
       dashes.; row_label=1800–1950; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r05_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -3777,6 +3812,8 @@ observations:
       component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature
       in another column is not used.; row_label=1833–1958; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r06_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -3878,6 +3915,8 @@ observations:
       the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en
       dashes.; row_label=1850–1950; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r07_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -3979,6 +4018,8 @@ observations:
       the crucible or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en
       dashes.; row_label=1850–1950; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r08_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -4077,6 +4118,8 @@ observations:
       component cell is a dash and is not stored as zero. Table 5 does not print a temperature for αvap. The melting temperature
       in another column is not used.; row_label=1873–1973; column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r09_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -4178,6 +4221,8 @@ observations:
       or gas cell were unwrapped to the formulas read on the 600 dpi page; Pt–Rh and ZrO2–CaO keep the page en dashes.; row_label=2000–2100;
       column_header=αvap
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r10_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -4353,10 +4398,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated
-      in the abstract and the conclusions where the printed values agree.
+      value: compilation_assessed
+    original_method_class: compilation_assessed
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -4378,6 +4421,8 @@ observations:
       discussion, and the conclusions print (2.2 ± 0.3) × 10^{−2}, which is this same 0.022 ± 0.003. It is not stored twice.;
       row_label=$SiO_2$; column_header=αvap (cr)
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r04_c08
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -4453,11 +4498,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated
-      in the abstract and the conclusions where the printed values agree. The dominant gas-phase component named for this
-      recommendation is TiO.
+      value: compilation_assessed
+    original_method_class: compilation_assessed
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -4479,6 +4521,8 @@ observations:
       this recommended coefficient was calculated for the dominant gas-phase component TiO. That sentence follows the Semenov
       0.20 ± 0.04 value and belongs to this 0.23 ± 0.02 recommendation.; row_label=$TiO_2$; column_header=αvap (cr)
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r05_c08
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -4554,10 +4598,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Shornikov (2015) Table 5 cell. Table 5 prints 0.32 ± 0.02. The abstract and the conclusions print 0.33 ±
-      0.02. Those are not the same number. The 0.33 ± 0.02 recommendation is a separate row.
+      value: compilation_assessed
+    original_method_class: compilation_assessed
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -4579,6 +4621,8 @@ observations:
       on published p. 1083, and the conclusions print the recommended crystalline value as 0.33 ± 0.02. That prose value is
       a separate observation. This cell is kept as printed.; row_label=$Al_2O_3$; column_header=αvap (cr)
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r06_c08
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -4654,10 +4698,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated
-      in the abstract and the conclusions where the printed values agree.
+      value: compilation_assessed
+    original_method_class: compilation_assessed
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -4678,6 +4720,8 @@ observations:
       5 does not print a temperature for αvap. The melting temperature in another column is not used.; row_label=MgO; column_header=αvap
       (cr)
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r07_c08
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -4753,10 +4797,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Shornikov (2015) Table 5 recommended crystalline vaporization coefficient. The same recommendation is repeated
-      in the abstract and the conclusions where the printed values agree.
+      value: compilation_assessed
+    original_method_class: compilation_assessed
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -4777,6 +4819,8 @@ observations:
       5 does not print a temperature for αvap. The melting temperature in another column is not used.; row_label=CaO; column_header=αvap
       (cr)
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r08_c08
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -4852,10 +4896,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Shornikov (2015) Table 5 cell. Table 5 prints 1.00 ± 0.30. The abstract and the conclusions print 1.00 ±
-      0.20. Those are not the same uncertainty. The 1.00 ± 0.20 evaluation is a separate row.
+      value: compilation_assessed
+    original_method_class: compilation_assessed
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -4877,6 +4919,8 @@ observations:
       on published p. 1083, and the conclusions print 1.00 ± 0.20 for crystalline FeO. That prose value, with 1373–1623 K,
       is a separate observation. This cell is kept as printed.; row_label=FeO; column_header=αvap (cr)
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cao_liq_hypothesis
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -4974,6 +5018,8 @@ observations:
       coefficients of all six oxides equal one. No temperature and no uncertainty are printed for these three. FeO, Al2O3,
       and SiO2 liquid values are separate rows with printed uncertainties.'
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_feo_cr_prose
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -5049,11 +5095,10 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: model_derived
+      value: compilation_assessed
+    original_method_class: compilation_assessed
     attribution: Evaluated in this study from experimental data (Darken and Gurry, 1946) and thermochemical data in Glushko
       et al. (1978–1982).
-    model: model_derived
   admission:
     status: rejected
     reason: source admission_status=rejected
@@ -5077,37 +5122,8 @@ observations:
     note: The sentence starts at the bottom of published p. 1082 and the value is printed on published p. 1083. 600 dpi render
       of PDF p. 4. This is not the Table 5 cell, which prints 1.00 ± 0.30.
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
-  derivation:
-    relation: Evaluated in this study on the basis of experimental data (Darken and Gurry, 1946) and calculations using thermochemical
-      information from Glushko et al. (1978–1982). This paper does not print those input numbers.
-    inputs: []
-    parameters: []
-    output_unit: dimensionless
-    raw_inputs:
-      state:
-        tag: value
-        value: not_printed
-      locator:
-        page: 4
-        published_page: 1083
-        pdf_page_index: 3
-        paragraph: Crystalline Fe oxide
-        note: The evaluation paragraph cites the experimental and thermochemical sources but prints no numeric inputs.
-    method:
-      state:
-        tag: value
-        value: αvap (FeO, cr) = 1.00 ± 0.20 on the basis of experimental data (Darken and Gurry, 1946) and calculations conducted
-          in the course of this study using thermochemical information from (Glushko et al., 1978–1982).
-      locator:
-        page: 4
-        published_page: 1083
-        pdf_page_index: 3
-        paragraph: Crystalline Fe oxide
-        equation: unnumbered evaluation paragraph
-        note: The evaluation paragraph identifies the method; no row-specific equation is printed.
-    references:
-    - Darken and Gurry, 1946
-    - Glushko et al., 1978–1982
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_feo_liq_prose
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -5203,6 +5219,8 @@ observations:
     paragraph: Liquid FeO
     note: 600 dpi render of PDF p. 4. The paper does not print a temperature for this liquid coefficient.
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_mgo_liq_hypothesis
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -5300,6 +5318,8 @@ observations:
       coefficients of all six oxides equal one. No temperature and no uncertainty are printed for these three. FeO, Al2O3,
       and SiO2 liquid values are separate rows with printed uncertainties.'
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_tio2_liq_hypothesis
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -5397,6 +5417,8 @@ observations:
       coefficients of all six oxides equal one. No temperature and no uncertainty are printed for these three. FeO, Al2O3,
       and SiO2 liquid values are separate rows with printed uncertainties.'
   read_from: pdf:shornikov-2015-cai-vaporization-coefficients
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_tio2_semenov_1920k
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -5505,3 +5527,5 @@ observations:
         paragraph: Semenov TiO2
         note: 600 dpi render of PDF p. 4. Semenov (1969) value at 1920 K by the Komlev equation. The recommended 0.23 ± 0.02
           is the separate Table 5 cell, not this row.
+  provenance:
+    printed_phase: cr

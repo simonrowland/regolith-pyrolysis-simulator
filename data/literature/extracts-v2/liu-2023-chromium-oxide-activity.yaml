@@ -65,7 +65,7 @@ observations:
       value: '0.006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -87,10 +87,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -193,12 +192,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row02::points:h=30b91a8878e7
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -262,7 +285,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -284,10 +307,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -390,12 +412,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row03::points:h=84494f23adf7
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -459,7 +505,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -481,10 +527,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -587,12 +632,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row04::points:h=04349ffaae63
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -656,7 +725,7 @@ observations:
       value: '0.006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -678,10 +747,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -784,12 +852,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row05::points:h=5ebb939ff0a1
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -853,7 +945,7 @@ observations:
       value: '0.00025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -875,10 +967,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -981,12 +1072,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row06::points:h=900c5bb7d811
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -1050,7 +1165,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1072,10 +1187,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1178,12 +1292,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row07::points:h=95b17a8cb3a2
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -1247,7 +1385,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1269,10 +1407,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1375,12 +1512,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row08::points:h=a2eade676625
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -1444,7 +1605,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1466,10 +1627,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1572,12 +1732,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row09::points:h=ce61e7299f9b
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -1641,7 +1825,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1663,10 +1847,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1769,12 +1952,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row10::points:h=22020a244d54
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -1838,7 +2045,7 @@ observations:
       value: '0.000000025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1860,10 +2067,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -1966,12 +2172,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row11::points:h=3b230d090de5
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -2035,7 +2265,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2057,10 +2287,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -2163,12 +2392,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cr_row12::points:h=cb60109b2318
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -2232,7 +2485,7 @@ observations:
       value: '0.000000025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2254,10 +2507,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported
-      by Kobayashi et al. (1995), ref. 27.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -2360,12 +2612,36 @@ observations:
         pdf_page_index: 4
         table: '3'
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:liu-2023-chromium-oxide-activity
+    relation: aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al.
+      [27].
+    inputs: []
     parameters: []
-    output_unit: dimensionless
-    references: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    method:
+      state:
+        tag: value
+        value: The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. In the present research,
+          it is calculated to be 11.91 at 1 823 K (1 550°C).
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+    references:
+    - 'Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]'
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -2450,7 +2726,7 @@ observations:
       value: '0.006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2626,6 +2902,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -2710,7 +2988,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2886,6 +3164,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -2970,7 +3250,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3146,6 +3426,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -3230,7 +3512,7 @@ observations:
       value: '0.006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3406,6 +3688,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -3490,7 +3774,7 @@ observations:
       value: '0.00025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3666,6 +3950,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -3750,7 +4036,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3926,6 +4212,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -4010,7 +4298,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4186,6 +4474,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -4270,7 +4560,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4446,6 +4736,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -4530,7 +4822,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4706,6 +4998,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -4790,7 +5084,7 @@ observations:
       value: '0.000000025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4966,6 +5260,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -5050,7 +5346,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5226,6 +5522,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -5310,7 +5608,7 @@ observations:
       value: '0.000000025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5486,6 +5784,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -5566,7 +5866,7 @@ observations:
       value: '0.006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5742,6 +6042,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -5822,7 +6124,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5998,6 +6300,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -6078,7 +6382,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6254,6 +6558,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -6334,7 +6640,7 @@ observations:
       value: '0.006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6510,6 +6816,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -6590,7 +6898,7 @@ observations:
       value: '0.00025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -6766,6 +7074,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -6846,7 +7156,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7022,6 +7332,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -7102,7 +7414,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7278,6 +7590,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -7358,7 +7672,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7534,6 +7848,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -7614,7 +7930,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -7790,6 +8106,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -7870,7 +8188,7 @@ observations:
       value: '0.000000025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8046,6 +8364,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -8126,7 +8446,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8302,6 +8622,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -8382,7 +8704,7 @@ observations:
       value: '0.000000025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8558,6 +8880,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=30365a9f958f
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -8629,7 +8953,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8652,9 +8976,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -8797,6 +9121,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=32468b8a91e7
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -8868,7 +9262,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -8891,9 +9285,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -9036,6 +9430,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=4054e18bbac2
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -9107,7 +9571,7 @@ observations:
       value: '0.000000025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -9130,9 +9594,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -9275,6 +9739,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=491e78e28880
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -9346,7 +9880,7 @@ observations:
       value: '0.006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -9369,9 +9903,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -9514,6 +10048,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=5d958c399617
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -9585,7 +10189,7 @@ observations:
       value: '0.000000025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -9608,9 +10212,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -9753,6 +10357,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=862f173805b3
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -9824,7 +10498,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -9847,9 +10521,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -9992,6 +10666,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=afe1d41c0fb3
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -10063,7 +10807,7 @@ observations:
       value: '0.00025837875'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -10086,9 +10830,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -10231,6 +10975,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=b12501e71919
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -10302,7 +11116,7 @@ observations:
       value: '0.006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -10325,9 +11139,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -10470,6 +11284,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=bec0a3e928cf
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -10541,7 +11425,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -10564,9 +11448,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -10709,6 +11593,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=ca48c108c637
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -10780,7 +11734,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -10803,9 +11757,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -10948,6 +11902,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=da8099d6a63c
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -11019,7 +12043,7 @@ observations:
       value: '0.000016212'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -11042,9 +12066,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -11187,6 +12211,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_t3_a_crox::points:h=ee6ddbdf59c3
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -11258,7 +12352,7 @@ observations:
       value: '0.0000006464535'
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Source reports the gas ratio and P_O2 but no total gas pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -11281,9 +12375,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
@@ -11426,6 +12520,76 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  derived_from:
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+  - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+  derivation:
+    relation: aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses.
+    inputs:
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01::points:h=69db0d8fab05
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01::points:h=8fe8c2b2036a
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02::points:h=49db84820bcc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02::points:h=b1820199e33c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03::points:h=e886c3476cfc
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03::points:h=6eb174519096
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04::points:h=a7bfff0a5bb6
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04::points:h=47e1a484ade1
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05::points:h=e857621ca349
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05::points:h=cba2abca5dea
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06::points:h=b27b2cc0855c
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06::points:h=ef423db1f7a4
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07::points:h=22a0e7cb111b
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07::points:h=d7a469c9f552
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08::points:h=d8b67178c953
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08::points:h=48b7070aa9b3
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09::points:h=ac7cca742145
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09::points:h=ef6e4f599707
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10::points:h=4b173d970557
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10::points:h=6414d2ea8f95
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11::points:h=505d18d590e5
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11::points:h=f6af33c88d48
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12::points:h=b6b30027bd63
+    - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12::points:h=ac21bfe03139
+    parameters: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions.
+      locator:
+        page: 5
+        published_page: 317
+        pdf_page_index: 4
+        table: '3'
+        section: 3.3. Activity of Chromium Oxide in Slags
+        equation: '15'
+    references:
+    - No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity
+      rows.
+  provenance:
+    printed_phase: l
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=11ca5ca4008c
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -11627,6 +12791,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=11d442083c15
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -11828,6 +12994,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=138919b4c7ae
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -12029,6 +13197,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=168add30e32f
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -12230,6 +13400,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=284fe87b2f25
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -12431,6 +13603,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=285938398fa7
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -12632,6 +13806,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=2eeb61ff4edd
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -12833,6 +14009,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=3347fcfd9ef9
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -13034,6 +14212,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=33fad448ad55
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -13235,6 +14415,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=3d0c64cb028e
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -13436,6 +14618,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=477ed11ae84a
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -13637,6 +14821,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=5c56e00ee3a7
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -13838,6 +15024,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=5dfc8d863506
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -14039,6 +15227,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=60bdba4aeb46
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -14240,6 +15430,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=6bf943c1e9ec
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -14441,6 +15633,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=73d54b3f6bf6
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -14642,6 +15836,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=75f18bd44e2d
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -14843,6 +16039,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=886f93296be3
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -15044,6 +16242,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=937347f31275
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -15245,6 +16445,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=b6a407845833
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -15446,6 +16648,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=c938030aacd0
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -15647,6 +16851,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=d043b19050a8
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -15848,6 +17054,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=d56765c4afd6
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -16049,6 +17257,8 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk
 - observation_id: liu-2023-chromium-oxide-activity::liu23_table2_oxide_mass_pct::points:h=eb752a8e8055
   experiment_id: 10.2355/isijinternational.isijint-2022-368::liu-2023-chromium-oxide-activity
   identity:
@@ -16250,3 +17460,5 @@ observations:
         published_page: 315
         pdf_page_index: 2
         table: '2'
+  provenance:
+    printed_phase: water-quenched slag bulk

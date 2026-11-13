@@ -8,7 +8,10 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import MethodToken, Quantity
+from simulator.battery.validity import effusion_regime_unverified
 from tests.helpers.corpus_paths import regolith_corpus_root
+
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/lopatin-2023-na-barium-borate-kems.yaml"
 SID = "lopatin-2023-na-barium-borate-kems"
@@ -23,6 +26,55 @@ TABLE_COLUMNS = {
     ("B2O3", "activity_coefficient"): "gamma",
     ("BaB2O4", "activity_coefficient"): "gamma",
 }
+UNPRINTED_PRESSURE_RECORDS = (
+    "lopatin_2023_sample13_NaBO2_activity_coefficient",
+    "lopatin_2023_sample13_B2O3_activity_coefficient",
+    "lopatin_2023_table2_NaBO2_activity_coefficient",
+    "lopatin_2023_table2_B2O3_activity_coefficient",
+    "lopatin_2023_table2_BaB2O4_activity_coefficient",
+)
+UNPRINTED_PRESSURE_SAMPLE_PINS = (
+    ("lopatin_2023_sample13_NaBO2_activity_coefficient", "13"),
+    ("lopatin_2023_sample13_B2O3_activity_coefficient", "13"),
+    ("lopatin_2023_table2_NaBO2_activity_coefficient", "1"),
+    ("lopatin_2023_table2_B2O3_activity_coefficient", "1"),
+    ("lopatin_2023_table2_BaB2O4_activity_coefficient", "38"),
+)
+
+
+def _assert_in_cell_pressure_is_typed_unknown(document: dict) -> None:
+    records = {
+        record["observation_id"]: record
+        for species in document["species"].values()
+        for record in species["observations"]
+    }
+    for record_id, sample in UNPRINTED_PRESSURE_SAMPLE_PINS:
+        assert record_id in records
+        point = next(
+            point
+            for point in records[record_id]["values"]["points"]
+            if point["sample"] == sample
+        )
+        condition = point.get("point_conditions", {}).get("total_pressure_Pa")
+        assert condition is not None
+        assert condition["state"] == {"tag": "unknown", "reason": "not_published"}
+        assert condition["locator"]["table"] == "2"
+        assert condition["locator"]["published_page"] == 5
+        assert (
+            "without numerical sample-side partial pressures"
+            in condition["locator"]["note"]
+        )
+
+
+def _migrated_named_row(observations: list, record_id: str, sample: str):
+    prefix = f"{SID}::{record_id}::"
+    return next(
+        row
+        for row in observations
+        if row.observation_id.startswith(prefix)
+        and row.locator is not None
+        and f"row {sample};" in row.locator.record
+    )
 
 
 def _table2_from_pdf_text(text: str) -> dict[str, tuple[str, ...]]:
@@ -70,6 +122,7 @@ def _assert_points_match_table(document: dict, table: dict[str, tuple[str, ...]]
 @pytest.mark.skipif(not TEXT.is_file(), reason="corpus source is absent")
 def test_table2_points_migrate_with_compositions_and_deferred_figures(tmp_path: Path) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_in_cell_pressure_is_typed_unknown(document)
     table = _table2_from_pdf_text(TEXT.read_text(encoding="utf-8"))
     _assert_points_match_table(document, table)
 
@@ -82,10 +135,20 @@ def test_table2_points_migrate_with_compositions_and_deferred_figures(tmp_path: 
     bad_document["species"]["NaBO2"]["observations"][0]["values"]["points"][0]["activity"] = "0.009"
     with pytest.raises(AssertionError):
         _assert_points_match_table(bad_document, table)
+    bad_pressure_document = deepcopy(document)
+    next(
+        record
+        for record in bad_pressure_document["species"]["NaBO2"]["observations"]
+        if record["observation_id"] == "lopatin_2023_table2_NaBO2_activity_coefficient"
+    )["values"]["points"][0]["point_conditions"].pop("total_pressure_Pa")
+    with pytest.raises(AssertionError):
+        _assert_in_cell_pressure_is_typed_unknown(bad_pressure_document)
 
     from tests.battery.test_migrate import _migrate_real_extract
 
     migrated = _migrate_real_extract(tmp_path, EXTRACT.name)
+    assert migrated.validation is not None
+    assert not migrated.validation.hard_issues
     observations = [row for row in migrated.observations.values() if row.source_id == SID]
     assert len(observations) == 186
     assert all(row.value.kind.value == "point" for row in observations)
@@ -93,6 +156,48 @@ def test_table2_points_migrate_with_compositions_and_deferred_figures(tmp_path: 
     for row in observations:
         assert "composition" in row.point_conditions
         assert row.point_conditions["composition"].state.is_value
+
+    worklist_observations = [
+        row
+        for row in observations
+        if any(
+            row.observation_id.startswith(f"{SID}::{record_id}::")
+            for record_id in UNPRINTED_PRESSURE_RECORDS
+        )
+    ]
+    for row in worklist_observations:
+        assert row.identity.total_pressure_Pa.is_unknown
+        assert "total_pressure_Pa" not in (row.point_conditions or {})
+        experiment = migrated.experiments[row.experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        gate = effusion_regime_unverified(
+            experiment,
+            Quantity.ACTIVITY_COEFFICIENT,
+            observation=row,
+            point_observations=observations,
+        )
+        assert not gate.passed
+        assert gate.primary_check == "in_cell_partial_pressure_sum"
+        pressure_check = next(
+            check
+            for check in gate.checks
+            if check.name == "in_cell_partial_pressure_sum"
+        )
+        assert pressure_check.detail["reason"] == (
+            "no admitted printed partial pressures at this exact point"
+        )
+
+    for record_id, sample in (
+        ("lopatin_2023_table2_NaBO2_activity_coefficient", "1"),
+        ("lopatin_2023_sample13_NaBO2_activity_coefficient", "13"),
+        ("lopatin_2023_table2_B2O3_activity_coefficient", "1"),
+        ("lopatin_2023_sample13_B2O3_activity_coefficient", "13"),
+        ("lopatin_2023_table2_BaB2O4_activity_coefficient", "38"),
+    ):
+        row = _migrated_named_row(observations, record_id, sample)
+        assert row.identity.total_pressure_Pa.is_unknown
+        assert "total_pressure_Pa" not in (row.point_conditions or {})
     column_positions = {
         "a_NaBO2": 0, "a_B2O3": 1, "a_BaB2O4": 2,
         "g_NaBO2": 3, "g_B2O3": 4, "g_BaB2O4": 5,

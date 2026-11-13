@@ -498,7 +498,7 @@ references:
     role: MODEL
     topic: redox-fo2
     status: current
-    coefficient_note: "QFM buffer grounding for the in-repo O'Neill-style fit: log10(fO2/bar) = 8.58 - 25050/T."
+    coefficient_note: "QFM buffer grounding for the in-repo O'Neill-style fit: log10(fO2/bar) = 8.58 - 25050/T; current implementation: simulator/oxygen_buffers.py::oneill_qfm_log10_fO2_bar."
     found: "2026-06-19 sso-r-r20-redox-grounding"
     needs_quote: true
     pull_quotes: []
@@ -530,7 +530,7 @@ references:
     role: MODEL
     topic: redox-fo2
     status: current
-    coefficient_note: "CCO buffer grounding for the in-repo graphite-CO-CO2 point formula; owned by simulator.chemistry.graphite_c_co.cco_log10_fO2_bar."
+    coefficient_note: "CCO buffer grounding for the in-repo graphite-CO-CO2 point formula; current implementation: simulator/oxygen_buffers.py::cco_log10_fO2_bar."
     found: "2026-06-19 sso-r-r20-redox-grounding"
     needs_quote: true
     pull_quotes: []

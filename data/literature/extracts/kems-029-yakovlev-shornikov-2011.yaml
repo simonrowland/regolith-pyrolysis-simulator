@@ -43,7 +43,7 @@ fidelity_samples:
   value: 15.0
   locator:
     published_page: 1
-    pdf_page_index: 1
+    pdf_page_index: 0
     paragraph: a 15 mg sample was loaded into a rhenium boat placed on the bottom of the cell
 - path: species.O2.observations[yakovlev_shornikov_2011_Po2_table_bar_calculated].values.points[0].p_bar
   value: 1.9e-09
@@ -154,7 +154,8 @@ experiments:
       locator:
         published_page: 1
         section: opening methods paragraphs
-        note: 'Several meteorite and CAI materials; no single series composition; L3 refuse composition:
+        note: 'Several named meteorite and CAI materials, but no starting-composition values are published;
+          no single series composition; L3 refuse composition:
           multiple meteorite/CAI materials without a single printed composition map; L3 refuse oxygen_condition:
           O2 table is model_derived (admission model_output_not_measurement), not a printed fO2_control/buffer/pO2
           point; L3 refuse pressure_boundary: chamber/run pressure not printed as a point'
@@ -466,7 +467,7 @@ species:
       type: apparatus
       locator:
         published_page: 1
-        pdf_page_index: 1
+        pdf_page_index: 0
         note: Vestnik NZ6104 3-page PDF, page 1
         paragraph: The Knudsen effusion method was used in combination with the mass spectrometric analysis
           of the vapor phase (MS-1301 mass spectrometer)

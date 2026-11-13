@@ -85,6 +85,83 @@ def _contexts(document: dict) -> dict[str, dict]:
     }
 
 
+def test_figure5_own_calculation_is_model_derived_and_comparators_stay_quoted() -> None:
+    contexts = _contexts(_document())
+    external_series = {
+        "deabreu2024_figure4_panel_b_cp_li4sio4": (0, [
+            "Asou et al. 1992",
+            "Barin 1989",
+            "Hollenberg 1986",
+            "Brandt and Schulz 1988",
+            "Kleykamp 1996",
+        ]),
+        "deabreu2024_figure4_panel_c_cp_li2sio3": (0, [
+            "Stull et al. 1970",
+            "Barin 1989",
+            "Bennington 1976",
+            "Brandt and Schulz 1988",
+            "Kleykamp 1994",
+        ]),
+        "deabreu2024_figure4_panel_d_cp_li2si2o5": (0, ["Bennington et al. 1976"]),
+        "deabreu2024_figure5_calculated_phase_diagram": (0, [
+            "Ballo and Dittler (1912)",
+            "Jaeger and Klooster (1914)",
+            "Kracek (1930)",
+            "Murthy and Hummel (1955)",
+            "Bennington et al. (1974)",
+            "Skokan et al. (1986)",
+            "Pengzhong et al. (1988)",
+            "Boivin et al. (1993)",
+            "Kleykamp (1996)",
+            "Claus et al. (1996)",
+            "Meshalkin and Kaplun (2004)",
+        ]),
+        "deabreu2024_figure6_calculated_gibbs_energies": (2, [
+            "Migge [53] estimated Li8SiO6 values",
+            "Migge [53] estimated Li4SiO4 values",
+        ]),
+        "deabreu2024_figure7_li2o_activity": (2, [
+            "Charles [58] at 1473 K",
+            "Charles [58] at 1673 K",
+        ]),
+    }
+    for observation_id, (offset, labels) in external_series.items():
+        series = contexts[observation_id]["values"]["series"]
+        for offset_index, label in enumerate(labels):
+            index = offset + offset_index
+            assert series[index]["series"] == label
+            assert series[index]["method_class"] == "quoted_attributed"
+
+    phase_diagram = contexts["deabreu2024_figure5_calculated_phase_diagram"]
+    own_result = phase_diagram["values"]["series"][11]
+    assert own_result["series"] == "This work calculated phase boundaries"
+    assert own_result["method_class"] == "model_derived"
+    derivation = own_result["derivation"]
+    assert derivation["raw_inputs"]["state"] == {
+        "tag": "value",
+        "value": "not_printed",
+    }
+    method_name = derivation["method"]["state"]["value"]
+    assert all(
+        name in method_name
+        for name in ("Thermo-Calc", "PARROT", "CALPHAD", "POLY-3")
+    )
+    assert derivation["method"]["locator"] == {
+        "page": 11,
+        "published_page": 313,
+        "pdf_page_index": 10,
+        "section": "5.2 Thermodynamic Modeling",
+    }
+    assert derivation["references"] == [
+        "Figure 5 caption input data: [10–12, 28, 35, 41, 54–57].",
+        "Thermo-Calc [43] and the CALPHAD method [44].",
+    ]
+
+    crystallography = contexts["deabreu2024_table1_crystallographic_data"]
+    assert crystallography["values"]["method_class"] == "quoted_attributed"
+    assert crystallography["values"]["admission_status"] == "context_only"
+
+
 def _flatten_table2_grid(document: dict) -> list[tuple[str, ...]]:
     context = _contexts(document)["deabreu2024_table2_xrd_rietveld_sample_grid"]
     flattened = []

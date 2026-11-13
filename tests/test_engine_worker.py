@@ -27,6 +27,7 @@ from simulator.engine_pool import (
     EngineWorkerRemoteError,
     EngineWorkerTimeout,
     WarmEngineWorker,
+    _EngineWorkerLaunch,
     _pool_ready_wait_s,
 )
 
@@ -176,6 +177,16 @@ def _test_worker(*, timeout_s=1.0):
         startup_timeout_s=_RENDEZVOUS_TIMEOUT_S,
         call_timeout_s=timeout_s,
     )
+
+
+def _bootstrap_worker_with_same_group_child():
+    child = subprocess.Popen(
+        [sys.executable, '-c', 'import time; time.sleep(60)'],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return None, child.pid
 
 
 def _points():
@@ -430,6 +441,76 @@ def test_pre_ready_worker_death_is_engine_worker_died():
     worker.close()
 
 
+class _HandshakeReleaseGate(threading.Event):
+    """Event whose ``wait`` records that the owner has reached the gate."""
+
+    def __init__(self, wait_entered):
+        super().__init__()
+        self.wait_entered = wait_entered
+
+    def wait(self, timeout=None):
+        self.wait_entered.set()
+        return super().wait(timeout)
+
+
+def test_reaped_restart_stays_published_until_ready_read(monkeypatch):
+    """Owner reap must not steal the launch before the ready read.
+
+    Hold the handshake until the owner has reaped the child and either
+    waits for the read (fixed) or finishes cleanup (unfixed). On the
+    unfixed code the read sees the cleared launch and a nonempty EOF.
+    """
+    real_init = _EngineWorkerLaunch.__init__
+
+    def init(self, worker, process, connection, child):
+        real_init(self, worker, process, connection, child)
+        if worker._bootstrap is not os._exit:
+            return
+        reaped = threading.Event()
+        self.handshake_released = _HandshakeReleaseGate(reaped)
+        real_started_wait = self.started.wait
+        real_finished_set = self.finished.set
+
+        def wait_until_reaped(timeout=None):
+            started = real_started_wait(timeout)
+            if started:
+                assert reaped.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+            return started
+
+        def finished():
+            real_finished_set()
+            reaped.set()
+
+        self.started.wait = wait_until_reaped
+        self.finished.set = finished
+        seen.append(self)
+
+    monkeypatch.setattr(_EngineWorkerLaunch, '__init__', init)
+    seen = []
+
+    worker = _test_worker(timeout_s=5.0)
+    worker.start()
+    try:
+        worker.close()
+        worker._bootstrap = os._exit
+        worker._bootstrap_args = (23,)
+        with pytest.raises(EngineWorkerDied) as restarted:
+            worker.call({
+                'T_C': 1100.0,
+                'P_bar': 0.01,
+                'fO2_log': -12.0,
+                'composition': {'SiO2': 50.0},
+            })
+    finally:
+        worker.close()
+
+    assert restarted.value.phase == 'restart'
+    cause = restarted.value.__cause__
+    assert isinstance(cause, EOFError)
+    assert str(cause) == ''
+    assert len(seen) == 1
+
+
 def test_replaced_start_runtimeerror_is_not_worker_death():
     worker = _test_worker(timeout_s=5.0)
     worker.start()
@@ -503,6 +584,138 @@ def test_inflight_disable_after_recv_is_call_death():
         _assert_call_death(caught)
     finally:
         pool.close(cancel_pending=True)
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_stale_stop_pair_cannot_cancel_same_worker_replacement(
+    monkeypatch, inherit,
+):
+    if inherit:
+        monkeypatch.setenv(engine_pool_module.INHERIT_PROCESS_GROUP_ENV, '1')
+    else:
+        monkeypatch.delenv(engine_pool_module.INHERIT_PROCESS_GROUP_ENV, raising=False)
+    worker = _test_worker()
+    stop_entered = threading.Event()
+    resume_stop = threading.Event()
+    cleanup_errors = []
+    real_stop = worker._stop_pair
+
+    def paused_stop(process, connection, **kwargs):
+        stop_entered.set()
+        assert resume_stop.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        return real_stop(process, connection, **kwargs)
+
+    def discard_old_launch(old_process, old_connection):
+        try:
+            worker._discard_current(
+                diagnostic=False,
+                expected_process=old_process,
+                expected_connection=old_connection,
+            )
+        except BaseException as exc:
+            cleanup_errors.append(exc)
+
+    try:
+        worker.start()
+        old_process, old_connection = worker.process, worker.connection
+        assert old_process is not None and old_connection is not None
+        worker._stop_pair = paused_stop
+        stale_cleanup = threading.Thread(
+            target=discard_old_launch,
+            args=(old_process, old_connection),
+        )
+        stale_cleanup.start()
+        assert stop_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+
+        worker.close()
+        worker.start()
+        replacement = worker.process
+        replacement_launch = worker._launch_owner
+        assert replacement is not None and replacement is not old_process
+        assert replacement_launch is not None
+        assert replacement.is_alive()
+
+        resume_stop.set()
+        stale_cleanup.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert not stale_cleanup.is_alive()
+        assert cleanup_errors == []
+        assert worker._launch_owner is replacement_launch
+        assert not replacement_launch.cancel_requested.is_set()
+        assert replacement.is_alive()
+    finally:
+        resume_stop.set()
+        worker._stop_pair = real_stop
+        worker.close()
+
+
+@pytest.mark.parametrize('inherit', (False, True), ids=('default', 'inherited'))
+def test_graceful_wrapper_exit_kills_same_group_child(monkeypatch, inherit):
+    from tests.test_remote_stdio_engine_worker import _assert_pids_gone
+
+    if inherit:
+        monkeypatch.setenv(engine_pool_module.INHERIT_PROCESS_GROUP_ENV, '1')
+    else:
+        monkeypatch.delenv(
+            engine_pool_module.INHERIT_PROCESS_GROUP_ENV,
+            raising=False,
+        )
+    caller_pgid = os.getpgrp()
+    real_killpg = os.killpg
+    killpg_calls = []
+
+    if inherit:
+        def record_killpg(group_id, signum):
+            killpg_calls.append((group_id, signum))
+
+        # If cleanup regresses, record the dangerous signal without sending it
+        # to pytest's process group.
+        monkeypatch.setattr(engine_pool_module.os, 'killpg', record_killpg)
+
+    worker = WarmEngineWorker(
+        name='graceful descendant cleanup worker',
+        bootstrap=_bootstrap_worker_with_same_group_child,
+        handler=_handle_test_request,
+        startup_timeout_s=5.0,
+        call_timeout_s=30.0,
+    )
+    child_pid = None
+    launch = None
+    try:
+        child_pid = worker.start()
+        wrapper = worker.process
+        launch = worker._launch_owner
+        assert wrapper is not None
+        assert launch is not None
+        child_group = os.getpgid(child_pid)
+        if inherit:
+            assert child_group == caller_pgid
+            assert os.getpgid(wrapper.pid) == caller_pgid
+        else:
+            assert child_group == wrapper.pid
+
+        worker.close()
+
+        wrapper.join(timeout=3.0)
+        assert not wrapper.is_alive()
+        assert launch.finished.wait(timeout=3.0)
+        if inherit:
+            # Shared-group children are not owned by this worker; their fate
+            # follows the caller's group owner. Closing the worker must leave
+            # both that child and the caller's group alone.
+            assert os.getpgrp() == caller_pgid
+            real_killpg(caller_pgid, 0)
+            assert killpg_calls == []
+            assert os.getpgid(child_pid) == caller_pgid
+            os.kill(child_pid, 0)
+        else:
+            _assert_pids_gone((child_pid,))
+    finally:
+        worker.close()
+        if child_pid is not None:
+            try:
+                os.kill(child_pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
 
 
 def test_timeout_discards_slot_and_next_call_respawns():
@@ -745,6 +958,9 @@ class _DeadlineRaceStartProcess:
         self.alive = False
         self.exitcode = -9
 
+    def terminate(self):
+        pass
+
 
 def _deadline_race_start_worker(
     monkeypatch,
@@ -766,9 +982,13 @@ def _deadline_race_start_worker(
         for spec in connection_specs
     ]
     processes = [_DeadlineRaceStartProcess() for _ in connections]
-    if use_real_discard:
-        for index, process in enumerate(processes):
-            process.pid = 8000 + index
+    for index, process in enumerate(processes):
+        process.pid = 8000 + index
+    monkeypatch.setattr(
+        engine_pool_module.os,
+        'killpg',
+        lambda *_args: (_ for _ in ()).throw(ProcessLookupError()),
+    )
     connection_iter = iter(connections)
     process_iter = iter(processes)
 
@@ -790,6 +1010,7 @@ def _deadline_race_start_worker(
     )
     discarded = []
     readers = []
+    event_count = 0
 
     def discard_current(**kwargs):
         if (
@@ -808,7 +1029,16 @@ def _deadline_race_start_worker(
         for reader in readers:
             reader.alive = False
 
-    def make_reader(*, target, name, daemon):
+    def make_reader(*, target, name, daemon, args=()):
+        if getattr(target, '__name__', '') in (
+            '_own_launch', '_start_process_for_launch',
+        ):
+            return threading.Thread(
+                target=target,
+                args=args,
+                name=name,
+                daemon=daemon,
+            )
         plan = reader_plans[len(readers)]
         run_target, caller_late = plan[:2]
         survive_join = plan[2] if len(plan) > 2 else False
@@ -822,6 +1052,15 @@ def _deadline_race_start_worker(
         )
         readers.append(reader)
         return reader
+
+    def make_event():
+        nonlocal event_count
+        # Six launch events, then the frame reader's clock event.
+        event_index = event_count % 7
+        event_count += 1
+        if event_index < 6:
+            return threading.Event()
+        return _DeadlineRaceEvent(clock)
 
     monkeypatch.setattr(
         engine_pool_module.multiprocessing,
@@ -840,7 +1079,6 @@ def _deadline_race_start_worker(
             return real_discard_current(**kwargs)
 
         monkeypatch.setattr(worker, '_discard_current', record_real_discard)
-        monkeypatch.setattr(engine_pool_module.os, 'killpg', lambda *_args: None)
         monkeypatch.setattr(
             worker,
             '_shutdown_connection_reader',
@@ -853,7 +1091,7 @@ def _deadline_race_start_worker(
         monotonic=clock.monotonic,
     ))
     monkeypatch.setattr(engine_pool_module, 'threading', SimpleNamespace(
-        Event=lambda: _DeadlineRaceEvent(clock),
+        Event=make_event,
         Lock=threading.Lock,
         Thread=make_reader,
     ))

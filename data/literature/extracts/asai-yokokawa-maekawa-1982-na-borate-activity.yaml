@@ -74,7 +74,21 @@ species:
         row_label: Na2O + 2 B2O3 + 0.4 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: &asai_standard_state_as_printed >-
+        ここに ΔG(Na₂O) などは Na₂O·2B₂O₃ 中の Na₂O を標準とした Gibbs の自由エネルギーなどである。
+      standard_state: &asai_reference_state
+        state:
+          tag: unknown
+          reason: >-
+            The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents a reference melt.
+        inferred: false
+        note: >-
+          No independent standard Gibbs function for the reference melt is cited. Table 2 gives relative ΔG(Na2O) values referred to this melt.
+        locator:
+          page: 2
+          published_page: 1006
+          pdf_page_index: 1
+          section: Experimental
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -109,6 +123,7 @@ species:
           locator: *id001
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -122,7 +137,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-1.1'
         relative_delta_G_uncertainty_kJ_mol: '0.2'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 2 B2O3 + 0.4 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -140,7 +154,8 @@ species:
         row_label: Na2O + 2 B2O3 + 0.6 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -175,6 +190,7 @@ species:
           locator: *id002
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -188,7 +204,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-10.9'
         relative_delta_G_uncertainty_kJ_mol: '0.9'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 2 B2O3 + 0.6 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -206,7 +221,8 @@ species:
         row_label: Na2O + 2 B2O3 + 0.8 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -241,6 +257,7 @@ species:
           locator: *id003
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -254,7 +271,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-21.1'
         relative_delta_G_uncertainty_kJ_mol: '0.3'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 2 B2O3 + 0.8 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -272,7 +288,8 @@ species:
         row_label: Na2O + 2 B2O3 + 1.0 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -307,6 +324,7 @@ species:
           locator: *id004
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -320,7 +338,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-25.1'
         relative_delta_G_uncertainty_kJ_mol: '0.5'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 2 B2O3 + 1.0 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -338,7 +355,8 @@ species:
         row_label: Na2O + 3 B2O3 + 0 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -373,6 +391,7 @@ species:
           locator: *id005
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -386,7 +405,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-24.9'
         relative_delta_G_uncertainty_kJ_mol: '0.7'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -404,7 +422,8 @@ species:
         row_label: Na2O + 3 B2O3 + 0.2 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -439,6 +458,7 @@ species:
           locator: *id006
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -452,7 +472,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-31.5'
         relative_delta_G_uncertainty_kJ_mol: '0.6'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.2 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -470,7 +489,8 @@ species:
         row_label: Na2O + 3 B2O3 + 0.4 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -505,6 +525,7 @@ species:
           locator: *id007
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -518,7 +539,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-36.1'
         relative_delta_G_uncertainty_kJ_mol: '0.3'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.4 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -536,7 +556,8 @@ species:
         row_label: Na2O + 3 B2O3 + 0.5 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -571,6 +592,7 @@ species:
           locator: *id008
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -584,7 +606,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-41.9'
         relative_delta_G_uncertainty_kJ_mol: '1.5'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.5 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -602,7 +623,8 @@ species:
         row_label: Na2O + 3 B2O3 + 0.6 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -637,6 +659,7 @@ species:
           locator: *id009
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -650,7 +673,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-43.6'
         relative_delta_G_uncertainty_kJ_mol: '1.2'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.6 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -668,7 +690,8 @@ species:
         row_label: Na2O + 3 B2O3 + 0.8 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -703,6 +726,7 @@ species:
           locator: *id010
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -716,7 +740,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-54.4'
         relative_delta_G_uncertainty_kJ_mol: '0.5'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.8 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -734,7 +757,8 @@ species:
         row_label: Na2O + 3 B2O3 + 0.9 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -769,6 +793,7 @@ species:
           locator: *id011
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -782,7 +807,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-56.3'
         relative_delta_G_uncertainty_kJ_mol: '0.6'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 0.9 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -800,7 +824,8 @@ species:
         row_label: Na2O + 3 B2O3 + 1.0 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -835,6 +860,7 @@ species:
           locator: *id012
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -848,7 +874,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-59.6'
         relative_delta_G_uncertainty_kJ_mol: '1.1'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 3 B2O3 + 1.0 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -866,7 +891,8 @@ species:
         row_label: Na2O + 4 B2O3 + 0 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -901,6 +927,7 @@ species:
           locator: *id013
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -914,7 +941,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-59.6'
         relative_delta_G_uncertainty_kJ_mol: '0.4'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -932,7 +958,8 @@ species:
         row_label: Na2O + 4 B2O3 + 0.25 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -967,6 +994,7 @@ species:
           locator: *id014
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -980,7 +1008,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-60.8'
         relative_delta_G_uncertainty_kJ_mol: '0.5'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.25 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -998,7 +1025,8 @@ species:
         row_label: Na2O + 4 B2O3 + 0.375 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1033,6 +1061,7 @@ species:
           locator: *id015
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1046,7 +1075,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-67.8'
         relative_delta_G_uncertainty_kJ_mol: '0.4'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.375 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1064,7 +1092,8 @@ species:
         row_label: Na2O + 4 B2O3 + 0.5 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1099,6 +1128,7 @@ species:
           locator: *id016
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1112,7 +1142,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-67.8'
         relative_delta_G_uncertainty_kJ_mol: '0.4'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.5 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1130,7 +1159,8 @@ species:
         row_label: Na2O + 4 B2O3 + 0.7 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1165,6 +1195,7 @@ species:
           locator: *id017
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1178,7 +1209,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-71.6'
         relative_delta_G_uncertainty_kJ_mol: '1.7'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.7 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1196,7 +1226,8 @@ species:
         row_label: Na2O + 4 B2O3 + 0.9 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1231,6 +1262,7 @@ species:
           locator: *id018
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1244,7 +1276,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-79.9'
         relative_delta_G_uncertainty_kJ_mol: '0.8'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 0.9 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1262,7 +1293,8 @@ species:
         row_label: Na2O + 4 B2O3 + 1.0 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1297,6 +1329,7 @@ species:
           locator: *id019
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1310,7 +1343,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-78.9'
         relative_delta_G_uncertainty_kJ_mol: '0.2'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 4 B2O3 + 1.0 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1328,7 +1360,8 @@ species:
         row_label: Na2O + 9 B2O3 + 0 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1363,6 +1396,7 @@ species:
           locator: *id020
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1376,7 +1410,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-99.2'
         relative_delta_G_uncertainty_kJ_mol: '1.5'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1394,7 +1427,8 @@ species:
         row_label: Na2O + 9 B2O3 + 0.2 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1429,6 +1463,7 @@ species:
           locator: *id021
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1442,7 +1477,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-96.7'
         relative_delta_G_uncertainty_kJ_mol: '1.0'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0.2 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1460,7 +1494,8 @@ species:
         row_label: Na2O + 9 B2O3 + 0.4 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1495,6 +1530,7 @@ species:
           locator: *id022
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1508,7 +1544,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-106.6'
         relative_delta_G_uncertainty_kJ_mol: '1.4'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0.4 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1526,7 +1561,8 @@ species:
         row_label: Na2O + 9 B2O3 + 0.6 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1561,6 +1597,7 @@ species:
           locator: *id023
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1574,7 +1611,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-110.0'
         relative_delta_G_uncertainty_kJ_mol: '0.6'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0.6 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1592,7 +1628,8 @@ species:
         row_label: Na2O + 9 B2O3 + 0.8 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1627,6 +1664,7 @@ species:
           locator: *id024
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1640,7 +1678,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-119.0'
         relative_delta_G_uncertainty_kJ_mol: '0.7'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 0.8 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1658,7 +1695,8 @@ species:
         row_label: Na2O + 9 B2O3 + 1.0 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1693,6 +1731,7 @@ species:
           locator: *id025
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1706,7 +1745,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-128.0'
         relative_delta_G_uncertainty_kJ_mol: '1.2'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 9 B2O3 + 1.0 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1724,7 +1762,8 @@ species:
         row_label: Na2O + 15 B2O3 + 0 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1759,6 +1798,7 @@ species:
           locator: *id026
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1772,7 +1812,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-117.3'
         relative_delta_G_uncertainty_kJ_mol: '0.2'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1790,7 +1829,8 @@ species:
         row_label: Na2O + 15 B2O3 + 0.2 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1825,6 +1865,7 @@ species:
           locator: *id027
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1838,7 +1879,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-118.4'
         relative_delta_G_uncertainty_kJ_mol: '0.8'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.2 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1856,7 +1896,8 @@ species:
         row_label: Na2O + 15 B2O3 + 0.3 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1891,6 +1932,7 @@ species:
           locator: *id028
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1904,7 +1946,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-122.4'
         relative_delta_G_uncertainty_kJ_mol: '1.1'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.3 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1922,7 +1963,8 @@ species:
         row_label: Na2O + 15 B2O3 + 0.4 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -1957,6 +1999,7 @@ species:
           locator: *id029
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -1970,7 +2013,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-127.4'
         relative_delta_G_uncertainty_kJ_mol: '0.8'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.4 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -1988,7 +2030,8 @@ species:
         row_label: Na2O + 15 B2O3 + 0.6 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -2023,6 +2066,7 @@ species:
           locator: *id030
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -2036,7 +2080,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-126.4'
         relative_delta_G_uncertainty_kJ_mol: '0.7'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.6 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -2054,7 +2097,8 @@ species:
         row_label: Na2O + 15 B2O3 + 0.8 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -2089,6 +2133,7 @@ species:
           locator: *id031
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -2102,7 +2147,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-134.5'
         relative_delta_G_uncertainty_kJ_mol: '1.1'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 0.8 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:
@@ -2120,7 +2164,8 @@ species:
         row_label: Na2O + 15 B2O3 + 1.0 Al2O3
       phase: l
       T_K: 1173
-      standard_state: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred to this melt
+      standard_state_as_printed: *asai_standard_state_as_printed
+      standard_state: *asai_reference_state
       regime: emf_concentration_cell
       units: kJ·mol−1 as printed for relative ΔG(Na2O)
       point_conditions:
@@ -2155,6 +2200,7 @@ species:
           locator: *id032
       values:
         quantity: activity
+        method_class: measured_tabulated
         admission_status: typed_refusal
         reason: reference-melt absolute activity not printed
         schema_gap: The printed relative partial molar Gibbs-energy quantity has no dedicated quantity token in
@@ -2168,7 +2214,6 @@ species:
         relative_delta_G_Na2O_kJ_mol: '-144.6'
         relative_delta_G_uncertainty_kJ_mol: '0.4'
         uncertainty_confidence: 95 per cent confidence limit; width as printed in Table 2 footnote
-        reference_state_as_printed: Na2O·2B2O3 melt
         composition_formula_amounts_as_printed: Na2O + 15 B2O3 + 1.0 Al2O3
         method_as_printed: emf of concentration cell; Na2O·2B2O3 reference melt
         method_locator:

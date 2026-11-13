@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
       role: pdf
@@ -132,6 +132,34 @@ context:
     emf_values_as_printed: No numerical cell emf is tabulated; measured potentials are used in Eq. [4].
     vapor_values_as_printed: No vapor-pressure values are reported.
   context_id: neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_method_and_reference_states
+  work_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  species: Na2O
+- observation_id: neudorf_elliott_1980_richardson_eq8_model_context
+  type: context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 612
+    section: Na2O-CaO-SiO2 System
+    note: Results and Discussion explains the Richardson ideal-mixing calculation used in Table IV.
+  units: As printed; activities dimensionless, composition mole fractions.
+  values:
+    quantity: ternary_Na2O_activity_model_method_and_inputs
+    method_class: model_derived
+    table_column_as_printed: By Eq. [8]¹¹
+    model_as_printed: Richardson ideal mixing of pseudobinary Na2O-SiO2 and CaO-SiO2 components, modified for Na+ monovalency.
+    temperature_as_printed: 1070 °C
+    N_SiO2_as_printed: '0.65'
+    x_as_printed: '0.538'
+    a_SiO2_Na_binary_as_printed: approximately 0.24
+    a_SiO2_Ca_binary_as_printed: roughly 1.56
+    a_SiO2_Ca_binary_method_as_printed: Estimated by extrapolating Rein and Chipman [25] activity data at 1550 and 1600 °C
+      to 1070 °C.
+    references:
+    - F. D. Richardson [11], Trans. Faraday Soc., 1956, vol. 52, p. 1312.
+    - H. R. Rein and J. Chipman [25], Trans. AIME, 1955, vol. 203, pp. 1250-1254.
+  context_id: neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
   work_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7
   source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
   species: Na2O

@@ -35,21 +35,52 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type described by
-      Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this study with Gibbs energy minimization using a code of the type described by Van Zeggern
+      and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 2
+    page: 1
     published_page: 462
-    pdf_page_index: 1
+    pdf_page_index: 0
     paragraph: Abstract
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  derived_from:
+  - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_h_chondrite_falls
+  - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_l_chondrite_falls
+  - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_ll_chondrite_falls
+  derivation:
+    relation: The authors' claim that CH4 is the major C-bearing gas follows from their chemical equilibrium calculations
+      of ordinary chondrite outgassing.
+    inputs:
+    - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_h_chondrite_falls
+    - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_l_chondrite_falls
+    - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_ll_chondrite_falls
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Gibbs energy minimization code of the type described by Van Zeggern and Storey (1970), using IVTANTHERMO (Belov
+          et al., 1999).
+      locator:
+        page: 3
+        published_page: 463
+        pdf_page_index: 2
+        section: 2.1 Chemical equilibrium calculations
+    references:
+    - Van Zeggern and Storey (1970)
+    - Belov et al. (1999)
+    - Koblitz (2005)
+    - Ghosh et al. (2003)
+  provenance:
+    printed_phase: equilibrium_gas_over_average_ordinary_chondrite
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_gas_chemistry_figures_figure_only
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -82,10 +113,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type described by
-      Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this study with Gibbs energy minimization using a code of the type described by Van Zeggern
+      and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
+    model: model_derived
   admission:
     status: rejected
     reason: Gas speciation, elemental distribution, fO2, mineralogy, and sensitivity panels exist only as Figs 2–17. No printed
@@ -104,6 +136,36 @@ observations:
     figure: 2–17
     note: All calculated gas-chemistry / mineralogy / fO2 plots; not digitised; pdf_page_index=5–18
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  derived_from:
+  - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_h_chondrite_falls
+  - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_l_chondrite_falls
+  - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_ll_chondrite_falls
+  derivation:
+    relation: Authors' calculated gas chemistry, elemental distribution, oxygen fugacity, mineralogy, and sensitivity results
+      from chemical equilibrium modelling.
+    inputs:
+    - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_h_chondrite_falls
+    - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_l_chondrite_falls
+    - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_ll_chondrite_falls
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Gibbs energy minimization code of the type described by Van Zeggern and Storey (1970), using IVTANTHERMO (Belov
+          et al., 1999).
+      locator:
+        page: 3
+        published_page: 463
+        pdf_page_index: 2
+        section: 2.1 Chemical equilibrium calculations
+    references:
+    - Van Zeggern and Storey (1970)
+    - Belov et al. (1999)
+    - Koblitz (2005)
+    - Ghosh et al. (2003)
+  provenance:
+    printed_phase: equilibrium_gas_over_average_ordinary_chondrite
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_hebe_tp_program_printed
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -157,6 +219,38 @@ observations:
     section: '2.4'
     note: Printed T–P program numbers from §2.4 prose; Fig. 1 itself is figure-only
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  derived_from:
+  - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_h_chondrite_falls
+  derivation:
+    relation: The H-chondrite pressure estimate uses the average volatile abundances in Table 1; the temperature profile and
+      pressure assumptions are attributed to the cited sources below.
+    inputs:
+    - schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_h_chondrite_falls
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: The authors used the ideal gas law and average volatile element abundances to assess whether lithostatic pressure
+          was a sensible total gas pressure, and assumed Pgas = Plithostatic (Eq. 1).
+      locator:
+        page: 5
+        published_page: 466
+        pdf_page_index: 4
+        section: '2.4'
+        equation: '1'
+        note: Equation 1 prints Pgas = Plithostatic; the preceding prose describes the ideal-gas estimate of 340 and 1120
+          bars on published page 465.
+    references:
+    - Van Zeggern and Storey (1970)
+    - Belov et al. (1999)
+    - Britt and Consolmagno (2003)
+    - Slater-Reynolds and McSween (2005)
+    - Ghosh et al. (2003)
+    - McSween et al. (1988)
+    - Michalak (2001)
+  provenance:
+    printed_phase: asteroid_6_Hebe_thermal_profile
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_quoted_brett_sato_1984_fo2
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -200,9 +294,9 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 12
+    page: 11
     published_page: 472
-    pdf_page_index: 11
+    pdf_page_index: 10
     paragraph: '3.1'
     note: Quoted Brett and Sato (1984) measured log fO2; not this work
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
@@ -212,11 +306,13 @@ observations:
         tag: value
         value: '1200'
       locator:
-        page: 12
+        page: 11
         published_page: 472
-        pdf_page_index: 11
+        pdf_page_index: 10
         paragraph: '3.1'
         note: Quoted Brett and Sato (1984) measured log fO2; not this work
+  provenance:
+    printed_phase: ordinary_chondrite_solid
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_quoted_gooding_muenow_1977_holbrook
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -266,6 +362,8 @@ observations:
     section: '2.5'
     note: Quoted Gooding and Muenow (1977) Holbrook L6 vacuum stepwise heating; Fig. 2 is this work's model overlay
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: Holbrook_L6_quoted_stepwise_vacuum_heating
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_quoted_muenow_1995_heating
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -314,6 +412,8 @@ observations:
     section: '2.5'
     note: Quoted Muenow et al. (1995) vacuum heating of ordinary chondrites; not this work
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: ordinary_chondrite_vacuum_heating_quoted
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_h_chondrite_falls
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -359,6 +459,8 @@ observations:
     table: '1'
     note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: average_H_chondrite_falls
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_l_chondrite_falls
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -404,6 +506,8 @@ observations:
     table: '1'
     note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: average_L_chondrite_falls
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_ll_chondrite_falls
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -449,6 +553,8 @@ observations:
     table: '1'
     note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: average_LL_chondrite_falls
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_h_solid_solutions
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -490,12 +596,14 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 12
+    page: 11
     published_page: 472
-    pdf_page_index: 11
+    pdf_page_index: 10
     table: '2'
     note: Table 2 Solid solution compositions, H chondrites block; 350 dpi pdftoppm of PDF page 11
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: olivine_orthopyroxene_plagioclase_solid_solutions
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_l_solid_solutions
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -537,12 +645,14 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 12
+    page: 11
     published_page: 472
-    pdf_page_index: 11
+    pdf_page_index: 10
     table: '2'
     note: Table 2 L chondrites block; 350 dpi pdftoppm of PDF page 11
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: olivine_orthopyroxene_plagioclase_solid_solutions
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_ll_solid_solutions
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -584,12 +694,14 @@ observations:
   notices: []
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
-    page: 12
+    page: 11
     published_page: 472
-    pdf_page_index: 11
+    pdf_page_index: 10
     table: '2'
     note: Table 2 LL chondrites block; 350 dpi pdftoppm of PDF page 11
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: olivine_orthopyroxene_plagioclase_solid_solutions
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table3_h_normative_vs_hebe
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -637,6 +749,8 @@ observations:
     table: '3'
     note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: average_H_chondrite_normative_vs_calculated
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table3_l_normative_vs_hebe
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -684,6 +798,8 @@ observations:
     table: '3'
     note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: average_L_chondrite_normative_vs_calculated
 - observation_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table3_ll_normative_vs_hebe
   experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
   identity:
@@ -731,3 +847,5 @@ observations:
     table: '3'
     note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
   read_from: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  provenance:
+    printed_phase: average_LL_chondrite_normative_vs_calculated

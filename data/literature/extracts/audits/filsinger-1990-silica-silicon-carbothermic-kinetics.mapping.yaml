@@ -1,0 +1,110 @@
+source_id: filsinger-1990-silica-silicon-carbothermic-kinetics
+source:
+  citation: Filsinger and Bourrie (1990), Tables I–III and Figures 3, 4, and 6.
+extraction:
+  method: >-
+    Table II columns 1–7 are reactants, ratio, onset temperature, intermediate material, intermediate temperature,
+    final residue wt%, and final-residue XRD. Table III columns 1–7 are reaction, vent, fit-temperature interval,
+    A, B, E_s, and Z. Numeric columns map below; row equations and conditions remain on their located source rows.
+  date: '2026-11-03'
+  worker: w1103cw4-fb90
+tables:
+  - page: 4
+    table_index: 2
+    rows: [3, 4, 5, 6, 7, 8]
+    type: mass_loss
+    quantity: final_residue_reactants_wt_percent
+    evidence_class: measured_direct
+    unit: wt%
+    phase: cr
+    values:
+      - column: 6
+        species: SiO2
+        quantity: final_residue_reactants_wt_percent
+        unit: wt%
+    render_verified:
+      - row: 3
+        column: 6
+        text: '<11'
+  - page: 4
+    table_index: 2
+    rows: [9, 10, 11, 12]
+    type: mass_loss
+    quantity: final_residue_reactants_wt_percent
+    evidence_class: measured_direct
+    unit: wt%
+    phase: cr
+    values:
+      - column: 6
+        species: SiO
+        quantity: final_residue_reactants_wt_percent
+        unit: wt%
+  - page: 7
+    table_index: 3
+    rows: [3, 5, 6, 7]
+    type: rate_series
+    quantity: arrhenius_kinetic_fit_parameters_as_published
+    evidence_class: measured_reduced
+    unit: as printed per mapped parameter
+    phase: gas
+    values:
+      - column: 4
+        species: CO
+        quantity: arrhenius_coefficient_A
+        unit: dimensionless
+      - column: 5
+        species: CO
+        quantity: arrhenius_coefficient_B
+        unit: dimensionless
+      - column: 6
+        species: CO
+        quantity: fitted_activation_energy
+        unit: kJ/mol
+      - column: 7
+        species: CO
+        quantity: fitted_preexponential_factor
+        unit: s^-1
+    render_verified:
+      - {row: 3, column: 3, text: '1733–1933'}
+      - {row: 5, column: 3, text: '1733–1933'}
+      - {row: 6, column: 3, text: '1963–2073'}
+      - {row: 7, column: 3, text: '1998–2073'}
+      - {row: 3, column: 7, text: '108'}
+      - {row: 5, column: 7, text: '1010'}
+      - {row: 6, column: 7, text: '1010'}
+      - {row: 7, column: 7, text: '1011'}
+      - {row: 6, column: 4, text: '-6.10'}
+  - page: 7
+    table_index: 3
+    rows: [4, 8, 9, 10]
+    type: rate_series
+    quantity: arrhenius_kinetic_fit_parameters_as_published
+    evidence_class: measured_reduced
+    unit: as printed per mapped parameter
+    phase: gas
+    values:
+      - column: 4
+        species: SiO
+        quantity: arrhenius_coefficient_A
+        unit: dimensionless
+      - column: 5
+        species: SiO
+        quantity: arrhenius_coefficient_B
+        unit: dimensionless
+      - column: 6
+        species: SiO
+        quantity: fitted_activation_energy
+        unit: kJ/mol
+      - column: 7
+        species: SiO
+        quantity: fitted_preexponential_factor
+        unit: s^-1
+    render_verified:
+      - {row: 4, column: 3, text: '1833–2033'}
+      - {row: 8, column: 3, text: '1833–2033'}
+      - {row: 9, column: 3, text: '1683–1833'}
+      - {row: 10, column: 3, text: '1683–1883'}
+      - {row: 4, column: 7, text: '106'}
+      - {row: 8, column: 7, text: '106'}
+      - {row: 9, column: 7, text: '106'}
+      - {row: 10, column: 7, text: '107'}

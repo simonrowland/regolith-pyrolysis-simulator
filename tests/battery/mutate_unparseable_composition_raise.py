@@ -27,6 +27,8 @@ REPLACEMENT = '''def _engine_prediction_or_unparseable_component(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    phase_siblings: Mapping[str, Decimal] | None = None,
+    phase_sibling_refusal: str | None = None,
 ) -> EnginePrediction:
     return _predict_with_engine(
         engine,
@@ -36,6 +38,8 @@ REPLACEMENT = '''def _engine_prediction_or_unparseable_component(
         experiment=experiment,
         bench=bench,
         fo2_mode=fo2_mode,
+        phase_siblings=phase_siblings,
+        phase_sibling_refusal=phase_sibling_refusal,
     )
 '''
 

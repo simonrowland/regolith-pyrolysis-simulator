@@ -88,6 +88,8 @@ observations:
               note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
         output_unit: K
         references: []
+  provenance:
+    printed_phase: Fe_crucible_internal_standard
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_feto_raoultian_gibbs_duhem_fig7_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -200,6 +202,8 @@ observations:
     note: 'Raoultian a_FetO from Gibbs-Duhem on Fe0.95O-P2O5; figure-only placeholder; no digitization. bound_not_point_ordering:
       ordering or bound only, never a point value.'
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -335,6 +339,8 @@ observations:
                 bound_not_point_ordering: ordering or bound only, never a point value.'
         output_unit: K
         references: []
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig3_time_dependence_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -470,6 +476,8 @@ observations:
                 ordering or bound only, never a point value.'
         output_unit: K
         references: []
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig4_time_dependence_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -566,6 +574,8 @@ observations:
     note: 'Temperature-cycle reproducibility at X_P2O5=0.0427; figure-only placeholder; no digitization. bound_not_point_ordering:
       ordering or bound only, never a point value.'
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig5_temperature_dependence_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -662,6 +672,8 @@ observations:
     note: 'Activity ion-current ratio vs T for samples 1-8; figure-only placeholder; no digitization. bound_not_point_ordering:
       ordering or bound only, never a point value.'
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig6_henrian_a_p2o5_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -772,6 +784,8 @@ observations:
     note: 'Henrian activity of P2O5 for FetO-P2O5 from Table 5 and eq. (3''); figure-only placeholder; no digitization. bound_not_point_ordering:
       ordering or bound only, never a point value.'
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig7_raoultian_activities_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -882,6 +896,8 @@ observations:
     note: 'Raoultian a_P2O5 and a_FetO vs X_P2O5; figure-only placeholder; no digitization. bound_not_point_ordering: ordering
       or bound only, never a point value.'
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig8_ion_current_vs_1T_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -978,6 +994,8 @@ observations:
     note: 'ln I_Fe+ T vs 1/T x 10^4 for FetO-P2O5 samples; figure-only placeholder; no digitization. bound_not_point_ordering:
       ordering or bound only, never a point value.'
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson::T=1643.15:h=c330ca7b9a5b
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -1101,6 +1119,8 @@ observations:
         equation: P2O5(s) = P2O5(l)
     references:
     - Turkdogan and Pearson, JISI 175 (1953), 398, ref. 17
+  provenance:
+    printed_phase: FetO-P2O5_oxide_melt_in_Fe_crucible
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson::T=1653.15:h=f5d39787ce30
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -1224,6 +1244,8 @@ observations:
         equation: P2O5(s) = P2O5(l)
     references:
     - Turkdogan and Pearson, JISI 175 (1953), 398, ref. 17
+  provenance:
+    printed_phase: FetO-P2O5_oxide_melt_in_Fe_crucible
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson::T=1663.15:h=2a18d2362965
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -1347,6 +1369,8 @@ observations:
         equation: P2O5(s) = P2O5(l)
     references:
     - Turkdogan and Pearson, JISI 175 (1953), 398, ref. 17
+  provenance:
+    printed_phase: FetO-P2O5_oxide_melt_in_Fe_crucible
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_solid_std_henry::T=1643.15:h=3cac5d14acef
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -1465,6 +1489,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity coefficient
     references: []
+  provenance:
+    printed_phase: FetO-P2O5_oxide_melt_in_Fe_crucible
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_solid_std_henry::T=1653.15:h=75cf965be6f6
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -1583,6 +1609,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity coefficient
     references: []
+  provenance:
+    printed_phase: FetO-P2O5_oxide_melt_in_Fe_crucible
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_solid_std_henry::T=1663.15:h=358acfd77a32
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -1701,6 +1729,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity coefficient
     references: []
+  provenance:
+    printed_phase: FetO-P2O5_oxide_melt_in_Fe_crucible
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_kems_geometry_and_calibration
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -1749,6 +1779,8 @@ observations:
     section: '2.1'
     note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: PbO-P2O5_and_FetO-P2O5_oxide_melts
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1643.15:h=00be9d544550
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -2033,6 +2065,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1643.15:h=4311109b537c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -2317,6 +2350,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1643.15:h=4f96eb317c65
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -2601,6 +2635,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1643.15:h=6d454ddc82b3
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -2885,6 +2920,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1643.15:h=94f95a144211
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -3169,6 +3205,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1643.15:h=96862e6c7096
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -3453,6 +3490,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1643.15:h=d573465378d6
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -3737,6 +3775,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1643.15:h=e35be1bc09e4
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -4021,6 +4060,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1653.15:h=1dde0535f09f
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -4305,6 +4345,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1653.15:h=28c3c1ad5469
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -4589,6 +4630,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1653.15:h=411d9dc3f2b8
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -4873,6 +4915,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1653.15:h=67f108ea0d58
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -5157,6 +5200,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1653.15:h=aab94f59637d
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -5441,6 +5485,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1653.15:h=afa99fc1c258
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -5725,6 +5770,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1653.15:h=d830502a4682
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -6009,6 +6055,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1663.15:h=354c4529aacf
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -6293,6 +6340,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1663.15:h=3804e882b219
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -6577,6 +6625,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1663.15:h=41028bae1ec8
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -6861,6 +6910,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1663.15:h=5597d916c463
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -7145,6 +7195,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1663.15:h=6ce09bee5c34
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -7429,6 +7480,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1663.15:h=7435db925e28
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -7713,6 +7765,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p2_table6_partial_pressure::T=1663.15:h=e7280114c02f
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -7997,6 +8050,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1643.0:h=fc593b6e815c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -8167,6 +8221,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: P4O10_s_saturation_used_as_P2O5_solid_standard
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1653.0:h=4d13eee35236
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -8337,6 +8393,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: P4O10_s_saturation_used_as_P2O5_solid_standard
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1663.0:h=0628c357b8bf
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -8507,6 +8565,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: P4O10_s_saturation_used_as_P2O5_solid_standard
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=3a0639d50db0
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -8646,6 +8706,8 @@ observations:
         pdf_page_index: 2
         table: '3'
         note: Table 3 row 3 prints X_P2O5=0.382 mole fraction; binary PbO is the complement.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=90ea453f2e72
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -8785,6 +8847,8 @@ observations:
         pdf_page_index: 2
         table: '3'
         note: Table 3 row 1 prints X_P2O5=0.359 mole fraction; binary PbO is the complement.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=dd92bb9c709c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -8924,6 +8988,8 @@ observations:
         pdf_page_index: 2
         table: '3'
         note: Table 3 row 2 prints X_P2O5=0.361 mole fraction; binary PbO is the complement.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_pd_internal_standard_pbo_system
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -8981,6 +9047,8 @@ observations:
         figure: '1'
         section: '2.1'
         note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+  provenance:
+    printed_phase: Pd_crucible_internal_standard
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1643.15:h=095a764c57ab
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -9265,6 +9333,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1643.15:h=137670c81499
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -9549,6 +9618,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1643.15:h=7d0d09ba57ef
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -9833,6 +9903,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1643.15:h=7e3090c51b97
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -10117,6 +10188,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1643.15:h=a4a9c1ef3793
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -10401,6 +10473,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1643.15:h=d88e5bd96f45
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -10685,6 +10758,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1643.15:h=e8bdd4e86e27
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -10969,6 +11043,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1643.15:h=ea7232ffd796
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -11253,6 +11328,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1653.15:h=28d46b1b64ab
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -11537,6 +11613,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1653.15:h=59af06cf6387
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -11821,6 +11898,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1653.15:h=79cac7842061
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -12105,6 +12183,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1653.15:h=9a8afeddaa24
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -12389,6 +12468,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1653.15:h=a9a788b5adbe
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -12673,6 +12753,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1653.15:h=ebd66c6f4d18
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -12957,6 +13038,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1653.15:h=fcd6ce85d693
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -13241,6 +13323,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1663.15:h=2c75ba40e7c3
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -13525,6 +13608,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1663.15:h=a1ac5a3ca90e
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -13809,6 +13893,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1663.15:h=b00e072eaef4
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -14093,6 +14178,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1663.15:h=b05aa1a83db8
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -14377,6 +14463,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1663.15:h=cc9fcc300785
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -14661,6 +14748,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1663.15:h=ed03a4e432c8
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -14945,6 +15033,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1663.15:h=eda1918b9a1c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -15229,6 +15318,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table1_ionic_species
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -15274,6 +15364,8 @@ observations:
     table: '1'
     note: Table 1 ionic species for PbO-P2O5 and FetO-P2O5
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: vapor_over_PbO-P2O5_and_FetO-P2O5_melts
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -15320,6 +15412,8 @@ observations:
     table: '2'
     note: Table 2 appearance potentials of the ionic species
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: literature_AP_comparison
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_this_work
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -15365,6 +15459,8 @@ observations:
     table: '2'
     note: Table 2 appearance potentials of the ionic species
   read_from: pdf:kems-057-kambayashi-1985
+  provenance:
+    printed_phase: vapor_over_PbO-P2O5_and_FetO-P2O5_melts
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c::T=1573.15:h=3a19962dde07
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -15506,6 +15602,8 @@ observations:
         pdf_page_index: 2
         table: '3'
         note: Table 3 row 3 prints X_P2O5=0.382 mole fraction; binary PbO is the complement.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c::T=1573.15:h=4eecaa554fe8
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -15647,6 +15745,8 @@ observations:
         pdf_page_index: 2
         table: '3'
         note: Table 3 row 1 prints X_P2O5=0.359 mole fraction; binary PbO is the complement.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c::T=1573.15:h=c48549543dc9
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -15788,6 +15888,8 @@ observations:
         pdf_page_index: 2
         table: '3'
         note: Table 3 row 2 prints X_P2O5=0.361 mole fraction; binary PbO is the complement.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=02d173285c6c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -15860,6 +15962,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 3's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=47b92f76255f
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -15932,6 +16036,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 1's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=a98f3de3f035
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -16004,6 +16110,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 8's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=be62d0f5ba14
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -16076,6 +16184,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 5's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=ce4068c9d465
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -16148,6 +16258,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 2's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=d870ebc165bc
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -16220,6 +16332,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 6's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=f7a1cfc7a0d0
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -16292,6 +16406,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 4's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table4_feto_p2o5_compositions::rows:h=fffca02c858c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -16364,6 +16480,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 7's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=3830633e3ea7
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -16545,6 +16663,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 2's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=3e93f4f9aab7
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -16726,6 +16846,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 7's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=6cc2925c5ab0
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -16907,6 +17029,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 5's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=7d1c06e4765f
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -17088,6 +17212,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 3's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=8cc7a9ed8531
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -17269,6 +17395,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 7's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=9986f2edb260
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -17450,6 +17578,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 6's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=b112afbb4653
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -17631,6 +17761,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 4's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=dd27a821fcd4
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -17812,6 +17944,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 8's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=e8a700e6d2a8
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -17993,6 +18127,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 4's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1643.15:h=f314312b32bc
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -18174,6 +18310,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 1's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=10aa42c9d891
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -18355,6 +18493,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 7's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=4cf79bf11862
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -18536,6 +18676,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 1's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=68b920cf39ca
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -18717,6 +18859,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 8's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=77a687223b53
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -18898,6 +19042,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 3's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=d8566223d581
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -19079,6 +19225,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 4's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=e3c2bd22f27c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -19260,6 +19408,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 2's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1653.15:h=f59ac36d026a
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -19441,6 +19591,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 6's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=033f437893d6
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -19622,6 +19774,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 8's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=445d0a99acdd
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -19803,6 +19957,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 2's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=643fd8259d35
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -19984,6 +20140,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 7's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=8a2430e93168
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -20165,6 +20323,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 3's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=b928c85a08f7
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -20346,6 +20506,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 1's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=f8262fffb3ed
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -20527,6 +20689,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 6's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table5_feto_p2o5_ion_current_ratios::T=1663.15:h=fc312c7843a3
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -20708,6 +20872,8 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: Normalized from sample 4's printed P2O5, FeO, and Fe2O3 weight percentages using their formula weights.
+  provenance:
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1643.15:h=0e3ff184061e
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -20993,6 +21159,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1643.15:h=187e53368b6e
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -21278,6 +21445,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1643.15:h=260519f9ac66
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -21563,6 +21731,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1643.15:h=470e1a0cc83f
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -21848,6 +22017,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1643.15:h=5a4fa155be53
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -22133,6 +22303,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1643.15:h=6c9c4b8139d0
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -22418,6 +22589,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1643.15:h=6efaff9ee3f7
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -22703,6 +22875,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1643.15:h=772c2c258b89
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -22988,6 +23161,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1653.15:h=038bf08953bc
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -23273,6 +23447,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1653.15:h=29cfa9ee5bf3
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -23558,6 +23733,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1653.15:h=613505ec4673
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -23843,6 +24019,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1653.15:h=709db9d620b5
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -24128,6 +24305,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1653.15:h=b61523f82ecc
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -24413,6 +24591,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1653.15:h=eeccd51b9fec
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -24698,6 +24877,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1653.15:h=f101f63693c1
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -24983,6 +25163,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1663.15:h=0df4555e2ad0
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -25268,6 +25449,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1663.15:h=1f87a3684226
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -25553,6 +25735,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1663.15:h=286af1c27e62
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -25838,6 +26021,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1663.15:h=2ca96800770a
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -26123,6 +26307,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1663.15:h=4877f6e5436b
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -26408,6 +26593,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1663.15:h=5482927d6b85
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -26693,6 +26879,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table6_partial_pressures_and_dg::T=1663.15:h=f84f0d68a40c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -26978,6 +27165,7 @@ observations:
       basis: explicit_author
       note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with t from Fe2+/Fe3+ analysis,
         mean t=0.95
+    printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1643.15:h=0b3e385a8064
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -27212,6 +27400,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1643.15:h=3b4fe7b1670c
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -27446,6 +27636,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1643.15:h=4b355bdb5f68
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -27680,6 +27872,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1643.15:h=4d83282bd60b
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -27914,6 +28108,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1643.15:h=9d297c5bcc47
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -28148,6 +28344,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1643.15:h=a9c9f7e03deb
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -28382,6 +28580,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1643.15:h=ca18ef660b86
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -28616,6 +28816,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1643.15:h=e0eeabf206fc
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -28850,6 +29052,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1653.15:h=0dda6d556c52
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -29084,6 +29288,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1653.15:h=2c619da7b963
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -29318,6 +29524,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1653.15:h=9c99bca70bfe
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -29552,6 +29760,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1653.15:h=b2aa51db59c8
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -29786,6 +29996,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1653.15:h=c9e03a476032
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -30020,6 +30232,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1653.15:h=ed323487d1f8
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -30254,6 +30468,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1653.15:h=f7dc915dca4a
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -30488,6 +30704,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1663.15:h=63eccc9f40a4
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -30722,6 +30940,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1663.15:h=9e0f4cf1a465
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -30956,6 +31176,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1663.15:h=c85583a32ca4
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -31190,6 +31412,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1663.15:h=d171d602faaa
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -31424,6 +31648,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1663.15:h=e603b469eb35
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -31658,6 +31884,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1663.15:h=e611aea30fc3
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -31892,6 +32120,8 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table7_raoultian_a_p2o5::T=1663.15:h=eb0685efef55
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -32126,3 +32356,5 @@ observations:
         equation: '14'
     references:
     - JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974), ref. 11
+  provenance:
+    printed_phase: l

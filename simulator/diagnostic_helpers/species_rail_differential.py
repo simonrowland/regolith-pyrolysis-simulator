@@ -39,7 +39,11 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_segment_for_temperature,
     ellingham_stoichiometry,
 )
-from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
+from simulator.physical_constants import (
+    ATM_PA,
+    PA_PER_BAR,
+    TABLE_SELF_CHECK_FINDING_DEX,
+)
 from simulator.diagnostic_helpers.gibbs_battery import (
     INDEPENDENT_AGREEMENT_BAND_KJ_MOL,
     LEDGER_PATH as GIBBS_PILOT_LEDGER_PATH,
@@ -112,10 +116,34 @@ VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
 # JANAF printed p° = 0.1 MPa = 1 bar = 1e5 Pa. B689 p° = 1 atm.
 # Na NBP 1156 K and Mg NBP 1363 K are the brief's 1-bar sanity rows
 # (NIST Mg T_b = 1363.15 K). P_sat(T_b) = 1 bar by definition.
-JANAF_STANDARD_PRESSURE_PA = 1.0e5
-B689_STANDARD_PRESSURE_PA = 101325.0
+JANAF_STANDARD_PRESSURE_PA = PA_PER_BAR
+B689_STANDARD_PRESSURE_PA = ATM_PA
 NA_NBP_K = 1156.0
 MG_NBP_K = 1363.0
+
+
+class RailPressureEvaluationFailure(RuntimeError):
+    """A present rail evaluator failed or returned an invalid pressure."""
+
+    def __init__(
+        self,
+        species_id: str,
+        cause: Exception | None,
+        *,
+        reason: str = "rail_evaluator_failed",
+        pressure_pa: float | None = None,
+    ) -> None:
+        self.species_id = species_id
+        self.cause = cause
+        self.reason = reason
+        self.pressure_pa = pressure_pa
+        self.exception_type = type(cause).__name__ if cause is not None else None
+        if cause is None:
+            detail = f"returned invalid pressure_pa={pressure_pa!r}"
+        else:
+            detail = f"raised {self.exception_type}"
+        super().__init__(f"vapour-rail evaluator for {species_id!r} {detail}")
+
 
 # G12: only the alias the gap analysis named (O2 vs the rail id).
 # The catalog species_id is already "O2"; this is identity, not invention.
@@ -1111,7 +1139,9 @@ def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | No
     return pressure
 
 
-def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> float | str:
+def _evaluate_rail_pressure_Pa(
+    species_id: str, T_K: float, catalog=None
+) -> float | str | RailPressureEvaluationFailure:
     """Pure-component P_sat in Pa. Melt Pref is not P_sat.
 
     Compiled Na/Mg evaluators are EQUILIBRIUM_PARTIAL_PRESSURE (NaO0.5 ⇌
@@ -1123,6 +1153,8 @@ def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> flo
     denormal). The catalog ``pure_component_antoine`` sidecar is metal
     P_sat in Pa. Use it when present; otherwise only a compiled
     PURE_COMPONENT_SATURATION_PRESSURE evaluator; otherwise rail_row_absent.
+    Evaluator exceptions and invalid pressure outputs return
+    RailPressureEvaluationFailure so they cannot be mistaken for missing rows.
     """
 
     sidecar = _pure_component_antoine_pa(_legacy_species_row(species_id), T_K)
@@ -1145,11 +1177,16 @@ def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> flo
         kwargs["source_activity"] = 1.0
     try:
         result = ev.evaluate(float(T_K), **kwargs)
-    except Exception:
-        return "rail_row_absent"
+    except Exception as exc:
+        return RailPressureEvaluationFailure(species_id, exc)
     P = float(result.pressure_pa)
     if not math.isfinite(P) or P <= 0.0:
-        return "rail_row_absent"
+        return RailPressureEvaluationFailure(
+            species_id,
+            None,
+            reason="rail_evaluator_invalid_output",
+            pressure_pa=P,
+        )
     return P
 
 
@@ -1834,6 +1871,19 @@ def score_psat_nbp_sanity(
             out.append(_wrap(_psat_refusal(point, "rail_row_absent"), point, rail))
             continue
         pressure = _evaluate_rail_pressure_Pa(sid, T_K, catalog)
+        if isinstance(pressure, RailPressureEvaluationFailure):
+            out.append(
+                _wrap(
+                    _psat_refusal(
+                        point,
+                        pressure.reason,
+                        note=str(pressure),
+                    ),
+                    point,
+                    rail,
+                )
+            )
+            continue
         if isinstance(pressure, str):
             out.append(_wrap(_psat_refusal(point, pressure), point, rail))
             continue
@@ -1921,6 +1971,19 @@ def score_psat_channel(
             )
             continue
         pressure = _evaluate_rail_pressure_Pa(sid, gas.T_K, catalog)
+        if isinstance(pressure, RailPressureEvaluationFailure):
+            out.append(
+                _wrap(
+                    _psat_refusal(
+                        gas,
+                        pressure.reason,
+                        note=str(pressure),
+                    ),
+                    gas,
+                    rail,
+                )
+            )
+            continue
         if isinstance(pressure, str):
             out.append(_wrap(_psat_refusal(gas, pressure), gas, rail))
             continue
@@ -2548,6 +2611,8 @@ def _psat_nbp_hand_computation() -> dict[str, Any]:
         ),
     ):
         sidecar = _evaluate_rail_pressure_Pa(formula, T_K)
+        if isinstance(sidecar, RailPressureEvaluationFailure):
+            raise sidecar from sidecar.cause
         pref_P = None
         pref_obs = None
         spec = catalog.species.get(formula)
