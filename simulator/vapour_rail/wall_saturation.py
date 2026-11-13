@@ -43,8 +43,10 @@ from simulator.vapour_rail.nasa_cea import (
     NasaCeaSegmentError,
     WallCondensedTerm,
     WallSaturationLawRefusal,
+    WallSaturationLawResult,
     WallSaturationReaction,
     operative_wall_saturation,
+    wall_saturation_ladder,
 )
 
 _BALANCE_TOLERANCE = 1.0e-9
@@ -137,6 +139,28 @@ def admissible_wall_reactions(
 
     prepared = _prepare_reactions(species_row, species_id=species_id, T_K=T_K)
     return tuple(item.reaction for item in prepared)
+
+
+def ranked_wall_saturations(
+    species_row: Mapping[str, Any],
+    *,
+    species_id: str,
+    T_K: float,
+    pO2_Pa: float | None = None,
+) -> tuple[WallSaturationLawResult, ...]:
+    """Every admissible reaction, lowest saturation pressure first.
+
+    The ledger walks this ladder. The first entry is the operative
+    reaction. A later entry is booked only when oxidant runs out and
+    that reaction is itself supersaturated. This is not a second K.
+    """
+
+    prepared = _prepare_reactions(species_row, species_id=species_id, T_K=T_K)
+    return wall_saturation_ladder(
+        tuple(item.reaction for item in prepared),
+        T_K=T_K,
+        pO2_Pa=pO2_Pa,
+    )
 
 
 def resolve_wall_saturation(

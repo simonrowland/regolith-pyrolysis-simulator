@@ -4867,6 +4867,9 @@ class EvaporationMixin:
                 **({'stage3_reactive_alkali': dict(
                     route_result.stage3_reactive_alkali_by_species[species])}
                    if species in route_result.stage3_reactive_alkali_by_species else {}),
+                **({'wall_reaction_booking': copy.deepcopy(
+                    route_result.wall_reaction_booking_by_species[species])}
+                   if species in route_result.wall_reaction_booking_by_species else {}),
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
                 'wall_temperature_K': (

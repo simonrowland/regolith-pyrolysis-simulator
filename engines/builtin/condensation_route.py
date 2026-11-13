@@ -268,10 +268,25 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                         control_audit=control_audit,
                         diagnostic={'credited_condensed_kg': 0.0,
                                     'reason_skipped': 'coupled reactive parcel below numerical floor'})
-        condensed_product_mol = self._condensed_product_mol(
-            species, baffle_condensed_kg, sp_data, registry,
-            resolve_species_formula,
-        )
+        booking = controls.get("wall_reaction_booking")
+        if isinstance(booking, Mapping):
+            # The route already assigned the captured extent to the winning
+            # reaction. These mols replace the static product map for this
+            # parcel. The yaml map is left in place for parcels that do not
+            # carry a booking.
+            condensed_product_mol = {
+                str(product): float(mol)
+                for product, mol in dict(
+                    booking.get("baffle_products_mol") or {}
+                ).items()
+                if float(mol) > 0.0
+            }
+        else:
+            booking = None
+            condensed_product_mol = self._condensed_product_mol(
+                species, baffle_condensed_kg, sp_data, registry,
+                resolve_species_formula,
+            )
         if reactive_mol > 0.0:
             ordinary_mol = max(0.0, condensed_product_mol.get(species, 0.0) - reactive_mol)
             if ordinary_mol > 0.0:
@@ -295,12 +310,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         if alkali_refusal is not None:
             return alkali_refusal
 
-        wall_plan = self._wall_reaction_plan(
-            species,
-            wall_deposit_mol_by_account,
-            request.account_view.accounts,
-            controls,
-        )
+        if isinstance(booking, Mapping):
+            wall_plan = self._booked_wall_plan(booking)
+        else:
+            wall_plan = self._wall_reaction_plan(
+                species,
+                wall_deposit_mol_by_account,
+                request.account_view.accounts,
+                controls,
+            )
 
         # MaterialLot applies its floor independently to every account/species
         # component on both sides.  Roll back only wall parcels whose coupled
@@ -327,7 +345,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             )
         )
 
-        credits = self._credits_by_product_account(condensed_product_mol, sp_data)
+        credits = self._credits_by_product_account(
+            condensed_product_mol,
+            self._booking_account_data(sp_data, condensed_product_mol)
+            if isinstance(booking, Mapping) else sp_data,
+        )
         # Prior retained vapor retries only through stable baffle chemistry;
         # newly arriving vapor keeps this tick's physical wall split. Merging
         # identical product/account components lets prior+current cross the
@@ -489,6 +511,19 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             }
         if reactive_mol > 0.0:
             debits['process.overhead_gas']['O2'] = oxygen_mol
+        if isinstance(booking, Mapping):
+            wall_survived = self._booked_wall_products_survived(booking, wall_plan)
+            o2_debit = float(booking.get("baffle_oxygen_debit_mol") or 0.0)
+            o2_credit = float(booking.get("baffle_oxygen_credit_mol") or 0.0)
+            if wall_survived:
+                o2_debit += float(booking.get("wall_oxygen_debit_mol") or 0.0)
+                o2_credit += float(booking.get("wall_oxygen_credit_mol") or 0.0)
+            if o2_debit > 0.0:
+                overhead = debits['process.overhead_gas']
+                overhead['O2'] = overhead.get('O2', 0.0) + o2_debit
+            if o2_credit > 0.0:
+                overhead_credit = credits.setdefault('process.overhead_gas', {})
+                overhead_credit['O2'] = overhead_credit.get('O2', 0.0) + o2_credit
         for account, species_mol in wall_plan[
             "substrate_debit_mol_by_account"
         ].items():
@@ -762,6 +797,100 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 **diagnostic,
             },
         )
+
+    def _booking_account_data(
+        self,
+        sp_data: Mapping[str, Any],
+        products_mol: Mapping[str, float],
+    ) -> dict[str, Any]:
+        """Product accounts for a wall-reaction booking.
+
+        Cr2O3 uses the chromia terminal this provider already declares.
+        Anything else keeps the species map, or the condensation train.
+        """
+
+        data = dict(sp_data)
+        accounts = dict(data.get("condensation_product_accounts") or {})
+        if "Cr2O3" in products_mol and "Cr2O3" not in accounts:
+            accounts["Cr2O3"] = self.CHROMIUM_CONDENSED_ACCOUNT
+        if accounts:
+            data["condensation_product_accounts"] = accounts
+        return data
+
+    @staticmethod
+    def _booked_wall_products_survived(
+        booking: Mapping[str, Any],
+        wall_plan: Mapping[str, Any],
+    ) -> bool:
+        """False when materialization replaced the booked wall solids.
+
+        The O2 debit belongs to those solids. A rolled-back vapour credit
+        has no oxygen movement.
+        """
+
+        booked = {
+            str(account): {
+                str(product): float(mol)
+                for product, mol in dict(species_mol).items()
+            }
+            for account, species_mol in dict(
+                booking.get("wall_products_mol_by_account") or {}
+            ).items()
+        }
+        surviving = {
+            str(account): {
+                str(product): float(mol)
+                for product, mol in dict(species_mol).items()
+            }
+            for account, species_mol in dict(
+                wall_plan.get("product_mol_by_account") or {}
+            ).items()
+        }
+        if set(booked) != set(surviving):
+            return False
+        for account, products in booked.items():
+            other = surviving[account]
+            if set(products) != set(other):
+                return False
+            for product, mol in products.items():
+                if abs(mol - other[product]) > 1.0e-12:
+                    return False
+        return True
+
+    def _booked_wall_plan(self, booking: Mapping[str, Any]) -> dict[str, Any]:
+        """Wall-account products from the same winning reactions as the baffle.
+
+        The SiO disproportionation matrix is not a fallback. An empty
+        product map means this parcel put no vapour on a wall.
+        """
+
+        products_by_account = {
+            str(account): {
+                str(product): float(mol)
+                for product, mol in dict(species_mol).items()
+                if float(mol) > 0.0
+            }
+            for account, species_mol in dict(
+                booking.get("wall_products_mol_by_account") or {}
+            ).items()
+        }
+        products_by_account = {
+            account: products
+            for account, products in products_by_account.items()
+            if products
+        }
+        return {
+            "product_mol_by_account": products_by_account,
+            "substrate_debit_mol_by_account": {},
+            "diagnostics_by_account": {
+                account: {
+                    "mechanism": "wall_saturation_winner",
+                    "status": "wall_reaction_booking",
+                }
+                for account in products_by_account
+            },
+            "alkali_state_by_account": {},
+        }
 
     def _wall_reaction_plan(
         self,

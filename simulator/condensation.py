@@ -2450,6 +2450,10 @@ class CondensationRouteResult:
         default_factory=dict)
     stage3_reactive_alkali_by_species: Dict[str, Dict[str, Any]] = field(
         default_factory=dict)
+    # Winning wall-reaction products for this parcel. Absent means the
+    # static condensation map, or the vapour species itself, still applies.
+    wall_reaction_booking_by_species: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict)
     # Stage-4 sub_order 1 only. One record per species that reached the
     # alkali freeze-out cartridge: f_eq, NTU, vapour eta, aerosol eta.
     cartridge_capture_by_species: Dict[str, Dict[str, Any]] = field(
@@ -2463,6 +2467,22 @@ class CondensationRouteResult:
 
     def silica_capture_kg(self, stage_number: int | None = None) -> float:
         """SiO2 product from the existing 2SiO -> Si + SiO2 split."""
+        booking = self.wall_reaction_booking_by_species.get('SiO')
+        if booking:
+            # The booked SiO2 mol is the winner's product, not the static
+            # 0.5 factor. MOLAR_MASS is g/mol, so mol * g/mol / 1000 is kg.
+            if stage_number is None:
+                sio2_mol = float(
+                    booking.get('baffle_products_mol', {}).get('SiO2', 0.0)
+                )
+            else:
+                stage_key = STAGE_KEY_BY_NUMBER.get(int(stage_number))
+                sio2_mol = float(
+                    (booking.get('baffle_products_mol_by_stage') or {})
+                    .get(stage_key, {})
+                    .get('SiO2', 0.0)
+                )
+            return sio2_mol * MOLAR_MASS['SiO2'] / 1000.0
         if stage_number is None:
             sio_condensed_kg = self.condensed_for_species('SiO')
         else:
@@ -3824,6 +3844,7 @@ class CondensationModel:
         # [mol]. Zero source recovers the retained-only budget; no terminal
         # store or melt-buffer oxygen is available to this reaction.
         oxygen_mol = max(0.0, retained_oxygen_mol + stream_source.get('O2', 0.0))
+        wall_reaction_bookings: dict[str, dict[str, Any]] = {}
         stream_po2_bar = None
         vapor_mol = sum(mol for sp, mol in stream_source.items() if sp != 'O2')
         if stream_source.get('O2', 0.0) > 0.0 and vapor_mol > 0.0:
@@ -3949,7 +3970,21 @@ class CondensationModel:
                         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                     )
                     deposit = candidates.get(segment.name, 0.0)
-                    if deposit > 0.0:
+                    if isinstance(deposit, (int, float)) and deposit > 0.0:
+                        deposit, oxygen_mol = _keep_declared_wall_deposit(
+                            species,
+                            float(deposit),
+                            surface="wall",
+                            T_K=float(segment.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+                            p_local_pa=partials.get(species),
+                            pO2_Pa=partials["O2"] if "O2" in partials else None,
+                            oxygen_mol=oxygen_mol,
+                            vapor_pressure_data=self.vapor_pressure_data,
+                            registry=self.species_formula_registry,
+                            bookings=wall_reaction_bookings,
+                            account=segment.wall_deposit_account,
+                        )
+                    if isinstance(deposit, (int, float)) and deposit > 0.0:
                         wall_hkl_by_species.setdefault(species, {})[segment.name] = deposit
                         wall_removed[species] = deposit
                 for species, deposit in wall_removed.items():
@@ -4143,6 +4178,24 @@ class CondensationModel:
                 if capture_refused:
                     continue
                 deposit = supply * eta
+                if deposit > 1e-15 and reaction is None:
+                    deposit, oxygen_mol = _keep_declared_wall_deposit(
+                        species,
+                        float(deposit),
+                        surface="baffle",
+                        T_K=_stage_midpoint_temperature_K(stage),
+                        p_local_pa=partials.get(species),
+                        pO2_Pa=stream_po2_Pa,
+                        oxygen_mol=oxygen_mol,
+                        vapor_pressure_data=self.vapor_pressure_data,
+                        registry=self.species_formula_registry,
+                        bookings=wall_reaction_bookings,
+                        stage_key=stage_key_for_stage(
+                            stage,
+                            falsey_sub_order_is_zero=True,
+                            include_collector_fallback=True,
+                        ),
+                    )
                 if deposit > 1e-15:
                     if reaction is not None:
                         molar_mass = resolve_species_formula(
@@ -4805,6 +4858,7 @@ class CondensationModel:
 
         return CondensationRouteResult(
             stage3_reactive_alkali_by_species=reactive_alkali,
+            wall_reaction_booking_by_species=copy.deepcopy(wall_reaction_bookings),
             remaining_by_species=copy.deepcopy(remaining_by_species),
             retained_in_source_by_species=copy.deepcopy(
                 retained_in_source_by_species
@@ -8284,6 +8338,192 @@ def _species_declares_wall_reactions(
         return wall_reactions_declaration(data) is not None
     except WallSaturationLawRefusal:
         return True
+
+
+def _empty_wall_reaction_booking() -> dict[str, Any]:
+    return {
+        "baffle_products_mol": {},
+        "baffle_products_mol_by_stage": {},
+        "baffle_oxygen_debit_mol": 0.0,
+        "baffle_oxygen_credit_mol": 0.0,
+        "wall_products_mol_by_account": {},
+        "wall_oxygen_debit_mol": 0.0,
+        "wall_oxygen_credit_mol": 0.0,
+    }
+
+
+def _assign_declared_wall_capture(
+    species: str,
+    captured_mol: float,
+    *,
+    T_K: float,
+    p_local_pa: float | None,
+    pO2_Pa: float | None,
+    oxygen_mol: float,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> tuple[list[dict[str, Any]], float, float] | None:
+    """Assign a transported capture to the saturation ladder.
+
+    Returns None when the species has no wall-reaction block. Otherwise
+    ``(legs, oxygen_mol_remaining, unbooked_mol)``.
+
+    Premise. The transport integral already used the lowest saturation
+    pressure. This assigns that captured extent to the same reactions.
+    It does not recompute K.
+
+    Algebra. Walk the reactions in ascending Psat. A reaction takes
+    vapour only while ``Psat < p_local``. An oxidative leg takes
+    ``min(remaining, n_O2 / (ν_O2/ν_v))`` and debits that times
+    ``ν_O2/ν_v``. When the budget is short, the take is rounded down
+    by one ULP so the debit cannot exceed ``n_O2``. A leg with
+    ``ν_O2 <= 0`` takes the rest; a credit adds ``|ν_O2/ν_v|`` mol O2
+    per mol vapour back to the budget. The next reaction is reached
+    only when it is itself supersaturated. Anything left is unbooked
+    vapour, not a deposit.
+
+    Units. Extents and the oxygen budget are moles. Pressures are
+    pascals. Stoichiometry ratios are mol per mol of vapour.
+    """
+
+    from simulator.vapour_rail.nasa_cea import NasaCeaError, WallSaturationLawRefusal
+    from simulator.vapour_rail.wall_saturation import (
+        ranked_wall_saturations,
+        wall_reactions_declaration,
+    )
+
+    data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
+    try:
+        declaration = wall_reactions_declaration(data)
+    except WallSaturationLawRefusal as exc:
+        raise WallSaturationPressureRefusal(species, float(T_K), exc.reason) from exc
+    if declaration is None:
+        return None
+    if captured_mol <= 0.0:
+        return [], oxygen_mol, 0.0
+    if p_local_pa is None or not math.isfinite(p_local_pa) or p_local_pa < 0.0:
+        raise WallSaturationPressureRefusal(
+            species, float(T_K), "saturation_pressure_unavailable",
+        )
+    try:
+        ladder = ranked_wall_saturations(
+            data, species_id=species, T_K=float(T_K), pO2_Pa=pO2_Pa,
+        )
+    except WallSaturationLawRefusal as exc:
+        raise WallSaturationPressureRefusal(species, float(T_K), exc.reason) from exc
+    except NasaCeaError as exc:
+        raise WallSaturationPressureRefusal(
+            species, float(T_K), "wall_saturation_law_refused",
+        ) from exc
+    remaining = captured_mol
+    legs: list[dict[str, Any]] = []
+    for reaction in ladder:
+        if remaining <= 0.0:
+            break
+        if not reaction.pressure_Pa < p_local_pa:
+            break
+        o2_per = float(reaction.o2_mol_per_mol_vapour)
+        if o2_per > 0.0:
+            if oxygen_mol <= 0.0:
+                continue
+            capacity = oxygen_mol / o2_per
+            if capacity < remaining:
+                capacity = math.nextafter(capacity, 0.0)
+            take = min(remaining, max(0.0, capacity))
+            if take <= 0.0:
+                continue
+            debit = take * o2_per
+            oxygen_mol -= debit
+            credit = 0.0
+        else:
+            take = remaining
+            debit = 0.0
+            credit = take * (-o2_per) if o2_per < 0.0 else 0.0
+            oxygen_mol += credit
+        products = {
+            str(product): take * float(ratio)
+            for product, ratio in reaction.products_mol_per_mol_vapour
+            if take * float(ratio) > 0.0
+        }
+        legs.append({
+            "reaction_id": reaction.reaction_id,
+            "products_mol": products,
+            "oxygen_debit_mol": debit,
+            "oxygen_credit_mol": credit,
+            "vapour_mol": take,
+        })
+        remaining -= take
+    return legs, oxygen_mol, remaining
+
+
+def _keep_declared_wall_deposit(
+    species: str,
+    deposit_kg: float,
+    *,
+    surface: str,
+    T_K: float,
+    p_local_pa: float | None,
+    pO2_Pa: float | None,
+    oxygen_mol: float,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    registry: Mapping[str, Any],
+    bookings: dict[str, dict[str, Any]],
+    stage_key: str | None = None,
+    account: str | None = None,
+) -> tuple[float, float]:
+    """Keep only the capture the oxygen budget can book.
+
+    A species with no wall block is unchanged. A declared reaction that
+    cannot take the extent returns that mass to the flowing vapour.
+    """
+
+    from simulator.accounting.formulas import resolve_species_formula
+
+    if not _species_declares_wall_reactions(species, vapor_pressure_data):
+        return deposit_kg, oxygen_mol
+    molar_mass = resolve_species_formula(
+        species, registry,
+    ).molar_mass_kg_per_mol()
+    if molar_mass <= 0.0:
+        raise WallSaturationPressureRefusal(
+            species, float(T_K), "saturation_pressure_unavailable",
+        )
+    captured_mol = deposit_kg / molar_mass
+    assigned = _assign_declared_wall_capture(
+        species,
+        captured_mol,
+        T_K=T_K,
+        p_local_pa=p_local_pa,
+        pO2_Pa=pO2_Pa,
+        oxygen_mol=oxygen_mol,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    if assigned is None:
+        return deposit_kg, oxygen_mol
+    legs, oxygen_mol, unbooked_mol = assigned
+    if legs:
+        booking = bookings.setdefault(species, _empty_wall_reaction_booking())
+        for leg in legs:
+            products = leg["products_mol"]
+            if surface == "wall":
+                account_products = booking["wall_products_mol_by_account"].setdefault(
+                    str(account), {},
+                )
+                for product, mol in products.items():
+                    account_products[product] = account_products.get(product, 0.0) + mol
+                booking["wall_oxygen_debit_mol"] += leg["oxygen_debit_mol"]
+                booking["wall_oxygen_credit_mol"] += leg["oxygen_credit_mol"]
+            else:
+                baffle = booking["baffle_products_mol"]
+                by_stage = booking["baffle_products_mol_by_stage"].setdefault(
+                    str(stage_key), {},
+                )
+                for product, mol in products.items():
+                    baffle[product] = baffle.get(product, 0.0) + mol
+                    by_stage[product] = by_stage.get(product, 0.0) + mol
+                booking["baffle_oxygen_debit_mol"] += leg["oxygen_debit_mol"]
+                booking["baffle_oxygen_credit_mol"] += leg["oxygen_credit_mol"]
+    kept_mol = max(0.0, captured_mol - unbooked_mol)
+    return kept_mol * molar_mass, oxygen_mol
 
 
 def _antoine_psat_pa(

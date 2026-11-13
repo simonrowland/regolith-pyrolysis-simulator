@@ -930,6 +930,66 @@ def wall_saturation_pressure_pa(
     return pressure_Pa
 
 
+def _wall_saturation_result(
+    reaction: WallSaturationReaction,
+    pressure_Pa: float,
+) -> WallSaturationLawResult:
+    nu_v = float(reaction.nu_vapour)
+    return WallSaturationLawResult(
+        pressure_Pa=pressure_Pa,
+        reaction_id=str(reaction.reaction_id),
+        nu_vapour=nu_v,
+        nu_O2=float(reaction.nu_O2),
+        o2_mol_per_mol_vapour=float(reaction.nu_O2) / nu_v,
+        products_mol_per_mol_vapour=tuple(
+            (term.species, float(term.stoichiometry) / nu_v)
+            for term in reaction.condensed
+        ),
+    )
+
+
+def wall_saturation_ladder(
+    reactions: Sequence[WallSaturationReaction],
+    *,
+    T_K: float,
+    pO2_Pa: float | None = None,
+    standard_pressure_Pa: float = WALL_STANDARD_PRESSURE_PA,
+) -> tuple[WallSaturationLawResult, ...]:
+    """Admissible reactions ordered by ascending saturation pressure.
+
+    The first entry is :func:`operative_wall_saturation`. An exact pressure
+    tie keeps declaration order. A missing parcel pO2 refuses the species
+    when any reaction has ν_O2 ≠ 0, before any pressure is returned.
+    """
+
+    if not reactions:
+        raise WallSaturationLawRefusal(
+            "wall_condensation_thermo_missing",
+            "no admissible wall reaction",
+        )
+    if any(reaction.nu_O2 != 0.0 for reaction in reactions) and pO2_Pa is None:
+        raise WallSaturationLawRefusal(
+            "wall_pO2_required",
+            "at least one admissible wall reaction consumes or releases O2",
+        )
+    ranked = [
+        _wall_saturation_result(
+            reaction,
+            wall_saturation_pressure_pa(
+                reaction,
+                T_K=T_K,
+                pO2_Pa=pO2_Pa,
+                standard_pressure_Pa=standard_pressure_Pa,
+            ),
+        )
+        for reaction in reactions
+    ]
+    # Stable sort: equal Psat keeps the declaration order. The operative
+    # winner is the first element, the same strict-< rule as before.
+    ranked.sort(key=lambda item: item.pressure_Pa)
+    return tuple(ranked)
+
+
 def operative_wall_saturation(
     reactions: Sequence[WallSaturationReaction],
     *,
@@ -947,43 +1007,12 @@ def operative_wall_saturation(
     an exact tie.
     """
 
-    if not reactions:
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_missing",
-            "no admissible wall reaction",
-        )
-    if any(reaction.nu_O2 != 0.0 for reaction in reactions) and pO2_Pa is None:
-        raise WallSaturationLawRefusal(
-            "wall_pO2_required",
-            "at least one admissible wall reaction consumes or releases O2",
-        )
-    winner: WallSaturationLawResult | None = None
-    winner_pressure = math.inf
-    for reaction in reactions:
-        pressure_Pa = wall_saturation_pressure_pa(
-            reaction,
-            T_K=T_K,
-            pO2_Pa=pO2_Pa,
-            standard_pressure_Pa=standard_pressure_Pa,
-        )
-        if winner is not None and not pressure_Pa < winner_pressure:
-            continue
-        nu_v = float(reaction.nu_vapour)
-        products = tuple(
-            (term.species, float(term.stoichiometry) / nu_v)
-            for term in reaction.condensed
-        )
-        winner_pressure = pressure_Pa
-        winner = WallSaturationLawResult(
-            pressure_Pa=pressure_Pa,
-            reaction_id=str(reaction.reaction_id),
-            nu_vapour=nu_v,
-            nu_O2=float(reaction.nu_O2),
-            o2_mol_per_mol_vapour=float(reaction.nu_O2) / nu_v,
-            products_mol_per_mol_vapour=products,
-        )
-    assert winner is not None
-    return winner
+    return wall_saturation_ladder(
+        reactions,
+        T_K=T_K,
+        pO2_Pa=pO2_Pa,
+        standard_pressure_Pa=standard_pressure_Pa,
+    )[0]
 
 
 __all__ = [
@@ -1007,5 +1036,6 @@ __all__ = [
     "continuity_residuals",
     "operative_wall_saturation",
     "reaction_equilibrium_constant",
+    "wall_saturation_ladder",
     "wall_saturation_pressure_pa",
 ]
