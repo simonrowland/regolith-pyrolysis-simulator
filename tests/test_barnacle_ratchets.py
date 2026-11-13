@@ -10,72 +10,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID_SIMULATOR_CEILING = 25
 SOURCE_ID_TOOLS_SCRIPTS_CEILING = 2
 FINITE_HELPER_CEILING = 87
-SC_388_SITE_CEILING = 32
+SC_388_SITE_CEILING = 30  # b261: 32 -> 30 after engine/physics removed sites
 
-SC_388_ALLOWLIST = (
-    (
-        "simulator/diagnostic_helpers/species_rail_differential.py",
-        "_evaluate_rail_pressure_Pa",
-        "engine",
-        "d-396 #1",
-    ),
-    (
-        "engines/alphamelts/provider.py",
-        "_run_liquidus_finder",
-        "engine",
-        "d-396 #2",
-    ),
-    (
-        "simulator/furnace_materials.py",
-        "_catalog_max_service_T_C",
-        "physics",
-        "d-396 #5",
-    ),
-    (
-        "scripts/render_flowsheet.py",
-        "build_live_major_facts",
-        "physics",
-        "d-396 #6",
-    ),
-    ("simulator/run_executor.py", "_safe_str", "engine", "d-396 #11"),
-)
+SC_388_ALLOWLIST = ()  # emptied in b261: engine typed-failures (4de120b56) and physics dry56/dry10 fixed every listed site
 
-SC_388_BEHAVIOR_PINS = (
-    (
-        "simulator/diagnostic_helpers/species_rail_differential.py",
-        "_evaluate_rail_pressure_Pa",
-        ("except-return", "rail_row_absent"),
-    ),
-    (
-        "engines/alphamelts/provider.py",
-        "_run_liquidus_finder",
-        (
-            "status = 'not_converged'",
-            "LiquidusSolidusResult(",
-            "status=status",
-        ),
-    ),
-    (
-        "simulator/furnace_materials.py",
-        "_catalog_max_service_T_C",
-        ("default: float = 2000.0", "return default"),
-    ),
-    (
-        "scripts/render_flowsheet.py",
-        "build_live_major_facts",
-        (
-            'for el in ("Al", "Ti", "Si", "Mn", "Cr"):',
-            "facts.setdefault(",
-            '"reducibility": "mg_reducible"',
-            '"reductant_class": "Mg-C6"',
-        ),
-    ),
-    (
-        "simulator/run_executor.py",
-        "_safe_str",
-        ("def _safe_str(builder: Any, default: str)", "return default"),
-    ),
-)
+SC_388_BEHAVIOR_PINS = ()  # emptied in b261: engine typed-failures (4de120b56) and physics dry56/dry10 fixed every listed site
 
 
 def _git_grep(pattern: str, *paths: str) -> list[str]:
@@ -291,8 +230,9 @@ def test_sc388_allowlist_only_shrinks() -> None:
     ]
     entries = set(listed_sites)
     assert len(entries) == len(listed_sites), "SC-388 allow-list has duplicate sites"
-    assert entries, "SC-388 allow-list is empty"
-    assert SC_388_BEHAVIOR_PINS, "SC-388 behavior pins are empty"
+    # The allow-list may be empty: b261 fixed every listed site. The guard that
+    # remains is the discovered-site ceiling below, which only shrinks.
+    assert len(SC_388_BEHAVIOR_PINS) == len(entries), "every allow-listed site needs a behavior pin"
     sites = _sc388_sites()
     print(f"SC-388 discovered count: {len(sites)} (ceiling {SC_388_SITE_CEILING})")
     extra_sites = len(sites) - SC_388_SITE_CEILING
