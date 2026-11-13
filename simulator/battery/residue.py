@@ -2967,6 +2967,12 @@ def _predict_hashimoto_residue_cohort(
     prediction_rows: list[_HashimotoResiduePrediction] = []
 
     for experiment in experiments:
+        experiment_id = str(experiment["experiment_id"])
+        if (
+            selected_experiment_ids is not None
+            and experiment_id not in selected_experiment_ids
+        ):
+            continue
         setup = _hashimoto_run_setup(
             experiment,
             gas_pack=gas_pack,
@@ -2977,12 +2983,6 @@ def _predict_hashimoto_residue_cohort(
             engine_metadata=melt_pack_identity,
             reference_printed_wt_pct=printed_wt_pct,
         )
-        experiment_id = setup.experiment_id
-        if (
-            selected_experiment_ids is not None
-            and experiment_id not in selected_experiment_ids
-        ):
-            continue
         temperature_K = setup.temperature_K
         duration_s = setup.duration_s
         sample_mass_kg = setup.sample_mass_kg
