@@ -815,11 +815,31 @@ def test_mo_pair_model_derived_without_lineage_is_refused():
     assert selected.reason is FallbackReason.UNTYPED_LINEAGE
 
 
-def test_mo_pair_quoted_attributed_atomic_oxygen_is_admitted():
-    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=EvidenceClass.QUOTED_ATTRIBUTED)
+@pytest.mark.parametrize("evidence", (
+    EvidenceClass.QUOTED_ATTRIBUTED,
+    EvidenceClass.MEASURED_REDUCED,
+    EvidenceClass.MEASURED_DIRECT,
+))
+def test_mo_pair_atomic_oxygen_is_admitted(evidence):
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=evidence)
     selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic), bench)
     assert isinstance(selected, SourceOxygenCondition)
     assert "mo-cell-oxygen" in selected.used_observations
+
+
+def test_stolyarova_1995_measured_eqn1_commands_all_eight_ca_points():
+    context = load_score_context(sources=("stolyarova-1995-cao-alumina-kems",))
+    calcium = [row for row in context.observations.values()
+               if "stolyarova_1995_ca_partial_pressure_table2" in row.observation_id]
+    assert len(calcium) == 8
+    for row in calcium:
+        selected = _resolve(context, row)
+        assert isinstance(selected, SourceOxygenCondition), (row.observation_id, selected)
+        assert len(selected.used_observations) == 1
+        command = context.observations[next(iter(selected.used_observations))]
+        assert "stolyarova_1995_o_partial_pressure_eqn1_table2" in command.observation_id
+        assert command.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert "cell-metal activity as assumed by the source" in selected.observation.derivation.relation
 
 
 def test_mo_pair_atomic_oxygen_with_derived_from_is_admitted():
