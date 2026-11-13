@@ -28,7 +28,7 @@ from engines.builtin.melt_effect_adjustment import (
     strip_non_oxide_residuals,
     warn_tier_analytical_diagnostic,
 )
-from simulator.oxygen_buffers import cco_log10_fO2_bar
+from simulator.oxygen_buffers import cco_buffered_fO2, cco_log10_fO2_bar
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
 from simulator.melt_backend.base import (
@@ -589,7 +589,7 @@ def test_t139_carbon_model_exposes_cco_negative_vapor_and_burnout_interval():
     model = warn_tier_analytical_diagnostic(
         "carbonaceous_organic",
         T_K=1500.0,
-        cco_reference_log10_fO2_bar=cco_log10_fO2_bar(1500.0, 1.0),
+        cco_reference_fO2=cco_buffered_fO2(1500.0, 1.0, reference_buffer=None),
     )
     assert model is not None
     assert model["analytical_model_class"] == "elemental_carbon_redox_partition"
@@ -634,7 +634,9 @@ def test_t139_cco_diagnostic_matches_reference_output_on_temperature_grid():
         model = warn_tier_analytical_diagnostic(
             "carbonaceous_organic",
             T_K=temperature_K,
-            cco_reference_log10_fO2_bar=cco_log10_fO2_bar(temperature_K, 1.0),
+            cco_reference_fO2=cco_buffered_fO2(
+                temperature_K, 1.0, reference_buffer=None
+            ),
         )
 
         assert model is not None
@@ -645,6 +647,25 @@ def test_t139_cco_diagnostic_matches_reference_output_on_temperature_grid():
             temperature_K,
             1.0,
         ).hex()
+
+
+def test_t139_cco_evaluation_carries_owner_fallback_validity_and_notice():
+    point = cco_buffered_fO2(1473.15, 1.0, reference_buffer=None)
+    model = warn_tier_analytical_diagnostic(
+        "carbonaceous_organic",
+        T_K=1473.15,
+        cco_reference_fO2=point,
+    )
+
+    assert model is not None
+    evaluation = model["evaluated_at_T_K"]["cco_buffer"]
+    assert evaluation["log10_fO2_bar"] == pytest.approx(
+        point.log10_fO2_bar, abs=1e-12
+    )
+    assert evaluation["validity"] == point.validity
+    assert evaluation["notice"] == point.validity
+    assert "cco_fit_out_of_band_ideal_gas_used" in evaluation["notice"]
+    assert evaluation["inside_valid_range"] is False
 
 
 def test_magemin_ig_bulk_sum_closure_warning_grounded_and_engine_gated():

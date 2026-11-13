@@ -32,6 +32,7 @@ from simulator.chemistry.kernel import (
 from simulator.oxygen_buffers import (
     CCO_PRESSURE_RANGE_BAR,
     CCO_TEMPERATURE_RANGE_K,
+    RedoxBufferPoint,
 )
 from simulator.scalar_boundary import finite_float
 
@@ -785,7 +786,7 @@ def _evaluate_analytical_forms(
     forms: Mapping[str, Any],
     *,
     T_K: float | None,
-    cco_reference_log10_fO2_bar: float | None = None,
+    cco_reference_fO2: RedoxBufferPoint | None = None,
 ) -> dict[str, Any]:
     if T_K is None:
         return {}
@@ -849,16 +850,15 @@ def _evaluate_analytical_forms(
         }
 
     cco = forms.get("cco_buffer")
-    if isinstance(cco, Mapping) and cco_reference_log10_fO2_bar is not None:
-        # The high-level caller evaluates the shared owner at its 1 bar reference.
+    if isinstance(cco, Mapping) and cco_reference_fO2 is not None:
         evaluations["cco_buffer"] = {
             "T_K": temperature,
-            "pressure_bar": 1.0,
-            "log10_fO2_bar": float(cco_reference_log10_fO2_bar),
-            "inside_valid_range": _inside_range(
-                temperature,
-                cco.get("valid_range_K"),
-            ),
+            "pressure_bar": cco_reference_fO2.pressure_bar,
+            "log10_fO2_bar": cco_reference_fO2.log10_fO2_bar,
+            "fO2_bar": cco_reference_fO2.fO2_bar,
+            "validity": cco_reference_fO2.validity,
+            "notice": cco_reference_fO2.notice,
+            "inside_valid_range": cco_reference_fO2.inside_valid_range,
         }
 
     return evaluations
@@ -930,7 +930,7 @@ def _analytical_model_metadata(
     species: str,
     *,
     T_K: float | None = None,
-    cco_reference_log10_fO2_bar: float | None = None,
+    cco_reference_fO2: RedoxBufferPoint | None = None,
 ) -> dict[str, Any]:
     model = WARN_TIER_ANALYTICAL_MODELS.get(row_key)
     if model is None:
@@ -951,7 +951,7 @@ def _analytical_model_metadata(
     evaluations = _evaluate_analytical_forms(
         selected_forms,
         T_K=T_K,
-        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
+        cco_reference_fO2=cco_reference_fO2,
     )
     if evaluations:
         metadata["evaluated_at_T_K"] = evaluations
@@ -962,7 +962,7 @@ def warn_tier_analytical_diagnostic(
     species: str,
     *,
     T_K: float | None = None,
-    cco_reference_log10_fO2_bar: float | None = None,
+    cco_reference_fO2: RedoxBufferPoint | None = None,
 ) -> dict[str, Any] | None:
     """Return the internal-analytical WARN-tier model for a residual species."""
     matched = _match_effect_row(species)
@@ -973,7 +973,7 @@ def warn_tier_analytical_diagnostic(
         row_key,
         species,
         T_K=T_K,
-        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
+        cco_reference_fO2=cco_reference_fO2,
     )
 
 
@@ -1207,7 +1207,7 @@ def _compute_property_perturbation(
     T_in_C: float,
     melts_result: Mapping[str, Any] | Any | None,
     engine: str,
-    cco_reference_log10_fO2_bar: float | None = None,
+    cco_reference_fO2: RedoxBufferPoint | None = None,
 ) -> PropertyPerturbation | None:
     mode = str(prop_cfg.get("mode", ""))
     grounded = bool(prop_cfg.get("grounded", False))
@@ -1216,7 +1216,7 @@ def _compute_property_perturbation(
         row_key,
         species,
         T_K=float(T_in_C) + 273.15,
-        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
+        cco_reference_fO2=cco_reference_fO2,
     )
 
     if mode == "phase_topology_presence":
@@ -1422,7 +1422,7 @@ def melt_effect_adjustment(
     *,
     T_in_C: float,
     cleaned_oxide_wt_pct: Mapping[str, float] | None = None,
-    cco_reference_log10_fO2_bar: float | None = None,
+    cco_reference_fO2: RedoxBufferPoint | None = None,
 ) -> MeltEffectAdjustmentResult:
     """Per-residual analytical correction with separate raw vs adjusted fields."""
     perturbations: list[PropertyPerturbation] = []
@@ -1479,7 +1479,7 @@ def melt_effect_adjustment(
                 T_in_C=T_in_C,
                 melts_result=melts_result,
                 engine=engine,
-                cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
+                cco_reference_fO2=cco_reference_fO2,
             )
             if pert is None:
                 continue
@@ -1740,7 +1740,7 @@ def evaluate_verdict_a_timeline(
     timeline: tuple[Any, ...],
     confounding_threshold_pct: float = 0.01,
     cleaned_oxide_wt_pct: Mapping[str, float] | None = None,
-    cco_reference_log10_fO2_bar: float | None = None,
+    cco_reference_fO2: RedoxBufferPoint | None = None,
 ) -> VerdictAResult:
     """Step-resolved WARN-only flags; clears when bakeoff drops residual."""
     hourly = _estimate_hourly_residuals(final_residual_wt_pct, timeline)
@@ -1756,7 +1756,7 @@ def evaluate_verdict_a_timeline(
             engine,
             T_in_C=T_in_C,
             cleaned_oxide_wt_pct=cleaned_oxide_wt_pct,
-            cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
+            cco_reference_fO2=cco_reference_fO2,
         )
         flags = evaluate_verdict_a(
             adjustment.perturbations,
@@ -2010,7 +2010,7 @@ def build_harness_verdicts(
     engine: str,
     timeline: tuple[Any, ...],
     T_in_C: float,
-    cco_reference_log10_fO2_bar: float | None = None,
+    cco_reference_fO2: RedoxBufferPoint | None = None,
 ) -> dict[str, Any]:
     """Assemble verdict (a) + verdict (b) for Stage0HarnessResult."""
     residual_wt = residual_wt_pct_by_species(cleaned_melt_kg)
@@ -2041,7 +2041,7 @@ def build_harness_verdicts(
         engine,
         T_in_C=T_in_C,
         cleaned_oxide_wt_pct=strip_result.oxide_wt_pct,
-        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
+        cco_reference_fO2=cco_reference_fO2,
     )
     verdict_a = evaluate_verdict_a_timeline(
         residual_wt,
@@ -2050,7 +2050,7 @@ def build_harness_verdicts(
         T_in_C=T_in_C,
         timeline=timeline,
         cleaned_oxide_wt_pct=strip_result.oxide_wt_pct,
-        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
+        cco_reference_fO2=cco_reference_fO2,
     )
 
     latest_status = str(

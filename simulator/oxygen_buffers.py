@@ -190,6 +190,7 @@ CCO_SOURCE = (
 CCO_TEMPERATURE_RANGE_K = (1_373.15, 1_773.15)
 CCO_PRESSURE_RANGE_BAR = (7_500.0, 20_000.0)
 CCO_OUT_OF_BAND_NOTICE = "cco_fit_out_of_band_ideal_gas_used"
+CCO_IN_CALIBRATION_VALIDITY = "inside_cco_jakobsson_oskarsson_calibration"
 QFM_REFERENCE_SOURCE = "O'Neill 1987 QFM fit used by MAGEMin adapter"
 
 
@@ -269,7 +270,7 @@ def _cco_log10_fO2_and_validity(
             _CCO_A / temperature_K
             + _CCO_B
             + _CCO_C * (pressure_bar - 1.0) / temperature_K,
-            "inside_cco_jakobsson_oskarsson_calibration",
+            CCO_IN_CALIBRATION_VALIDITY,
         )
     return (
         _closed_co_log10_fO2_bar(temperature_K, pressure_bar),
@@ -288,7 +289,7 @@ def cco_log10_fO2_bar(temperature_K: float, pressure_bar: float = 1.0) -> float:
     temperature = _require_finite_positive(temperature_K, "temperature_K")
     pressure = _require_finite_positive(pressure_bar, "pressure_bar")
     log_fO2, validity = _cco_log10_fO2_and_validity(temperature, pressure)
-    if validity != "inside_cco_jakobsson_oskarsson_calibration":
+    if validity != CCO_IN_CALIBRATION_VALIDITY:
         warnings.warn(validity, RuntimeWarning, stacklevel=2)
     return log_fO2
 
@@ -333,6 +334,14 @@ class RedoxBufferPoint:
     formulation: str
     source: str
     validity: str
+
+    @property
+    def inside_valid_range(self) -> bool:
+        return self.validity == CCO_IN_CALIBRATION_VALIDITY
+
+    @property
+    def notice(self) -> str | None:
+        return None if self.inside_valid_range else self.validity
 
 
 @dataclass(frozen=True)
@@ -404,8 +413,8 @@ def cco_log10_fO2_interval_for_pressure_range(
     high, high_validity = _cco_log10_fO2_and_validity(temperature, high_p)
     values = [low, high]
     branches = {
-        "inside_cco_jakobsson_oskarsson_calibration"
-        if validity == "inside_cco_jakobsson_oskarsson_calibration"
+        CCO_IN_CALIBRATION_VALIDITY
+        if validity == CCO_IN_CALIBRATION_VALIDITY
         else "ideal_gas_fallback"
         for validity in (low_validity, high_validity)
     }
@@ -421,7 +430,7 @@ def cco_log10_fO2_interval_for_pressure_range(
         values.append(fit_value)
         values.append(_closed_co_log10_fO2_bar(temperature, boundary_pressure))
         branches.update(
-            {"inside_cco_jakobsson_oskarsson_calibration", "ideal_gas_fallback"}
+            {CCO_IN_CALIBRATION_VALIDITY, "ideal_gas_fallback"}
         )
 
     reason = "pressure_range_not_certified_point"
