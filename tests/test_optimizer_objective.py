@@ -3605,10 +3605,27 @@ def _supply_window_snapshots(
     sibling: str,
     window: tuple[str, ...],
 ) -> tuple[SimpleNamespace, ...]:
-    return tuple(
+    snapshots = tuple(
         _supply_kind_snapshot(index, species, sibling, kind)
         for index, kind in enumerate(window, start=1)
     )
+    # These classifier and mutation fixtures isolate interval
+    # classification from allocation. The measured-rate stamper assigns
+    # each carrier a distinct synthetic parent; record a nonbinding
+    # charge for both requested carriers in every window, including
+    # windows whose later ceiling snapshot records an inventory map.
+    nonbinding_kg = {
+        _NONBINDING_PARENT_OXIDE: _NONBINDING_OXIDE_KG,
+        f"_measured_{species}": _NONBINDING_OXIDE_KG,
+        f"_measured_{sibling}": _NONBINDING_OXIDE_KG,
+    }
+    for snapshot in snapshots:
+        inventory = getattr(snapshot, "inventory", None)
+        recorded = getattr(inventory, "melt_oxide_kg", {})
+        oxide_kg = dict(recorded) if isinstance(recorded, Mapping) else {}
+        oxide_kg.update(nonbinding_kg)
+        snapshot.inventory = SimpleNamespace(melt_oxide_kg=oxide_kg)
+    return snapshots
 
 
 def _kind_contribution_kg(kind: str) -> float | None:
@@ -3887,8 +3904,18 @@ def _activity_one_refusal_snapshot(
     }
     if temperature_C is not None:
         snapshot_fields["temperature_C"] = temperature_C
+    inventory_kg = {
+        _NONBINDING_PARENT_OXIDE: _NONBINDING_OXIDE_KG,
+        f"_measured_{species}": _NONBINDING_OXIDE_KG,
+    }
+    inventory_kg.update(
+        {
+            f"_measured_{name}": _NONBINDING_OXIDE_KG
+            for name in (rates or {})
+        }
+    )
     snapshot_fields["inventory"] = SimpleNamespace(
-        melt_oxide_kg={_NONBINDING_PARENT_OXIDE: _NONBINDING_OXIDE_KG}
+        melt_oxide_kg=inventory_kg
     )
     return SimpleNamespace(**snapshot_fields)
 
