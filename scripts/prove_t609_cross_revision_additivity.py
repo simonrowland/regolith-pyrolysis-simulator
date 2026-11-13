@@ -10,10 +10,12 @@ catalog additions cannot change the historic t-609 subject.
 from __future__ import annotations
 
 import argparse
+import ast
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 import dis
 from enum import Enum
+from functools import lru_cache
 import hashlib
 import inspect
 import json
@@ -64,31 +66,157 @@ def _global_writes(code: CodeType) -> frozenset[str]:
     return frozenset(writes)
 
 
+_PHYSICAL_CONSTANTS_MODULE = "simulator.physical_constants"
+_OPAQUE_GLOBAL_MUTATION_NAMES = frozenset(
+    {"globals", "vars", "exec", "eval", "compile", "setattr", "delattr"}
+)
+
+
+@lru_cache(maxsize=None)
+def _module_owned_constant_imports(
+    source_path: str, modified_ns: int, size: int
+) -> frozenset[str]:
+    """Return imported physical constants with no static module rebinding."""
+    del modified_ns, size  # They form the cache key and invalidate edited files.
+    try:
+        source = Path(source_path).read_text(encoding="utf-8")
+        tree = ast.parse(source, filename=source_path)
+    except (OSError, SyntaxError, UnicodeError):
+        return frozenset()
+
+    imported: set[str] = set()
+    rebound: set[str] = set()
+    opaque_namespace_access = False
+    importlib_names = {"importlib"}
+    importlib_reload_names: set[str] = set()
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name == "importlib":
+                    importlib_names.add(alias.asname or "importlib")
+                elif alias.name == "importlib.reload":
+                    importlib_reload_names.add(alias.asname or "reload")
+        elif isinstance(node, ast.ImportFrom) and node.module == "importlib":
+            for alias in node.names:
+                if alias.name == "reload":
+                    importlib_reload_names.add(alias.asname or alias.name)
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name):
+            if node.id in _OPAQUE_GLOBAL_MUTATION_NAMES or node.id == "__dict__":
+                opaque_namespace_access = True
+            if node.id in importlib_reload_names:
+                opaque_namespace_access = True
+            if isinstance(node.ctx, (ast.Store, ast.Del)):
+                rebound.add(node.id)
+        elif isinstance(node, ast.Constant) and node.value == "__dict__":
+            opaque_namespace_access = True
+        elif isinstance(node, ast.Attribute):
+            if node.attr == "__dict__":
+                opaque_namespace_access = True
+            root = node
+            while isinstance(root, ast.Attribute):
+                root = root.value
+            if node.attr == "reload" and isinstance(root, ast.Name):
+                if root.id in importlib_names:
+                    opaque_namespace_access = True
+        elif isinstance(node, (ast.Global, ast.Nonlocal)):
+            rebound.update(node.names)
+        elif isinstance(node, ast.ExceptHandler) and node.name is not None:
+            rebound.add(node.name)
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            rebound.add(node.name)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                bound_name = alias.asname or alias.name.split(".", 1)[0]
+                rebound.add(bound_name)
+        elif isinstance(node, ast.ImportFrom):
+            if any(alias.name == "*" for alias in node.names):
+                # A star import could bind any of the names we are proving.
+                return frozenset()
+            for alias in node.names:
+                bound_name = alias.asname or alias.name
+                if (
+                    node.module == _PHYSICAL_CONSTANTS_MODULE
+                    and node.level == 0
+                    and alias.asname is None
+                ):
+                    imported.add(alias.name)
+                else:
+                    # This also rejects importing the owner value under an
+                    # alias, or binding the candidate name from another owner.
+                    rebound.add(bound_name)
+                    rebound.add(alias.name)
+
+    if opaque_namespace_access:
+        return frozenset()
+    return frozenset(imported - rebound)
+
+
+def _stable_owned_global_names(
+    global_namespace: Mapping[str, Any],
+) -> frozenset[str]:
+    """Return owner globals proven stable by their importing module source."""
+    module_name = global_namespace.get("__name__")
+    module = sys.modules.get(module_name) if isinstance(module_name, str) else None
+    if module is None or vars(module) is not global_namespace:
+        return frozenset()
+
+    filename = global_namespace.get("__file__")
+    if not isinstance(filename, str):
+        return frozenset()
+    try:
+        source_path = Path(filename).resolve(strict=True)
+        if not source_path.is_file():
+            return frozenset()
+        stat = source_path.stat()
+    except (OSError, RuntimeError, ValueError):
+        return frozenset()
+
+    owner = sys.modules.get(_PHYSICAL_CONSTANTS_MODULE)
+    if owner is None:
+        return frozenset()
+    owner_values = vars(owner)
+    stable_imports = _module_owned_constant_imports(
+        str(source_path), stat.st_mtime_ns, stat.st_size
+    )
+    return frozenset(
+        name
+        for name in stable_imports
+        if type(global_namespace.get(name)) in (int, float)
+        and global_namespace.get(name) is owner_values.get(name)
+    )
+
+
 def _canonical_code(
     code: CodeType,
     global_namespace: Mapping[str, Any] | None = None,
     written_globals: frozenset[str] | None = None,
+    stable_owned_globals: frozenset[str] = frozenset(),
 ) -> dict[str, Any]:
-    """Fingerprint instructions, normalizing only stable owner globals.
+    """Fingerprint instructions, normalizing only proven-stable owner globals.
 
-    This normalization is sound under four premises: (a) the instruction is
-    ``LOAD_GLOBAL``; (b) its name resolves in the function's globals to an
-    exact ``int`` or ``float`` exported under that same name by
-    ``simulator.physical_constants``; (c) no code object in the function's
-    nested code tree stores or deletes that global; and (d) the owner binding
-    is not rebound at runtime, as pinned by
-    ``tests/test_physical_constant_ownership.py``. Under these premises the
-    load yields the same numeric value as the literal on every input. The
-    exact finite evaluation grid is supporting evidence, not the proof of
+    Replacing a load with a constant is valid only when all four conditions
+    hold: (1) it is ``LOAD_GLOBAL``, since class-local ``LOAD_NAME`` and
+    closure loads have different lookup rules; (2) the globals belong to a
+    loaded module with a resolvable source file, whose whole AST binds the
+    name only through ``from simulator.physical_constants import NAME`` and
+    never assigns, deletes, or declares it in any scope, so sibling functions
+    and other scopes cannot rebind it; (3) that source has no ``globals()``,
+    ``vars()``, ``exec``, ``eval``, ``compile``, ``__dict__``, ``setattr``,
+    ``delattr``, or ``importlib.reload`` use, because those make writes opaque
+    to the AST scan; and (4) at canonicalization time the globals binding is
+    the identical owner object with exact type ``int`` or ``float`` (not
+    ``bool``), while ``tests/test_physical_constant_ownership.py`` pins that
+    owner binding against runtime rebinding. Under these premises the load
+    yields the same numeric value as the literal on every input. The exact
+    finite evaluation grid is supporting evidence, not the proof of
     equivalence. Jump destinations use instruction indexes because inline
     cache slots shift byte offsets without changing control flow.
     """
     if written_globals is None:
         written_globals = _global_writes(code)
-    physical_constants = sys.modules.get("simulator.physical_constants")
-    physical_constant_names = (
-        vars(physical_constants) if physical_constants is not None else {}
-    )
     jump_opcodes = set(dis.hasjabs) | set(dis.hasjrel)
     decoded = tuple(dis.get_instructions(code))
     offset_to_index = {
@@ -106,16 +234,12 @@ def _canonical_code(
             )
             continue
 
-        if (
-            instruction.opname == "LOAD_GLOBAL"
-            and global_namespace is not None
-        ):
+        if instruction.opname == "LOAD_GLOBAL" and global_namespace is not None:
             name = instruction.argval
             value = global_namespace.get(name)
             if (
-                name not in written_globals
-                and type(value) in (int, float)
-                and physical_constant_names.get(name) is value
+                name in stable_owned_globals
+                and name not in written_globals
             ):
                 instructions.append(
                     ("CONST", _canonical(value, global_namespace, written_globals))
@@ -162,7 +286,14 @@ def _canonical(
         return {"__float_hex__": value.hex()}
     if isinstance(value, CodeType):
         return {
-            "__code__": _canonical_code(value, global_namespace, written_globals)
+            "__code__": _canonical_code(
+                value,
+                global_namespace,
+                written_globals,
+                _stable_owned_global_names(global_namespace)
+                if global_namespace is not None
+                else frozenset(),
+            )
         }
     if is_dataclass(value) and not isinstance(value, type):
         cls = type(value)
@@ -215,16 +346,24 @@ def _canonical(
             except ValueError:
                 closure.append({"__empty_cell__": True})
         written_globals = _global_writes(value.__code__)
+        stable_owned_globals = _stable_owned_global_names(value.__globals__)
         return {
             "__function__": f"{value.__module__}.{value.__qualname__}",
             "code": _canonical_code(
-                value.__code__, value.__globals__, written_globals
+                value.__code__,
+                value.__globals__,
+                written_globals,
+                stable_owned_globals,
             ),
             "defaults": _canonical(
-                value.__defaults__, value.__globals__, written_globals
+                value.__defaults__,
+                value.__globals__,
+                written_globals,
             ),
             "kwdefaults": _canonical(
-                value.__kwdefaults__, value.__globals__, written_globals
+                value.__kwdefaults__,
+                value.__globals__,
+                written_globals,
             ),
             "closure": closure,
         }
