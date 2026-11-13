@@ -284,9 +284,11 @@ letter is decided on the raw token or cell before spans are stripped.
 `<sup>SiO2</sup>`, `SiO2ⁿ`, `SiO2ᵃ`, and `Fe^{x}` certify no formula or
 species label. The refusal is `charged_species_unsupported`. A superscript
 in another token of the same cited span does not; that unrelated miss stays
-`cited_token_absent`. A CSV or TSV cell is one unit, the same classifier
-as an HTML cell. A space inside the cell does not split it, so `SiO2 ⁿ`
-is `charged_species_unsupported` for `SiO2`.
+`cited_token_absent`. An addressed HTML, CSV, or TSV cell is one unit
+on that check. A space inside the cell does not split it, so `Fe -`
+is `charged_species_unsupported` for `Fe` and `SiO2 ⁿ` is
+`charged_species_unsupported` for `SiO2`. Only prose splits on
+whitespace.
 Formula
 and species labels take that guarded comparison first, on prose, an
 HTML cell, a CSV or TSV cell, and repository text, so an identical

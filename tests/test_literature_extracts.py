@@ -10566,6 +10566,7 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     assert dispatch.index("_formula_label_in_text") < dispatch.index("_leaf_in_text")
     reason = inspect.getsource(vle._locator_source_blind_reason)
     assert reason.count("_pinned_leaf_certifies") == 5
+    assert reason.count("_charged_formula_miss(") == 1
     assert "_pinned_leaf_in_text" not in reason
     assert "_pinned_leaf_in_cells" not in reason
     mineru_text = (REPO_ROOT / "tools/mineru_table_draft.py").read_text(encoding="utf-8")
@@ -12032,6 +12033,122 @@ def test_csv_tsv_cell_superscript_is_classified_whole(tmp_path: Path):
                 failures.append(
                     f"{key} {label!r} ~ {relative}: {codes} != {expected}"
                 )
+    assert failures == []
+
+
+def test_addressed_cell_charge_is_one_unit(tmp_path: Path):
+    """Every addressed cell is one unit on the one charge check.
+
+    HTML, CSV, and TSV. The shapes are ``Fe -``, ``SiO2 ⁿ``,
+    ``Fe<sup>2</sup>``, and ``Cl−``. Each refuses its formula as
+    ``charged_species_unsupported``. A space in the cell does not
+    split it. Prose still splits, so ``Fe -`` in prose does not
+    charge ``Fe``. ``Fe -`` does not type ``SiO2``.
+    """
+    reason = inspect.getsource(vle._locator_source_blind_reason)
+    assert reason.count("_charged_formula_miss(") == 1
+    fe = vle._PinnedLeaf("Fe", True)
+    sio = vle._PinnedLeaf("SiO2", True)
+    spaced = "Fe -"
+    assert vle._charged_formula_miss([fe], spaced, cells=(spaced,)) is True
+    assert vle._charged_formula_miss([sio], spaced, cells=(spaced,)) is False
+    assert vle._charged_formula_miss([fe], spaced) is False
+    assert vle._formula_element_symbols(spaced) == ("Fe",)
+    shapes = (
+        ("Fe -", "Fe", "fe-space"),
+        ("SiO2 ⁿ", "SiO2", "sio2-space-sup"),
+        ("Fe<sup>2</sup>", "Fe", "fe-sup"),
+        ("Cl\u2212", "Cl", "cl-minus"),
+    )
+    failures: list[str] = []
+
+    def surfaces(body: str, stem: str):
+        return (
+            (
+                "html",
+                f"<table><tr><td>{body}</td></tr></table>\n",
+                f"text/{stem}.html",
+                {"table_row": 1, "table_column": 1},
+            ),
+            ("csv", body + "\n", f"tables/{stem}.csv", None),
+            ("tsv", body + "\n", f"tables/{stem}.tsv", None),
+        )
+
+    for body, label, stem in shapes:
+        for kind, source, relative, locator_extra in surfaces(body, stem):
+            for key in ("formula", "species"):
+                doc = _html_source_document(
+                    tmp_path,
+                    label,
+                    source,
+                    key=key,
+                    relative=relative,
+                    locator_extra=locator_extra,
+                )
+                warnings = vle.fidelity_source_warnings(
+                    doc,
+                    label=f"cell-unit-{kind}-{key}-{stem}",
+                    artifact_root=tmp_path,
+                )
+                blind = [
+                    warning
+                    for warning in warnings
+                    if warning.kind == "source_blind_pin"
+                ]
+                codes = (
+                    set().union(
+                        *(warning.reason_codes_by_pin[0] for warning in blind)
+                    )
+                    if blind and blind[0].reason_codes_by_pin
+                    else set()
+                )
+                if codes != {"charged_species_unsupported"}:
+                    failures.append(
+                        f"{kind} {key} {label!r} ~ {body!r}: {codes}"
+                    )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"cell-unit-cert-{kind}-{key}-{stem}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if (
+                    "source_blind_pin" not in joined
+                    or "charged_species_unsupported" not in joined
+                    or "superscript_in_cell" in joined
+                ):
+                    failures.append(
+                        f"certify {kind} {key} {label!r} ~ {body!r}: {errors}"
+                    )
+    for kind, source, relative, locator_extra in surfaces(
+        "Fe -", "fe-space-unrelated"
+    ):
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path,
+                "SiO2",
+                source,
+                key=key,
+                relative=relative,
+                locator_extra=locator_extra,
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc,
+                label=f"cell-unit-unrelated-{kind}-{key}",
+                artifact_root=tmp_path,
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {"cited_token_absent"}:
+                failures.append(f"unrelated {kind} {key}: {codes}")
     assert failures == []
 
 
