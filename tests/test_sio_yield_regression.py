@@ -524,13 +524,53 @@ BASELINE_STAGE3_SIO2_KG = {
 }
 
 
+def _notice_key(path: str) -> bool:
+    """True when ``path`` addresses a published ``*_notice`` value."""
+
+    leaf = path.rsplit(".", 1)[-1]
+    leaf = leaf.split("[", 1)[0]
+    return leaf.endswith("_notice") or leaf.endswith("_notices")
+
+
+def _notice_mappings(value):
+    """One legacy dict, or a list of dicts, as notice bodies.
+
+    Empty and non-mapping values are not notices. The caller then reports
+    a shape mismatch instead of hashing a dict.
+    """
+
+    if isinstance(value, dict) and value:
+        return [value]
+    if isinstance(value, list) and all(
+        isinstance(item, dict) and item for item in value
+    ):
+        return value
+    return None
+
+
 def _assert_golden_close(actual, expected, path="root"):
+    # Invariant: a golden comparison never TypeErrors on a notice's shape.
+    # Typed publication stores a list. Older goldens store one dict. The
+    # bodies are the value-identity check. A different body or a different
+    # count fails at this path.
+    if _notice_key(path) and type(actual) is not type(expected):
+        actual_notices = _notice_mappings(actual)
+        expected_notices = _notice_mappings(expected)
+        if actual_notices is not None and expected_notices is not None:
+            assert len(actual_notices) == len(expected_notices), path
+            for index, (left, right) in enumerate(
+                zip(actual_notices, expected_notices)
+            ):
+                _assert_golden_close(left, right, f"{path}[{index}]")
+            return
     if isinstance(expected, dict):
+        assert isinstance(actual, dict), path
         assert set(actual) == set(expected), path
         for key in expected:
             _assert_golden_close(actual[key], expected[key], f"{path}.{key}")
         return
     if isinstance(expected, list):
+        assert isinstance(actual, list), path
         assert len(actual) == len(expected), path
         for index, expected_item in enumerate(expected):
             _assert_golden_close(
@@ -588,6 +628,147 @@ def test_golden_comparison_matches_null_only_with_null():
         _assert_golden_close(None, 0.0)
     with pytest.raises(AssertionError):
         _assert_golden_close(0.0, None)
+
+
+_CAO_EXTRAPOLATION_NOTICE = {
+    "acquisition_flag": "evaporation_alpha_hkl_upper_bound_b136:Ca2",
+    "authority_level": "extrapolated",
+    "certified_band": {"temperature_K": [1757.0, 2273.15]},
+    "reason": "oxide_vapor_pressure_out_of_validated_range",
+    "temperature_K": 1638.15,
+    "valid_range_K": [1757.0, 2273.15],
+}
+
+
+def _wrap_notice_dicts(value):
+    """Typed publication shape: each lone notice dict becomes a one-element list."""
+
+    if isinstance(value, dict):
+        wrapped = {}
+        for key, item in value.items():
+            child = _wrap_notice_dicts(item)
+            if (
+                (key.endswith("_notice") or key.endswith("_notices"))
+                and isinstance(child, dict)
+            ):
+                child = [child]
+            wrapped[key] = child
+        return wrapped
+    if isinstance(value, list):
+        return [_wrap_notice_dicts(item) for item in value]
+    return value
+
+
+def _notice_sites(value, path="root"):
+    """Every ``*_notice`` node in a golden tree, as ``(path, value)``."""
+
+    found = []
+    if isinstance(value, dict):
+        for key, item in value.items():
+            child = f"{path}.{key}"
+            if key.endswith("_notice") or key.endswith("_notices"):
+                found.append((child, item))
+            found.extend(_notice_sites(item, child))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            found.extend(_notice_sites(item, f"{path}[{index}]"))
+    return found
+
+
+@pytest.mark.parametrize("actual_is_list", [False, True])
+def test_golden_comparison_accepts_one_notice_dict_or_list(actual_is_list):
+    """The Ca2 yield failure: list-shaped actual, dict-shaped golden.
+
+    Same body compares equal from either side. A changed reason, an extra
+    notice, or a non-notice list still fails by assertion. ``set()`` on the
+    list of dicts used to raise ``TypeError: unhashable type: 'dict'``.
+    """
+
+    body = dict(_CAO_EXTRAPOLATION_NOTICE)
+    lone = body
+    listed = [dict(body)]
+    actual = listed if actual_is_list else lone
+    expected = lone if actual_is_list else listed
+    path = (
+        "root.fouling_rate.sticking_alpha_authority."
+        "vapour_carrier_authority_by_species.Ca2.extra.extrapolation_notice"
+    )
+    _assert_golden_close(actual, expected, path)
+    changed = dict(body)
+    changed["reason"] = "other_reason"
+    with pytest.raises(AssertionError, match="extrapolation_notice"):
+        _assert_golden_close([changed], body, path)
+    with pytest.raises(AssertionError, match="extrapolation_notice"):
+        _assert_golden_close([dict(body), dict(body)], body, path)
+    with pytest.raises(AssertionError):
+        _assert_golden_close(
+            [{"unhashable": True}],
+            {"keep": 1},
+            "root.fouling_rate.payload",
+        )
+
+
+def _spoil_notice_body(node) -> bool:
+    """Move one leaf past the 1% golden tolerance.
+
+    Adding 10 K to 1638.15 stays inside ``max(abs*0.01, 1e-12)``. Scaling
+    by 4 and adding 50 does not, for any finite number. Nested mappings
+    and lists are walked so a notice whose numbers sit under ``certified_band``
+    is not skipped.
+    """
+
+    if isinstance(node, dict):
+        for key, item in node.items():
+            if isinstance(item, bool):
+                continue
+            if isinstance(item, (int, float)):
+                node[key] = float(item) * 4.0 + 50.0
+                return True
+        for item in node.values():
+            if isinstance(item, (dict, list)) and _spoil_notice_body(item):
+                return True
+        return False
+    if isinstance(node, list):
+        for index, item in enumerate(node):
+            if isinstance(item, bool):
+                continue
+            if isinstance(item, (int, float)):
+                node[index] = float(item) * 4.0 + 50.0
+                return True
+            if isinstance(item, (dict, list)) and _spoil_notice_body(item):
+                return True
+    return False
+
+
+def test_every_sio_golden_notice_survives_list_shape():
+    """Each notice in the SiO goldens compares equal to its list-shaped twin.
+
+    A numeric leaf inside one wrapped notice still fails the comparison,
+    and the failure names that notice. This does not run the yield CLI.
+    """
+
+    seen = 0
+    for _feedstock, golden_name in GOLDENS:
+        expected = json.loads((FIXTURE_DIR / golden_name).read_text())
+        sites = _notice_sites(expected)
+        assert sites, golden_name
+        seen += len(sites)
+        _assert_golden_close(_wrap_notice_dicts(expected), expected)
+        _assert_golden_close(expected, _wrap_notice_dicts(expected))
+    assert seen >= 2
+    mutated = _wrap_notice_dicts(
+        json.loads((FIXTURE_DIR / GOLDENS[0][1]).read_text())
+    )
+    sites = _notice_sites(mutated)
+    path, value = sites[0]
+    target = value[0] if isinstance(value, list) else value
+    assert _spoil_notice_body(target), path
+    with pytest.raises(AssertionError) as caught:
+        _assert_golden_close(
+            mutated,
+            json.loads((FIXTURE_DIR / GOLDENS[0][1]).read_text()),
+        )
+    assert path in str(caught.value), caught.value
 
 
 @pytest.mark.parametrize(("feedstock", "golden_name"), GOLDENS)
