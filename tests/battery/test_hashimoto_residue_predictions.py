@@ -51,20 +51,6 @@ def _hashimoto_prediction_tuple_digest(predictions) -> str:
 pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
 
 
-@pytest.fixture(scope="module")
-def _hashimoto_real_openimcc_cohort():
-    pytest.importorskip("openimcc")
-    experiments, _measured_rows, preform_dimensions_mm = _source_data()
-    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
-    return _predict_hashimoto_residue_cohort(
-        experiments,
-        catalog,
-        preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="pre-mass-loss-pin",
-        engine="openimcc",
-    )
-
-
 def _hanging_openimcc_engine(**_kwargs):
     import threading
 
@@ -308,11 +294,28 @@ def _source_data():
     )
 
 
+# PROVISIONAL CPU budget from the historical pre-fixture gate14 cohort cost:
+# 665 CPU s on Mac-Studio-256-3 (s3, loaded). The checked-in gate14 JUnit is
+# fixture-era (291.403 call CPU s / 354.982 wall s) and excludes that setup
+# cost, so it is not comparable. Fresh samples: 0; spread unavailable. Three
+# whole-file cpu_budget(1) probes returned no receipt within 75 min. The cap
+# is ceil(665 * 1.5) = 998 CPU s. CPU sizes the budget; wall/CPU remains a
+# tripwire once an uncensored full-cohort run is available.
+@pytest.mark.nightly
+@pytest.mark.cpu_budget(998)
 @pytest.mark.xdist_group("hashimoto_real_cohort")
-def test_hashimoto_openimcc_primary_numeric_output_is_pinned(
-    _hashimoto_real_openimcc_cohort,
-) -> None:
-    predictions = copy.deepcopy(_hashimoto_real_openimcc_cohort)
+def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
+    pytest.importorskip("openimcc")
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    cohort = _predict_hashimoto_residue_cohort(
+        experiments,
+        catalog,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision="pre-mass-loss-pin",
+        engine="openimcc",
+    )
+    predictions = copy.deepcopy(cohort)
     assert _hashimoto_prediction_tuple_digest(predictions) == (
         "32160db87343d79931fef2a3a862ddc570aacc770faf38cec6b2a5f5dbfbd635"
     )
@@ -737,13 +740,7 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     legacy_catalog = vapor_pressure_legacy_view(catalog)
-    catalog_rows = [
-        (str(species), row)
-        for group in legacy_catalog.values()
-        if isinstance(group, dict)
-        for species, row in group.items()
-        if isinstance(row, dict) and row.get("formula")
-    ]
+    catalog_rows = residue._residue_catalog_rows(legacy_catalog)
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
     activity_compositions: list[tuple[tuple[str, float], ...]] = []
     original_evaluate = openimcc_bridge.evaluate

@@ -2887,6 +2887,18 @@ def _hashimoto_run_setup(
     )
 
 
+def _residue_catalog_rows(
+    legacy_catalog: Mapping[str, Any],
+) -> list[tuple[str, Mapping[str, Any]]]:
+    return [
+        (str(name), row)
+        for group in legacy_catalog.values()
+        if isinstance(group, Mapping)
+        for name, row in group.items()
+        if isinstance(row, Mapping) and row.get("formula")
+    ]
+
+
 def _predict_hashimoto_residue_cohort(
     experiments: Sequence[Mapping[str, Any]],
     runtime_catalog: Mapping[str, Any],
@@ -2928,13 +2940,7 @@ def _predict_hashimoto_residue_cohort(
 
     gas_pack = load_gas_datapack()
     legacy_catalog = vapor_pressure_legacy_view(runtime_catalog)
-    catalog_rows = [
-        (str(species), row)
-        for group in legacy_catalog.values()
-        if isinstance(group, Mapping)
-        for species, row in group.items()
-        if isinstance(row, Mapping) and row.get("formula")
-    ]
+    catalog_rows = _residue_catalog_rows(legacy_catalog)
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
     first = experiments[0]
     printed_wt_pct = first["sample"]["printed_composition"]["state"]["value"]
@@ -3609,13 +3615,7 @@ def _predict_sossi_residue_cohort(
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     legacy_catalog = vapor_pressure_legacy_view(runtime_catalog)
-    catalog_rows = [
-        (str(name), row)
-        for group in legacy_catalog.values()
-        if isinstance(group, Mapping)
-        for name, row in group.items()
-        if isinstance(row, Mapping) and row.get("formula")
-    ]
+    catalog_rows = _residue_catalog_rows(legacy_catalog)
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
     engine_binding_identity: dict[str, str] | None = None
     if engine == "openimcc":
