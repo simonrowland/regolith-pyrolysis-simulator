@@ -10294,6 +10294,7 @@ def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
         ("<table><tr><td>1.5\u00b710<sup>3</sup></td></tr></table>\n", 1.5e3, True),
         ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", -100.0, True),
         ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", 100.0, False),
+        ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", "-10^2", True),
         (
             "<table><tr><td>-1.5\u00d710<sup>3</sup></td></tr></table>\n",
             -1500.0,
@@ -10351,10 +10352,25 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     assert vle._leaf_in_text(100, "SiO2 100") is True
     assert vle._leaf_in_text(1550, "1 550") is False
     assert vle._fold_digit_groups("SiO2 100") == "SiO2 100"
-    text_source = inspect.getsource(vle._pinned_leaf_in_text)
-    cell_source = inspect.getsource(vle._pinned_leaf_in_cells)
-    assert text_source.index("formula_label") < text_source.index("_formula_label_in_text")
-    assert cell_source.index("_cell_certifies_leaf") < cell_source.index("formula_label")
+    dispatch = inspect.getsource(vle._pinned_leaf_certifies)
+    assert dispatch.index("formula_label") < dispatch.index("_formula_label_in_text")
+    assert dispatch.index("formula_label") < dispatch.index("_formula_cell_matches")
+    assert dispatch.index("_formula_cell_matches") < dispatch.index("_cell_certifies_leaf")
+    assert dispatch.index("_formula_label_in_text") < dispatch.index("_leaf_in_text")
+    reason = inspect.getsource(vle._locator_source_blind_reason)
+    assert reason.count("_pinned_leaf_certifies") == 5
+    assert "_pinned_leaf_in_text" not in reason
+    assert "_pinned_leaf_in_cells" not in reason
+    mineru_text = (REPO_ROOT / "tools/mineru_table_draft.py").read_text(encoding="utf-8")
+    validator_text = (REPO_ROOT / "tools/validate_literature_extracts.py").read_text(
+        encoding="utf-8"
+    )
+    assert mineru_text.count("⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹") == 1
+    assert "⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹" not in validator_text
+    assert "UNICODE_SUPERSCRIPTS" in validator_text
+    assert vle._explicit_power_decimal("-10^2") == Decimal("-100")
+    assert vle._explicit_power_decimal("-10^2") != Decimal("100")
+    assert vle._superscript_power_decimal("-102", ((3, 4),)) == Decimal("-100")
     for numeric in ("2", "2.0", "6.98", "1e-999"):
         assert vle._formula_label_in_text(numeric, "SiO_{2}") is False
         assert vle._formula_label_in_text(numeric, "SiO₂") is False
@@ -10747,8 +10763,8 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     ``SiO2`` is not ``CaO·SiO2``. A raw token with a caret, ``<sup>``,
     a Unicode superscript, or a trailing charge is unsupported.
     ``Fe``, ``Fe2``, and ``Fe^{2+}`` refuse with
-    ``charged_species_unsupported``. A neutral ``Fe`` elsewhere still
-    certifies.
+    ``charged_species_unsupported``, including a CSV cell. A neutral
+    ``Fe`` elsewhere still certifies.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -10942,6 +10958,60 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                 or "superscript_in_cell" in joined
             ):
                 failures.append(f"charged cell {key} {label!r}: {errors}")
+    for kind, source in _CHARGED_SPECIES_SOURCES:
+        for key in ("formula", "species"):
+            for label in _CHARGED_SPECIES_LABELS:
+                doc = _html_source_document(
+                    tmp_path,
+                    label,
+                    source + "\n",
+                    key=key,
+                    relative="tables/charged.csv",
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"charged-csv-{key}-{kind}-{label}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if (
+                    "charged_species_unsupported" not in joined
+                    or "source_blind_pin" not in joined
+                ):
+                    failures.append(
+                        f"charged csv {key} {label!r} {kind} {source!r}: {errors}"
+                    )
+        neighbour = f"Fe,{source}\n"
+        doc = _html_source_document(
+            tmp_path,
+            "Fe",
+            neighbour,
+            key="formula",
+            relative="tables/charged.csv",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"charged-csv-neutral-{kind}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"csv neutral Fe {kind} {source!r}: {errors}")
+        for label in ("Fe2", "Fe^{2+}"):
+            doc = _html_source_document(
+                tmp_path,
+                label,
+                neighbour,
+                key="formula",
+                relative="tables/charged.csv",
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc,
+                label=f"charged-csv-neighbour-{kind}-{label}",
+                artifact_root=tmp_path,
+            )
+            joined = "\n".join(errors)
+            if "charged_species_unsupported" not in joined:
+                failures.append(
+                    f"charged csv neighbour {label!r} {kind}: {errors}"
+                )
     assert failures == []
 
 

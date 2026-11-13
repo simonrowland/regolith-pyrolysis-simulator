@@ -217,12 +217,13 @@ complete power and nothing else: an optional sign, a base number, an
 optional × or x or ·, then 10 and the superscript exponent, or the base
 raised to that exponent. `10<sup>3</sup>` certifies `1e3`.
 `1.5×10<sup>3</sup>` certifies 1500 / `1.5e3`. A leading minus applies
-to the whole power, so `-10<sup>2</sup>` is -100 and `-1.5×10<sup>3</sup>`
-is -1500. The positive value does not certify. `10<sup>3</sup>2` and any
+to the whole power. The HTML cell and the caret spelling use that one
+parser, so `-10<sup>2</sup>` and `-10^2` are -100 and `100` does not
+certify. `-1.5×10<sup>3</sup>` is -1500. `10<sup>3</sup>2` and any
 other leading or trailing content are `superscript_in_cell`. A plain
 number is also `superscript_in_cell`, so `103` and `1000` do not
 certify. A string certifies only as a spelling of that power (`1e3`,
-`10^3`, `1×10^3`). A value printed
+`10^3`, `1×10^3`, `-10^2`). A value printed
 in another row of the same line does not certify. A cited
 `line_range`, or the opened text when `line_range` is absent, that
 includes a line of an HTML `<table>` and has no `table_row` or
@@ -248,9 +249,12 @@ contains `^` does not certify as a plain formula or a plain number, so
 and `$SiO^{2}$` does not certify `SiO2`. Charged or powered species
 labels are unsupported. Before any wrapper is removed, a raw token that
 carries `^`, `<sup>`, a Unicode superscript, or a trailing charge sign
-on a formula is charged. That token, and an HTML cell that contains it,
-certifies no formula or species label, neither the neutral prefix nor a
-charged label, and certifies no number. The refusal is
+on a formula is charged. That token, and an HTML, CSV, or TSV cell
+that contains it, certifies no formula or species label, neither the
+neutral prefix nor a charged label, and certifies no number. Formula
+and species labels take that guarded comparison first, on prose, an
+HTML cell, a CSV or TSV cell, and repository text, so an identical
+`Fe^{2+}` cell does not certify. The refusal is
 `charged_species_unsupported`. `Fe`, `Fe2`, and `Fe^{2+}` all refuse
 `$\mathrm{Fe}^{2+}$`, `$Fe^{2+}$`, `Fe<sup>2+</sup>`, `Fe⁺`, and `Fe²⁺`.
 A neutral `Fe` elsewhere in the same text still certifies `Fe`. A plain

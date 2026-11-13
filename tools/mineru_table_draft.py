@@ -169,10 +169,12 @@ _COMMA_DECIMAL = re.compile(
 )
 _AMBIGUOUS_COMMA = re.compile(r"(?<![\d.,])\d{2,},\d{3}(?!\d)")
 _FOOTNOTE_MARK = re.compile(r"([*†‡§¶|]+)$")
+# The one superscript alphabet. Certification imports this string.
+UNICODE_SUPERSCRIPTS = "⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹"
 _NUMERIC_SUPERSCRIPT = re.compile(
-    r"[+\-−–—]?\d+|[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+"
+    r"[+\-−–—]?\d+|[" + UNICODE_SUPERSCRIPTS + r"]+"
 )
-_UNICODE_SUPERSCRIPT_SUFFIX = re.compile(r"[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+$")
+_UNICODE_SUPERSCRIPT_SUFFIX = re.compile("[" + UNICODE_SUPERSCRIPTS + r"]+$")
 _NEGATIVE_HEADER = re.compile(
     r"\b(?:negative|minus)\b|below\s+zero|less\s+than\s+zero|[<≤]\s*0",
     re.IGNORECASE,

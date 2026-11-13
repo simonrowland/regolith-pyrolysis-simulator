@@ -59,8 +59,8 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   optional × or x or ·, then 10 and the superscript exponent, or the
   base raised to that exponent. ``10<sup>3</sup>`` certifies ``1e3``.
   ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``. A leading minus
-  applies to the whole power, so ``-10<sup>2</sup>`` is ``-100`` and
-  not ``100``. ``10<sup>3</sup>2``
+  applies to the whole power, so ``-10<sup>2</sup>`` and the caret
+  spelling ``-10^2`` are ``-100`` and not ``100``. ``10<sup>3</sup>2``
   and any other leading or trailing content are ``superscript_in_cell``,
   as is a plain number. A value in another row
   does not certify. Formula and species labels are normalized before every
@@ -75,8 +75,10 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``$O^{2-}$`` is not ``O2`` and ``$SiO^{2}$`` is not ``SiO2``.
   A raw token that carries ``^``, ``<sup>``, a Unicode superscript, or a
   trailing charge sign is a charged species. It certifies no formula or
-  species label and no number. The refusal is
-  ``charged_species_unsupported``. ``Fe`` is not ``$\\mathrm{Fe}^{2+}$``.
+  species label and no number, on prose, an HTML cell, a CSV or TSV
+  cell, and repository text. The refusal is
+  ``charged_species_unsupported``. ``Fe`` is not ``$\\mathrm{Fe}^{2+}$``
+  and ``Fe^{2+}`` is not an identical CSV cell.
   A plain numeric cell with no element symbol is still a power.
   A subscript digit inside a formula token is not a number: ``SiO_{2}``
   and ``SiO₂`` do not certify 2, and ``Fe_{2}O_{3}`` does not certify 2.
@@ -196,6 +198,7 @@ from simulator.battery.extract_context import (
 from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.state_types import StateTag
 from tools.mineru_table_draft import (
+    UNICODE_SUPERSCRIPTS,
     Cell,
     TableGeometryError,
     parse_table_html,
@@ -872,12 +875,6 @@ def _html_table_grid(
 _EXPLICIT_SCIENCE_RE = re.compile(
     r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))[eE]([+\-]?\d+)"
 )
-_EXPLICIT_CARET_RE = re.compile(
-    r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\s*\^\s*([+\-]?\d+)"
-)
-_EXPLICIT_TIMES_RE = re.compile(
-    r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\s*×\s*10\s*\^\s*([+\-]?\d+)"
-)
 # × U+00D7, ASCII x, · U+00B7. The optional group is mantissa times 10.
 # Without it the prefix is the base of base**exponent.
 _SUPERSCRIPT_TIMES = "\u00d7x\u00b7"
@@ -898,52 +895,19 @@ def _power_product(base: Decimal, exponent: int) -> Decimal | None:
     return value
 
 
-def _explicit_power_decimal(text: str) -> Decimal | None:
-    """Value of one explicit power spelling, or None.
-
-    ``1e3``, ``10^3``, and ``1×10^3`` are powers. ``1000`` and ``103``
-    are plain numbers.
-    """
-    token = _fold_numeric_signs(text.strip())
-    scientific = _EXPLICIT_SCIENCE_RE.fullmatch(token)
-    if scientific:
-        return _finite_decimal(f"{scientific.group(1)}e{scientific.group(2)}")
-    caret = _EXPLICIT_CARET_RE.fullmatch(token)
-    if caret:
-        base = _finite_decimal(caret.group(1))
-        if base is None:
-            return None
-        return _power_product(base, int(caret.group(2)))
-    times = _EXPLICIT_TIMES_RE.fullmatch(token)
-    if times:
-        mantissa = _finite_decimal(times.group(1))
-        if mantissa is None:
-            return None
-        factor = _power_product(Decimal(10), int(times.group(2)))
-        if factor is None:
-            return None
-        try:
-            value = mantissa * factor
-        except (ArithmeticError, DecimalException):
-            return None
-        if not value.is_finite():
-            return None
-        return value
-    return None
-
-
 def _superscript_power_decimal(
     text: str, spans: tuple[tuple[int, int], ...]
 ) -> Decimal | None:
-    """One complete power cell, or None.
+    """One complete power. The unary sign applies to the whole value.
 
     The cell is an optional sign, a base number, an optional × or x or
     middle dot, then 10, and one superscript exponent. Or that base raised
-    to the exponent. The sign applies to the whole printed value, so
-    ``-10<sup>2</sup>`` is ``-100`` and ``-1.5×10<sup>3</sup>`` is
-    ``-1500``. ``10<sup>3</sup>`` is ``10**3``, which is ``1e3``.
+    to the exponent. ``-10<sup>2</sup>`` and the caret spelling ``-10^2``
+    are ``-(10**2)`` = ``-100``, not ``(-10)**2``. ``-1.5×10<sup>3</sup>``
+    is ``-1500``. ``10<sup>3</sup>`` is ``10**3``, which is ``1e3``.
     ``1.5×10<sup>3</sup>`` is ``1.5 * 10**3``. A trailing or leading extra,
-    including ``10<sup>3</sup>2``, is not a power.
+    including ``10<sup>3</sup>2``, is not a power. This is the only
+    signed-power parser.
     """
     if len(spans) != 1:
         return None
@@ -985,6 +949,29 @@ def _superscript_power_decimal(
     if not value.is_finite():
         return None
     return value
+
+
+def _explicit_power_decimal(text: str) -> Decimal | None:
+    """Value of one explicit power spelling, or None.
+
+    ``1e3``, ``10^3``, and ``1×10^3`` are powers. ``1000`` and ``103``
+    are plain numbers. A caret spelling is the HTML power parser, so
+    ``-10^2`` is ``-100``.
+    """
+    token = _fold_numeric_signs(text.strip())
+    scientific = _EXPLICIT_SCIENCE_RE.fullmatch(token)
+    if scientific:
+        return _finite_decimal(f"{scientific.group(1)}e{scientific.group(2)}")
+    if "^" not in token:
+        return None
+    prefix, _, exponent = token.partition("^")
+    prefix = prefix.strip()
+    exponent = exponent.strip()
+    if not prefix or not exponent:
+        return None
+    return _superscript_power_decimal(
+        prefix + exponent, ((len(prefix), len(prefix) + len(exponent)),)
+    )
 
 
 def _superscript_leaf_certifies(
@@ -3363,11 +3350,9 @@ def _formula_run_char(ch: str) -> bool:
     return (ch.isascii() and ch.isalnum()) or ch in _FORMULA_RUN_MARKS
 
 
-# Superscript digits and signs. A raw token that carries one of these, a
-# caret, or ``<sup>`` is a charged species before any wrapper is removed.
-_UNICODE_SUPERSCRIPTS = (
-    "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u207a\u207b"
-)
+# ``UNICODE_SUPERSCRIPTS`` is the MinerU alphabet. A raw token that carries
+# one of those characters, a caret, or ``<sup>`` is a charged species
+# before any wrapper is removed.
 _SUP_TAG_RE = re.compile(r"</?\s*sup\b[^>]*>", re.IGNORECASE)
 # The numeric times sign in ``1.5x10``. It is not an element symbol.
 _TIMES_X_RE = re.compile(r"(?<=\d)\s*[xX]\s*(?=10)")
@@ -3394,7 +3379,7 @@ def _raw_token_is_charged_species(token: str) -> bool:
         return False
     if "^" in raw or "<sup" in raw.lower():
         return True
-    if any(ch in _UNICODE_SUPERSCRIPTS for ch in raw):
+    if any(ch in UNICODE_SUPERSCRIPTS for ch in raw):
         return True
     return _TRAILING_FORMULA_CHARGE_RE.search(raw) is not None
 
@@ -3501,24 +3486,26 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
     return False
 
 
-def _pinned_leaf_in_text(leaf: _PinnedLeaf, text: str) -> bool:
-    """Formula labels compare only after the formula fold.
+def _pinned_leaf_certifies(
+    leaf: _PinnedLeaf,
+    text: str,
+    cells: Sequence[str] | None = None,
+) -> bool:
+    """Formula and species labels use the guarded comparison first.
 
-    A raw substring would accept CO inside CO₂. Other leaves keep the
-    ordinary token match.
+    Prose and repository text pass ``text`` and leave ``cells`` unset.
+    An HTML cell, a CSV cell, and a TSV cell pass ``cells``. A formula
+    label never falls through to a raw string or numeric match, so an
+    identical ``Fe^{2+}`` cell does not certify. Other leaves keep the
+    text token or the whole-cell match.
     """
     if leaf.formula_label and isinstance(leaf.value, str):
-        return _formula_label_in_text(leaf.value, text)
-    return _leaf_in_text(leaf.value, text)
-
-
-def _pinned_leaf_in_cells(leaf: _PinnedLeaf, cells: Sequence[str]) -> bool:
-    """Whole-cell match, then a formula fold only for a formula label."""
-    if any(_cell_certifies_leaf(leaf.value, cell) for cell in cells):
-        return True
-    if leaf.formula_label and isinstance(leaf.value, str):
+        if cells is None:
+            return _formula_label_in_text(leaf.value, text)
         return any(_formula_cell_matches(leaf.value, cell) for cell in cells)
-    return False
+    if cells is None:
+        return _leaf_in_text(leaf.value, text)
+    return any(_cell_certifies_leaf(leaf.value, cell) for cell in cells)
 
 
 def _certification_scalar_leaves(
@@ -3710,13 +3697,18 @@ def _locator_source_blind_reason(
                     candidate_reason_codes.add("charged_species_unsupported")
                     break
                 if superscript_spans:
-                    missing = [
-                        leaf
-                        for leaf in leaves
-                        if not _superscript_leaf_certifies(
-                            leaf.value, cell, superscript_spans
-                        )
-                    ]
+                    missing = []
+                    for leaf in leaves:
+                        if leaf.formula_label and isinstance(leaf.value, str):
+                            matched = _pinned_leaf_certifies(
+                                leaf, cell, (cell,)
+                            )
+                        else:
+                            matched = _superscript_leaf_certifies(
+                                leaf.value, cell, superscript_spans
+                            )
+                        if not matched:
+                            missing.append(leaf)
                     if missing:
                         rendered = ", ".join(
                             repr(leaf.value) for leaf in missing[:3]
@@ -3732,7 +3724,7 @@ def _locator_source_blind_reason(
                 missing = [
                     leaf
                     for leaf in leaves
-                    if not _pinned_leaf_in_cells(leaf, (cell,))
+                    if not _pinned_leaf_certifies(leaf, cell, (cell,))
                 ]
             elif delimiter is None:
                 cited, span_error = _cited_text(text, locator)
@@ -3750,7 +3742,7 @@ def _locator_source_blind_reason(
                     missing = [
                         leaf
                         for leaf in leaves
-                        if not _pinned_leaf_in_text(leaf, prose)
+                        if not _pinned_leaf_certifies(leaf, prose)
                     ]
                     if missing:
                         candidate_reasons.append(
@@ -3768,7 +3760,7 @@ def _locator_source_blind_reason(
                 missing = [
                     leaf
                     for leaf in leaves
-                    if not _pinned_leaf_in_text(leaf, cited)
+                    if not _pinned_leaf_certifies(leaf, cited)
                 ]
             else:
                 # Parse the complete table, then select. A sliced line is not a table.
@@ -3790,7 +3782,7 @@ def _locator_source_blind_reason(
                 missing = [
                     leaf
                     for leaf in leaves
-                    if not _pinned_leaf_in_cells(leaf, cells)
+                    if not _pinned_leaf_certifies(leaf, charge_text, cells)
                 ]
             if not missing:
                 key_matched = True
@@ -3873,7 +3865,9 @@ def fidelity_source_warnings(
     ``H2O2``. A token that contains ``^`` holds a superscript and does
     not certify as a plain formula or a plain number. A raw token that
     carries ``^``, ``<sup>``, a Unicode superscript, or a trailing charge
-    sign is unsupported. It certifies no formula or species label. The
+    sign is unsupported. It certifies no formula or species label, on
+    prose, an HTML cell, a CSV or TSV cell, and repository text. The
+    comparison is that one guard, before a raw cell match. The
     refusal is ``charged_species_unsupported``.
     A subscript digit inside a formula token is not a number, so
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
@@ -3893,7 +3887,8 @@ def fidelity_source_warnings(
     is a complete power and nothing else. ``10<sup>3</sup>`` certifies
     ``1e3``. ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``.
     A leading minus applies to the whole power, so ``-10<sup>2</sup>``
-    is ``-100``.
+    and the caret spelling ``-10^2`` are ``-100``. ``100`` does not
+    certify.
     ``10<sup>3</sup>2`` and a plain number are ``superscript_in_cell``.
     An unsigned digit run joins on a thin space, narrow no-break space,
     or no-break space. An ASCII space does not. The first group is one
