@@ -10343,6 +10343,88 @@ def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
     assert failures == []
 
 
+# The superscript-cell family. Each axis is a branch of the power grammar:
+# one leading sign (or a second sign), a base (or none), a times mark (or
+# none), and a superscript exponent (or none). The product is every shape.
+_SUPERSCRIPT_CELL_SIGNS = ("", "+", "-", "--", "+-", "-\u2212")
+_SUPERSCRIPT_CELL_BASES = ("", "0", "10", "1.5", ".5")
+_SUPERSCRIPT_CELL_TIMES = ("", "\u00d7", "x", "\u00b7")
+_SUPERSCRIPT_CELL_EXPONENTS = ("", "2", "-2", "+3")
+
+
+def _superscript_cell_family() -> list[str]:
+    """Every superscript cell in the grammar product, as one HTML table."""
+    cells: list[str] = []
+    for sign, base, times, exponent in itertools.product(
+        _SUPERSCRIPT_CELL_SIGNS,
+        _SUPERSCRIPT_CELL_BASES,
+        _SUPERSCRIPT_CELL_TIMES,
+        _SUPERSCRIPT_CELL_EXPONENTS,
+    ):
+        marked = f"{times}10" if times else ""
+        inner = f"{sign}{base}{marked}<sup>{exponent}</sup>"
+        cells.append(f"<table><tr><td>{inner}</td></tr></table>\n")
+    cells.append("<table><tr><td>10<sup>3</sup>2</td></tr></table>\n")
+    return cells
+
+
+def test_superscript_cell_family_certifies_or_refuses(tmp_path: Path):
+    """A superscript cell returns a certification result. It does not raise.
+
+    ``<sup>2</sup>`` has an empty base. That cell refuses with
+    ``superscript_in_cell``. ``0<sup>2</sup>`` is ``0**2``, which is
+    positive zero, so ``0.0`` certifies and ``-0.0`` refuses. The sign
+    comparison is ``_same_signed_decimal`` on both the plain-cell path
+    and the two superscript equalities. The expected sign bits come from
+    ``Decimal``, not from the gate.
+    """
+    reader = inspect.getsource(vle._read_superscript_power)
+    assert 'prefix[:1] in {"+", "-"}' in reader
+    leaf = inspect.getsource(vle._superscript_leaf_certifies)
+    assert leaf.count("and _same_signed_decimal") == 2
+    assert "_same_signed_decimal" in inspect.getsource(vle._cell_certifies_leaf)
+    assert vle._superscript_power_decimal("2", ((0, 1),)) is None
+    positive_zero = Decimal(0) ** 2
+    negative_zero = Decimal(repr(-0.0))
+    assert positive_zero.as_tuple().sign == 0
+    assert negative_zero.as_tuple().sign == 1
+    pins = (
+        ("<table><tr><td><sup>2</sup></td></tr></table>\n", 2, False),
+        ("<table><tr><td>0<sup>2</sup></td></tr></table>\n", 0.0, True),
+        ("<table><tr><td>0<sup>2</sup></td></tr></table>\n", -0.0, False),
+    )
+    for cell, pin, accepts in pins:
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            cell,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"sup-pin-{pin!r}", artifact_root=tmp_path
+        )
+        if accepts:
+            assert errors == [], (cell, pin, errors)
+            continue
+        joined = "\n".join(errors)
+        assert "source_blind_pin" in joined, (cell, pin, errors)
+        assert "superscript_in_cell" in joined, (cell, pin, errors)
+    family = _superscript_cell_family()
+    assert "<table><tr><td><sup>2</sup></td></tr></table>\n" in family
+    assert "<table><tr><td>0<sup>2</sup></td></tr></table>\n" in family
+    for cell in family:
+        doc = _html_source_document(
+            tmp_path,
+            1,
+            cell,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="sup-family", artifact_root=tmp_path
+        )
+        assert isinstance(errors, list), (cell, errors)
+
+
 def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     """Formula and species labels fold subscript markup. Numbers do not.
 
@@ -10815,6 +10897,10 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     ``SO_{4}−``, and ``Fe-rich`` refuse the neutral label on prose, an
     HTML cell, CSV, and TSV. ``Cl`` certifies ``Cl``. ``-6.98``
     certifies ``-6.98``. An unrelated formula miss is not that refusal.
+    The charged reason is the element symbols after the subscript fold,
+    lowercase letters included. ``SO₄−`` does not type ``SiO2``, ``F−``
+    does not type ``Fe``, and ``MnO−`` does not type ``MgO``: each is
+    ``cited_token_absent``.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -11228,6 +11314,82 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
         or "charged_species_unsupported" in joined
     ):
         failures.append(f"unrelated SiO2 beside Fe-rich: {errors}")
+    assert vle._formula_element_symbols("SiO2") == ("Si", "O")
+    assert vle._formula_element_symbols("SO\u2084\u2212") == ("S", "O")
+    assert vle._formula_element_symbols("Fe") == ("Fe",)
+    assert vle._formula_element_symbols("F\u2212") == ("F",)
+    assert vle._formula_element_symbols("MgO") == ("Mg", "O")
+    assert vle._formula_element_symbols("MnO\u2212") == ("Mn", "O")
+    assert vle._formula_element_symbols("SO4") == ("S", "O")
+    assert vle._formula_element_symbols("Fe-rich") == ("Fe",)
+    assert vle._formula_element_symbols("Fe2") == ("Fe",)
+    assert vle._formula_element_symbols("Fe^{2+}") == ("Fe",)
+    assert vle._charged_token_carries_label("SO\u2084\u2212", "SiO2") is False
+    assert vle._charged_token_carries_label("F\u2212", "Fe") is False
+    assert vle._charged_token_carries_label("MnO\u2212", "MgO") is False
+    assert vle._charged_token_carries_label("SO\u2084\u2212", "SO4") is True
+    assert vle._charged_token_carries_label("Fe-rich", "Fe") is True
+    assert vle._charged_token_carries_label("Cl\u2212,", "Cl") is True
+    assert not hasattr(vle, "_uppercase_element_letters")
+    # A shared uppercase skeleton is not the charged reason.
+    skeleton_misses = (
+        ("SiO2", "SO\u2084\u2212"),
+        ("Fe", "F\u2212"),
+        ("MgO", "MnO\u2212"),
+    )
+    for label, source in skeleton_misses:
+        csv_cell = source
+        surfaces = (
+            ("prose", source + "\n", "text/skeleton-miss.md", None),
+            (
+                "html",
+                f"<table><tr><td>{source}</td></tr></table>\n",
+                "text/skeleton-miss.html",
+                {"table_row": 1, "table_column": 1},
+            ),
+            ("csv", csv_cell + "\n", "tables/skeleton-miss.csv", None),
+            ("tsv", source + "\n", "tables/skeleton-miss.tsv", None),
+        )
+        for kind, text, relative, locator_extra in surfaces:
+            for key in ("formula", "species"):
+                doc = _html_source_document(
+                    tmp_path,
+                    label,
+                    text,
+                    key=key,
+                    relative=relative,
+                    locator_extra=locator_extra,
+                )
+                warnings = vle.fidelity_source_warnings(
+                    doc, label=f"skeleton-{kind}-{key}", artifact_root=tmp_path
+                )
+                blind = [
+                    warning
+                    for warning in warnings
+                    if warning.kind == "source_blind_pin"
+                ]
+                codes = (
+                    set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                    if blind and blind[0].reason_codes_by_pin
+                    else set()
+                )
+                if codes != {"cited_token_absent"}:
+                    failures.append(
+                        f"skeleton {kind} {key} {label!r} ~ {source!r}: {codes}"
+                    )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"skeleton-cert-{kind}-{key}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if (
+                    "source_blind_pin" not in joined
+                    or "charged_species_unsupported" in joined
+                ):
+                    failures.append(
+                        f"skeleton certify {kind} {key} {label!r}: {errors}"
+                    )
     assert failures == []
 
 

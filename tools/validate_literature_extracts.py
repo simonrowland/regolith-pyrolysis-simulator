@@ -63,9 +63,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   applies to the whole power, so ``-10<sup>2</sup>`` and the caret
   spelling ``-10^2`` are ``-100`` and not ``100``. A second sign is not
   that grammar: ``--10<sup>2</sup>``, ``+-10<sup>2</sup>``, and
-  ``-−10<sup>2</sup>`` are ``superscript_in_cell``. ``10<sup>3</sup>2``
-  and any other leading or trailing content are ``superscript_in_cell``,
-  as is a plain number. A value in another row
+  ``-−10<sup>2</sup>`` are ``superscript_in_cell``. A missing base,
+  including ``<sup>2</sup>``, is ``superscript_in_cell`` and does not
+  raise. ``10<sup>3</sup>2`` and any other leading or trailing content
+  are ``superscript_in_cell``, as is a plain number. ``0<sup>2</sup>``
+  certifies ``0.0`` and does not certify ``-0.0``. A value in another row
   does not certify. Formula and species labels are normalized before every
   comparison, including a label with no ASCII digit. Markup folds
   inside each whitespace token and does not delete a separator. ``_{n}``,
@@ -84,7 +86,11 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   ``SO_{4}−``, and ``Fe-rich`` do not certify the neutral label. ``Cl``
   does. The same rule applies to a whole HTML, CSV, or TSV cell. It
   certifies no formula or species label and no number. The refusal is
-  ``charged_species_unsupported``. A numeric token has no element letter,
+  ``charged_species_unsupported`` only when the label is that token's
+  element symbols, lowercase letters included, after the subscript fold.
+  ``SO₄−`` does not type ``SiO2``, ``F−`` does not type ``Fe``, and
+  ``MnO−`` does not type ``MgO``; those misses stay
+  ``cited_token_absent``. A numeric token has no element letter,
   so ``-6.98`` still certifies ``-6.98``. ``Fe`` is not
   ``$\\mathrm{Fe}^{2+}$`` and ``Fe^{2+}`` is not an identical CSV cell.
   A plain numeric cell with no element symbol is still a power.
@@ -791,14 +797,22 @@ def _cell_certifies_leaf(leaf: Any, cell: str) -> bool:
         stored = _stored_number_decimal(leaf)
         if parsed is None or stored is None:
             return False
-        if parsed != stored:
-            return False
-        # Decimal equality collapses the sign of zero. The sign is part
-        # of the value, so a negative zero does not certify a positive zero.
-        if parsed.is_zero():
-            return parsed.as_tuple().sign == stored.as_tuple().sign
-        return True
+        return _same_signed_decimal(parsed, stored)
     return False
+
+
+def _same_signed_decimal(parsed: Decimal, stored: Decimal) -> bool:
+    """True when the numbers are equal, including the sign of zero.
+
+    ``Decimal`` equality treats negative zero as zero. The sign is part
+    of the certified value, so ``-0.0`` is not ``0.0``. This is the only
+    comparison. A plain cell and a superscript power both call it.
+    """
+    if parsed != stored:
+        return False
+    if parsed.is_zero():
+        return parsed.as_tuple().sign == stored.as_tuple().sign
+    return True
 
 
 def _leaf_in_table(leaf: Any, cells: Sequence[str]) -> bool:
@@ -884,9 +898,21 @@ def _superscript_power_decimal(
     ``(-10)**2``. ``-1.5×10<sup>3</sup>`` is ``-1500``. ``10<sup>3</sup>``
     is ``10**3``, which is ``1e3``. ``1.5×10<sup>3</sup>`` is
     ``1.5 * 10**3``. A trailing or leading extra, including
-    ``10<sup>3</sup>2``, is not a power. This is the only signed-power
-    parser.
+    ``10<sup>3</sup>2``, is not a power. A missing base, including
+    ``<sup>2</sup>``, is not a power. This is the only signed-power
+    parser. Any failure, including an empty prefix, returns None. The
+    caller refuses with ``superscript_in_cell``.
     """
+    try:
+        return _read_superscript_power(text, spans)
+    except Exception:  # noqa: BLE001 — a power that cannot be read is a refusal
+        return None
+
+
+def _read_superscript_power(
+    text: str, spans: tuple[tuple[int, int], ...]
+) -> Decimal | None:
+    """The power grammar. Callers use ``_superscript_power_decimal``."""
     if len(spans) != 1:
         return None
     start, end = spans[0]
@@ -901,7 +927,9 @@ def _superscript_power_decimal(
     sign = Decimal(1)
     # One optional leading sign. The base pattern is unsigned, so a
     # second sign, including ``--``, ``+-``, and a folded ``-−``, refuses.
-    if prefix[:1] in "+-":
+    # ``"" in "+-"`` is true, so the test is a one-character set. An empty
+    # prefix, as in ``<sup>2</sup>``, is a missing base and is not indexed.
+    if prefix[:1] in {"+", "-"}:
         if prefix[0] == "-":
             sign = Decimal(-1)
         prefix = prefix[1:].strip()
@@ -964,18 +992,20 @@ def _superscript_leaf_certifies(
     ``10<sup>3</sup>`` and ``1.5e3`` certifies ``1.5×10<sup>3</sup>``.
     ``103`` does not, because it is not that power. A string certifies
     only as ``1e3``, ``10^3``, or ``1×10^3`` (the same value). Extra
-    characters in the cell are not a power.
+    characters in the cell are not a power. ``0<sup>2</sup>`` certifies
+    ``0.0`` and does not certify ``-0.0``. Both comparisons use
+    ``_same_signed_decimal``.
     """
     power = _superscript_power_decimal(text, spans)
     if power is None:
         return False
     if isinstance(leaf, str):
         spelled = _explicit_power_decimal(leaf)
-        return spelled is not None and spelled == power
+        return spelled is not None and _same_signed_decimal(spelled, power)
     if isinstance(leaf, bool) or not isinstance(leaf, (int, float)):
         return False
     stored = _stored_number_decimal(leaf)
-    return stored is not None and stored == power
+    return stored is not None and _same_signed_decimal(stored, power)
 
 
 def _parse_positive_index(raw: Any) -> int | None:
@@ -3432,32 +3462,43 @@ def _formula_text_without_charged_tokens(text: str) -> str:
     return "".join(pieces)
 
 
-def _uppercase_element_letters(text: str) -> str:
-    """Uppercase ASCII letters, in order. Digits and markup stay out."""
-    return "".join(ch for ch in text if "A" <= ch <= "Z")
+# One element symbol: an uppercase letter and the lowercase letters that
+# follow it. Digits and charge marks are not part of the symbol.
+_ELEMENT_SYMBOL_RE = re.compile(r"[A-Z][a-z]*")
+
+
+def _formula_element_symbols(text: str) -> tuple[str, ...]:
+    """Element symbols after the subscript fold, lowercase letters included.
+
+    ``SO₄`` and ``SO4`` are both ``S``, ``O``. ``Si`` stays ``Si``.
+    This is the formula the charged-reason check compares. It is not an
+    uppercase skeleton.
+    """
+    return tuple(_ELEMENT_SYMBOL_RE.findall(_normalize_formula_label(text)))
 
 
 def _charged_token_carries_label(token: str, label: str) -> bool:
-    """True when ``token`` contains the label's element letters in order."""
-    wanted = _uppercase_element_letters(label)
+    """True when ``label`` is this token's formula, as element symbols.
+
+    Both sides are ``_formula_element_symbols``: the symbols after the
+    subscript fold, lowercase letters included. Digits and charge marks
+    are not symbols, so ``Fe2`` and ``Fe^{2+}`` are the same symbols and
+    ``SO4`` is ``SO₄−``. An uppercase skeleton is not the comparison:
+    ``SO₄−`` does not carry ``SiO2``, ``F−`` does not carry ``Fe``, and
+    ``MnO−`` does not carry ``MgO``.
+    """
+    wanted = _formula_element_symbols(label)
     if not wanted:
         return False
-    found = _uppercase_element_letters(token)
-    start = 0
-    for ch in wanted:
-        index = found.find(ch, start)
-        if index < 0:
-            return False
-        start = index + 1
-    return True
+    return _formula_element_symbols(token) == wanted
 
 
 def _charged_formula_miss(missing: Sequence[_PinnedLeaf], text: str) -> bool:
     """True when a formula miss is the unsupported charged-species refusal.
 
     A charged token elsewhere in the text does not type an unrelated
-    miss. The label is charged, or a charged raw token carries that
-    label's element letters in order.
+    miss. The label is charged, or a charged raw token's element symbols
+    are the label's. Lowercase letters stay, so ``SO₄−`` is not ``SiO2``.
     """
     formula_miss = [
         leaf
@@ -3718,15 +3759,30 @@ def _locator_source_blind_reason(
                     break
                 charge_text = cell
                 if _html_cell_is_charged_species(cell, superscript_spans):
+                    # Same attribution as prose. An unrelated formula is
+                    # cited_token_absent. A number, or the matching formula,
+                    # stays charged and does not fall through to the power path.
                     rendered = ", ".join(
                         repr(leaf.value) for leaf in leaves[:3]
                     )
-                    candidate_reasons.append(
-                        "charged_species_unsupported: a charged or powered "
-                        "species certifies no formula, species, or number "
-                        f"({rendered})"
+                    formula_only = all(
+                        leaf.formula_label and isinstance(leaf.value, str)
+                        for leaf in leaves
                     )
-                    candidate_reason_codes.add("charged_species_unsupported")
+                    if formula_only and not _charged_formula_miss(leaves, cell):
+                        candidate_reasons.append(
+                            "opened "
+                            f"{path.name} but the resolved extract value is not in "
+                            f"the cited text ({rendered})"
+                        )
+                        candidate_reason_codes.add("cited_token_absent")
+                    else:
+                        candidate_reasons.append(
+                            "charged_species_unsupported: a charged or powered "
+                            "species certifies no formula, species, or number "
+                            f"({rendered})"
+                        )
+                        candidate_reason_codes.add("charged_species_unsupported")
                     break
                 if superscript_spans:
                     missing = []
@@ -3902,7 +3958,10 @@ def fidelity_source_warnings(
     ``Cl`` does, and ``-6.98`` still certifies. The same rule applies
     to a whole HTML, CSV, or TSV cell. The comparison is that one
     guard, before a raw cell match. The refusal is
-    ``charged_species_unsupported``. An unrelated formula miss stays
+    ``charged_species_unsupported`` when the label is that token's
+    element symbols, lowercase letters included, after the subscript
+    fold. ``SO₄−`` does not type ``SiO2``, ``F−`` does not type ``Fe``,
+    and ``MnO−`` does not type ``MgO``. An unrelated formula miss stays
     ``cited_token_absent``.
     A subscript digit inside a formula token is not a number, so
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
@@ -3925,7 +3984,10 @@ def fidelity_source_warnings(
     and the caret spelling ``-10^2`` are ``-100``. ``100`` does not
     certify. A second sign refuses, so ``--10<sup>2</sup>``,
     ``+-10<sup>2</sup>``, and ``-−10<sup>2</sup>`` are
-    ``superscript_in_cell``.
+    ``superscript_in_cell``. A missing base, including ``<sup>2</sup>``,
+    is the same refusal and does not raise. ``0<sup>2</sup>`` certifies
+    ``0.0`` and does not certify ``-0.0``. The sign of zero is
+    ``_same_signed_decimal``, the comparison a plain numeric cell uses.
     ``10<sup>3</sup>2`` and a number that is not that power are
     ``superscript_in_cell``. ``103`` is not. A stored integer uses the
     same equality as a float, so ``1000`` certifies ``10<sup>3</sup>``.

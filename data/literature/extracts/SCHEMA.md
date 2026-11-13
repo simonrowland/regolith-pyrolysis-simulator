@@ -223,7 +223,10 @@ parser, so `-10<sup>2</sup>` and `-10^2` are -100 and `100` does not
 certify. A second sign is not that grammar: `--10<sup>2</sup>`,
 `+-10<sup>2</sup>`, and `-−10<sup>2</sup>` are `superscript_in_cell`.
 `-1.5×10<sup>3</sup>` is -1500. `10<sup>3</sup>2` and any
-other leading or trailing content are `superscript_in_cell`. A stored
+other leading or trailing content are `superscript_in_cell`. A missing
+base, including `<sup>2</sup>`, is `superscript_in_cell` and does not
+raise. `0<sup>2</sup>` certifies `0.0` and does not certify `-0.0`.
+The sign of zero is the same comparison a plain numeric cell uses. A stored
 integer uses the same numeric equality as a float, so `10<sup>3</sup>`
 certifies `1000` and `1000.0`, and `103` does not. A string certifies
 only as a spelling of that power (`1e3`,
@@ -261,7 +264,10 @@ plus and minus included), anywhere in the token, before formula folding.
 label. `Cl` does. `-6.98` still certifies `-6.98`. That token, and an
 HTML, CSV, or TSV cell that contains it, certifies no formula or species
 label, neither the neutral prefix nor a charged label, and certifies no
-number. An unrelated formula miss stays `cited_token_absent`. Formula
+number. An unrelated formula miss stays `cited_token_absent`. The charged
+reason compares element symbols, lowercase letters included, after the
+subscript fold. `SO₄−` does not type `SiO2`, `F−` does not type `Fe`, and
+`MnO−` does not type `MgO`. Formula
 and species labels take that guarded comparison first, on prose, an
 HTML cell, a CSV or TSV cell, and repository text, so an identical
 `Fe^{2+}` cell does not certify. The refusal is
