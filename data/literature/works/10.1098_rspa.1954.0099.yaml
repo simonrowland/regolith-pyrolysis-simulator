@@ -1,0 +1,2828 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1098/rspa.1954.0099
+  citation: C. J. B. Fincham and F. D. Richardson, "The behaviour of sulphur in silicate and aluminate melts", Proceedings
+    of the Royal Society of London, Series A, 223 (1954) 40-62.
+  source_ids:
+  - fincham-1954-proc-roy-soc-a
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:fincham-1954-proc-roy-soc-a
+      role: pdf
+      path: raw/fincham-1954-proc-roy-soc-a/fincham-1954-proc-roy-soc-a.pdf
+      sha256:
+        tag: value
+        value: 750f0559860477c304c9c6ff892c68e50054732645c0e9222b9009dae5b1c808
+    - asset_id: pdftotext:fincham-1954-proc-roy-soc-a
+      role: pdftotext
+      path: text/fincham-1954-proc-roy-soc-a
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:fincham-1954-proc-roy-soc-a
+      role: table_csv
+      path: tables/fincham-1954-proc-roy-soc-a
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:fincham-1954-proc-roy-soc-a
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1098/rspa.1954.0099
+experiments:
+- experiment_id: 10.1098/rspa.1954.0099::experiment::fincham-feo-sio2-silica-cups
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+        note: Sample masses not printed
+    printed_composition:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 9
+        published_page: 48
+        table: '3'
+        note: 'Compositions are printed, not unpublished. Table 3 prints one composition per temperature (1350 °C: FeO 56.8,
+          Fe2O3 4.5, SiO2 38.7 wt%; 1500 °C: FeO 54, Fe2O3 4, SiO2 42 wt%; context rows fincham1954_t3_feo_sio2_1350c and
+          _1500c). "The compositions quoted are taken from the results of Michal & Schuhmann (1952); those at 1500° C were
+          obtained by extrapolation and are thus only approximate" (p. 48). Starting charges "always contained slightly less
+          silica than the equilibrium amounts" (p. 48). The experiment covers both temperatures, so no single composition
+          describes it. not_applicable means no one composition.'
+    container:
+      state:
+        tag: value
+        value: Silica cups sealed from 3/8 in. silica tubing (p. 48)
+      locator:
+        page: 9
+        published_page: 48
+        section: Melts containing iron oxide and silica
+        note: 'Printed: "The samples were held in small silica cups made by sealing off the ends of lengths of ⅜ in. diameter
+          silica tubing." (The ¼ in. on p. 42 is the radius of the platinum cups, not this tubing.)'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1623.15'
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+        note: Printed 1350 °C; T_K = T_C + 273.15. Also run at 1500 °C (Table 3 second column).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 23
+        published_page: 62
+        section: Appendix
+        note: Total pressure not stated. Partial pressures are given in atm (e.g. p_N2 = 0.5, p_O2 = 0.99 rows), but the total
+          is not printed.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 3
+        published_page: 42
+        section: 'Experimental: Gas mixtures'
+        note: 'The gas is printed, not unpublished: "Mixtures of hydrogen, carbon dioxide, sulphur dioxide and nitrogen were
+          produced by metering purified commercial gases through capillary flowmeters" (p. 42); flow 1.5-17.3 ml/s at s.t.p.
+          (p. 44). The ingoing ratio changes from run to run (% SO2 input, p_N2, p_H2/p_CO2 or p_CO2/p_O2 per row in the Appendix,
+          p. 62; context row fincham1954_appendix_gas_mixtures), so no single mixture describes the experiment. not_applicable
+          means no one composition, not an absent value.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1098/rspa.1954.0099
+  locator:
+    page: 9
+    published_page: 48
+    section: Melts containing iron oxide and silica
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Ingoing H2/CO2/SO2/N2 ratios set p_O2 and p_S2; calculated hot-zone values per run in the Appendix (p_O2 from
+          about 10^-10.6 to 0.99 atm)
+      locator:
+        page: 23
+        published_page: 62
+        section: Appendix
+  bench_id: 10.1098/rspa.1954.0099::bench::fincham-pt-wound-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Samples pushed into the hot zone over 10-15 min under N2, flushed 10-15 min, then gas passed; temperature checked
+          every half hour; 6 h standard time; quenched by pulling into air (p. 42-44)
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '21600'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 44
+        section: 'Results: General'
+        note: 'Printed: "Six hours was therefore taken as the safe standard time of each experiment"; unit conversion only'
+      inference:
+        relation: h_to_s
+        inputs:
+        - t_s = t_h × 3600
+        - original_unit=h
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '6'
+            locator:
+              page: 5
+              published_page: 44
+              section: 'Results: General'
+              note: 'Printed: "Six hours was therefore taken as the safe standard time of each experiment"; unit conversion
+                only'
+        - - factor
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              page: 5
+              published_page: 44
+              section: 'Results: General'
+              note: 'Printed: "Six hours was therefore taken as the safe standard time of each experiment"; unit conversion
+                only'
+        output_unit: s
+        references: []
+- experiment_id: 10.1098/rspa.1954.0099::experiment::fincham-gas-slag-equilibration-1500c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+        note: Sample masses not printed
+    printed_composition:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 5
+        published_page: 44
+        table: '1'
+        note: Compositions are printed, not unpublished. Table 1 prints every mixture (S1-S17, wt% and mole ratios; context
+          rows fincham1954_t1_*); the 1500 °C work used several of them (Table 2 and Fig. 2a; p. 47 and p. 45), so no single
+          composition describes the experiment. not_applicable means no one composition.
+    container:
+      state:
+        tag: value
+        value: Pt cups
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+        note: Printed 1500 °C; T_K = T_C + 273.15. Table 2 results.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 23
+        published_page: 62
+        section: Appendix
+        note: Total pressure not stated. Partial pressures are given in atm (e.g. p_N2 = 0.5, p_O2 = 0.99 rows), but the total
+          is not printed.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 3
+        published_page: 42
+        section: 'Experimental: Gas mixtures'
+        note: 'The gas is printed, not unpublished: "Mixtures of hydrogen, carbon dioxide, sulphur dioxide and nitrogen were
+          produced by metering purified commercial gases through capillary flowmeters" (p. 42); flow 1.5-17.3 ml/s at s.t.p.
+          (p. 44). The ingoing ratio changes from run to run (% SO2 input, p_N2, p_H2/p_CO2 or p_CO2/p_O2 per row in the Appendix,
+          p. 62; context row fincham1954_appendix_gas_mixtures), so no single mixture describes the experiment. not_applicable
+          means no one composition, not an absent value.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1098/rspa.1954.0099
+  locator:
+    page: 3
+    published_page: 42
+    section: Experimental
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Ingoing H2/CO2/SO2/N2 ratios set p_O2 and p_S2; calculated hot-zone values per run in the Appendix (p_O2 from
+          about 10^-10.6 to 0.99 atm)
+      locator:
+        page: 23
+        published_page: 62
+        section: Appendix
+  bench_id: 10.1098/rspa.1954.0099::bench::fincham-pt-wound-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Samples pushed into the hot zone over 10-15 min under N2, flushed 10-15 min, then gas passed; temperature checked
+          every half hour; 6 h standard time; quenched by pulling into air (p. 42-44)
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '21600'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 44
+        section: 'Results: General'
+        note: 'Printed: "Six hours was therefore taken as the safe standard time of each experiment"; unit conversion only'
+      inference:
+        relation: h_to_s
+        inputs:
+        - t_s = t_h × 3600
+        - original_unit=h
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '6'
+            locator:
+              page: 5
+              published_page: 44
+              section: 'Results: General'
+              note: 'Printed: "Six hours was therefore taken as the safe standard time of each experiment"; unit conversion
+                only'
+        - - factor
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              page: 5
+              published_page: 44
+              section: 'Results: General'
+              note: 'Printed: "Six hours was therefore taken as the safe standard time of each experiment"; unit conversion
+                only'
+        output_unit: s
+        references: []
+- experiment_id: 10.1098/rspa.1954.0099::experiment::fincham-gas-slag-equilibration-1650c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+        note: Sample masses not printed
+    printed_composition:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 5
+        published_page: 44
+        table: '1'
+        note: Compositions are printed, not unpublished. Table 1 prints every mixture (S1-S17, wt% and mole ratios; context
+          rows fincham1954_t1_*); the 1650 °C work used several of them (Fig. 4 mixtures a-i, p. 47; Table 4 and 5 rows),
+          so no single composition describes the experiment. not_applicable means no one composition.
+    container:
+      state:
+        tag: value
+        value: Pt cups
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923.15'
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+        note: Printed 1650 °C; T_K = T_C + 273.15. Table 4 aluminate/silicate Cs (and Fig. 4).
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 23
+        published_page: 62
+        section: Appendix
+        note: Total pressure not stated. Partial pressures are given in atm (e.g. p_N2 = 0.5, p_O2 = 0.99 rows), but the total
+          is not printed.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 3
+        published_page: 42
+        section: 'Experimental: Gas mixtures'
+        note: 'The gas is printed, not unpublished: "Mixtures of hydrogen, carbon dioxide, sulphur dioxide and nitrogen were
+          produced by metering purified commercial gases through capillary flowmeters" (p. 42); flow 1.5-17.3 ml/s at s.t.p.
+          (p. 44). The ingoing ratio changes from run to run (% SO2 input, p_N2, p_H2/p_CO2 or p_CO2/p_O2 per row in the Appendix,
+          p. 62; context row fincham1954_appendix_gas_mixtures), so no single mixture describes the experiment. not_applicable
+          means no one composition, not an absent value.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1098/rspa.1954.0099
+  locator:
+    page: 3
+    published_page: 42
+    section: Experimental
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Ingoing H2/CO2/SO2/N2 ratios set p_O2 and p_S2; calculated hot-zone values per run in the Appendix (p_O2 from
+          about 10^-10.6 to 0.99 atm)
+      locator:
+        page: 23
+        published_page: 62
+        section: Appendix
+  bench_id: 10.1098/rspa.1954.0099::bench::fincham-mo-wound-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Samples pushed into the hot zone over 10-15 min under N2, flushed 10-15 min, then gas passed; temperature checked
+          every half hour; 6 h standard time; quenched by pulling into air (p. 42-44)
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '21600'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 44
+        section: 'Results: General'
+        note: 'Printed: "Six hours was therefore taken as the safe standard time of each experiment"; unit conversion only'
+      inference:
+        relation: h_to_s
+        inputs:
+        - t_s = t_h × 3600
+        - original_unit=h
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '6'
+            locator:
+              page: 5
+              published_page: 44
+              section: 'Results: General'
+              note: 'Printed: "Six hours was therefore taken as the safe standard time of each experiment"; unit conversion
+                only'
+        - - factor
+          - state:
+              tag: value
+              value: '3600'
+            locator:
+              page: 5
+              published_page: 44
+              section: 'Results: General'
+              note: 'Printed: "Six hours was therefore taken as the safe standard time of each experiment"; unit conversion
+                only'
+        output_unit: s
+        references: []
+benches:
+- id: 10.1098/rspa.1954.0099::bench::fincham-mo-wound-furnace
+  work_id: 10.1098/rspa.1954.0099
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Molybdenum-wound tube furnace (experiments above 1550 °C)
+    locator:
+      page: 3
+      published_page: 42
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Recrystallized impermeable alumina reaction tube, 2 in. diameter, 3 ft long; samples in cold-pressed Pt cups
+        (0.005 in. sheet, roughly hemispherical, radius about 1/4 in.) on alumina-cement blocks
+    locator:
+      page: 3
+      published_page: 42
+      section: Experimental
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Leeds and Northrup disappearing-filament optical pyrometer sighted through a prism onto the base of an alumina
+          black-body crucible
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: Pyrometer calibrated against a Pt/13%Rh-Pt thermocouple to 1535 °C and extrapolated linearly to 1650 °C (error
+          not more than ±2 °C; correction 30° at 1650 °C). Stated maximum temperature uncertainty ±3 °C up to 1550 °C and
+          ±6 °C at 1650 °C (p. 49).
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+  heating_method:
+    state:
+      tag: value
+      value: Resistance winding; Variac supply controlled by a Sunvic energy regulator; maximum temperature held within ±2
+        °C at 1650 °C; constant to within 4 °C over nearly 2 in.
+    locator:
+      page: 3
+      published_page: 42
+      section: Experimental
+  other_facts: []
+- id: 10.1098/rspa.1954.0099::bench::fincham-pt-wound-furnace
+  work_id: 10.1098/rspa.1954.0099
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Platinum-wound tube furnace (work at lower temperatures)
+    locator:
+      page: 3
+      published_page: 42
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Mullite reaction tube; samples in cold-pressed Pt cups (0.005 in. sheet, roughly hemispherical, radius about
+        1/4 in.) on alumina-cement blocks
+    locator:
+      page: 3
+      published_page: 42
+      section: Experimental
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Leeds and Northrup disappearing-filament optical pyrometer sighted through a prism onto the base of an alumina
+          black-body crucible
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: Pyrometer calibrated against a Pt/13%Rh-Pt thermocouple to 1535 °C and extrapolated linearly to 1650 °C (error
+          not more than ±2 °C; correction 30° at 1650 °C). Stated maximum temperature uncertainty ±3 °C up to 1550 °C and
+          ±6 °C at 1650 °C (p. 49).
+      locator:
+        page: 3
+        published_page: 42
+        section: Experimental
+  heating_method:
+    state:
+      tag: value
+      value: Resistance winding; Variac supply controlled by a Sunvic energy regulator; maximum temperature held within ±2
+        °C at 1650 °C; constant to within 4 °C over nearly 2 in.
+    locator:
+      page: 3
+      published_page: 42
+      section: Experimental
+  other_facts: []
+context:
+- observation_id: fincham1954_appendix_gas_mixtures
+  type: gas_composition_table
+  locator:
+    page: 23
+    published_page: 62
+    section: Appendix
+  units: '% SO2 by volume in cold gas; atm; -log10 atm'
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: ingoing_gas_and_calculated_hot_zone_pressures
+    rows:
+    - temp_C: '1425'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '3.25'
+      minus_log10_p_O2: '10.05'
+      minus_log10_p_S2: '3.73'
+    - temp_C: '1425'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.75'
+      minus_log10_p_O2: '8.51'
+      minus_log10_p_S2: '3.42'
+    - temp_C: '1425'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.25'
+      minus_log10_p_O2: '7.27'
+      minus_log10_p_S2: '4.63'
+    - temp_C: '1425'
+      percent_SO2_input: '1'
+      p_N2: '0.9'
+      p_H2_over_p_CO2: —
+      minus_log10_p_O2: '1.06'
+      minus_log10_p_S2: '16.62'
+    - temp_C: '1425'
+      percent_SO2_input: '1'
+      p_N2: —
+      p_H2_over_p_CO2: (p_O2 = 0.99)
+      minus_log10_p_O2: '0.00'
+      minus_log10_p_S2: '18.73'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '13.4'
+      minus_log10_p_O2: '10.60'
+      minus_log10_p_S2: '3.85'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '8.00'
+      minus_log10_p_O2: '10.17'
+      minus_log10_p_S2: '3.80'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '3.25'
+      minus_log10_p_O2: '9.37'
+      minus_log10_p_S2: '3.60'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '2.00'
+      minus_log10_p_O2: '8.88'
+      minus_log10_p_S2: '3.49'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.75'
+      minus_log10_p_O2: '7.75'
+      minus_log10_p_S2: '3.70'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.60'
+      minus_log10_p_O2: '7.50'
+      minus_log10_p_S2: '3.83'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.20'
+      minus_log10_p_O2: '6.33'
+      minus_log10_p_S2: '5.42'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.10'
+      minus_log10_p_O2: '5.68'
+      minus_log10_p_S2: '6.60'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.02'
+      minus_log10_p_O2: '4.20'
+      minus_log10_p_S2: '9.40'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.01'
+      minus_log10_p_O2: '3.60'
+      minus_log10_p_S2: '10.60'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: —
+      p_H2_over_p_CO2: (p_CO2 = 0.99)
+      minus_log10_p_O2: '2.74'
+      minus_log10_p_S2: '12.34'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.90'
+      p_H2_over_p_CO2: —
+      minus_log10_p_O2: '1.05'
+      minus_log10_p_S2: '15.72'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: '0.49'
+      p_H2_over_p_CO2: —
+      minus_log10_p_O2: '0.30'
+      minus_log10_p_S2: '17.20'
+    - temp_C: '1500'
+      percent_SO2_input: '1'
+      p_N2: —
+      p_H2_over_p_CO2: (p_O2 = 0.99)
+      minus_log10_p_O2: '0.00'
+      minus_log10_p_S2: '17.81'
+    - temp_C: '1500'
+      percent_SO2_input: '2'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '14.0'
+      minus_log10_p_O2: '10.4'
+      minus_log10_p_S2: '3.27'
+    - temp_C: '1500'
+      percent_SO2_input: '2'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '3.15'
+      minus_log10_p_O2: '9.15'
+      minus_log10_p_S2: '3.03'
+    - temp_C: '1500'
+      percent_SO2_input: '2'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '1.00'
+      minus_log10_p_O2: '8.00'
+      minus_log10_p_S2: '2.90'
+    - temp_C: '1500'
+      percent_SO2_input: '2'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.50'
+      minus_log10_p_O2: '7.25'
+      minus_log10_p_S2: '3.45'
+    - temp_C: '1500'
+      percent_SO2_input: '2'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.35'
+      minus_log10_p_O2: '6.90'
+      minus_log10_p_S2: '3.90'
+    - temp_C: '1500'
+      percent_SO2_input: '2'
+      p_N2: '0.5'
+      p_H2_over_p_CO2: '0.15'
+      minus_log10_p_O2: '6.08'
+      minus_log10_p_S2: '5.28'
+    - temp_C: '1500'
+      percent_SO2_input: '2'
+      p_N2: —
+      p_H2_over_p_CO2: (p_CO2 = 0.98)
+      minus_log10_p_O2: '2.74'
+      minus_log10_p_S2: '11.73'
+    - temp_C: '1500'
+      percent_SO2_input: '2'
+      p_N2: '0.88'
+      p_H2_over_p_CO2: —
+      minus_log10_p_O2: '1.01'
+      minus_log10_p_S2: '15.18'
+    - temp_C: '1500'
+      percent_SO2_input: '2'
+      p_N2: —
+      p_H2_over_p_CO2: (p_O2 = 0.98)
+      minus_log10_p_O2: '0.01'
+      minus_log10_p_S2: '17.20'
+    - temp_C: '1550'
+      percent_SO2_input: '1'
+      p_N2: '0.50'
+      p_H2_over_p_CO2: '3.25'
+      minus_log10_p_O2: '9.10'
+      minus_log10_p_S2: '3.66'
+    - temp_C: '1550'
+      percent_SO2_input: '1'
+      p_N2: '0.50'
+      p_H2_over_p_CO2: '0.75'
+      minus_log10_p_O2: '7.39'
+      minus_log10_p_S2: '3.95'
+    - temp_C: '1550'
+      percent_SO2_input: '1'
+      p_N2: '0.50'
+      p_H2_over_p_CO2: '0.25'
+      minus_log10_p_O2: '6.12'
+      minus_log10_p_S2: '5.33'
+    - temp_C: '1550'
+      percent_SO2_input: '1'
+      p_N2: —
+      p_H2_over_p_CO2: (p_O2 = 0.99)
+      minus_log10_p_O2: '0.00'
+      minus_log10_p_S2: '17.20'
+    - temp_C: '1650'
+      percent_SO2_input: '1'
+      p_N2: '0.50'
+      p_H2_over_p_CO2: '2.63'
+      minus_log10_p_O2: '8.00'
+      minus_log10_p_S2: '3.57'
+    - temp_C: '1650'
+      percent_SO2_input: '1'
+      p_N2: '0.50'
+      p_H2_over_p_CO2: '0.472'
+      minus_log10_p_O2: '6.00'
+      minus_log10_p_S2: '4.80'
+    - temp_C: '1650'
+      percent_SO2_input: '1'
+      p_N2: —
+      p_H2_over_p_CO2: (p_2o = 0.99) [sic]
+      minus_log10_p_O2: '0.00'
+      minus_log10_p_S2: '6.12'
+    - temp_C: '1650'
+      percent_SO2_input: '2'
+      p_N2: —
+      p_H2_over_p_CO2: (p_O2 = 0.98)
+      minus_log10_p_O2: '0.01'
+      minus_log10_p_S2: '17.51'
+    row_count: 36
+    derivation_as_printed: p_O2 and p_S2 calculated for equilibrium within the gas mixtures in the hottest zone of the furnace
+      from thermodynamic data on H2, H2O, CO, CO2, SO2, SO3, SO, H2S, HS, COS, CS2, CS, S2, S (pp. 41-42).
+    print_anomaly_note: 1650 °C, 1 % SO2 row prints "(p_2o = 0.99)" with -log10 p_S2 = 6.12, unlike the other p_O2 ≈ 0.99
+      rows (17.20-18.73). Kept verbatim; not corrected.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_appendix_gas_mixtures
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_cas_saturation_s5
+  type: sulphur_content_equilibrium
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 12
+    published_page: 51
+    section: Anomalous results
+  units: wt% S; atm
+  values:
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S5
+    temperature_C: 1500
+    clear_glass:
+      p_O2_atm: '4.27e-10'
+      percent_SO2_input: 1
+      percent_S: '1.26'
+    crystalline_presumed_CaS_saturated:
+      p_O2_atm: '7.1e-10'
+      percent_SO2_input: 2
+      percent_S_approximate: '4.2'
+    crystallisation_window_as_printed: S5 appeared crystalline on quenching when p_O2 < 7 × 10^-10 atm or > about 9 × 10^-2
+      atm at 1500 °C with 2 % SO2 input; such results were rejected (pp. 46, 51).
+    literature_cas_limits_quoted: Glaser (1926) 5.5 % S in liquid CaSiO3 at 1500 °C; Filer & Darken (1952) 3.5-4.5 % S in
+      blast-furnace slags at 1500 °C; MacCaffery & Oesterle (1923) about 8 % S (acid) and 11 % S (basic) CaO-Al2O3-SiO2 melts
+      at 1500 °C (p. 51).
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_cas_saturation_s5
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_1
+  type: equation
+  locator:
+    page: 10
+    published_page: 49
+    section: 'Discussion: The sulphide and sulphate equilibria'
+    equation: '1'
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: 1
+    relation_as_printed: ½S2 + (O)melt = ½O2 + (S)melt
+    equilibrium_constant_as_printed: K_1 = (S)(p_O2)^(1/2) / ((O)(p_S2)^(1/2))
+    states_as_printed: S2 and O2 gas; (O), (S) oxygen and sulphide sulphur in the melt
+    note: Sulphide equilibrium; no numerical K printed. Fig. 2b plots log10 K'_1 = log10 (% S)(p_O2)^(1/2)/(p_S2)^(1/2), with
+      K'_1 proportional to K_1 under the two stated provisos (p. 49).
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_12
+  type: equation
+  locator:
+    page: 17
+    published_page: 56
+    section: Thermodynamic functions for sulphides
+    sulphates and oxides in silicate melts: null
+    equation: '12'
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: 12
+    relation_as_printed: CaO(s) + ½S2 + 3/2O2 = CaSO4(s)
+    equilibrium_constant_as_printed: K_12 = 1/((p_S2)^(1/2)(p_O2)^(3/2))
+    states_as_printed: CaO and CaSO4 pure solids; S2 and O2 gas
+    note: No numerical K12 printed; "These constants can be calculated from the data already referred to under equation (4)"
+      (p. 56). Used with the sulphate capacities to derive gamma(CaSO4) and the Table 5 ratios.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_12
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_13
+  type: equation
+  locator:
+    page: 21
+    published_page: 60
+    section: Structural aspects
+    equation: '13'
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: 13
+    relation_as_printed: 'O2− + :Si—O—Si: = 2(:Si—O−)'
+    equilibrium_constant_as_printed: K = (:Si—O−)^2/(O2−)(:Si—O—Si:)
+    states_as_printed: free oxide ion, bridging and non-bridging oxygen in the melt
+    note: No numerical K printed (p. 60).
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_13
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_14
+  type: equation
+  locator:
+    page: 21
+    published_page: 60
+    section: Structural aspects
+    equation: '14'
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: 14
+    relation_as_printed: 'O2− + Ca2+ + :Si—O—Si: = (:Si—O−Ca2+O−—Si:)'
+    equilibrium_constant_as_printed: K' = (:Si—O−Ca2+O−—Si:)/(O2−)(Ca2+)(:Si—O—Si:)
+    states_as_printed: melt species as printed
+    note: Printed as a possible more complex equilibrium; "the above [eq. 13] is the simplest and, on structural grounds,
+      the most reasonable" (p. 60). No numerical K' printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_14
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_2
+  type: equation
+  locator:
+    page: 10
+    published_page: 49
+    section: 'Discussion: The sulphide and sulphate equilibria'
+    equation: '2'
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: 2
+    relation_as_printed: ½S2 + 3/2O2 + (O)melt = (SO4)melt
+    equilibrium_constant_as_printed: K_2 = (SO4) / ((p_S2)^(1/2)(p_O2)^(3/2)(O))
+    states_as_printed: S2 and O2 gas; (O), (SO4) oxygen and sulphate in the melt
+    note: Sulphate equilibrium; no numerical K printed. The p_O2 exponent is small type in the scan and reads 3/2, matching
+      the 3/2 O2 of the relation. Fig. 2b plots log10 K'_2 = log10 (% S)/(p_S2)^(1/2)(p_O2)^(3/2) (p. 49).
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_2
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_5
+  type: equation
+  locator:
+    page: 13
+    published_page: 52
+    section: The sulphur capacity of silicate melts
+    equation: '5'
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: 5
+    relation_as_printed: (CaO)melt + ½S2 = (CaS)melt + ½O2
+    states_as_printed: CaO and CaS in the melt; S2 and O2 gas
+    note: No K printed for the melt reaction. Valid "provided that no significant proportion of the sulphur held in the slag
+      is linked to silicon or aluminium" (p. 52).
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_5
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_6
+  type: equation
+  locator:
+    page: 13
+    published_page: 52
+    section: The sulphur capacity of silicate melts
+    equation: '6'
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: 6
+    relation_as_printed: (MgO)melt + ½S2 = (MgS)melt + ½O2
+    states_as_printed: MgO and MgS in the melt; S2 and O2 gas
+    note: No K printed for the melt reaction (p. 52).
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_6
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_7
+  type: equation
+  locator:
+    page: 13
+    published_page: 52
+    section: The sulphur capacity of silicate melts
+    equation: '7'
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: 7
+    relation_as_printed: ('FeO')melt + ½S2 = ('FeS')melt + ½O2
+    states_as_printed: '''FeO'' and ''FeS'' in the melt; S2 and O2 gas'
+    note: No K printed for the melt reaction (p. 52).
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_7
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_8
+  type: equation
+  locator:
+    page: 14
+    published_page: 53
+    section: The sulphur capacity of silicate melts
+    equation: '8'
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: 8
+    relation_as_printed: '''FeS''(l) + ½O2 = ''FeO''(l) + ½S2'
+    states_as_printed: '''FeS'' and ''FeO'' pure liquids (subscript printed as a small-capital L); O2 and S2 gas'
+    note: No K value printed here. Used to calculate the sulphide capacities of pure liquid 'FeO' at 1500 and 1600 °C from
+      approximate constants derived from the literature (Grant & Chipman 1946; Sherman, Elvander & Chipman 1950; Chipman 1948;
+      Dastur & Chipman 1949; Richardson & Jeffes 1952; Coughlin 1950; Kelley 1936) (p. 53). K11 on p. 55 is calculated "for
+      'FeO' as equation (8)".
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_8
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_equation_cs_temperature_coefficient
+  type: equation
+  locator:
+    page: 19
+    published_page: 58
+    section: Thermodynamic functions for sulphides
+    sulphates and oxides in silicate melts: null
+  units: relation as printed
+  values:
+    quantity: printed_equation
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    equation_number: unnumbered
+    relation_as_printed: R ∂ln C_S / ∂(1/T) = −ΔH° − ΔH̄_CaS + ΔH̄_CaO
+    definitions_as_printed: ΔH° is the heat change for the pure phase reaction (9); ΔH̄_CaS and ΔH̄_CaO are the partial molar
+      heats of solution of solid CaS and CaO in the mixture (p. 58).
+    note: Printed unnumbered between the "It can easily be shown that" sentence and Table 5 (p. 58).
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_equation_cs_temperature_coefficient
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_figures_context
+  type: figure_only
+  locator:
+    page: 6
+    published_page: 45
+    figure: 1-7
+  units: figure-only context
+  values:
+    method_class: figure_only
+    evidence_class: figure_only
+    figures:
+    - 1 equilibrium apparatus (p. 43)
+    - 2a log % S vs log p_O2 at 1500 °C, S1 and S5 (p. 45)
+    - 2b sulphide/sulphate equilibrium constants (p. 45)
+    - 3 temperature effect, S1, 1425-1650 °C (p. 46)
+    - 4 composition effect at 1650 °C, mixtures a-i (p. 47)
+    - 5 log Cs vs molar fraction of base, 1500 and 1650 °C, plus industrial slags (p. 54)
+    - 6 free energies of formation of binary melts at 1600 °C (p. 56)
+    - 7 Cs contours in CaO-SiO2-Al2O3 at 1650 °C (p. 59)
+    digitization_status: Not digitized. Most of the 169 runs (% S vs p_O2 for S1, S5, S11-S17 and the temperature series)
+      appear only in Figs. 2a, 3 and 4; Table 2 holds only the results not shown in the figures.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_figures_context
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p40_abstract_thresholds
+  type: statement
+  locator:
+    page: 1
+    published_page: 40
+    section: Abstract
+  units: atm
+  values:
+    method_class: author_derived
+    evidence_class: author_derived
+    sulphide_region_as_printed: '"when p_O2 is less than about 10^-5 atm, a sulphur atom can only enter the melt by displacing
+      a suitable oxygen atom. The sulphur is then held in the slag entirely as sulphide"'
+    sulphate_region_as_printed: '"When p_O2 is greater than about 10^-3 atm, the sulphur is held as sulphate"'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p40_abstract_thresholds
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p41_abstract_and_introduction
+  type: statement
+  locator:
+    page: 2
+    published_page: 41
+    section: Abstract and Introduction
+  units: °C; molar ratio
+  values:
+    method_class: quoted_unattributed
+    evidence_class: quoted_unattributed
+    reaction_temperatures_as_printed: '"Most of the reactions in which molten silicates take part, and in which the metallurgist
+      and geologist are interested, occur above 1300° C"'
+    feo_activity_pattern_as_printed: '"It follows the pattern established for FeO activity coefficients in CaO-SiO2 and CaO-P2O5
+      melts, these rising to a maximum at CaO:SiO2 and CaO:P2O5 molar ratios of 2:1 and 3:1 respectively." (Abstract; the
+      same pattern is attributed on p. 60 to Taylor & Chipman 1942 and Oelsen & Maetz 1941.)'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p41_abstract_and_introduction
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p42_alumina_blocks
+  type: method_note
+  locator:
+    page: 3
+    published_page: 42
+    section: 'Experimental: Furnaces and temperature control'
+  units: °C
+  values:
+    method_class: method_only
+    evidence_class: method_only
+    cup_supports_as_printed: '"The cups were supported on alumina blocks, which were made from commercial alumina cement and
+      fashioned to shape after firing the ''blanks to 1000° C."'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p42_alumina_blocks
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p43_preparation
+  type: method_note
+  locator:
+    page: 4
+    published_page: 43
+    section: 'Experimental: Preparation of materials; Figure 1'
+  units: °C; h
+  values:
+    method_class: method_only
+    evidence_class: method_only
+    oxides_as_printed: '"The silica was obtained by crushing clear mineral quartz. The lime, alumina and magnesia were prepared
+      from commercially pure oxides by calcination at about 1000° C for 2h."'
+    ternary_mixes_as_printed: '"The ternary compositions were made by alternate sintering in hydrogen and grinding of the
+      pure constituents in iron crucibles."'
+    high_sulphur_charges_as_printed: '"Mixtures containing relatively large amounts of sulphur, for use in the experiments
+      where equilibrium was approached from the high-sulphur side, were prepared by adding sulphur from the gas phase at about
+      1500° C."'
+    figure_1_caption_as_printed: '"H, six silicate samples in platinum cups" (Figure 1, Equilibrium apparatus)'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p43_preparation
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p45_p46_figure_series
+  type: figure_only
+  locator:
+    page: 6
+    published_page: 45
+    figure: 2a
+    note: Continues on p. 46 (PDF page 7)
+  units: '% SO2 input; °C'
+  values:
+    method_class: figure_only
+    evidence_class: figure_only
+    figure_2a_caption_as_printed: '"Sulphur equilibria at 1500° C. ... ×, S1, 1 % SO2; ⊗, S1, 2 % SO2; •, S5, 1 % SO2; ○,
+      S5, 2 % SO2."'
+    figure_2a_text_as_printed: '"for compositions S1 (at 1 and 2 % SO2 inputs) and S5 (at 2 % SO2 input apart from one point
+      at 1 %)" (pp. 45-46)'
+    sample_counts_as_printed: '"Where no digits are shown, the number of samples is two, both coming from the same experiment.
+      The digit 2 is shown where the two samples come from different experiments." (p. 46)'
+    figure_3_caption_as_printed: '"Effect of temperature on sulphur equilibria. Temperatures (° C): □, 1425; ×, 1500; ○, 1550;
+      Δ, 1650 approx. Composition: S1, 1 % SO2 input in gas." (p. 46)'
+    digitization_status: Not digitized; the plotted points stay figure-only.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p45_p46_figure_series
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p47_fig4_point_spread
+  type: method_note
+  experiment: fincham-gas-slag-equilibration-1650c
+  locator:
+    page: 8
+    published_page: 47
+    section: 'Results: Binary or ternary melts containing CaO or MgO'
+    note: Sentence begins on p. 46 (PDF page 7)
+  units: '% S'
+  values:
+    method_class: measured_direct
+    evidence_class: measured_direct
+    spread_as_printed: '"Figure 4 shows the results obtained with the binary mixtures S11 to S17, each point being the mean
+      of two samples in different experiments; the normal spread in values was ± 0.002 % sulphur." (pp. 46-47)'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p47_fig4_point_spread
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p47_figure_4_caption
+  type: figure_only
+  locator:
+    page: 8
+    published_page: 47
+    figure: '4'
+  units: '% SO2 input; mole ratio'
+  values:
+    method_class: figure_only
+    evidence_class: figure_only
+    figure_4_caption_as_printed: '"Effect of composition of melt on sulphur equilibria at 1650° C. 1 % SO2 input in gas. Ratios
+      in moles: a, CaO : Al2O3 = 2.00; b, CaO : Al2O3 = 1.27; c, CaO : Al2O3 ; SiO2 = 1.35/0.3/1; d, CaO : Al2O3 = 1.00; e,
+      CaO : SiO2 = 1.26; f, CaO : SiO2 = 1.00; g, CaO : Al2O3 : SiO2 = 1.05 : 0.44 : 1; h, CaO : SiO2 = 0.63; i, MgO : SiO2
+      = 1.00."'
+    caption_note: The caption prints 2.00 (a), 1.00 (d) and 1.00 (i) where Table 1 prints 2.0, 1.0 and 1.0 for the same mixtures;
+      both kept as printed.
+    digitization_status: Not digitized.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p47_figure_4_caption
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p48_feo_sio2_run_notes
+  type: method_note
+  experiment: fincham-feo-sio2-silica-cups
+  locator:
+    page: 9
+    published_page: 48
+    section: Melts containing iron oxide and silica
+  units: wt%; °C; atm; '% SO2 input'; h
+  values:
+    method_class: measured_direct
+    evidence_class: measured_direct
+    iron_crucible_attempt_as_printed: '"At first an attempt was made to study compositions corresponding to fayalite (Fe2SiO4)
+      and to ''FeO''* = 62 %, SiO2 = 38 % by weight at 1350° C. These were held in iron crucibles similar to the platinum
+      cups already described. In all the experiments, however, the melt ''crept'' out of the iron cups"'
+    erratic_1350C_as_printed: '"The results obtained at 1350° C with p_O2 = 1.1 × 10^-11 atm (Fe(s)-(''FeO''-SiO2)-SiO2(s)
+      equilibrium value, 9.73 × 10^-12 atm) and % SO2 input = 0.3, were extremely erratic, and showed no signs of equilibrium
+      having been reached even after 9 h."'
+    reproducible_run_as_printed: '"At 1300° C, however, when p_O2 was equal to 1.13 × 10^-8 atm and the SO2 input was 0.3
+      %, reproducible results were obtained and equilibrium was reached in less than 6h." (The 1300 °C prose against the 1350
+      °C Table 3 heading stays unresolved; see fincham1954_t3_feo_sio2_1350c.)'
+    erratic_1500C_as_printed: '"Similarly, at 1500° C, when p_O2 was near the Fe-''FeO''-SiO2 equilibrium value (1.60 × 10^-10
+      atm), with 0.3 % SO2 input, the results were erratic; but when p_O2 was raised by a factor of 10^3, the results were
+      reproducible."'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p48_feo_sio2_run_notes
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p49_error_estimates
+  type: method_note
+  locator:
+    page: 10
+    published_page: 49
+    section: Errors
+  units: '%'
+  values:
+    method_class: author_estimate
+    evidence_class: author_estimate
+    flowmeters_as_printed: Flowmeters ± 1 %
+    sulphur_analysis_as_printed: 'Sulphur analysis above 0.10 % ± 2 %; below 0.05 % ± 50 % (a different statement from the
+      p. 46 band: contents below 0.003 % subject to ± 50 %)'
+    probable_error_as_printed: '"In the opinion of the authors, the effect of these errors is to cause a probable error of
+      ± 4 % in the measured sulphur contents, when these were greater than 0.1 %, for any particular melt and ingoing gas
+      composition."'
+    already_carried_note: Temperature ± 3 °C up to 1550 °C and ± 6 °C at 1650 °C, slag composition ± 0.5 %, and ± 20 % on
+      the derived quantities are carried in the benches and Table 1/2 notes.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p49_error_estimates
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p50_equilibrium_ranges
+  type: statement
+  locator:
+    page: 11
+    published_page: 50
+    section: 'Discussion: The sulphide and sulphate equilibria'
+  units: atm
+  values:
+    method_class: author_derived
+    evidence_class: author_derived
+    constancy_as_printed: '"The good constancy of K''_1 at oxygen partial pressures less than 10^-6 atm, and the reasonable
+      constancy of K''_2 at oxygen pressures greater than 10^-4 atm, indicate that these two equilibria can account for the
+      sulphur contents of the melts S1 and S5."'
+    slope_change_as_printed: '"The changes in slope of the curves shown in figure 2a, at about p_O2 = 10^-8 atm, are due to
+      the fact that the curves are plotted for constant % SO2 input and not constant p_S2. At 1500° C, when p_O2 is less than
+      about 10^-8.5 atm, p_S2 is determined almost entirely by the equilibria between H2, S2, H2S and HS. When p_O2 is greater
+      than 10^-7.5 atm, p_S2 is determined almost entirely by the equilibria between O2, S2, SO2 and SO."'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p50_equilibrium_ranges
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p51_pyrosulphate_literature
+  type: statement
+  locator:
+    page: 12
+    published_page: 51
+    section: Anomalous results
+  units: '% SO2; °C'
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Darken & Shields (1951)
+    pyrosulphate_as_printed: '"substantial amounts of pyrosulphate have been found, by Darken & Shields (1951), to occur in
+      CaO-Fe2O3 melts brought into equilibrium with air containing 8 % SO2, at temperatures ranging from about 1300 to 1500°
+      C. According to these authors, the amounts of pyrosulphate became negligible at 1600° C."'
+    authors_inference_as_printed: '"This supports the assumption made in this paper that, at 1 % SO2 and 1650° C, the sulphate
+      equilibrium is the only one of importance at the higher oxygen pressures."'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p51_pyrosulphate_literature
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p52_sulphate_and_fe_fes_notes
+  type: statement
+  locator:
+    page: 13
+    published_page: 52
+    section: Anomalous results
+  units: '% S; factor'
+  values:
+    method_class: author_derived
+    evidence_class: author_derived
+    sulphate_saturation_as_printed: '"It also seems unlikely that saturation could have been reached at a sulphate sulphur
+      concentration as low as 0.13 %."'
+    fe_fes_phase_as_printed: '"Fortunately, the appearance of the Fe-FeS phase can be prevented by raising the oxygen potential
+      by a factor of 10^3—a change which does not markedly upset the ''FeO'' : SiO2 ratio in the melt"'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p52_sulphate_and_fe_fes_notes
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p53_capacity_constancy_range
+  type: statement
+  locator:
+    page: 14
+    published_page: 53
+    section: The sulphur capacity of silicate melts
+  units: '% S'
+  values:
+    method_class: author_derived
+    evidence_class: author_derived
+    constancy_as_printed: '"the quantities C_S and C_SO4 are constant for a given temperature and composition in the range
+      of conditions studied, i.e. up to 1 % S and 0.01 % S respectively (e.g. see figure 2b)."'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p53_capacity_constancy_range
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p53_literature_capacities
+  type: statement
+  locator:
+    page: 14
+    published_page: 53
+    section: The sulphur capacity of silicate melts
+    figure: '5'
+  units: °C; wt%
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Constants for eq. (8) from Grant & Chipman 1946 and others; slag data of Fetters & Chipman (1941) and Winkler
+      & Chipman (1946)
+    pure_feo_as_printed: '"The sulphide capacities shown for pure liquid ''FeO'' at 1500 and 1600° C were calculated from
+      the approximate equilibrium constants which can be derived for the reaction" (8)'
+    complex_slags_as_printed: '"the sulphur capacities calculated by the authors for the silicate melts used by Fetters &
+      Chipman (1941) and by Winkler & Chipman (1946) in their studies of the partition of sulphur between molten iron and
+      complex slags at about 1600° C. Values of (% S)[O]/[S], obtained directly from their results for mixtures containing
+      less than 5 % P2O5 and less than 10 % MnO by weight, were converted to values of C_S"'
+    digitization_status: The Fig. 5 points are figure-only and not digitized.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p53_literature_capacities
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p54_hatch_chipman_comparison
+  type: statement
+  locator:
+    page: 15
+    published_page: 54
+    section: The sulphur capacity of silicate melts
+  units: atm; °C
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Hatch & Chipman (1949); Morris & Buehl (1950) in the footnoted calculation
+    comparison_as_printed: '"the sulphur capacities measured for the CaO-SiO2-Al2O3 melts at 1500° C over the range 10^-11
+      to 10^-6 atm of oxygen, are the same as those which can be deduced* for these same mixtures from the measurements made
+      by Hatch & Chipman (1949) of the partition of sulphur between silicates and molten iron at 1500° C in the presence of
+      carbon and carbon monoxide at 1 atm pressure (i.e. p_O2 = 10^-15.72 atm)." (pp. 53-54)'
+    scope_note: The 1 atm is the Hatch & Chipman carbon-saturation comparison, not the total pressure of this paper's furnace
+      runs.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p54_hatch_chipman_comparison
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p55_literature_gammas
+  type: statement
+  locator:
+    page: 16
+    published_page: 55
+    section: Thermodynamic functions for sulphides
+    sulphates and oxides in silicate melts: null
+  units: dimensionless
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Chipman (1948); Glaser (1926)
+    gamma_FeS_as_printed: '"Indeed, in the case of ''FeO'' melts, gamma(FeS) falls to a value of about 1.5 in the complete
+      absence of silica (Chipman 1948)."'
+    gamma_CaS_glaser_as_printed: '"The value of about 5, obtained for gamma(CaS) at low concentrations, compares reasonably
+      with the value of about 10 which can be derived for saturated solutions of CaS in liquid CaSiO3 at 1500° C from the
+      results of Glaser (1926)." (pp. 55-56)'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p55_literature_gammas
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p57_aluminate_activity_notes
+  type: thermodynamic_example
+  locator:
+    page: 18
+    published_page: 57
+    section: Thermodynamic functions for sulphides
+    sulphates and oxides in silicate melts: null
+  units: molar fraction; °C; %; kcal
+  values:
+    method_class: author_estimate
+    evidence_class: author_estimate
+    lime_activity_range_as_printed: '"so that the lime activities would be expected to be considerably larger in aluminate
+      than in silicate melts, at CaO molar fractions less than 0.60."'
+    curve_assignment_as_printed: '"If this curve is assigned as it stands to 1600° C the maximum error due to this is only
+      3 % (on ΔG), and much less than its probable uncertainty of about ± 2 kcal."'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p57_aluminate_activity_notes
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p57_formation_energies_quoted
+  type: thermodynamic_example
+  locator:
+    page: 18
+    published_page: 57
+    section: Thermodynamic functions for sulphides
+    sulphates and oxides in silicate melts: null
+  units: kcal; K
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Richardson, Jeffes & Withers (1950)
+    formation_energies_as_printed: '"the free energy of formation of 3CaO.Al2O3 (ca. −5 kcal at 298° K) is small compared
+      with that for CaO.SiO2 (ca. −22 kcal at 298° K)"'
+    note: Distinct from the p. 60 values (−4.0 ± 10 and −21.25 ± 0.5 kcal) carried in fincham1954_partial_molar_heats.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p57_formation_energies_quoted
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p58_heat_inputs
+  type: thermodynamic_example
+  locator:
+    page: 19
+    published_page: 58
+    section: Thermodynamic functions for sulphides
+    sulphates and oxides in silicate melts: null
+  units: kcal; °C
+  values:
+    method_class: author_estimate
+    evidence_class: author_estimate
+    cas_fusion_as_printed: '"the molar heat of fusion of CaS (unknown, but probably about the same as for CaO, 18 kcal (Kelley
+      1936))"'
+    cas_fusion_attribution: The 18 kcal for CaO is quoted from Kelley (1936); applying it to CaS is the authors' estimate.
+    partial_heat_drift_as_printed: '"The two partial molar heats are likely to change more with temperature than ΔH°, but
+      not by more than about 2 kcal over the 150° C interval on which the derived ΔH values are based."'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p58_heat_inputs
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p59_feo_heat_and_contours
+  type: thermodynamic_example
+  locator:
+    page: 20
+    published_page: 59
+    section: Thermodynamic functions for sulphides
+    sulphates and oxides in silicate melts: null
+  units: molar fraction; %; dimensionless; °C
+  values:
+    method_class: author_derived
+    evidence_class: author_derived
+    composition_neglect_as_printed: '"(The slight change in composition from 0.52 to 0.56 molar ''FeO'' has been neglected,
+      as a_FeO changes by only about 10 % in this composition range.)"'
+    gamma_FeS_as_printed: '"It follows that ΔH̄_FeS,liq. is approximately 6 kcal, i.e. small and endothermic, as suggested
+      for CaS(L), corresponding (if ΔS̄_FeS were ideal) to a value of 6 for gamma_FeS."'
+    contour_guide_as_printed: '"The results at 1500° C have also been used as a guide in drawing the contours, on the assumption
+      that the pattern of the constant C_S lines is the same at 1650° C as at 1500° C." (Fig. 7; contours stay figure-only.)'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p59_feo_heat_and_contours
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p60_p61_structural_argument
+  type: statement
+  locator:
+    page: 21
+    published_page: 60
+    section: Structural aspects
+    note: Continues on p. 61 (PDF page 22)
+  units: factor; molar fraction; °C
+  values:
+    method_class: author_derived
+    evidence_class: author_derived
+    capacity_fall_as_printed: '"In the case of CaO-SiO2 mixtures at 1650° C, for example (see figure 5), the sulphur-holding
+      capacity decreases by a factor of about 630 as the molar fraction of CaO falls from 0.90 to 0.30."'
+    singly_bonded_oxygen_as_printed: '"Between 0.3 and 0.6 molar fraction of CaO, the number of oxygen atoms bonded to one
+      silicon atom only, in a mole of melt (n_CaSiO + n_O2 = 1), increases by, at most, a factor of 2. ... An increase in
+      C_S of about twofold would thus be expected if the most important oxygen atoms participating in the sulphide and sulphate
+      equilibria were those bonded to one silicon only."'
+    mole_of_melt_note: The n subscripts are transcribed as they appear in the scan ("CaSiO", with a mark over the a, and "O2");
+      not corrected or completed.
+    actual_increase_as_printed: '"The actual increase is about elevenfold at 1500° C and eightfold at 1650° C." (p. 61)'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p60_p61_structural_argument
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_p60_ratio_patterns_quoted
+  type: statement
+  locator:
+    page: 21
+    published_page: 60
+    section: Thermodynamic functions for sulphides
+    sulphates and oxides in silicate melts: null
+  units: molar ratio
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Taylor & Chipman (1942); Oelsen & Maetz (1941)
+    pattern_as_printed: '"activity coefficients of ''FeO'' in ''FeO''-CaO-SiO2 melts are a maximum when the CaO:SiO2 ratio
+      is about 2:1 (Taylor & Chipman 1942), and ''FeO'' solubilities in ''FeO''-CaO-P2O5 melts are a minimum when the molar
+      ratio CaO:P2O5 is about 3:1 (Oelsen & Maetz 1941)."'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_p60_ratio_patterns_quoted
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_partial_molar_heats
+  type: thermodynamic_example
+  locator:
+    page: 19
+    published_page: 58
+    section: Thermodynamic functions
+  units: kcal
+  values:
+    method_class: author_derived
+    evidence_class: author_derived
+    CaO_SiO2_056: At 56 mol % CaO, ΔH from the temperature coefficient of Cs is 43 kcal; ΔH_CaS (partial molar) = 21 kcal,
+      using ΔH° = +24.0 ± 1.5 kcal and ΔH_CaO ≈ +2 kcal (Richardson 1953) (p. 58).
+    CaO_SiO2_039: At 39 mol % CaO, ΔH = 61 kcal gives ΔH_CaO = -16 kcal (p. 58).
+    FeO_SiO2: ΔH ≈ 38 kcal; ΔH_FeO,liq ≈ -4 kcal (Rey 1953) and ΔH° ≈ +28 kcal give ΔH_FeS,liq ≈ 6 kcal (p. 59).
+    cas_ternary: Cs (and presumably a_CaO) in CaO-SiO2-Al2O3 melts maximal where SiO2 and Al2O3 molar proportions are equal;
+      Fig. 7 contours at 1650 °C (p. 59).
+    formation_energies_quoted: 'ΔG (298 K): sillimanite -46 ± 3; CaO·SiO2 -21.25 ± 0.5; 2CaO·SiO2 -29.8 ± 3; 3CaO·Al2O3 -4.0
+      ± 10 kcal (Richardson et al. 1950) (p. 60).'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_partial_molar_heats
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_preliminary_checks
+  type: method_note
+  locator:
+    page: 5
+    published_page: 44
+    section: 'Results: General'
+  units: as printed
+  values:
+    method_class: measured_direct
+    evidence_class: measured_direct
+    silica_loss_test: 'Weighed CaO-Al2O3-SiO2 samples at 1500 °C, 1 % SO2 (p_O2 10^-10 atm): net weight losses 0.3, 0.2 and
+      0.2 % after 3, 4 1/2 and 5 1/2 h, after allowing for 0.1 % sulphur pick-up (p. 44).'
+    flow_rate_test: Gas flow rates 1.5 to 17.3 ml/s at s.t.p. had no significant influence (p. 44).
+    equilibration_time: '3, 6, 9 and 12 h runs from both sides: equilibrium virtually reached in 4 1/2 h; 6 h taken as the
+      standard time (p. 44).'
+    quench: Samples pulled into air; about 10 s from hot zone to surface solidification; less than 0.5 % of S could have been
+      lost; one N2-quench run agreed (pp. 44-45).
+    analysis_limits: Detection limit 0.001 % S; contents below 0.003 % subject to ±50 % errors (p. 46).
+    pt_si_limit: At 1500 °C, with p_O2 = 3 × 10^-12 atm, silica reduction produced a Pt-Si alloy melting below 1500 °C; lowest
+      p_O2 used was 2 × 10^-11 atm (p. 46).
+    experiment_count: 169 separate experiments (p. 42)
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_preliminary_checks
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_sulphide_equilibrium_constants
+  type: thermodynamic_example
+  locator:
+    page: 16
+    published_page: 55
+    equation: 9-11
+  units: (p_O2)^1/2/(p_S2)^1/2
+  values:
+    quantity: pure_phase_sulphide_equilibrium_constants
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    K9_CaO_cryst:
+      value_as_printed: 3.82 × 10^-3
+      temperature_C: 1600
+    K10_MgO_cryst:
+      value_as_printed: 4.0 × 10^-5
+      temperature_C: 1650
+    K11_FeO_liq:
+    - value_as_printed: 1.3 × 10^-3
+      temperature_C: 1350
+    - value_as_printed: 2.5 × 10^-3
+      temperature_C: 1500
+    attribution: 'Calculated from literature thermodynamic data: CaO via eq. (3) (Rosenqvist 1951; Rossini et al. 1947; Richardson
+      & Jeffes 1952), FeO via eq. (8), MgO from Shomate & Huffman 1943, Kelley 1935-1950, Richardson & Jeffes 1952.'
+    heats_of_reaction_as_printed:
+      CaO(s)+1/2S2=CaS(s)+1/2O2: ΔH° (1700 to 2000 K) = 24 ± 1.5 kcal
+      CaO(s)+1/2S2+3/2O2=CaSO4(s): ΔH° (1700 to 2000 K) = -195 ± 5.0 kcal
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_sulphide_equilibrium_constants
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_sulphide_sulphate_confirmation_s5
+  type: sulphur_content_equilibrium
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 11
+    published_page: 50
+    section: Discussion
+  units: wt% S; atm
+  values:
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S5
+    temperature_C: 1500
+    sulphide_run:
+      percent_SO2_input: 2
+      p_O2_atm_design: 1e-8
+      percent_S: '0.63'
+      analysis: evolution and combustion both 0.63 %
+    sulphate_run:
+      percent_SO2_input: 4
+      p_O2_atm_design: 1e-3
+      percent_S_combustion: '0.013'
+      evolution_result_as_printed: no sulphur (italic "no" in the page image; dropped from the OCR text layer)
+    note: The evolution method detects only sulphide; the combustion method measures sulphate plus sulphide (p. 50).
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_sulphide_sulphate_confirmation_s5
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s1
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S1
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S1
+    composition_mass_percent:
+      CaO: 37
+      Al2O3: 27
+      SiO2: 36
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : Al2O3 : SiO2 = 1.1 : 0.44 : 1'
+    melting_point_C_as_printed: 1425
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s11
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S11
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S11
+    composition_mass_percent:
+      CaO: 54
+      SiO2: 46
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : SiO2 = 1.26 : 1'
+    melting_point_C_as_printed: 1460
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s11
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s12
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S12
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S12
+    composition_mass_percent:
+      CaO: 48
+      SiO2: 52
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : SiO2 = 1.00 : 1'
+    melting_point_C_as_printed: 1540
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s12
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s13
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S13
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S13
+    composition_mass_percent:
+      CaO: 37
+      SiO2: 63
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : SiO2 = 0.63 : 1'
+    melting_point_C_as_printed: 1440
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s13
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s14
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S14
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S14
+    composition_mass_percent:
+      CaO: '35.5'
+      Al2O3: '64.5'
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : Al2O3 = 1.0 : 1'
+    melting_point_C_as_printed: 1600
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s14
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s15
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S15
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S15
+    composition_mass_percent:
+      CaO: 41
+      Al2O3: 59
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : Al2O3 = 1.27 : 1'
+    melting_point_C_as_printed: 1540
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s15
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s16
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S16
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S16
+    composition_mass_percent:
+      CaO: '52.5'
+      Al2O3: '47.5'
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : Al2O3 = 2.0 : 1'
+    melting_point_C_as_printed: 1460
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s16
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s17
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S17
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S17
+    composition_mass_percent:
+      SiO2: 60
+      MgO: 40
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'MgO : SiO2 = 1.0 : 1'
+    melting_point_C_as_printed: 1600
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s17
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s1a
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S1a
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S1a
+    composition_mass_percent:
+      CaO: 36
+      Al2O3: '27.5'
+      SiO2: '36.5'
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : Al2O3 : SiO2 = 1.05 : 0.44 : 1'
+    melting_point_C_as_printed: 1425
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s1a
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s2
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S2
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S2
+    composition_mass_percent:
+      CaO: '32.5'
+      Al2O3: '26.5'
+      SiO2: 41
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : Al2O3 : SiO2 = 0.85 : 0.38 : 1'
+    melting_point_C_as_printed: 1400
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s2
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s4
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S4
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S4
+    composition_mass_percent:
+      CaO: 54
+      Al2O3: 1
+      SiO2: 45
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : Al2O3 : SiO2 = 1.3 : 0.01 : 1'
+    melting_point_C_as_printed: 1480
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s4
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s5
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S5
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S5
+    composition_mass_percent:
+      CaO: 41
+      Al2O3: 52
+      SiO2: 7
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : Al2O3 : SiO2 = 6.2 : 4.3 : 1'
+    melting_point_C_as_printed: 1450
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s5
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t1_s6
+  type: composition
+  locator:
+    page: 5
+    published_page: 44
+    table: '1'
+    note: Mixture S6
+  units: wt%; mole ratio; °C
+  values:
+    quantity: starting_mixture_composition
+    method_class: method_only
+    mixture_number: S6
+    composition_mass_percent:
+      CaO: '45.8'
+      Al2O3: 18
+      SiO2: '36.2'
+    composition_basis_note: Nominal mixture compositions (wt%) as listed in Table 1; "some check analyses on the melted mixtures
+      showed that the correct compositions were being obtained" (p. 43). Slag-composition uncertainty ±0.5 % for each constituent
+      (p. 49).
+    mole_ratio_as_printed: 'CaO : Al2O3 : SiO2 = 1.35 : 0.3 : 1'
+    melting_point_C_as_printed: 1400
+    melting_point_source_note: '"The melting-points shown are those estimated from the phase diagrams collected by Hall &
+      Insley (1947)" (p. 43): quoted estimates, not measured here.'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t1_s6
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t2_s11_capacities_1500c
+  type: sulphide_capacity
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 8
+    published_page: 47
+    table: '2'
+    note: Composition S11
+  units: Cs in wt% S·atm^(1/2)/atm^(1/2) (as defined); Cso4 likewise as defined
+  values:
+    quantity: sulphide_and_sulphate_capacity_1500C
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S11
+    temperature_C: 1500
+    Cs_times_1e4_as_printed: '2.7'
+    Cs: '0.00027'
+    Cso4_note: — printed (no sulphate capacity)
+    definition_as_printed: Cs = (% S)(p_O2)^1/2/(p_S2)^1/2 measured where sulphur is present only as sulphide; Cso4 = (% S)/(p_S2)^1/2(p_O2)^3/2
+      where present only as sulphate (p. 52). % S is wt% in the melt; pressures in atm calculated for the hot zone.
+    derived_quantity_note: 'Cs and Cso4 combine measured % S with p_O2 and p_S2 calculated from the ingoing gas (Appendix);
+      authors: "These quantities may well be accurate only to ± 20 %" (p. 49). Column headers are 10^4 Cs and 10^-6 Cso4;
+      Cs = printed × 10^-4 and Cso4 = printed × 10^6 (scaling only).'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t2_s11_capacities_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t2_s13_capacities_1500c
+  type: sulphide_capacity
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 8
+    published_page: 47
+    table: '2'
+    note: Composition S13
+  units: Cs in wt% S·atm^(1/2)/atm^(1/2) (as defined); Cso4 likewise as defined
+  values:
+    quantity: sulphide_and_sulphate_capacity_1500C
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S13
+    temperature_C: 1500
+    Cs_times_1e4_as_printed: '5.3'
+    Cs: '0.00053'
+    Cso4_note: — printed (no sulphate capacity)
+    definition_as_printed: Cs = (% S)(p_O2)^1/2/(p_S2)^1/2 measured where sulphur is present only as sulphide; Cso4 = (% S)/(p_S2)^1/2(p_O2)^3/2
+      where present only as sulphate (p. 52). % S is wt% in the melt; pressures in atm calculated for the hot zone.
+    derived_quantity_note: 'Cs and Cso4 combine measured % S with p_O2 and p_S2 calculated from the ingoing gas (Appendix);
+      authors: "These quantities may well be accurate only to ± 20 %" (p. 49). Column headers are 10^4 Cs and 10^-6 Cso4;
+      Cs = printed × 10^-4 and Cso4 = printed × 10^6 (scaling only).'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t2_s13_capacities_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t2_s1_capacities_1500c
+  type: sulphide_capacity
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 8
+    published_page: 47
+    table: '2'
+    note: Composition S1
+  units: Cs in wt% S·atm^(1/2)/atm^(1/2) (as defined); Cso4 likewise as defined
+  values:
+    quantity: sulphide_and_sulphate_capacity_1500C
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S1
+    temperature_C: 1500
+    Cs_times_1e4_as_printed: '1.3'
+    Cs: '0.00013'
+    Cso4_times_1e-6_as_printed: '5.0'
+    Cso4: '5.0E+6'
+    definition_as_printed: Cs = (% S)(p_O2)^1/2/(p_S2)^1/2 measured where sulphur is present only as sulphide; Cso4 = (% S)/(p_S2)^1/2(p_O2)^3/2
+      where present only as sulphate (p. 52). % S is wt% in the melt; pressures in atm calculated for the hot zone.
+    derived_quantity_note: 'Cs and Cso4 combine measured % S with p_O2 and p_S2 calculated from the ingoing gas (Appendix);
+      authors: "These quantities may well be accurate only to ± 20 %" (p. 49). Column headers are 10^4 Cs and 10^-6 Cso4;
+      Cs = printed × 10^-4 and Cso4 = printed × 10^6 (scaling only).'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t2_s1_capacities_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t2_s1a_capacities_1500c
+  type: sulphide_capacity
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 8
+    published_page: 47
+    table: '2'
+    note: Composition S1a
+  units: Cs in wt% S·atm^(1/2)/atm^(1/2) (as defined); Cso4 likewise as defined
+  values:
+    quantity: sulphide_and_sulphate_capacity_1500C
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S1a
+    temperature_C: 1500
+    Cs_times_1e4_as_printed: '0.96'
+    Cs: '0.000096'
+    Cso4_note: — printed (no sulphate capacity)
+    definition_as_printed: Cs = (% S)(p_O2)^1/2/(p_S2)^1/2 measured where sulphur is present only as sulphide; Cso4 = (% S)/(p_S2)^1/2(p_O2)^3/2
+      where present only as sulphate (p. 52). % S is wt% in the melt; pressures in atm calculated for the hot zone.
+    derived_quantity_note: 'Cs and Cso4 combine measured % S with p_O2 and p_S2 calculated from the ingoing gas (Appendix);
+      authors: "These quantities may well be accurate only to ± 20 %" (p. 49). Column headers are 10^4 Cs and 10^-6 Cso4;
+      Cs = printed × 10^-4 and Cso4 = printed × 10^6 (scaling only).'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t2_s1a_capacities_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t2_s2_capacities_1500c
+  type: sulphide_capacity
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 8
+    published_page: 47
+    table: '2'
+    note: Composition S2
+  units: Cs in wt% S·atm^(1/2)/atm^(1/2) (as defined); Cso4 likewise as defined
+  values:
+    quantity: sulphide_and_sulphate_capacity_1500C
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S2
+    temperature_C: 1500
+    Cs_times_1e4_as_printed: '0.84'
+    Cs: '0.000084'
+    Cso4_times_1e-6_as_printed: '3.2'
+    Cso4: '3.2E+6'
+    definition_as_printed: Cs = (% S)(p_O2)^1/2/(p_S2)^1/2 measured where sulphur is present only as sulphide; Cso4 = (% S)/(p_S2)^1/2(p_O2)^3/2
+      where present only as sulphate (p. 52). % S is wt% in the melt; pressures in atm calculated for the hot zone.
+    derived_quantity_note: 'Cs and Cso4 combine measured % S with p_O2 and p_S2 calculated from the ingoing gas (Appendix);
+      authors: "These quantities may well be accurate only to ± 20 %" (p. 49). Column headers are 10^4 Cs and 10^-6 Cso4;
+      Cs = printed × 10^-4 and Cso4 = printed × 10^6 (scaling only).'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t2_s2_capacities_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t2_s4_capacities_1500c
+  type: sulphide_capacity
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 8
+    published_page: 47
+    table: '2'
+    note: Composition S4
+  units: Cs in wt% S·atm^(1/2)/atm^(1/2) (as defined); Cso4 likewise as defined
+  values:
+    quantity: sulphide_and_sulphate_capacity_1500C
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S4
+    temperature_C: 1500
+    Cs_times_1e4_as_printed: '2.5'
+    Cs: '0.00025'
+    Cso4_times_1e-6_as_printed: '15.0'
+    Cso4: '1.50E+7'
+    definition_as_printed: Cs = (% S)(p_O2)^1/2/(p_S2)^1/2 measured where sulphur is present only as sulphide; Cso4 = (% S)/(p_S2)^1/2(p_O2)^3/2
+      where present only as sulphate (p. 52). % S is wt% in the melt; pressures in atm calculated for the hot zone.
+    derived_quantity_note: 'Cs and Cso4 combine measured % S with p_O2 and p_S2 calculated from the ingoing gas (Appendix);
+      authors: "These quantities may well be accurate only to ± 20 %" (p. 49). Column headers are 10^4 Cs and 10^-6 Cso4;
+      Cs = printed × 10^-4 and Cso4 = printed × 10^6 (scaling only).'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t2_s4_capacities_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t2_s5_capacities_1500c
+  type: sulphide_capacity
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 8
+    published_page: 47
+    table: '2'
+    note: Composition S5
+  units: Cs in wt% S·atm^(1/2)/atm^(1/2) (as defined); Cso4 likewise as defined
+  values:
+    quantity: sulphide_and_sulphate_capacity_1500C
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S5
+    temperature_C: 1500
+    Cs_times_1e4_as_printed: '16.0'
+    Cs: '0.00160'
+    Cso4_times_1e-6_as_printed: '67.0'
+    Cso4: '6.70E+7'
+    definition_as_printed: Cs = (% S)(p_O2)^1/2/(p_S2)^1/2 measured where sulphur is present only as sulphide; Cso4 = (% S)/(p_S2)^1/2(p_O2)^3/2
+      where present only as sulphate (p. 52). % S is wt% in the melt; pressures in atm calculated for the hot zone.
+    derived_quantity_note: 'Cs and Cso4 combine measured % S with p_O2 and p_S2 calculated from the ingoing gas (Appendix);
+      authors: "These quantities may well be accurate only to ± 20 %" (p. 49). Column headers are 10^4 Cs and 10^-6 Cso4;
+      Cs = printed × 10^-4 and Cso4 = printed × 10^6 (scaling only).'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t2_s5_capacities_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t2_s6_capacities_1500c
+  type: sulphide_capacity
+  experiment: fincham-gas-slag-equilibration-1500c
+  locator:
+    page: 8
+    published_page: 47
+    table: '2'
+    note: Composition S6
+  units: Cs in wt% S·atm^(1/2)/atm^(1/2) (as defined); Cso4 likewise as defined
+  values:
+    quantity: sulphide_and_sulphate_capacity_1500C
+    method_class: measured_direct
+    evidence_class: measured_direct
+    composition_ref: S6
+    temperature_C: 1500
+    Cs_times_1e4_as_printed: '3.7'
+    Cs: '0.00037'
+    Cso4_times_1e-6_as_printed: '16.0'
+    Cso4: '1.60E+7'
+    definition_as_printed: Cs = (% S)(p_O2)^1/2/(p_S2)^1/2 measured where sulphur is present only as sulphide; Cso4 = (% S)/(p_S2)^1/2(p_O2)^3/2
+      where present only as sulphate (p. 52). % S is wt% in the melt; pressures in atm calculated for the hot zone.
+    derived_quantity_note: 'Cs and Cso4 combine measured % S with p_O2 and p_S2 calculated from the ingoing gas (Appendix);
+      authors: "These quantities may well be accurate only to ± 20 %" (p. 49). Column headers are 10^4 Cs and 10^-6 Cso4;
+      Cs = printed × 10^-4 and Cso4 = printed × 10^6 (scaling only).'
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t2_s6_capacities_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t3_feo_sio2_1350c
+  type: sulphur_content_equilibrium
+  experiment: fincham-feo-sio2-silica-cups
+  locator:
+    page: 9
+    published_page: 48
+    table: '3'
+    note: Column 1350 °C
+  units: atm; wt%
+  values:
+    quantity: sulphur_in_silica_saturated_FeO_SiO2_melt
+    method_class: measured_direct
+    evidence_class: measured_direct
+    temperature_C: 1350
+    p_N2_atm: '0.50'
+    percent_SO2_input: '0.3'
+    p_H2_over_p_CO2: '0.22'
+    p_O2_atm_as_printed: 1.13 x 10^-8
+    p_S2_atm_as_printed: ~1.1 x 10^-5
+    composition_mass_percent:
+      FeO: '56.8'
+      Fe2O3: '4.5'
+      SiO2: '38.7'
+    composition_source_note: '"The compositions quoted are taken from the results of Michal & Schuhmann (1952); those at 1500°
+      C were obtained by extrapolation and are thus only approximate" (p. 48): quoted, not analysed here.'
+    mean_percent_S: '0.066'
+    scatter_of_results: ± 8%
+    number_of_samples: 4
+    text_discrepancy_note: Prose on p. 48 says reproducible results were obtained "At 1300° C ... when p_O2 was equal to 1.13
+      × 10^-8 atm"; Table 3 prints this p_O2 under 1350 °C. Both kept; not resolved.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t3_feo_sio2_1350c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t3_feo_sio2_1500c
+  type: sulphur_content_equilibrium
+  experiment: fincham-feo-sio2-silica-cups
+  locator:
+    page: 9
+    published_page: 48
+    table: '3'
+    note: Column 1500 °C
+  units: atm; wt%
+  values:
+    quantity: sulphur_in_silica_saturated_FeO_SiO2_melt
+    method_class: measured_direct
+    evidence_class: measured_direct
+    temperature_C: 1500
+    p_N2_atm: '0.50'
+    percent_SO2_input: '0.3'
+    p_H2_over_p_CO2: '0.30'
+    p_O2_atm_as_printed: 1.88 x 10^-7
+    p_S2_atm_as_printed: 1.8 x 10^-6
+    composition_mass_percent:
+      FeO: '54'
+      Fe2O3: '4'
+      SiO2: '42'
+    composition_source_note: '"The compositions quoted are taken from the results of Michal & Schuhmann (1952); those at 1500°
+      C were obtained by extrapolation and are thus only approximate" (p. 48): quoted, not analysed here.'
+    mean_percent_S: '0.017'
+    scatter_of_results: ± 18%
+    number_of_samples: 4
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t3_feo_sio2_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_cao_aluminate_050_1650c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: CaO aluminate N=0.50 1650 °C
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: CaO
+    melt_basis: aluminate
+    molar_fraction_as_printed: '0.50'
+    temperature_C: 1650
+    a_MO_as_printed: 0.026*
+    a_MO_standard_state: pure cryst. oxide (column head a(MO, cryst.))
+    gamma_MS_as_printed: (5)
+    gamma_MS_standard_state: pure cryst. sulphide
+    Cs_times_1e4_as_printed: '9.6'
+    footnote_as_printed: '* Calculated assuming that gamma_CaS = 5.'
+    method_class: author_derived
+    evidence_class: author_derived
+    derivation_as_printed: a(CaO) calculated from the measured Cs and K9 assuming gamma_CaS = 5, the value found for the silicate
+      melts (pp. 57-58); not an independent activity measurement.
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  experiment: fincham-gas-slag-equilibration-1650c
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_cao_aluminate_050_1650c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_cao_aluminate_056_1650c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: CaO aluminate N=0.56 1650 °C
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: CaO
+    melt_basis: aluminate
+    molar_fraction_as_printed: '0.56'
+    temperature_C: 1650
+    a_MO_as_printed: 0.05*
+    a_MO_standard_state: pure cryst. oxide (column head a(MO, cryst.))
+    gamma_MS_as_printed: (5)
+    gamma_MS_standard_state: pure cryst. sulphide
+    Cs_times_1e4_as_printed: '21'
+    footnote_as_printed: '* Calculated assuming that gamma_CaS = 5.'
+    method_class: author_derived
+    evidence_class: author_derived
+    derivation_as_printed: a(CaO) calculated from the measured Cs and K9 assuming gamma_CaS = 5, the value found for the silicate
+      melts (pp. 57-58); not an independent activity measurement.
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  experiment: fincham-gas-slag-equilibration-1650c
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_cao_aluminate_056_1650c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_cao_aluminate_067_1500c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: CaO aluminate N=0.67 1500 °C
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: CaO
+    melt_basis: aluminate
+    molar_fraction_as_printed: '0.67'
+    temperature_C: 1500
+    a_MO_as_printed: 0.5†
+    a_MO_standard_state: pure cryst. oxide (column head a(MO, cryst.))
+    gamma_MS_as_printed: —
+    gamma_MS_standard_state: pure cryst. sulphide
+    footnote_as_printed: † Calculated from CaS saturation.
+    method_class: author_derived
+    evidence_class: author_derived
+    derivation_as_printed: Calculated from the approximate CaS saturation limit observed for melt 16 at 1500 °C at p_O2 =
+      4.27 × 10^-10 atm, 1 % SO2 input (p. 57).
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_cao_aluminate_067_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_cao_aluminate_067_1650c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: CaO aluminate N=0.67 1650 °C
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: CaO
+    melt_basis: aluminate
+    molar_fraction_as_printed: '0.67'
+    temperature_C: 1650
+    a_MO_as_printed: 0.23*
+    a_MO_standard_state: pure cryst. oxide (column head a(MO, cryst.))
+    gamma_MS_as_printed: (5)
+    gamma_MS_standard_state: pure cryst. sulphide
+    Cs_times_1e4_as_printed: '94'
+    footnote_as_printed: '* Calculated assuming that gamma_CaS = 5.'
+    method_class: author_derived
+    evidence_class: author_derived
+    derivation_as_printed: a(CaO) calculated from the measured Cs and K9 assuming gamma_CaS = 5, the value found for the silicate
+      melts (pp. 57-58); not an independent activity measurement.
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  experiment: fincham-gas-slag-equilibration-1650c
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_cao_aluminate_067_1650c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_cao_silicate_039_1600c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: CaO silicate N=0.39 1600 °C
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: CaO
+    melt_basis: silicate
+    molar_fraction_as_printed: '0.39'
+    temperature_C: 1600
+    a_MO_as_printed: 3.5 x 10^-3
+    a_MO_standard_state: pure cryst. oxide (column head a(MO, cryst.))
+    gamma_MS_as_printed: '5'
+    gamma_MS_standard_state: pure cryst. sulphide
+    Cs_times_1e4_as_printed: '1.4'
+    method_class: author_derived
+    evidence_class: author_derived
+    a_MO_attribution: Approximate a(CaO)/a(MgO) estimated from the free-energy-of-formation curves of Richardson (1953), Fig.
+      6 (p. 55); a(MgO) "assigned to 1650° C without correction". The attribution applies to the a(MO) column only.
+    class_note: The authors' own reductions set the row class. 10^4 Cs is the authors' sulphide capacity from their equilibrations
+      (for CaO-SiO2 at 1600 °C "derived from the Cs values at 1500 and 1650° C by the use of log Cs, 1/T plots", p. 55), and
+      gamma(MS) = a_MS/N_MS is calculated from K9-K11, those capacities and the oxide activities (p. 55).
+    Cs_derivation_note: Cs for CaO-SiO2 at 1600 °C derived from the 1500 and 1650 °C values by log Cs vs 1/T plots (p. 55).
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_cao_silicate_039_1600c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_cao_silicate_050_1600c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: CaO silicate N=0.50 1600 °C
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: CaO
+    melt_basis: silicate
+    molar_fraction_as_printed: '0.50'
+    temperature_C: 1600
+    a_MO_as_printed: 6.9 x 10^-3
+    a_MO_standard_state: pure cryst. oxide (column head a(MO, cryst.))
+    gamma_MS_as_printed: '7'
+    gamma_MS_standard_state: pure cryst. sulphide
+    Cs_times_1e4_as_printed: '2.0'
+    method_class: author_derived
+    evidence_class: author_derived
+    a_MO_attribution: Approximate a(CaO)/a(MgO) estimated from the free-energy-of-formation curves of Richardson (1953), Fig.
+      6 (p. 55); a(MgO) "assigned to 1650° C without correction". The attribution applies to the a(MO) column only.
+    class_note: The authors' own reductions set the row class. 10^4 Cs is the authors' sulphide capacity from their equilibrations
+      (for CaO-SiO2 at 1600 °C "derived from the Cs values at 1500 and 1650° C by the use of log Cs, 1/T plots", p. 55), and
+      gamma(MS) = a_MS/N_MS is calculated from K9-K11, those capacities and the oxide activities (p. 55).
+    Cs_derivation_note: Cs for CaO-SiO2 at 1600 °C derived from the 1500 and 1650 °C values by log Cs vs 1/T plots (p. 55).
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_cao_silicate_050_1600c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_cao_silicate_056_1600c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: CaO silicate N=0.56 1600 °C
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: CaO
+    melt_basis: silicate
+    molar_fraction_as_printed: '0.56'
+    temperature_C: 1600
+    a_MO_as_printed: '0.1'
+    a_MO_standard_state: pure cryst. oxide (column head a(MO, cryst.))
+    gamma_MS_as_printed: '47'
+    gamma_MS_standard_state: pure cryst. sulphide
+    Cs_times_1e4_as_printed: '5.2'
+    method_class: author_derived
+    evidence_class: author_derived
+    a_MO_attribution: Approximate a(CaO)/a(MgO) estimated from the free-energy-of-formation curves of Richardson (1953), Fig.
+      6 (p. 55); a(MgO) "assigned to 1650° C without correction". The attribution applies to the a(MO) column only.
+    class_note: The authors' own reductions set the row class. 10^4 Cs is the authors' sulphide capacity from their equilibrations
+      (for CaO-SiO2 at 1600 °C "derived from the Cs values at 1500 and 1650° C by the use of log Cs, 1/T plots", p. 55), and
+      gamma(MS) = a_MS/N_MS is calculated from K9-K11, those capacities and the oxide activities (p. 55).
+    Cs_derivation_note: Cs for CaO-SiO2 at 1600 °C derived from the 1500 and 1650 °C values by log Cs vs 1/T plots (p. 55).
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_cao_silicate_056_1600c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_cao_silicate_056_1600c_gamma5
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: CaO silicate N=0.56 1600 °C
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: CaO
+    melt_basis: silicate
+    molar_fraction_as_printed: '0.56'
+    temperature_C: 1600
+    a_MO_as_printed: 12.0 x 10^-3*
+    a_MO_standard_state: pure cryst. oxide (column head a(MO, cryst.))
+    gamma_MS_as_printed: '5'
+    gamma_MS_standard_state: pure cryst. sulphide
+    footnote_as_printed: '* Calculated assuming that gamma_CaS = 5.'
+    method_class: author_derived
+    evidence_class: author_derived
+    derivation_as_printed: Revised a(CaO) at 0.56 CaO assuming gamma_CaS = 5 (so a_CaS = 15 × 10^-3), used to shift the minimum
+      of the Richardson 1953 free-energy curve (p. 55; Fig. 6).
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_cao_silicate_056_1600c_gamma5
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_feo_silicate_054_1500c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: '''FeO'' silicate N=0.54 1500 °C'
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: '''FeO'''
+    melt_basis: silicate
+    molar_fraction_as_printed: '0.54'
+    temperature_C: 1500
+    a_MO_as_printed: '0.39'
+    a_MO_standard_state: pure liq. oxide (column head a(MO, liq.))
+    gamma_MS_as_printed: '8.5'
+    gamma_MS_standard_state: pure liq. sulphide
+    Cs_times_1e4_as_printed: '55'
+    method_class: author_derived
+    evidence_class: author_derived
+    a_MO_attribution: a(FeO) measured by Michal & Schuhmann (1952) (p. 55). The attribution applies to the a(MO) column only.
+    class_note: The authors' own reductions set the row class. 10^4 Cs is the authors' sulphide capacity from their equilibrations
+      (Table 3, p. 48), and gamma(MS) = a_MS/N_MS is calculated from K11, that capacity and the oxide activity (p. 55).
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_feo_silicate_054_1500c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_feo_silicate_057_1350c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: '''FeO'' silicate N=0.57 1350 °C'
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: '''FeO'''
+    melt_basis: silicate
+    molar_fraction_as_printed: '0.57'
+    temperature_C: 1350
+    a_MO_as_printed: '0.36'
+    a_MO_standard_state: pure liq. oxide (column head a(MO, liq.))
+    gamma_MS_as_printed: '10.7'
+    gamma_MS_standard_state: pure liq. sulphide
+    Cs_times_1e4_as_printed: '21'
+    method_class: author_derived
+    evidence_class: author_derived
+    a_MO_attribution: a(FeO) measured by Michal & Schuhmann (1952) (p. 55). The attribution applies to the a(MO) column only.
+    class_note: The authors' own reductions set the row class. 10^4 Cs is the authors' sulphide capacity from their equilibrations
+      (Table 3, p. 48), and gamma(MS) = a_MS/N_MS is calculated from K11, that capacity and the oxide activity (p. 55).
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_feo_silicate_057_1350c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t4_mgo_silicate_050_1650c
+  type: activity_context
+  locator:
+    page: 18
+    published_page: 57
+    table: '4'
+    note: MgO silicate N=0.50 1650 °C
+  units: activity and activity coefficient dimensionless; Cs as Table 2
+  values:
+    quantity: binary_melt_thermodynamic_quantities
+    oxide: MgO
+    melt_basis: silicate
+    molar_fraction_as_printed: '0.50'
+    temperature_C: 1650
+    a_MO_as_printed: 10^-1
+    a_MO_standard_state: pure cryst. oxide (column head a(MO, cryst.))
+    gamma_MS_as_printed: '2'
+    gamma_MS_standard_state: pure cryst. sulphide
+    Cs_times_1e4_as_printed: '1.2'
+    method_class: author_derived
+    evidence_class: author_derived
+    a_MO_attribution: Approximate a(CaO)/a(MgO) estimated from the free-energy-of-formation curves of Richardson (1953), Fig.
+      6 (p. 55); a(MgO) "assigned to 1650° C without correction". The attribution applies to the a(MO) column only.
+    class_note: The authors' own reductions set the row class. 10^4 Cs is the authors' sulphide capacity from their equilibrations
+      (for CaO-SiO2 at 1600 °C "derived from the Cs values at 1500 and 1650° C by the use of log Cs, 1/T plots", p. 55), and
+      gamma(MS) = a_MS/N_MS is calculated from K9-K11, those capacities and the oxide activities (p. 55).
+    gamma_MS_note: gamma(MS) derived from Cs, K9-K11 and the a(MO) column; N reckoned in moles of oxides and sulphide (p.
+      55). Values in parentheses were assumed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t4_mgo_silicate_050_1650c
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1500c_CaO-Al2O3-SiO2_0p85-0p38-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1500
+    melt_as_printed: 'CaO : Al2O3 : SiO2 = 0.85 : 0.38 : 1'
+    ratio_as_printed: '1.0'
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1500c_CaO-Al2O3-SiO2_0p85-0p38-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1500c_CaO-Al2O3-SiO2_1p1-0p44-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1500
+    melt_as_printed: 'CaO : Al2O3 : SiO2 = 1.1 : 0.44 : 1'
+    ratio_as_printed: '1.0'
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1500c_CaO-Al2O3-SiO2_1p1-0p44-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1500c_CaO-Al2O3-SiO2_1p3-0p01-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1500
+    melt_as_printed: 'CaO : Al2O3 : SiO2 = 1.3 : 0.01 : 1'
+    ratio_as_printed: '1.6'
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1500c_CaO-Al2O3-SiO2_1p3-0p01-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1500c_CaO-Al2O3-SiO2_1p35-0p3-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1500
+    melt_as_printed: 'CaO : Al2O3 : SiO2 = 1.35 : 0.3 : 1'
+    ratio_as_printed: '1.1'
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1500c_CaO-Al2O3-SiO2_1p35-0p3-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1500c_CaO-Al2O3-SiO2_6p2-4p3-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1500
+    melt_as_printed: 'CaO : Al2O3 : SiO2 = 6.2 : 4.3 : 1'
+    ratio_as_printed: '1.1'
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1500c_CaO-Al2O3-SiO2_6p2-4p3-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1650c_CaO-Al2O3_1p0-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1650
+    melt_as_printed: 'CaO : Al2O3 = 1.0 : 1'
+    ratio_as_printed: '1.0'
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1650c_CaO-Al2O3_1p0-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1650c_CaO-Al2O3_1p27-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1650
+    melt_as_printed: 'CaO : Al2O3 = 1.27 : 1'
+    ratio_as_printed: '0.9'
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1650c_CaO-Al2O3_1p27-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1650c_CaO-Al2O3_2p0-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1650
+    melt_as_printed: 'CaO : Al2O3 = 2.0 : 1'
+    ratio_as_printed: '1.2'
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1650c_CaO-Al2O3_2p0-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1650c_CaO-SiO2_1p0-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1650
+    melt_as_printed: 'CaO : SiO2 = 1.0 : 1'
+    ratio_as_printed: (1.6)
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1650c_CaO-SiO2_1p0-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO
+- observation_id: fincham1954_t5_1650c_CaO-SiO2_1p26-1
+  type: activity_context
+  locator:
+    page: 19
+    published_page: 58
+    table: '5'
+  units: dimensionless
+  values:
+    quantity: gamma_CaS_over_gamma_CaSO4
+    method_class: author_derived
+    evidence_class: author_derived
+    temperature_C: 1650
+    melt_as_printed: 'CaO : SiO2 = 1.26 : 1'
+    ratio_as_printed: '1.1'
+    standard_state_as_printed: '* The standard states for CaS and CaSO4 are the pure crystals at 1500 and 1650° C. The melting
+      of CaSO4 at 1300° C has been neglected.'
+    derivation_note: Ratio from the sulphide and sulphate capacities with K9 and K12; independent of errors in the approximate
+      lime activities (pp. 56-57). Parentheses as printed.
+  context_id: fincham-1954-proc-roy-soc-a::context::fincham1954_t5_1650c_CaO-SiO2_1p26-1
+  work_id: 10.1098/rspa.1954.0099
+  source_id: fincham-1954-proc-roy-soc-a
+  species: CaO

@@ -44,18 +44,21 @@ TABLE_MAPPING = (
 EXPECTED_OBSERVATIONS = {
     "wood_wade_2013_pbo_activity_coefficient": {
         "species": "PbO",
+        "parent_element": "pb",
         "value": "0.22",
         "proof": "0.22 at 1,923 K",
         "method_class": EvidenceClass.MODEL_DERIVED,
     },
     "wood_wade_2013_cuo05_activity_coefficient": {
         "species": "CuO0.5",
+        "parent_element": "cu",
         "value": "3.5",
         "proof": "3.5 in the silicate melt at 1,923 K",
         "method_class": EvidenceClass.MODEL_DERIVED,
     },
     "wood_wade_2013_ino15_activity_coefficient": {
         "species": "InO1.5",
+        "parent_element": "in",
         "value": "0.02",
         "proof": "0.02 in the SiO2-rich liquid at 1,923 K",
         "method_class": EvidenceClass.MODEL_DERIVED,
@@ -216,7 +219,8 @@ def _assert_source_value_pins(document: dict) -> None:
         stored_ids.update(
             row["observation_id"] for row in block.get("observations", [])
         )
-    assert stored_ids == set(EXPECTED_OBSERVATIONS)
+    assert len(stored_ids) == 325
+    assert set(EXPECTED_OBSERVATIONS) <= stored_ids
     for observation_id, expected in EXPECTED_OBSERVATIONS.items():
         row = _observation_by_id(document, observation_id)
         assert row["type"] == "activity_coefficient"
@@ -261,16 +265,43 @@ def _assert_source_value_pins(document: dict) -> None:
             _page_from_grep("Compositions of phases produced at 1.5 GPa/1,650 °C")[0]
         )
         assert row["point_conditions"]["fO2_log"]["state"]["tag"] == "unknown"
-        assert row["point_conditions"]["composition"]["state"]["tag"] == "unknown"
+        composition = row["point_conditions"]["composition"]["state"]
+        assert composition["tag"] == "value"
+        assert composition["value"]["amount_basis"] == "mass_percent"
         assert "No uncertainty width is printed" in row["uncertainty"]["note"]
+
+    observations = [
+        row
+        for block in document["species"].values()
+        for row in block.get("observations", [])
+    ]
+    digitized = [row for row in observations if row.get("values", {}).get("digitization_method") == "digitized"]
+    measured = [row for row in observations if row.get("values", {}).get("evidence_class") == "measured_direct"]
+    assert len(digitized) == 307
+    assert len(measured) == 14
+    assert {row["values"]["component_as_printed"] for row in digitized} == {
+        "NiO", "FeO", "MoO2", "WO3"
+    }
+    for row in digitized:
+        assert row["values"]["method_class"] == "model_derived"
+        assert row["values"]["evidence_class"] == "model_derived"
+        assert row["values"]["gamma"] == row["values"]["gamma_as_digitized"]
+        assert row["values"]["composition_read_uncertainty_each_endmember_fraction"] == "0.02"
+        components = row["point_conditions"]["composition"]["state"]["value"]["components"]
+        amounts = [float(pair[1]) for pair in components]
+        assert all(amount >= 0 for amount in amounts)
+        assert sum(amounts) == pytest.approx(1, abs=0.00002)
+        assert row["point_conditions"]["T_C"]["state"]["value"] == "1650"
+        assert row["derived_from"]
+    assert all(row["values"]["evidence_class"] == "measured_direct" for row in measured)
 
 
 def _assert_migrated_pins(result) -> None:
     assert result.validation is not None
     assert result.validation.hard_issues == ()
-    assert len(result.observations) == 3
+    assert len(result.observations) == 325
     assert len(result.works) == 1
-    assert sum(row.value.kind.value == "point" for row in result.observations.values()) == 3
+    assert sum(row.value.kind.value == "point" for row in result.observations.values()) == 325
     assert sum(row.value.kind.value == "unavailable" for row in result.observations.values()) == 0
     quantity_unknown = {
         row.observation_id
@@ -285,11 +316,32 @@ def _assert_migrated_pins(result) -> None:
     assert quantity_unknown == set()
     assert phase_unknown == set()
 
+    assert sum(row.evidence.class_.value is EvidenceClass.MODEL_DERIVED for row in result.observations.values()) == 311
+    assert sum(row.evidence.class_.value is EvidenceClass.MEASURED_DIRECT for row in result.observations.values()) == 14
+    for row in result.observations.values():
+        assert row.point_conditions["T_C"].state.value == Decimal("1650")
+        if "_fig" not in row.observation_id:
+            assert row.point_conditions["total_pressure_Pa"].state.value == Decimal("1500000000")
+        if (
+            row.identity.species is not None
+            and row.identity.species.phase.value is Phase.L
+            and row.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+        ):
+            assert row.point_conditions["composition"].state.is_value
+
+    digitized = [row for row in result.observations.values() if "_fig" in row.observation_id and "_point_" in row.observation_id]
+    assert len(digitized) == 307
+    for row in digitized:
+        assert row.point_conditions["composition"].state.is_value
+        assert row.point_conditions["T_C"].state.value == Decimal("1650")
+
     for observation_id, expected in EXPECTED_OBSERVATIONS.items():
         row = result.observations[f"{SOURCE_ID}::{observation_id}"]
         assert row.experiment_id in result.experiments
         expected_parents = (
-            f"{SOURCE_ID}::context::wood_wade_2013_bw1102_table1_partitioning_inputs",
+            f"{SOURCE_ID}::wood_wade_2013_bw1102_table1_silicate_{expected['parent_element']}_measured",
+            f"{SOURCE_ID}::wood_wade_2013_bw1102_table1_metal_{expected['parent_element']}_measured",
+            f"{SOURCE_ID}::wood_wade_2013_bw1102_table1_feo_activity_coefficient",
             f"{SOURCE_ID}::context::wood_wade_2013_metal_silicate_method_and_constants",
         )
         assert row.derived_from == expected_parents
@@ -308,7 +360,7 @@ def _assert_migrated_pins(result) -> None:
         assert row.identity.total_pressure_Pa.is_value
         assert row.identity.total_pressure_Pa.value == Decimal("1500000000")
         assert row.identity.fO2_Pa.is_unknown
-        assert row.identity.composition.is_unknown
+        assert row.identity.composition.is_value
         profile = profile_for(row.identity)
         assert "temperature_K" in profile.required
         assert "composition" in profile.required
@@ -337,16 +389,17 @@ def _assert_migrated_pins(result) -> None:
         )
         assert row.point_conditions["fO2_log"].state.is_unknown
         assert row.point_conditions["fO2_log"].locator.page == run_page
-        assert row.point_conditions["composition"].state.is_unknown
+        assert row.point_conditions["composition"].state.is_value
         assert row.point_conditions["composition"].locator.page == table_page
 
     uncertainty_kinds = Counter(row.uncertainty.kind for row in result.observations.values())
-    assert uncertainty_kinds == {UncertaintyKind.PRINTED: 3}
+    assert uncertainty_kinds[UncertaintyKind.PRINTED] == 324
+    assert uncertainty_kinds[UncertaintyKind.NONE] == 1
     confidence_levels = Counter(
         (row.uncertainty.verbatim or {}).get("confidence_level", "not_present")
         for row in result.observations.values()
     )
-    assert confidence_levels == Counter({"not_present": 3})
+    assert confidence_levels["not_present"] == 325
 
 
 def test_wood_wade_2013_pins_three_prose_coefficients_and_table_census() -> None:
@@ -459,17 +512,19 @@ def test_wood_wade_2013_isolated_migration_reaches_required_identity_axes(
         for rows in result.context_by_work.values()
         for row in rows
     ]
-    assert {row.get("experiment") for row in contexts} == {
-        "wood_wade_2013_bw1102"
-    }
+    assert sum(row.get("experiment") == "wood_wade_2013_bw1102" for row in contexts) == 3
+    assert sum(row.get("experiment") is None for row in contexts) == 4
     context_ids = {row["context_id"] for row in contexts}
-    assert len(context_ids) == 3
+    assert len(context_ids) == 7
     assert f"{SOURCE_ID}::context::wood_wade_2013_bw1102_table1_partitioning_inputs" in context_ids
     assert f"{SOURCE_ID}::context::wood_wade_2013_metal_silicate_method_and_constants" in context_ids
     assert f"{SOURCE_ID}::context::wood_wade_2013_volatility_figure_context" in context_ids
 
-    assert len(result.experiments) == 1
-    experiment = next(iter(result.experiments.values()))
+    assert len(result.experiments) == 2
+    experiment = next(
+        row for row in result.experiments.values()
+        if row.experiment_id.endswith("::experiment::wood_wade_2013_bw1102")
+    )
     assert experiment.experiment_id == (
         "10.1007/s00410-013-0896-z::experiment::wood_wade_2013_bw1102"
     )

@@ -8,7 +8,6 @@ T-intervals are all retained. Ambiguities are recorded, never guessed.
 
 Usage::
 
-  python tools/harvest_nasa_glenn_compilation.py
   python tools/harvest_nasa_glenn_compilation.py --thermo PATH --output-root PATH
 """
 
@@ -45,19 +44,13 @@ from simulator.reference_data.nasa_glenn import (  # noqa: E402
     record_document,
 )
 
-# Brief-specified snapshot (main checkout, gitignored research dir).
-BRIEF_THERMO = Path(
-    "/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/"
-    "Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/"
-    "2026-08-01-cea-sweep/thermo.inp"
-)
 EXTRACT_PATH = ROOT / "data" / "literature" / "extracts" / "nasa-cea-thermo.yaml"
 CEA_DOWNLOAD_URL = "https://www.grc.nasa.gov/www/CEAWeb/"
 
 
 def cli() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--thermo", type=Path)
+    parser.add_argument("--thermo", type=Path, required=True)
     parser.add_argument(
         "--output-root",
         type=Path,
@@ -67,20 +60,14 @@ def cli() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def resolve_thermo(args_thermo: Path | None, output_root: Path) -> Path:
-    candidates = []
-    if args_thermo is not None:
-        candidates.append(args_thermo)
-    candidates.append(output_root / "source" / "thermo.inp")
-    candidates.append(ROOT / "docs-private/research/2026-08-01-cea-sweep/thermo.inp")
-    candidates.append(BRIEF_THERMO)
-    for path in candidates:
-        if path.is_file():
-            return path
-    raise FileNotFoundError(
-        "thermo.inp not found; looked at: "
-        + ", ".join(str(path) for path in candidates)
-    )
+def resolve_thermo(thermo: Path | None) -> Path:
+    if thermo is None:
+        raise FileNotFoundError(
+            "--thermo is required; provide the NASA Glenn thermo.inp path"
+        )
+    if not thermo.is_file():
+        raise FileNotFoundError(f"--thermo file does not exist: {thermo}")
+    return thermo
 
 
 def extract_species_keys(extract_path: Path) -> set[str]:
@@ -227,7 +214,7 @@ def main() -> int:
     source_dir.mkdir(parents=True, exist_ok=True)
     records_dir.mkdir(parents=True, exist_ok=True)
 
-    thermo_src = resolve_thermo(args.thermo, output_root)
+    thermo_src = resolve_thermo(args.thermo)
     dest_thermo = source_dir / "thermo.inp"
     copy_if_needed(thermo_src, dest_thermo)
     payload = dest_thermo.read_bytes()

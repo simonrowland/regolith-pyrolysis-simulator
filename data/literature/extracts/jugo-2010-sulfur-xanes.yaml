@@ -44,6 +44,10 @@ species:
         admission_status: admitted
         calibration: Eq. 3; XANES peak-integral calibration against SB-5 (100%) and SB-41 (0%)
         points:
+        # Jugo et al. (2010), p. 5934, Eq. 6 (pdf_page_index 8), defines the
+        # reference as: "Subtracting the log fO2 value for the FMQ buffer at
+        # the appropriate P–T conditions". The Table 2 footnote gives SB-41
+        # a Churakov–Gottschalk fluid-mixture model.
         - label: SB-5
           value: 100.83
           T_C: 1050

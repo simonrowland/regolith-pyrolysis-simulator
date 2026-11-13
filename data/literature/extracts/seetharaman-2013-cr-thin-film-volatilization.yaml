@@ -1,0 +1,898 @@
+schema_version: literature_extract.v1
+source_id: seetharaman-2013-cr-thin-film-volatilization
+source:
+  citation: "Seetharaman, S., Albertsson, G. J., and Scheller, P. (2013), Studies of vaporization of chromium from thin slag films at steelmaking temperatures in oxidizing atmosphere, Metallurgical and Materials Transactions B."
+  doi: 10.1007/s11663-013-9904-y
+  year: 2013
+extraction:
+  method: >-
+    Born-digital pdftotext-layout and MinerU table drafts. Tables I-IV and their row/column assignments were checked against 600 dpi page renders. Figure-only numeric points were left undigitized; printed figure legends and captions were checked against 600 dpi renders.
+  date: '2026-11-03'
+  worker: Codex
+  schema_gap: >-
+    Measured elemental Cr concentrations are printed in atomic percent. The exact candidate quantity is simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION; simulator/battery/migrate.py::QUANTITY_ALIASES maps component_amount to it, and tools/validate_literature_extracts.py::OBSERVATION_TYPES admits concentration_series. The controller ruled that these at.% values stay exactly as printed, with units at.%, and remain typed-refused until the migrator can scale this quantity. simulator/battery/migrate.py::_convert_compilation_amount passes component_amount through unchanged for this quantity; the percent_to_fraction selector in simulator/battery/migrate.py::select_declared_source does not include Quantity.EQUILIBRIUM_PHASE_COMPOSITION. Therefore each row retains the printed number in component_amount_as_published, sets component_amount to null, and gives a refusal reason; no divided value or converted twin is stored. simulator/battery/enums.py::PHASE_BASIS_TOKENS includes mole_fraction but no atomic_percent token. Table IV's Spinel label is retained separately from the supported slag phase role. Cr-specific loss and relative mass-loss-rate forms have no exact quantity token: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE describe total-sample mass loss, simulator/battery/enums.py::Quantity.YIELD_FRACTION is not Cr loss, and simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO compares phase contents. The same Table IV WDS result is reproduced in Albertsson (2013), Table 20, and is not independent replication.
+review_status: draft
+fidelity_samples:
+  - path: species.Cr.context[seetharaman2013_table2_initial_slag_composition].values.rows[0].mass_percent[0]
+    value: '45.0'
+    locator:
+      page: 3
+      table: II
+  - path: species.Cr.context[seetharaman2013_table4_wds_phase_compositions].values.rows[0].values[5]
+    value: '0.03'
+    locator:
+      page: 5
+      table: IV
+  - path: species.Cr.context[seetharaman2013_table4_wds_phase_compositions].values.rows[1].values[5]
+    value: '0.00'
+    locator:
+      page: 5
+      table: IV
+  - path: species.Cr.context[seetharaman2013_figure2_mass_loss].values.legend_sample_as_published
+    value: '0.5mm O2'
+    locator:
+      page: 4
+      figure: '2'
+species:
+  Cr:
+    observations:
+      - observation_id: seetharaman2013_table4_spinel_cr
+        type: concentration_series
+        locator:
+          page: 5
+          table: IV
+          row: Spinel
+          column: Cr
+        phase: condensed_solid
+        units: at.%
+        note: The analyzed phase is printed as Spinel; slag is its parent phase role.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: slag
+          measured_phase_as_published: Spinel
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '0.03'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            The source prints 0.03 at.% Cr. Under t-1600 the current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 0.03 mole fraction.
+          T_K: '1873'
+          treatment_duration_h: '24'
+          atmosphere_as_published: oxygen
+          sample_thickness: not stated for this treatment
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 5, table: IV, row: treatment conditions}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: oxygen}
+            locator: {page: 5, table: IV}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 5, table: IV}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 5, table: IV}
+
+      - observation_id: seetharaman2013_table4_matrix_cr
+        type: concentration_series
+        locator:
+          page: 5
+          table: IV
+          row: Matrix
+          column: Cr
+        phase: glass
+        units: at.%
+        note: The adjacent prose identifies the Matrix as a glassy phase.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: glass
+          measured_phase_as_published: Matrix (glassy phase)
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '0.00'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            The source prints 0.00 at.% Cr. Under t-1600 the current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 0.00 mole fraction.
+          T_K: '1873'
+          treatment_duration_h: '24'
+          atmosphere_as_published: oxygen
+          sample_thickness: not stated for this treatment
+          quench_preservation_status: not_stated
+          quench_statement_as_printed: The samples were cooled at the rate of 40 K/min after the experiment and then subjected to SEM/WDS analysis.
+          quench_statement_locator: {page: 3, section: Experimental}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 5, table: IV, row: treatment conditions}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: oxygen}
+            locator: {page: 5, table: IV}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 5, table: IV}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 5, table: IV}
+
+      - observation_id: seetharaman2013_prose_cr_loss_2h_oxygen
+        type: concentration_series
+        locator:
+          page: 6
+          figure: '9'
+          note: 2h O2 bar label
+        phase: condensed_solid
+        units: at.%
+        note: The post-experiment WDS result is an average for the slag film, not a phase-specific value.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: slag
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '0.27'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            Figure 9 prints 0.27 at.% Cr for the 2h O2 bar. Under t-1600 the current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 0.27 mole fraction.
+          initial_Cr_content_as_published: '2'
+          initial_Cr_content_units_as_published: at.%
+          T_K: '1873'
+          treatment_duration_h: '2'
+          atmosphere_as_published: O2
+          sample_thickness: not stated for Figure 9
+          pO2_as_printed: not stated numerically
+          total_pressure: not stated
+          statement_as_published: Cr content drops from 2 at. pct to 0.27 at. pct in 2 hours at 1873 K in pure oxygen.
+          statement_locator: {page: 6, section: Discussion}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 6, figure: '9'}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: O2}
+            locator: {page: 6, figure: '9', note: 2h O2 bar label}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+
+      - observation_id: seetharaman2013_figure9_cr_2h_argon
+        type: concentration_series
+        locator:
+          page: 6
+          figure: '9'
+          note: 2h Ar bar label
+        phase: condensed_solid
+        units: at.%
+        note: Figure 9 prints the average Cr content of the slag sample.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: slag
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '1,62'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            Figure 9 prints 1,62 at.% Cr for 2 h in Ar at 1873 K. Under t-1600 the current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 1,62 mole fraction.
+          T_K: '1873'
+          treatment_duration_h: '2'
+          atmosphere_as_published: Ar
+          sample_thickness: not stated for Figure 9
+          pO2_as_printed: gas label Ar; no numerical experimental pO2
+          total_pressure: not stated
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 6, figure: '9'}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: Ar}
+            locator: {page: 6, figure: '9', note: 2h Ar bar label}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+
+      - observation_id: seetharaman2013_figure9_cr_4h_air
+        type: concentration_series
+        locator:
+          page: 6
+          figure: '9'
+          note: 4h Air bar label
+        phase: condensed_solid
+        units: at.%
+        note: Figure 9 prints the average Cr content of the slag sample.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: slag
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '1,25'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            Figure 9 prints 1,25 at.% Cr for 4 h in air at 1873 K. Under t-1600 the current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 1,25 mole fraction.
+          T_K: '1873'
+          treatment_duration_h: '4'
+          atmosphere_as_published: Air
+          sample_thickness: not stated for Figure 9
+          pO2_as_printed: gas label Air; no numerical experimental pO2
+          total_pressure: not stated
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 6, figure: '9'}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: Air}
+            locator: {page: 6, figure: '9', note: 4h Air bar label}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+
+      - observation_id: seetharaman2013_figure9_cr_6h_oxygen
+        type: concentration_series
+        locator:
+          page: 6
+          figure: '9'
+          note: 6h O2 bar label
+        phase: condensed_solid
+        units: at.%
+        note: Figure 9 prints the average Cr content of the slag sample.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: slag
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '0.04'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            Figure 9 prints 0.04 at.% Cr for 6 h in O2 at 1873 K. Under t-1600 the current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 0.04 mole fraction.
+          T_K: '1873'
+          treatment_duration_h: '6'
+          atmosphere_as_published: O2
+          sample_thickness: not stated for Figure 9
+          pO2_as_printed: gas label O2; no numerical experimental pO2
+          total_pressure: not stated
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 6, figure: '9'}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: O2}
+            locator: {page: 6, figure: '9', note: 6h O2 bar label}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+
+      - observation_id: seetharaman2013_figure9_cr_24h_oxygen
+        type: concentration_series
+        locator:
+          page: 6
+          figure: '9'
+          note: 24h O2 bar label
+        phase: condensed_solid
+        units: at.%
+        note: Figure 9 prints the average Cr content of the slag sample.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: slag
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '0,02'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            Figure 9 prints 0,02 at.% Cr for 24 h in O2 at 1873 K. Under t-1600 the current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 0,02 mole fraction.
+          T_K: '1873'
+          treatment_duration_h: '24'
+          atmosphere_as_published: O2
+          sample_thickness: not stated for Figure 9
+          pO2_as_printed: gas label O2; no numerical experimental pO2
+          total_pressure: not stated
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 6, figure: '9'}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: O2}
+            locator: {page: 6, figure: '9', note: 24h O2 bar label}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, figure: '9'}
+    context:
+      - observation_id: seetharaman2013_table1_reagent_purity
+        type: table_context
+        locator:
+          page: 3
+          table: I
+        units: '%'
+        printed_units_as_published: purity, weight percent
+        values:
+          quantity: reagent_purity_as_published
+          method_class: method_only
+          rows:
+            - chemical: Pt-wire
+              purity_percent: '99.99'
+              supplier: Alfa-Aesar, Germany
+            - chemical: Cr2O3
+              purity_percent: '99.8'
+              supplier: Sigma-Aldrich
+            - chemical: SiO2
+              purity_percent: '99 (reagent grade)'
+              supplier: Sigma-Aldrich
+            - chemical: MgO
+              purity_percent: '99'
+              supplier: Sigma-Aldrich
+            - chemical: CaO
+              purity_percent: '99'
+              supplier: Sigma-Aldrich
+            - chemical: Al2O3
+              purity_percent: '99.8'
+              supplier: Sigma-Aldrich
+          disposition: Reagent specifications, not slag measurements.
+
+      - observation_id: seetharaman2013_table2_initial_slag_composition
+        type: table_context
+        locator:
+          page: 3
+          table: II
+        units: wt%
+        printed_units_as_published: weight percent
+        values:
+          quantity: designed_alumina_saturated_slag_composition
+          method_class: method_only
+          basicity_CaO_over_SiO2: '1'
+          components: [Al2O3, CaO, SiO2, MgO, Cr2O3]
+          rows:
+            - series: single printed composition
+              mass_percent: ['45.0', '20.0', '20.0', '8.0', '7.0']
+          disposition: >-
+            Starting composition used for the thin-film study. The table caption states that the slag was alumina-saturated and CaO/SiO2 basicity was set to 1.
+
+      - observation_id: seetharaman2013_table3_factsage_condensed_phases
+        type: table_context
+        locator:
+          page: 3
+          table: III
+        units: wt%
+        printed_units_as_published: mass percent
+        values:
+          quantity: calculated_condensed_phase_amounts
+          method_class: model_derived
+          model: FACTSAGE 6.1 with Fact53 and FToxid databases
+          atmosphere_as_published: air
+          temperatures_K: ['1673', '1773', '1873']
+          temperature_headers_as_published: ['1673 K (1400 °C)', '1773 K (1500 °C)', '1873 K (1600 °C)']
+          rows:
+            - phase: ASlag-Liq#1
+              amounts_wt_percent: ['61.0', '71.9', '78.0']
+            - phase: CaMg2Al16O27_Solid
+              amounts_wt_percent: ['16.9', '0.0', '0.0']
+            - phase: ASpinel
+              amounts_wt_percent: ['22.1', '28.1', '21.9']
+          disposition: Calculated phase amounts, not measured Cr-loss results.
+
+      - observation_id: seetharaman2013_figure1_calculated_cro3_pressure
+        type: figure_record
+        locator:
+          page: 2
+          figure: '1'
+        units: Pa
+        phase_as_printed: gas
+        axes_as_printed: 'x: T (K); y: partial pressure of CrO3(g) (Pa)'
+        caption: The partial pressure of CrO3(g) as a function of temperature in the Cr-O2 system at elevated temperatures.
+        panel: single
+        series:
+          - label: FACTSAGE calculated CrO3(g) pressure
+            method_class: model_derived
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        values:
+          quantity: calculated_CrO3_partial_pressure_vs_temperature
+          method_class: model_derived
+          oxygen_partial_pressure_Pa_as_modelled: '9 × 10^4'
+          note: This is a FactSage model condition, not an experimental oxygen pressure.
+
+      - observation_id: seetharaman2013_quoted_okretic_cro3_vapor_pressure
+        type: quoted_context
+        locator:
+          page: 2
+          section: Introduction
+        units: Pa
+        values:
+          quantity: quoted_CrO3_vapor_pressure
+          method_class: quoted_attributed
+          value: '0.1'
+          temperature_K: '1773'
+          attribution: Okretic et al. [7], as cited by Seetharaman et al.
+          attribution_as_published: Okretic et al. estimated the vapor pressure of CrO3 as 0.1 Pa at 1773 K (1500 °C).
+          disposition: Prior-work estimate, not measured in the present study.
+
+      - observation_id: seetharaman2013_experimental_method_geometry_conditions
+        type: context_record
+        locator:
+          page: 3
+          section: Materials and Sample Preparation; Experimental
+        units: methods and apparatus as printed
+        values:
+          method_class: method_only
+          composition_table: II
+          sample_preparation: >-
+            Alumina tube with 4 mm inner diameter and 6 mm outer diameter was dipped into the melt; the tube was removed and quenched at room temperature in argon, then cut into 0.5 and 1.0 mm thick slices.
+          main_apparatus: SETARAM TGA 24 with sample held in an alumina ring inside an alumina reaction tube; the paper states the slag films were saturated with Al2O3.
+          preliminary_apparatus: SHTT films formed on Pt-30 pct Rh/Pt-6 pct Rh thermocouple wire at TUBAF.
+          tga_temperature_range_K: 1673 to 1873
+          tga_heating_rate_K_per_min: '30'
+          tga_cooling_rate_K_per_min: '40'
+          argon_preheat_flow_Nml_per_min: '50'
+          oxidant_flow_Nml_per_min: '320'
+          stated_starvation_flow_Nml_per_min: '300'
+          mass_and_temperature_recording_interval_s: '2'
+          atmosphere_change: Oxidant gas was switched on after the target temperature was reached.
+          experimental_atmospheres_as_printed: [air, pure oxygen, argon]
+          numeric_experimental_oxygen_partial_pressure: not stated
+          total_pressure: not stated
+          disposition: Gas flow rates are not total pressure; do not infer pO2 from a gas label.
+
+      - observation_id: seetharaman2013_shtt_preliminary_total_cr_loss
+        type: measured_context
+        locator:
+          page: 3
+          section: Results
+        units: qualitative Cr loss
+        values:
+          quantity: qualitative_total_Cr_loss_from_slag_film
+          method_class: measured_direct
+          apparatus: TUBAF SHTT preliminary experiments
+          atmosphere_as_published: air
+          temperature_range_K: 1673 to 1873
+          duration_as_published: nearly 24 hours
+          geometry_as_published: Convex lens-shaped film on a Pt-alloy thermocouple wire.
+          result_as_published: SEM/EDX indicated total Cr loss after exposure to air for nearly 24 hours at steelmaking temperatures.
+          composition_table: II
+          sample_thickness: not stated
+          oxygen_partial_pressure: not stated numerically
+          total_pressure: not stated
+          note: This preliminary setup is distinct from the later TGA alumina-ring experiments.
+
+      - observation_id: seetharaman2013_ring_cr_wds_and_mass_balance
+        type: measured_context
+        locator:
+          page: 4
+          section: Results
+        units: at.% Cr; mm3 for volumes
+        printed_units_as_published: atomic percent for Cr; mm3 for volumes
+        values:
+          quantity: Cr_dissolved_in_alumina_ring_and_approximate_mass_balance
+          method_class: measured_direct
+          dissolved_Cr_in_alumina_ring_at_percent: up to 0.13
+          measured_by: WDS
+          original_sample_Cr_at_percent: '2.0'
+          alumina_ring_wall_volume_mm3: '15.7'
+          slag_sample_volume_mm3: '12.5'
+          mass_balance: Approximate; the values are given to account for Cr dissolved in the ring before estimating Cr loss.
+          specimen_treatment_for_maximum_ring_Cr: not assigned to one printed run
+          geometry: TGA alumina ring holding the thin slag film
+          oxygen_partial_pressure: not stated numerically
+          total_pressure: not stated
+          schema_gap: >-
+            The reported maximum dissolved ring Cr is atomic percent but is not assigned to one experiment. simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION is mass-based and simulator/battery/enums.py::PHASE_BASIS_TOKENS has no atomic_percent basis; retain it as context with the printed unit and do not divide it.
+
+      - observation_id: seetharaman2013_table4_wds_phase_compositions
+        type: table_context
+        locator:
+          page: 5
+          table: IV
+        units: at.%
+        printed_units_as_published: atomic percent
+        values:
+          quantity: WDS_elemental_phase_composition_at_percent
+          method_class: measured_direct
+          method: SEM/WDS of the post-experiment slag sample
+          treatment_temperature_K: '1873'
+          treatment_duration_h: '24'
+          atmosphere_as_published: oxygen
+          specimen_thickness: not stated for this treatment
+          pO2_as_experimentally_specified: not stated numerically
+          total_pressure: not stated
+          elements: [O, Mg, Al, Si, Ca, Cr]
+          rows:
+            - phase: Spinel
+              values: ['61.82', '8.36', '29.65', '0.10', '0.04', '0.03']
+            - phase: Matrix (glassy phase per adjacent prose)
+              values: ['66.59', '3.07', '17.84', '8.03', '4.47', '0.00']
+          detection_note: Separately, the discussion says the result after 6 h in oxygen was near WDS noise; no detection limit is given, and that statement is not assigned to the 24 h Table IV cells.
+          schema_gap: >-
+            The Cr cells have the exact elemental-composition candidate under simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION, but the migrator cannot scale the printed at.% value for component_amount. Their structured rows retain each printed number and unit with component_amount null and a typed refusal. The Spinel sample phase label is preserved while the supported slag phase role identifies its host. The same two rows appear in Albertsson (2013), Table 20; that is overlapping data from the same study, not an independent replication.
+          disposition: All twelve elemental cells are retained in table context; the Cr cells also have structured typed-refused records, with no values divided by 100.
+
+      - observation_id: seetharaman2013_figure2_mass_loss
+        type: figure_record
+        locator:
+          page: 4
+          figure: '2'
+        units: dimensionless mass change as plotted
+        phase_as_printed: slag film
+        axes_as_printed: 'x: t (s); y: σ'
+        caption: Dimensionless mass loss curves for slag samples of 1 mm and 0.5 mm thickness.
+        panel: single
+        series:
+          - label: 0.5mm O2
+            line_style: dashed
+            atmosphere_as_printed: O2
+            sample_thickness_mm: '0.5'
+          - label: 1.0mm Air
+            line_style: dash-dot
+            atmosphere_as_printed: Air
+            sample_thickness_mm: '1.0'
+          - label: 0.5mm Air
+            line_style: solid
+            atmosphere_as_printed: Air
+            sample_thickness_mm: '0.5'
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        values:
+          quantity: mass_loss_fraction
+          method_class: measured_direct
+          legend_sample_as_published: '0.5mm O2'
+          temperature_K: '1873'
+          soak_duration_h: '2'
+          sample_thicknesses_mm: ['0.5', '1.0']
+          atmosphere_as_published: air and pure oxygen
+          composition_table: II
+          pO2_as_printed: gas labels only; no numerical experimental pO2
+          total_pressure: not stated
+          mass_loss_normalisation_as_printed: Δwt/wt_initial
+          PtOx_mass_loss_compensation: applied
+          note: >-
+            The chart is whole-sample mass change, not a Cr-specific loss measurement. The text states that Si was also lost and mass change was compensated for PtOx loss.
+
+      - observation_id: seetharaman2013_figure3_before_after_samples
+        type: figure_record
+        locator:
+          page: 4
+          figure: '3'
+        units: not applicable; qualitative photograph
+        phase_as_printed: slag film in alumina ring
+        caption: Samples before and after heat treatment at 1873 K for 24 h in pure O2.
+        panel: before and after
+        series:
+          - label: before heat treatment
+          - label: after heat treatment
+        digitisation: not applicable
+        numeric_points: none
+        values:
+          quantity: qualitative_sample_appearance
+          method_class: measured_direct
+          treatment_temperature_K: '1873'
+          treatment_duration_h: '24'
+          atmosphere_as_printed: pure O2
+          note: The after-treatment film is described in the text as nearly colorless; the photo itself supplies no numeric Cr-loss value.
+
+      - observation_id: seetharaman2013_figure4_sem_micrograph
+        type: figure_record
+        locator:
+          page: 4
+          figure: '4'
+        units: not applicable; SEM image
+        phase_as_printed: MgAl2O4 spinel grains and amorphous matrix
+        caption: SEM micrograph of the sample after 24 h at 1873 K in oxygen.
+        panel: single
+        digitisation: not applicable
+        numeric_points: none
+        values:
+          quantity: qualitative_post_treatment_microstructure
+          method_class: measured_direct
+          treatment_temperature_K: '1873'
+          treatment_duration_h: '24'
+          atmosphere_as_printed: oxygen
+          note: No numeric Cr-analysis cells are read from the micrograph.
+
+      - observation_id: seetharaman2013_figure5_cr_content_temperature
+        type: figure_record
+        locator:
+          page: 5
+          figure: '5'
+        units: at.% Cr
+        phase_as_printed: slag sample
+        axes_as_printed: 'x: T (K); y: Cr (at.%)'
+        caption: Average Cr content in the slag as a function of temperature after 6 h in oxygen; sample thickness was 0.5 mm.
+        panel: single
+        series:
+          - label: 6h in oxygen
+            method_class: measured_direct
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        values:
+          quantity: chromium_content_at_percent
+          method_class: measured_direct
+          treatment_duration_h: '6'
+          atmosphere_as_printed: oxygen
+          sample_thickness_mm: '0.5'
+          composition_table: II
+          pO2_as_printed: no numerical experimental pO2
+          total_pressure: not stated
+          note: Values read only from the plot are deferred; the prose summary is recorded separately.
+
+      - observation_id: seetharaman2013_figure6_cr_content_time
+        type: figure_record
+        locator:
+          page: 5
+          figure: '6'
+        units: at.% Cr
+        phase_as_printed: slag sample
+        axes_as_printed: 'x: T (K); y: Cr (at.%)'
+        caption: Average Cr content in the slag after 2 and 6 h in oxygen.
+        panel: single
+        series:
+          - label: 2h O2
+            legend_swatch: light gray
+            method_class: measured_direct
+          - label: 6h O2
+            legend_swatch: dark gray
+            method_class: measured_direct
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        values:
+          quantity: chromium_content_at_percent
+          method_class: measured_direct
+          atmosphere_as_printed: oxygen
+          temperature_axis_as_printed: T (K)
+          sample_thickness: not stated for this figure
+          composition_table: II
+          pO2_as_printed: no numerical experimental pO2
+          total_pressure: not stated
+
+      - observation_id: seetharaman2013_figure7_mass_loss
+        type: figure_record
+        locator:
+          page: 5
+          figure: '7'
+        units: dimensionless mass change as plotted
+        phase_as_printed: slag film
+        axes_as_printed: 'x: t (s); y: dimensionless mass loss, σ'
+        caption: Dimensionless weight-loss TGA curves for isothermal oxidation of 0.5 mm slag films for 2 h.
+        panel: single
+        series:
+          - label: 1873K O2
+            line_style: dash-dot
+            atmosphere_as_printed: O2
+          - label: 1873K Air
+            line_style: dashed
+            atmosphere_as_printed: Air
+          - label: 1873K Ar
+            line_style: solid
+            atmosphere_as_printed: Ar
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        values:
+          quantity: mass_loss_fraction
+          method_class: measured_direct
+          temperature_K: '1873'
+          soak_duration_h: '2'
+          sample_thickness_mm: '0.5'
+          atmosphere_as_published: oxygen, air, argon
+          composition_table: II
+          pO2_as_printed: gas labels only; no numerical experimental pO2
+          total_pressure: not stated
+          mass_loss_normalisation_as_printed: σ (dimensionless weight loss)
+          PtOx_mass_loss_compensation: applied
+          note: This is whole-sample weight loss, not element-specific Cr volatilization.
+
+      - observation_id: seetharaman2013_prose_cr_loss_temperature_summary
+        type: measured_context
+        locator:
+          page: 5
+          section: Effect of Temperature
+        units: '%'
+        printed_units_as_published: Cr loss percent as described by the authors
+        values:
+          quantity: chromium_specific_loss_fraction
+          method_class: author_estimate
+          treatment_duration_h: '6'
+          atmosphere_as_published: oxygen
+          at_1773_K: about 50 pct loss
+          at_1873_K: zero value
+          sample_thickness_mm: '0.5'
+          pO2_as_printed: not stated numerically
+          total_pressure: not stated
+          schema_gap: >-
+            The text gives Cr-specific loss, not total-sample mass loss. simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION does not mean element-specific loss; simulator/battery/enums.py::Quantity.YIELD_FRACTION does not describe an amount of Cr lost from a slag sample. The paper's supporting plot points remain figure-only and are not stored as parents. simulator/battery/migrate.py::QUANTITY_ALIASES provides no exact Cr-specific loss token.
+          note: Figure 9's printed bar labels are stored as concentration observations; the prose summary remains approximate and is not replaced by the 6 h bar label.
+
+      - observation_id: seetharaman2013_prose_relative_mass_loss_rate
+        type: measured_context
+        locator:
+          page: 5
+          section: Effect of Oxygen Partial Pressure
+        units: dimensionless rate ratio as described
+        values:
+          quantity: relative_air_to_oxygen_whole_sample_mass_loss_rate
+          method_class: author_estimate
+          relative_rate_as_published: about 0.4 times
+          gas_atmospheres_compared: [air, oxygen]
+          temperature_K: '1873'
+          time_context: 2 h isothermal mass-loss curves are described in this section
+          sample_thickness: not specified for this ratio sentence
+          pO2_as_printed: no numerical experimental pO2; authors state the trend corresponds approximately to square root of pO2
+          total_pressure: not stated
+          uncertainty_note: Authors warn that mass-loss uncertainty could make a mechanism inferred from the curves misleading.
+          schema_gap: >-
+            The printed value is a ratio of mass-loss rates, not an absolute mass_loss_rate. simulator/battery/enums.py::Quantity.MASS_LOSS_RATE has mass/time units, while simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO compares phase contents; neither token exactly represents this rate ratio.
+          source_wording_figure2_comparison: >-
+            The prose says the argon rate for the “0.5 m” sample exceeds air with a 1 mm sample, referring to Figure 2. The rendered Figure 2 legend instead labels 0.5 mm O2, 1.0 mm Air, and 0.5 mm Air; this source mismatch is retained without resolving the prose to a gas or thickness.
+
+      - observation_id: seetharaman2013_figure8_surface_photo
+        type: figure_record
+        locator:
+          page: 5
+          figure: '8'
+        units: not applicable; qualitative photograph
+        phase_as_printed: polished slag sample surface
+        caption: The polished sample surface after treatment at 2 h at 1673 K (1400 °C).
+        panel: single
+        digitisation: not applicable
+        numeric_points: none
+        values:
+          quantity: qualitative_sample_surface_appearance
+          method_class: measured_direct
+          treatment_temperature_K: '1673'
+          treatment_duration_h: '2'
+          atmosphere_as_printed: not specified in the Figure 8 caption
+          note: Figure 8 is a color/photo observation; no Cr concentration point is extracted.
+
+      - observation_id: seetharaman2013_figure9_cr_content_soak
+        type: figure_record
+        locator:
+          page: 6
+          figure: '9'
+        units: at.% Cr
+        phase_as_printed: slag sample
+        axes_as_printed: 'x: soaking time; y: average Cr content (atomic percent)'
+        caption: Average Cr content in slag after soaking at 1873 K; the original Cr content was 2.0 atomic percent.
+        panel: single
+        series:
+          - label: Cr original
+            legend_color: orange
+          - label: 2h Ar
+            legend_color: light blue
+          - label: 4h Air
+            legend_color: purple
+          - label: 2h O2
+            legend_color: green
+          - label: 6h O2
+            legend_color: blue
+          - label: 24h O2
+            legend_color: black
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        values:
+          quantity: chromium_content_at_percent
+          method_class: measured_direct
+          temperature_K: '1873'
+          composition_table: II
+          pO2_as_printed: gas labels only; no numerical experimental pO2
+          total_pressure: not stated
+          sample_thickness: not stated in this figure caption
+          note: Printed numerical bar labels are recorded in the associated concentration_series observations; no unlabelled bar values were digitized.

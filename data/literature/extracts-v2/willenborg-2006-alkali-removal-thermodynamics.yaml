@@ -40,7 +40,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: Equation (2) prints Na2O(l,s), which names both liquid and solid and does not specify one reference phase for
+        these activities.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -87,8 +88,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Willenborg et al. (2006), present work.
   admission:
     status: admitted
@@ -271,11 +272,21 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:willenborg-2006-alkali-removal-thermodynamics
+    relation: Equation (3) reduces the determined KEMS sodium partial pressure to Na2O activity; the source takes Kp for Equation
+      (2) from FACT [17]. The pressure inputs for these reported points are not printed.
+    inputs: []
     parameters: []
-    output_unit: dimensionless activity
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 2595
+        pdf_page_index: 2
+        section: Experimental Setup
+        equation: '3'
     references: []
 - observation_id: willenborg-2006-alkali-removal-thermodynamics::willenborg_2006_alsi8na1_na2o_activity_1400::T=1673.15:h=885c70dc26e3
   experiment_id: 10.1021/ef060305k::willenborg-2006-alkali-removal-thermodynamics
@@ -315,7 +326,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: Equation (2) prints Na2O(l,s), which names both liquid and solid and does not specify one reference phase for
+        these activities.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -360,8 +372,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Willenborg et al. (2006), present work.
   admission:
     status: admitted
@@ -521,9 +533,19 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: as_published
-    inputs:
-    - pdf:willenborg-2006-alkali-removal-thermodynamics
+    relation: Equation (3) reduces the determined KEMS sodium partial pressure to Na2O activity; the source takes Kp for Equation
+      (2) from FACT [17]. The pressure inputs for these reported points are not printed.
+    inputs: []
     parameters: []
-    output_unit: dimensionless activity
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 2595
+        pdf_page_index: 2
+        section: Experimental Setup
+        equation: '3'
     references: []

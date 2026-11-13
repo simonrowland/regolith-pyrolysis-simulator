@@ -1,0 +1,389 @@
+schema_version: literature_extract.v1
+source_id: yakovlev-2018-meteoritic-kems
+source:
+  citation: "Yakovlev, O. I., and Shornikov, S. I. (2018). Experimental Investigations of Meteoritic Substance by Knudsen Effusion Mass-Spectrometric Method. 81st Annual Meeting of the Meteoritical Society, LPI Contribution No. 2067, abstract PDF 6018."
+  year: 2018
+  corpus_asset: raw/yakovlev-2018-meteoritic-kems/yakovlev-2018-meteoritic-kems.pdf
+  corpus_sha256: 7a0162db2342561e2e640d5ae1eeec20d142e0c8381d41114fecb74bbf3b4ac5
+extraction:
+  method: >-
+    Manual transcription checked against a 300 dpi render of the single supplied
+    page. The abstract contains no data tables. Numeric claims, species names,
+    the volatility sequence, and qualifying prose were checked against the page
+    image. Apparatus details and per-sample numerical series are not printed.
+  date: '2026-10-05'
+  worker: codex-resume-26240-1791222229
+review_status: draft
+fidelity_samples:
+- species: O
+  observation_id: yakovlev_2018_oxygen_vapor_fraction_context
+  field: oxygen_volume_fraction_lower_bound
+  value: 0.5
+  locator:
+    page: 1
+    paragraph: 2
+    note: At T > 2000 °C, combined O and O2 content is stated to be more than half of vapor volume.
+benches:
+- id: yakovlev-2018-knudsen-effusion-ms
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state: {tag: value, value: Knudsen effusion method with mass-spectrometric vapor analysis}
+    locator: {page: 1, section: Abstract, note: Instrument model and analyzer configuration are not stated.}
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_published}
+    locator: {page: 1, section: Abstract, note: No cell material or liner is identified.}
+  geometry:
+    orifice_diameter_m:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No orifice diameter is stated.}
+    orifice_channel_length_m:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No orifice channel length is stated.}
+  ionization:
+    ionization_energy:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No ionization energy is stated.}
+  temperature_measurement:
+    sensor:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Temperature sensor is not stated.}
+  temperature_calibration:
+    method:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Temperature calibration is not stated.}
+  other_facts:
+  - name: ionization_cross_sections_and_source
+    unit: as printed
+    value:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No ionization cross-sections or source are given.}
+  - name: multiplier_and_isotope_corrections
+    unit: as printed
+    value:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No multiplier or isotope corrections are described.}
+experiments:
+- experiment_id: yakovlev-2018-chondrite-and-chondrule-series
+  bench_id: yakovlev-2018-knudsen-effusion-ms
+  method: knudsen_effusion
+  locator: {page: 1, section: Abstract, note: Experiments are identified as Knudsen-effusion evaporation studies.}
+  apparatus:
+    calibration:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, section: Abstract, note: No intensity-to-pressure conversion method is described.}
+      reference_substance:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, section: Abstract, note: No calibration substance is named.}
+      pressure_conversion:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, section: Abstract, note: No sample partial-pressure calculation is described.}
+  sample:
+    printed_composition:
+      state: {tag: value, value: Murchison CM and Krymka LL3 chondrites; Saratov chondrite chondrules (L6)}
+      locator: {page: 1, section: Abstract}
+    initial_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No starting chemical analyses or proportions are printed.}
+    characterization:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No starting purity or post-run composition assay is printed.}
+    pretreatment:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Sample preparation is not described.}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: no per-sample temperature series reported}
+      locator: {page: 1, section: Abstract, note: "The abstract gives only the overall method capability up to 2500 °C, not this set's run temperatures."}
+  pressure_environment:
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Chamber background pressure is not stated.}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Sweep gas or residual-gas composition is not stated.}
+- experiment_id: yakovlev-2018-efremovka-cai-series
+  bench_id: yakovlev-2018-knudsen-effusion-ms
+  method: knudsen_effusion
+  locator: {page: 1, section: Abstract, note: CAIs Type A from Efremovka are specifically discussed.}
+  apparatus:
+    calibration:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, section: Abstract, note: No intensity-to-pressure conversion method is described.}
+      reference_substance:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, section: Abstract, note: No calibration substance is named.}
+      pressure_conversion:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, section: Abstract, note: No sample partial-pressure calculation is described.}
+  sample:
+    printed_composition:
+      state: {tag: value, value: Type A CAIs of Efremovka chondrite (CV)}
+      locator: {page: 1, section: Abstract}
+    initial_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No starting chemical analysis or proportions are printed.}
+    characterization:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No starting purity or post-run composition assay is printed.}
+    pretreatment:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Sample preparation is not described.}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: no complete run schedule reported}
+      locator: {page: 1, section: Abstract, note: Narrative observations near 1900 °C and 2400 °C are not a complete temperature series.}
+  pressure_environment:
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Chamber background pressure is not stated.}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Sweep gas or residual-gas composition is not stated.}
+- experiment_id: yakovlev-2018-mineral-series
+  bench_id: yakovlev-2018-knudsen-effusion-ms
+  method: knudsen_effusion
+  locator: {page: 1, section: Abstract, note: High-temperature evaporation experiments on three minerals are reported.}
+  apparatus:
+    calibration:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, section: Abstract, note: No intensity-to-pressure conversion method is described.}
+      reference_substance:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, section: Abstract, note: No calibration substance is named.}
+      pressure_conversion:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 1, section: Abstract, note: No sample partial-pressure calculation is described.}
+  sample:
+    printed_composition:
+      state: {tag: value, value: "Spinel, perovskite, and wollastonite"}
+      locator: {page: 1, section: Abstract}
+    initial_composition:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Starting compositions and assays are not printed.}
+    characterization:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: No starting purity or post-run composition assay is printed.}
+    pretreatment:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Sample preparation is not described.}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: no per-sample temperature series reported}
+      locator: {page: 1, section: Abstract, note: The abstract gives the overall method capability but no mineral run temperatures.}
+  pressure_environment:
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Chamber background pressure is not stated.}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Abstract, note: Sweep gas or residual-gas composition is not stated.}
+species:
+  O:
+    observations: []
+    context:
+    - observation_id: yakovlev_2018_study_scope
+      type: laboratory_conditions
+      locator: {page: 1, section: Abstract}
+      units: as printed
+      values:
+        quantity: experimental_scope_and_method
+        method_class: measured_direct
+        method: Knudsen effusion combined with mass-spectrometric vapor analysis
+        sample_sets:
+        - Murchison CM and Krymka LL3 chondrites
+        - Saratov chondrite chondrules (L6)
+        - Type A CAIs of Efremovka chondrite (CV)
+        - spinel, perovskite, and wollastonite
+        maximum_temperature_C_as_reported: 2500
+        reported_outputs: vapor species, partial pressures, evaporation rates, and vapor/melt-phase compositions at various temperatures
+        measurement_qualification: >-
+          The authors state that partial-pressure measurements of melt components
+          characterize the equilibrium state of the system.
+    - observation_id: yakovlev_2018_vapor_species_identified
+      type: thermodynamic_example
+      locator: {page: 1, section: Abstract}
+      units: as printed
+      values:
+        quantity: vapor_species_observed
+        method_class: measured_direct
+        sample_scope: chondrite melts; individual assignments by sample are not stated
+        atomic_metals_as_printed: [K, Na, Fe, Ni, Cr, Mg, Ca, Al]
+        suboxide_and_oxide_forms_as_printed: [PO, PO2, SiO, TiO, TiO2, AlO, Al2O, Al2O2]
+        oxygen_forms_as_printed: [O, O2]
+        vapor_qualification: >-
+          The authors say most melt oxides thermally dissociate to metal forms
+          and oxygen in the vapor. Oxygen is stated to be the main vapor
+          component over the entire melt-evaporation temperature range.
+    - observation_id: yakovlev_2018_oxygen_vapor_fraction_context
+      type: thermodynamic_example
+      locator:
+        page: 1
+        section: Abstract
+        note: Numeric oxygen abundance statement; no underlying table or individual sample assignment is supplied.
+      units: vapor volume fraction
+      values:
+        quantity: oxygen_fraction_of_vapor_volume_context
+        method_class: measured_direct
+        oxygen_forms: [O, O2]
+        temperature_threshold_C: 2000
+        temperature_operator: '>'
+        oxygen_volume_fraction_lower_bound: 0.5
+        fraction_operator: '>'
+        statement_as_printed: >-
+          The total oxygen content in the forms of O and O2 at high temperatures
+          (T > 2000 °C) was more than half of the vapor volume.
+    - observation_id: yakovlev_2018_evaporative_sequence_context
+      type: thermodynamic_example
+      locator: {page: 1, section: Abstract}
+      units: as printed
+      values:
+        quantity: evaporative_sequence_context
+        method_class: measured_direct
+        sequence_as_printed: >-
+          K > Na > Fe (FeO), Ni > SiO, Cr > Mg > Ca (CaO) > TiO, TiO2 > Al,
+          AlO, Al2O (Al2O2).
+        qualification_as_printed: >-
+          The brackets show the forms that are present in the vapor in small
+          quantities.
+        note: The source gives an evaporative sequence but no numeric species-pressure series.
+        statements_as_printed:
+        - >-
+          The temperature sequence of the appearance of metallic, suboxide and oxide forms in vapors during
+          evaporation of chondrites is mainly determined by the volatility of the individual oxide.
+        - >-
+          On the qualitative side, the forms of vapor components over the chondrite melts coincide with the
+          vapor forms observed in case of the evaporation of the individual oxides.
+    - observation_id: yakovlev_2018_melt_composition_trends_context
+      type: thermodynamic_example
+      locator: {page: 1, section: Abstract}
+      units: as printed
+      values:
+        quantity: qualitative_melt_composition_trends
+        method_class: measured_direct
+        statements_as_printed:
+        - >-
+          The composition of the evaporating melt depends on the temperature and
+          evaporation time.
+        - >-
+          As the temperature increases, the melt content of non-volatile oxides
+          (CaO, TiO2, Al2O3) increases; the content of moderately volatile oxides
+          passes through the maximum values in the appropriate temperature
+          range and mass losses.
+    - observation_id: yakovlev_2018_cai_volatility_inversion_context
+      type: thermodynamic_example
+      experiment: yakovlev-2018-efremovka-cai-series
+      locator: {page: 1, section: Abstract}
+      units: as printed
+      values:
+        quantity: cai_volatility_inversion_context
+        method_class: measured_direct
+        samples: Type A CAIs of Efremovka chondrite (CV)
+        temperature_Mg_vapor_not_observed_C: 1900
+        temperature_SiO_observed_C: 2400
+        partial_pressure_values:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 1, section: Abstract, note: No species-specific partial-pressure values are printed.}
+        statements_as_printed:
+        - >-
+          In the experiment with the CAIs Type A of Efremovka chondrite we
+          observed inversion of the volatility of SiO2 and MgO, that is the most
+          volatile MgO compared to the volatility of SiO2.
+        - >-
+          The results of the experiment clearly showed that in the field of high
+          temperatures (T ≈ 1900 °C) the magnesium vapor was no longer observed,
+          since it completely evaporated from the melt of the CAI melt.
+        - >-
+          At the same time, silicon in the form of SiO was observed in the vapor
+          along with vapors of refractory oxides – CaO and Al2O3, which indicates
+          SiO2 presence in the melt even at the final, high-temperature
+          evaporation stage of the melt (T ≈ 2400 °C).
+        uncertainty: Not stated.
+    - observation_id: yakovlev_2018_acid_base_activity_context
+      type: thermodynamic_example
+      experiment: yakovlev-2018-efremovka-cai-series
+      locator: {page: 1, section: Abstract}
+      units: as printed
+      values:
+        quantity: activity_and_volatility_explanation
+        method_class: model_derived
+        activity_species: [MgO, SiO2]
+        defining_ions: Not stated.
+        standard_states: Not stated.
+        source_references: '[1] and [2] as cited in the abstract'
+        statements_as_printed:
+        - >-
+          Thermodynamic analysis of this volatility inversion showed that it is
+          due to the acid-base melt factor [1], which, in turn, is determined by
+          the concentration of CaO.
+        - >-
+          The increasing the CaO concentration in the melt leads to an increase
+          in the activity and, accordingly, the volatility of MgO and a decrease
+          in the activity and, accordingly, the volatility of SiO2 [2].
+    - observation_id: yakovlev_2018_complex_vapor_molecules_context
+      type: thermodynamic_example
+      experiment: yakovlev-2018-mineral-series
+      locator: {page: 1, section: Abstract}
+      units: percent of total vapor concentration
+      values:
+        quantity: complex_molecule_vapor_context
+        method_class: measured_direct
+        samples: spinel, perovskite, and wollastonite
+        molecules_as_printed: [MgAlO, CaSiO, CaSiO2, CaTiO3]
+        total_concentration_percent_upper_bound: 1
+        concentration_operator: '<='
+        statements_as_printed:
+        - >-
+          Complex forms of molecules were observed in the field of high
+          evaporation temperatures of minerals – spinel, perovskite and
+          wollastonite: MgAlO, CaSiO, CaSiO2, CaTiO3 [3].
+        - >-
+          The concentration of complex molecules in the vapor is small and does
+          not exceed 1 % in total concentration.
+        - >-
+          However, it is noted that the proportion of complex molecules
+          increases with the increase of melt temperature.
+    - observation_id: yakovlev_2018_complex_molecule_formation_analysis
+      type: thermodynamic_example
+      experiment: yakovlev-2018-mineral-series
+      locator: {page: 1, section: Abstract, paragraph: 4}
+      units: qualitative thermodynamic conclusion
+      values:
+        quantity: complex_molecule_formation_analysis
+        method_class: model_derived
+        statements_as_printed:
+        - >-
+          Thermodynamic analysis of the formation of complex molecules showed
+          that they are formed not as a result of synthesis in the gas phase,
+          but as a result of a heterogeneous reaction directly at the exit from
+          the melt.
+    - observation_id: yakovlev_2018_printed_source_metadata
+      type: characterization
+      locator: {page: 1, section: Affiliation and References}
+      units: bibliographic and address metadata as printed
+      values:
+        quantity: printed_source_metadata
+        affiliation:
+          as_printed: Vernadsky Institute of Geochemistry & Analytical Chemistry of RAS, Kosygin st. 19, Moscow 119991, Russia
+          street_number: 19
+          postal_code: 119991
+          locator: {page: 1, section: Affiliation}
+        references:
+        - label: '1'
+          as_printed: Korzhinskii D. S. (1959) Dokl. Akad. Nauk SSSR 128:383–386.
+          locator: {page: 1, section: References}
+        - label: '2'
+          as_printed: 'Yakovlev O. I. et al. (2017) Geochem. Int. 55: 251–256.'
+          locator: {page: 1, section: References}
+        - label: '3'
+          as_printed: Shornikov S. I. and Yakovlev O. I. (2015) Geochem. Int. 53:690–699.
+          locator: {page: 1, section: References}

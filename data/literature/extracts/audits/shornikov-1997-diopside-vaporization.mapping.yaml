@@ -1,0 +1,194 @@
+source_id: shornikov-1997-diopside-vaporization
+source:
+  citation: "Shornikov, S. I., Stolyarova, V. L., and Shul’ts, M. M. (1997). Vaporization and the Thermodynamic Properties of Diopside. Russian Journal of Physical Chemistry, 71(2), 174–178."
+  year: 1997
+extraction:
+  method: MinerU content-list tables and markdown, reconciled with pdftotext-layout; flagged rows and table layouts verified against PDF page renders
+  date: '2026-11-08'
+  worker: w1108ox-sh97
+review_status: draft
+observables:
+  - quantity: p_partial
+    table: '1'
+    engine_observable: partial pressure of gas species
+    stored_species: [Ca(g), Mg(g), SiO(g), SiO2(g), MoO2(g), MoO3(g), O(g), O*(g), O2(g)]
+    evidence_class: measured_reduced
+    unit_as_printed: atm with species-row power-of-ten scale
+    row_column_map:
+      - {row: 2, label: 'pCa × 10^10', observation_id: shornikov_1997_ca_pressure_table1, scale: cell × 10^-10 atm}
+      - {row: 3, label: 'pMg × 10^9', observation_id: shornikov_1997_mg_pressure_table1, scale: cell × 10^-9 atm}
+      - {row: 4, label: 'pSiO × 10^7', observation_id: shornikov_1997_sio_pressure_table1, scale: cell × 10^-7 atm}
+      - {row: 5, label: 'pSiO2 × 10^10', observation_id: shornikov_1997_sio2_pressure_table1, scale: cell × 10^-10 atm}
+      - {row: 6, label: 'pMoO2 × 10^9', observation_id: shornikov_1997_moo2_pressure_table1, scale: cell × 10^-9 atm}
+      - {row: 7, label: 'pMoO3 × 10^9', observation_id: shornikov_1997_moo3_pressure_table1, scale: cell × 10^-9 atm}
+      - {row: 8, label: 'pO × 10^12', observation_id: shornikov_1997_o_atomic_pressure_table1, scale: cell × 10^-12 atm}
+      - {row: 9, label: 'pO* × 10^12', observation_id: shornikov_1997_o_atomic_alternate_pressure_table1, scale: cell × 10^-12 atm}
+      - {row: 10, label: 'pO2 × 10^14', observation_id: shornikov_1997_o2_pressure_table1, scale: cell × 10^-14 atm}
+    temperatures:
+      columns: [2, 3, 4, 5, 6, 7]
+      printed_K: [1566, 1640, 1688, 1743, 1778, 1862]
+      ca_oxygen_link: Each Ca row point links only to the pO2 observation in the same temperature column through source_oxygen_condition.
+    printed_row_count: 9
+    numeric_value_cells: 50
+    dash_cells: 4
+  - quantity: p_partial
+    table: '2'
+    engine_observable: partial pressure of gas species; author-reduced temperature relation
+    equation_as_printed: 'log pi [atm] = −A × 10^3/T + B'
+    evidence_class: measured_reduced
+    row_column_map:
+      - {row: 2, columns: [2, 3], observation_id: shornikov_1997_ca_pressure_table2, species: Ca}
+      - {row: 2, columns: [5, 6], observation_id: shornikov_1997_o_atomic_pressure_table2, species: O}
+      - {row: 3, columns: [2, 3], observation_id: shornikov_1997_mg_pressure_table2, species: Mg}
+      - {row: 3, columns: [5, 6], observation_id: shornikov_1997_o_atomic_alternate_pressure_table2, species: O*}
+      - {row: 4, columns: [2, 3], observation_id: shornikov_1997_sio_pressure_table2, species: SiO}
+      - {row: 4, columns: [5, 6], observation_id: shornikov_1997_o2_pressure_table2, species: O2}
+      - {row: 5, columns: [2, 3], observation_id: shornikov_1997_sio2_pressure_table2, species: SiO2}
+    printed_fit_rows: 7
+    coefficient_cells: 14
+  - quantity: activity
+    table: '3'
+    engine_observable: oxide component activity in liquid diopside
+    unit_as_printed: dimensionless
+    printed_row_count: 14
+    numeric_temperature_cells: 14
+    numeric_activity_cells: 28
+    authors_measurements:
+      method: I, mass-spectrometric Knudsen method
+      evidence_class: measured_reduced
+      components: [CaO, MgO, SiO2]
+      temperature_points_K: [1566, 1640, 1688, 1743, 1778, 1862]
+      point_count: 18
+    cited_values:
+      evidence_class: quoted_attributed
+      references: [22, 23, 25, 26, 29, 30]
+      point_count: 10
+      note: Per-run composition, standard-state convention, fO2, and total pressure are not restated for these cited values; each absence is located at Table 3.
+  - quantity: partial_molar_enthalpy
+    table: '4'
+    engine_observable: partial component enthalpy
+    unit_as_printed: kJ/mol
+    evidence_class: measured_reduced
+    printed_component_rows: 3
+    numeric_value_cells: 3
+    temperature_range_K: [1665, 1870]
+  - quantity: partial_component_entropy
+    table: '4'
+    engine_observable: partial component entropy
+    unit_as_printed: J/(mol K)
+    evidence_class: measured_reduced
+    disposition: typed_refused
+    printed_component_rows: 3
+    numeric_value_cells: 3
+    schema_gap_symbols:
+      - simulator/battery/enums.py::Quantity.S
+      - simulator/battery/enums.py::Quantity
+      - simulator/battery/migrate.py::QUANTITY_ALIASES
+      - simulator/battery/migrate.py::TYPE_QUANTITY
+      - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+    reason: Quantity.S is absolute entropy; no exact partial-component-entropy token or observation type exists.
+    temperature_range_K: [1665, 1870]
+tables:
+  - page: 2
+    published_page: 175
+    table: '1'
+    draft_key: p002-t01
+    printed_rows: 9
+    temperature_header_cells: 6
+    numeric_pressure_cells: 50
+    dash_cells: 4
+    caption_temperature_range_K: [1550, 1870]
+    audit_basis: MinerU and pdftotext values agree; the page 2 render confirms the row and temperature-column assignments.
+  - page: 2
+    published_page: 175
+    table: '2'
+    draft_key: p002-t02
+    printed_rows: 7
+    numeric_coefficient_cells: 14
+    caption_temperature_range_K: [1665, 1870]
+    audit_basis: MinerU and pdftotext values agree; the page 2 render confirms the two side-by-side fit blocks and their row assignments.
+  - page: 2
+    published_page: 175
+    table: '3'
+    draft_key: p002-t03
+    printed_rows: 14
+    temperature_cells: 14
+    numeric_activity_cells: 28
+    dash_cells: 14
+    caption_temperature_range_K: [1550, 1880]
+    audit_basis: The page 2 render confirms both seven-row blocks; flagged cells and reference placement were resolved against the render.
+  - page: 3
+    published_page: 176
+    table: '4'
+    draft_key: p003-t04
+    printed_rows: 3
+    numeric_value_cells: 6
+    caption_temperature_range_K: [1665, 1870]
+    mineru_body_rows: 0
+    audit_basis: MinerU placed all value rows in header_rows; the 600-dpi page 3 render was used to reconstruct and verify them.
+cell_audit:
+  file: shornikov-1997-diopside-vaporization.cell-audit.csv
+  rows: 144
+  table_cells:
+    table_1: 60
+    table_2: 14
+    table_3: 56
+    table_4: 6
+  additional_located_numeric_facts: 4
+  includes_printed_dash_cells: 18
+compare:
+  raw_file: shornikov-1997-diopside-vaporization.compare.csv
+  resolution_file: shornikov-1997-diopside-vaporization.compare-resolution.csv
+  raw_result: 78 mismatch, 0 locator-error, 0 unverifiable
+  disposition: Each mismatch has its exact printed grid cell in the resolution file. Table 1 requires the row-specific power-of-ten multiplier; Table 3 requires the parallel-block row and component column. The page 2 render confirms those assignments.
+id_change_summary:
+  compared_base: d5e6b8dc216bd601ca080d47dd1a53e10168aa6e
+  old_observations: 81
+  new_observations: 91
+  removed_ids: 38
+  added_ids: 48
+  preserved_ids: 43
+  net_observations: 10
+old_to_new_observation_ids:
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1566.00:h=a90dcc455f24', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1566.00:h=76f9f3d4b5a5'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1640.00:h=2b64e459539e', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1640.00:h=a9d8648c25ba'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1688.00:h=840501588eb4', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1688.00:h=88a2d38a7cc9'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1743.00:h=4003db48a3e5', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1743.00:h=2dbf0bb943d5'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1778.00:h=80fa0634cb03', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1778.00:h=a774506d7968'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1862.00:h=f7c5d2a5c9a5', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_ca_pressure_table1::T=1862.00:h=6a9b028ddadb'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_cao_partial_enthalpy_table4::points:h=afb500bd6e40', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_cao_partial_enthalpy_table4::points:h=a9bca8190a42'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_cao_partial_entropy_table4', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_cao_partial_entropy_table4::points:h=6c9a068f6111'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1566.00:h=865b6ca1995f', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1566.00:h=8867777e463d'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1640.00:h=22ab1a9e712d', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1640.00:h=eaf82720e0fa'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1688.00:h=3461d5e0c7ac', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1688.00:h=216c77473a71'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1743.00:h=ebcff1409bc2', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1743.00:h=ee7cd82cf166'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1778.00:h=b61c762f5640', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1778.00:h=283921497710'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1862.00:h=2661d97b01aa', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_mg_pressure_table1::T=1862.00:h=18f9a832b3e8'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_mgo_partial_enthalpy_table4::points:h=96113f5e44e7', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_mgo_partial_enthalpy_table4::points:h=f4fe6470c3bf'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_mgo_partial_entropy_table4', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_mgo_partial_entropy_table4::points:h=776765fa4634'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_alternate_pressure_table1::T=1688.00:h=69b2369d70d1', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_alternate_pressure_table1::T=1688.00:h=3ab4f1e714d5'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_alternate_pressure_table1::T=1743.00:h=acc4db904a5a', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_alternate_pressure_table1::T=1743.00:h=034337b84cb2'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_alternate_pressure_table1::T=1778.00:h=71a80e965362', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_alternate_pressure_table1::T=1778.00:h=a15c98e03f43'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_alternate_pressure_table1::T=1862.00:h=6a6f5c5b2d06', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_alternate_pressure_table1::T=1862.00:h=50b843ae3ff3'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1566.00:h=5e70a1468284', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1566.00:h=b210fad6da02'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1640.00:h=733f582b29fd', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1640.00:h=926bacf29561'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1688.00:h=a780cd091105', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1688.00:h=107237abb8f3'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1743.00:h=4cd8bf15793f', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1743.00:h=3340cb43e2ad'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1778.00:h=504322b36832', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1778.00:h=f2032453ee53'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1862.00:h=a4653e772b7e', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_o_atomic_pressure_table1::T=1862.00:h=b05f8195ea61'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_partial_enthalpy_table4::points:h=73dd446c23c8', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_partial_enthalpy_table4::points:h=28e7e46d8da8'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_partial_entropy_table4', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_partial_entropy_table4::points:h=91e921b526e2'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_pressure_table1::T=1688.00:h=ad8999830424', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_pressure_table1::T=1688.00:h=e5c3a57d561d'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_pressure_table1::T=1743.00:h=593a2fa9b2af', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_pressure_table1::T=1743.00:h=a63badb7f543'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_pressure_table1::T=1778.00:h=165be609493b', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_pressure_table1::T=1778.00:h=a6f574a56419'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_pressure_table1::T=1862.00:h=101ccba283a1', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio2_pressure_table1::T=1862.00:h=fc4ea0dbe333'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1566.00:h=ea1c2b992c89', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1566.00:h=b12606a24eac'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1640.00:h=95ad2c728020', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1640.00:h=ea5bec189980'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1688.00:h=5613a174e66b', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1688.00:h=da8cf36e70e1'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1743.00:h=09febc58bf10', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1743.00:h=30f3f28a6518'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1778.00:h=792e7655860f', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1778.00:h=80ecdf51a449'}
+  - {old: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1862.00:h=8f84f6834d08', new: 'shornikov-1997-diopside-vaporization::shornikov_1997_sio_pressure_table1::T=1862.00:h=33e4086f81d2'}
+excluded_tables:
+  - {table: '5', page: 3, reason: Integral formation enthalpy and entropy compilation, outside the vapor and component-activity extract scope.}
+  - {table: '6', page: 4, reason: Fusion enthalpy comparison, outside the vapor and component-activity extract scope.}
+  - {table: '7', page: 4, reason: Cited compound activity and Gibbs-energy comparison, outside the vapor and component-activity extract scope.}

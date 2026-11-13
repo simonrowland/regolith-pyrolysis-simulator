@@ -18,6 +18,12 @@ from types import MappingProxyType
 import pytest
 import yaml
 
+from simulator.battery.composition import (
+    mole_percent_to_mole_fraction,
+    phase_mole_fractions_to_component_wt_percent,
+    phase_ppm_mass_as_wt_percent,
+    phase_printed_mole_amounts_to_wt_percent,
+)
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AmountBasis,
@@ -34,10 +40,13 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     SourceRelation,
+    ValenceDenominatorKind,
+    ValenceValueForm,
+    effective_phase_basis,
     ppm_mass_to_wt_percent,
 )
-from simulator.battery.identity import Identity, celsius_to_kelvin, profile_for
-from simulator.battery.migrate import REPO_ROOT, migrate
+from simulator.battery.identity import Identity, ValenceBasis, celsius_to_kelvin, profile_for
+from simulator.battery.migrate import REPO_ROOT, is_engine_map_oxide_key, migrate
 from simulator.battery.records import (
     Composition,
     Derivation,
@@ -57,7 +66,6 @@ from simulator.battery.score import (
     _residual_engine_observable,
     compile_residual,
     compute_metric,
-    compile_residual,
     metric_operation_for_identity,
     no_headline_rail_reason,
     populate_numeric,
@@ -683,6 +691,7 @@ def test_ppm_mass_phase_row_is_refused_without_calling_the_assemblage(
     assert prediction.refusal_detail["basis"] == "ppm_mass"
     assert prediction.refusal_detail["engine_basis"] == "wt_percent"
     assert "ppm_mass is not converted to wt%" in prediction.refusal_detail["detail"]
+    assert prediction.refusal_detail["reason"] == "element_ppm_not_oxide_wt_percent"
     assert "mole_fraction" not in prediction.refusal_detail["detail"]
     assert metric_operation_for_identity(identity) is MetricOperation.DEX
 
@@ -2047,3 +2056,760 @@ def test_unknown_capacity_equation_is_refused(
         is RefusalReason.CAPACITY_DEFINITION_NOT_IMPLEMENTED
     )
     assert calls == []
+
+
+# CIAAW: Si = 28.085, O = 15.999, Ca = 40.078.
+# SiO2 = 60.083, CaO = 56.077.
+# w(SiO2) = 100 * 0.5 * 60.083 / (0.5 * 60.083 + 0.5 * 56.077)
+#         = 3004.15 / 58.08
+# The ruling's 51.72 uses rounded masses 60.08 and 56.08. This literal
+# does not call oxide_molar_mass.
+_HAND_EQUAL_MOLE_SIO2_WT = Decimal("3004.15") / Decimal("58.08")
+
+
+def _assert_near(got: Decimal, expected: Decimal) -> None:
+    assert abs(got - expected) < Decimal("1e-12")
+
+
+def test_equal_mole_silica_lime_wt_percent_is_the_hand_value() -> None:
+    fractions = {"SiO2": Decimal("0.5"), "CaO": Decimal("0.5")}
+    wt, reason = phase_mole_fractions_to_component_wt_percent("SiO2", fractions)
+    assert reason is None
+    assert wt is not None
+    _assert_near(wt, _HAND_EQUAL_MOLE_SIO2_WT)
+    cao, cao_reason = phase_mole_fractions_to_component_wt_percent("CaO", fractions)
+    assert cao_reason is None
+    assert cao is not None
+    _assert_near(wt + cao, Decimal(100))
+
+
+def test_prose_mole_percent_divides_by_100_then_uses_the_same_wt_rule() -> None:
+    """50 mol% is x = 0.50. t-1600's bulk map converter is not this path."""
+
+    assert mole_percent_to_mole_fraction(Decimal("50")) == Decimal("0.5")
+    assert mole_percent_to_mole_fraction(Decimal("66.8")) == Decimal("0.668")
+    printed = {"SiO2": Decimal("50"), "CaO": Decimal("50")}
+    wt, reason = phase_printed_mole_amounts_to_wt_percent(
+        "SiO2", printed, mole_percent=True
+    )
+    assert reason is None
+    assert wt is not None
+    _assert_near(wt, _HAND_EQUAL_MOLE_SIO2_WT)
+
+
+def test_unclosed_mole_fraction_set_stays_refused() -> None:
+    """Babaian-shaped liquid: 0.391 + 0.074 + 0.448 = 0.913. Do not renormalise."""
+
+    fractions = {
+        "FeO": Decimal("0.391"),
+        "MgO": Decimal("0.074"),
+        "SiO2": Decimal("0.448"),
+    }
+    assert sum(fractions.values(), Decimal(0)) == Decimal("0.913")
+    wt, reason = phase_mole_fractions_to_component_wt_percent("SiO2", fractions)
+    assert wt is None
+    assert reason == "phase_mole_fraction_set_unclosed"
+
+
+def test_non_engine_oxide_sibling_refuses_the_whole_mole_set() -> None:
+    fractions = {"SiO2": Decimal("0.5"), "CrO1.5": Decimal("0.5")}
+    wt, reason = phase_mole_fractions_to_component_wt_percent("SiO2", fractions)
+    assert wt is None
+    assert reason == "phase_sibling_not_engine_map_oxide"
+    own, own_reason = phase_mole_fractions_to_component_wt_percent(
+        "FeO1.5", {"FeO1.5": Decimal(1)}
+    )
+    assert own is None
+    assert own_reason == "phase_component_not_engine_map_oxide"
+
+
+def test_engine_map_oxide_key_is_the_printed_key_not_an_alias() -> None:
+    assert is_engine_map_oxide_key("SiO2") is True
+    assert is_engine_map_oxide_key("V2O5") is True
+    assert is_engine_map_oxide_key("FeO") is True
+    assert is_engine_map_oxide_key("Fe2O3") is True
+    assert is_engine_map_oxide_key("CrO1.5") is False
+    assert is_engine_map_oxide_key("FeOT") is False
+    assert is_engine_map_oxide_key("FeO1.5") is False
+    assert is_engine_map_oxide_key("Ni") is False
+    assert is_engine_map_oxide_key("Mo") is False
+    assert is_engine_map_oxide_key("SnO2") is False
+    assert is_engine_map_oxide_key("CaF2") is False
+
+
+def test_oxide_key_ppm_mass_is_ppm_over_1e4() -> None:
+    """2500 ppm = 0.25 wt%. 10000 ppm = 1 wt%. The literal is the scale."""
+
+    wt, reason = phase_ppm_mass_as_wt_percent("SiO2", Decimal("2500"))
+    assert reason is None
+    assert wt == Decimal("0.25")
+    one, one_reason = phase_ppm_mass_as_wt_percent("CaO", Decimal("10000"))
+    assert one_reason is None
+    assert one == Decimal(1)
+    refused, refused_reason = phase_ppm_mass_as_wt_percent("Mo", Decimal("1377"))
+    assert refused is None
+    assert refused_reason == "element_ppm_not_oxide_wt_percent"
+
+
+def _assemblage_hook(store: list[dict]):
+    def hook(engine, *, temperature_C, composition_kg, fO2_log, pressure_bar, handles=None, **kwargs):
+        store.append({"engine": engine})
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 10.0, "CaO": 40.0, "FeO": 20.0}},
+        )
+
+    return hook
+
+
+def test_closed_mole_fraction_reaches_the_assemblage_and_the_hand_reference(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict] = []
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage",
+        _assemblage_hook(calls),
+    )
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    sio2 = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    cao = _phase_identity(
+        "CaO",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    metal = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.METAL,
+        subtype="mole_fraction",
+    )
+    sio2_row = F.observation(
+        "sio2-melt",
+        experiment.experiment_id,
+        sio2,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="mole-phase-source",
+    )
+    cao_row = F.observation(
+        "cao-melt",
+        experiment.experiment_id,
+        cao,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="mole-phase-source",
+    )
+    # A different phase role, and a different experiment, must not enter the sum.
+    metal_row = F.observation(
+        "sio2-metal",
+        experiment.experiment_id,
+        metal,
+        Decimal("0.9"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="mole-phase-source",
+    )
+    other = F.observation(
+        "sio2-other-run",
+        "other-experiment",
+        sio2,
+        Decimal("0.9"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="mole-phase-source",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={
+            sio2_row.observation_id: sio2_row,
+            cao_row.observation_id: cao_row,
+            metal_row.observation_id: metal_row,
+            other.observation_id: other,
+        },
+        extract_review={sio2_row.source_id: "reviewed"},
+        hostname="test",
+    )
+    residual, _ = compile_residual(
+        sio2_row,
+        Engine.MAGEMIN,
+        context=context,
+        comparison_ids={sio2_row.observation_id},
+    )
+    assert calls, residual.refusal
+    assert residual.numeric is not None
+    expected = compute_metric(
+        MetricOperation.DEX, Decimal("10"), _HAND_EQUAL_MOLE_SIO2_WT
+    )
+    assert expected is not None
+    assert residual.numeric.value is not None
+    _assert_near(residual.numeric.value, expected)
+
+
+def test_unclosed_mole_fraction_siblings_do_not_call_the_assemblage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def hook(*args, **kwargs):
+        raise AssertionError("phase assemblage must not be called")
+
+    monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", hook)
+    identity = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    observation = F.observation(
+        "sio2-unclosed",
+        "sample-1",
+        identity,
+        Decimal("0.448"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        observation,
+        phase_siblings={
+            "FeO": Decimal("0.391"),
+            "MgO": Decimal("0.074"),
+            "SiO2": Decimal("0.448"),
+        },
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_detail["reason"] == "phase_mole_fraction_set_unclosed"
+
+
+def test_mole_fraction_without_siblings_stays_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def hook(*args, **kwargs):
+        raise AssertionError("phase assemblage must not be called")
+
+    monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", hook)
+    identity = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    observation = F.observation(
+        "sio2-no-siblings",
+        "sample-1",
+        identity,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_detail["reason"] == "phase_mole_fraction_siblings_unavailable"
+
+
+def test_duplicate_mole_fraction_component_stays_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Two SiO2 rows in one phase point are not summed twice."""
+
+    def hook(*args, **kwargs):
+        raise AssertionError("phase assemblage must not be called")
+
+    monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", hook)
+    identity = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="mole_fraction",
+    )
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    first = F.observation(
+        "sio2-dup-a",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="dup-mole-source",
+    )
+    second = F.observation(
+        "sio2-dup-b",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="dup-mole-source",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={
+            first.observation_id: first,
+            second.observation_id: second,
+        },
+        extract_review={first.source_id: "reviewed"},
+        hostname="test",
+    )
+    residual, _ = compile_residual(
+        first,
+        Engine.MAGEMIN,
+        context=context,
+        comparison_ids={first.observation_id},
+    )
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert residual.refusal.detail["reason"] == "phase_mole_fraction_duplicate_component"
+
+
+def test_stored_wt_percent_sentences_match_the_funnelrule_groups() -> None:
+    """The table cuts three labels. The stored sentence is that group."""
+
+    stored = (
+        "Electron-microprobe wt.% as printed; elemental component in quenched silicate glass.",
+        "Analyzed glass composition, mass%; each glass composition is normalized to 100%.",
+        "ICP-OES measured oxide wt.% as printed.",
+    )
+    for text in stored:
+        assert effective_phase_basis(text) == "wt_percent"
+    assert effective_phase_basis("Cu2O mass percent in Spinel phase") is None
+    assert effective_phase_basis("oxide wt.%") is None
+    assert effective_phase_basis("oxide mole percent") is None
+    assert effective_phase_basis("Si concentration in copper button; wt ppm") is None
+
+
+def test_prose_weight_percent_is_scored_as_wt_percent_without_rewriting_subtype(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict] = []
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage",
+        _assemblage_hook(calls),
+    )
+    identity = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="oxide wt%",
+    )
+    token = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="wt_percent",
+    )
+    assert "phase_role" in profile_for(token).required
+    assert "phase_role" not in profile_for(identity).required
+    assert identity.subtype.value == "oxide wt%"
+    assert metric_operation_for_identity(identity) is MetricOperation.DEX
+    observation = F.observation(
+        "sio2-prose-wt",
+        "sample-1",
+        identity,
+        Decimal("30.7"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal("10")
+    assert prediction.identity.subtype.value == "oxide wt%"
+    assert calls
+    missing_role = replace(identity, phase_role=None)
+    missing = F.observation(
+        "sio2-prose-no-role",
+        "sample-1",
+        missing_role,
+        Decimal("30.7"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    refused = predict_with_engine(Engine.MAGEMIN, missing)
+    assert refused.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert refused.refusal_detail == {"reason": "missing_input", "input": "phase_role"}
+
+
+def test_glass_prose_wt_percent_uses_the_existing_liquid_phase_role(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict] = []
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage",
+        _assemblage_hook(calls),
+    )
+    identity = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.GLASS,
+        subtype="Analyzed glass composition, mass%",
+    )
+    observation = F.observation(
+        "glass-sio2",
+        "sample-1",
+        identity,
+        Decimal("52"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal("10")
+
+
+def test_copper_button_ppm_prose_stays_quantity_not_predicted() -> None:
+    identity = _phase_identity(
+        "Si",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.METAL,
+        subtype="Si concentration in copper button; wt ppm",
+    )
+    observation = F.observation(
+        "cu-button-si",
+        "sample-1",
+        identity,
+        Decimal("77"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail == {
+        "reason": "quantity_not_predicted",
+        "quantity": "equilibrium_phase_composition",
+    }
+
+
+def test_cheng_style_mole_percent_refuses_when_formula_disagrees_with_the_basis(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def hook(*args, **kwargs):
+        raise AssertionError("phase assemblage must not be called")
+
+    monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", hook)
+    identity = _phase_identity(
+        "Fe3O4",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="CaO mol pct in the phase, Table 5",
+    )
+    observation = F.observation(
+        "cheng-cao",
+        "sample-1",
+        identity,
+        Decimal("66.8"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_detail["reason"] == "phase_species_disagrees_with_basis_component"
+
+
+def test_oxide_ppm_mass_reaches_the_assemblage_on_the_wt_percent_scale(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[dict] = []
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage",
+        _assemblage_hook(calls),
+    )
+    identity = _phase_identity(
+        "SiO2",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.MELT,
+        subtype="ppm_mass",
+    )
+    observation = F.observation(
+        "sio2-ppm",
+        "sample-1",
+        identity,
+        Decimal("2500"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal("10")
+    assert calls
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    reference = F.observation(
+        "sio2-ppm-residual",
+        experiment.experiment_id,
+        identity,
+        Decimal("2500"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="ppm-oxide-source",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={reference.observation_id: reference},
+        extract_review={reference.source_id: "reviewed"},
+        hostname="test",
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.MAGEMIN,
+        context=context,
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+    )
+    assert residual.numeric is not None
+    assert residual.numeric.value == compute_metric(
+        MetricOperation.DEX, Decimal("10"), Decimal("0.25")
+    )
+
+
+def test_sum_near_one_mass_percent_bulk_stays_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Taniguchi metal Fe 0.974 is a mislabelled fraction, not a wt% map."""
+
+    def hook(*args, **kwargs):
+        raise AssertionError("phase assemblage must not be called")
+
+    monkeypatch.setattr("simulator.battery.score._equilibrate_phase_assemblage", hook)
+    identity = _phase_identity(
+        "Fe",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.METAL,
+        subtype="wt_percent",
+    )
+    mass_percent_identity = replace(
+        identity,
+        composition=State.of(
+            Composition(
+                basis="printed_phase_composition",
+                components=(("Fe", Decimal("0.974")),),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+        ),
+    )
+    observation = F.observation(
+        "taniguchi-fe",
+        "sample-1",
+        mass_percent_identity,
+        Decimal("0.974"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_detail["identity_amount_basis"] == "mass_percent"
+    assert prediction.refusal_detail["detail"] == (
+        "printed mass-percent phase identity cannot be read as moles"
+    )
+
+
+def _valence_identity(formula: str, basis: ValenceBasis) -> Identity:
+    return Identity(
+        quantity=Quantity.VALENCE_RATIO,
+        species=Species(formula, Phase.L),
+        temperature_K=State.of(celsius_to_kelvin(T_C)),
+        valence_basis=State.of(basis),
+        composition=State.of(_bulk()),
+        fO2_Pa=State.of(Decimal(str(P_O2_PA))),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
+
+
+def _fe_ratio_basis() -> ValenceBasis:
+    return ValenceBasis(
+        numerator_oxidation_states=(3,),
+        denominator_kind=ValenceDenominatorKind.OXIDATION_STATE,
+        denominator_oxidation_state=2,
+        value_form=ValenceValueForm.RATIO,
+    )
+
+
+def _fe_fraction_basis() -> ValenceBasis:
+    return ValenceBasis(
+        numerator_oxidation_states=(3,),
+        denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+        denominator_oxidation_state=None,
+        value_form=ValenceValueForm.FRACTION,
+    )
+
+
+def test_non_fe_valence_stays_refused_and_does_not_call_fe_redox(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def hook(*args, **kwargs):
+        raise AssertionError("_predict_fe_redox must not be called")
+
+    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    identity = _valence_identity("Cr", _fe_fraction_basis())
+    observation = F.observation(
+        "cr-valence",
+        "sample-1",
+        identity,
+        Decimal("0.476"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "non_fe_valence_not_fe3_fe2"
+    assert prediction.refusal_detail["species"] == "Cr"
+
+
+def test_other_fe_valence_forms_stay_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def hook(*args, **kwargs):
+        raise AssertionError("_predict_fe_redox must not be called")
+
+    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    average = ValenceBasis(
+        numerator_oxidation_states=(),
+        denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+        denominator_oxidation_state=None,
+        value_form=ValenceValueForm.AVERAGE_OXIDATION_STATE,
+    )
+    ferrous = ValenceBasis(
+        numerator_oxidation_states=(2,),
+        denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+        denominator_oxidation_state=None,
+        value_form=ValenceValueForm.FRACTION,
+    )
+    for basis, point in ((average, Decimal("2.4")), (ferrous, Decimal("0.2"))):
+        observation = F.observation(
+            "fe-other",
+            "sample-1",
+            _valence_identity("Fe", basis),
+            point,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-phase-source",
+        )
+        prediction = predict_with_engine(Engine.MAGEMIN, observation)
+        assert prediction.value is None
+        assert prediction.refusal_detail["reason"] == "fe_valence_form_not_fe3_fe2"
+
+
+def test_fe3_sumfe_outside_unit_interval_does_not_call_the_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def hook(*args, **kwargs):
+        raise AssertionError("_predict_fe_redox must not be called")
+
+    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    for point in (Decimal(0), Decimal(1), Decimal("-0.1")):
+        observation = F.observation(
+            "fe-fraction-undefined",
+            "sample-1",
+            _valence_identity("Fe", _fe_fraction_basis()),
+            point,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-phase-source",
+        )
+        prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, observation)
+        assert prediction.value is None
+        assert prediction.refusal_detail["reason"] == "fe3_sumfe_ratio_undefined"
+
+
+def test_fe3_sumfe_fraction_reference_becomes_one_third(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """r = 0.25 → R = 1/3. The expected ratio is that quotient, not the helper."""
+
+    def hook(engine, observation, identity, channel, *, handles=None, isolated=None, experiment=None):
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.PRODUCED, call_evidence="fe-redox-test"),
+            value=Decimal("2"),
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=(),
+            lineage_complete=False,
+            identity=identity,
+        )
+
+    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    identity = _valence_identity("Fe", _fe_fraction_basis())
+    reference = F.observation(
+        "fe-fraction",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fe-valence-source",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={reference.observation_id: reference},
+        extract_review={reference.source_id: "reviewed"},
+        hostname="test",
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={reference.observation_id},
+    )
+    assert residual.numeric is not None, residual.refusal
+    expected = compute_metric(
+        MetricOperation.DEX, Decimal("2"), Decimal(1) / Decimal(3)
+    )
+    assert expected is not None
+    assert residual.numeric.value == expected
+
+
+def test_fe3_fe2_ratio_form_keeps_the_printed_ratio(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def hook(engine, observation, identity, channel, *, handles=None, isolated=None, experiment=None):
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.PRODUCED, call_evidence="fe-redox-test"),
+            value=Decimal("0.2"),
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=(),
+            lineage_complete=False,
+            identity=identity,
+        )
+
+    monkeypatch.setattr("simulator.battery.score._predict_fe_redox", hook)
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    identity = _valence_identity("Fe", _fe_ratio_basis())
+    reference = F.observation(
+        "fe-ratio",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.179"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fe-valence-source",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={reference.observation_id: reference},
+        extract_review={reference.source_id: "reviewed"},
+        hostname="test",
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={reference.observation_id},
+    )
+    assert residual.numeric is not None, residual.refusal
+    assert residual.numeric.value == compute_metric(
+        MetricOperation.DEX, Decimal("0.2"), Decimal("0.179")
+    )

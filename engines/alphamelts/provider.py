@@ -727,16 +727,13 @@ class AlphaMELTSProvider(ChemistryProvider):
             )
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             typed_failure = liquidus_sample_error_from_exception(exc)
-            if typed_failure is not None:
-                status = typed_failure.status
-                reason = typed_failure.diagnostics['backend_status_reason']
-                category = typed_failure.diagnostics[
-                    'backend_failure_category'
-                ]
-            else:
-                status = 'not_converged'
-                reason = OutOfDomainReason.NOT_CONVERGED.value
-                category = status
+            if typed_failure is None:
+                raise
+            status = typed_failure.status
+            reason = typed_failure.diagnostics['backend_status_reason']
+            category = typed_failure.diagnostics[
+                'backend_failure_category'
+            ]
             result = LiquidusSolidusResult(
                 status=status,
                 warnings=(f'AlphaMELTS liquidus finder failed: {exc}',),
@@ -874,17 +871,14 @@ class AlphaMELTSProvider(ChemistryProvider):
             )
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             typed_failure = liquidus_sample_error_from_exception(exc)
-            if typed_failure is not None:
-                return mode, completed(EquilibriumCrystallizationPathResult(
-                    status=typed_failure.status,
-                    warnings=(
-                        f'AlphaMELTS EC liquidus finder failed: {exc}',
-                    ),
-                    diagnostics=typed_failure.diagnostics,
-                ))
+            if typed_failure is None:
+                raise
             return mode, completed(EquilibriumCrystallizationPathResult(
-                status='not_converged',
-                warnings=(f'AlphaMELTS EC liquidus finder failed: {exc}',),
+                status=typed_failure.status,
+                warnings=(
+                    f'AlphaMELTS EC liquidus finder failed: {exc}',
+                ),
+                diagnostics=typed_failure.diagnostics,
             ))
         if (
             bounds.status != 'ok'

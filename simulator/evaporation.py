@@ -50,6 +50,7 @@ from simulator.state import (
     EvaporationFlux,
     clamp_stir_factor,
 )
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FluxActivationContext,
@@ -395,7 +396,7 @@ def viscous_p_bulk_out_of_domain_diagnostic(
             "commanded_pressure_mbar": commanded_pa / 100.0,
             "pipe_diameter_m": float(pipe_diameter_m),
             "gas_temperature_K": float(gas_temperature_K),
-            "gas_temperature_C": float(gas_temperature_K) - 273.15,
+            "gas_temperature_C": float(gas_temperature_K) - CELSIUS_TO_KELVIN_OFFSET,
             "carrier_gas": str(carrier_gas),
             "affected_species": tuple(
                 sorted(str(species) for species in affected_species)
@@ -490,7 +491,7 @@ def viscous_p_bulk_out_of_domain_diagnostic(
         "commanded_pressure_mbar": commanded_pa / 100.0,
         "pipe_diameter_m": float(pipe_diameter_m),
         "gas_temperature_K": float(gas_temperature_K),
-        "gas_temperature_C": float(gas_temperature_K) - 273.15,
+        "gas_temperature_C": float(gas_temperature_K) - CELSIUS_TO_KELVIN_OFFSET,
         "carrier_gas": str(carrier_gas),
         "affected_species": tuple(sorted(str(species) for species in affected_species)),
         "framing": (
@@ -1021,7 +1022,7 @@ class EvaporationMixin:
         Returns:
             EvaporationFlux with species_kg_hr dict
         """
-        T_K = self.melt.temperature_C + 273.15
+        T_K = self.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
         flux = EvaporationFlux()
         self._last_partial_melt_offgassing_diagnostic = {}
 
@@ -1727,7 +1728,7 @@ class EvaporationMixin:
 
         payload = {
             'status': status,
-            'T_K': float(self.melt.temperature_C) + 273.15,
+            'T_K': float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
             'solidus_K': fraction.get('solidus_K'),
             'liquidus_K': fraction.get('liquidus_K'),
             'melt_fraction_F': fraction.get('melt_fraction_F'),
@@ -1775,7 +1776,7 @@ class EvaporationMixin:
         if liquidus_T_C is None:
             liquidus_T_K = self._optional_float(diagnostics.get('liquidus_T_K'))
             if liquidus_T_K is not None:
-                liquidus_T_C = liquidus_T_K - 273.15
+                liquidus_T_C = liquidus_T_K - CELSIUS_TO_KELVIN_OFFSET
 
         F = self._optional_float(getattr(equilibrium, 'liquid_fraction', None))
         source = ''
@@ -1815,10 +1816,10 @@ class EvaporationMixin:
             'F_source': source,
             'melt_regime': regime,
             'solidus_K': (
-                solidus_T_C + 273.15 if solidus_T_C is not None else None
+                solidus_T_C + CELSIUS_TO_KELVIN_OFFSET if solidus_T_C is not None else None
             ),
             'liquidus_K': (
-                liquidus_T_C + 273.15 if liquidus_T_C is not None else None
+                liquidus_T_C + CELSIUS_TO_KELVIN_OFFSET if liquidus_T_C is not None else None
             ),
             'unavailable_reasons': tuple(dict.fromkeys(reasons)),
         }
@@ -1960,8 +1961,8 @@ class EvaporationMixin:
         )
         regime_diagnostic: dict[str, Any] = {}
         melt_regime(
-            temperature_K=float(self.melt.temperature_C) + 273.15,
-            solidus_K=float(curve['solidus_T_C']) + 273.15,
+            temperature_K=float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+            solidus_K=float(curve['solidus_T_C']) + CELSIUS_TO_KELVIN_OFFSET,
             epsilon=0.0,
             diagnostic=regime_diagnostic,
             diagnostic_site='evaporation.freeze_gate_curve.solidus_boundary',
@@ -3602,8 +3603,8 @@ class EvaporationMixin:
         liquidus_T_C = float(curve['liquidus_T_C'])
         if (
             melt_regime(
-                temperature_K=float(temperature_C) + 273.15,
-                solidus_K=solidus_T_C + 273.15,
+                temperature_K=float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+                solidus_K=solidus_T_C + CELSIUS_TO_KELVIN_OFFSET,
                 epsilon=0.0,
             )
             == MeltRegime.FROZEN
@@ -4111,7 +4112,7 @@ class EvaporationMixin:
             ),
             'gas_temperature_K': float(
                 getattr(self.overhead, 'headspace_temperature_K', 0.0)
-                or self.melt.temperature_C + 273.15
+                or self.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
             ),
             'carrier_gas': carrier_gas,
             'evaporation_series_resistance': dict(
@@ -4870,12 +4871,12 @@ class EvaporationMixin:
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
                 'wall_temperature_K': (
-                    float(self.condensation_model.wall_temperature_C) + 273.15
+                    float(self.condensation_model.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
                     if self.condensation_model.wall_temperature_C is not None else None
                 ),
                 'wall_deposit_account_temperatures_K': {
                     segment.wall_deposit_account: (
-                        float(segment.wall_temperature_C) + 273.15
+                        float(segment.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
                     )
                     for segment in self.condensation_model.active_pipe_segments
                     if segment.name not in self.condensation_model.wall_temperature_input_refusals

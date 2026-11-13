@@ -10,8 +10,20 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
+    - asset_id: pdf:lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+      role: pdf
+      path: raw/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems.pdf
+      sha256:
+        tag: value
+        value: 1605bc02f2a6f267115ff702b2d2365b95c7c37ec746e378cd1de40715c3419e
+    - asset_id: pdftotext:lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+      role: pdftotext
+      path: text/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
     - asset_id: unknown:lopatin-shugurov-tyurnina-2022-sro-al2o3-kems
       role: pdftotext
       path: unknown

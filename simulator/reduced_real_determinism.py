@@ -60,6 +60,7 @@ from simulator.melt_backend.melt_envelope import (
     melt_extrapolation_diagnostic,
 )
 from simulator.melt_backend.sulfsat import SulfurSaturationResult
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -434,7 +435,7 @@ class PT0DeterminismStore:
     ) -> dict[str, float | None]:
         melt_temperature_C = float(sim.melt.temperature_C)
         T_K = _quantize(
-            melt_temperature_C + 273.15,
+            melt_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
             self._control_quantization.t_k_quantum,
             self._control_quantization.t_k_decimals,
         )
@@ -467,7 +468,7 @@ class PT0DeterminismStore:
                 f"{fO2_log!r}"
             )
         return {
-            "temperature_C": None if T_K is None else float(T_K) - 273.15,
+            "temperature_C": None if T_K is None else float(T_K) - CELSIUS_TO_KELVIN_OFFSET,
             "pressure_bar": pressure_bar,
             "fO2_log": quantized_fO2_log,
         }
@@ -674,7 +675,7 @@ class PT0DeterminismStore:
             vapor_pressure_diagnostic
             and _payload_consumes_melt_envelope(payload, result)
         ):
-            temperature_K = float(result.temperature_C) + 273.15
+            temperature_K = float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
             if has_melt_extrapolation_envelope(vapor_pressure_diagnostic):
                 consume_melt_extrapolation_envelope(
                     vapor_pressure_diagnostic,
@@ -2602,7 +2603,7 @@ def record_binding_producer_ids(
             controls.get("high_t_melt_activity", "openimcc"),
         )
         if openimcc_binding_selected_by_inputs(
-            temperature_K=temperature_C + 273.15,
+            temperature_K=temperature_C + CELSIUS_TO_KELVIN_OFFSET,
             controls=controls,
             quantity_class="activity",
         ):
@@ -3007,7 +3008,7 @@ def canonical_replay_key(
         else:
             _register_gate_providers_for_key(sim)
     live_T_K = _quantize(
-        float(sim.melt.temperature_C) + 273.15,
+        float(sim.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
         quantization.t_k_quantum,
         quantization.t_k_decimals,
     )
@@ -3570,7 +3571,7 @@ def canonical_replay_output_projection(
             "PT-0 equilibrium replay does not support cached ledger transitions"
         )
     intent = _equilibrium_payload_intent(sim)
-    temperature_K = float(result.temperature_C) + 273.15
+    temperature_K = float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
     payload = {
         "authority": _equilibrium_record_authority(sim, intent),
         "equilibrium_result": {
@@ -3708,7 +3709,7 @@ def equilibrium_from_payload(payload: Mapping[str, Any]) -> EquilibriumResult:
     if sulfur_data is not None:
         result.sulfur_saturation = SulfurSaturationResult(**dict(sulfur_data))
     consumes_melt_envelope = _payload_consumes_melt_envelope(payload, result)
-    temperature_K = float(result.temperature_C) + 273.15
+    temperature_K = float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
     canonical_diagnostic = (
         melt_extrapolation_diagnostic(temperature_K, "MELTS-v1.0")
         if consumes_melt_envelope

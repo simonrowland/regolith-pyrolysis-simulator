@@ -286,7 +286,11 @@ def runner_golden_loader(tmp_path_factory):
     """One live capture and one stored text per canonical scenario per session."""
     from simulator import engine_local_config
     from tests.binding_admission_fixtures import isolate_engine_local_config
-    from tests.test_runner_smoke import FIXTURES_DIR, _run_scenario
+    from tests.test_runner_smoke import (
+        FIXTURES_DIR,
+        _assert_authoritative_flux_capture,
+        _run_scenario,
+    )
 
     source_path = engine_local_config.config_path()
     directory = tmp_path_factory.mktemp("runner-golden")
@@ -297,6 +301,7 @@ def runner_golden_loader(tmp_path_factory):
         if name not in loaded:
             with isolate_engine_local_config(directory / name, source_path=source_path):
                 actual, capture = _run_scenario(scenario, capture=True)
+            _assert_authoritative_flux_capture(actual, capture)
             expected_text = (FIXTURES_DIR / scenario["fixture"]).read_text(encoding="utf-8")
             loaded[name] = actual, capture, expected_text
         return loaded[name]

@@ -12,6 +12,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import yaml
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from simulator.corpus_paths import regolith_corpus_root
+
 SCHEMA = "literature_index.v1"
 STATUS_SCHEMA = "literature_source_status.v1"
 STORE_SUMMARY_SCHEMA = "literature_observation_store_summary.v1"
@@ -399,9 +404,26 @@ def load_extracts(root: Path) -> dict[str, dict]:
             continue
         doc = load_yaml(path)
         if isinstance(doc, dict) and doc.get("schema_version") == "literature_extract.v1":
+            review_status = doc.get("review_status") or "unknown"
+            if review_status == "reviewed":
+                repo = Path(__file__).resolve().parents[2]
+                if str(repo) not in sys.path:
+                    sys.path.insert(0, str(repo))
+                from tools.validate_literature_extracts import (
+                    certify_extract_source_fidelity,
+                )
+
+                refusals = certify_extract_source_fidelity(
+                    doc, label=path.stem, artifact_root=root
+                )
+                if refusals:
+                    raise ValueError(
+                        "index refuses review_status reviewed without source "
+                        "certification:\n" + "\n".join(refusals)
+                    )
             extracts[path.stem] = {
                 "doc": doc,
-                "files": [{"path": posix(path.relative_to(root)), "review_status": doc.get("review_status") or "unknown",
+                "files": [{"path": posix(path.relative_to(root)), "review_status": review_status,
                            "rows": sum(len(body.get("observations") or []) for body in (doc.get("species") or {}).values())}],
             }
             locators = [row.get("locator") or {} for body in (doc.get("species") or {}).values()
@@ -779,7 +801,7 @@ def build_alias_map(extracts, pdfs, measurements, presets):
 
 def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_json: Path | None = None, root_label: str = ".") -> dict:
     root = root.resolve()
-    corpus = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+    corpus = regolith_corpus_root()
     corpus_commit = None
     if (corpus / ".git").exists():
         try:
@@ -1414,8 +1436,7 @@ def build_source_status(root: Path, *, corpus: Path | None = None, now: datetime
                         root_label: str = ".") -> dict:
     """Derive one registry row per source_id from artefacts. Never read a stage field."""
     root = root.resolve()
-    corpus = Path(corpus) if corpus is not None else Path(
-        os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
+    corpus = Path(corpus) if corpus is not None else regolith_corpus_root()
     now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         now = now.replace(tzinfo=timezone.utc)
@@ -1556,9 +1577,10 @@ def build_source_status(root: Path, *, corpus: Path | None = None, now: datetime
             body["could_not_derive"] = extra_reason
         return body
 
-    by_stage = {name: 0 for name in STATUS_STAGES}
+    by_stage = {}
     for row in rows:
         by_stage[row["stage"]] = by_stage.get(row["stage"], 0) + 1
+    by_stage = {name: count for name, count in by_stage.items() if count}
     anti_loss = {
         "corpus_uncommitted": pack(uncommitted, uncommitted_why),
         "corpus_unpushed": pack(unpushed, unpushed_why),

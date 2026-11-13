@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery import migrate
@@ -19,6 +21,29 @@ def _table_rows(document, observation_id):
         if context["observation_id"] == observation_id:
             return context["values"]["rows_as_printed"]
     raise AssertionError(f"missing context row {observation_id}")
+
+
+def _assert_reduced_fit_classes(document):
+    context_rows = {
+        row["observation_id"]: row
+        for row in document["species"]["Electromotive_force"]["context"]
+    }
+    rows = {
+        observation_id: context_rows[observation_id]
+        for observation_id in (
+            "wang_2017_eq4_reference_emf_fit_schema_gap",
+            "wang_2017_eq8_test_cell_emf_fit_schema_gap",
+        )
+    }
+    rows["wang_2017_eq12_sodium_stannate_formation_gibbs_fit"] = document[
+        "species"
+    ]["Na2SnO3"]["observations"][0]
+    for row in rows.values():
+        values = row["values"]
+        assert values["method_class"] == "measured_reduced"
+        raw_inputs = values["derivation"]["raw_inputs"]
+        assert raw_inputs["state"]["value"] == "not_printed"
+        assert raw_inputs["locator"]["figure"] == "5"
 
 
 def test_html_tables_and_equation_fits_match_independent_transcription():
@@ -45,6 +70,15 @@ def test_html_tables_and_equation_fits_match_independent_transcription():
         row["observation_id"]: row
         for row in document["species"]["Electromotive_force"]["context"]
     }
+    _assert_reduced_fit_classes(document)
+    mutated = deepcopy(document)
+    next(
+        row
+        for row in mutated["species"]["Electromotive_force"]["context"]
+        if row["observation_id"] == "wang_2017_eq4_reference_emf_fit_schema_gap"
+    )["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_reduced_fit_classes(mutated)
     assert fits["wang_2017_eq4_reference_emf_fit_schema_gap"]["values"]["fit_as_printed"] == "153.24 + 0.1078T ± 2.32"
     assert fits["wang_2017_eq8_test_cell_emf_fit_schema_gap"]["values"]["fit_as_printed"] == "589.94 − 0.2660T ± 13.143"
 
@@ -56,7 +90,7 @@ def test_html_tables_and_equation_fits_match_independent_transcription():
     assert formation["values"]["uncertainty_as_printed"] == "± 7.54"
     assert formation["values"]["equation_10_cell_reaction_relation"] == "ΔG° = −nE⁰F = −nEF"
     assert formation["values"]["equation_11_relation_as_printed"] == "ΔG° = 2ΔG°(NaCrO2) + ΔG°(SnO2) − ΔG°(Cr2O3) − ΔG°(Na2SnO3)"
-    assert formation["values"]["method_class"] == "quoted_attributed"
+    assert formation["values"]["method_class"] == "measured_reduced"
     assert formation["values"]["printed_uncertainty_note"] == "confidence level not stated"
 
 
@@ -70,7 +104,7 @@ def test_isolated_migration_preserves_fit_and_html_context_without_assumed_condi
 
     observation = next(iter(result.observations.values()))
     assert observation.source_id == "wang-2017-sodium-stannate-formation-emf"
-    assert observation.evidence.original_method_class == "quoted_attributed"
+    assert observation.evidence.original_method_class == "measured_reduced"
     assert observation.value.kind.value == "unavailable"
     assert observation.identity.temperature_K.tag.value == "unknown"
     assert observation.point_conditions is None

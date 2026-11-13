@@ -40,7 +40,7 @@ import weakref
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping, Optional
+from typing import Any, Iterable, Mapping, Optional
 
 import yaml
 
@@ -192,7 +192,6 @@ SIO_YIELD_STAGE_KEYS: dict[str, str] = {
     K_TRAP_STAGE_KEY: "stage_4b_k_trap_carryover",
     COLLECTOR_STAGE_KEY_BY_NUMBER[5]: "stage_5_dust_filter_carryover",
 }
-SIO_WALL_DEPOSIT_SPECIES: tuple[str, ...] = ("SiO", "Na", "K", "Mg", "Fe")
 NOT_APPLICABLE_UNTIL_P0 = "not_applicable_until_p0"
 PRESET_PROVENANCE_METADATA_KEY = "preset"
 SIO_TSWEEP_SCHEMA_VERSION = "sio-tsweep-v1"
@@ -3574,15 +3573,39 @@ def _kg_by_species_from_mol_state(
             )
             continue
         kg = mol_value * formula.molar_mass_kg_per_mol()
-        if abs(kg) > 1e-12:
-            kg_by_species[species] = _clean_report_float(kg)
+        reported_kg = _clean_report_float(kg)
+        if kg != 0.0 and reported_kg == 0.0:
+            # Report formatting must not erase a nonzero wall booking.
+            reported_kg = kg
+        kg_by_species[species] = reported_kg
     return kg_by_species
+
+
+def _evaporating_species_with_supply(
+    snapshots: Iterable[Any],
+) -> tuple[str, ...]:
+    species_with_supply: set[str] = set()
+    for snapshot in snapshots:
+        flux = getattr(snapshot, "evap_flux", None)
+        rates = getattr(flux, "species_kg_hr", None)
+        if not isinstance(rates, Mapping):
+            continue
+        for species, raw_rate in rates.items():
+            try:
+                rate = float(raw_rate)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(rate) and rate > 0.0:
+                species_with_supply.add(str(species))
+    return tuple(sorted(species_with_supply))
 
 
 def _wall_deposit_report_kg(
     state: Mapping[str, Mapping[str, float]],
     species_formula_registry: Mapping[str, Any] | None,
     unresolved_species_mol_by_species: dict[str, float],
+    *,
+    snapshots: Iterable[Any] = (),
 ) -> dict[str, float]:
     wall_deposit_kg = _kg_by_species_from_mol_state(
         state,
@@ -3603,8 +3626,11 @@ def _wall_deposit_report_kg(
             unresolved_species_mol_by_species,
         ).items():
             wall_deposit_kg[species] = wall_deposit_kg.get(species, 0.0) + kg
-    for species in SIO_WALL_DEPOSIT_SPECIES:
-        wall_deposit_kg.setdefault(species, 0.0)
+    for species in _evaporating_species_with_supply(snapshots):
+        if species not in wall_deposit_kg:
+            # The exported flux is the model's supply list; absence from its
+            # committed wall accounts means this species booked no wall mass.
+            wall_deposit_kg[species] = 0.0
     return {
         species: wall_deposit_kg[species]
         for species in sorted(wall_deposit_kg)
@@ -3616,17 +3642,18 @@ def _wall_deposit_report_refusal(
 ) -> dict[str, Any] | None:
     if not unresolved_species_mol_by_species:
         return None
-    return {
+    report: dict[str, Any] = {
         "status": "refused",
         "reason": "unknown_species_formula",
-        "unresolved_wall_deposit_species": [
-            {
-                "species": species,
-                "mol": float(mol),
-            }
-            for species, mol in sorted(unresolved_species_mol_by_species.items())
-        ],
     }
+    report["unresolved_wall_deposit_species"] = [
+        {
+            "species": species,
+            "mol": float(mol),
+        }
+        for species, mol in sorted(unresolved_species_mol_by_species.items())
+    ]
+    return report
 
 
 def _attach_wall_deposit_report_refusal(
@@ -3688,6 +3715,7 @@ def _final_summary_report(
             final_state,
             species_formula_registry,
             unresolved_species_mol_by_species,
+            snapshots=execution.snapshots,
         ),
         "deposit_by_surface_species_kg": _nested_species_kg_from_segment_species(
             execution.trace.wall_deposit_by_segment_species_kg,
@@ -4760,6 +4788,7 @@ def build_sio_yield_report(
         final_state,
         sim.species_formula_registry,
         unresolved_wall_deposit_species_mol,
+        snapshots=getattr(sim.record, "snapshots", ()),
     )
     wall_fouling = _wall_fouling_report(
         wall_deposit_kg,

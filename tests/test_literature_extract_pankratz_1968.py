@@ -5,6 +5,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import yaml
+import pytest
 
 from simulator.battery.enums import Quantity, ValueKind
 from tests.battery.factories import migrate_one_extract
@@ -22,6 +23,16 @@ def _source_observations(document: dict) -> dict[str, dict]:
         for rows in document["species"].values()
         for row in rows["observations"]
     }
+
+
+def _assert_theoretical_rows_are_author_estimates(document: dict) -> None:
+    rows = _source_observations(document)
+    for index in range(1, 5):
+        theoretical_row = rows[f"pank68_naca{index}_table1_theoretical_chemical_analysis"]
+        assert theoretical_row["values"]["method_class"] == "author_estimate"
+        assert theoretical_row["values"]["note"] == (
+            'Table 1 footnote: "Theoretical percentages are given in parentheses."'
+        )
 
 
 def _expected_entropy_ids() -> set[str]:
@@ -96,6 +107,14 @@ def test_pankratz_1968_tables_migrate_with_full_row_pins() -> None:
     theory = source_rows["pank68_naca1_table1_theoretical_chemical_analysis"]
     assert actual["values"]["oxide_wt_percent"] == {"CaO": "31.48", "SiO2": "33.80"}
     assert theory["values"]["oxide_wt_percent"] == {"CaO": "31.48", "SiO2": "33.73"}
+    _assert_theoretical_rows_are_author_estimates(document)
+    reverted = deepcopy(document)
+    _source_observations(reverted)[
+        "pank68_naca1_table1_theoretical_chemical_analysis"
+    ]["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_theoretical_rows_are_author_estimates(reverted)
+    assert theory["values"]["method_class"] == "author_estimate"
     assert actual["locator"]["page"] == theory["locator"]["page"] == 9
     assert actual["locator"]["published_page"] == theory["locator"]["published_page"] == 2
     assert actual["locator"]["table"] == theory["locator"]["table"] == "1"

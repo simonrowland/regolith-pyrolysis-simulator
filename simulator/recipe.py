@@ -30,54 +30,54 @@ O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v12"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
 _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
 
-# Hot-wall bounds: the mandate invariant keeps ducts upstream of the designated
-# condenser above ~1400 C. The CEILING is not an independent number -- the hot
-# duct is built of the same refractory as the furnace, so its service ceiling IS
-# the furnace envelope ceiling, and it is INHERITED rather than restated here.
+# Hot-wall search bounds. The per-species no-fouling temperatures live in the
+# dew-point check (CLAUDE.md §4 / docs/concepts.md), not in this floor. The
+# historical 1400 C figure is the SiO-quiescent cell of that table. Using it
+# as the search floor kept alkali and Mg walls out of the envelope (b-282).
+#
+# The CEILING is not an independent number. The hot duct is built of the same
+# refractory as the furnace, so its service ceiling IS the furnace envelope
+# ceiling, inherited rather than restated.
 #
 # Premise: FURNACE_MAX_T_BOUNDS_C[1] is the highest max_service_T_C among enabled
 #   rows of data/furnace_materials.yaml (zirconia_ysz, 2200 C at time of writing).
-# Why inherited, not literal: this was the literal 1750.0 (Doloma-REE), correct
-#   only while the furnace itself was capped near dense-alumina. Once the furnace
-#   ceiling began inheriting from `furnace_material` (c5434d19), a fixed 1750 left
-#   the FIRST COMPONENT DOWNSTREAM of the melt rated 450 C below the vapour it
-#   receives, with nothing refusing -- the cross-layer disagreement BUG-076 exists
-#   to prevent, reintroduced one layer out (b-329).
+#   Fe millibar bake-off wants 1775 C. 2200 C includes that cell. Doloma's
+#   wall_materials service cap is 1700 C and is not this ceiling; b-329 removed
+#   the old Doloma-REE 1750 C duct cap because it sat below the vapour the
+#   furnace can make and nothing refused the gap.
+# Why inherited, not literal: a fixed duct cap below the furnace ceiling is the
+#   cross-layer disagreement BUG-076 exists to prevent (b-329).
 # Unit check: both sides are absolute temperatures in C.
-# Sanity: ceiling >= floor, so the band is non-empty for any catalog whose best
-#   enabled material is rated above 1400 C.
+# Sanity: ceiling >= Fe bake-off 1775 C for the current zirconia row.
 # Boundary -- what this does NOT assert: this is an ENVELOPE (what the optimizer
 #   may explore), not a per-run setpoint, and NOT a claim that any real duct holds
 #   2200 C. A run's actual ceiling is capped down from the campaign's named
 #   `furnace_material` in campaigns.py; this bound only says no recipe may ask for
 #   more than the best enabled material in the catalog is rated to hold.
-OVERHEAD_HOT_WALL_MIN_C = 1400.0
 OVERHEAD_HOT_WALL_MAX_C = float(FURNACE_MAX_T_BOUNDS_C[1])
 # Offset window derivation: the offset knob is liner-relative-to-melt (K).
-# Premise: at the melt ceiling the liner must still be able to sit at the hot-wall
-#   floor, so offset_min = HOT_WALL_MIN - melt_ceiling.
-# Algebra: 1400 - OVERHEAD_HOT_WALL_MAX_C, evaluated rather than pinned. The old
-#   literal -443.0 was 1400 - 1843 (the dense-alumina ceiling) and went stale the
-#   moment that ceiling moved: a pinned difference between two moving numbers is a
-#   value that can contradict its own derivation.
+# Premise: at the melt ceiling the liner must still be able to sit at the
+#   upstream-wall search floor, so offset_min = floor - melt_ceiling.
+# The floor is assigned below, from the coldest downstream collector interface.
 # Unit check: a difference in C equals a difference in K.
-# Sanity: melt at the ceiling + offset_min -> liner exactly 1400 C, the floor.
 # Boundary -- what this does NOT assert: offset_max = 0 because the gas is never
 #   hotter than the melt WITHOUT AN EXPLICIT WALL-HEAT MODEL. That is a modelling
 #   limit, not a claim that an actively heated duct is physically impossible.
-OVERHEAD_HEADSPACE_OFFSET_MIN_K = OVERHEAD_HOT_WALL_MIN_C - OVERHEAD_HOT_WALL_MAX_C
 OVERHEAD_HEADSPACE_OFFSET_MAX_K = 0.0
 OVERHEAD_HOT_WALL_BOUNDS_SOURCE = (
-    "hot_wall_invariant: docs/concepts.md Hot walls section; floor 1400 C from "
-    "data/setpoints.yaml condensation_train.metals_train.stage_0_hot_duct "
-    "temp_range_C=[1400,1600]; ceiling INHERITED from the furnace-material "
-    "envelope FURNACE_MAX_T_BOUNDS_C[1] (highest enabled max_service_T_C in "
-    "data/furnace_materials.yaml), not restated here (b-329)"
+    "hot_wall_invariant: docs/concepts.md Hot walls section and the CLAUDE.md "
+    "per-species table; search floor is the coldest downstream collector "
+    "interface so alkali and Mg walls are inside the search (the SiO-quiescent "
+    "~1400 C figure is not a floor, b-282); ceiling INHERITED from the "
+    "furnace-material envelope FURNACE_MAX_T_BOUNDS_C[1] (highest enabled "
+    "max_service_T_C in data/furnace_materials.yaml), which includes Fe "
+    "bake-off at 1775 C, not a doloma service cap (b-329)"
 )
 OVERHEAD_HEADSPACE_OFFSET_BOUNDS_SOURCE = (
     "hot_wall_invariant: melt ceiling = furnace-material envelope "
-    "(FURNACE_MAX_T_BOUNDS_C[1], data/furnace_materials.yaml) minus Stage 0 "
-    "hot-wall floor 1400 C => offset_min = 1400 - ceiling, derived not pinned; "
+    "(FURNACE_MAX_T_BOUNDS_C[1], data/furnace_materials.yaml) minus the "
+    "upstream-wall search floor (coldest downstream collector interface) "
+    "=> offset_min = floor - ceiling, derived not pinned; "
     "gas not hotter than melt without an explicit wall-heat model"
 )
 DOWNSTREAM_CONDENSATION_STAGE_PAIRS: tuple[tuple[str, int, int], ...] = (
@@ -102,6 +102,42 @@ def _condensation_train_downstream_segment_bounds(
             )
         bounds[segment_name] = (low, high)
     return MappingProxyType(bounds)
+
+
+def _upstream_wall_search_floor_C(
+    setpoints: Mapping[str, Any] | None = None,
+) -> float:
+    """Coldest downstream collector interface, used as the upstream search floor.
+
+    Premise: alkali and Mg designated walls are the cold end of the metals
+    train. The optimizer already searches those interfaces. Upstream segments
+    must be allowed to sit at the same temperatures. The SiO-quiescent ~1400 C
+    figure is one cell of the CLAUDE.md table, not this floor (b-282).
+    Algebra: floor = min(collector band low of each downstream stage).
+    Unit check: collector bands are degrees Celsius.
+    Sanity: the shipped stage-7 band starts at 20 C, below Na bake-off
+    (~486 C) and Mg bake-off (~586 C).
+    """
+
+    stage_ranges = resolve_collector_bands_C(setpoints)
+    lows = [
+        float(stage_ranges[downstream][0])
+        for _name, _upstream, downstream in DOWNSTREAM_CONDENSATION_STAGE_PAIRS
+    ]
+    floor = min(lows)
+    if not math.isfinite(floor):
+        raise RuntimeError(
+            f"upstream hot-wall search floor is not finite: {floor}"
+        )
+    return floor
+
+
+# Assigned after the collector bands exist. The class allowlist below reads
+# these names; they are not restated as literals.
+OVERHEAD_HOT_WALL_MIN_C = _upstream_wall_search_floor_C()
+OVERHEAD_HEADSPACE_OFFSET_MIN_K = (
+    OVERHEAD_HOT_WALL_MIN_C - OVERHEAD_HOT_WALL_MAX_C
+)
 
 
 FURNACE_MAX_T_C_PATH: KeyPath = ("furnace_max_T_C",)

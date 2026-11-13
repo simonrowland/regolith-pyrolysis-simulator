@@ -55,6 +55,23 @@ def _source_sha256() -> str:
     return digest.hexdigest()
 
 
+def test_harvest_cli_requires_explicit_thermo_path(
+    monkeypatch, capsys, tmp_path
+) -> None:
+    from tools import harvest_nasa_glenn_compilation as harvest
+
+    monkeypatch.setattr("sys.argv", ["harvest_nasa_glenn_compilation.py"])
+    with pytest.raises(SystemExit) as excinfo:
+        harvest.cli()
+    assert excinfo.value.code == 2
+    assert "--thermo" in capsys.readouterr().err
+
+    with pytest.raises(FileNotFoundError, match="--thermo"):
+        harvest.resolve_thermo(None)
+    with pytest.raises(FileNotFoundError, match="--thermo"):
+        harvest.resolve_thermo(tmp_path / "missing-thermo.inp")
+
+
 def test_source_snapshot_is_byte_identical_to_manifest_sha256(manifest) -> None:
     expected = manifest["source"]["sha256"]
     assert SOURCE.is_file()

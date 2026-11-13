@@ -1,0 +1,794 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2016-spinel-evaporation
+source:
+  citation: 'Shornikov, S. I. (2016), "High-temperature thermodynamic properties of MgAl2O4 spinel", Experiment in Geosciences 22(1):42–44.'
+  year: 2016
+  corpus_asset: raw/shornikov-2016-spinel-evaporation/shornikov-2016-spinel-evaporation.pdf
+  corpus_sha256: 47b215eaa0001a45732fdf58913c7581e7dcee9d7bec45ee953a287415a84fce
+extraction:
+  method: Manual transcription checked digit by digit against 300 dpi renders of all three PDF pages. The target article has no data tables. Figure 1 partial-pressure curves are retained as figure-only; no curve coordinates were digitized. The figure labeled Fig. 2 on page 42 belongs to the preceding article and is excluded.
+  date: '2026-10-05'
+  worker: x-2016-spinelevap
+review_status: draft
+fidelity_samples:
+  - species: Mg
+    observation_id: shornikov_2016_mg_partial_pressure_fig1
+    observable: thermodynamic_example
+    field: method_class
+    value: figure_only
+    locator:
+      page: 43
+      published_page: 43
+      pdf_page_index: 1
+      figure: '1'
+      note: 'Legend entry 1 is Mg; the curve is not digitized.'
+benches:
+  - id: shornikov-2016-mo-kems
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state:
+        tag: value
+        value: Mass-spectrometric Knudsen effusion apparatus
+      locator:
+        page: 43
+        published_page: 43
+        pdf_page_index: 1
+        section: Experimental description
+        note: The source specifies the method but does not name an instrument model.
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Molybdenum Knudsen effusion cells
+      locator:
+        page: 43
+        published_page: 43
+        pdf_page_index: 1
+        section: Experimental description
+        note: The source says "Knudsen effusion molybdenum cells"; no liner is stated.
+    cell_materials:
+      - state:
+          tag: value
+          value: Mo
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: The source says "Knudsen effusion molybdenum cells".
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: The article does not state an effusion-orifice diameter.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: The article does not state an effusion-orifice channel length.
+    temperature_measurement:
+      sensor:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: Temperatures are reported but no sensor is identified.
+    temperature_calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: No temperature calibration method is stated.
+      uncertainty:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: No uncertainty for the measurement temperatures is stated.
+    ionization:
+      energy_eV:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: No ionization energy is stated.
+      multiplier_correction:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: No multiplier correction is stated.
+      isotope_correction:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: No isotope correction is stated.
+experiments:
+  - experiment_id: shornikov-2016-mo-spinel-kems
+    bench_id: shornikov-2016-mo-kems
+    method: knudsen_effusion
+    locator:
+      page: 43
+      published_page: 43
+      pdf_page_index: 1
+      section: Experimental description
+      note: Stoichiometric MgAl2O4 evaporation studied by Knudsen effusion mass spectrometry.
+    conditions:
+      temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1850'
+            interval_high: '2300'
+        locator:
+          page: 42
+          published_page: 42
+          pdf_page_index: 0
+          section: Abstract
+          note: The abstract reports the study interval as 1850–2300 K.
+    sample:
+      printed_composition:
+        state:
+          tag: value
+          value: Stoichiometric MgAl2O4 spinel
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: The source says "stoichiometric spinel".
+      preparation:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: No preparation procedure is given.
+      starting_materials:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: Starting materials are not identified.
+      purity:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: No sample or starting-material purity is stated.
+      characterization:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Results
+          note: The paper reports qualitative composition change at higher temperature but no post-run composition analysis or numeric assay.
+    apparatus:
+      calibration:
+        method:
+          state:
+            tag: value
+            value: Hertz-Knudsen equation used to determine partial pressures
+          locator:
+            page: 43
+            published_page: 43
+            pdf_page_index: 1
+            section: Results
+            note: The source says partial pressures were determined by the Hertz-Knudsen equation.
+        reference_substance:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 43
+            published_page: 43
+            pdf_page_index: 1
+            section: Results
+            note: No calibration or reference substance for ion-current-to-pressure conversion is stated.
+        ionization_cross_sections:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 43
+            published_page: 43
+            pdf_page_index: 1
+            section: Experimental description
+            note: No ionization cross-sections are stated.
+        cross_section_source:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 43
+            published_page: 43
+            pdf_page_index: 1
+            section: Experimental description
+            note: No source for ionization cross-sections is stated.
+        ion_current_to_pressure_conversion:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 43
+            published_page: 43
+            pdf_page_index: 1
+            section: Experimental description
+            note: The source does not describe converting measured ion currents to pressure.
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: No chamber background or residual pressure is reported.
+      sweep_gas:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: No sweep gas is stated.
+      regime:
+        regime_class:
+          tag: unknown
+          reason: not_published
+species:
+  Mg:
+    observations: []
+    context:
+      - observation_id: shornikov_2016_mg_partial_pressure_fig1
+        type: thermodynamic_example
+        experiment: shornikov-2016-mo-spinel-kems
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          figure: '1'
+          note: Curve 1 in Fig. 1; no coordinates digitized.
+        T_range_K: [1850.0, 2090.0]
+        phase: gas
+        regime: kems_effusion
+        units: log10(partial pressure in atm) as plotted
+        values:
+          quantity: partial_pressure
+          gas_species: Mg(g)
+          method_class: figure_only
+          admission_status: figure_only
+          reason: Fig. 1 is a curve without tabulated values; coordinates were not digitized.
+          pressure_axis_as_printed: Lg p_i, atm
+          composition_as_printed: Stoichiometric MgAl2O4 spinel
+  MgO:
+    observations: []
+    context:
+      - observation_id: shornikov_2016_mgo_partial_pressure_fig1
+        type: thermodynamic_example
+        experiment: shornikov-2016-mo-spinel-kems
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          figure: '1'
+          note: Curve 2 in Fig. 1; no coordinates digitized.
+        T_range_K: [1850.0, 2090.0]
+        phase: gas
+        regime: kems_effusion
+        units: log10(partial pressure in atm) as plotted
+        values:
+          quantity: partial_pressure
+          gas_species: MgO(g)
+          method_class: figure_only
+          admission_status: figure_only
+          reason: Fig. 1 is a curve without tabulated values; coordinates were not digitized.
+          pressure_axis_as_printed: Lg p_i, atm
+          composition_as_printed: Stoichiometric MgAl2O4 spinel
+  Al:
+    observations: []
+    context:
+      - observation_id: shornikov_2016_al_partial_pressure_fig1
+        type: thermodynamic_example
+        experiment: shornikov-2016-mo-spinel-kems
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          figure: '1'
+          note: Curve 3 in Fig. 1; no coordinates digitized.
+        T_range_K: [1850.0, 2090.0]
+        phase: gas
+        regime: kems_effusion
+        units: log10(partial pressure in atm) as plotted
+        values:
+          quantity: partial_pressure
+          gas_species: Al(g)
+          method_class: figure_only
+          admission_status: figure_only
+          reason: Fig. 1 is a curve without tabulated values; coordinates were not digitized.
+          pressure_axis_as_printed: Lg p_i, atm
+          composition_as_printed: Stoichiometric MgAl2O4 spinel
+  AlO:
+    observations: []
+    context:
+      - observation_id: shornikov_2016_alo_partial_pressure_fig1
+        type: thermodynamic_example
+        experiment: shornikov-2016-mo-spinel-kems
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          figure: '1'
+          note: Curve 4 in Fig. 1; no coordinates digitized.
+        T_range_K: [1850.0, 2090.0]
+        phase: gas
+        regime: kems_effusion
+        units: log10(partial pressure in atm) as plotted
+        values:
+          quantity: partial_pressure
+          gas_species: AlO(g)
+          method_class: figure_only
+          admission_status: figure_only
+          reason: Fig. 1 is a curve without tabulated values; coordinates were not digitized.
+          pressure_axis_as_printed: Lg p_i, atm
+          composition_as_printed: Stoichiometric MgAl2O4 spinel
+  Al2O:
+    observations: []
+    context:
+      - observation_id: shornikov_2016_al2o_partial_pressure_fig1
+        type: thermodynamic_example
+        experiment: shornikov-2016-mo-spinel-kems
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          figure: '1'
+          note: Curve 5 in Fig. 1; no coordinates digitized.
+        T_range_K: [1850.0, 2090.0]
+        phase: gas
+        regime: kems_effusion
+        units: log10(partial pressure in atm) as plotted
+        values:
+          quantity: partial_pressure
+          gas_species: Al2O(g)
+          method_class: figure_only
+          admission_status: figure_only
+          reason: Fig. 1 is a curve without tabulated values; coordinates were not digitized.
+          pressure_axis_as_printed: Lg p_i, atm
+          composition_as_printed: Stoichiometric MgAl2O4 spinel
+  O:
+    observations: []
+    context:
+      - observation_id: shornikov_2016_o_partial_pressure_fig1
+        type: thermodynamic_example
+        experiment: shornikov-2016-mo-spinel-kems
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          figure: '1'
+          note: Curve 6 in Fig. 1; no coordinates digitized.
+        T_range_K: [1850.0, 2090.0]
+        phase: gas
+        regime: kems_effusion
+        units: log10(partial pressure in atm) as plotted
+        values:
+          quantity: partial_pressure
+          gas_species: O(g)
+          method_class: figure_only
+          admission_status: figure_only
+          reason: Fig. 1 is a curve without tabulated values; coordinates were not digitized.
+          pressure_axis_as_printed: Lg p_i, atm
+          composition_as_printed: Stoichiometric MgAl2O4 spinel
+  O2:
+    observations: []
+    context:
+      - observation_id: shornikov_2016_o2_partial_pressure_fig1
+        type: thermodynamic_example
+        experiment: shornikov-2016-mo-spinel-kems
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          figure: '1'
+          note: Curve 7 in Fig. 1; no coordinates digitized.
+        T_range_K: [1850.0, 2090.0]
+        phase: gas
+        regime: kems_effusion
+        units: log10(partial pressure in atm) as plotted
+        values:
+          quantity: partial_pressure
+          gas_species: O2(g)
+          method_class: figure_only
+          admission_status: figure_only
+          reason: Fig. 1 is a curve without tabulated values; coordinates were not digitized.
+          pressure_axis_as_printed: Lg p_i, atm
+          composition_as_printed: Stoichiometric MgAl2O4 spinel
+  MgAlO:
+    observations: []
+    context:
+      - observation_id: shornikov_2016_mgal_o_partial_pressure_fig1
+        type: thermodynamic_example
+        experiment: shornikov-2016-mo-spinel-kems
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          figure: '1'
+          note: Curve 8 in Fig. 1; no coordinates digitized.
+        T_range_K: [1850.0, 2090.0]
+        phase: gas
+        regime: kems_effusion
+        units: log10(partial pressure in atm) as plotted
+        values:
+          quantity: partial_pressure
+          gas_species: MgAlO(g)
+          method_class: figure_only
+          admission_status: figure_only
+          reason: Fig. 1 is a curve without tabulated values; coordinates were not digitized.
+          pressure_axis_as_printed: Lg p_i, atm
+          composition_as_printed: Stoichiometric MgAl2O4 spinel
+  MgAl2O4:
+    observations: []
+    context:
+      - observation_id: shornikov_2016_oxide_activity_definition
+        type: thermodynamic_example
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          equation: '2'
+          section: Results
+          note: Oxide activity definition; no numerical activity values are tabulated.
+        units: dimensionless activity
+        values:
+          quantity: oxide_activity_definition
+          method_class: model_derived
+          equation_as_printed: ai = pi / pi°
+          reference_pressure_as_printed: pi° is the partial pressure over a simple oxide
+          activity_components:
+            - oxide: MgO
+              defining_ion:
+                state:
+                  tag: unknown
+                  reason: not_published
+                locator:
+                  page: 43
+                  published_page: 43
+                  pdf_page_index: 1
+                  equation: '2'
+                  note: The source does not identify which vapor ion defines MgO activity.
+              simple_oxide_reference_phase:
+                state:
+                  tag: unknown
+                  reason: not_published
+                locator:
+                  page: 43
+                  published_page: 43
+                  pdf_page_index: 1
+                  equation: '2'
+                  note: The source does not state whether the simple-oxide reference is solid or liquid.
+            - oxide: Al2O3
+              defining_ion:
+                state:
+                  tag: unknown
+                  reason: not_published
+                locator:
+                  page: 43
+                  published_page: 43
+                  pdf_page_index: 1
+                  equation: '2'
+                  note: The source does not identify which vapor ion defines Al2O3 activity.
+              simple_oxide_reference_phase:
+                state:
+                  tag: unknown
+                  reason: not_published
+                locator:
+                  page: 43
+                  published_page: 43
+                  pdf_page_index: 1
+                  equation: '2'
+                  note: The source does not state whether the simple-oxide reference is solid or liquid.
+          numeric_activity_values:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 1
+              equation: '2'
+              note: The source states that activities were calculated but does not tabulate values; Fig. 1 plots partial pressures only.
+      - observation_id: shornikov_2016_crystalline_spinel_formation_thermodynamics
+        type: thermodynamic_example
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          equation: '3'
+          section: Results
+          note: Crystalline MgAl2O4 formation properties; values are repeated in the abstract on page 42.
+        units: as printed per property
+        values:
+          quantity: spinel_formation_thermodynamics
+          method_class: model_derived
+          attribution: Calculated in the present study from the Delta G(T) dependence using least squares under the stated constancy approximation.
+          phase: crystalline MgAl2O4
+          standard_state: Formation from oxides; the source does not identify whether each simple-oxide reference is solid or liquid.
+          rows:
+            - property: enthalpy_of_formation_from_oxides
+              value: -12.02
+              plus_minus_as_printed: 1.14
+              unit: kJ/mole
+              uncertainty_semantics: The source prints ±; it does not state a confidence level here.
+            - property: entropy_of_formation_from_oxides
+              value: 5.03
+              plus_minus_as_printed: 0.56
+              unit: J/(mole·K)
+              uncertainty_semantics: The source prints ±; it does not state a confidence level here.
+      - observation_id: shornikov_2016_liquid_spinel_formation_and_melting
+        type: thermodynamic_example
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Results
+          note: Liquid-state properties are derived using oxide activities in MgAl2O4–SiO2 melts attributed to Shornikov and Archakov (2001).
+        units: as printed per property
+        values:
+          quantity: liquid_spinel_formation_and_melting_thermodynamics
+          method_class: model_derived
+          attribution: The present authors calculate these values using MgAl2O4–SiO2 melt activity data from Shornikov and Archakov (2001), reference 8.
+          phase: liquid MgAl2O4
+          standard_state: Formation from oxides; the source does not identify whether each simple-oxide reference is solid or liquid.
+          rows:
+            - property: enthalpy_of_formation_from_oxides
+              value: 43.79
+              plus_minus_as_printed: 4.84
+              unit: kJ/mole
+              uncertainty_semantics: The source prints ±; it does not state a confidence level here.
+            - property: entropy_of_formation_from_oxides
+              value: 28.09
+              plus_minus_as_printed: 1.64
+              unit: J/(mole·K)
+              uncertainty_semantics: The source prints ±; it does not state a confidence level here.
+            - property: enthalpy_of_melting
+              value: 55.81
+              plus_minus_as_printed: 4.62
+              unit: kJ/mole
+              melting_temperature_K: 2420.0
+              melting_temperature_plus_minus_as_printed_K: 25.0
+              uncertainty_semantics: The source prints ± for both quantities; it does not state a confidence level here.
+      - observation_id: shornikov_2016_introduction_qualifications
+        type: thermodynamic_example
+        locator:
+          page: 42
+          published_page: 42
+          pdf_page_index: 0
+          section: Introduction
+        units: as printed
+        values:
+          quantity: introduction_qualifications
+          method_class: quoted_unattributed
+          statements:
+            - text: 'The MgAl2O4 spinel is of particular interest to cosmochemistry as a basic mineral (up to 24 vol. %) of all types of substances of the refractory Ca–Al–Inclusions (CAIs).'
+              locator: {page: 42, published_page: 42, pdf_page_index: 0, section: Introduction}
+            - text: 'They are the earliest objects in the Solar system with an unusual isotopic characteristics and founded in carbonaceous chondrites.'
+              locator: {page: 42, published_page: 42, pdf_page_index: 0, section: Introduction}
+            - text: 'Spinel is also a dominant mineral in the Wark-Lowering rims (up to 71 vol. %), which are formed in the flesh-heating process (above the temperature of 2300 K) due to changes in the CAls mineral composition, which caused by the enrichment of refractory minerals (mainly spinel and perovskite and pyroxene) due to melilite [Wark and Boynton, 2001].'
+              locator:
+                page: 42
+                published_page: 42
+                pdf_page_index: 0
+                section: Introduction
+                note: The printed phrase "flesh-heating process" is plainly garbled English and is retained verbatim.
+            - text: 'That’s why, the thermodynamic data characterized the evaporation processes of spinel at temperatures exceeding 1500 K acquired a special interest.'
+              locator: {page: 42, published_page: 42, pdf_page_index: 0, section: Introduction}
+            - text: 'The thermochemical information is based on measurements of the specific heat of the spinel, their differences are exceeded 10 J/(mole·K), leading to systematic deviations.'
+              locator: {page: 42, published_page: 42, pdf_page_index: 0, section: Introduction}
+            - text: 'Studies of the heterogeneous equilibria in oxide melts including spinel [Kalyanram and Bell, 1961; Rein and Chipman, 1965; Chamberlin et al., 1995; Fujii et al., 2000] are inaccurate, the differences in the Gibbs energy values exceed 15 kJ/mole (on 1 mole of the compounds), the values of enthalpy and entropy of spinel formation has a considerable error.'
+              locator:
+                page: 42
+                published_page: '42–43'
+                pdf_page_index: 0
+                section: Introduction
+                note: Sentence begins on page 42 and continues at the top of page 43.
+            - text: 'Thermochemical data on the value of the enthalpy of spinel melting are contradictory.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Introduction}
+            - text: 'The information on the evaporation processes of spinel are scarce [Rutman et al, 1969; Sasamoto et al., 1981] and it limited the values of partial vapor pressure of the gas phase dominant component (atomic of magnesium).'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Introduction}
+            - text: 'The enthalpy and entropy of spinel formation from oxides, equal to –12.02±1.14 kJ/mole and 5.03±0.56 J/(mole·K), correspondingly, and the enthalpy of melting equal to 55.81±4.62 kJ/mole are corresponding to literature information.'
+              locator: {page: 42, published_page: 42, pdf_page_index: 0, section: Abstract}
+      - observation_id: shornikov_2016_results_qualifications_and_comparisons
+        type: thermodynamic_example
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Results
+        units: as printed
+        values:
+          quantity: results_qualifications_and_comparisons
+          method_class: quoted_unattributed
+          support_as_printed:
+            text: "The present study was supported by RAS Presidium’s Program #7 (Experimental and theoretical studies of Solar system objects and star planetary systems. Transients in astrophysics)."
+            locator:
+              page: 44
+              published_page: 44
+              pdf_page_index: 2
+              section: Support footnote
+              note: "Top-left footnote marked by the asterisk after the conclusion on page 43."
+          references_as_printed:
+            - text: "1. Chamberlin, L., J. R. Beckett, E. Stolper (1995). Palladium oxide equilibration and the thermodynamic properties of MgAl2O4 spinel. Amer. Miner., vol. 80, no. 3–4, pp. 285–296."
+              locator: {page: 44, published_page: 44, pdf_page_index: 2, section: References, note: "Reference 1, left column"}
+            - text: "2. Fujii, K., T. Nagasaka, M. Hino (2000). Activities of the constituents in spinel solid solution and free energies of formation of MgO, MgO·Al2O3. JISJ Int., vol. 40, no. 11, pp. 1059–1066."
+              locator: {page: 44, published_page: 44, pdf_page_index: 2, section: References, note: "Reference 2, left column"}
+            - text: "3. Kalyanram, M. R. and H. B. Bell (1961). Activities in the system CaO–MgO–Al2O3. Trans. Brit. Ceram. Soc., vol. 60, no. 2, pp. 135–145."
+              locator: {page: 44, published_page: 44, pdf_page_index: 2, section: References, note: "Reference 3, left column"}
+            - text: "4. Rein, R. H. and J. Chipman (1965). Activities in the liquid solution SiO2–CaO–MgO–Al2O3 at 1600 °C. Trans. Met. Soc. AIME, vol. 233, no. 2, pp. 415–425."
+              locator: {page: 44, published_page: 44, pdf_page_index: 2, section: References, note: "Reference 4, left column; 1600 °C belongs to the cited work, not this experiment"}
+            - text: "5. Richet, P. (1993). Melting of forsterite and spinel with implications for the glass transition of Mg2SiO4 liquid. Geophys. Res. Lett., vol. 20, no. 16, pp. 1675–1678."
+              locator: {page: 44, published_page: 44, pdf_page_index: 2, section: References, note: "Reference 5, left column"}
+            - text: "6. Rutman, D. S., I. L. Schetnikova, T. S. Ignatova, E. I. Kelareva, L. V. Uzberg, G. A. Semenov (1969). The study of the evaporation process of refractory materials based on MgO and ZrO2. Trudy Vostochnogo instituta ogneuporov, no. 9, pp. 143–161 [in Russian]."
+              locator: {page: 44, published_page: 44, pdf_page_index: 2, section: References, note: "Reference 6, left column"}
+            - text: "7. Sasamoto, T., H. Hara, T. Sata (1981). Mass spectrometric study of the vaporization of magnesium oxide from magnesium aluminate spinel. Bull. Chem. Soc. Japan, vol. 54, no. 11, pp. 3327–3333."
+              locator: {page: 44, published_page: 44, pdf_page_index: 2, section: References, note: "Reference 7, left column"}
+            - text: "8. Shornikov, S. I. and I. Yu. Archakov (2001). High temperature mass spectrometric study of vaporization processes and thermodynamic properties in the MgAl2O4–SiO2 system. High Temperature Corrosion and Materials Chemistry III, vol. 2001–12, pp. 322–329."
+              locator: {page: 44, published_page: 44, pdf_page_index: 2, section: References, note: "Reference 8, left column; vol. 2001–12 retained as printed"}
+            - text: "9. Wark, D., and W. V. Boynton (2001). The formation of rims on calcium-aluminum-rich inclusions: Step I – Flash heating. Met. Planet. Sci., vol. 36, no. 8, p. 1135–1166."
+              locator: {page: 44, published_page: 44, pdf_page_index: 2, section: References, note: "Reference 9, left column"}
+          statements:
+            - text: 'In the present study we have investigated the evaporation of a stoichiometric spinel from Knudsen effusion molybdenum cells, the gas phase composition over spinel was identified by mass spectrometric method in the temperature range 1850–2300 K.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Experimental description}
+            - text: 'The ions, characteristic to the oxides of magnesium and aluminum, as well as the MgAlO complex gaseous oxide ion were detected in the mass spectra of vapor over spinel.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Experimental description}
+            - text: 'The established molecular composition of the gas phase over spinel allowed to make the assumption that the spinel evaporation occurs mainly by heterogeneous reactions, typical for the individual oxide’s vaporization.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Results}
+            - text: 'The MgAlO molecular form presented in minor amounts in the gas phase over spinel and indicated about the possible heterogeneous reaction:'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Results}
+            - text: '[MgAl2O4] = (MgAlO) + (Al) + 3(O).'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, equation: '1'}
+            - text: 'The partial pressures values of the vapor species over spinel (pi) in the temperature range 1850–2090 K were determined by the Hertz-Knudsen equation and shown in the Fig. 1.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, figure: '1', section: Results}
+            - text: 'There was a noticeable change of spinel composition at higher temperatures due to the preferential evaporation of the vapor species, belonging to the magnesium oxide.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Results}
+            - text: 'The activity values of oxides in spinel were calculated by the Lewis equation:'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, equation: '2'}
+            - text: '(pi and pi° – the partial pressures values of the vapor species over spinel and simple oxide, respectively).'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, equation: '2'}
+            - text: 'The activity values of oxides in spinel in the crystalline state at higher temperatures (2050–2300 K) were found using the data [Shornikov and Archakov, 2001] on the MgAl2O4–SiO2 melts evaporation.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Results}
+            - text: 'The value of the Gibbs energy of spinel formation ΔG_T(MgAl2O4) was found by the relation:'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, equation: '3', section: Results}
+            - text: 'ΔG_T(MgAl2O4) = RT ∑ x_i ln a_i.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, equation: '3'}
+            - text: 'where x_i is the mole fraction of oxide (∑ x_i = 1).'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, equation: '3'}
+            - text: 'The values of enthalpy ΔH_T(MgAl2O4) and entropy ΔS_T(MgAl2O4) of spinel formation has been calculated using by the least squares method from the ΔG_T(MgAl2O4) temperature dependences in the approximation of constancy of these values in the considered temperature interval and equal to −12.02±1.14 kJ/mole and 5.03±0.56 J/(mole·K), respectively, and are consistent with available data.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Results}
+            - text: 'Thermodynamic information on the oxide activities in the MgAl2O4–SiO2 melts [Shornikov and Archakov, 2001] allowed also to calculate the Gibbs energy values of spinel in the liquid state and find of enthalpy and entropy of spinel formation, equal to 43.79±4.84 kJ/mole and 28.09±1.64 J/(mole·K), respectively, and calculate the enthalpy of spinel melting, equal to 55.81±4.62 kJ/mole at the temperature of 2420±25 K.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Results}
+            - text: 'The values of ΔH_T(MgAl2O4) and ΔS_T(MgAl2O4) determined in the present study are correlated with results of the Knudsen mass spectrometric effusion method [Rutman et al, 1969; Sasamoto et al., 1981], performed at lower temperatures.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Results}
+            - text: 'Information obtained in studies of heterogeneous equilibria involving spinel [Kalyanram and Bell, 1961; Rein and Chipman, 1965; Chamberlin et al., 1995; Fujii et al., 2000] does not contradict the results of the present study, however they have a significant error.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Results}
+            - text: 'The values characterizing the spinel melting found in the present work are in good agreement with the experimental data, obtained by Richet [Richet, 1993].'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Results}
+            - text: 'Thus, the spinel evaporation from the molybdenum cell was studied by the Knudsen mass spectrometric effusion method studied at 1850–2300 K.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Conclusion}
+            - text: 'The molecular components typical for simple oxides forming the spinel and also in a small number of the MgAlO complex gaseous oxide were identified in the gas phase over spinel.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Conclusion}
+            - text: 'The partial pressures values of vapor species over spinel were determined at the first time.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Conclusion}
+            - text: 'The spinel thermodynamic data related to their crystalline and liquid state were determined too.'
+              locator: {page: 43, published_page: 43, pdf_page_index: 1, section: Conclusion}
+      - observation_id: shornikov_2016_sample_preparation_and_assay_absences
+        type: method
+        locator:
+          page: 43
+          published_page: 43
+          pdf_page_index: 1
+          section: Experimental description
+          note: The source identifies a stoichiometric spinel charge but omits preparation and assay details.
+        units: as reported
+        values:
+          quantity: sample_preparation_and_assay_context
+          method_class: quoted_unattributed
+          printed_composition: Stoichiometric MgAl2O4 spinel
+          preparation:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 1
+              section: Experimental description
+              note: The source does not describe sample preparation.
+          starting_materials:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 1
+              section: Experimental description
+              note: The source does not identify starting materials.
+          purity:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 1
+              section: Experimental description
+              note: The source does not state a purity.
+          post_run_composition_assay:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 43
+              published_page: 43
+              pdf_page_index: 1
+              section: Results
+              note: The source states a qualitative composition change at higher temperatures but prints no post-run composition or assay.

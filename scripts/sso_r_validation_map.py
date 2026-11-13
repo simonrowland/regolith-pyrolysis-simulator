@@ -37,6 +37,7 @@ from simulator.optimize.sso_r_owner_surface import (
     certification_reachability_reason,
     owner_certification_row,
 )
+from simulator.oxygen_buffers import delta_iw_log10
 from simulator.runner import _deep_merge_setpoints, build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase
 
@@ -602,8 +603,10 @@ def run_row(
         "post_exchange_fO2_log_diagnostic": float(
             sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
         ),
-        "post_exchange_delta_IW_diagnostic": float(snapshot.fe_redox_split.get("fO2_log", 0.0) or 0.0)
-        - float(snapshot.fe_redox_split.get("iw_log", 0.0) or 0.0),
+        "post_exchange_delta_IW_diagnostic": delta_iw_log10(
+            float(snapshot.fe_redox_split.get("fO2_log", 0.0) or 0.0),
+            float(snapshot.fe_redox_split.get("iw_log", 0.0) or 0.0),
+        ),
         "fO2_diagnostic_status": (
             "diagnostic_only_not_manual_anchor_scale; do not use as certification value"
         ),

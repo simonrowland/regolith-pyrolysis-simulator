@@ -1,0 +1,5310 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  citation: 'Chen, X.; Deng, T.; Zhao, Z.; Yan, B. (2020). Thermodynamic Study on CaO-SiO2-Al2O3-5%MgO-10%Ce2O3 Slag System:
+    Liquide Lines and Distribution Behavior of Cerium at 1873 K. ISIJ International 60(8):1602–1609.'
+  source_ids:
+  - chen-2020-ce2o3-cmas-activity-phase-equilibria
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:chen-2020-ce2o3-cmas-activity-phase-equilibria
+      role: pdf
+      path: raw/chen-2020-ce2o3-cmas-activity-phase-equilibria/chen-2020-ce2o3-cmas-activity-phase-equilibria.pdf
+      sha256:
+        tag: value
+        value: 2b85713ca35a54a13dd69e29dcc8ce086468692e48c43dcec3f5a6535d827128
+    - asset_id: pdftotext:chen-2020-ce2o3-cmas-activity-phase-equilibria
+      role: pdftotext
+      path: text/chen-2020-ce2o3-cmas-activity-phase-equilibria
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:chen-2020-ce2o3-cmas-activity-phase-equilibria
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.isijint-2019-683
+experiments:
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_101
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '0'
+          - - SiO2
+            - '78.5'
+          - - Al2O3
+            - '6.5'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=101
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_102
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '2'
+          - - SiO2
+            - '78'
+          - - Al2O3
+            - '5'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=102
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_103
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '5'
+          - - SiO2
+            - '77.5'
+          - - Al2O3
+            - '2.5'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=103
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_104
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '17'
+          - - SiO2
+            - '68'
+          - - Al2O3
+            - '0'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=104
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_105
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '0'
+          - - SiO2
+            - '42.5'
+          - - Al2O3
+            - '42.5'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=105
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_106
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '1.25'
+          - - SiO2
+            - '40'
+          - - Al2O3
+            - '43.75'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=106
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_107
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '5'
+          - - SiO2
+            - '35'
+          - - Al2O3
+            - '45'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=107
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_108
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '2.5'
+          - - SiO2
+            - '30'
+          - - Al2O3
+            - '52.5'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=108
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_109
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '12.75'
+          - - SiO2
+            - '27.5'
+          - - Al2O3
+            - '45'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=109
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_110
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '20'
+          - - SiO2
+            - '20'
+          - - Al2O3
+            - '45'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=110
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_111
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '17.5'
+          - - SiO2
+            - '15'
+          - - Al2O3
+            - '52.5'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=111
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_112
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '5'
+          - - SiO2
+            - '15'
+          - - Al2O3
+            - '65'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=112
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_113
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '25'
+          - - SiO2
+            - '5'
+          - - Al2O3
+            - '55'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=113
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_114
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '25'
+          - - SiO2
+            - '0'
+          - - Al2O3
+            - '60'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=114
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_115
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '27'
+          - - SiO2
+            - '7'
+          - - Al2O3
+            - '51'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=115
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_116
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '50'
+          - - SiO2
+            - '35'
+          - - Al2O3
+            - '0'
+          - - MgO
+            - '3.5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=116
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_117
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '42'
+          - - SiO2
+            - '38'
+          - - Al2O3
+            - '5'
+          - - MgO
+            - '3.5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=117
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_118
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '51'
+          - - SiO2
+            - '29.8'
+          - - Al2O3
+            - '4.25'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=118
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_119
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '45'
+          - - SiO2
+            - '30'
+          - - Al2O3
+            - '10'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=119
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_120
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '50'
+          - - SiO2
+            - '15'
+          - - Al2O3
+            - '20'
+          - - MgO
+            - '3.5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=120
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_121
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '56.5'
+          - - SiO2
+            - '7.5'
+          - - Al2O3
+            - '21'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=121
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_122
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '60'
+          - - SiO2
+            - '5'
+          - - Al2O3
+            - '20'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=122
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t1_123
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          CeO2=10 wt%'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: printed oxides
+          amount_basis: mass_percent
+          components:
+          - - CaO
+            - '65'
+          - - SiO2
+            - '0'
+          - - Al2O3
+            - '20'
+          - - MgO
+            - '5'
+          - - CeO2
+            - '10'
+      locator:
+        published_page: 1606
+        pdf_page_index: 4
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1606
+    pdf_page_index: 4
+    table: '1'
+    note: row=123
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_101
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.2569038794351924750229723354'
+          - - SiO2
+            - '0.6127582279384031039410300695'
+          - - Al2O3
+            - '0.03139877940676131219996499616'
+          - - MgO
+            - '0.07943186696157695793294636774'
+          - - Ce2O3
+            - '0.01950724625806615090308623092'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '22.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '57.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '22.5'
+          SiO2: '57.5'
+          Al2O3: '5'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 101
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 101
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 101
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 101
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_102
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.312802968811855150108360377'
+          - - SiO2
+            - '0.557353378921749850811632919'
+          - - Al2O3
+            - '0.03127971545900871273307094844'
+          - - MgO
+            - '0.07913066188811578736440041557'
+          - - Ce2O3
+            - '0.01943327491927049898253533944'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '27.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '27.5'
+          SiO2: '52.5'
+          Al2O3: '5'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 102
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 102
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 102
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 102
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_103
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3682797217880161291888914122'
+          - - SiO2
+            - '0.5023671321536298684775258081'
+          - - Al2O3
+            - '0.03116155107938296630164082249'
+          - - MgO
+            - '0.07883173252017964362355357996'
+          - - Ce2O3
+            - '0.01935986245879139240838837708'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '32.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '32.5'
+          SiO2: '47.5'
+          Al2O3: '5'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 103
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 103
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 103
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 103
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_104
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.120606012214891554439553782'
+          - - SiO2
+            - '0.6753880478978553968347371314'
+          - - Al2O3
+            - '0.09949811062286380434967087921'
+          - - MgO
+            - '0.08390263183523315677521981081'
+          - - Ce2O3
+            - '0.02060519742915608760081839613'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '10'
+          SiO2: '60'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 104
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 104
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 104
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 104
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_105
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.1801845559033058518092425477'
+          - - SiO2
+            - '0.6166264598155136210526905145'
+          - - Al2O3
+            - '0.09909966369866200819787213255'
+          - - MgO
+            - '0.08356663806230715853537840634'
+          - - Ce2O3
+            - '0.02052268252021136040481639883'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '15'
+          SiO2: '55'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 105
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 105
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 105
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 105
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_106
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.2392878302117940873086295528'
+          - - SiO2
+            - '0.5583336241027735894697822383'
+          - - Al2O3
+            - '0.09870439526139317914436135499'
+          - - MgO
+            - '0.08323332457564248108404358431'
+          - - Ce2O3
+            - '0.02044082584839666299318326933'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '20'
+          SiO2: '50'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 106
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 106
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 106
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 106
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_107
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.2979214995188643575701413477'
+          - - SiO2
+            - '0.5005039540524748185730234027'
+          - - Al2O3
+            - '0.09831226742906063950344984901'
+          - - MgO
+            - '0.0829026594309217847810059247'
+          - - Ce2O3
+            - '0.0203596195686783995723794754'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '25'
+          SiO2: '45'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 107
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 107
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 107
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 107
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_108
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3270639778511173568143073791'
+          - - SiO2
+            - '0.4717610845319593715174745702'
+          - - Al2O3
+            - '0.09811736956589984985484681863'
+          - - MgO
+            - '0.08273831014272036907410861161'
+          - - Ce2O3
+            - '0.02031925790830305273926262041'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '27.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '27.5'
+          SiO2: '42.5'
+          Al2O3: '15'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 108
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 108
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 108
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 108
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_109
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.06273036507780190341656833218'
+          - - SiO2
+            - '0.6733003153700850988256473404'
+          - - Al2O3
+            - '0.1552547677176189209031518767'
+          - - MgO
+            - '0.08727993952133529306130229635'
+          - - Ce2O3
+            - '0.02143461231315878379333015358'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '57.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '5'
+          SiO2: '57.5'
+          Al2O3: '22.5'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 109
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 109
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 109
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 109
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_110
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.1866299315384554250310832999'
+          - - SiO2
+            - '0.5515905407152254665760603449'
+          - - Al2O3
+            - '0.1539668316092282737676490168'
+          - - MgO
+            - '0.08655589743682980847738616435'
+          - - Ce2O3
+            - '0.02125679870026102614782117341'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '15'
+          SiO2: '47.5'
+          Al2O3: '22.5'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 110
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 110
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 110
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 110
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_111
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3084907606889883442173383067'
+          - - SiO2
+            - '0.4318834708775294406353581795'
+          - - Al2O3
+            - '0.1527000881770691564799086539'
+          - - MgO
+            - '0.08584376928918420465030509957'
+          - - Ce2O3
+            - '0.02108191096722885401708975983'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '37.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '25'
+          SiO2: '37.5'
+          Al2O3: '22.5'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 111
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 111
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 111
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 111
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_112
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3985785464109535704601746135'
+          - - SiO2
+            - '0.3433878900406291096842385038'
+          - - Al2O3
+            - '0.1517636255608490674037895883'
+          - - MgO
+            - '0.08531731588804716983077817761'
+          - - Ce2O3
+            - '0.0209526220995210826210191158'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '32.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '32.5'
+          SiO2: '30'
+          Al2O3: '22.5'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 112
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 112
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 112
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 112
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_113
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.06507773127651420394227015115'
+          - - SiO2
+            - '0.6073871039716870562154585571'
+          - - Al2O3
+            - '0.2147525214281519622543639104'
+          - - MgO
+            - '0.09054594920586262752727619214'
+          - - Ce2O3
+            - '0.02223669411778415006063118916'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '5'
+          SiO2: '50'
+          Al2O3: '30'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 113
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 113
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 113
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 113
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_114
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.1616422743859671019144171016'
+          - - SiO2
+            - '0.5129405487496028017859440293'
+          - - Al2O3
+            - '0.213363836217782644058210503'
+          - - MgO
+            - '0.08996043887199164333332810379'
+          - - Ce2O3
+            - '0.02209290177465580890810026172'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '12.5'
+          SiO2: '42.5'
+          Al2O3: '30'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 114
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 114
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 114
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 114
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_115
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.2569659828119490654454886765'
+          - - SiO2
+            - '0.41970761249862558125724447'
+          - - Al2O3
+            - '0.2119929953291277285100998291'
+          - - MgO
+            - '0.0893824522264891141562660193'
+          - - Ce2O3
+            - '0.02195095713380851063090100488'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '20'
+          SiO2: '35'
+          Al2O3: '30'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 115
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 115
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 115
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 115
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_116
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3510726205819066723640247416'
+          - - SiO2
+            - '0.3276650524170161646642231304'
+          - - Al2O3
+            - '0.2106396570140424906061705809'
+          - - MgO
+            - '0.08881184517833367417409739769'
+          - - Ce2O3
+            - '0.02181082480870099819148414883'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '27.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '27.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '27.5'
+          SiO2: '27.5'
+          Al2O3: '30'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 116
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 116
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 116
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 116
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_117
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.09989184475582794159745546783'
+          - - SiO2
+            - '0.5283124712610532522629000929'
+          - - Al2O3
+            - '0.2563843025776186749573766233'
+          - - MgO
+            - '0.09265639437562134412497905996'
+          - - Ce2O3
+            - '0.02275498702987878705728875532'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '7.5'
+          SiO2: '42.5'
+          Al2O3: '35'
+          MgO: '5'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=sample 117
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=sample 117
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 117
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=sample 117
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_star_304
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3975403475590007682367226158'
+          - - SiO2
+            - '0.5830543243054892369109321419'
+          - - Al2O3
+            - '0'
+          - - MgO
+            - '0'
+          - - Ce2O3
+            - '0.01940532813550999485234524237'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '35'
+          SiO2: '55'
+          Al2O3: '0'
+          MgO: '0'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=starred comparison row 1 (*)
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=starred comparison row 1 (*)
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=starred comparison row 1 (*)
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=starred comparison row 1 (*)
+        output_unit: Pa
+        references: []
+- experiment_id: 10.2355/isijinternational.isijint-2019-683::experiment::chen20_t2_star_305
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4306368603648478650655957646'
+          - - SiO2
+            - '0.5500017989900540856588391352'
+          - - Al2O3
+            - '0'
+          - - MgO
+            - '0'
+          - - Ce2O3
+            - '0.01936134064509804927556510006'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '38'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '38'
+          SiO2: '52'
+          Al2O3: '0'
+          MgO: '0'
+          Ce2O3: '10'
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    note: row=starred comparison row 2 (*)
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        published_page: 1607
+        pdf_page_index: 5
+        table: '2'
+        note: row=starred comparison row 2 (*)
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=starred comparison row 2 (*)
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 1607
+              pdf_page_index: 5
+              table: '2'
+              note: row=starred comparison row 2 (*)
+        output_unit: Pa
+        references: []
+context:
+- observation_id: chen20_eq3_activity_coefficient_fit
+  type: thermodynamic_equation_context
+  units: as printed
+  locator:
+    published_page: 1608
+    pdf_page_index: 6
+    equation: '3'
+  values:
+    method_class: model_derived
+    equation_as_printed: ln γ_Ce2O3 = 3.46[(wt% CaO + 0.72 wt% Al2O3)/(wt% SiO2)] − 14.93
+    domain_as_printed: 5 mass% MgO, 10 mass% Ce2O3, 1873 K; fit to the same Table 2 activity family
+  context_id: chen-2020-ce2o3-cmas-activity-phase-equilibria::context::chen20_eq3_activity_coefficient_fit
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  source_id: chen-2020-ce2o3-cmas-activity-phase-equilibria
+  species: Ce2O3
+- observation_id: chen20_eq4_partition_fit
+  type: thermodynamic_equation_context
+  units: as printed
+  locator:
+    published_page: 1608
+    pdf_page_index: 6
+    equation: '4'
+  values:
+    method_class: model_derived
+    equation_as_printed: lg LCe = −0.73[(wt% CaO + 0.79 wt% Al2O3)/(wt% SiO2)] + 4.64
+    domain_as_printed: 5 mass% MgO, 10 mass% Ce2O3, 1873 K; fit to the same Table 2 family
+  context_id: chen-2020-ce2o3-cmas-activity-phase-equilibria::context::chen20_eq4_partition_fit
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  source_id: chen-2020-ce2o3-cmas-activity-phase-equilibria
+  species: Ce2O3
+- observation_id: chen20_table2_starred_comparisons
+  type: phase_equilibrium_context
+  units: as printed
+  locator:
+    published_page: 1607
+    pdf_page_index: 5
+    table: '2'
+    row: starred rows
+  values:
+    method_class: quoted_attributed
+    note: The two starred CaO-SiO2-Ce2O3 comparison rows are inherited comparisons, not new CMAS experiments; lg LCe is absent
+      in the printed table.
+  context_id: chen-2020-ce2o3-cmas-activity-phase-equilibria::context::chen20_table2_starred_comparisons
+  work_id: 10.2355/isijinternational.isijint-2019-683
+  source_id: chen-2020-ce2o3-cmas-activity-phase-equilibria
+  species: Ce2O3

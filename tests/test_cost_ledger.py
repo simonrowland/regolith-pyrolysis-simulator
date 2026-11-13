@@ -460,7 +460,14 @@ def test_furnace_flux_tracks_absolute_temperature_times_time():
     assert ELECTRICAL_USD_PER_KWH.value == 0.15
     assert ELECTRICAL_USD_PER_KWH.to_json()["status"] == "owner-ratified"
     assert THERMAL_USD_PER_FLUX_H.value == 1.0
-    assert len(owner_ratify_cost_placeholders()) == 4
+    assert {parameter.name for parameter in owner_ratify_cost_placeholders()} == {
+        "carrier_gas_earth_price_per_kg.Kr",
+        "carrier_makeup_loss_fraction_per_run",
+        "thermal_usd_per_flux_h",
+        "furnace_usd_per_h",
+        "launch_usd_per_kg",
+        "reagent_usd_per_kg",
+    }
 
 
 def test_electricity_price_is_owner_ratified_not_a_placeholder():
@@ -1166,6 +1173,24 @@ def test_cost_rollup_unavailable_money_mutation_fails_then_restores(monkeypatch)
         "incomplete_unavailable_pumping"
     )
     assert isinstance(unavailable_quantity(reason="x", units="USD"), dict)
+
+
+def test_cost_rollup_failure_does_not_publish_zero_ledger_balance(monkeypatch) -> None:
+    from simulator import cost_ledger as ledger_mod
+
+    def fail_summary(**kwargs):
+        raise RuntimeError("injected summary failure")
+
+    monkeypatch.setattr(ledger_mod, "_build_cost_rollup_diagnostic", fail_summary)
+    summary = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(), per_hour=(), products_kg={}
+    )
+
+    assert "transition_count" not in summary
+    assert "transition_balance_max_abs" not in summary
+    assert summary["run_input_cost"]["allocation_status"] == (
+        "unavailable_after_cost_observation_error"
+    )
 
 
 def test_energy_and_money_consumers_do_not_default_unavailable_to_zero() -> None:

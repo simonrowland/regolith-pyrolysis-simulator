@@ -114,13 +114,13 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
-from simulator.chemistry.qfm_oneill import (
-    _ONEILL_QFM_REFERENCE_BAND_K,
+from simulator.fe_redox import RedoxState, normalize_redox_state
+from simulator.oxygen_buffers import (
+    ONEILL_QFM_TEMPERATURE_RANGE_K,
     oneill_qfm_log10_fO2_bar,
     _magemin_corrected_buffer_offset,
     _oneill_qfm_outside_reference_band,
 )
-from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
@@ -3428,8 +3428,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         temperature_C: float,
         pressure_kbar: float,
         fO2_log: float,
+        capture_native_activities: bool = False,
     ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
-        """Build the canonical MAGEMin argv and resolved buffer values."""
+        """Build MAGEMin argv, optionally requesting native activities."""
         if self._binary_path is None:
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
         binary_path = self._binary_path.resolve()
@@ -3450,6 +3451,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             f'--buffer={buffer_name}',
             f'--buffer_n={buffer_n:.6f}',
         ]
+        if capture_native_activities:
+            args = [
+                '--Verb=1' if item == '--Verb=0' else item
+                for item in args
+            ]
+        # Native oxygen potential must be read back for every solve.
+        args.append('--out_matlab=1')
         return args, buffer_name, buffer_n, tuple(buffer_warnings)
 
     def _call_magemin_subprocess(
@@ -3487,13 +3495,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
+                capture_native_activities=capture_native_activities,
             )
         )
-        # The native dump is required even for compact calls: argv algebra
-        # cannot establish the oxygen potential that the minimizer solved.
-        args.append('--out_matlab=1')
-        if capture_native_activities:
-            args = ['--Verb=1' if item == '--Verb=0' else item for item in args]
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
         if call_timeout_s is None:
             timeout_s = configured_timeout_s
@@ -3589,7 +3593,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'kind': 'out_of_certified_band', 'authority': 'extrapolated',
                 'reference': 'PySulfSat Oneill linearisation; initial offset only',
                 'temperature_K': temperature_C + 273.15,
-                'certified_temperature_K': list(_ONEILL_QFM_REFERENCE_BAND_K),
+                'certified_temperature_K': list(ONEILL_QFM_TEMPERATURE_RANGE_K),
             }
             buffer_warnings = (*buffer_warnings, (
                 'MAGEMin QFM initial-offset reference: out_of_certified_band '
@@ -3700,7 +3704,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         allowed = set(self._MAGEMIN_INPUT_BASIS)
         source: Dict[str, float] = {}
         unknown: List[str] = []
-        feo, fe2o3 = iron_oxide_values(composition_wt_pct)
+        # FeOt is already MAGEMin's total-iron slot and is folded from
+        # ``source`` below. Keep that engine key out of the feedstock alias
+        # resolver, where FeOt means total iron expressed as FeO.
+        iron_oxide_input = composition_wt_pct
+        if 'FeOt' in composition_wt_pct:
+            iron_oxide_input = {
+                name: amount
+                for name, amount in composition_wt_pct.items()
+                if name != 'FeOt'
+            }
+        feo, fe2o3 = iron_oxide_values(iron_oxide_input)
         for component, raw_value in composition_wt_pct.items():
             name = str(component)
             if name in ('FeO', 'Fe2O3'):
@@ -3718,7 +3732,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 + ', '.join(sorted(unknown))
             )
 
-        feot = source.pop('FeOt', 0.0) + total_fe(composition_wt_pct)
+        feot = source.pop('FeOt', 0.0) + total_fe(iron_oxide_input)
         excess_o = source.pop('O', 0.0)
         merged: List[str] = []
         if feo > 0.0:

@@ -138,6 +138,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 import yaml
+from simulator.corpus_paths import regolith_corpus_root
 
 
 _CHUNK_START = re.compile(r"p(\d+)-p\d+")
@@ -191,7 +192,10 @@ _CSV_FIELDS = (
     "colspan",
     "flags",
 )
-_DEFAULT_CORPUS_ROOT = Path.home() / "Repos" / "regolith-corpus" / "raw"
+
+
+def default_corpus_root() -> Path:
+    return regolith_corpus_root() / "raw"
 
 
 @dataclass
@@ -893,9 +897,14 @@ def convert_source(
     source: str | Path,
     out_dir: str | Path,
     *,
-    corpus_root: str | Path = _DEFAULT_CORPUS_ROOT,
+    corpus_root: str | Path | None = None,
 ) -> Path:
-    sid, content_files = _source_files(source, Path(corpus_root).expanduser())
+    corpus = (
+        Path(corpus_root).expanduser()
+        if corpus_root is not None
+        else default_corpus_root()
+    )
+    sid, content_files = _source_files(source, corpus)
     table_dir = Path(out_dir).expanduser() / "tables" / sid
     table_dir.mkdir(parents=True, exist_ok=True)
     tables: list[dict[str, Any]] = []
@@ -2451,6 +2460,20 @@ def emit_extract(
     }
     if fidelity is not None:
         document["fidelity_samples"] = copy.deepcopy(fidelity)
+    # Emitting review_status=reviewed is a source-review promotion. Drafts
+    # stay writable; the corpus is not rejected for fidelity warnings.
+    if review_status == "reviewed":
+        root = str(Path(__file__).resolve().parents[1])
+        if root not in sys.path:
+            sys.path.insert(0, root)
+        from tools.validate_literature_extracts import certify_extract_source_fidelity
+
+        refusals = certify_extract_source_fidelity(document, label=source_id)
+        if refusals:
+            raise ValueError(
+                "source certification refused for review_status 'reviewed':\n"
+                + "\n".join(refusals)
+            )
     out_path = Path(out).expanduser()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(_dump_fragment(document), encoding="utf-8")
@@ -2534,7 +2557,7 @@ def main(argv: list[str] | None = None) -> int:
     convert.add_argument("--out", required=True, help="draft output root")
     convert.add_argument(
         "--corpus-root",
-        default=str(_DEFAULT_CORPUS_ROOT),
+        default=None,
         help="raw corpus root used when source is a source id",
     )
     convert.set_defaults(run=_convert_command)

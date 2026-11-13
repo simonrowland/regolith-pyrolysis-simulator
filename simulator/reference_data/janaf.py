@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterable, Iterator, Mapping
+from typing import TYPE_CHECKING, Any, Callable, Iterable, Iterator, Mapping, Sequence
 
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -1148,6 +1148,123 @@ def load_table_document(path: Path) -> dict[str, Any]:
     return dict(document)
 
 
+def table_delta_fh_298_uncertainty_kj_per_mol(
+    table: Mapping[str, Any],
+) -> Decimal | None:
+    """Return a table's printed ΔfH°(298.15 K) uncertainty in kJ/mol."""
+
+    metadata = table.get("delta_fH_298_uncertainty")
+    if metadata is None:
+        return None
+    if not isinstance(metadata, Mapping):
+        raise JanafParseError("delta_fH_298_uncertainty must be a mapping")
+    if metadata.get("unit") != "kJ mol^-1":
+        raise JanafParseError(
+            "delta_fH_298_uncertainty unit must be 'kJ mol^-1'"
+        )
+    try:
+        value = Decimal(str(metadata.get("value")))
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise JanafParseError(
+            "delta_fH_298_uncertainty value must be a decimal"
+        ) from exc
+    if not value.is_finite() or value < 0:
+        raise JanafParseError(
+            "delta_fH_298_uncertainty value must be finite and non-negative"
+        )
+    return value
+
+
+def table_fusion_transition(
+    table: Mapping[str, Any],
+) -> dict[str, Decimal | str] | None:
+    """Return printed liquid-element fusion values and uncertainties.
+
+    The optional metadata uses the same unit-and-locator shape for its
+    temperature and enthalpy entries. Missing values or uncertainties remain
+    unavailable; they are never replaced with zero.
+    """
+
+    metadata = table.get("fusion_transition")
+    if metadata is None:
+        return None
+    if not isinstance(metadata, Mapping):
+        raise JanafParseError("fusion_transition must be a mapping")
+
+    def value_and_uncertainty(
+        name: str, unit: str
+    ) -> tuple[Decimal, Decimal, str]:
+        entry = metadata.get(name)
+        if not isinstance(entry, Mapping):
+            raise JanafParseError(f"fusion_transition.{name} must be a mapping")
+        if entry.get("unit") != unit:
+            raise JanafParseError(
+                f"fusion_transition.{name} unit must be {unit!r}"
+            )
+        try:
+            value = Decimal(str(entry.get("value")))
+            uncertainty = Decimal(str(entry.get("uncertainty")))
+        except (InvalidOperation, TypeError, ValueError) as exc:
+            raise JanafParseError(
+                f"fusion_transition.{name} value and uncertainty must be decimals"
+            ) from exc
+        locator = entry.get("locator")
+        if not isinstance(locator, str) or not locator.strip():
+            raise JanafParseError(f"fusion_transition.{name} needs a locator")
+        if (
+            not value.is_finite()
+            or value <= 0
+            or not uncertainty.is_finite()
+            or uncertainty < 0
+        ):
+            raise JanafParseError(
+                f"fusion_transition.{name} values must be finite and non-negative"
+            )
+        return value, uncertainty, locator
+
+    temperature, temperature_uncertainty, temperature_locator = (
+        value_and_uncertainty("temperature", "K")
+    )
+    enthalpy, enthalpy_uncertainty, enthalpy_locator = value_and_uncertainty(
+        "enthalpy", "kJ mol^-1"
+    )
+    return {
+        "temperature_K": temperature,
+        "temperature_uncertainty_K": temperature_uncertainty,
+        "enthalpy_kJ_per_mol": enthalpy,
+        "enthalpy_uncertainty_kJ_per_mol": enthalpy_uncertainty,
+        "temperature_locator": temperature_locator,
+        "enthalpy_locator": enthalpy_locator,
+    }
+
+
+@lru_cache(maxsize=None)
+def _compiled_table_by_id(table_id: str) -> dict[str, Any]:
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    table = document.get("table")
+    if not isinstance(table, Mapping) or table.get("table_id") != table_id:
+        raise JanafParseError(f"{table_id}: compiled table metadata is missing")
+    return dict(table)
+
+
+def table_delta_fh_298_uncertainty_for_table_id(
+    table_id: str,
+) -> Decimal | None:
+    """Load one table's optional printed ΔfH°(298.15 K) uncertainty."""
+
+    return table_delta_fh_298_uncertainty_kj_per_mol(
+        _compiled_table_by_id(table_id)
+    )
+
+
+def table_fusion_transition_for_table_id(
+    table_id: str,
+) -> dict[str, Decimal | str] | None:
+    """Load one table's optional printed fusion transition metadata."""
+
+    return table_fusion_transition(_compiled_table_by_id(table_id))
+
+
 def load_manifest(path: Path | None = None) -> dict[str, Any]:
     payload = load_cached_safe_yaml(
         (path or MANIFEST_PATH).read_text(encoding="utf-8")
@@ -1558,6 +1675,30 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
         oxide, crystal_table, liquid_table, temperature_K
     )
 
+def _bracketed_signed_roots(
+    difference: Callable[[Decimal], Decimal],
+    grid: Sequence[Decimal],
+) -> tuple[Decimal, ...]:
+    """Linear roots of ``difference`` on a sorted grid, including endpoint zeros.
+
+    The same bracket the crystal/liquid fusion crossing uses: a sign change
+    is interpolated, and a grid node where the difference is already zero is
+    itself a root. This is table arithmetic, not a second stability rule.
+    """
+
+    roots: list[Decimal] = []
+    for left, right in zip(grid, grid[1:]):
+        d_left = difference(left)
+        d_right = difference(right)
+        if d_left == 0:
+            roots.append(left)
+        elif d_left * d_right < 0:
+            roots.append(left - d_left * (right - left) / (d_right - d_left))
+    if grid and difference(grid[-1]) == 0:
+        roots.append(grid[-1])
+    return tuple(roots)
+
+
 def _janaf_fusion_energy_for_pair(
     oxide: str,
     solid_table: str,
@@ -1598,15 +1739,7 @@ def _janaf_fusion_energy_for_pair(
             liquid, t
         ) - _interpolate_formation_gibbs(crystal, t)
 
-    crossings: list[Decimal] = []
-    for left, right in zip(overlap, overlap[1:]):
-        d_left, d_right = difference(left), difference(right)
-        if d_left == 0:
-            crossings.append(left)
-        elif d_left * d_right < 0:
-            crossings.append(left - d_left * (right - left) / (d_right - d_left))
-    if overlap and difference(overlap[-1]) == 0:
-        crossings.append(overlap[-1])
+    crossings = _bracketed_signed_roots(difference, overlap)
     if len(crossings) != 1:
         raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
     tm = crossings[0]

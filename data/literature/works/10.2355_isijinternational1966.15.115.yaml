@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:kems-088-ichise-1975
       role: pdf
@@ -112,38 +112,6 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -287,38 +255,6 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -462,38 +398,6 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -637,38 +541,6 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -812,38 +684,6 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -987,38 +827,6 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -1162,38 +970,6 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -1337,38 +1113,6 @@ experiments:
         published_page: 116
         pdf_page_index: 2
         note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable

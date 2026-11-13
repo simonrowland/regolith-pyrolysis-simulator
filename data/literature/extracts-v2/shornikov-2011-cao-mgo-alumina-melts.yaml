@@ -74,10 +74,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -104,6 +105,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Al_{2}O_{3}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -175,10 +204,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -205,6 +235,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Al_{2}O_{3}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -276,10 +334,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -306,6 +365,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=Al; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -378,10 +465,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -408,6 +496,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=CaO; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -479,10 +595,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -509,6 +626,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=CaO; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -580,10 +725,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -610,6 +756,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=AlO; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -682,10 +856,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -712,6 +887,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$CaAl_{2}O_{4}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -783,10 +986,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -813,6 +1017,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$CaAl_{2}O_{4}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -884,10 +1116,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -914,6 +1147,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$AlO_{2}$; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r06_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -986,10 +1247,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1016,6 +1278,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$CaAl_{4}O_{7}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r06_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -1087,10 +1377,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1117,6 +1408,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Al_{2}$; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r07_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -1189,10 +1508,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1219,6 +1539,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$CaAl_{12}O_{19}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r07_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -1290,10 +1638,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1320,6 +1669,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Al_{2}O$; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r08_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -1392,10 +1769,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1422,6 +1800,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Ca_{3}Al_{2}O_{6}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r08_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -1493,10 +1899,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1523,6 +1930,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Al_{2}O_{2}$; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r09_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -1595,10 +2030,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1625,6 +2061,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Ca_{5}Al_{6}O_{14}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r09_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -1696,10 +2160,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1726,6 +2191,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Al_{2}O_{3}$; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -1798,10 +2291,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1828,6 +2322,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Ca_{12}Al_{14}O_{33}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -1899,10 +2421,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1929,6 +2452,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Ca_{12}Al_{14}O_{33}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2000,10 +2551,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2030,6 +2582,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=Ca; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2102,10 +2682,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2132,6 +2713,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Ca_{3}MgAl_{4}O_{10}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2203,10 +2812,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2233,6 +2843,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$Ca_{3}MgAl_{4}O_{10}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2304,10 +2942,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2334,6 +2973,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=CaO; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2406,10 +3073,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2436,6 +3104,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$MgAl_{2}O_{4}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2507,10 +3203,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2537,6 +3234,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$MgAl_{2}O_{4}$; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2608,10 +3333,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2638,6 +3364,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=Mg; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2710,10 +3464,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2740,6 +3495,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=MgO; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2811,10 +3594,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2841,6 +3625,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=MgO; column_header=Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -2912,10 +3724,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2942,6 +3755,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=MgO; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r14_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -3013,10 +3854,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3043,6 +3885,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=O; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r15_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -3114,10 +3984,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3144,6 +4015,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$O_{2}$; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_cao_mgo_alumina_melts_p001_t01_r16_c06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
   identity:
@@ -3215,10 +4114,11 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: model_derived
+    original_method_class: model_derived
     attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
       et al., 1979; Shornikov et al., 1997].'
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3245,6 +4145,34 @@ observations:
         pdf_page_index: 0
         table: '1'
         note: row_label=$O_{3}$; column_header=Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+  derivation:
+    relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs
+      energy minimization.
+    inputs: []
+    parameters: []
+    output_unit: kJ/mole
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory with Gibbs energy minimization
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Opening calculation paragraph and paragraph following Table 1
+    references:
+    - Glushko et al. (1978–1982)
+    - Allibert et al. (1979)
+    - Shornikov et al. (1997)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_a_allibert_marker_01
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -3295,7 +4223,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3374,6 +4302,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (1401.5, 3435.5), fresh crop 2 page pixel (1401.76, 3436.61);
           plotted ordinate 0.303870 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_a_allibert_marker_02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -3424,7 +4354,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3503,6 +4433,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (1479.5, 3507.5), fresh crop 2 page pixel (1479.81, 3508.45);
           plotted ordinate 0.399001 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_a_allibert_marker_03
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -3553,7 +4485,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3632,6 +4564,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (1561.5, 3603.5), fresh crop 2 page pixel (1561.86, 3604.23);
           plotted ordinate 0.525839 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_a_allibert_marker_04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -3682,7 +4616,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3761,6 +4695,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (1657.5, 3735.5), fresh crop 2 page pixel (1657.92, 3735.94);
           plotted ordinate 0.700249 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_a_allibert_marker_05
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -3811,7 +4747,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3890,6 +4826,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (1841.5, 3963.0), fresh crop 2 page pixel (1842.03, 3963.43);
           plotted ordinate 1.001166 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_a_series2_unavailable
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series2_hallstedt_1992
   identity:
@@ -3939,7 +4877,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4011,6 +4949,8 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Figure 1 a model curve; no data markers digitized.
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_a_series3_unavailable
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series3_present_study
   identity:
@@ -4060,7 +5000,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4132,6 +5072,8 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Figure 1 a model curve; no data markers digitized.
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_b_allibert_marker_01
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -4182,7 +5124,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4261,6 +5203,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (1373.5, 4737.5), fresh crop 2 page pixel (1373.75, 4737.69);
           plotted ordinate 0.399192 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_b_allibert_marker_02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -4311,7 +5255,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4390,6 +5334,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (1513.5, 4869.5), fresh crop 2 page pixel (1513.83, 4869.39);
           plotted ordinate 0.524525 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_b_allibert_marker_03
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -4440,7 +5386,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4519,6 +5465,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (1825.5, 5053.5), fresh crop 2 page pixel (1826.02, 5052.98);
           plotted ordinate 0.699235 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_b_allibert_marker_04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -4569,7 +5517,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4646,6 +5594,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054); plotted ordinate
           0.6999 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_b_series2_unavailable
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series2_hallstedt_1992
   identity:
@@ -4695,7 +5645,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4767,6 +5717,8 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Figure 1 b model curve; no data markers digitized.
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_b_series3_unavailable
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series3_present_study
   identity:
@@ -4816,7 +5768,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4888,6 +5840,8 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Figure 1 b model curve; no data markers digitized.
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_c_allibert_marker_01
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -4938,7 +5892,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5015,6 +5969,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2689, 4043); plotted ordinate
           1.9954 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_c_allibert_marker_02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -5065,7 +6021,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5142,6 +6098,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2820, 3732); plotted ordinate
           1.3120 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_c_allibert_marker_03
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -5192,7 +6150,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5271,6 +6229,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (2994.5, 3599.5), fresh crop 2 page pixel (2994.73, 3600.24);
           plotted ordinate 1.021677 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_c_allibert_marker_04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -5321,7 +6281,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5400,6 +6360,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (3130.5, 3463.5), fresh crop 2 page pixel (3130.81, 3464.55);
           plotted ordinate 0.723187 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_c_allibert_marker_05
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -5450,7 +6412,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5529,6 +6491,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (3290.5, 3388.0), fresh crop 2 page pixel (3290.91, 3388.72);
           plotted ordinate 0.556929 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_c_allibert_marker_06
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -5579,7 +6543,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure_comparator
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5658,6 +6622,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (3482.5, 3332.5), fresh crop 2 page pixel (3483.02, 3332.84);
           plotted ordinate 0.434562 −lg activity.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_c_series2_unavailable
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series2_hallstedt_1992
   identity:
@@ -5707,7 +6673,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5779,6 +6745,8 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Figure 1 c model curve; no data markers digitized.
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_c_series3_unavailable
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series3_present_study
   identity:
@@ -5828,7 +6796,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_reported_for_figure
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -5900,6 +6868,8 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Figure 1 c model curve; no data markers digitized.
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_01
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -5937,17 +6907,8 @@ observations:
     original_method_class: figure_only
     attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
   admission:
-    status: rejected
-    reason: source status=typed_refusal
-    decided_by:
-      worker: trial-lxh-1018
-      date: '2026-10-18'
-      evidence:
-        page: 2
-        pdf_page_index: 1
-        figure: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2557, 5233); plotted ordinate
-          22.6214 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
+    status: pending
+    reason: source admission_status=pending
   notices: []
   source_id: shornikov-2011-cao-mgo-alumina-melts
   locator:
@@ -5988,6 +6949,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2557, 5233); plotted ordinate
           22.6214 −ΔfG1960, kJ/mole.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_02
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -6027,17 +6990,8 @@ observations:
     original_method_class: figure_only
     attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
   admission:
-    status: rejected
-    reason: source status=typed_refusal
-    decided_by:
-      worker: trial-lxh-1018
-      date: '2026-10-18'
-      evidence:
-        page: 2
-        pdf_page_index: 1
-        figure: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (2722.5, 5065.5), fresh crop 2 page pixel (2722.56, 5064.95);
-          plotted ordinate 24.250232 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
+    status: pending
+    reason: source admission_status=pending
   notices: []
   source_id: shornikov-2011-cao-mgo-alumina-melts
   locator:
@@ -6078,6 +7032,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (2722.5, 5065.5), fresh crop 2 page pixel (2722.56, 5064.95);
           plotted ordinate 24.250232 −ΔfG1960, kJ/mole.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_03
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -6115,17 +7071,8 @@ observations:
     original_method_class: figure_only
     attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
   admission:
-    status: rejected
-    reason: source status=typed_refusal
-    decided_by:
-      worker: trial-lxh-1018
-      date: '2026-10-18'
-      evidence:
-        page: 2
-        pdf_page_index: 1
-        figure: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736); plotted ordinate
-          27.4466 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
+    status: pending
+    reason: source admission_status=pending
   notices: []
   source_id: shornikov-2011-cao-mgo-alumina-melts
   locator:
@@ -6166,6 +7113,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736); plotted ordinate
           27.4466 −ΔfG1960, kJ/mole.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_allibert_marker_04
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
   identity:
@@ -6203,17 +7152,8 @@ observations:
     original_method_class: figure_only
     attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
   admission:
-    status: rejected
-    reason: source status=typed_refusal
-    decided_by:
-      worker: trial-lxh-1018
-      date: '2026-10-18'
-      evidence:
-        page: 2
-        pdf_page_index: 1
-        figure: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503); plotted ordinate
-          29.7087 −ΔfG1960, kJ/mole.; panel=d; marker_symbol=open square; series=1'
+    status: pending
+    reason: source admission_status=pending
   notices: []
   source_id: shornikov-2011-cao-mgo-alumina-melts
   locator:
@@ -6254,6 +7194,8 @@ observations:
         figure: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503); plotted ordinate
           29.7087 −ΔfG1960, kJ/mole.'
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_series2_unavailable
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series2_hallstedt_1992
   identity:
@@ -6375,6 +7317,8 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Figure 1 d model curve; no data markers digitized.
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_fig1_d_series3_unavailable
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series3_present_study
   identity:
@@ -6496,6 +7440,8 @@ observations:
         pdf_page_index: 1
         figure: '1'
         note: Figure 1 d model curve; no data markers digitized.
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2011-cao-mgo-alumina-melts::shornikov_2011_text_minimum_delta_fG1960_melt
   experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_text_conclusion_minimum_melt
   identity:
@@ -6528,14 +7474,20 @@ observations:
     kind: none
   evidence:
     class:
-      tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Final paragraph reports the minimum melt Gibbs energy of formation from oxides and cites prior thermodynamic
-      data.
+      tag: unknown
+      reason: unmapped method_class typed_refusal
+    original_method_class: typed_refusal
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: 'Printed model-derived melt minimum refused: only 45 mole % Al2O3 is reported, so the melt composition is incomplete.'
+    decided_by:
+      worker: trial-lxh-1018
+      date: '2026-10-18'
+      evidence:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+        note: 'Final paragraph: ΔfG1960 = −31.5 kJ/mole at 45 mole % Al2O3, closed to liquidus line.'
   notices: []
   source_id: shornikov-2011-cao-mgo-alumina-melts
   locator:
@@ -6572,3 +7524,5 @@ observations:
         pdf_page_index: 1
         section: Results
         note: No oxygen fugacity is reported for this text value.
+  provenance:
+    printed_phase: l
