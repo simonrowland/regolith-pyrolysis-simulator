@@ -62565,7 +62565,7 @@ observations:
       tag: value
       value: H_minus_H298
     species:
-      formula: '02'
+      formula: O2
       phase:
         tag: value
         value: g
@@ -62578,15 +62578,23 @@ observations:
     subtype:
       tag: value
       value: H(T)-H(298.15 K)
+      reason: pankratz-1984-usbm-b677-p001-p040.md:677 prints the standard state as the pure stable element or compound at
+        1 atm, and for gases the pure gas extrapolated to an ideally behaving gas at 1 atm; :130 atm = 101325 pascals; :137
+        mol = gram formula weight or molar mass; :149 H-H298 is the enthalpy increment between T and 298.15 K. Table units
+        are cal/mol·K and kcal/mol of the substance, not per mole of O2.
     per:
       tag: value
       value: mol_species
+      reason: pankratz-1984-usbm-b677-p001-p040.md:677 prints the standard state as the pure stable element or compound at
+        1 atm, and for gases the pure gas extrapolated to an ideally behaving gas at 1 atm; :130 atm = 101325 pascals; :137
+        mol = gram formula weight or molar mass; :149 H-H298 is the enthalpy increment between T and 298.15 K. Table units
+        are cal/mol·K and kcal/mol of the substance, not per mole of O2.
     temperature_K:
       tag: unknown
       reason: source prints a temperature grid (H°-H298°); series coordinate, not a single identity temperature_K
     standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     reaction:
       tag: not_applicable
       reason: profile H_minus_H298 does not use reaction
@@ -62701,7 +62709,7 @@ observations:
       tag: value
       value: S
     species:
-      formula: '02'
+      formula: O2
       phase:
         tag: value
         value: g
@@ -62717,12 +62725,16 @@ observations:
     per:
       tag: value
       value: mol_species
+      reason: pankratz-1984-usbm-b677-p001-p040.md:677 prints the standard state as the pure stable element or compound at
+        1 atm, and for gases the pure gas extrapolated to an ideally behaving gas at 1 atm; :130 atm = 101325 pascals; :137
+        mol = gram formula weight or molar mass; :149 H-H298 is the enthalpy increment between T and 298.15 K. Table units
+        are cal/mol·K and kcal/mol of the substance, not per mole of O2.
     temperature_K:
       tag: unknown
       reason: source prints a temperature grid (S°); series coordinate, not a single identity temperature_K
     standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     reaction:
       tag: not_applicable
       reason: profile S does not use reaction
@@ -62837,7 +62849,7 @@ observations:
       tag: value
       value: cp
     species:
-      formula: '02'
+      formula: O2
       phase:
         tag: value
         value: g
@@ -62853,12 +62865,16 @@ observations:
     per:
       tag: value
       value: mol_species
+      reason: pankratz-1984-usbm-b677-p001-p040.md:677 prints the standard state as the pure stable element or compound at
+        1 atm, and for gases the pure gas extrapolated to an ideally behaving gas at 1 atm; :130 atm = 101325 pascals; :137
+        mol = gram formula weight or molar mass; :149 H-H298 is the enthalpy increment between T and 298.15 K. Table units
+        are cal/mol·K and kcal/mol of the substance, not per mole of O2.
     temperature_K:
       tag: unknown
       reason: source prints a temperature grid (Cp°); series coordinate, not a single identity temperature_K
     standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     reaction:
       tag: not_applicable
       reason: profile cp does not use reaction

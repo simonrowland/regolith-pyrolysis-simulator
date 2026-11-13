@@ -1,0 +1,1811 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2138/am-1998-9-1005
+  citation: 'Dohmen, R., Chakraborty, S., Palme, H., and Rammensee, W. (1998), "Solid-solid reactions mediated by a gas phase:
+    An experimental study of reaction progress and the role of surfaces in the system olivine+iron metal," American Mineralogist
+    83, 970-984.'
+  source_ids:
+  - dohmen-1998-olivine-fe-gas
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:dohmen-1998-olivine-fe-gas
+      role: pdf
+      path: raw/dohmen-1998-olivine-fe-gas/dohmen-1998-olivine-fe-gas.pdf
+      sha256:
+        tag: value
+        value: d99c7803f5940fb365c74fe0c13f824d2b5654de42ef6a92e70c279d6aa5e12b
+    - asset_id: pdftotext:dohmen-1998-olivine-fe-gas
+      role: pdftotext
+      path: text/dohmen-1998-olivine-fe-gas
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:dohmen-1998-olivine-fe-gas
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2138/am-1998-9-1005
+experiments:
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-1atm-1600c-metal-olivine-test
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1873.15'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Interpretations
+        note: Printed run temperature 1600 C.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Interpretations
+        note: Printed fO2 is 10^-11 bar.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no total pressure is printed for the 1600 C powder test
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Interpretations
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: gas composition and flow not published for this run
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Interpretations
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not published
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 3
+    published_page: 972
+    pdf_page_index: 2
+    section: Interpretations
+    note: The section heading is on page 2; this page-3 powder-test paragraph does not state a total pressure.
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Interpretations
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-1atm-diffusion-couple
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+        note: Printed run temperature 1300 C.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000001'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+        note: Printed fO2 is 10^-12 bar.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: gas composition ratio and flow not published
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not published
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 2
+    published_page: 971
+    pdf_page_index: 1
+    section: 1 atm experiments
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: CO
+      value:
+        state:
+          tag: unknown
+          reason: gas ratio not published
+        locator:
+          page: 2
+          published_page: 971
+          pdf_page_index: 1
+          section: 1 atm experiments
+      basis: mole
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '414000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+        note: Printed anneal duration is 115 h.
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-1atm-diffusion-couple-thin-foil-repeat
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+        note: The repeat is explicitly described as the experiment above under the same conditions; printed run temperature
+          1300 C.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000001'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+        note: The repeat is explicitly described as the experiment above under the same conditions; printed fO2 is 10^-12
+          bar.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+        note: The repeat is explicitly described as the experiment above under the same conditions.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: gas composition ratio and flow not published
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+        note: The repeat is explicitly described as the experiment above under the same conditions; gas mix CO+CO2.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not published
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 3
+    published_page: 972
+    pdf_page_index: 2
+    section: Interpretations
+    note: The text says this repeats the experiment described above with a thin Fe foil instead of a large block.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: CO
+      value:
+        state:
+          tag: unknown
+          reason: gas ratio not published
+        locator:
+          page: 2
+          published_page: 971
+          pdf_page_index: 1
+          section: 1 atm experiments
+      basis: mole
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '414000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 971
+        pdf_page_index: 1
+        section: 1 atm experiments
+        note: The repeat is explicitly described as the experiment above under the same conditions; printed anneal duration
+          is 115 h.
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v892
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Anneal at 1400 C.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not an absolute point; source says below the Fe-FeO buffer
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+        note: Chamber background vacuum; not in-cell sample total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep gas stated
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Knudsen regime not explicitly classified
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V892
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: Fe metal; O2 below Fe-FeO buffer
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed second heat at 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed second heat at 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed second heat at 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed final anneal is 24 h.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Always cooled at 20 C/min
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Table footnote applies to every run.
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v893
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Heat to 1500 C.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not published for this run
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+        note: Chamber background vacuum; not in-cell sample total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep gas stated
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Knudsen regime not explicitly classified
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V893
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1773.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Always cooled at 20 C/min
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Table footnote applies to every run.
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v914
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Anneal at 1400 C.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: source states below the Fe-FeO buffer, not an absolute point
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+        note: Chamber background vacuum; not in-cell sample total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep gas stated
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Knudsen regime not explicitly classified
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V914
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: Fe metal; O2 below Fe-FeO buffer
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed first heat at 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed first heat at 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed first heat at 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed second heat at 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed second heat at 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed second heat at 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '68400'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed final anneal is 19 h.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Always cooled at 20 C/min
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Table footnote applies to every run.
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v929
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Anneal at 1400 C.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00002'
+          approximate: true
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+        note: Printed IW buffer pressure is approximately 2.0 x 10^-10 bar at 1400 C; O2 was not detected in V929.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+        note: Chamber background vacuum; not in-cell sample total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep gas stated
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Knudsen regime not explicitly classified
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V929
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: iron-wustite buffer (Fe + wustite)
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed first heat at 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed first heat at 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed first heat at 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed reheating at 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed reheating at 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed reheating at 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '79200'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed anneal is 22 h.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Always cooled at 20 C/min
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Table footnote applies to every run.
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v932
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Anneal at 1400 C.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 gives Fe + wustite for V932, but the text does not assign it the absolute IW buffer pressure
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+        note: Chamber background vacuum; not in-cell sample total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep gas stated
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Knudsen regime not explicitly classified
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V932
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: iron-wustite buffer (Fe + wustite)
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '72000'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed anneal is 20 h.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Always cooled at 20 C/min
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Table footnote applies to every run.
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v933
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Anneal at 1400 C.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not published as an absolute point for this run
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+        note: Chamber background vacuum; not in-cell sample total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep gas stated
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Knudsen regime not explicitly classified
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V933
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '82800'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed anneal is 23 h.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Always cooled at 20 C/min
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Table footnote applies to every run.
+- experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v937
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    form:
+      state:
+        tag: value
+        value: Molten sample
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Run state at 1400 C, not the phase of the after-run assay.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Anneal at 1400 C.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: buffer assemblage is printed but no absolute fO2 point is reported
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.001'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+        note: Chamber background vacuum; not in-cell sample total pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep gas stated
+      locator:
+        page: 3
+        published_page: 972
+        pdf_page_index: 2
+        section: Knudsen-cell experiments, Setup
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Knudsen regime not explicitly classified
+  work_id: 10.2138/am-1998-9-1005
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V937
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: iron metal + magnetite
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.083333333333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed 5 C/min; converted to K/s.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 4
+                published_page: 973
+                pdf_page_index: 3
+                table: '1'
+                note: Printed 5 C/min; converted to K/s.
+          output_unit: K/s
+          references: []
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '72000'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 973
+          pdf_page_index: 3
+          table: '1'
+          note: Printed anneal is 20 h.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Always cooled at 20 C/min
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+        note: Table footnote applies to every run.
+context:
+- observation_id: dohmen_1998_figure_only_candidates
+  type: figure_index
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 972
+    section: Results
+  units: as captioned
+  values:
+    quantity_as_printed: plotted reaction-progress, gas-phase, and model series
+    method_class: figure_only
+    digitisation: deferred per extraction instructions
+    figures:
+    - figure: '1'
+      page: 3
+      pdf_page_index: 2
+      published_page: 972
+      subject: FeO concentration profile in forsterite; Figure 1 graph labels include Fe-metal + synthetic forsterite, 1300
+        C, IW-1, and 115 h.
+    - figure: '2'
+      page: 3
+      pdf_page_index: 2
+      published_page: 972
+      subject: Knudsen-cell sample configuration schematic.
+    - figure: '3'
+      page: 5
+      pdf_page_index: 4
+      published_page: 974
+      subject: gas-phase partial pressures during heating; Mg, Fe, SiO+CO2, and calculated Fe.
+    - figure: '4'
+      page: 6
+      pdf_page_index: 5
+      published_page: 975
+      subject: ion-current ratios identifying SiO(g) and Mg(g) versus time.
+    - figure: '5'
+      page: 6
+      pdf_page_index: 5
+      published_page: 975
+      subject: Mg partial pressure during initial heating and a V929 annealing cycle.
+    - figure: '6'
+      page: 7
+      pdf_page_index: 6
+      published_page: 976
+      subject: Mg partial pressure during the constant-temperature anneal for V914 and V929.
+    - figure: '7'
+      page: 7
+      pdf_page_index: 6
+      published_page: 976
+      subject: BSE images and thin sections of single-crystal samples and Fe-rich olivine overgrowths.
+    - figure: '8'
+      page: 8
+      pdf_page_index: 7
+      published_page: 977
+      subject: composition profile across the V932 single-crystal/overgrowth interface.
+    - figure: '9'
+      page: 9
+      pdf_page_index: 8
+      published_page: 978
+      subject: measured and calculated Mg partial pressures at two oxygen fugacities.
+    - figure: '10'
+      page: 10
+      pdf_page_index: 9
+      published_page: 979
+      subject: Mg partial pressures for single-crystal and polycrystalline samples.
+    - figure: '11'
+      page: 11
+      pdf_page_index: 10
+      published_page: 980
+      subject: reaction and gas-transport mechanism schematic.
+    - figure: '12'
+      page: 12
+      pdf_page_index: 11
+      published_page: 981
+      subject: model simulations of reaction progress and gas partial pressures.
+  context_id: dohmen-1998-olivine-fe-gas::context::dohmen_1998_figure_only_candidates
+  work_id: 10.2138/am-1998-9-1005
+  source_id: dohmen-1998-olivine-fe-gas
+  species: Fe
+- observation_id: dohmen_1998_table1_full_grid
+  type: table_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 973
+    table: '1'
+  units: as printed
+  values:
+    quantity_as_printed: Knudsen-cell experiment run, starting-material configuration, thermal history, and experimental product
+    method_class: measured_direct
+    printed_row_count: 7
+    extracted_row_count: 7
+    rows:
+    - run: V892
+      position_A: Fe + Fo100 (synthetic, polycrystalline)
+      position_B: —
+      thermal_history: (a) heat to 1400 C (5 C/min); (b) heat to 1400 C (5 C/min); (c) anneal at 1400 C for 24 h
+      product: Fa6Fo94; homogeneous grains
+    - run: V893
+      position_A: Fo100 (synthetic, polycrystalline)
+      position_B: —
+      thermal_history: (a) heat to 1500 C (5 C/min)
+      product: Fo100; single phase
+    - run: V914
+      position_A: Fe (synthetic, polycrystalline)
+      position_B: Fo100 (synthetic, polycrystalline)
+      thermal_history: (a) heat to 1400 C (5 C/min); (b) heat to 1400 C (5 C/min); (c) anneal at 1400 C for 19 h
+      product: Fa2Fo98-Fa4Fo96; individual grains unzoned
+    - run: V929
+      position_A: Fe + wustite (synthetic, polycrystalline)
+      position_B: Fo100 (synthetic, polycrystalline)
+      thermal_history: (a) heat to 1400 C (5 C/min); (b) anneal at 1400 C for 22 h; (c) heat to 1400 C (5 C/min)
+      product: Fa26Fo74; individual grains unzoned†
+    - run: V932
+      position_A: Fe + wustite (synthetic, polycrystalline)
+      position_B: San Carlos olivine (single crystal)
+      thermal_history: (a) heat to 1400 C (5 C/min); (b) anneal at 1400 C for 20 h
+      product: Fayalitic films†
+    - run: V933
+      position_A: Fe (synthetic, polycrystalline)
+      position_B: Fo90 + Fo100 (synthetic single crystals)
+      thermal_history: (a) heat to 1400 C (5 C/min); (b) anneal at 1400 C for 23 h
+      product: Fayalitic films
+    - run: V937
+      position_A: Fe + magnetite (synthetic, polycrystalline)
+      position_B: Fo100 (synthetic, polycrystalline)
+      thermal_history: (a) heat to 1400 C (5 C/min); (b) anneal at 1400 C for 20 h
+      product: 'Molten sample: Fa74Fo26†'
+    footnotes:
+    - '* Always cooled at 20 C/min.'
+    - † Spinel formation on alumina crucible cell.
+    reconciliation_note: The rendered Table 1 confirms seven body rows. The product column is read cell-by-cell from the render;
+      in particular the rendered V937 Table 1 reads Fa74Fo26†, while Results prose states Fa = 70 mol%; both printed forms
+      are retained without reconciling them.
+  context_id: dohmen-1998-olivine-fe-gas::context::dohmen_1998_table1_full_grid
+  work_id: 10.2138/am-1998-9-1005
+  source_id: dohmen-1998-olivine-fe-gas
+  species: Fe
+- observation_id: dohmen_1998_text_fe_rich_olivine_film_thickness
+  type: measured_numeric_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 976
+    section: Single-crystal experiments
+  units: μm
+  values:
+    quantity_as_printed: thickness of newly formed Fe-rich olivine films
+    method_class: measured_direct
+    maximum_thickness_as_printed: up to 300 μm
+    schema_gap: This is a measured film-thickness bound, not an olivine composition or gas pressure. No exact thickness observation
+      type or quantity token is available in tools/validate_literature_extracts.py::OBSERVATION_TYPES, simulator/battery/migrate.py::TYPE_QUANTITY
+      or simulator/battery/migrate.py::QUANTITY_ALIASES. The candidate quantity family in simulator/battery/enums.py::Quantity
+      and composition basis tokens in simulator/battery/enums.py::PHASE_BASIS_TOKENS do not encode film thickness. It remains
+      unscored context rather than being mislabeled as a concentration or pressure row.
+  context_id: dohmen-1998-olivine-fe-gas::context::dohmen_1998_text_fe_rich_olivine_film_thickness
+  work_id: 10.2138/am-1998-9-1005
+  source_id: dohmen-1998-olivine-fe-gas
+  species: Fe
+- observation_id: dohmen_1998_text_kems_gas_detection
+  type: measured_numeric_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 974
+    section: Results, Gas phase composition
+  units: as printed
+  values:
+    quantity_as_printed: gas species detection and identification
+    method_class: measured_direct
+    detectable_temperature_as_printed: about 1100 °C
+    magnesium_observation_temperature_range_as_printed: 1100–1400 °C
+    dominant_gas_species_as_printed: SiO, O2, O, Mg
+    magnesium_behavior_as_printed: The Mg partial pressure increases dramatically when Fe is present, whether or not Fe contacts
+      the olivine. The text gives no numeric partial-pressure value; Figure 5 is recorded as figure-only.
+    sio_identification_as_printed: At 1400 °C during later annealing, after CO2 was degassed, SiO was identified using the
+      28Si16O, 29Si16O, and 30Si16O isotope signals.
+  context_id: dohmen-1998-olivine-fe-gas::context::dohmen_1998_text_kems_gas_detection
+  work_id: 10.2138/am-1998-9-1005
+  source_id: dohmen-1998-olivine-fe-gas
+  species: Fe
+- observation_id: dohmen_1998_text_v932_nickel_content
+  type: measured_numeric_context
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 977
+    section: Single-crystal experiments
+  units: mass ppm
+  values:
+    quantity_as_printed: Ni content across the V932 crystal-film boundary
+    method_class: measured_direct
+    basis: ppm_mass
+    experiment: V932
+    original_crystal_as_published: approximately 3000 ppm
+    film_as_published: <100 ppm
+  context_id: dohmen-1998-olivine-fe-gas::context::dohmen_1998_text_v932_nickel_content
+  work_id: 10.2138/am-1998-9-1005
+  source_id: dohmen-1998-olivine-fe-gas
+  species: Ni

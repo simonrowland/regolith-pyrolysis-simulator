@@ -1,0 +1,5646 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/zhao-2019-ce2o3-ternary-thermodynamics.yaml
+observations:
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_301_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4863786196469711045793476368'
+        - - SiO2
+          - '0.5043884451313313076797314764'
+        - - Ce2O3
+          - '0.009232935221697587740920886827'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000329'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_301_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=301
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4863786196469711045793476368'
+          - - SiO2
+            - '0.5043884451313313076797314764'
+          - - Ce2O3
+            - '0.009232935221697587740920886827'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=301
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=301
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=301
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4863786196469711045793476368'
+          - - SiO2
+            - '0.5043884451313313076797314764'
+          - - Ce2O3
+            - '0.009232935221697587740920886827'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=301
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=301
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=301
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=301
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=301
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=301
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=301
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '45'
+          Ce2O3: '5'
+          SiO2: '50'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=301
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_302_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4444260579976125279450701462'
+        - - SiO2
+          - '0.546314315170491583144180381'
+        - - Ce2O3
+          - '0.009259626831895888910749472919'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000172'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_302_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=302
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4444260579976125279450701462'
+          - - SiO2
+            - '0.546314315170491583144180381'
+          - - Ce2O3
+            - '0.009259626831895888910749472919'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '54'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=302
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=302
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=302
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4444260579976125279450701462'
+          - - SiO2
+            - '0.546314315170491583144180381'
+          - - Ce2O3
+            - '0.009259626831895888910749472919'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=302
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=302
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=302
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '54'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=302
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=302
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=302
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=302
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '41'
+          Ce2O3: '5'
+          SiO2: '54'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=302
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_303_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4022302306973284886794098989'
+        - - SiO2
+          - '0.5884832960869073983277783294'
+        - - Ce2O3
+          - '0.009286473215764112992811771465'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000086'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_303_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=303
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4022302306973284886794098989'
+          - - SiO2
+            - '0.5884832960869073983277783294'
+          - - Ce2O3
+            - '0.009286473215764112992811771465'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '37'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '58'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=303
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=303
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=303
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4022302306973284886794098989'
+          - - SiO2
+            - '0.5884832960869073983277783294'
+          - - Ce2O3
+            - '0.009286473215764112992811771465'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=303
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '37'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=303
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=303
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '58'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=303
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=303
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=303
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=303
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '37'
+          Ce2O3: '5'
+          SiO2: '58'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=303
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_304_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3975403475590007682367226158'
+        - - SiO2
+          - '0.5830543243054892369109321419'
+        - - Ce2O3
+          - '0.01940532813550999485234524237'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000281'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_304_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=304
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3975403475590007682367226158'
+          - - SiO2
+            - '0.5830543243054892369109321419'
+          - - Ce2O3
+            - '0.01940532813550999485234524237'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=304
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=304
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=304
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3975403475590007682367226158'
+          - - SiO2
+            - '0.5830543243054892369109321419'
+          - - Ce2O3
+            - '0.01940532813550999485234524237'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=304
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=304
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=304
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=304
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=304
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=304
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=304
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '35'
+          Ce2O3: '10'
+          SiO2: '55'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=304
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_305_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4306368603648478650655957646'
+        - - SiO2
+          - '0.5500017989900540856588391352'
+        - - Ce2O3
+          - '0.01936134064509804927556510006'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000364'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_305_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=305
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4306368603648478650655957646'
+          - - SiO2
+            - '0.5500017989900540856588391352'
+          - - Ce2O3
+            - '0.01936134064509804927556510006'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '38'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=305
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=305
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=305
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4306368603648478650655957646'
+          - - SiO2
+            - '0.5500017989900540856588391352'
+          - - Ce2O3
+            - '0.01936134064509804927556510006'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=305
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '38'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=305
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=305
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=305
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=305
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=305
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=305
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '38'
+          Ce2O3: '10'
+          SiO2: '52'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=305
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_306_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.415533911041240661557812459'
+        - - SiO2
+          - '0.5540406040562853446980963113'
+        - - Ce2O3
+          - '0.03042548490247399374409122931'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000794'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_306_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=306
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.415533911041240661557812459'
+          - - SiO2
+            - '0.5540406040562853446980963113'
+          - - Ce2O3
+            - '0.03042548490247399374409122931'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=306
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=306
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=306
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.415533911041240661557812459'
+          - - SiO2
+            - '0.5540406040562853446980963113'
+          - - Ce2O3
+            - '0.03042548490247399374409122931'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=306
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=306
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=306
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=306
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=306
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=306
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=306
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '35'
+          Ce2O3: '15'
+          SiO2: '50'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=306
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_307_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3866180203240597092609011848'
+        - - SiO2
+          - '0.5828961644596234993330851356'
+        - - Ce2O3
+          - '0.0304858152163167914060136794'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000503'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_307_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=307
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3866180203240597092609011848'
+          - - SiO2
+            - '0.5828961644596234993330851356'
+          - - Ce2O3
+            - '0.0304858152163167914060136794'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '32.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=307
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=307
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=307
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3866180203240597092609011848'
+          - - SiO2
+            - '0.5828961644596234993330851356'
+          - - Ce2O3
+            - '0.0304858152163167914060136794'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=307
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '32.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=307
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=307
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=307
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=307
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=307
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=307
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '32.5'
+          Ce2O3: '15'
+          SiO2: '52.5'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=307
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_308_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4049848876676457942510034036'
+        - - SiO2
+          - '0.5524363263754792144630967775'
+        - - Ce2O3
+          - '0.04257878595687499128589981901'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000001622'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_308_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=308
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4049848876676457942510034036'
+          - - SiO2
+            - '0.5524363263754792144630967775'
+          - - Ce2O3
+            - '0.04257878595687499128589981901'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '32.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=308
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=308
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=308
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4049848876676457942510034036'
+          - - SiO2
+            - '0.5524363263754792144630967775'
+          - - Ce2O3
+            - '0.04257878595687499128589981901'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=308
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '32.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=308
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=308
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=308
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=308
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=308
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=308
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '32.5'
+          Ce2O3: '20'
+          SiO2: '47.5'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=308
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_309_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3746103023930030657955519234'
+        - - SiO2
+          - '0.582722287704576302605525611'
+        - - Ce2O3
+          - '0.04266740990242063159892246577'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000897'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_309_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=309
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3746103023930030657955519234'
+          - - SiO2
+            - '0.582722287704576302605525611'
+          - - Ce2O3
+            - '0.04266740990242063159892246577'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=309
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=309
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=309
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3746103023930030657955519234'
+          - - SiO2
+            - '0.582722287704576302605525611'
+          - - Ce2O3
+            - '0.04266740990242063159892246577'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=309
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=309
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=309
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=309
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=309
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=309
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=309
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '30'
+          Ce2O3: '20'
+          SiO2: '50'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=309
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_310_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.361346945970525639731166719'
+        - - SiO2
+          - '0.5825302287813890693825782715'
+        - - Ce2O3
+          - '0.05612282524808529088625500943'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000158'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_310_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=310
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.361346945970525639731166719'
+          - - SiO2
+            - '0.5825302287813890693825782715'
+          - - Ce2O3
+            - '0.05612282524808529088625500943'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '27.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=310
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=310
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=310
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.361346945970525639731166719'
+          - - SiO2
+            - '0.5825302287813890693825782715'
+          - - Ce2O3
+            - '0.05612282524808529088625500943'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=310
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '27.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=310
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=310
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.5'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=310
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=310
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=310
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=310
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '27.5'
+          Ce2O3: '25'
+          SiO2: '47.5'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=310
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_311_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3292182895684980421536411609'
+        - - SiO2
+          - '0.6145356930956399099892210183'
+        - - Ce2O3
+          - '0.05624601733586204785713782081'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000902'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_311_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=311
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3292182895684980421536411609'
+          - - SiO2
+            - '0.6145356930956399099892210183'
+          - - Ce2O3
+            - '0.05624601733586204785713782081'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=311
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=311
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=311
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3292182895684980421536411609'
+          - - SiO2
+            - '0.6145356930956399099892210183'
+          - - Ce2O3
+            - '0.05624601733586204785713782081'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=311
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=311
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=311
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=311
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=311
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=311
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=311
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '25'
+          Ce2O3: '25'
+          SiO2: '50'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=311
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_312_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3296700722093412572008004252'
+        - - SiO2
+          - '0.5991848291034941656592476199'
+        - - Ce2O3
+          - '0.07114509868716457713995195484'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000001906'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_312_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=312
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3296700722093412572008004252'
+          - - SiO2
+            - '0.5991848291034941656592476199'
+          - - Ce2O3
+            - '0.07114509868716457713995195484'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.75'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=312
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=312
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=312
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3296700722093412572008004252'
+          - - SiO2
+            - '0.5991848291034941656592476199'
+          - - Ce2O3
+            - '0.07114509868716457713995195484'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=312
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23.75'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=312
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=312
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=312
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=312
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=312
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=312
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '23.75'
+          Ce2O3: '30'
+          SiO2: '46.25'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=312
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_313_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.2956520223562408209147264108'
+        - - SiO2
+          - '0.6330378856788949812711178596'
+        - - Ce2O3
+          - '0.07131009196486419781415572972'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000903'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_313_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=313
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.2956520223562408209147264108'
+          - - SiO2
+            - '0.6330378856788949812711178596'
+          - - Ce2O3
+            - '0.07131009196486419781415572972'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '21.25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.75'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=313
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=313
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=313
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.2956520223562408209147264108'
+          - - SiO2
+            - '0.6330378856788949812711178596'
+          - - Ce2O3
+            - '0.07131009196486419781415572972'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=313
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '21.25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=313
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=313
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.75'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=313
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=313
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=313
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=313
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '21.25'
+          Ce2O3: '30'
+          SiO2: '48.75'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=313
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_314_ce2o3_activity
+  experiment_id: 10.1007/s11663-018-1471-9::experiment::zhao_2019_ce2o3_activity_runs
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Ce2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ce2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ce2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.2761578202802408241944183023'
+        - - SiO2
+          - '0.6357713798696663448098589972'
+        - - Ce2O3
+          - '0.08807079985009283099572270035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000000482307'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000182'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row uncertainty is printed for Table IV activity or Ce concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: zhao-2019-ce2o3-ternary-thermodynamics::zhao_2019_table_iv_sample_314_ce2o3_activity
+  source_id: zhao-2019-ce2o3-ternary-thermodynamics
+  locator:
+    page: 8
+    published_page: 402
+    pdf_page_index: 7
+    table: IV
+    note: row=314
+  read_from: pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1599.85'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+    pCO_atm:
+      state:
+        tag: value
+        value: '1'
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: method
+    initial_melt_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.2761578202802408241944183023'
+          - - SiO2
+            - '0.6357713798696663448098589972'
+          - - Ce2O3
+            - '0.08807079985009283099572270035'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '18.75'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=314
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1599.85'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=314
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=314
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.2761578202802408241944183023'
+          - - SiO2
+            - '0.6357713798696663448098589972'
+          - - Ce2O3
+            - '0.08807079985009283099572270035'
+          amount_basis: mole_fraction
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=314
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '18.75'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=314
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=314
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.25'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=314
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=314
+        - - original_Ce2O3_wt_pct
+          - state:
+              tag: value
+              value: '35'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=314
+        - - M_Ce2O3_g_mol
+          - state:
+              tag: value
+              value: '328.22900000000004'
+            locator:
+              page: 8
+              published_page: 402
+              pdf_page_index: 7
+              table: IV
+              note: row=314
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '18.75'
+          Ce2O3: '35'
+          SiO2: '46.25'
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+        table: IV
+        note: row=314
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000000482307'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 397
+        pdf_page_index: 2
+        table: section
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=4.76e-16 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000000000000000476'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 397
+              pdf_page_index: 2
+              table: section
+        output_unit: Pa
+        references: []
+  derived_from:
+  - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+  derivation:
+    relation: Table IV activity reduced from measured Ce in liquid Sn using Eqs. [3] and [4].
+    inputs:
+    - pdf:zhao-2019-ce2o3-ternary-thermodynamics
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l

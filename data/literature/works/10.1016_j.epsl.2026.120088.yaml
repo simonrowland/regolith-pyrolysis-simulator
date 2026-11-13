@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:gorojovsky-wood-2026-sulfur-crustal
       role: pdf
@@ -48,6 +48,15 @@ experiments:
         table: '1'
         note: 'Table 1 starting material AJ99 Basanite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 98.6.'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: Table 2 prints a dash for MnO; complete product-glass composition unavailable.
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Product-glass composition in Table 2 prints a dash for MnO.
   conditions:
     temperature_K:
       state:
@@ -215,6 +224,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-Free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '62.2'
+          TiO2: '1.2'
+          Al2O3: '22.5'
+          FeO: '0.08'
+          MnO: '0.12'
+          MgO: '0.92'
+          CaO: '5.2'
+          Na2O: '7.3'
+          K2O: '1.6'
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Measured quenched product glass composition in Table 2 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -910,6 +937,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 100.4.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '59.3'
+          TiO2: '1.8'
+          Al2O3: '20.1'
+          FeO: '5.4'
+          MnO: '0.14'
+          MgO: '1.6'
+          CaO: '2.5'
+          Na2O: '7.8'
+          K2O: '3.6'
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Measured quenched product glass composition in Table 2 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -989,6 +1034,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material AJ99 Basanite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 98.6.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '46.1'
+          TiO2: '4.7'
+          Al2O3: '12.5'
+          FeO: '12.3'
+          MnO: '0.55'
+          MgO: '5.7'
+          CaO: '10.4'
+          Na2O: '3.5'
+          K2O: '1.1'
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Measured quenched product glass composition in Table 2 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -1156,6 +1219,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-Free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '58.8'
+          TiO2: '1.6'
+          Al2O3: '22.4'
+          FeO: '0.12'
+          MnO: '0.13'
+          MgO: '1.6'
+          CaO: '5.1'
+          Na2O: '8.3'
+          K2O: '2.9'
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Measured quenched product glass composition in Table 2 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -1851,6 +1932,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 100.4.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '56.8'
+          TiO2: '1.8'
+          Al2O3: '21.3'
+          FeO: '4.9'
+          MnO: '0.14'
+          MgO: '2.0'
+          CaO: '3.3'
+          Na2O: '8.0'
+          K2O: '3.0'
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Measured quenched product glass composition in Table 2 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -1930,6 +2029,15 @@ experiments:
         table: '1'
         note: 'Table 1 starting material AJ99 Basanite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 98.6.'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: Table 2 prints a dash for MnO; complete product-glass composition unavailable.
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Product-glass composition in Table 2 prints a dash for MnO.
   conditions:
     temperature_K:
       state:
@@ -2097,6 +2205,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-Free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '57.8'
+          TiO2: '1.6'
+          Al2O3: '22.3'
+          FeO: '0.16'
+          MnO: '0.16'
+          MgO: '2.1'
+          CaO: '6.9'
+          Na2O: '6.5'
+          K2O: '1.7'
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Measured quenched product glass composition in Table 2 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -2792,6 +2918,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 100.4.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '58.3'
+          TiO2: '1.7'
+          Al2O3: '21.0'
+          FeO: '4.0'
+          MnO: '0.17'
+          MgO: '2.2'
+          CaO: '3.3'
+          Na2O: '6.7'
+          K2O: '2.2'
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Measured quenched product glass composition in Table 2 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -2871,6 +3015,15 @@ experiments:
         table: '1'
         note: 'Table 1 starting material AJ99 Basanite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 98.6.'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: Table 2 prints a dash for MnO; complete product-glass composition unavailable.
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Product-glass composition in Table 2 prints a dash for MnO.
   conditions:
     temperature_K:
       state:
@@ -2950,6 +3103,15 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Basaltic Andesite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: Table 2 prints a dash for MnO; complete product-glass composition unavailable.
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Product-glass composition in Table 2 prints a dash for MnO.
   conditions:
     temperature_K:
       state:
@@ -3117,6 +3279,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-Free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.4'
+          TiO2: '1.6'
+          Al2O3: '22.7'
+          FeO: '3.6'
+          MnO: '0.19'
+          MgO: '2.7'
+          CaO: '5.8'
+          Na2O: '5.8'
+          K2O: '1.6'
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Measured quenched product glass composition in Table 2 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -3988,6 +4168,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 100.4.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '58.8'
+          TiO2: '1.7'
+          Al2O3: '21.5'
+          FeO: '0.10'
+          MnO: '0.14'
+          MgO: '2.5'
+          CaO: '6.5'
+          Na2O: '6.5'
+          K2O: '2.1'
+      locator:
+        page: 40
+        pdf_page_index: 39
+        table: '2'
+        note: Measured quenched product glass composition in Table 2 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -4067,6 +4265,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '61.1'
+          TiO2: '2.1'
+          Al2O3: '22.3'
+          FeO: '0.11'
+          MnO: '0.16'
+          MgO: '1.5'
+          CaO: '2.2'
+          Na2O: '7.3'
+          K2O: '4.1'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -4146,6 +4362,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60.6'
+          TiO2: '1.7'
+          Al2O3: '21.9'
+          FeO: '0.08'
+          MnO: '0.10'
+          MgO: '0.90'
+          CaO: '2.6'
+          Na2O: '6.1'
+          K2O: '3.7'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -5105,6 +5339,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 100.4.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '61.8'
+          TiO2: '1.6'
+          Al2O3: '19.8'
+          FeO: '3.1'
+          MnO: '0.14'
+          MgO: '1.2'
+          CaO: '1.1'
+          Na2O: '7.7'
+          K2O: '4.3'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -5184,6 +5436,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 100.4.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '61.5'
+          TiO2: '1.8'
+          Al2O3: '18.7'
+          FeO: '4.2'
+          MnO: '0.11'
+          MgO: '1.3'
+          CaO: '2.5'
+          Na2O: '6.5'
+          K2O: '3.7'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -5263,6 +5533,15 @@ experiments:
         table: '1'
         note: 'Table 1 starting material AJ99 Basanite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 98.6.'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints a dash for MnO; complete product-glass composition unavailable.
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Product-glass composition in Table 3 prints a dash for MnO.
   conditions:
     temperature_K:
       state:
@@ -5342,6 +5621,15 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Basaltic Andesite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints a dash for MnO; complete product-glass composition unavailable.
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Product-glass composition in Table 3 prints a dash for MnO.
   conditions:
     temperature_K:
       state:
@@ -5421,6 +5709,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '60.7'
+          TiO2: '1.8'
+          Al2O3: '22.4'
+          FeO: '0.08'
+          MnO: '0.10'
+          MgO: '1.7'
+          CaO: '3.6'
+          Na2O: '7.1'
+          K2O: '3.1'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -6292,6 +6598,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 100.4.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '58.5'
+          TiO2: '1.6'
+          Al2O3: '20.5'
+          FeO: '4.4'
+          MnO: '0.14'
+          MgO: '2.0'
+          CaO: '3.8'
+          Na2O: '7.3'
+          K2O: '3.0'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -6371,6 +6695,15 @@ experiments:
         table: '1'
         note: 'Table 1 starting material AJ99 Basanite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 98.6.'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints a dash for MnO; complete product-glass composition unavailable.
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Product-glass composition in Table 3 prints a dash for MnO.
   conditions:
     temperature_K:
       state:
@@ -6450,6 +6783,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '58.4'
+          TiO2: '1.8'
+          Al2O3: '21.5'
+          FeO: '0.15'
+          MnO: '0.13'
+          MgO: '2.0'
+          CaO: '5.0'
+          Na2O: '7.0'
+          K2O: '2.9'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -7057,6 +7408,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 100.4.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '57.7'
+          TiO2: '2.2'
+          Al2O3: '22.1'
+          FeO: '4.3'
+          MnO: '1.3'
+          MgO: '2.0'
+          CaO: '4.6'
+          Na2O: '2.9'
+          K2O: '3.7'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -7136,6 +7505,15 @@ experiments:
         table: '1'
         note: 'Table 1 starting material AJ99 Basanite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 98.6.'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints a dash for MnO; complete product-glass composition unavailable.
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Product-glass composition in Table 3 prints a dash for MnO.
   conditions:
     temperature_K:
       state:
@@ -7215,6 +7593,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '55.8'
+          TiO2: '2.3'
+          Al2O3: '22.2'
+          FeO: '4.6'
+          MnO: '1.1'
+          MgO: '2.3'
+          CaO: '3.4'
+          Na2O: '3.0'
+          K2O: '4.4'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -7646,6 +8042,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material AJ99 Basanite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 98.6.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '48.2'
+          TiO2: '2.5'
+          Al2O3: '15.8'
+          FeO: '8.8'
+          MnO: '0.37'
+          MgO: '6.2'
+          CaO: '11.0'
+          Na2O: '3.2'
+          K2O: '1.0'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -8165,6 +8579,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 100.4.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '56.0'
+          TiO2: '1.6'
+          Al2O3: '21.7'
+          FeO: '5.1'
+          MnO: '0.14'
+          MgO: '2.0'
+          CaO: '4.4'
+          Na2O: '7.2'
+          K2O: '2.7'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:
@@ -8244,6 +8676,15 @@ experiments:
         table: '1'
         note: 'Table 1 starting material AJ99 Basanite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot stored
           as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 98.6.'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: Table 3 prints a dash for MnO; complete product-glass composition unavailable.
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Product-glass composition in Table 3 prints a dash for MnO.
   conditions:
     temperature_K:
       state:
@@ -8323,6 +8764,24 @@ experiments:
         table: '1'
         note: 'Table 1 starting material Fe-free T-Phonolite; superscript a: Boulliung and Wood 2022, 2023; printed FeOtot
           stored as FeOT using the existing total-iron-as-FeO composition convention; printed total wt.% = 99.0.'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '59.9'
+          TiO2: '1.8'
+          Al2O3: '22.2'
+          FeO: '0.07'
+          MnO: '0.13'
+          MgO: '2.1'
+          CaO: '5.3'
+          Na2O: '5.8'
+          K2O: '2.1'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '3'
+        note: Measured quenched product glass composition in Table 3 (wt.%).
   conditions:
     temperature_K:
       state:

@@ -63,6 +63,8 @@ observations:
     parameters: []
     output_unit: kJ/mol
     references: []
+  provenance:
+    printed_phase: Type_B_CAI_like_liquid_B133
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_mg_isotope_alpha_vacuum
   experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
   identity:
@@ -106,6 +108,8 @@ observations:
     section: Results and discussion
     note: Rayleigh fit; no apparent distinction as to sample size
   read_from: pdf:ta-mendybaev-2002-lpsc
+  provenance:
+    printed_phase: Type_B_CAI_like_liquid_B133_residue
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1600C_1mm_loops
   experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
   identity:
@@ -162,6 +166,8 @@ observations:
         section: Results and discussion
         note: 'Printed triad: weight loss rates of 1.0 mm samples evaporated at 1800 C, 1700 C and 1600 C are ~1.1x10^-5,
           ~2x10^-6 and ~3x10^-7 g/mm^2/min, respectively.'
+  provenance:
+    printed_phase: Type_B_CAI_like_liquid_B133
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
   experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
   identity:
@@ -218,6 +224,8 @@ observations:
         section: Results and discussion
         note: 'Printed triad: weight loss rates of 1.0 mm samples evaporated at 1800 C, 1700 C and 1600 C are ~1.1x10^-5,
           ~2x10^-6 and ~3x10^-7 g/mm^2/min, respectively.'
+  provenance:
+    printed_phase: Type_B_CAI_like_liquid_B133
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
   experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
   identity:
@@ -271,6 +279,8 @@ observations:
       locator:
         pdf_page_index: 1
         section: Results and discussion
+  provenance:
+    printed_phase: Type_B_CAI_like_liquid_B133
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_large_loops
   experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
   identity:
@@ -325,3 +335,5 @@ observations:
         pdf_page_index: 1
         section: Results and discussion
         note: prose average for 2.5, 3.3 and 6.0 mm diameter samples at 1800 C
+  provenance:
+    printed_phase: Type_B_CAI_like_liquid_B133
