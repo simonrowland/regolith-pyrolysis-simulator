@@ -620,6 +620,45 @@ def continuity_residuals(
     }
 
 
+def _reaction_delta_g_over_RT(
+    terms: Sequence[tuple[float, ThermoState | float]],
+) -> float:
+    """Σ ν_i G°_i/(R T) for one reaction at one T.
+
+    Same sum ``reaction_equilibrium_constant`` exponentiates. Split out so a
+    caller that needs log(K) = −ΔG°/(R T) does not have to materialise K when
+    K itself overflows float64. Non-finite ν or G°/(R T) raises
+    :class:`NasaCeaError`. ThermoState terms at two temperatures raise
+    :class:`NasaCeaDomainError`.
+    """
+
+    delta_g_over_RT = 0.0
+    seen_T: float | None = None
+    for nu, state in terms:
+        nu_f = _require_finite_number(nu, what="reaction ν", err=NasaCeaError)
+        if isinstance(state, ThermoState):
+            t = _require_positive_finite_T(
+                state.T_K, what="reaction ThermoState.T_K"
+            )
+            if seen_T is None:
+                seen_T = t
+            elif t != seen_T:
+                raise NasaCeaDomainError(
+                    "reaction_equilibrium_constant received ThermoState "
+                    f"objects at {seen_T} K and {t} K; ΔG°/RT is only "
+                    "defined at one T"
+                )
+            g_over_RT = _require_finite_number(
+                state.g_over_RT, what="reaction G°/RT", err=NasaCeaError
+            )
+        else:
+            g_over_RT = _require_finite_number(
+                state, what="reaction G°/RT", err=NasaCeaError
+            )
+        delta_g_over_RT += nu_f * g_over_RT
+    return delta_g_over_RT
+
+
 def reaction_equilibrium_constant(
     terms: Sequence[tuple[float, ThermoState | float]],
     *,
@@ -659,37 +698,292 @@ def reaction_equilibrium_constant(
     function does not require a non-empty reaction. ``T_K`` is accepted for
     call-site documentation and is not used in the exponent.
     """
-    delta_g_over_RT = 0.0
-    seen_T: float | None = None
-    for nu, state in terms:
-        nu_f = _require_finite_number(nu, what="reaction ν", err=NasaCeaError)
-        if isinstance(state, ThermoState):
-            t = _require_positive_finite_T(
-                state.T_K, what="reaction ThermoState.T_K"
-            )
-            if seen_T is None:
-                seen_T = t
-            elif t != seen_T:
-                raise NasaCeaDomainError(
-                    "reaction_equilibrium_constant received ThermoState "
-                    f"objects at {seen_T} K and {t} K; ΔG°/RT is only "
-                    "defined at one T"
-                )
-            g_over_RT = _require_finite_number(
-                state.g_over_RT, what="reaction G°/RT", err=NasaCeaError
-            )
-        else:
-            g_over_RT = _require_finite_number(
-                state, what="reaction G°/RT", err=NasaCeaError
-            )
-        delta_g_over_RT += nu_f * g_over_RT
     # T_K is accepted for call-site documentation; the ratio form already
     # cancels R T, so evaluation does not re-scale by T and does not compare
     # T_K to ThermoState.T_K.
     del T_K
     return _exp_neg_delta_g_over_RT(
-        delta_g_over_RT, what="reaction_equilibrium_constant"
+        _reaction_delta_g_over_RT(terms),
+        what="reaction_equilibrium_constant",
     )
+
+
+# CEA / JANAF standard pressure. 1 bar = 1e5 Pa. JANAF prints p° = 0.1 MPa.
+# This law does not switch condensed records to 1 atm.
+WALL_STANDARD_PRESSURE_PA = 100_000.0
+
+
+class WallSaturationLawRefusal(NasaCeaError):
+    """Typed refusal from the wall-saturation law. ``reason`` is the token."""
+
+    def __init__(self, reason: str, detail: str = "") -> None:
+        self.reason = str(reason)
+        self.detail = str(detail)
+        message = f"wall_saturation_law_refused: reason={self.reason}"
+        if self.detail:
+            message = f"{message} detail={self.detail}"
+        super().__init__(message)
+
+
+@dataclass(frozen=True)
+class WallCondensedTerm:
+    """One condensed product, stoichiometry as written (not per mole of vapour)."""
+
+    species: str
+    stoichiometry: float
+    g_over_RT: ThermoState | float
+
+
+@dataclass(frozen=True)
+class WallSaturationReaction:
+    """One admissible wall reaction with Gibbs terms already resolved.
+
+    The caller has already chosen the condensed record whose interval contains
+    T and has already checked atom balance. This object does not look up files.
+    ``nu_O2`` is signed: positive when O2 is consumed, negative when released.
+    """
+
+    reaction_id: str
+    nu_vapour: float
+    g_vapour: ThermoState | float
+    condensed: tuple[WallCondensedTerm, ...]
+    nu_O2: float = 0.0
+    g_oxygen: ThermoState | float | None = None
+
+
+@dataclass(frozen=True)
+class WallSaturationLawResult:
+    """Operative wall equilibrium: the reaction with the lowest Psat."""
+
+    pressure_Pa: float
+    reaction_id: str
+    nu_vapour: float
+    nu_O2: float
+    # Signed O2 per mole of vapour. Positive is a debit, negative a credit.
+    o2_mol_per_mol_vapour: float
+    products_mol_per_mol_vapour: tuple[tuple[str, float], ...]
+
+
+def _wall_g_over_rt(
+    state: ThermoState | float,
+    *,
+    T_K: float,
+    what: str,
+) -> float:
+    if isinstance(state, ThermoState):
+        t = _require_positive_finite_T(state.T_K, what=f"{what}.T_K")
+        if t != T_K:
+            raise NasaCeaDomainError(
+                f"{what} is at {t} K but the wall law was asked for {T_K} K"
+            )
+        return _require_finite_number(
+            state.g_over_RT, what=f"{what} G°/RT", err=NasaCeaError
+        )
+    return _require_finite_number(state, what=f"{what} G°/RT", err=NasaCeaError)
+
+
+def wall_saturation_pressure_pa(
+    reaction: WallSaturationReaction,
+    *,
+    T_K: float,
+    pO2_Pa: float | None = None,
+    standard_pressure_Pa: float = WALL_STANDARD_PRESSURE_PA,
+) -> float:
+    """Equilibrium vapour pressure of one wall reaction, in pascals.
+
+    Derivation
+    ----------
+    Premise. Wall saturation is equilibrium between the vapour and the
+    condensed phases stable at the wall, each condensed activity 1. It is
+    not the melt source reaction. The gas standard state is the ideal gas
+    at P° = 1 bar = 1e5 Pa, the pressure ``reaction_equilibrium_constant``
+    assumes and the pressure JANAF labels 0.1 MPa. Melt activity and the
+    source pO2 exponent do not appear.
+
+    Algebra. Per extent, with ν_v > 0 and ν_O2 signed (positive when O2 is
+    consumed, negative when it is released, zero for congruent condensation,
+    disproportionation, and metal-cluster association)::
+
+        ν_v V(g) + ν_O2 O2(g) = Σ_s ν_s S(s, l)
+        ΔG°/(R T) = Σ_s ν_s G_s/(R T) − ν_v G_v/(R T) − ν_O2 G_O2/(R T)
+        K = exp(−ΔG°/(R T)) = reaction_equilibrium_constant(...)
+        (p_v / P°) ^ ν_v · (pO2 / P°) ^ ν_O2 = 1 / K
+        p_v = P° · exp(ΔG°/(ν_v R T)) · (pO2 / P°) ^ (−ν_O2 / ν_v)
+
+    K is not recomputed here by a second exponential. The pressure line is
+    the mass-action solve for p_v.
+
+    Units. G/(R T) and K are dimensionless in the 1 bar standard state.
+    p_v, pO2, and P° are pascals. (pO2/P°) is dimensionless. T is kelvin
+    and is used to require that every ThermoState was evaluated at that T.
+    A float G/(R T) has no temperature of its own.
+
+    Limiting cases.
+    Congruent ``M(g) = M(s)`` (ν_v = 1, ν_O2 = 0) gives
+    ``Psat = P° · exp(−(G_g − G_s)/(R T))``, which is P° times
+    ``NasaCeaPolynomial.pure_psat_over_Pstd``. Below the boiling point
+    G_g > G_s and Psat < P°.
+    Disproportionation uses the same ν_O2 = 0 reduction with ν_v > 1.
+    SiO, ν_v = 2: ``Psat = P° · exp(ΔrG / (2 R T))`` with
+    ``ΔrG = G_Si + G_SiO2 − 2 G_SiO``.
+    pO2 → 0 with ν_O2 > 0 sends Psat → +∞. pO2 → ∞ with ν_O2 > 0 sends
+    Psat → 0. pO2 → 0 with ν_O2 < 0 sends Psat → 0.
+    A missing pO2 is not that limit. ν_O2 ≠ 0 and pO2 is None raises
+    ``WallSaturationLawRefusal`` with reason ``wall_pO2_required``.
+    A provided pO2 that is negative or non-finite raises reason
+    ``wall_pO2_invalid``. pO2 = 0 is the limit above, not a missing value.
+    """
+
+    T = _require_positive_finite_T(T_K, what="wall T_K")
+    nu_v = _require_finite_number(
+        reaction.nu_vapour, what="wall ν_v", err=NasaCeaError
+    )
+    if nu_v <= 0.0:
+        raise NasaCeaError(
+            f"wall ν_v must be > 0; got {reaction.nu_vapour!r} "
+            f"for {reaction.reaction_id!r}"
+        )
+    if not reaction.condensed:
+        raise NasaCeaError(
+            f"wall reaction {reaction.reaction_id!r} has no condensed product"
+        )
+    nu_O2 = _require_finite_number(
+        reaction.nu_O2, what="wall ν_O2", err=NasaCeaError
+    )
+    P_std = _require_finite_number(
+        standard_pressure_Pa, what="wall P°", err=NasaCeaError
+    )
+    if P_std <= 0.0:
+        raise NasaCeaError(f"wall P° must be > 0 Pa; got {standard_pressure_Pa!r}")
+
+    g_vapour = _wall_g_over_rt(reaction.g_vapour, T_K=T, what="wall vapour")
+    terms: list[tuple[float, float]] = [(-nu_v, g_vapour)]
+    for index, product in enumerate(reaction.condensed):
+        nu_s = _require_finite_number(
+            product.stoichiometry,
+            what=f"wall ν_{product.species}",
+            err=NasaCeaError,
+        )
+        if nu_s <= 0.0:
+            raise NasaCeaError(
+                f"wall condensed stoichiometry must be > 0; "
+                f"{product.species!r} has {product.stoichiometry!r}"
+            )
+        g_s = _wall_g_over_rt(
+            product.g_over_RT,
+            T_K=T,
+            what=f"wall condensed[{index}] {product.species}",
+        )
+        terms.append((nu_s, g_s))
+    if nu_O2 != 0.0:
+        if pO2_Pa is None:
+            raise WallSaturationLawRefusal(
+                "wall_pO2_required",
+                f"{reaction.reaction_id} has ν_O2={nu_O2} and no parcel pO2",
+            )
+        try:
+            p_O2 = float(pO2_Pa)
+        except (TypeError, ValueError) as exc:
+            raise WallSaturationLawRefusal(
+                "wall_pO2_invalid",
+                f"parcel pO2 must be a number of pascals; got {pO2_Pa!r}",
+            ) from exc
+        if not math.isfinite(p_O2) or p_O2 < 0.0:
+            raise WallSaturationLawRefusal(
+                "wall_pO2_invalid",
+                f"parcel pO2 must be finite and ≥ 0 Pa; got {pO2_Pa!r}",
+            )
+        if reaction.g_oxygen is None:
+            raise WallSaturationLawRefusal(
+                "wall_condensation_thermo_missing",
+                f"{reaction.reaction_id} needs G°/RT of O2",
+            )
+        g_O2 = _wall_g_over_rt(reaction.g_oxygen, T_K=T, what="wall O2")
+        terms.append((-nu_O2, g_O2))
+        if p_O2 == 0.0:
+            # (pO2/P°)^(−ν_O2/ν_v) is singular at zero. The sign of ν_O2
+            # fixes which side of the singularity this reaction sits on.
+            if nu_O2 > 0.0:
+                return math.inf
+            return 0.0
+        log_po2_term = (-nu_O2 / nu_v) * math.log(p_O2 / P_std)
+    else:
+        log_po2_term = 0.0
+
+    # ΔG°/(R T) is the sum inside reaction_equilibrium_constant.
+    # log(K) = −ΔG°/(R T). K itself is not materialised: a stable condensate
+    # has K above the float64 range while Psat = P°·K^(−1/ν_v) stays finite.
+    # log(p_v/P°) = (ΔG°/(R T))/ν_v + (−ν_O2/ν_v) log(pO2/P°).
+    delta_g_over_RT = _reaction_delta_g_over_RT(terms)
+    log_pressure_ratio = delta_g_over_RT / nu_v + log_po2_term
+    try:
+        pressure_Pa = P_std * math.exp(log_pressure_ratio)
+    except OverflowError:
+        return math.inf
+    if pressure_Pa < 0.0 or not math.isfinite(pressure_Pa):
+        if math.isinf(pressure_Pa):
+            return math.inf
+        raise NasaCeaError(
+            f"wall Psat for {reaction.reaction_id!r} is not finite and ≥ 0: "
+            f"{pressure_Pa!r}"
+        )
+    return pressure_Pa
+
+
+def operative_wall_saturation(
+    reactions: Sequence[WallSaturationReaction],
+    *,
+    T_K: float,
+    pO2_Pa: float | None = None,
+    standard_pressure_Pa: float = WALL_STANDARD_PRESSURE_PA,
+) -> WallSaturationLawResult:
+    """``Psat_wall = min Psat`` over the admissible reactions.
+
+    A missing parcel pO2 refuses the species when any reaction has
+    ν_O2 ≠ 0, including when another reaction has ν_O2 = 0. The winner,
+    and therefore the ledger, depends on pO2. Returning the
+    disproportionation pressure would book the wrong condensate.
+    ν_O2 = 0 reactions do not read pO2. The first declared reaction wins
+    an exact tie.
+    """
+
+    if not reactions:
+        raise WallSaturationLawRefusal(
+            "wall_condensation_thermo_missing",
+            "no admissible wall reaction",
+        )
+    if any(reaction.nu_O2 != 0.0 for reaction in reactions) and pO2_Pa is None:
+        raise WallSaturationLawRefusal(
+            "wall_pO2_required",
+            "at least one admissible wall reaction consumes or releases O2",
+        )
+    winner: WallSaturationLawResult | None = None
+    winner_pressure = math.inf
+    for reaction in reactions:
+        pressure_Pa = wall_saturation_pressure_pa(
+            reaction,
+            T_K=T_K,
+            pO2_Pa=pO2_Pa,
+            standard_pressure_Pa=standard_pressure_Pa,
+        )
+        if winner is not None and not pressure_Pa < winner_pressure:
+            continue
+        nu_v = float(reaction.nu_vapour)
+        products = tuple(
+            (term.species, float(term.stoichiometry) / nu_v)
+            for term in reaction.condensed
+        )
+        winner_pressure = pressure_Pa
+        winner = WallSaturationLawResult(
+            pressure_Pa=pressure_Pa,
+            reaction_id=str(reaction.reaction_id),
+            nu_vapour=nu_v,
+            nu_O2=float(reaction.nu_O2),
+            o2_mol_per_mol_vapour=float(reaction.nu_O2) / nu_v,
+            products_mol_per_mol_vapour=products,
+        )
+    assert winner is not None
+    return winner
 
 
 __all__ = [
@@ -705,6 +999,13 @@ __all__ = [
     "R_J_PER_MOL_K",
     "StandardState",
     "ThermoState",
+    "WALL_STANDARD_PRESSURE_PA",
+    "WallCondensedTerm",
+    "WallSaturationLawRefusal",
+    "WallSaturationLawResult",
+    "WallSaturationReaction",
     "continuity_residuals",
+    "operative_wall_saturation",
     "reaction_equilibrium_constant",
+    "wall_saturation_pressure_pa",
 ]
