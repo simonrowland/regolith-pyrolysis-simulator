@@ -10373,13 +10373,30 @@ def test_superscript_cell_family_certifies_or_refuses(tmp_path: Path):
 
     ``<sup>2</sup>`` has an empty base. That cell refuses with
     ``superscript_in_cell``. ``0<sup>2</sup>`` is ``0**2``, which is
-    positive zero, so ``0.0`` certifies and ``-0.0`` refuses. The sign
-    comparison is ``_same_signed_decimal`` on both the plain-cell path
-    and the two superscript equalities. The expected sign bits come from
-    ``Decimal``, not from the gate.
+    positive zero, so ``0.0`` certifies and ``-0.0`` refuses.
+    ``-0<sup>2</sup>`` is that power negated with ``copy_negate``, so
+    ``-0.0`` certifies and ``0.0`` refuses. The product is one context
+    that traps an inexact result. ``12345678901234567890123456789<sup>1</sup>``
+    refuses the rounded spelling ``1.2345678901234567890123456790e28``.
+    ``10<sup>-1000</sup>`` refuses 0. ``1.5×10<sup>3</sup>`` certifies
+    1500. The sign comparison is ``_same_signed_decimal`` on both the
+    plain-cell path and the two superscript equalities. The expected
+    sign bits come from ``Decimal``, not from the gate.
     """
     reader = inspect.getsource(vle._read_superscript_power)
     assert 'prefix[:1] in {"+", "-"}' in reader
+    assert "with localcontext() as ctx:" in reader
+    assert "value.copy_negate()" in reader
+    for trap in (
+        "Inexact",
+        "Rounded",
+        "Underflow",
+        "Overflow",
+        "Subnormal",
+        "InvalidOperation",
+    ):
+        assert f"ctx.traps[{trap}] = True" in reader
+    assert not hasattr(vle, "_power_product")
     leaf = inspect.getsource(vle._superscript_leaf_certifies)
     assert leaf.count("and _same_signed_decimal") == 2
     assert "_same_signed_decimal" in inspect.getsource(vle._cell_certifies_leaf)
@@ -10388,10 +10405,42 @@ def test_superscript_cell_family_certifies_or_refuses(tmp_path: Path):
     negative_zero = Decimal(repr(-0.0))
     assert positive_zero.as_tuple().sign == 0
     assert negative_zero.as_tuple().sign == 1
+    negated = vle._superscript_power_decimal("-02", ((2, 3),))
+    assert negated is not None and negated.is_zero()
+    assert negated.as_tuple().sign == 1
+    long_base = "12345678901234567890123456789"
+    assert (
+        vle._superscript_power_decimal(
+            long_base + "1", ((len(long_base), len(long_base) + 1))
+        )
+        is None
+    )
+    tiny = vle._superscript_power_decimal("10-1000", ((2, 7),))
+    assert tiny is None or not tiny.is_zero()
+    assert vle._superscript_power_decimal("1.5\u00d7103", ((6, 7),)) == Decimal(1500)
     pins = (
         ("<table><tr><td><sup>2</sup></td></tr></table>\n", 2, False),
         ("<table><tr><td>0<sup>2</sup></td></tr></table>\n", 0.0, True),
         ("<table><tr><td>0<sup>2</sup></td></tr></table>\n", -0.0, False),
+        ("<table><tr><td>-0<sup>2</sup></td></tr></table>\n", -0.0, True),
+        ("<table><tr><td>-0<sup>2</sup></td></tr></table>\n", 0.0, False),
+        (
+            "<table><tr><td>12345678901234567890123456789<sup>1</sup></td></tr></table>\n",
+            "1.2345678901234567890123456790e28",
+            False,
+        ),
+        (
+            "<table><tr><td>12345678901234567890123456789<sup>1</sup></td></tr></table>\n",
+            1.2345678901234567890123456790e28,
+            False,
+        ),
+        ("<table><tr><td>10<sup>-1000</sup></td></tr></table>\n", 0, False),
+        ("<table><tr><td>10<sup>-1000</sup></td></tr></table>\n", 0.0, False),
+        (
+            "<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n",
+            1500,
+            True,
+        ),
     )
     for cell, pin, accepts in pins:
         doc = _html_source_document(

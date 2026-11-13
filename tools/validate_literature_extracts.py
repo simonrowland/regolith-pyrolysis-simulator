@@ -67,7 +67,15 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   including ``<sup>2</sup>``, is ``superscript_in_cell`` and does not
   raise. ``10<sup>3</sup>2`` and any other leading or trailing content
   are ``superscript_in_cell``, as is a plain number. ``0<sup>2</sup>``
-  certifies ``0.0`` and does not certify ``-0.0``. A value in another row
+  certifies ``0.0`` and does not certify ``-0.0``. ``-0<sup>2</sup>``
+  is that power negated with ``copy_negate``, so it certifies ``-0.0``
+  and does not certify ``0.0``. The power, including a times-ten
+  product, is one ``localcontext`` that traps inexact, rounded,
+  underflow, overflow, subnormal, and invalid results. Any of those is
+  ``superscript_in_cell``. ``12345678901234567890123456789<sup>1</sup>``
+  does not certify ``1.2345678901234567890123456790e28``.
+  ``10<sup>-1000</sup>`` does not certify 0. ``1.5×10<sup>3</sup>``
+  still certifies 1500. A value in another row
   does not certify. Formula and species labels are normalized before every
   comparison, including a label with no ASCII digit. Markup folds
   inside each whitespace token and does not delete a separator. ``_{n}``,
@@ -181,7 +189,17 @@ import csv
 import hashlib
 from copy import deepcopy
 from dataclasses import dataclass, field
-from decimal import Decimal, DecimalException
+from decimal import (
+    Decimal,
+    DecimalException,
+    Inexact,
+    InvalidOperation,
+    Overflow,
+    Rounded,
+    Subnormal,
+    Underflow,
+    localcontext,
+)
 from functools import lru_cache
 import math
 import os
@@ -874,16 +892,6 @@ _SUPERSCRIPT_CELL_RE = re.compile(
 )
 
 
-def _power_product(base: Decimal, exponent: int) -> Decimal | None:
-    try:
-        value = base ** exponent
-    except (ArithmeticError, DecimalException):
-        return None
-    if not value.is_finite():
-        return None
-    return value
-
-
 def _superscript_power_decimal(
     text: str, spans: tuple[tuple[int, int], ...]
 ) -> Decimal | None:
@@ -899,7 +907,12 @@ def _superscript_power_decimal(
     is ``10**3``, which is ``1e3``. ``1.5×10<sup>3</sup>`` is
     ``1.5 * 10**3``. A trailing or leading extra, including
     ``10<sup>3</sup>2``, is not a power. A missing base, including
-    ``<sup>2</sup>``, is not a power. This is the only signed-power
+    ``<sup>2</sup>``, is not a power. ``-0<sup>2</sup>`` is ``-(0**2)``.
+    ``copy_negate`` keeps that negative zero. The product is evaluated
+    in one context that traps an inexact, rounded, underflow, overflow,
+    subnormal, or invalid result, and that result is not a power.
+    ``12345678901234567890123456789<sup>1</sup>`` and ``10<sup>-1000</sup>``
+    do not certify a rounded stand-in or 0. This is the only signed-power
     parser. Any failure, including an empty prefix, returns None. The
     caller refuses with ``superscript_in_cell``.
     """
@@ -924,14 +937,14 @@ def _read_superscript_power(
     if not re.fullmatch(r"[+\-]?\d+", exponent):
         return None
     prefix = _fold_numeric_signs(text[:start].strip())
-    sign = Decimal(1)
+    negative = False
     # One optional leading sign. The base pattern is unsigned, so a
     # second sign, including ``--``, ``+-``, and a folded ``-−``, refuses.
     # ``"" in "+-"`` is true, so the test is a one-character set. An empty
     # prefix, as in ``<sup>2</sup>``, is a missing base and is not indexed.
     if prefix[:1] in {"+", "-"}:
         if prefix[0] == "-":
-            sign = Decimal(-1)
+            negative = True
         prefix = prefix[1:].strip()
     parsed = _SUPERSCRIPT_CELL_RE.fullmatch(prefix)
     if parsed is None:
@@ -940,20 +953,24 @@ def _read_superscript_power(
     if base is None:
         return None
     power = int(exponent)
-    if parsed.group(2) is None:
-        value = _power_product(base, power)
-    else:
-        factor = _power_product(Decimal(10), power)
-        if factor is None:
-            return None
-        try:
-            value = base * factor
-        except (ArithmeticError, DecimalException):
-            return None
-    if value is None or not value.is_finite():
+    # One exact product. Unary negation drops the sign of zero, so a
+    # negative result uses copy_negate. A trap is not a rounded stand-in.
+    try:
+        with localcontext() as ctx:
+            ctx.traps[Inexact] = True
+            ctx.traps[Rounded] = True
+            ctx.traps[Underflow] = True
+            ctx.traps[Overflow] = True
+            ctx.traps[Subnormal] = True
+            ctx.traps[InvalidOperation] = True
+            if parsed.group(2) is None:
+                value = base ** power
+            else:
+                value = base * (Decimal(10) ** power)
+            if negative:
+                value = value.copy_negate()
+    except (ArithmeticError, DecimalException):
         return None
-    if sign < 0:
-        value = -value
     if not value.is_finite():
         return None
     return value
@@ -993,8 +1010,9 @@ def _superscript_leaf_certifies(
     ``103`` does not, because it is not that power. A string certifies
     only as ``1e3``, ``10^3``, or ``1×10^3`` (the same value). Extra
     characters in the cell are not a power. ``0<sup>2</sup>`` certifies
-    ``0.0`` and does not certify ``-0.0``. Both comparisons use
-    ``_same_signed_decimal``.
+    ``0.0`` and does not certify ``-0.0``. ``-0<sup>2</sup>`` certifies
+    ``-0.0`` and does not certify ``0.0``. An inexact power certifies
+    nothing. Both comparisons use ``_same_signed_decimal``.
     """
     power = _superscript_power_decimal(text, spans)
     if power is None:
@@ -3986,7 +4004,15 @@ def fidelity_source_warnings(
     ``+-10<sup>2</sup>``, and ``-−10<sup>2</sup>`` are
     ``superscript_in_cell``. A missing base, including ``<sup>2</sup>``,
     is the same refusal and does not raise. ``0<sup>2</sup>`` certifies
-    ``0.0`` and does not certify ``-0.0``. The sign of zero is
+    ``0.0`` and does not certify ``-0.0``. ``-0<sup>2</sup>`` certifies
+    ``-0.0`` and does not certify ``0.0``, because negation uses
+    ``copy_negate``. The power is one context that traps an inexact,
+    rounded, underflow, overflow, subnormal, or invalid result. Any of
+    those is ``superscript_in_cell``.
+    ``12345678901234567890123456789<sup>1</sup>`` does not certify
+    ``1.2345678901234567890123456790e28``, and ``10<sup>-1000</sup>``
+    does not certify 0. ``1.5×10<sup>3</sup>`` still certifies 1500.
+    The sign of zero is
     ``_same_signed_decimal``, the comparison a plain numeric cell uses.
     ``10<sup>3</sup>2`` and a number that is not that power are
     ``superscript_in_cell``. ``103`` is not. A stored integer uses the

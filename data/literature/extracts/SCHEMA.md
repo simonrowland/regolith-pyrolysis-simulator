@@ -226,6 +226,13 @@ certify. A second sign is not that grammar: `--10<sup>2</sup>`,
 other leading or trailing content are `superscript_in_cell`. A missing
 base, including `<sup>2</sup>`, is `superscript_in_cell` and does not
 raise. `0<sup>2</sup>` certifies `0.0` and does not certify `-0.0`.
+`-0<sup>2</sup>` is that power negated with `copy_negate`, so it certifies
+`-0.0` and does not certify `0.0`. The power, including a times-ten
+product, is computed in one decimal context that traps an inexact,
+rounded, underflow, overflow, subnormal, or invalid result. Any of those
+is `superscript_in_cell`. `12345678901234567890123456789<sup>1</sup>`
+does not certify `1.2345678901234567890123456790e28`. `10<sup>-1000</sup>`
+does not certify 0. `1.5×10<sup>3</sup>` still certifies 1500.
 The sign of zero is the same comparison a plain numeric cell uses. A stored
 integer uses the same numeric equality as a float, so `10<sup>3</sup>`
 certifies `1000` and `1000.0`, and `103` does not. A string certifies
