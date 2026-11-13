@@ -6,14 +6,13 @@ import hashlib
 from collections import Counter
 from pathlib import Path
 
-import yaml
-
 from simulator.battery.enums import AdmissionStatus, NoticeKind
 from simulator.battery.migrate import (
     REPO_ROOT,
     iter_observation_store_paths,
     iter_work_store_paths,
     load_migrated_store,
+    _load_yaml_text,
 )
 from simulator.battery.validate import ValidationIssue, validate_corpus
 
@@ -101,7 +100,7 @@ def validate_migrated_store(root: Path | None = None) -> dict[str, object]:
         source = work_path.read_text(encoding="utf-8")
         if not any(context_id in source for context_id in referenced_context_ids):
             continue
-        payload = yaml.safe_load(source) or {}
+        payload = _load_yaml_text(source) or {}
         for row in payload.get("context") or ():
             context_id = str(row["context_id"])
             if context_id in referenced_context_ids:
