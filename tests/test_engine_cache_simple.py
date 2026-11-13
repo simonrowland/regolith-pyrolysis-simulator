@@ -40,59 +40,66 @@ def _engine_cache_counters(*, reset: bool = False):
 
 
 @pytest.mark.parametrize(
-    ("engine", "missing_fields"),
-    (
-        ("openimcc", ("pack", "gas_pack")),
-        (
-            "alphamelts",
-            (
-                "python_api_model",
-                "transport",
-                "effective_calc_mode",
-                "raw_model_name",
-                "redox_buffer",
-                "fO2_offset",
-                "Fe3Fet_ratio",
-                "configured_vapor_transport_pO2_bar",
-                "configured_vapor_transport_floor_bar",
-            ),
-        ),
-        (
-            "vaporock",
-            ("temperature_units", "pressure_units", "vapor_pressure_units"),
-        ),
-        ("magemin", ("database", "bridge", "fO2_buffer")),
-        (
-            "thermoengine",
-            (
-                "model",
-                "configured_vapor_transport_pO2_bar",
-                "configured_vapor_transport_floor_bar",
-                "redox_buffer",
-                "fO2_offset",
-                "Fe3Fet_ratio",
-            ),
-        ),
-    ),
+    "engine", tuple(engine_cache._ENGINE_CACHE_SETTINGS_PROJECTIONS)
 )
-def test_engine_cache_settings_rejects_missing_normalized_fields(
+def test_engine_cache_settings_rejects_each_missing_normalized_field(
     engine: str,
-    missing_fields: tuple[str, ...],
 ) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
     from simulator.engine_cache import (
         EngineCacheSettingsError,
         engine_cache_settings,
     )
 
+    projection_fields = tuple(
+        engine_cache._ENGINE_CACHE_SETTINGS_PROJECTIONS[engine]
+    )
     with pytest.raises(EngineCacheSettingsError) as exc_info:
         engine_cache_settings(engine, {})
 
-    error = exc_info.value
-    assert error.engine_name == engine
-    assert error.missing_fields == missing_fields
-    assert engine in str(error)
-    assert all(field in str(error) for field in missing_fields)
-    assert "normalize_engine_settings(...)" in str(error)
+    assert exc_info.value.engine_name == engine
+    assert exc_info.value.missing_fields == projection_fields
+    assert "normalize_engine_settings(...)" in str(exc_info.value)
+
+    normalized = normalize_engine_settings(engine, None)
+    for field in projection_fields:
+        incomplete = dict(normalized)
+        del incomplete[field]
+        with pytest.raises(EngineCacheSettingsError) as exc_info:
+            engine_cache_settings(engine, incomplete)
+        assert exc_info.value.engine_name == engine
+        assert exc_info.value.missing_fields == (field,)
+
+
+@pytest.mark.parametrize(
+    "engine", tuple(engine_cache._ENGINE_CACHE_SETTINGS_PROJECTIONS)
+)
+def test_engine_cache_settings_ignores_unprojected_fields(engine: str) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        normalize_engine_settings,
+    )
+    from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
+        engine_cache_key,
+        engine_cache_settings,
+    )
+
+    normalized = normalize_engine_settings(engine, None)
+    with_extra = {**normalized, "unprojected_test_field": "ignored"}
+    projection = engine_cache_settings(engine, normalized)
+
+    assert engine_cache_settings(engine, with_extra) == projection
+    assert engine_cache_key(
+        engine,
+        ENGINE_CHEMISTRY_VERSION[engine],
+        {"engine_settings": engine_cache_settings(engine, with_extra)},
+    ) == engine_cache_key(
+        engine,
+        ENGINE_CHEMISTRY_VERSION[engine],
+        {"engine_settings": projection},
+    )
 
 
 def _bootstrap_cache_counter_worker():

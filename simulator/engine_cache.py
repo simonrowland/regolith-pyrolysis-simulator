@@ -191,6 +191,40 @@ def engine_cache_key(engine_id: str, chem_version: str | int, request: Any) -> b
     return hashlib.sha256(payload).digest()
 
 
+def _tuple_to_list_if_needed(value: Any) -> Any:
+    return list(value) if isinstance(value, tuple) else value
+
+
+_ENGINE_CACHE_SETTINGS_PROJECTIONS: dict[str, dict[str, Any]] = {
+    "openimcc": {"pack": "melt_pack", "gas_pack": None},
+    "alphamelts": {
+        "transport": "transport_mode",
+        "effective_calc_mode": None,
+        "raw_model_name": "model",
+        "python_api_model": _tuple_to_list_if_needed,
+        "redox_buffer": None,
+        "fO2_offset": "fo2_offset",
+        "Fe3Fet_ratio": "fe3fet_ratio",
+        "configured_vapor_transport_pO2_bar": "vapor_transport_pO2_bar",
+        "configured_vapor_transport_floor_bar": "vapor_transport_floor_bar",
+    },
+    "vaporock": {
+        "temperature_units": None,
+        "pressure_units": None,
+        "vapor_pressure_units": None,
+    },
+    "magemin": {"database": None, "bridge": None, "fO2_buffer": None},
+    "thermoengine": {
+        "model": None,
+        "configured_vapor_transport_pO2_bar": "vapor_transport_pO2_bar",
+        "configured_vapor_transport_floor_bar": "vapor_transport_floor_bar",
+        "redox_buffer": None,
+        "fO2_offset": "fo2_offset",
+        "Fe3Fet_ratio": "fe3fet_ratio",
+    },
+}
+
+
 def engine_cache_settings(
     engine_name: str,
     normalized_settings: Mapping[str, Any],
@@ -199,116 +233,28 @@ def engine_cache_settings(
     if engine_name == "internal-analytical":
         # Residue calls consume prior-call state and are deliberately uncached.
         return {}
+    try:
+        projection = _ENGINE_CACHE_SETTINGS_PROJECTIONS[engine_name]
+    except KeyError as exc:
+        raise ValueError(f"unknown engine {engine_name!r}") from exc
 
-    fields = normalized_settings
-    if engine_name == "openimcc":
-        _require_normalized_engine_settings(
-            engine_name, fields, ("pack", "gas_pack")
+    if isinstance(normalized_settings, Mapping):
+        missing = tuple(
+            name for name in projection if name not in normalized_settings
         )
-        return {
-            "melt_pack": fields["pack"],
-            "gas_pack": fields["gas_pack"],
-        }
-    if engine_name == "alphamelts":
-        _require_normalized_engine_settings(
-            engine_name,
-            fields,
-            (
-                "python_api_model",
-                "transport",
-                "effective_calc_mode",
-                "raw_model_name",
-                "redox_buffer",
-                "fO2_offset",
-                "Fe3Fet_ratio",
-                "configured_vapor_transport_pO2_bar",
-                "configured_vapor_transport_floor_bar",
-            ),
-        )
-        # Opener fields map to the transport, model, redox, and vapor settings
-        # read by AlphaMELTSBackend.initialize() and equilibrate().
-        api_model = fields["python_api_model"]
-        if isinstance(api_model, tuple):
-            api_model = list(api_model)
-        return {
-            "transport_mode": fields["transport"],
-            "effective_calc_mode": fields["effective_calc_mode"],
-            "model": fields["raw_model_name"],
-            "python_api_model": api_model,
-            "redox_buffer": fields["redox_buffer"],
-            "fo2_offset": fields["fO2_offset"],
-            "fe3fet_ratio": fields["Fe3Fet_ratio"],
-            "vapor_transport_pO2_bar": fields[
-                "configured_vapor_transport_pO2_bar"
-            ],
-            "vapor_transport_floor_bar": fields[
-                "configured_vapor_transport_floor_bar"
-            ],
-        }
-    if engine_name == "vaporock":
-        _require_normalized_engine_settings(
-            engine_name,
-            fields,
-            ("temperature_units", "pressure_units", "vapor_pressure_units"),
-        )
-        return {
-            name: fields[name]
-            for name in (
-                "temperature_units",
-                "pressure_units",
-                "vapor_pressure_units",
-            )
-        }
-    if engine_name == "magemin":
-        _require_normalized_engine_settings(
-            engine_name, fields, ("database", "bridge", "fO2_buffer")
-        )
-        return {
-            "database": fields["database"],
-            "bridge": fields["bridge"],
-            "fO2_buffer": fields["fO2_buffer"],
-        }
-    if engine_name == "thermoengine":
-        _require_normalized_engine_settings(
-            engine_name,
-            fields,
-            (
-                "model",
-                "configured_vapor_transport_pO2_bar",
-                "configured_vapor_transport_floor_bar",
-                "redox_buffer",
-                "fO2_offset",
-                "Fe3Fet_ratio",
-            ),
-        )
-        return {
-            "model": fields["model"],
-            "vapor_transport_pO2_bar": fields[
-                "configured_vapor_transport_pO2_bar"
-            ],
-            "vapor_transport_floor_bar": fields[
-                "configured_vapor_transport_floor_bar"
-            ],
-            "redox_buffer": fields["redox_buffer"],
-            "fo2_offset": fields["fO2_offset"],
-            "fe3fet_ratio": fields["Fe3Fet_ratio"],
-        }
-    raise ValueError(f"unknown engine {engine_name!r}")
-
-
-def _require_normalized_engine_settings(
-    engine_name: str,
-    settings: Mapping[str, Any],
-    required_fields: Iterable[str],
-) -> None:
-    required = tuple(required_fields)
-    missing = (
-        required
-        if not isinstance(settings, Mapping)
-        else tuple(name for name in required if name not in settings)
-    )
+    else:
+        missing = tuple(projection)
     if missing:
         raise EngineCacheSettingsError(engine_name, missing)
+
+    return {
+        target if isinstance(target, str) else name: (
+            target(normalized_settings[name])
+            if callable(target)
+            else normalized_settings[name]
+        )
+        for name, target in projection.items()
+    }
 
 
 def _configured_engine_cache_path() -> str | None:
