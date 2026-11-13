@@ -427,6 +427,12 @@ def _validate_segment_coverage(
     return ordered
 
 
+# CEA / JANAF standard pressure. 1 bar = 1e5 Pa. JANAF prints p° = 0.1 MPa.
+# The wall law and NASA CEA record metadata share this owner; condensed records
+# are not switched to 1 atm.
+WALL_STANDARD_PRESSURE_PA = 100_000.0
+
+
 @dataclass(frozen=True)
 class NasaCeaPolynomial:
     """Multi-segment NASA CEA polynomial for one species / phase record."""
@@ -445,7 +451,7 @@ class NasaCeaPolynomial:
     # in this module do not read the field; it is stored metadata.
     # NASA/TP-2002-211556 mixed convention (as encoded by tools/vp_cea_ingest.py):
     # ideal-gas standard state 1 bar; pure condensed reference substances 1 atm.
-    reference_pressure_Pa: float = 100_000.0
+    reference_pressure_Pa: float = WALL_STANDARD_PRESSURE_PA
 
     def __post_init__(self) -> None:
         if self.family not in ("nasa_cea_7", "nasa_cea_9"):
@@ -706,11 +712,6 @@ def reaction_equilibrium_constant(
         _reaction_delta_g_over_RT(terms),
         what="reaction_equilibrium_constant",
     )
-
-
-# CEA / JANAF standard pressure. 1 bar = 1e5 Pa. JANAF prints p° = 0.1 MPa.
-# This law does not switch condensed records to 1 atm.
-WALL_STANDARD_PRESSURE_PA = 100_000.0
 
 
 class WallSaturationLawRefusal(NasaCeaError):
