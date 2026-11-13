@@ -39,6 +39,7 @@ from simulator.vapour_rail.batch import (
 )
 import simulator.optimize.evaluate as evaluate_module
 from simulator.optimize.evaluate import (
+    COMPUTED_EXCEEDS_INVENTORY,
     INVENTORY_CAPPED,
     MISSING_PARENT_OXIDE_INVENTORY,
     MISSING_PARENT_OXIDE_STOICHIOMETRY,
@@ -5826,16 +5827,17 @@ def test_stripping_the_pre_evaporation_map_understates_a_leading_debit(
         assert sodium_oxide < 1.0
 
 
-# Invariant. For one parent oxide, the oxide-equivalent of every computed
-# vapour debit (published or withheld) plus every published refused bound
-# is at most the first recorded inventory, unless the computed debit alone
-# already exceeds it. An empty first map is zero for every parent. A later
-# map does not add an oxide. A withheld species keeps its computed debit in
-# that sum. A snapshot that omits its inventory does not publish the kinetic
-# ceiling. A refused bound whose parent was never recorded is absent and
-# named missing_parent_oxide_inventory. The checks below sum the case
-# inputs and the returned map. They do not call the allocator or scale a
-# demand by the remaining budget.
+# Invariant. For one parent oxide, the oxide-equivalent of the published
+# supply (computed vapour plus refused bounds) is at most the window-start
+# charge. The limit is that charge, including when the computed vapour
+# alone is larger: the published value is then the charge, and
+# computed_exceeds_inventory names the carrier. An empty first map is zero
+# for every parent. A later map does not add an oxide. A withheld species
+# is absent from the published sum. A snapshot that omits its inventory
+# does not publish the kinetic ceiling. A refused bound whose parent was
+# never recorded is absent and named missing_parent_oxide_inventory. The
+# checks below sum the case inputs and the returned map. They do not call
+# the allocator or scale a demand by the remaining budget.
 _OXIDE_CARRIERS = ("K2O_gas", "K2", "Na2O_gas")
 _OXIDE_PARENT = {"K2O_gas": "K2O", "K2": "K2O", "Na2O_gas": "Na2O"}
 _OXIDE_COMPUTED_RATE_KG_HR = 0.25
@@ -6008,22 +6010,41 @@ def _oxide_case_facts(
     }
 
 
-def _accounted_parent_oxide_kg(
+def _published_parent_oxide_kg(
     bounds: Mapping[str, float],
-    computed: Mapping[str, float],
     parent: str,
 ) -> float:
-    """Published oxide plus the computed debit of unpublished carriers."""
+    """Oxide kilograms this map publishes for ``parent``.
+
+    Withheld carriers are absent. Their computed debit is a reserve,
+    not a published kilogram. Stoichiometry in this fixture is 1, so
+    the vapour kilogram is the oxide kilogram. This does not call the
+    allocator and does not scale a demand.
+    """
 
     total = 0.0
     for name, oxide in _OXIDE_PARENT.items():
-        if oxide != parent:
-            continue
-        if name in bounds:
+        if oxide == parent and name in bounds:
             total += float(bounds[name])
-        else:
-            total += float(computed[name])
     return total
+
+
+def _parent_charge_limit(
+    parent: str,
+    charge: Mapping[str, float],
+    recorded: bool,
+) -> float | None:
+    """Window-start charge, or None when the window recorded no map.
+
+    A recorded map that omits the oxide is zero. This is the charge,
+    not ``max(charge, computed)``.
+    """
+
+    if parent in charge:
+        return float(charge[parent])
+    if recorded:
+        return 0.0
+    return None
 
 
 def _assert_shared_parent_oxide_invariant(
@@ -6033,22 +6054,13 @@ def _assert_shared_parent_oxide_invariant(
     facts = _oxide_case_facts(case)
     charge = facts["charge"]
     computed = facts["computed"]
+    limits: dict[str, float | None] = {}
     for parent in set(_OXIDE_PARENT.values()):
-        computed_oxide = sum(
-            float(computed[name])
-            for name, oxide in _OXIDE_PARENT.items()
-            if oxide == parent
-        )
-        accounted = _accounted_parent_oxide_kg(bounds, computed, parent)
-        if parent in charge:
-            limit = max(float(charge[parent]), computed_oxide)
-        elif facts["recorded"]:
-            # A recorded map that omits the oxide is a known zero.
-            limit = computed_oxide
-        else:
-            limit = None
+        limit = _parent_charge_limit(parent, charge, bool(facts["recorded"]))
+        limits[parent] = limit
         if limit is not None:
-            assert accounted <= limit + 1.0e-9
+            published = _published_parent_oxide_kg(bounds, parent)
+            assert published <= limit + 1.0e-9
     for name in _OXIDE_CARRIERS:
         if facts["unavailable"][name]:
             assert name not in bounds
@@ -6073,19 +6085,43 @@ def _assert_shared_parent_oxide_invariant(
             or facts["physical"][name]
         ):
             assert name in bounds
-        if name in bounds:
-            assert float(bounds[name]) + 1.0e-15 >= float(
-                facts["computed"][name]
-            )
+        if name not in bounds:
+            continue
+        published_kg = float(bounds[name])
+        computed_kg = float(computed[name])
+        parent_limit = limits[_OXIDE_PARENT[name]]
+        parent_computed = sum(
+            float(computed[carrier])
+            for carrier, oxide in _OXIDE_PARENT.items()
+            if oxide == _OXIDE_PARENT[name]
+        )
+        # Any computed oxide above the charge is an excess. The 1e-9
+        # slack above is only the published-versus-charge comparison.
+        # Two 1e-15 kg hours against a recorded zero are still an
+        # excess: the cap publishes zero. The limit is the charge,
+        # not max(charge, computed).
+        over = parent_limit is not None and parent_computed > parent_limit
+        if over:
+            assert published_kg <= computed_kg + 1.0e-15
+            if published_kg + 1.0e-12 < computed_kg:
+                assert bounds.computed_exceeds_inventory[name] is True
+        else:
+            assert published_kg + 1.0e-15 >= computed_kg
     na_hours = facts["positive_hours"]
     # Na2O_gas is computed on every positive hour of these cases.
+    # Stoichiometry is 1, so a charge below the raw sum publishes the
+    # charge. An unknown charge publishes the raw sum.
     if all(
         interval["kinds"]["Na2O_gas"] == "computed"
         for interval in case["intervals"]
     ):
-        assert bounds["Na2O_gas"] == _approx_kg(
-            _OXIDE_NA_RATE_KG_HR * na_hours
-        )
+        na_computed = _OXIDE_NA_RATE_KG_HR * na_hours
+        na_limit = limits["Na2O"]
+        if na_limit is not None and na_computed > na_limit:
+            assert bounds["Na2O_gas"] == _approx_kg(na_limit)
+            assert bounds.computed_exceeds_inventory["Na2O_gas"] is True
+        else:
+            assert bounds["Na2O_gas"] == _approx_kg(na_computed)
 
 
 def _oxide_interval(
@@ -6213,6 +6249,10 @@ def test_shared_parent_oxide_conservation(
         _assert_shared_parent_oxide_invariant(bounds, case)
     assert dict(results[0]) == dict(results[1])
     assert results[0].inventory_capped == results[1].inventory_capped
+    assert (
+        results[0].computed_exceeds_inventory
+        == results[1].computed_exceeds_inventory
+    )
     assert results[0].supply_unavailable == results[1].supply_unavailable
 
 
@@ -6292,6 +6332,7 @@ def test_withheld_computed_debit_stays_in_the_shared_reserve() -> None:
 
     1 kg of K2O. Hour 1 computes 0.25 kg of K2O_gas and refuses K2.
     Hour 2 has no flux law for K2O_gas, so K2O_gas is not published.
+    The notice keeps that classifier token, ``no_flux_law_and_no_psat``.
     K2's oxide is 0.75 kg, not the whole charge. Both species orders
     agree. The kinetic ceiling is above that remainder.
     """
@@ -6305,6 +6346,9 @@ def test_withheld_computed_debit_stays_in_the_shared_reserve() -> None:
         assert bounds["K2"] * 2.0 == _approx_kg(0.75)
         assert bounds["K2"] * 2.0 + 0.25 == _approx_kg(1.0)
         assert bounds.inventory_capped == {"K2": True}
+        # Hour 2 has no flux law for K2O_gas. That classifier token is
+        # the published reason. The gap does not become a missing key.
+        assert bounds.supply_unavailable["K2O_gas"] == "no_flux_law_and_no_psat"
     execution = _refused_supply_execution(
         snapshots,
         (("K2O_gas", "hot_wall"), ("K2", "hot_wall")),
@@ -6315,7 +6359,9 @@ def test_withheld_computed_debit_stays_in_the_shared_reserve() -> None:
         execution,
     )
     assert booked["notice_authority"][INVENTORY_CAPPED] == {"K2": True}
-    assert SUPPLY_UNAVAILABLE not in booked["notice_authority"]
+    assert booked["notice_authority"][SUPPLY_UNAVAILABLE] == {
+        "K2O_gas": "no_flux_law_and_no_psat"
+    }
 
 
 def test_dropping_a_withheld_computed_debit_respends_the_charge(
@@ -6475,12 +6521,14 @@ def test_unrestricted_refused_mass_breaks_the_parent_oxide_budget(
     mode: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Publishing the kinetic ceiling on these hours exceeds the charge.
+    """The publication cap, not the allocator, is the charge bound.
 
-    The mutation replaces the one allocator. Recorded and composition
-    then book the ceiling twice. An empty melt books the ceiling instead
-    of zero. A run with no inventory publishes a number instead of the
-    typed gap.
+    Replacing the allocator with the kinetic ceiling is not enough.
+    Recorded and composition still publish the 1 kg charge. An empty
+    map still publishes zero. A run that recorded no inventory has no
+    charge to enforce, so that mutation publishes the kinetic mass.
+    Disabling the publication cap is what lets the kinetic ceiling
+    through on a known charge.
     """
 
     monkeypatch.setattr(
@@ -6494,8 +6542,35 @@ def test_unrestricted_refused_mass_breaks_the_parent_oxide_budget(
         ("K2O_gas",),
     )
     assert "K2O_gas" in bounds
-    assert bounds["K2O_gas"] > 1.0 or mode == "empty"
-    assert bounds["K2O_gas"] >= kinetic
+    if mode == "missing":
+        assert bounds["K2O_gas"] >= kinetic
+    elif mode == "empty":
+        assert bounds["K2O_gas"] == 0.0
+        assert bounds["K2O_gas"] < kinetic
+    else:
+        assert bounds["K2O_gas"] == _approx_kg(1.0)
+        assert bounds["K2O_gas"] < kinetic
+
+    def _leave_published_uncapped(
+        totals: dict[str, float],
+        published: object,
+        computed_vapour_kg: object,
+        snapshots: object,
+        catalog: object,
+    ) -> tuple[set[str], set[str]]:
+        del totals, published, computed_vapour_kg, snapshots, catalog
+        return set(), set()
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_enforce_published_element_inventory",
+        _leave_published_uncapped,
+    )
+    uncapped = _optimizer_refused_flux_bounds(
+        _exhausted_then_unrecorded_snapshots(mode),
+        ("K2O_gas",),
+    )
+    assert uncapped["K2O_gas"] >= kinetic
 
 
 class _SnapshotParentCatalog:
@@ -12321,3 +12396,406 @@ def _composition_score_profile(
         "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 1}},
         "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
     }
+
+
+# Classifier gaps. Each token is the evidence the interval classifier
+# returns. The oracle expects that literal. It does not read the
+# classifier.
+_CLASSIFIER_REFUSAL_REASONS = (
+    "missing_temperature",
+    "missing_melt_surface_area",
+    "missing_molar_mass",
+    "missing_recorded_pO2",
+    "no_flux_law_and_no_psat",
+)
+
+
+def _classifier_gap_snapshot(
+    reason: str,
+    *,
+    sibling_rate: float | None = None,
+    hour: int = 1,
+) -> SimpleNamespace:
+    """One interval whose ceiling is refused for ``reason``.
+
+    Na2O_gas, when requested, is a computed sibling with its own oxide.
+    The snapshot records no inventory, so that sibling is not capped.
+    """
+
+    species = "K2O_gas"
+    sibling = "Na2O_gas"
+    rates: dict[str, float] = {}
+    channels: dict[str, object] = {}
+    if sibling_rate is not None:
+        rates[sibling] = sibling_rate
+        channels[sibling] = {
+            "parent_oxide": "Na2O",
+            "stoich_oxide_per_vapor": 1.0,
+        }
+    flux_fields: dict[str, object] = {
+        "published_species_kg_hr": rates,
+        "species_kg_hr": dict(rates),
+        "carrier_authority_by_species": channels,
+    }
+    snapshot_fields: dict[str, object] = {
+        "hour": hour,
+        "duration_h": 1.0,
+    }
+    if reason != "missing_temperature":
+        snapshot_fields["temperature_C"] = _ACTIVITY_ONE_T_C
+    if reason != "missing_melt_surface_area":
+        flux_fields["melt_surface_area_m2"] = _ACTIVITY_ONE_AREA_M2
+    if reason == "missing_molar_mass":
+        record = _transport_refusal_channel(species)
+        record["activity_one_psat_pa"] = _ACTIVITY_ONE_PSAT_PA
+        channels[species] = record
+    elif reason == "no_flux_law_and_no_psat":
+        channels[species] = _transport_refusal_channel(species)
+    elif reason == "missing_recorded_pO2":
+        snapshot_fields["vapour_catalog"] = _species_ceiling_catalog(
+            species,
+            -1.0,
+            _M0_P_UNIT_PA,
+        )
+    elif reason == "missing_melt_surface_area":
+        record = _transport_refusal_channel(species)
+        record["activity_one_psat_pa"] = _ACTIVITY_ONE_PSAT_PA
+        record["molar_mass_kg_per_mol"] = _ACTIVITY_ONE_MASS_KG_PER_MOL
+        channels[species] = record
+    elif reason == "missing_temperature":
+        pass
+    else:
+        raise AssertionError(reason)
+    snapshot_fields["evap_flux"] = SimpleNamespace(**flux_fields)
+    return SimpleNamespace(**snapshot_fields)
+
+
+@pytest.mark.parametrize("reason", _CLASSIFIER_REFUSAL_REASONS)
+@pytest.mark.parametrize(
+    "order",
+    (("K2O_gas", "Na2O_gas"), ("Na2O_gas", "K2O_gas")),
+)
+def test_classifier_refusal_reason_is_published(
+    reason: str,
+    order: tuple[str, ...],
+) -> None:
+    """A ceiling gap stays typed on the integral and on the booking notice.
+
+    The sibling's computed kilogram is a different element and stays.
+    Species order does not change the reason or the kilogram.
+    """
+
+    sibling_rate = 0.4
+    snapshot = _classifier_gap_snapshot(reason, sibling_rate=sibling_rate)
+    bounds = _optimizer_refused_flux_bounds((snapshot,), order)
+    assert "K2O_gas" not in bounds
+    assert bounds.supply_unavailable["K2O_gas"] == reason
+    assert bounds["Na2O_gas"] == _approx_kg(sibling_rate)
+    assert bounds.computed_exceeds_inventory == {}
+    execution = _refused_supply_execution(
+        (snapshot,),
+        (("K2O_gas", "hot_wall"),),
+    )
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        {},
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    assert booked["notice_authority"][SUPPLY_UNAVAILABLE]["K2O_gas"] == reason
+
+
+def test_first_classifier_gap_is_the_published_reason() -> None:
+    """Two different gaps: the earlier interval's evidence is the token.
+
+    Reversing the hours publishes the other token. Neither gap becomes
+    a missing reason, and neither hour's mass is a partial supply.
+    """
+
+    missing_temperature = _classifier_gap_snapshot(
+        "missing_temperature",
+        hour=1,
+    )
+    missing_mass = _classifier_gap_snapshot("missing_molar_mass", hour=2)
+    forward = _optimizer_refused_flux_bounds(
+        (missing_temperature, missing_mass),
+        ("K2O_gas",),
+    )
+    backward = _optimizer_refused_flux_bounds(
+        (
+            _classifier_gap_snapshot("missing_molar_mass", hour=1),
+            _classifier_gap_snapshot("missing_temperature", hour=2),
+        ),
+        ("K2O_gas",),
+    )
+    assert "K2O_gas" not in forward
+    assert "K2O_gas" not in backward
+    assert forward.supply_unavailable["K2O_gas"] == "missing_temperature"
+    assert backward.supply_unavailable["K2O_gas"] == "missing_molar_mass"
+
+
+def test_classifier_gap_drops_the_computed_partial_and_keeps_the_reason() -> None:
+    """0.4 kg computed, then a missing temperature, is not a 0.4 kg supply."""
+
+    channel = _k2o_channel("K2O_gas", stoich=1.0)
+    computed = _k2o_budget_snapshot(
+        1,
+        rates={"K2O_gas": 0.4},
+        channels={"K2O_gas": channel},
+        inventory_kg=1.0,
+    )
+    gap = _classifier_gap_snapshot("missing_temperature", hour=2)
+    bounds = _optimizer_refused_flux_bounds(
+        (computed, gap),
+        ("K2O_gas",),
+    )
+    assert "K2O_gas" not in bounds
+    assert bounds.supply_unavailable["K2O_gas"] == "missing_temperature"
+    assert bounds.computed_exceeds_inventory == {}
+
+
+def _oracle_charge_scaled_vapour(
+    vapour_kg: Mapping[str, float],
+    stoich: Mapping[str, float],
+    charge: float,
+) -> dict[str, float]:
+    """Published vapour after the charge cap.
+
+    Oxide is vapour times stoichiometry. The scale is ``charge / oxide``
+    when the oxide exceeds the charge, and 1 otherwise. Species order
+    is not an input. This does not call the allocator or the publication
+    cap.
+    """
+
+    oxide = sum(
+        float(vapour_kg[name]) * float(stoich[name]) for name in vapour_kg
+    )
+    scale = 1.0 if oxide <= charge else charge / oxide
+    return {name: float(vapour_kg[name]) * scale for name in vapour_kg}
+
+
+def _overdraw_snapshots(
+    interval_order: str,
+) -> tuple[SimpleNamespace, ...]:
+    """1 kg of K2O. K2O_gas is 0.5 kg at stoich 1. K2 is 0.5 kg at stoich 2.
+
+    The oxide sum is 1.5 kg. ``together`` puts both rates on one hour.
+    The other orders split them across two hours.
+    """
+
+    k2o = _k2o_channel("K2O_gas", stoich=1.0)
+    k2 = _k2o_channel("K2", stoich=2.0)
+    channels = {"K2O_gas": k2o, "K2": k2}
+    if interval_order == "together":
+        return (
+            _k2o_budget_snapshot(
+                1,
+                rates={"K2O_gas": 0.5, "K2": 0.5},
+                channels=channels,
+                inventory_kg=1.0,
+            ),
+        )
+    if interval_order == "k2o_then_k2":
+        first_rates = {"K2O_gas": 0.5}
+        second_rates = {"K2": 0.5}
+    elif interval_order == "k2_then_k2o":
+        first_rates = {"K2": 0.5}
+        second_rates = {"K2O_gas": 0.5}
+    else:
+        raise AssertionError(interval_order)
+    return (
+        _k2o_budget_snapshot(
+            1,
+            rates=first_rates,
+            channels=channels,
+            inventory_kg=1.0,
+        ),
+        _k2o_budget_snapshot(
+            2,
+            rates=second_rates,
+            channels=channels,
+            inventory_kg=1.0,
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "interval_order",
+    ("together", "k2o_then_k2", "k2_then_k2o"),
+)
+@pytest.mark.parametrize(
+    "species_order",
+    (("K2O_gas", "K2"), ("K2", "K2O_gas")),
+)
+def test_computed_overdraw_publishes_the_charge(
+    interval_order: str,
+    species_order: tuple[str, ...],
+) -> None:
+    """Computed oxide above the charge publishes the charge, not the sum.
+
+    0.5 kg of K2O_gas and 0.5 kg of K2 at stoich 2 are 1.5 kg of K2O.
+    The charge is 1 kg. Each carrier scales by 1 / 1.5. The oxide sum
+    is the charge. Interval order and species order do not change it.
+    """
+
+    charge = 1.0
+    vapour = {"K2O_gas": 0.5, "K2": 0.5}
+    stoich = {"K2O_gas": 1.0, "K2": 2.0}
+    oxide = vapour["K2O_gas"] * stoich["K2O_gas"] + vapour["K2"] * stoich["K2"]
+    assert oxide == 1.5
+    expected = _oracle_charge_scaled_vapour(vapour, stoich, charge)
+    assert expected["K2O_gas"] == pytest.approx(1.0 / 3.0)
+    assert expected["K2"] == pytest.approx(1.0 / 3.0)
+    published_oxide = (
+        expected["K2O_gas"] * stoich["K2O_gas"]
+        + expected["K2"] * stoich["K2"]
+    )
+    assert published_oxide == pytest.approx(charge)
+    bounds = _optimizer_refused_flux_bounds(
+        _overdraw_snapshots(interval_order),
+        species_order,
+    )
+    assert bounds["K2O_gas"] == _approx_kg(expected["K2O_gas"])
+    assert bounds["K2"] == _approx_kg(expected["K2"])
+    assert bounds["K2O_gas"] * 1.0 + bounds["K2"] * 2.0 == _approx_kg(charge)
+    assert bounds.computed_exceeds_inventory == {
+        "K2O_gas": True,
+        "K2": True,
+    }
+
+
+def test_two_computed_intervals_publish_the_charge_not_the_sum() -> None:
+    """1 kg of K2O and two computed hours of 0.75 kg publish 1 kg.
+
+    The uncapped sum is 1.5 kg. The notice carries
+    ``computed_exceeds_inventory``. A charge the window never recorded
+    does not invent this cap: the same 1.5 kg stays 1.5 kg.
+    """
+
+    channel = _k2o_channel("K2O_gas", stoich=1.0)
+    charged = (
+        _k2o_budget_snapshot(
+            1,
+            rates={"K2O_gas": 0.75},
+            channels={"K2O_gas": channel},
+            inventory_kg=1.0,
+        ),
+        _k2o_budget_snapshot(
+            2,
+            rates={"K2O_gas": 0.75},
+            channels={"K2O_gas": channel},
+            inventory_kg=1.0,
+        ),
+    )
+    bounds = _optimizer_refused_flux_bounds(charged, ("K2O_gas",))
+    assert bounds["K2O_gas"] == _approx_kg(1.0)
+    assert bounds["K2O_gas"] < 1.5
+    assert bounds.computed_exceeds_inventory == {"K2O_gas": True}
+    execution = _refused_supply_execution(
+        charged,
+        (("K2O_gas", "hot_wall"),),
+    )
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        {},
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    assert booked["notice_authority"][COMPUTED_EXCEEDS_INVENTORY] == {
+        "K2O_gas": True
+    }
+    unrecorded = (
+        _k2o_budget_snapshot(
+            1,
+            rates={"K2O_gas": 0.75},
+            channels={"K2O_gas": channel},
+            inventory_kg=None,
+        ),
+        _k2o_budget_snapshot(
+            2,
+            rates={"K2O_gas": 0.75},
+            channels={"K2O_gas": channel},
+            inventory_kg=None,
+        ),
+    )
+    raw = _optimizer_refused_flux_bounds(unrecorded, ("K2O_gas",))
+    assert raw["K2O_gas"] == _approx_kg(1.5)
+    assert raw.computed_exceeds_inventory == {}
+
+
+def test_computed_under_the_charge_is_not_scaled() -> None:
+    """0.25 kg computed against a 1 kg charge stays 0.25 kg."""
+
+    channel = _k2o_channel("K2O_gas", stoich=1.0)
+    bounds = _optimizer_refused_flux_bounds(
+        (
+            _k2o_budget_snapshot(
+                1,
+                rates={"K2O_gas": 0.25},
+                channels={"K2O_gas": channel},
+                inventory_kg=1.0,
+            ),
+        ),
+        ("K2O_gas",),
+    )
+    assert bounds["K2O_gas"] == _approx_kg(0.25)
+    assert bounds.computed_exceeds_inventory == {}
+
+
+def test_empty_charge_caps_computed_vapour_at_zero() -> None:
+    """A recorded empty melt publishes 0, not the computed 0.75 kg."""
+
+    channel = _k2o_channel("K2O_gas", stoich=1.0)
+    snapshot = _k2o_budget_snapshot(
+        1,
+        rates={"K2O_gas": 0.75},
+        channels={"K2O_gas": channel},
+        inventory_kg=0.0,
+    )
+    bounds = _optimizer_refused_flux_bounds((snapshot,), ("K2O_gas",))
+    assert bounds["K2O_gas"] == 0.0
+    assert bounds.computed_exceeds_inventory == {"K2O_gas": True}
+
+
+def test_skipping_the_publication_cap_books_the_computed_overdraw(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Without the publication cap the two 0.75 kg hours book 1.5 kg.
+
+    The charge is 1 kg. The mutation leaves the summed rate untouched.
+    """
+
+    def _leave_published_uncapped(
+        totals: dict[str, float],
+        published: object,
+        computed_vapour_kg: object,
+        snapshots: object,
+        catalog: object,
+    ) -> tuple[set[str], set[str]]:
+        del totals, published, computed_vapour_kg, snapshots, catalog
+        return set(), set()
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_enforce_published_element_inventory",
+        _leave_published_uncapped,
+    )
+    channel = _k2o_channel("K2O_gas", stoich=1.0)
+    bounds = _optimizer_refused_flux_bounds(
+        (
+            _k2o_budget_snapshot(
+                1,
+                rates={"K2O_gas": 0.75},
+                channels={"K2O_gas": channel},
+                inventory_kg=1.0,
+            ),
+            _k2o_budget_snapshot(
+                2,
+                rates={"K2O_gas": 0.75},
+                channels={"K2O_gas": channel},
+                inventory_kg=1.0,
+            ),
+        ),
+        ("K2O_gas",),
+    )
+    assert bounds["K2O_gas"] == _approx_kg(1.5)
+    assert bounds["K2O_gas"] > 1.0
+    assert bounds.computed_exceeds_inventory == {}

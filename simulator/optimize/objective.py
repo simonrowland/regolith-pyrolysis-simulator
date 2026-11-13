@@ -4809,6 +4809,7 @@ def _book_wall_deposits_at_vapour_supply(
         snapshots,
     )
     from simulator.optimize.evaluate import (
+        COMPUTED_EXCEEDS_INVENTORY,
         INVENTORY_CAPPED,
         SUPPLY_INTERVAL_UPPER_BOUND_USED,
         SUPPLY_UNAVAILABLE,
@@ -4856,6 +4857,13 @@ def _book_wall_deposits_at_vapour_supply(
         notice_authority[INVENTORY_CAPPED] = {
             str(species): True
             for species in raw_capped
+            if species in supply_kg
+        }
+    raw_exceeded = getattr(supply_kg, COMPUTED_EXCEEDS_INVENTORY, None)
+    if isinstance(raw_exceeded, Mapping) and raw_exceeded:
+        notice_authority[COMPUTED_EXCEEDS_INVENTORY] = {
+            str(species): True
+            for species in raw_exceeded
             if species in supply_kg
         }
     booked_deposit = dict(wall_deposit)
