@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.enums import (
     ELEMENT_WT_PERCENT_BASIS,
     AmountBasis,
@@ -626,10 +627,7 @@ def excluded_component_notice_reason(
 
 
 def _amount_token(amount: Decimal) -> str:
-    text = format(amount, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text or "0"
+    return decimal_token(amount)
 
 
 def _atomic_weight(symbol: str) -> Decimal:

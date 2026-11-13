@@ -31,6 +31,8 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Sequence
 
+from simulator.battery.decimal_tokens import decimal_token
+from simulator.battery.source_declarations import SOURCE_DECLARATIONS
 from simulator.battery.enums import (
     EQUILIBRIUM_FIT_QUANTITIES,
     FORMATION_QUANTITIES,
@@ -251,10 +253,8 @@ class _Nasa9FitComparison:
 
 
 def _decimal_token(value: Decimal) -> str:
-    text = format(value, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    if text in {"", "-", "-0"}:
+    text = decimal_token(value)
+    if text == "-0":
         return "0"
     return text
 
@@ -2648,7 +2648,10 @@ def _tabulated_gas_basis_matches(
         )
     if source_id == b1452_source:
         return b1452_ideal_gas(formula)
-    if source_id == "pankratz-1984-usbm-b677":
+    b677_enthalpy_zero = SOURCE_DECLARATIONS.get(source_id, {}).get(
+        "ideal_gas_enthalpy_zero"
+    )
+    if b677_enthalpy_zero is not None and b677_enthalpy_zero.value is True:
         # B677 defines H°T−H°298 as the integral of Cp° from 298.15 K, and
         # says that for a table headed ideal gas, H298 is that gas rather
         # than the stable condensed phase (p001-p040.md:223,259,285-287).
