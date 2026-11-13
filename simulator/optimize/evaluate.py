@@ -1151,16 +1151,17 @@ def evaluate(
         key=key,
     )
 
-    if _c6_hold_target_priced_unavailable(run_execution):
-        # C6's hold-target refusal is campaign-scoped inside the engine, so
-        # the executor does not mark the batch refused. The price is still
-        # unavailable: do not score a numeric zero for the Mg/Al ledger.
+    c6_refusal_reason = _c6_campaign_refusal_reason(run_execution)
+    if c6_refusal_reason:
+        # C6's refusal is campaign-scoped, so the executor leaves batch
+        # status ok and keeps the diagnostic. Every such reason is priced
+        # unavailable. A partial product total is not a score.
         return _physics_refused_result(
             candidate_id,
             spec,
             key,
-            reason="c6_hold_target_not_acquired",
-            error_message="priced_unavailable:c6_hold_target_not_acquired",
+            reason=c6_refusal_reason,
+            error_message=f"priced_unavailable:{c6_refusal_reason}",
             run_execution=run_execution,
             profile=profile,
             diagnostic=getattr(run_execution, "refusal_diagnostic", None),
@@ -3127,13 +3128,18 @@ def _c0_pyrolysis_continues_through_later_steps(
     return phases == (CampaignPhase.C0,)
 
 
-def _c6_hold_target_priced_unavailable(run_execution: Any) -> bool:
-    """True when C6 ended on ``c6_hold_target_not_acquired``.
+def _c6_campaign_refusal_reason(run_execution: Any) -> str:
+    """Reason for a campaign-scoped C6 refusal, or "" when there is none.
 
-    That typed refusal is priced unavailable. It is not a numeric zero.
+    INVARIANT: a stored C6 refusal (status refused) is priced unavailable
+    for every reason the campaign controller or the thermite step records.
+    RunExecutor leaves batch status ok and keeps the diagnostic. This is
+    the pricing chokepoint. It does not whitelist a reason string. A
+    missing reason is still unavailable (``c6_campaign_refused``).
+
+    Behaviour-changing scoring edits require a VERSION bump
+    (simulator/optimize/evalspec.py). Do not bump data/corpus_version.yaml.
     """
-
-    from simulator.campaigns import C6_HOLD_ACQUISITION_REFUSAL_REASON
 
     blobs: list[Any] = []
     diagnostic = getattr(run_execution, "refusal_diagnostic", None)
@@ -3144,13 +3150,14 @@ def _c6_hold_target_priced_unavailable(run_execution: Any) -> bool:
     if isinstance(live, MappingABC):
         blobs.append(live)
     for blob in blobs:
-        reason = blob.get("reason_refused") or blob.get("reason")
-        nested = blob.get("diagnostic")
-        if isinstance(nested, MappingABC):
-            reason = nested.get("reason_refused") or reason
-        if str(reason or "") == C6_HOLD_ACQUISITION_REFUSAL_REASON:
-            return True
-    return False
+        if str(blob.get("status") or "") != "refused":
+            continue
+        campaign = str(blob.get("campaign") or "")
+        family = str(blob.get("reaction_family") or "")
+        if campaign != "C6" and family != "c6_mg_thermite":
+            continue
+        return _reason_from_mapping(blob) or "c6_campaign_refused"
+    return ""
 
 
 def _build_eval_inputs_impl(

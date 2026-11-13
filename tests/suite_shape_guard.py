@@ -140,6 +140,15 @@ HEAVY_ROSTER = frozenset({
     # justification at the mark). It stays nightly in the serial chain.
     ("tests/test_web_functional_qa.py",
      "test_headless_full_run_ledgers_and_product_story_web"),
+    # b-080 sol P2 (2026-11-12): the continuation pin and the TPE yield
+    # pair must execute the production campaign and read engine totals.
+    # A full AUTO_APPLY pair does not fit the 300 s default. Nightly,
+    # serial chain. 5000 s is headroom over one measured C0-to-C6
+    # trajectory (~1283 s) times two caps.
+    ("tests/test_optimizer_evaluate.py",
+     "test_lunar_highland_c0_horizon_changes_extracted_metals"),
+    ("tests/test_optimizer_strategy_tpe.py",
+     "test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair"),
 })
 
 # b-586: these campaign-length yield nodes must stay out of the PR tier. They

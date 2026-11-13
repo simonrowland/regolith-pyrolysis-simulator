@@ -4,6 +4,17 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## [0.6.8] — 2026-11-12
+
+- Every campaign-scoped C6 refusal is priced unavailable. The executor
+  leaves batch status ok and keeps the diagnostic, and the pricing
+  chokepoint does not whitelist one reason string. That includes CI's
+  `c6_joint_thermodynamic_liquid_fraction_window_empty`. EvalSpec keys
+  follow this VERSION bump. `data/corpus_version.yaml` is unchanged.
+  Glass mass on the measured profiles remains an open finding: glass = 0
+  is the current classifier's route gate (b-1185) plus 96% SiO offgas
+  loss (b-1184); not a physics yield.
+
 ## [0.6.7] — 2026-11-12
 
 - Objective claims, gates, and study-scalar weights use the resolved

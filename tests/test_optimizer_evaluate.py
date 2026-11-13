@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import ast
 import copy
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 import inspect
 import math
+import textwrap
 from types import SimpleNamespace
 
 import pytest
@@ -7300,19 +7303,169 @@ def test_plain_c0_evaluation_drives_later_steps_and_keeps_authored_hours() -> No
     assert c2a_executor.config.until_campaign_complete is False
 
 
-def test_c6_hold_target_not_acquired_is_priced_unavailable() -> None:
-    """The typed C6 acquisition refusal is never a numeric zero.
+def _c6_refusal_reasons_the_engine_can_record() -> tuple[str, ...]:
+    """Every reason a stored C6 refusal diagnostic can carry.
 
-    The executor leaves the batch status ok for a campaign-scoped C6
-    refusal. The evaluator still returns an unscored physics refusal.
+    Sources are the campaign constants, the C6 thermite dispatch methods,
+    and feedstock static windows. A new reason in those sources joins this
+    tuple without a hand-written case.
     """
 
+    from engines.builtin.metallothermic_step import BuiltinMetallothermicStepProvider
+    import simulator.campaigns as campaigns
+
+    reasons: set[str] = set()
+    for name, value in vars(campaigns).items():
+        if (
+            name.startswith("C6_")
+            and name.endswith("_REFUSAL_REASON")
+            and isinstance(value, str)
+            and value
+        ):
+            reasons.add(value)
+    crossover = BuiltinMetallothermicStepProvider.C6_ABOVE_CROSSOVER_REFUSAL
+    if isinstance(crossover, str) and crossover:
+        reasons.add(crossover)
+    for method_name in (
+        "_dispatch_c6_mg_primary",
+        "_dispatch_c6_back_reduction",
+    ):
+        source = textwrap.dedent(
+            inspect.getsource(
+                getattr(BuiltinMetallothermicStepProvider, method_name)
+            )
+        )
+        tree = ast.parse(source)
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Dict):
+                continue
+            for key, value in zip(node.keys, node.values, strict=True):
+                if (
+                    isinstance(key, ast.Constant)
+                    and key.value == "reason_refused"
+                    and isinstance(value, ast.Constant)
+                    and isinstance(value.value, str)
+                    and value.value
+                ):
+                    reasons.add(value.value)
+    windows = (
+        load_config_bundle(DEFAULT_DATA_DIR)
+        .setpoints["campaigns"]["C6"]
+        .get("static_window_by_feedstock", {})
+    )
+    for window in windows.values():
+        if not isinstance(window, Mapping):
+            continue
+        if str(window.get("status") or "") != "refused":
+            continue
+        reason = window.get("reason_refused")
+        if isinstance(reason, str) and reason:
+            reasons.add(reason)
+    return tuple(sorted(reasons))
+
+
+def _c6_priced_unavailable_cases() -> tuple[tuple[str, str], ...]:
+    reasons = _c6_refusal_reasons_the_engine_can_record()
+    cases = [
+        (reason, carrier)
+        for reason in reasons
+        for carrier in ("execution", "simulator")
+    ]
+    # A reason that is not in the engine list still refuses. The chokepoint
+    # is not a whitelist.
+    cases.append(("c6_unlisted_campaign_refusal", "execution"))
+    cases.append(("c6_unlisted_campaign_refusal", "simulator"))
+    cases.append(("", "execution"))
+    return tuple(cases)
+
+
+def _c6_ok_execution(reason: str, carrier: str):
+    """Batch status stays ok. That is the executor's C6 behaviour."""
+
+    diagnostic = {
+        "status": "refused",
+        "reaction_family": "c6_mg_thermite",
+        "campaign": "C6",
+        "diagnostic": {"reason_refused": reason} if reason else {},
+    }
+    if carrier == "execution":
+        return _execution(status="ok", refusal_diagnostic=diagnostic)
+    execution = _execution(status="ok", refusal_diagnostic={})
+    execution.simulator._last_c6_refusal_diagnostic = diagnostic
+    return execution
+
+
+def test_c6_refusal_reason_discovery_includes_every_recorded_class() -> None:
+    """The generative grid is the engine's reasons, not one counterexample."""
+
+    reasons = set(_c6_refusal_reasons_the_engine_can_record())
+    assert C6_WINDOW_REFUSAL in reasons
+    assert "c6_hold_target_not_acquired" in reasons
+    assert "c6_hold_target_nonfinite" in reasons
+    assert "no_liquid_phase" in reasons
+    assert "c6_mg_thermite_above_crossover_requires_local_support" in reasons
+    assert "c6_unlisted_campaign_refusal" not in reasons
+
+
+@pytest.mark.parametrize(
+    ("reason", "carrier"),
+    _c6_priced_unavailable_cases(),
+    ids=lambda value: value or "missing-reason",
+)
+def test_every_c6_campaign_refusal_is_priced_unavailable(
+    reason: str,
+    carrier: str,
+) -> None:
+    """A C6 refusal with batch status ok is never a numeric score.
+
+    The executor preserves the diagnostic and leaves status ok. Pricing
+    uses the recorded reason, including CI's empty static window.
+    """
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(_c6_ok_execution(reason, carrier)),
+    )
+    expected = reason or "c6_campaign_refused"
+
+    assert result.feasible is False
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.objectives is None
+    assert result.run_reference is not None
+    assert result.run_reference.reason == expected
+    assert f"priced_unavailable:{expected}" in result.run_reference.error_message
+    assert f"priced_unavailable:{expected}" in result.notes
+
+
+def test_ok_execution_without_c6_refusal_keeps_a_numeric_score() -> None:
+    """The refusal gate does not unscored an ordinary ok batch."""
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(_execution(status="ok")),
+    )
+
+    assert result.objectives is not None
+    assert result.failure_category is not FailureCategory.PHYSICS_REFUSED
+
+
+def test_c4_refusal_diagnostic_is_not_priced_as_a_c6_refusal() -> None:
+    """C4 already stops the batch. This gate is the C6 status-ok hole."""
+
     execution = _execution(
+        status="ok",
         refusal_diagnostic={
             "status": "refused",
-            "campaign": "C6",
+            "campaign": "C4",
+            "reaction_family": "c4_mg_selective_pyrolysis",
             "diagnostic": {
-                "reason_refused": "c6_hold_target_not_acquired",
+                "reason_refused": "c4_target_window_not_acquired",
             },
         },
     )
@@ -7324,15 +7477,9 @@ def test_c6_hold_target_not_acquired_is_priced_unavailable() -> None:
         executor=FakeExecutor(execution),
     )
 
-    assert result.feasible is False
-    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
-    assert result.objectives is None
-    assert result.run_reference is not None
-    assert result.run_reference.reason == "c6_hold_target_not_acquired"
-    assert "priced_unavailable:c6_hold_target_not_acquired" in (
-        result.run_reference.error_message
-    )
-    assert "priced_unavailable:c6_hold_target_not_acquired" in result.notes
+    assert result.objectives is not None
+    assert result.failure_category is not FailureCategory.PHYSICS_REFUSED
+    assert "priced_unavailable:" not in " ".join(result.notes)
 
 
 def continuation_metal_delta(
@@ -7355,7 +7502,8 @@ def continuation_metal_delta(
         )
     if baseline_kg == capped_kg:
         raise AssertionError(
-            "C4_HORIZON_RELATION: cap must change extracted metals"
+            "C4_HORIZON_RELATION: cap must change extracted metals "
+            f"({baseline_kg} vs {capped_kg})"
         )
     return baseline_kg - capped_kg
 
@@ -7384,33 +7532,92 @@ def test_continuation_metal_delta_requires_a_numeric_change() -> None:
     assert continuation_metal_delta(4.0, 1.5) == pytest.approx(2.5)
 
 
-def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
-    """Authored hours stay 24. The controller, not that hour count, is the stop.
+def _later_campaign_names(result) -> list[str]:
+    trace = result.run_reference.trace
+    stops = trace["campaign_stops"] if "campaign_stops" in trace else ()
+    return [
+        str(stop["campaign"])
+        for stop in stops
+        if str(stop.get("campaign") or "") not in {"", "C0"}
+    ]
 
-    The live furnace-cap pair is not in this suite. Two AUTO_APPLY sequences
-    exceeded 3600s, and a pass that accepts two refusals or one missing
-    metal total hid that. This test arms continuation on the highland C0
-    profile and keeps the authored hours. ``continuation_metal_delta``
-    fails closed. A live metal delta was not re-measured.
+
+def _engine_metals_kg(result) -> float:
+    """Extracted metals from this evaluate() result, or a failed assertion.
+
+    A physics refusal, a missing summary, or a non-finite total is not a
+    yield. There is no branch that substitutes a synthetic number.
     """
 
+    assert result.failure_category is not FailureCategory.PHYSICS_REFUSED, (
+        getattr(result.run_reference, "reason", None)
+    )
+    assert result.run_reference is not None
+    summary = result.run_reference.product_summary
+    metals = float(
+        summary["product_classes"]["metals_plus_O2"]["metals_total_kg"]
+    )
+    assert math.isfinite(metals)
+    return metals
+
+
+def _highland_profile_at_mass(mass_kg: float) -> dict:
     profile = copy.deepcopy(dict(load_profile("lunar_highland")))
     profile["run"]["hours"] = 24
+    profile["run"]["mass_kg"] = mass_kg
     for fidelity_options in profile["fidelities"].values():
         fidelity_options["hours"] = 24
-    executor = FakeExecutor(_execution())
-    result = evaluate(
-        RecipePatch({}),
-        "lunar_highland",
-        "fast",
-        profile=profile,
-        executor=executor,
-    )
-    assert result.eval_spec is not None
-    assert result.eval_spec.hours == 24
-    assert result.eval_spec.campaign == "C0"
-    assert executor.config.until_campaign_complete is True
-    assert executor.config.hours == 24
+        fidelity_options["mass_kg"] = mass_kg
+    return profile
+
+
+@pytest.mark.nightly
+@pytest.mark.xdist_group("serial")
+@pytest.mark.cpu_budget(5000)
+def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
+    """Authored hours stay 24. Later steps run, and metals come from them.
+
+    Both totals are ``evaluate()`` with the production executor, on two
+    charge masses of the same campaign. A 1200 C furnace cap cannot enter
+    the C4 window and is ``c4_target_window_not_acquired``, so it is not a
+    yield pair. Glass mass is not asserted: glass = 0 is the current
+    classifier's route gate (b-1185) plus 96% SiO offgas loss (b-1184);
+    not a physics yield.
+    """
+
+    def one(mass_kg: float):
+        result = evaluate(
+            RecipePatch({}),
+            "lunar_highland",
+            "fast",
+            profile=_highland_profile_at_mass(mass_kg),
+        )
+        assert result.eval_spec is not None
+        assert result.eval_spec.hours == 24
+        assert result.eval_spec.mass_kg == pytest.approx(mass_kg)
+        assert result.eval_spec.campaign == "C0"
+        assert result.run_reference is not None
+        names = _later_campaign_names(result)
+        assert names, (
+            f"did not leave C0; reason={result.run_reference.reason!r} "
+            f"stops={list(result.run_reference.trace.get('campaign_stops', ()))}"
+        )
+        for stop in result.run_reference.trace["campaign_stops"]:
+            assert stop["stop_reason"] in {
+                "endpoint_met",
+                "time_cap",
+                "refused",
+                "stop_reason_unrecorded",
+            }
+        return result
+
+    full = one(1000.0)
+    half = one(500.0)
+    full_metals = _engine_metals_kg(full)
+    half_metals = _engine_metals_kg(half)
+    assert full_metals > 0.0, full_metals
+    assert half_metals > 0.0, half_metals
+    assert continuation_metal_delta(full_metals, half_metals) != 0.0
 
 
 _EXECUTION_TRACKS = ("pyrolysis", "mre_baseline")

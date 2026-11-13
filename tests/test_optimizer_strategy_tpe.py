@@ -25,6 +25,7 @@ from simulator.optimize.evaluate import (
     FailureCategory,
     RunReference,
     ScoredResult,
+    evaluate,
 )
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
@@ -46,6 +47,7 @@ from simulator.optimize.strategy.bayesian import (
     _BAD_MAXIMIZE_VALUE,
     _BAD_MINIMIZE_VALUE,
     _resolve_n_startup_trials,
+    objective_values_for_executed_spec,
     _CONSTRAINT_NAMES_ATTR,
     _CANDIDATE_ID_ATTR,
     _CONSTRAINT_VALUES_ATTR,
@@ -715,72 +717,102 @@ def _lunar_profile_for_hours(hours: int, *, gates: tuple[str, ...] | None = None
     return profile
 
 
+@pytest.mark.nightly
+@pytest.mark.xdist_group("serial")
+@pytest.mark.cpu_budget(5000)
 def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> None:
-    """Infeasible finite yields are told as those yields, not as sentinels.
+    """Finite yields told to TPE are the engine's yields.
 
-    The profile's authored analytical hours stay 60. This test does not call
-    evaluate(). A C0 start now continues through AUTO_APPLY, and four of
-    those sequences exceeded 3600s. Glass mass is not asserted: glass = 0
-    is the current classifier's route gate (b-1185) plus 96% SiO offgas
-    loss (b-1184); not a physics yield.
+    The pair is two production evaluations. Both caps clear the C4
+    window; a 1200 C cap is ``c4_target_window_not_acquired`` and is not
+    a yield. Authored hours stay 60, and each run leaves C0. Glass mass
+    is not asserted: glass = 0 is the current classifier's route gate
+    (b-1185) plus 96% SiO offgas loss (b-1184); not a physics yield.
     """
 
-    profile = _lunar_profile_for_hours(60)
-    assert (
-        profile["fidelities"][ANALYTICAL_BACKEND_SERIALIZATION_TOKEN]["hours"]
-        == 60
+    furnace_path = ("furnace_max_T_C",)
+    schema = RecipeSchema(
+        allowlist=(
+            KnobSpec(
+                path=furnace_path,
+                kind="float",
+                low=1200.0,
+                high=2200.0,
+                bounds_source="C5 acceptance",
+            ),
+        )
     )
+    profile = _lunar_profile_for_hours(60)
     strategy = OptunaTPEStrategy(
-        _simple_schema(),
+        schema,
         seed=5505,
         objective_profile=profile,
         n_startup_trials=0,
+        warm_start_seeds=(
+            WarmStartSeed(
+                id="nonbinding-1800-cap",
+                patch=RecipePatch({furnace_path: 1800.0}),
+                proposal_source="seed_recipe",
+            ),
+            WarmStartSeed(
+                id="alumina-max-1843-cap",
+                patch=RecipePatch({furnace_path: 1843.0}),
+                proposal_source="seed_recipe",
+            ),
+        ),
     )
-    assert "oxygen_kg" in strategy.objective_metrics
-    assert "duration_h" in strategy.objective_metrics
     candidates = strategy.ask(2)
-    results = []
-    for index, candidate in enumerate(candidates):
-        raw = float(index + 1)
-        results.append(
-            ScoredResult(
-                candidate_id=candidate.id,
-                eval_spec=None,
-                cache_key=None,
-                feasible=False,
-                failure_category=FailureCategory.INFEASIBLE_RECIPE,
-                objectives=ObjectiveVector(
-                    tuple(
-                        ObjectiveValue(
-                            metric=definition.metric,
-                            sense=definition.sense,
-                            value=raw,
-                            units=definition.units,
-                        )
-                        for definition in strategy.objective_definitions
-                    )
-                ),
-                feasibility_margins={"extraction_completeness": -0.5},
-                failing_gates=("extraction_completeness",),
-                run_reference=_available_run_reference(),
-            )
+    results = [
+        evaluate(
+            candidate.patch,
+            "lunar_mare_low_ti",
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            profile=profile,
+            candidate_id=candidate.id,
         )
+        for candidate in candidates
+    ]
+
+    for result in results:
+        assert result.eval_spec is not None and result.eval_spec.hours == 60
+        assert result.eval_spec.campaign == "C0"
+        assert result.run_reference is not None
+        stops = result.run_reference.trace.get("campaign_stops", ())
+        assert any(
+            str(stop.get("campaign") or "") not in {"", "C0"} for stop in stops
+        ), stops
+        assert result.failure_category is not FailureCategory.PHYSICS_REFUSED, (
+            result.run_reference.reason
+        )
+        assert result.objectives is not None
+        mapping = result.objectives.as_mapping()
+        engine_metals = float(
+            result.run_reference.product_summary["product_classes"][
+                "metals_plus_O2"
+            ]["metals_total_kg"]
+        )
+        assert math.isfinite(engine_metals)
+        assert engine_metals > 0.0
+        assert mapping["metals_total_kg"] == pytest.approx(engine_metals)
+        assert math.isfinite(mapping["oxygen_kg"])
+        assert math.isfinite(mapping["duration_h"])
+        assert "pure_silica_glass_kg" in mapping
+
     strategy.tell(list(zip(candidates, results, strict=True)))
     trials = _trials_by_candidate(strategy)
-    for index, candidate in enumerate(candidates):
+    for candidate, result in zip(candidates, results, strict=True):
         trial = trials[candidate.id]
-        raw = float(index + 1)
-        assert trial.state.name == "COMPLETE"
-        assert trial.values is not None
-        assert len(trial.values) == len(strategy.objective_metrics)
-        assert trial.values == [raw] * len(strategy.objective_metrics)
-        assert all(math.isfinite(value) for value in trial.values)
-        assert _BAD_MAXIMIZE_VALUE not in trial.values
-        assert _BAD_MINIMIZE_VALUE not in trial.values
-        assert "extraction_completeness" in trial.user_attrs[_CONSTRAINT_NAMES_ATTR]
-        assert any(
-            value > 0.0 for value in trial.user_attrs[_CONSTRAINT_VALUES_ATTR]
+        expected = objective_values_for_executed_spec(
+            profile,
+            strategy.objective_definitions,
+            result,
         )
+        assert expected is not None
+        assert all(math.isfinite(value) for value in expected)
+        assert _BAD_MAXIMIZE_VALUE not in expected
+        assert _BAD_MINIMIZE_VALUE not in expected
+        assert trial.state.name == "COMPLETE"
+        assert trial.values == [pytest.approx(value) for value in expected]
 
 
 def test_tpe_infeasible_objectives_without_furnace_cost_use_raw_metrics() -> None:
