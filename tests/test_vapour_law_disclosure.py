@@ -24,9 +24,12 @@ read only through that gate.
 Registration of a new row is ``register_executed_law``. Compiled laws call
 it from ``CompiledPressureEvaluator.evaluate``. Every other published
 extrapolation is one chokepoint, ``PUBLISHED_EXTRAPOLATION_CLASSES``: the
-temperature band (direct Antoine, including out-of-band SiO) and the
-Ellingham fit band (``species:ellingham``, including a gas-fugacity
-pressure past the fit). A compiled neighbour does not name the Ellingham
+temperature band and the Ellingham fit band (``species:ellingham``,
+including a gas-fugacity pressure past the fit). Antoine is only the
+direct coefficient continuation, including out-of-band SiO. A compiled
+evaluator executed in that dispatch keeps its own family and temperature
+band; an extrapolated source-activity floor does not rename it to Antoine.
+A compiled neighbour does not name the Ellingham
 law. A non-diagnostic law is registered when the evaluation leaves a
 certified domain: the temperature band, the Ellingham fit, the oxygen
 evaluator band, or the oxygen mass-action floor. An in-domain
@@ -908,6 +911,255 @@ def test_sio_oxygen_extrapolation_survives_cache_hit_and_ranking() -> None:
         "flagged_law_ids": "SiO:standard_reaction_term",
         "flagged_law_authority": "extrapolated",
     }
+
+
+def _antoine_block_selects_compiled_evaluator(data: dict) -> bool:
+    """Same gate as the oxide loop: unreadable Antoine, or A <= 0."""
+
+    from engines.antoine import (
+        _AntoineCoefficientRefusal,
+        _read_antoine_coefficients,
+    )
+
+    antoine = data.get("antoine") or {}
+    try:
+        coefficients = _read_antoine_coefficients(antoine)
+    except _AntoineCoefficientRefusal:
+        return True
+    return coefficients[0] <= 0.0
+
+
+def _compiled_floor_species(provider):
+    """Parent-oxide laws whose provider path executes a compiled evaluator.
+
+    Diagnostic admissions register inside evaluate() even in band, so they
+    are not this defect. Hot-train skips never publish the pressure.
+    """
+
+    from simulator.vapour_rail.catalog import CatalogCompileError
+
+    catalog = provider._vapour_rail_catalog
+    oxides = provider._vapor_pressure_data.get("oxide_vapors") or {}
+    selected = []
+    for name, data in oxides.items():
+        if not isinstance(data, dict) or not data.get("parent_oxide"):
+            continue
+        if not _antoine_block_selects_compiled_evaluator(data):
+            continue
+        try:
+            evaluator = catalog.evaluator_for(str(name))
+        except (KeyError, ValueError):
+            continue
+        if evaluator is None:
+            continue
+        if getattr(evaluator, "diagnostic_admission_notice", None):
+            continue
+        try:
+            catalog.assert_hot_train_applicable(str(name), process_phase=None)
+        except CatalogCompileError:
+            continue
+        selected.append((str(name), str(data["parent_oxide"]), evaluator))
+    return selected
+
+
+def _floor_activity_dispatch(provider, parent: str, temperature_K: float):
+    """Production dispatch with the parent activity below the compiled floor."""
+
+    import warnings
+
+    from engines.builtin import vapor_pressure as vapor_pressure_module
+    from simulator.chemistry.kernel.capabilities import ChemistryIntent
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+    from simulator.chemistry.melt_activity import MeltOxideActivity
+
+    activity = 1.0e-310
+
+    def with_activity(*args, **kwargs):
+        del kwargs
+        oxide = args[0]
+        # Other parents stay inactive. The oxide loop continues on None, so
+        # an unrelated Antoine species cannot raise out of its band and hide
+        # this parent's compiled law.
+        if oxide != parent:
+            return None
+        return MeltOxideActivity(
+            parent_oxide=oxide,
+            single_cation_component=oxide,
+            gamma=1.0,
+            x_single_cation=activity,
+            activity=activity,
+            citation="test activity injection",
+        )
+
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {parent: 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1e-6,
+        fO2_log=math.log10(1.0e-9),
+        control_inputs={
+            "pO2_bar": 1.0e-9,
+            "intrinsic_fO2_log": math.log10(1.0e-9),
+            "pO2_admission": "observation",
+        },
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        original = vapor_pressure_module._high_t_activity_for_parent
+        vapor_pressure_module._high_t_activity_for_parent = with_activity
+        try:
+            result = provider.dispatch(request)
+        finally:
+            vapor_pressure_module._high_t_activity_for_parent = original
+    return result
+
+
+def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
+    """In-band compiled laws keep their family when activity is floored.
+
+    Invariant: an extrapolated notice discloses the evaluator that produced
+    the pressure. ``authority_level == "extrapolated"`` does not select
+    Antoine. TiO at 2100 K is the reviewer point: oxygen is inside the
+    evaluator band, TiO2 activity is below the floor, and the executed law
+    is nasa_cea_9 on [1923.15, 2273.15] K. Every other compiled parent-oxide
+    law is the same arm at its own band midpoint. Cold dispatch and cache
+    replay publish the same law id, band, and count. The pressure stays the
+    floored evaluation.
+    """
+
+    from engines.builtin.vapor_pressure import (
+        COMPILED_SOURCE_ACTIVITY_FLOOR,
+        BuiltinVaporPressureProvider,
+    )
+    from simulator.physical_constants import (
+        MELT_DISSOCIATION_PO2_MAX_BAR,
+        MELT_DISSOCIATION_PO2_MIN_BAR,
+    )
+
+    provider = BuiltinVaporPressureProvider(_live_vapor())
+    species_rows = _compiled_floor_species(provider)
+    names = {name for name, _parent, _evaluator in species_rows}
+    assert "TiO" in names
+    mismatches: list[str] = []
+    checked: set[str] = set()
+    memory = PT0DeterminismStore("capture")
+    for name, parent, evaluator in species_rows:
+        low, high = evaluator.valid_temperature_K
+        band = [float(low), float(high)]
+        if name == "TiO":
+            assert evaluator.evaluator_family == "nasa_cea_9"
+            assert band == [1923.15, 2273.15]
+            temperature_K = 2100.0
+        else:
+            temperature_K = (float(low) + float(high)) / 2.0
+        # Below 400 K the provider returns before the oxide loop.
+        if temperature_K < 400.0:
+            continue
+        checked.add(name)
+        law_id = f"{name}:{evaluator.evaluator_family}"
+        key, payload = _tagged_curve(f"activity-floor-{name}")
+        with disclosure_scope(inherit=False) as cold:
+            with computation_disclosure() as computation:
+                try:
+                    result = _floor_activity_dispatch(
+                        provider, parent, temperature_K
+                    )
+                except Exception as exc:
+                    mismatches.append(
+                        f"{name}: dispatch {type(exc).__name__}: {exc}"
+                    )
+                    continue
+                memory._store("freeze_gate_curve", key, payload)
+                one = computation.snapshot()
+            cold_snapshot = cold.snapshot()
+        if result.status != "ok":
+            mismatches.append(f"{name}: status {result.status}")
+            continue
+        diagnostic = result.diagnostic or {}
+        pressures = diagnostic.get("vapor_pressures_Pa") or {}
+        if name not in pressures:
+            mismatches.append(f"{name}: unpublished")
+            continue
+        provenance = (
+            diagnostic.get("vapor_pressure_numerator_provenance") or {}
+        ).get(name) or {}
+        floor = provenance.get("source_activity_floor_notice")
+        if floor != [
+            {
+                "authority_level": "extrapolated",
+                "reason": "source_activity_floored",
+                "certified_band": {
+                    "source_activity": (COMPILED_SOURCE_ACTIVITY_FLOOR, 1.0)
+                },
+                "source_activity_used": 1.0e-310,
+            }
+        ]:
+            mismatches.append(f"{name}: floor notice {floor!r}")
+            continue
+        used = provenance.get("pO2_bar")
+        try:
+            oxygen = float(used)
+        except (TypeError, ValueError):
+            mismatches.append(f"{name}: pO2 {used!r}")
+            continue
+        if not (
+            MELT_DISSOCIATION_PO2_MIN_BAR
+            <= oxygen
+            <= MELT_DISSOCIATION_PO2_MAX_BAR
+        ):
+            mismatches.append(f"{name}: oxygen {oxygen} outside the evaluator band")
+            continue
+        if name in (diagnostic.get("extrapolated_beyond_valid_range_K") or {}):
+            mismatches.append(f"{name}: temperature extrapolation at {temperature_K}")
+            continue
+        rows = [item for item in one if item.get("law_id") == law_id]
+        if len(rows) != 1:
+            present = [item.get("law_id") for item in one if str(item.get("law_id") or "").startswith(name + ":")]
+            mismatches.append(f"{name}: laws {present}")
+            continue
+        row = rows[0]
+        problems = []
+        if row.get("law_id") != law_id:
+            problems.append(f"law {row.get('law_id')}")
+        if (
+            str(row.get("law_id")).endswith(":antoine")
+            and evaluator.evaluator_family != "antoine"
+        ):
+            problems.append("antoine stand-in")
+        if row.get("authority") != "extrapolated":
+            problems.append(f"authority {row.get('authority')}")
+        if row.get("provenance") != "source_activity_floored":
+            problems.append(f"provenance {row.get('provenance')!r}")
+        if row.get("certified_band_K") != band:
+            problems.append(f"band {row.get('certified_band_K')}")
+        if row.get("evaluation_count") != 1:
+            problems.append(f"count {row.get('evaluation_count')}")
+        try:
+            reference = evaluator.evaluate(
+                temperature_K,
+                source_activity=COMPILED_SOURCE_ACTIVITY_FLOOR,
+                pO2_bar=oxygen,
+            )
+            published_hex = pressures[name].hex()
+            reference_hex = reference.pressure_pa.hex()
+        except Exception as exc:
+            problems.append(f"reference {type(exc).__name__}: {exc}")
+        else:
+            if published_hex != reference_hex:
+                problems.append("pressure moved")
+        if cold_snapshot != one:
+            problems.append("run snapshot is not the computation")
+        with disclosure_scope(inherit=False) as warm:
+            memory._lookup("freeze_gate_curve", key)
+            if warm.snapshot() != cold_snapshot:
+                problems.append("cache replay diverged")
+        if problems:
+            mismatches.append(f"{name}: {', '.join(problems)}")
+    assert "TiO" in checked
+    assert mismatches == []
 
 
 def test_cache_publication_paths_use_the_disclosure_chokepoint() -> None:

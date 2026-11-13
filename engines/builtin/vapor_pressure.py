@@ -387,14 +387,18 @@ def _register_direct_flagged_continuations(
     vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
     disclosure_before: Sequence[Mapping[str, Any]],
     published_extrapolation_maps: Mapping[str, Mapping[str, Any]],
+    executed_compiled_laws: Mapping[str, Any],
 ) -> None:
-    """Register every published continuation that did not execute a compiled law.
+    """Register every published continuation evaluate() did not already record.
 
     Invariant: a published vapour pressure whose publication map says the
     producing law was extrapolated is in the run disclosure under that law.
-    The maps are ``PUBLISHED_EXTRAPOLATION_CLASSES``. Compiled laws register
-    inside ``CompiledPressureEvaluator.evaluate``. This is the one other call
-    of ``register_executed_law``. A temperature or carrier-notice continuation
+    The family is the evaluator that ran. ``authority_level`` does not select
+    Antoine. ``executed_compiled_laws`` names each compiled evaluator this
+    dispatch executed; a direct coefficient continuation is Antoine only when
+    that map has no entry. The maps are ``PUBLISHED_EXTRAPOLATION_CLASSES``.
+    Compiled laws also register inside ``CompiledPressureEvaluator.evaluate``.
+    This is the one other call of ``register_executed_law``. A continuation
     already registered by evaluate() for that species is not registered again.
     An Ellingham fit-band continuation is a different law (``species:ellingham``)
     and is registered even when a compiled carrier already disclosed the species.
@@ -426,6 +430,7 @@ def _register_direct_flagged_continuations(
                     vapor_pressure_provenance=vapor_pressure_provenance,
                     temperature_records=records,
                     registered_species=registered_species,
+                    executed_compiled_laws=executed_compiled_laws,
                     public_carrier_notices=public_carrier_notices,
                 )
             )
@@ -446,6 +451,17 @@ def _register_direct_flagged_continuations(
         register_executed_law(evaluator, evaluation)
 
 
+def _continuation_reasons(notices: Sequence[Mapping[str, Any]]) -> str:
+    """Distinct notice reasons, in publication order, as one status."""
+
+    reasons: list[str] = []
+    for notice in notices:
+        reason = str(notice.get("reason") or "").strip()
+        if reason and reason not in reasons:
+            reasons.append(reason)
+    return "; ".join(reasons) if reasons else "extrapolated"
+
+
 def _antoine_continuation_execution(
     species: str,
     *,
@@ -461,11 +477,6 @@ def _antoine_continuation_execution(
         if _direct_continuation_band(notice) is not None
     ]
     chosen = banded[0] if banded else notices[0]
-    reasons: list[str] = []
-    for notice in notices:
-        reason = str(notice.get("reason") or "").strip()
-        if reason and reason not in reasons:
-            reasons.append(reason)
     evaluator = SimpleNamespace(
         species_id=str(species),
         evaluator_family="antoine",
@@ -474,9 +485,48 @@ def _antoine_continuation_execution(
     )
     evaluation = SimpleNamespace(
         out_of_range=True,
-        status="; ".join(reasons) if reasons else "extrapolated",
+        status=_continuation_reasons(notices),
     )
     return evaluator, evaluation
+
+
+def _compiled_continuation_execution(
+    evaluator: Any,
+    *,
+    notices: Sequence[Mapping[str, Any]],
+):
+    """The compiled law that produced the pressure, not an Antoine stand-in.
+
+    ``authority_level == "extrapolated"`` is the disclosure flag. The family
+    and certified temperature band come from the evaluator this dispatch
+    executed. A source-activity floor on nasa_cea_9 stays ``species:nasa_cea_9``.
+    """
+
+    from types import SimpleNamespace
+
+    evaluation = SimpleNamespace(
+        out_of_range=True,
+        status=_continuation_reasons(notices),
+    )
+    return evaluator, evaluation
+
+
+def _continuation_execution(
+    species: str,
+    notices: Sequence[Mapping[str, Any]],
+    executed_compiled_laws: Mapping[str, Any],
+):
+    """Disclose the law that produced this published pressure.
+
+    Invariant: an extrapolated notice does not select ``antoine``. Antoine
+    is only the direct coefficient continuation, and only when this dispatch
+    did not execute a compiled evaluator for the species.
+    """
+
+    evaluator = executed_compiled_laws.get(str(species))
+    if evaluator is not None:
+        return _compiled_continuation_execution(evaluator, notices=notices)
+    return _antoine_continuation_execution(str(species), notices=notices)
 
 
 def _temperature_band_executions(
@@ -485,6 +535,7 @@ def _temperature_band_executions(
     vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
     temperature_records: Mapping[str, Any],
     registered_species: set[str],
+    executed_compiled_laws: Mapping[str, Any],
     public_carrier_notices,
 ) -> list[tuple[Any, Any]]:
     """Carrier notices, including the temperature map copied onto provenance."""
@@ -504,7 +555,11 @@ def _temperature_band_executions(
         if not extrapolated:
             continue
         executions.append(
-            _antoine_continuation_execution(species, notices=extrapolated)
+            _continuation_execution(
+                str(species),
+                extrapolated,
+                executed_compiled_laws,
+            )
         )
         covered.add(str(species))
     for species, notice in temperature_records.items():
@@ -513,7 +568,11 @@ def _temperature_band_executions(
         if species in covered or not isinstance(notice, Mapping):
             continue
         executions.append(
-            _antoine_continuation_execution(str(species), notices=(notice,))
+            _continuation_execution(
+                str(species),
+                (notice,),
+                executed_compiled_laws,
+            )
         )
     return executions
 
@@ -4433,6 +4492,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
 
         oxide_vapors_data = self._vapor_pressure_data.get('oxide_vapors', {}) or {}
+        # Compiled evaluators this dispatch actually executed. The registrar
+        # reads this map so an extrapolated notice keeps that law. Antoine is
+        # not inferred from authority_level. The map is not published.
+        executed_compiled_laws: dict[str, Any] = {}
         from simulator.vapour_rail.catalog import CatalogCompileError
         from simulator.vapour_rail.instrumentation import (
             apply_public_carrier_notices,
@@ -4820,6 +4883,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ),
             ):
                 vapor_pressures[name] = P_eq_Pa
+                if compiled_evaluator is not None:
+                    executed_compiled_laws[str(name)] = compiled_evaluator
                 # Above-band predictions remain diagnostic-limited, including
                 # the SiO continuation without a second certified interval.
                 oxide_extrapolated = name in oxide_vapor_extrapolations
@@ -5140,6 +5205,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 key: diagnostic[key]
                 for _class_name, key in PUBLISHED_EXTRAPOLATION_CLASSES
             },
+            executed_compiled_laws=executed_compiled_laws,
         )
 
         return IntentResult(
