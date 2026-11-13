@@ -277,6 +277,9 @@ def _printed_partner_is_ineligible(
 def _unidentified_molecular_input(row: Observation) -> bool:
     return (
         row.identity.species.formula == "O2"
+        and row.identity.reaction is not None
+        and row.identity.reaction.is_value
+        and {term.species.formula for term in row.identity.reaction.value.terms} == {"O", "O2"}
         and not row.derived_from
         and row.derivation is not None
         and row.derivation.declares_unprinted_raw_inputs
