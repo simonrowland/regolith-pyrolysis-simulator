@@ -12846,6 +12846,57 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
     assert any(row.get("status") == ResidualStatus.REFUSED.value for row in rows)
 
 
+@pytest.mark.parametrize("workers", (1, 2))
+def test_species_selection_count_printed_once_for_serial_and_worker_scoring(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    workers: int,
+) -> None:
+    context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    reference = context.observations["fixture-measured-vapour"]
+    monkeypatch.setattr(
+        score_mod,
+        "comparison_candidates",
+        lambda _context: (reference,),
+    )
+    monkeypatch.setattr(score_mod, "diagnostic_references", lambda _context: ())
+    monkeypatch.setattr(
+        score_mod, "_refusal_diagnostic_references", lambda _context: ()
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "_compile_residual_with_lineage",
+        lambda observation, _engine, **_kwargs: (
+            fixture_residuals[observation.observation_id],
+            fixture_candidates.get(
+                fixture_residuals[observation.observation_id].candidate or ""
+            ),
+        ),
+    )
+    if workers > 1:
+        monkeypatch.setattr(score_mod, "_SCORE_WORKER_SETUP", None)
+
+        def run_inline(tasks, worker, *, initializer, initargs, **_kwargs):
+            initializer(*initargs)
+            return [worker(task) for task in tasks]
+
+        monkeypatch.setattr(score_mod, "supervised_process_map", run_inline)
+
+    score_mod._score_store_to_jsonl(
+        context,
+        tmp_path / f"species-count-{workers}.jsonl",
+        root=score_mod.REPO_ROOT,
+        engines=(engine,),
+        species_formulas=("Na",),
+        include_diagnostics=False,
+        workers=workers,
+    )
+
+    line = "species references selected=1 formulas=Na"
+    assert capsys.readouterr().out.splitlines().count(line) == 1
+
+
 def test_compact_static_refusals_are_opt_in_and_preserve_numeric_rows(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
