@@ -27,6 +27,7 @@ from simulator.engine_pool import (
     EngineWorkerRemoteError,
     EngineWorkerTimeout,
     WarmEngineWorker,
+    _EngineWorkerLaunch,
     _pool_ready_wait_s,
 )
 
@@ -438,6 +439,76 @@ def test_pre_ready_worker_death_is_engine_worker_died():
     assert restarted.value.phase == 'restart'
     assert isinstance(restarted.value.__cause__, EOFError)
     worker.close()
+
+
+class _HandshakeReleaseGate(threading.Event):
+    """Event whose ``wait`` records that the owner has reached the gate."""
+
+    def __init__(self, wait_entered):
+        super().__init__()
+        self.wait_entered = wait_entered
+
+    def wait(self, timeout=None):
+        self.wait_entered.set()
+        return super().wait(timeout)
+
+
+def test_reaped_restart_stays_published_until_ready_read(monkeypatch):
+    """Owner reap must not steal the launch before the ready read.
+
+    Hold the handshake until the owner has reaped the child and either
+    waits for the read (fixed) or finishes cleanup (unfixed). On the
+    unfixed code the read sees the cleared launch and a nonempty EOF.
+    """
+    real_init = _EngineWorkerLaunch.__init__
+
+    def init(self, worker, process, connection, child):
+        real_init(self, worker, process, connection, child)
+        if worker._bootstrap is not os._exit:
+            return
+        reaped = threading.Event()
+        self.handshake_released = _HandshakeReleaseGate(reaped)
+        real_started_wait = self.started.wait
+        real_finished_set = self.finished.set
+
+        def wait_until_reaped(timeout=None):
+            started = real_started_wait(timeout)
+            if started:
+                assert reaped.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+            return started
+
+        def finished():
+            real_finished_set()
+            reaped.set()
+
+        self.started.wait = wait_until_reaped
+        self.finished.set = finished
+        seen.append(self)
+
+    monkeypatch.setattr(_EngineWorkerLaunch, '__init__', init)
+    seen = []
+
+    worker = _test_worker(timeout_s=5.0)
+    worker.start()
+    try:
+        worker.close()
+        worker._bootstrap = os._exit
+        worker._bootstrap_args = (23,)
+        with pytest.raises(EngineWorkerDied) as restarted:
+            worker.call({
+                'T_C': 1100.0,
+                'P_bar': 0.01,
+                'fO2_log': -12.0,
+                'composition': {'SiO2': 50.0},
+            })
+    finally:
+        worker.close()
+
+    assert restarted.value.phase == 'restart'
+    cause = restarted.value.__cause__
+    assert isinstance(cause, EOFError)
+    assert str(cause) == ''
+    assert len(seen) == 1
 
 
 def test_replaced_start_runtimeerror_is_not_worker_death():
@@ -984,9 +1055,10 @@ def _deadline_race_start_worker(
 
     def make_event():
         nonlocal event_count
-        event_index = event_count % 6
+        # Six launch events, then the frame reader's clock event.
+        event_index = event_count % 7
         event_count += 1
-        if event_index < 5:
+        if event_index < 6:
             return threading.Event()
         return _DeadlineRaceEvent(clock)
 
