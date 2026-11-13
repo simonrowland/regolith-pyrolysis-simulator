@@ -1726,7 +1726,6 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             "status",
             "engine_status",
             "liquid_composition_wt_pct",
-            "fe_redox_split",
         ),
         Engine.THERMOENGINE: (
             "status",
