@@ -110,6 +110,25 @@ def dissociation_delta_g(species: str, temperature_K: float) -> float:
     )
 
 
+def _metallothermic_reductant_for_oxide(
+    species: str,
+    temperature_K: float,
+) -> str | None:
+    """Return the stronger Mg or Ca reductant for the oxide at this temperature."""
+    target_dG = dissociation_delta_g(species, temperature_K)
+    mg_dG = dissociation_delta_g("Mg", temperature_K)
+    ca_dG = dissociation_delta_g("Ca", temperature_K)
+    # Premise: all three formation values share a mol-O2 basis at the same T.
+    # ΔΔG = target dG - reductant-oxide dG; >1 kJ/mol-O2 means the target oxide
+    # is less stable by that margin. Equality (including identical lines) stays
+    # on the less-reducible side, matching the prior strict comparisons.
+    if target_dG > mg_dG + 1.0:
+        return "Mg"
+    if target_dG > ca_dG + 1.0:
+        return "Ca"
+    return None
+
+
 def dissociation_equilibrium_constant(species: str, temperature_K: float) -> float:
     """K for the formation reaction, ``exp(ΔG·1000 / (R·T))``."""
 
