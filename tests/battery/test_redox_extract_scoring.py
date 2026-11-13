@@ -1567,7 +1567,10 @@ def test_thermoengine_fe_redox_reaches_equilibrate_cell_with_cache_enabled(
     tmp_path, monkeypatch
 ):
     from simulator import engine_cache
-    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        normalize_engine_settings,
+    )
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
     engine_cache.engine_cache_counters(reset=True)
@@ -1599,6 +1602,9 @@ def test_thermoengine_fe_redox_reaches_equilibrate_cell_with_cache_enabled(
         unavailable_reason=None,
         takes_fo2=True,
         supports_intrinsic_fo2=True,
+        engine_settings=normalize_engine_settings(
+            Engine.THERMOENGINE.value, None
+        ),
     )
     handles = {Engine.THERMOENGINE.value: handle}
 
