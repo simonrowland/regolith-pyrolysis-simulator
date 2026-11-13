@@ -243,8 +243,12 @@ def test_sossi_printed_mn_row_reaches_the_scored_retention_path() -> None:
     assert float(scored.numeric.value) == pytest.approx(
         math.log10(float(prediction.value) / float(observed_fm)), rel=1e-12
     )
-    report = score_module._append_element_retention_diagnostics(
-        "score report", (scored,), context.observations
+    from simulator.battery.score_report import format_element_retention_diagnostics
+    from simulator.battery.score_report_data import element_retention_report_data
+
+    report = format_element_retention_diagnostics(
+        "score report",
+        element_retention_report_data((scored,), context.observations),
     )
     assert "observed loss" in report
     assert "3.8 ppm" in report

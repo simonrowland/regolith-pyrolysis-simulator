@@ -42,7 +42,7 @@ benches:
     state: {tag: value, value: Knudsen effusion mass spectrometry}
     locator:
       source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
-      page: 1-7
+      page: 1  # This page does not print KEMS; identity comes from the study title.
       note: Study title identifies KEMS; the supplied supplement contains parameter tables only.
   cell_materials:
     - state:
@@ -50,7 +50,7 @@ benches:
         value: Ir
       locator:
         source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
-        page: 1-7
+        page: 5
         note: 'Table footnote: “there is a thin graphite coating on the inner surface of the lid of the iridium cell”; a thin
           graphite disc later replaced the coating.'
     - state:
@@ -58,21 +58,21 @@ benches:
         value: C_graphite
       locator:
         source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
-        page: 1-7
+        page: 5
         note: 'Table footnote: “there is a thin graphite coating on the inner surface of the lid of the iridium cell”; a thin
           graphite disc later replaced the coating.'
   cell_material_and_liner:
     state: {tag: value, value: iridium cell with graphite-coated lid; later graphite disc}
     locator:
       source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
-      page: 1-7
+      page: 5
       note: 'Table footnote: “there is a thin graphite coating on the inner surface of the lid of the iridium cell”; a thin graphite disc later replaced the coating.'
 
 experiments:
 - experiment_id: bencze-2016-ir-kems
   bench_id: bencze-2016-supplement-kems
   locator:
-    page: 1-7
+    page: 5
     note: 'Table footnote: "there is a thin graphite coating on the inner surface of the lid of the iridium cell"; a thin graphite disc later replaced the coating.'
 species:
   Na:
@@ -81,7 +81,7 @@ species:
       type: psat_series
       locator:
         source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
-        page: 1-6
+        page: 1
         table: S-I
         note: 'Columns: ln(p(Na(g))/Pa)=A+B/T; vapor pressure p(Na(g))/Pa at 1273 K; activity a(Na2O) at 1273 K.'
       phase: gas
@@ -192,7 +192,7 @@ species:
     observations:
     - observation_id: bencze_2016_table_s1_k_all_subsamples
       type: psat_series
-      locator: {source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 1-6, table: S-I, note: 'Columns: ln(p(K(g))/Pa)=A+B/T; vapor pressure p(K(g))/Pa at 1273 K; activity a(K2O) at 1273 K.'}
+      locator: {source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 1, table: S-I, note: 'Columns: ln(p(K(g))/Pa)=A+B/T; vapor pressure p(K(g))/Pa at 1273 K; activity a(K2O) at 1273 K.'}
       phase: gas
       experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
