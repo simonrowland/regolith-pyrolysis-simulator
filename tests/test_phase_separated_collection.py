@@ -175,6 +175,7 @@ def test_stage3_includes_reviewed_same_hour_stream_oxygen(sio_kg, retained, expe
 
 def test_stage3_coproduct_pressure_uses_measured_vapor_carrier_dilution():
     from simulator.accounting.formulas import resolve_species_formula
+    from simulator.physical_constants import PA_PER_BAR
     model = _model("through", hard_gate=False)
     rates = {"SiO": 1.0, "Na": 0.0007, "K": 0.0001}
     mol = {sp: kg / resolve_species_formula(sp).molar_mass_kg_per_mol()
@@ -187,10 +188,39 @@ def test_stage3_coproduct_pressure_uses_measured_vapor_carrier_dilution():
     melt = MeltState(temperature_C=1650)
     melt.oxygen_reservoir.headspace_ledger_pO2_bar = 1e-8
     result = model.route(EvaporationFlux(rates), melt)
-    # SiO2 -> SiO + 1/2 O2 gives pO2_source = 0.5*pSiO by Dalton's law,
-    # independent of the 10 mbar carrier-gas total; mbar/1000 is bar.
+    stream_po2_bar = model.wall_species_partial_pressures_pa["O2"] / PA_PER_BAR
+    assert stream_po2_bar > 0.0
     for reaction in result.stage3_reactive_alkali_by_species.values():
-        assert reaction["pO2_bar"] == pytest.approx(1e-8 + 0.5 * 0.4 / 1000)
+        assert reaction["pO2_bar"] == pytest.approx(stream_po2_bar)
+        assert reaction["pO2_source"] == "stream_dalton_o2_partial"
+
+
+def test_stage3_committed_overhead_o2_drives_favourability_from_stream_once():
+    from simulator.physical_constants import PA_PER_BAR
+
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1.0)
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas", {"O2": 0.5}, material_origin="reagent",
+    )
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    assert sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar > 0.0
+
+    model = _model("through", hard_gate=False)
+    committed_overhead = sim.atom_ledger.physical_mol_by_account("process.overhead_gas")
+    assert committed_overhead["O2"] == pytest.approx(0.5)
+    model.retained_vapor_mol = dict(committed_overhead)
+    result = model.route(
+        EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}), sim.melt,
+    )
+
+    reaction = result.stage3_reactive_alkali_by_species["Na"]
+    stream_po2_bar = model.wall_species_partial_pressures_pa["O2"] / PA_PER_BAR
+    assert model.retained_vapor_mol["O2"] == pytest.approx(0.5)
+    assert stream_po2_bar > 0.0
+    assert reaction["pO2_bar"] == pytest.approx(stream_po2_bar)
+    assert reaction["pO2_source"] == "stream_dalton_o2_partial"
+    assert reaction["log_Q_over_K"] is not None
 
 
 @pytest.mark.parametrize("oxygen_mol", [1e-7, 1.0])
