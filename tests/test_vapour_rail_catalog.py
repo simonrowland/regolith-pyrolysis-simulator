@@ -25,6 +25,7 @@ from simulator.condensation import (
 from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.physical_constants import PA_PER_BAR
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.volatile_properties import _catalog as _volatile_runtime_catalog
 from simulator.vapour_rail.catalog import (
@@ -66,6 +67,7 @@ PINNED_CATALOG_FIXTURE_SHA256 = {
         "fefcd5fa2f3f1ba60c3255504dc33c7e710dbb1f0a60fedff433ef14c7826f5d"
     ),
 }
+_NOT_OWNER_PA_PER_BAR = 1.0e5
 
 
 @pytest.mark.parametrize(
@@ -151,6 +153,46 @@ def _load_t609_proof():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def test_additivity_proof_code_canonicalizes_owned_numeric_constants() -> None:
+    proof = _load_t609_proof()
+
+    def literal_closure(offset: float):
+        def calculate(value: float) -> float:
+            return value * 1.0e5 + offset
+
+        return calculate
+
+    def owner_closure(offset: float):
+        def calculate(value: float) -> float:
+            return value * PA_PER_BAR + offset
+
+        return calculate
+
+    def changed_literal_closure(offset: float):
+        def calculate(value: float) -> float:
+            return value * 1.0e4 + offset
+
+        return calculate
+
+    def unrelated_global_closure(offset: float):
+        def calculate(value: float) -> float:
+            return value * _NOT_OWNER_PA_PER_BAR + offset
+
+        return calculate
+
+    literal = literal_closure(2.0)
+    owner = owner_closure(2.0)
+    changed = changed_literal_closure(2.0)
+    unrelated = unrelated_global_closure(2.0)
+    for function in (owner, changed, unrelated):
+        function.__qualname__ = literal.__qualname__
+
+    canonical = proof._canonical(literal)
+    assert canonical == proof._canonical(owner)
+    assert canonical != proof._canonical(changed)
+    assert canonical != proof._canonical(unrelated)
 
 
 def _family_species_ids(text: str) -> set[str]:
