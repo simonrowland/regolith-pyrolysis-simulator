@@ -367,8 +367,10 @@ def wall_deposit_candidate_for_surface_kg(
         applied_regime_factor = _deposition_finite_scalar(
             "regime_factor", applied_regime_factor
         )
-        # The segment gas map's O2 partial is the wall pO2. Absence is
-        # missing, not a floor: reactions that need pO2 then refuse.
+        # Missing wall pO2 uses a pO2-free route, flagged
+        # wall_pO2_unknown_pO2_free_route_used. This is the conservative bound
+        # because adding O2 can only lower P_sat. Refuse wall_pO2_required only
+        # when every admissible reaction needs pO2.
         wall_pO2_Pa = None
         if isinstance(pressure_source, Mapping) and "O2" in pressure_source:
             wall_pO2_Pa = _deposition_finite_scalar(

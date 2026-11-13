@@ -1010,12 +1010,11 @@ def operative_wall_saturation(
 ) -> WallSaturationLawResult:
     """``Psat_wall = min Psat`` over the admissible reactions.
 
-    A missing parcel pO2 refuses the species when any reaction has
-    ν_O2 ≠ 0, including when another reaction has ν_O2 = 0. The winner,
-    and therefore the ledger, depends on pO2. Returning the
-    disproportionation pressure would book the wrong condensate.
-    ν_O2 = 0 reactions do not read pO2. The first declared reaction wins
-    an exact tie.
+    With missing wall pO2, the ladder uses a pO2-free route when one is
+    available and flags ``wall_pO2_unknown_pO2_free_route_used``. This is a
+    conservative bound because adding O2 can only lower the minimum P_sat.
+    Refuse ``wall_pO2_required`` only when every admissible route needs pO2.
+    The first declared reaction wins an exact tie.
     """
 
     return wall_saturation_ladder(
