@@ -264,14 +264,32 @@ class MeltOxideActivity:
         return self.activity ** (1.0 / exponent)
 
     def thermodynamic_parent_activity(self) -> float:
-        """Return activity on the parent-oxide formula basis."""
+        """Return activity on the parent-oxide formula basis.
+
+        Invariant: a positive provider activity is never a silent 0.0.
+        This is the only parent-oxide power the publication paths call.
+        """
 
         cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(self.parent_oxide, 1.0)
         if self.activity <= 0.0:
             return 0.0
-        # For a pure-endmember reference, mu(parent) is cations times the
-        # single-cation chemical potential, so a(parent) = a(single)**cations.
-        return self.activity ** float(cations)
+        # Premise: mu(parent) = cations * mu(single) on a pure-endmember
+        # reference, so a(parent) = a(single)**cations.
+        # Unit check: both activities are dimensionless.
+        # Sanity: cations = 1 leaves the activity unchanged, and a = 1 stays 1.
+        parent = self.activity ** float(cations)
+        if parent > 0.0 and math.isfinite(parent):
+            return parent
+        if parent == 0.0:
+            # The power underflows float64. K2O and Na2O have two cations, so
+            # the 1e-310 floor pin squares to 1e-620, which is 0.0. That is
+            # not a measured zero. The positive provider activity is the last
+            # representable measure. A caller that then applies
+            # COMPILED_SOURCE_ACTIVITY_FLOOR (1e-300) still passes the floor
+            # into evaluate(), because both 0.0 and this sub-floor activity
+            # sit below it, so the pressure is unchanged.
+            return self.activity
+        return parent
 
     def provenance(self) -> dict[str, Any]:
         payload: dict[str, Any] = {

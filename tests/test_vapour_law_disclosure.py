@@ -29,6 +29,11 @@ including a gas-fugacity pressure past the fit). Antoine is only the
 direct coefficient continuation, including out-of-band SiO. A compiled
 evaluator executed in that dispatch keeps its own family and temperature
 band; an extrapolated source-activity floor does not rename it to Antoine.
+A positive provider activity is never published as 0.0. Parent-oxide basis
+is ``a(single)**cations`` in ``thermodynamic_parent_activity``. A
+representable power is that power. When the power underflows, the published
+activity stays the positive provider activity. K2 and Na2 at the 1e-310
+floor pin are that case (two cations; the square is 0.0 in float64).
 A compiled neighbour does not name the Ellingham
 law. A non-diagnostic law is registered when the evaluation leaves a
 certified domain: the temperature band, the Ellingham fit, the oxygen
@@ -1099,6 +1104,18 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
         ]:
             mismatches.append(f"{name}: floor notice {floor!r}")
             continue
+        # The injected provider activity is positive. Parent-oxide basis
+        # (K2, Na2, and every other di-cation law) must not publish the
+        # underflow of a(single)**cations as a measured 0.0.
+        published_activity = (diagnostic.get("activities") or {}).get(name)
+        if published_activity != 1.0e-310:
+            mismatches.append(
+                f"{name}: published activity {published_activity!r}"
+            )
+            continue
+        if provenance.get("equivalent_parent_oxide_activity") == 0.0:
+            mismatches.append(f"{name}: equivalent parent activity 0.0")
+            continue
         used = provenance.get("pO2_bar")
         try:
             oxygen = float(used)
@@ -1158,7 +1175,95 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
                 problems.append("cache replay diverged")
         if problems:
             mismatches.append(f"{name}: {', '.join(problems)}")
+    oxides = provider._vapor_pressure_data.get("oxide_vapors") or {}
+    # Same 400 K gate as the loop. A parent-oxide law the provider can
+    # publish has to be in the checked set, including K2 and Na2.
+    hot_parent_basis: set[str] = set()
+    for name, _parent, evaluator in species_rows:
+        row = oxides.get(name) or {}
+        if row.get("source_activity_basis") != "parent_oxide":
+            continue
+        low, high = evaluator.valid_temperature_K
+        if (float(low) + float(high)) / 2.0 < 400.0:
+            continue
+        hot_parent_basis.add(name)
+    assert {"K2", "Na2"} <= hot_parent_basis
+    assert hot_parent_basis <= checked
     assert "TiO" in checked
+    assert mismatches == []
+
+
+def test_parent_oxide_basis_never_publishes_a_silent_zero() -> None:
+    """Every parent oxide keeps a positive activity at the floor pin.
+
+    Invariant: a positive provider activity is never published as 0.0.
+    ``thermodynamic_parent_activity`` is the only parent-oxide power.
+    The input class is every oxide in ``MELT_OXIDE_CATIONS_PER_FORMULA``,
+    not only K2O and Na2O. A representable power stays that power. The
+    1e-310 pin squared by two cations is 0.0 in float64; the published
+    activity stays 1e-310. A true zero provider activity stays 0.0.
+    """
+
+    from simulator.chemistry.melt_activity import (
+        MELT_OXIDE_CATIONS_PER_FORMULA,
+        MeltOxideActivity,
+    )
+
+    pin = 1.0e-310
+    ordinary = 0.25
+    representable = 1.0e-100
+    assert MELT_OXIDE_CATIONS_PER_FORMULA["K2O"] == 2.0
+    assert MELT_OXIDE_CATIONS_PER_FORMULA["Na2O"] == 2.0
+    # (1e-310)**2 = 1e-620, below the smallest positive float64.
+    assert pin ** 2.0 == 0.0
+    mismatches: list[str] = []
+    saw_underflow = False
+    for parent, cations in sorted(MELT_OXIDE_CATIONS_PER_FORMULA.items()):
+        cations_f = float(cations)
+        pinned = MeltOxideActivity(
+            parent_oxide=parent,
+            single_cation_component=parent,
+            gamma=1.0,
+            x_single_cation=pin,
+            activity=pin,
+            citation="floor pin",
+        )
+        published = pinned.thermodynamic_parent_activity()
+        powered = pin ** cations_f
+        if powered == 0.0:
+            saw_underflow = True
+            if published != pin:
+                mismatches.append(f"{parent}: underflow published {published!r}")
+        elif published != powered:
+            mismatches.append(f"{parent}: pin power {published!r} != {powered!r}")
+        for activity in (ordinary, representable, 1.0):
+            row = MeltOxideActivity(
+                parent_oxide=parent,
+                single_cation_component=parent,
+                gamma=1.0,
+                x_single_cation=activity,
+                activity=activity,
+                citation="value identity",
+            )
+            expected = activity ** cations_f
+            actual = row.thermodynamic_parent_activity()
+            if not (expected > 0.0 and math.isfinite(expected)):
+                mismatches.append(f"{parent}: {activity} power {expected!r} not representable")
+            elif actual != expected:
+                mismatches.append(
+                    f"{parent}: activity {activity} published {actual!r} != {expected!r}"
+                )
+        zero = MeltOxideActivity(
+            parent_oxide=parent,
+            single_cation_component=parent,
+            gamma=1.0,
+            x_single_cation=0.0,
+            activity=0.0,
+            citation="measured zero",
+        )
+        if zero.thermodynamic_parent_activity() != 0.0:
+            mismatches.append(f"{parent}: measured zero moved")
+    assert saw_underflow
     assert mismatches == []
 
 
