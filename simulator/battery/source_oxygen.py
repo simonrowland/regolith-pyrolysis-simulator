@@ -244,7 +244,8 @@ def _printed_partner_is_ineligible(
 ) -> bool:
     """Both formulas are printed and this is not one eligible condition.
 
-    Counted on the printed rows, before eligibility drops a partner.
+    Counted on the printed rows, before eligibility drops a partner,
+    except an unidentified-input molecular reduction beside a cell command.
     Exactly one measured-eligible side is ambiguous. Neither side eligible
     is ambiguous too: an O/O2 pair where either row fails, including both,
     stays AMBIGUOUS. A cell-route O is the base exception, and it still
@@ -253,6 +254,8 @@ def _printed_partner_is_ineligible(
     """
     printed: dict[str, list[Observation]] = {"O": [], "O2": []}
     for row in point.values():
+        if cell_oxygen and _unidentified_molecular_input(row):
+            continue
         if _positive_oxygen_pressure(row):
             printed[row.identity.species.formula].append(row)
     if not printed["O"] or not printed["O2"]:
@@ -269,6 +272,15 @@ def _printed_partner_is_ineligible(
         if cell_ids and all(row.observation_id in cell_ids for row in printed["O"]):
             return False
     return True
+
+
+def _unidentified_molecular_input(row: Observation) -> bool:
+    return (
+        row.identity.species.formula == "O2"
+        and not row.derived_from
+        and row.derivation is not None
+        and row.derivation.declares_unprinted_raw_inputs
+    )
 
 
 def _janaf_atomic_oxygen(temperature_K: Decimal) -> tuple[Decimal, float, Locator]:
@@ -592,7 +604,13 @@ def resolve_source_oxygen(
             continue
         gases, used = ancestry
         if formula == "O" and cell_pair and gases == cell_pair:
-            if row.derived_from or row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED:
+            # Measured >= quoted for the same identified cell reduction:
+            # stronger evidence must never lose the oxygen command.
+            if row.derived_from or row.evidence.class_.value in {
+                EvidenceClass.QUOTED_ATTRIBUTED,
+                EvidenceClass.MEASURED_DIRECT,
+                EvidenceClass.MEASURED_REDUCED,
+            }:
                 cell_oxygen.append((row, used))
         elif (
             row.evidence.class_.is_value
@@ -601,6 +619,11 @@ def resolve_source_oxygen(
             and not row.derived_from
         ):
             measured.append((row, used))
+    if cell_oxygen:
+        # A reduction with an unidentified O input cannot outrank an
+        # identified cell reduction, either as command or as partner veto.
+        measured = [(row, used) for row, used in measured
+                    if not _unidentified_molecular_input(row)]
     candidates = measured or cell_oxygen
     comeasured = _comeasured_oxygen_pair(measured)
     if comeasured is not None:
