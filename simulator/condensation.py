@@ -8414,6 +8414,12 @@ def _assign_declared_wall_capture(
     pressure. This assigns that captured extent to the same reactions.
     It does not recompute K.
 
+    Transport uses the minimum P_sat, often the near-zero oxidative route at
+    trace pO2; this split spends only committed O2 and sends an exhausted
+    remainder through a supersaturated pO2-free route. The coupling moves
+    f_eq by about 0.6% at the Stage-3 design peak; forecast O2 must not be fed
+    back to erase it (d-402: committed O2 only).
+
     Oxygen is the committed parcel inventory, never a forecast coproduct.
     For n_v mol captured and a = ν_O2/ν_v mol O2 per mol vapour,
     n_oxidised = min(n_v, n_O2/a); n_free = n_v - n_oxidised.
@@ -9433,6 +9439,11 @@ def _declared_wall_driving_pressure_pa(
     A law refusal is re-raised. It is not replaced by ``p_local``.
     """
 
+    # Transport uses the minimum P_sat (trace pO2 can select the near-zero
+    # oxidative route); booking later spends committed O2 and may send the
+    # exhausted remainder through a supersaturated pO2-free route. This moves
+    # f_eq by about 0.6% at the Stage-3 design peak; forecast O2 must not be
+    # fed back to remove the coupling (d-402: committed O2 only).
     try:
         P_sat_pa = _antoine_psat_pa(
             species,
