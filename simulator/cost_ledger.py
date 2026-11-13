@@ -731,8 +731,6 @@ class CostLedger:
             "schema_version": COST_LEDGER_SCHEMA_VERSION,
             "policy_id": str(getattr(self, "allocation_policy_id", COST_POLICY_ID)),
             "import_context": import_context,
-            "transition_count": 0,
-            "transition_balance_max_abs": 0.0,
             "product_costs": {},
             "active_inventory_costs": {},
             "warnings": warnings,

@@ -52,7 +52,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -191,6 +191,8 @@ observations:
             varying.
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: EAC-1A mare simulant
 - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_jsc_1a_total_mass_loss_150_1300_c::T=1573.15:h=43be52741ae1
   experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::jsc-1a-tga-dsc-ega
   identity:
@@ -241,7 +243,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -380,6 +382,8 @@ observations:
             varying.
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: JSC-1A mare simulant
 - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_lms_1_total_mass_loss_150_1300_c::T=1573.15:h=0d8bce737fd6
   experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::lms-1-tga-dsc-ega
   identity:
@@ -430,7 +434,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -569,6 +573,8 @@ observations:
             varying.
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: LMS-1 mare simulant
 - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_oprl2n_total_mass_loss_150_1300_c::T=1573.15:h=3e91578768b6
   experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::oprl2n-tga-dsc-ega
   identity:
@@ -619,7 +625,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -758,6 +764,8 @@ observations:
             varying.
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: OPRL2N mare simulant
 - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_oprl2nt_total_mass_loss_150_1300_c::T=1573.15:h=addecbfa1c00
   experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::oprl2nt-tga-dsc-ega
   identity:
@@ -808,7 +816,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -947,6 +955,8 @@ observations:
             varying.
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: OPRL2NT mare simulant
 - observation_id: sutherland-2025-mare-simulant-volatile-loss::sutherland_2025_tubs_m_total_mass_loss_150_1300_c::T=1573.15:h=3ce5cdf1bdae
   experiment_id: 10.1016/j.chemgeo.2025.123115::experiment::tubs-m-tga-dsc-ega
   identity:
@@ -997,7 +1007,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1136,3 +1146,5 @@ observations:
             varying.
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: TUBS-M mare simulant

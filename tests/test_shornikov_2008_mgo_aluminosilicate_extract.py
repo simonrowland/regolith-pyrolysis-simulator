@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import AdmissionStatus, ValueKind
@@ -13,6 +15,24 @@ from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml"
+
+
+def _assert_sc456_model_class(row: dict) -> None:
+    assert row["values"]["method_class"] == "model_derived"
+    assert row["values"]["value"] == row["values"]["value_as_printed"]
+    assert row["values"]["method_as_printed"].startswith("Calculation within")
+    assert "Gibbs formation energies calculated" in row["values"]["method_description"]
+    assert row["values"]["attribution"] == (
+        "Cited model input references: Shornikov and Archakov [1]; Glushko et al. [3]; "
+        "Robie and Hemingway [4]; Chase [5]"
+    )
+    assert row["derivation"]["method"]["locator"]["section"]
+    assert row["derivation"]["references"] == [
+        "Shornikov and Archakov (2001) [1]",
+        "Glushko et al. (1978–1982) [3]",
+        "Robie and Hemingway (1995) [4]",
+        "Chase (1998) [5]",
+    ]
 
 
 def test_render_pins_and_isolated_migration_preserve_every_temperature():
@@ -40,6 +60,12 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         and row["locator"].get("curve") is not None
     ]
     assert len(table_rows) == 42
+    assert all(row["values"]["method_class"] == "model_derived" for row in table_rows)
+    _assert_sc456_model_class(table_rows[0])
+    flipped = deepcopy(table_rows[0])
+    flipped["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_model_class(flipped)
     assert len(marker_rows) == 23
     assert len(curve_rows) == 4
 
@@ -69,7 +95,7 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
             for candidate, row in observations
             if candidate == formula and row["observation_id"] == observation_id
         )
-        assert row["values"]["value"] == value
+        assert row["values"]["value_as_printed"] == value
         assert row["phase"] == phase
         assert row["locator"]["page"] == 2
         assert row["locator"]["published_page"] == 148
@@ -114,7 +140,7 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         ),
         (
             "shornikov_2008_fig1_d_marker_3",
-            "value",
+            "value_as_printed",
             "-27",
             52,
             0.002671,
@@ -141,7 +167,9 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         assert values[value_key] == value
         assert values["x_SiO2_mol_pct_as_read"] == x_siO2_mol_pct
         uncertainty_key = (
-            "read_uncertainty_kJ_mol" if value_key == "value" else "read_uncertainty_dex"
+            "read_uncertainty_kJ_mol"
+            if value_key in {"value", "value_as_printed"}
+            else "read_uncertainty_dex"
         )
         assert values[uncertainty_key] == uncertainty
         assert values[uncertainty_key] > 0
@@ -181,7 +209,7 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         row for _, row in observations
         if row["observation_id"] == "shornikov_2008_prose_cordierite_minimum_delta_fg"
     )
-    assert prose_row["values"]["value"] == "-26.9"
+    assert prose_row["values"]["value_as_printed"] == "-26.9"
     assert prose_row["locator"]["page"] == 1
     assert prose_row["locator"]["pdf_page_index"] == 0
     assert prose_row["locator"]["published_page"] == 147
@@ -199,11 +227,13 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     result = migrator.result
     migrated = [row for row in result.observations.values() if row.source_id == document["source_id"]]
     assert len(migrated) == 70
-    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 66
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 4
-    assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 66
+    assert sum(row.value.kind is ValueKind.POINT for row in migrated) == 59
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated) == 11
+    assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 59
     assert sum(row.admission.status is AdmissionStatus.REJECTED for row in migrated) == 4
+    assert sum(row.admission.status is AdmissionStatus.PENDING for row in migrated) == 7
     assert not result.registry_issues
+    assert result.validation is not None
     assert not result.validation.hard_issues
 
     for row in migrated:

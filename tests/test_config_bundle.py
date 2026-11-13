@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from hashlib import sha256
+from datetime import date
 from pathlib import Path
 import shutil
 import subprocess
@@ -121,8 +122,17 @@ def test_parsed_yaml_process_cache_is_keyed_by_exact_content(
     tmp_path: Path,
 ) -> None:
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
-    original = b"root:\n  value: 1\n"
-    changed = b"root:\n  value: 2\n"
+    original = (
+        b"date: 2026-11-11\n"
+        b"integer: 1\n"
+        b"float: 1.0\n"
+        b"none: null\n"
+        b"boolean: false\n"
+        b"pairs: !!pairs [alpha: 1, beta: 2]\n"
+        b"duplicate: first\n"
+        b"duplicate: last\n"
+    )
+    changed = original + b"new: true\n"
     original_yaml_load = yaml.load
     parse_calls = 0
 
@@ -136,8 +146,16 @@ def test_parsed_yaml_process_cache_is_keyed_by_exact_content(
     second = load_cached_safe_yaml(original)
     third = load_cached_safe_yaml(changed)
 
-    assert first == second == {"root": {"value": 1}}
-    assert third == {"root": {"value": 2}}
+    assert first == second
+    assert type(first["date"]) is date
+    assert type(first["integer"]) is int
+    assert type(first["float"]) is float
+    assert first["integer"] == first["float"]
+    assert first["none"] is None
+    assert first["boolean"] is False
+    assert type(first["pairs"][0]) is tuple
+    assert first["duplicate"] == "last"
+    assert third["new"] is True
     assert parse_calls == 2
 
 
@@ -161,7 +179,46 @@ def test_parsed_yaml_process_cache_preserves_shared_aliases(
 
     assert first["base"] is first["copy"]
     assert second["base"] is second["copy"]
+    assert parse_calls == 1
+
+
+def test_parsed_yaml_cache_can_be_disabled(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE", "off")
+    original_yaml_load = yaml.load
+    parse_calls = 0
+
+    def counted_yaml_load(value: str | bytes, *args, **kwargs) -> object:
+        nonlocal parse_calls
+        parse_calls += 1
+        return original_yaml_load(value, *args, **kwargs)
+
+    monkeypatch.setattr(yaml_cache_module.yaml, "load", counted_yaml_load)
+    payload = b"root:\n  value: 1\n"
+
+    assert load_cached_safe_yaml(payload) == {"root": {"value": 1}}
+    assert load_cached_safe_yaml(payload) == {"root": {"value": 1}}
     assert parse_calls == 2
+    assert not list((tmp_path / "yaml-cache").rglob("*.pickle"))
+
+
+def test_corrupt_parsed_yaml_cache_entry_is_a_miss(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
+    payload = b"value: cached\n"
+    first = load_cached_safe_yaml(payload)
+    cache_path = yaml_cache_module._cache_path(sha256(payload).hexdigest())
+    cache_path.write_bytes(b"truncated pickle")
+
+    second = load_cached_safe_yaml(payload)
+
+    assert first["value"] == "cached"
+    assert second == first
 
 
 def test_parsed_yaml_cache_is_reused_by_fresh_process(
@@ -203,7 +260,7 @@ def test_parsed_yaml_cache_default_is_in_writable_temp_root(
     path = yaml_cache_module._cache_path("a" * 64)
 
     assert tmp_path in path.parents
-    assert path.name == f"{'a' * 64}.json"
+    assert path.name == f"{'a' * 64}.pickle"
 
 
 def test_parsed_yaml_cache_rejects_untrusted_temp_root(

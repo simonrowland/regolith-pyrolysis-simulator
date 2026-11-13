@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:shornikov-2011-titania-melt-evaporation
       role: pdf
@@ -1058,13 +1058,46 @@ context:
     panel: c
     note: Figure 2 panel c line 4. Calculated. No markers. Not sampled.
   units: mole % as printed
+  derivation:
+    relation: Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and
+      the previously described evaporation method.
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        pdf_page_index: 1
+        paragraph: thermodynamic model and source inputs
+        note: The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation
+          method to Shornikov (2009); numeric inputs are not reproduced in this extract.
+    method:
+      state:
+        tag: value
+        value: Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described
+          by Shornikov (2009); simple-oxide evaporation model.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Evaporation calculations
+    references:
+    - Shornikov (2009)
+    - Archakov et al. (2000)
+    - Xirouchakis et al. (1997)
+    - DeСapitani and Kirschen (1998)
+    - Shornikov et al. (2000)
+    - Shornikov and Archakov (2003)
+    - Glushko et al. (1978–1982)
   values:
     quantity_as_printed: x(i), mole %
-    method_class: quoted_attributed
+    method_class: model_derived
     formula: CaO
     unavailable_reason: model_curve_not_sampled
     schema_gap: Mole percent has no scored residue field.
-    attribution: 'Figure 2 caption: lines 4-6 calculated in the present study.'
+    attribution: Authors' calculated curves; model inputs include experimental thermodynamic values from Xirouchakis et al.
+      (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), reference values
+      from Glushko et al. (1978–1982), and the selected experimental composition of Archakov et al. (2000); evaporation method
+      cited to Shornikov (2009).
     redox_as_printed: neutral
     temperature_K_as_printed: '2300'
   context_id: shornikov-2011-titania-melt-evaporation::context::shornikov_2011_fig2c_line4_CaO_mole_pct_not_sampled
@@ -1080,13 +1113,46 @@ context:
     panel: c
     note: Figure 2 panel c line 5. Calculated. No markers. Not sampled.
   units: mole % as printed
+  derivation:
+    relation: Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and
+      the previously described evaporation method.
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        pdf_page_index: 1
+        paragraph: thermodynamic model and source inputs
+        note: The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation
+          method to Shornikov (2009); numeric inputs are not reproduced in this extract.
+    method:
+      state:
+        tag: value
+        value: Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described
+          by Shornikov (2009); simple-oxide evaporation model.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Evaporation calculations
+    references:
+    - Shornikov (2009)
+    - Archakov et al. (2000)
+    - Xirouchakis et al. (1997)
+    - DeСapitani and Kirschen (1998)
+    - Shornikov et al. (2000)
+    - Shornikov and Archakov (2003)
+    - Glushko et al. (1978–1982)
   values:
     quantity_as_printed: x(i), mole %
-    method_class: quoted_attributed
+    method_class: model_derived
     formula: TiO2
     unavailable_reason: model_curve_not_sampled
     schema_gap: Mole percent has no scored residue field.
-    attribution: 'Figure 2 caption: lines 4-6 calculated in the present study.'
+    attribution: Authors' calculated curves; model inputs include experimental thermodynamic values from Xirouchakis et al.
+      (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), reference values
+      from Glushko et al. (1978–1982), and the selected experimental composition of Archakov et al. (2000); evaporation method
+      cited to Shornikov (2009).
     redox_as_printed: neutral
     temperature_K_as_printed: '2300'
   context_id: shornikov-2011-titania-melt-evaporation::context::shornikov_2011_fig2c_line5_TiO2_mole_pct_not_sampled
@@ -1102,13 +1168,46 @@ context:
     panel: c
     note: Figure 2 panel c line 6. Calculated. No markers. Not sampled.
   units: mole % as printed
+  derivation:
+    relation: Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and
+      the previously described evaporation method.
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        pdf_page_index: 1
+        paragraph: thermodynamic model and source inputs
+        note: The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation
+          method to Shornikov (2009); numeric inputs are not reproduced in this extract.
+    method:
+      state:
+        tag: value
+        value: Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described
+          by Shornikov (2009); simple-oxide evaporation model.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Evaporation calculations
+    references:
+    - Shornikov (2009)
+    - Archakov et al. (2000)
+    - Xirouchakis et al. (1997)
+    - DeСapitani and Kirschen (1998)
+    - Shornikov et al. (2000)
+    - Shornikov and Archakov (2003)
+    - Glushko et al. (1978–1982)
   values:
     quantity_as_printed: x(i), mole %
-    method_class: quoted_attributed
+    method_class: model_derived
     formula: SiO2
     unavailable_reason: model_curve_not_sampled
     schema_gap: Mole percent has no scored residue field.
-    attribution: 'Figure 2 caption: lines 4-6 calculated in the present study.'
+    attribution: Authors' calculated curves; model inputs include experimental thermodynamic values from Xirouchakis et al.
+      (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), reference values
+      from Glushko et al. (1978–1982), and the selected experimental composition of Archakov et al. (2000); evaporation method
+      cited to Shornikov (2009).
     redox_as_printed: neutral
     temperature_K_as_printed: '2300'
   context_id: shornikov-2011-titania-melt-evaporation::context::shornikov_2011_fig2c_line6_SiO2_mole_pct_not_sampled
@@ -1823,13 +1922,46 @@ context:
     panel: d
     note: Figure 2 panel d line 4. Calculated. No markers. Not sampled.
   units: mole % as printed
+  derivation:
+    relation: Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and
+      the previously described evaporation method.
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        pdf_page_index: 1
+        paragraph: thermodynamic model and source inputs
+        note: The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation
+          method to Shornikov (2009); numeric inputs are not reproduced in this extract.
+    method:
+      state:
+        tag: value
+        value: Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described
+          by Shornikov (2009); simple-oxide evaporation model.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Evaporation calculations
+    references:
+    - Shornikov (2009)
+    - Archakov et al. (2000)
+    - Xirouchakis et al. (1997)
+    - DeСapitani and Kirschen (1998)
+    - Shornikov et al. (2000)
+    - Shornikov and Archakov (2003)
+    - Glushko et al. (1978–1982)
   values:
     quantity_as_printed: x(i), mole %
-    method_class: quoted_attributed
+    method_class: model_derived
     formula: CaO
     unavailable_reason: model_curve_not_sampled
     schema_gap: Mole percent has no scored residue field.
-    attribution: 'Figure 2 caption: lines 4-6 calculated in the present study.'
+    attribution: Authors' calculated curves; model inputs include experimental thermodynamic values from Xirouchakis et al.
+      (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), reference values
+      from Glushko et al. (1978–1982), and the selected experimental composition of Archakov et al. (2000); evaporation method
+      cited to Shornikov (2009).
     redox_as_printed: reducing
     temperature_K_as_printed: '2300'
   context_id: shornikov-2011-titania-melt-evaporation::context::shornikov_2011_fig2d_line4_CaO_mole_pct_not_sampled
@@ -1845,13 +1977,46 @@ context:
     panel: d
     note: Figure 2 panel d line 5. Calculated. No markers. Not sampled.
   units: mole % as printed
+  derivation:
+    relation: Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and
+      the previously described evaporation method.
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        pdf_page_index: 1
+        paragraph: thermodynamic model and source inputs
+        note: The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation
+          method to Shornikov (2009); numeric inputs are not reproduced in this extract.
+    method:
+      state:
+        tag: value
+        value: Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described
+          by Shornikov (2009); simple-oxide evaporation model.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Evaporation calculations
+    references:
+    - Shornikov (2009)
+    - Archakov et al. (2000)
+    - Xirouchakis et al. (1997)
+    - DeСapitani and Kirschen (1998)
+    - Shornikov et al. (2000)
+    - Shornikov and Archakov (2003)
+    - Glushko et al. (1978–1982)
   values:
     quantity_as_printed: x(i), mole %
-    method_class: quoted_attributed
+    method_class: model_derived
     formula: TiO2
     unavailable_reason: model_curve_not_sampled
     schema_gap: Mole percent has no scored residue field.
-    attribution: 'Figure 2 caption: lines 4-6 calculated in the present study.'
+    attribution: Authors' calculated curves; model inputs include experimental thermodynamic values from Xirouchakis et al.
+      (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), reference values
+      from Glushko et al. (1978–1982), and the selected experimental composition of Archakov et al. (2000); evaporation method
+      cited to Shornikov (2009).
     redox_as_printed: reducing
     temperature_K_as_printed: '2300'
   context_id: shornikov-2011-titania-melt-evaporation::context::shornikov_2011_fig2d_line5_TiO2_mole_pct_not_sampled
@@ -1867,13 +2032,46 @@ context:
     panel: d
     note: Figure 2 panel d line 6. Calculated. No markers. Not sampled.
   units: mole % as printed
+  derivation:
+    relation: Author-calculated evaporation concentration-change curve based on the present-study thermodynamic model and
+      the previously described evaporation method.
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        pdf_page_index: 1
+        paragraph: thermodynamic model and source inputs
+        note: The paper identifies the selected experimental composition as Archakov et al. (2000) and cites the evaporation
+          method to Shornikov (2009); numeric inputs are not reproduced in this extract.
+    method:
+      state:
+        tag: value
+        value: Ideal associated solutions thermodynamic results with the evaporation concentration-change calculation described
+          by Shornikov (2009); simple-oxide evaporation model.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Evaporation calculations
+    references:
+    - Shornikov (2009)
+    - Archakov et al. (2000)
+    - Xirouchakis et al. (1997)
+    - DeСapitani and Kirschen (1998)
+    - Shornikov et al. (2000)
+    - Shornikov and Archakov (2003)
+    - Glushko et al. (1978–1982)
   values:
     quantity_as_printed: x(i), mole %
-    method_class: quoted_attributed
+    method_class: model_derived
     formula: SiO2
     unavailable_reason: model_curve_not_sampled
     schema_gap: Mole percent has no scored residue field.
-    attribution: 'Figure 2 caption: lines 4-6 calculated in the present study.'
+    attribution: Authors' calculated curves; model inputs include experimental thermodynamic values from Xirouchakis et al.
+      (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov (2003), reference values
+      from Glushko et al. (1978–1982), and the selected experimental composition of Archakov et al. (2000); evaporation method
+      cited to Shornikov (2009).
     redox_as_printed: reducing
     temperature_K_as_printed: '2300'
   context_id: shornikov-2011-titania-melt-evaporation::context::shornikov_2011_fig2d_line6_SiO2_mole_pct_not_sampled
@@ -1887,14 +2085,43 @@ context:
     pdf_page_index: 1
     note: Page 2 text. The minimum of melt formation from oxides, at the titanite concentration.
   units: kJ/mole
+  derivation:
+    relation: Author-calculated thermodynamic result using the ideal associated solutions model and total Gibbs-energy minimization.
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: thermodynamic model and source inputs
+        note: The paper states that model parameters use experimental thermodynamic values from the cited works and reference
+          values from Glushko et al.; the numeric input rows are not reproduced in this extract.
+    method:
+      state:
+        tag: value
+        value: Ideal associated solutions theory using the simplified lattice model and semi-phenomenological energy parameters;
+          total Gibbs-energy minimization.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Thermodynamic model
+    references:
+    - Xirouchakis et al. (1997)
+    - DeСapitani and Kirschen (1998)
+    - Shornikov et al. (2000)
+    - Shornikov and Archakov (2003)
+    - Glushko et al. (1978–1982)
   values:
     quantity_as_printed: ΔfG2050 of melt formation from oxides
     value_as_printed: –53.4
-    method_class: quoted_attributed
+    method_class: model_derived
     temperature_K_as_printed: '2050'
     schema_gap: Formation from oxides of the melt at the titanite concentration, not the pure-phase from-elements Table value
       for CaTiSiO5. No balanced reaction is printed, so this is not a scored delta_fG.
-    attribution: Calculated in the present study. The text states the minimum corresponds to the titanite (CaTiSiO5) concentration.
+    attribution: Authors' calculated present-study results; model input energy parameters use experimental thermodynamic values
+      from Xirouchakis et al. (1997), DeСapitani and Kirschen (1998), Shornikov et al. (2000), and Shornikov and Archakov
+      (2003), plus reference values from Glushko et al. (1978–1982).
   context_id: shornikov-2011-titania-melt-evaporation::context::shornikov_2011_melt_formation_minimum_from_oxides
   work_id: 10.2205/2011nz000231
   source_id: shornikov-2011-titania-melt-evaporation

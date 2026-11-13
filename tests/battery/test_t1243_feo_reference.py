@@ -23,6 +23,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    IdentityEqualKind,
     MetricOperation,
     NoticeKind,
     Phase,
@@ -37,7 +38,7 @@ from simulator.battery.generators.janaf import (
     _interpolate_formation_gibbs,
     load_table_document,
 )
-from simulator.battery.identity import quantity_token
+from simulator.battery.identity import identity_equal, quantity_token
 from simulator.battery.migrate import (
     REPO_ROOT,
     Migrator,
@@ -45,7 +46,9 @@ from simulator.battery.migrate import (
     load_yaml,
 )
 from simulator.battery.records import (
+    IronSaturationComposition,
     Located,
+    Locator,
     Notice,
     StandardState,
     State,
@@ -60,6 +63,7 @@ from simulator.battery.score import (
     compile_residual,
     flagged_strata,
     fusion_comparison_reference,
+    iron_saturation_composition,
     predict_with_engine,
     score_store,
     temperature_of,
@@ -439,14 +443,15 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
     rows = _feo_rows(migration)
     assert len(rows) == 96
     context = _context(migration)
-    # The reference conversion is applied. Table 2 prints log fO2 on each FeO
-    # row (AD 10 at 1677 K is -10.31). The bare-log converter stamps
+    # Holzheid takes the Darken & Gurry gas-line factor. Table 2 prints log fO2
+    # on each FeO row (AD 10 at 1677 K is -10.31). The bare-log converter stamps
     # identity.fO2_Pa as 1e5 Pa times 10 to that power. Those 57 rows now
     # match the stub's copied identity, so they carry a dex residual. Table 2
     # prints no per-row gamma uncertainty, so the decision rule stays missing.
-    # Composition remains unknown on 15 rows; Distin's phase now maps to liquid,
-    # leaving its missing independent fO2 as the refusal. Neither refusal is the
-    # reference state.
+    # Composition remains unknown on 15 rows. Distin's tabulated activity is
+    # the same iron-saturated oxygen ratio, so it takes the same gas-line
+    # factor; its missing independent fO2 is still the refusal. Neither
+    # refusal is the reference state.
     refusal_fields: dict[tuple[str, ...], int] = {}
     scored = 0
     extrapolated = 0
@@ -460,27 +465,36 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
             comparison_ids={observation.observation_id},
             predict=_predict,
         )
-        notice = _conversion_notice(residual.notices)
         temperature = temperature_of(observation.identity)
         assert temperature is not None
+        notice = _conversion_notice(residual.notices)
         source, converted = notice.reason.split("source_value=", 1)[1].split(
             "; converted_value=", 1
         )
         converted_value, _rest = converted.split("; factor=", 1)
-        assert Decimal(converted_value) == Decimal(source) * _independent_factor(temperature)
+        assert Decimal(converted_value) == Decimal(source) * _independent_factor(
+            temperature
+        )
         band = [
             item
             for item in residual.notices
             if item.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         ]
         outside = temperature < Decimal("1649.15") or temperature > Decimal("1766.15")
+        composition = next(
+            item
+            for item in residual.notices
+            if item.reason.startswith("fe_saturation_composition_owner_supplied")
+        )
         if outside:
             assert len(band) == 1
             assert band[0].reason == _EXTRAPOLATED
             assert band[0].band == _WINDOW
+            assert composition.authority is Authority.EXTRAPOLATED
             extrapolated += 1
         else:
             assert band == []
+            assert composition.authority is Authority.DERIVED
         assert residual.refusal is not None
         assert "reference_state_mismatch" not in json.dumps(
             residual.refusal.detail, default=str
@@ -516,10 +530,10 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
         assert candidate is not None
         state = candidate.identity.reference_state.value
         assert isinstance(state, StandardState)
-        assert state.endmember.formula == "FeO"
-        assert state.component_basis == "FeO"
         assert phase_token(state.endmember) is Phase.L
         assert state.reference_pressure_bar == Decimal("1.01325")
+        assert state.endmember.formula == "FeO"
+        assert state.component_basis == "FeO"
     assert scored == 57
     assert ad10 == 2
     assert ad10_scored == 1
@@ -610,19 +624,27 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
         residuals.append(residual)
         assert residual.status is ResidualStatus.NO_BAND
         assert residual.numeric is not None
-        conversion = next(
-            notice
+        assert not any(
+            notice.reason.startswith("reference_converted_via_iron_saturation;")
+            or "distin_masson_temkin_frame" in notice.reason
             for notice in residual.notices
-            if notice.reason.startswith("reference_converted_via_iron_saturation;")
         )
-        assert conversion.kind is NoticeKind.DERIVATION_USES_COMPILATION
-        assert "method=a_FeO(stoich)=N_Fe2+^0*a_FeO(source)" in conversion.reason
-        assert "factor=" in conversion.reason
-        assert "log10_shift=" in conversion.reason and " dex;" in conversion.reason
+        conversion = _conversion_notice(residual.notices)
         if observation.observation_id.endswith("distin1971_t1_1880_1_4"):
             assert observation.value.point == Decimal("0.952")
-            assert "factor=0.9861" in conversion.reason
-            assert "log10_shift=-0.0061 dex" in conversion.reason
+            assert (Decimal("0.60") / Decimal("0.63")).quantize(
+                Decimal("0.001")
+            ) == Decimal("0.952")
+            temperature = temperature_of(observation.identity)
+            assert temperature == Decimal("2153.15")
+            source, converted = conversion.reason.split("source_value=", 1)[1].split(
+                "; converted_value=", 1
+            )
+            converted_value, _rest = converted.split("; factor=", 1)
+            assert Decimal(source) == Decimal("0.952")
+            assert Decimal(converted_value) == Decimal("0.952") * _independent_factor(
+                temperature
+            )
         for engine, reason in {
             Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
             Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
@@ -846,6 +868,334 @@ def test_score_store_changes_only_the_iron_saturated_feo_rows(migration, monkeyp
     )
     assert set(changed) == feo_ids
     assert len(migration.observations) > 96
+
+
+def _saturation_locator() -> Locator:
+    return Locator(page=73, table="I", note="fixture")
+
+
+def _cited_saturation(composition_as_printed: str) -> IronSaturationComposition:
+    return IronSaturationComposition(
+        method="cited_standard",
+        composition_as_printed=composition_as_printed,
+        quote="Coughlin Fe0.947O, fixture",
+        locator=_saturation_locator(),
+    )
+
+
+def _derived_saturation(
+    n_fe2_plus: Decimal, band_dex: Decimal
+) -> IronSaturationComposition:
+    return IronSaturationComposition(
+        method="derived_from_source_analyses",
+        composition_as_printed="zero-silica Fe2+ ion fraction",
+        quote="Table I analyses extrapolated to zero silica, fixture",
+        locator=_saturation_locator(),
+        n_fe2_plus=n_fe2_plus,
+        provenance=(
+            "fixture reduction of printed analyses; linear versus quadratic "
+            "and lowest-3 versus lowest-4; not an openimcc constant"
+        ),
+        band_dex=band_dex,
+    )
+
+
+def _with_saturation(row: object, recorded: IronSaturationComposition) -> object:
+    identity = row.identity
+    standard = identity.reference_state.value
+    assert isinstance(standard, StandardState)
+    standard = replace(standard, iron_saturation_composition=recorded)
+    return replace(
+        row, identity=replace(identity, reference_state=State.of(standard))
+    )
+
+
+def _ruled_segment(
+    temperature_K: Decimal,
+    left: tuple[Decimal, Decimal],
+    right: tuple[Decimal, Decimal],
+) -> Decimal:
+    """End-segment continuation of two ruled (T, O/Fe) anchors."""
+
+    t0, y0 = left
+    t1, y1 = right
+    return y0 + (y1 - y0) * (temperature_K - t0) / (t1 - t0)
+
+
+def test_owner_supplies_darken_gurry_composition_inside_the_window() -> None:
+    """Ruled anchors, not a refit: 3 - 2*1.0394 = 0.9212 at 1649.15 K."""
+
+    decision = iron_saturation_composition(_wustite_row(Decimal("1649.15")))
+    assert decision.failure is None
+    assert decision.notice == "fe_saturation_composition_owner_supplied"
+    assert decision.o_over_fe == Decimal("1.0394")
+    assert decision.n_fe2_plus is not None
+    assert decision.n_fe2_plus.quantize(Decimal("0.0001")) == Decimal("0.9212")
+    assert decision.authority is Authority.DERIVED
+    assert decision.extrapolated is False
+    # |log10(N0(1.0394) / N0(Fe0.947O))|. The review prints this through
+    # 17 decimal places as 0.01590791249755476. A constant band fails it.
+    assert decision.band_dex.quantize(Decimal("1e-17")) == Decimal(
+        "0.01590791249755476"
+    )
+    assert decision.band_dex != Decimal("1")
+    midpoint = iron_saturation_composition(
+        _wustite_row((Decimal("1649.15") + Decimal("1709.15")) / 2)
+    )
+    assert midpoint.o_over_fe == (Decimal("1.0394") + Decimal("1.0287")) / 2
+    assert midpoint.authority is Authority.DERIVED
+    endpoint = iron_saturation_composition(_wustite_row(Decimal("1766.15")))
+    assert endpoint.o_over_fe == Decimal("1.0265")
+    assert endpoint.authority is Authority.DERIVED
+    assert endpoint.extrapolated is False
+
+
+def test_cited_coughlin_composition_is_used_exactly() -> None:
+    row = _with_saturation(
+        _wustite_row(Decimal("1649.15"), Decimal("1")),
+        _cited_saturation("Fe0.947O"),
+    )
+    decision = iron_saturation_composition(row)
+    owner = iron_saturation_composition(_wustite_row(Decimal("1649.15")))
+    assert decision.notice == "fe_saturation_composition_from_cited_standard"
+    assert decision.failure is None
+    assert decision.band_dex is None
+    assert decision.authority is None
+    # Review digits, not the 0.001 rounding 0.888. The owner's full
+    # precision continues past this prefix.
+    assert str(decision.n_fe2_plus).startswith("0.8880675818373812")
+    assert decision.n_fe2_plus.quantize(Decimal("1e-16")) == Decimal(
+        "0.8880675818373812"
+    )
+    assert decision.n_fe2_plus != decision.n_fe2_plus.quantize(Decimal("0.001"))
+    assert decision.n_fe2_plus != owner.n_fe2_plus
+    converted = fusion_comparison_reference(row, engine=Engine.INTERNAL_ANALYTICAL)
+    assert converted.value.point == _independent_factor(Decimal("1649.15"))
+    cited = next(
+        notice
+        for notice in converted.notices
+        if notice.reason.startswith("fe_saturation_composition_from_cited_standard")
+    )
+    assert cited.band is None
+    assert "N0=" in cited.reason
+
+
+def test_unparseable_cited_composition_does_not_fall_through() -> None:
+    row = _with_saturation(
+        replace(_wustite_row(Decimal("1649.15")), source_id=_DISTIN),
+        _cited_saturation("not-a-formula"),
+    )
+    decision = iron_saturation_composition(row)
+    assert decision.notice == "fe_saturation_composition_from_cited_standard"
+    assert decision.failure is not None
+    assert decision.n_fe2_plus is None
+    converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
+    # The activity step is f and does not read the failed formula.
+    assert converted.value.point == _independent_factor(Decimal("1649.15"))
+    standard = converted.identity.reference_state.value
+    assert isinstance(standard, StandardState)
+    assert standard.endmember.formula == "FeO"
+    assert any(
+        notice.reason.startswith("fe_saturation_composition_from_cited_standard")
+        and "not-a-formula" in notice.reason
+        for notice in converted.notices
+    )
+    assert not any(
+        "fe_saturation_composition_owner_supplied" in notice.reason
+        for notice in converted.notices
+    )
+
+
+def test_owner_extrapolates_the_end_segment_and_does_not_clamp() -> None:
+    anchor = iron_saturation_composition(_wustite_row(Decimal("1649.15")))
+    cold = iron_saturation_composition(_wustite_row(Decimal("1600")))
+    assert cold.authority is Authority.EXTRAPOLATED
+    assert cold.extrapolated is True
+    assert cold.o_over_fe != Decimal("1.0394")
+    assert cold.o_over_fe == _ruled_segment(
+        Decimal("1600"),
+        (Decimal("1649.15"), Decimal("1.0394")),
+        (Decimal("1709.15"), Decimal("1.0287")),
+    )
+    assert cold.o_over_fe > anchor.o_over_fe
+    assert cold.n_fe2_plus != anchor.n_fe2_plus
+    assert cold.band_dex == anchor.band_dex
+    hot = iron_saturation_composition(_wustite_row(Decimal("1800")))
+    assert hot.authority is Authority.EXTRAPOLATED
+    assert hot.o_over_fe != Decimal("1.0265")
+    assert hot.o_over_fe == _ruled_segment(
+        Decimal("1800"),
+        (Decimal("1709.15"), Decimal("1.0287")),
+        (Decimal("1766.15"), Decimal("1.0265")),
+    )
+    # Local spread at 1800 K, above the 1766.15 K anchor spread. A band
+    # clamped to the window value, or a constant, fails this.
+    assert hot.band_dex.quantize(Decimal("1e-17")) == Decimal(
+        "0.02910062656820004"
+    )
+    assert hot.band_dex != anchor.band_dex
+    assert hot.band_dex > anchor.band_dex
+
+
+def test_recorded_source_analysis_composition_precedes_the_owner_line() -> None:
+    temperature = Decimal("1709.15")
+    n0 = Decimal("0.91")
+    row = _with_saturation(
+        _wustite_row(temperature, Decimal("1.2")),
+        _derived_saturation(n0, Decimal("0.03")),
+    )
+    decision = iron_saturation_composition(row)
+    assert decision.notice == "composition_derived_from_source_analyses"
+    assert decision.n_fe2_plus == n0
+    assert decision.authority is Authority.DERIVED
+    assert decision.band_dex == Decimal("0.03")
+    assert decision.source is not None and "openimcc constant" in decision.source
+    converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
+    assert converted.value.point == Decimal("1.2") * _independent_factor(temperature)
+    assert any(
+        notice.reason.startswith("composition_derived_from_source_analyses")
+        for notice in converted.notices
+    )
+
+
+def test_distin_oxygen_ratio_converts_by_the_gibbs_factor() -> None:
+    """Stored a_FeO is O_metal/O_sat. a_F019 = a_D * f. a_D = 1 maps to f."""
+
+    assert (Decimal("0.43") / Decimal("0.44")).quantize(Decimal("0.001")) == Decimal(
+        "0.977"
+    )
+    assert (Decimal("0.60") / Decimal("0.63")).quantize(Decimal("0.001")) == Decimal(
+        "0.952"
+    )
+    assert (Decimal("0.78") / Decimal("0.84")).quantize(Decimal("0.001")) == Decimal(
+        "0.929"
+    )
+    temperature = Decimal("2153.15")
+    point = Decimal("0.952")
+    row = replace(_wustite_row(temperature, point), source_id=_DISTIN)
+    factor = _independent_factor(temperature)
+    for engine in (
+        None,
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+        Engine.ALPHAMELTS,
+        Engine.MAGEMIN,
+        Engine.THERMOENGINE,
+    ):
+        converted = fusion_comparison_reference(row, engine=engine)
+        assert converted.value.point == point * factor
+        standard = converted.identity.reference_state.value
+        assert isinstance(standard, StandardState)
+        assert standard.endmember.formula == "FeO"
+        composition = next(
+            notice
+            for notice in converted.notices
+            if notice.reason.startswith("fe_saturation_composition_owner_supplied")
+        )
+        assert composition.authority is Authority.EXTRAPOLATED
+        assert any(notice.reason == _EXTRAPOLATED for notice in converted.notices)
+    saturated = replace(_wustite_row(temperature, Decimal("1")), source_id=_DISTIN)
+    assert (
+        fusion_comparison_reference(saturated, engine=Engine.OPENIMCC).value.point
+        == factor
+    )
+    vaporock = fusion_comparison_reference(row, engine=Engine.VAPOROCK)
+    assert vaporock.value.point == point
+
+
+def test_recorded_n0_does_not_scale_a_distin_oxygen_ratio() -> None:
+    temperature = Decimal("2153.15")
+    point = Decimal("0.952")
+    n0 = Decimal("0.90")
+    row = _with_saturation(
+        replace(_wustite_row(temperature, point), source_id=_DISTIN),
+        _derived_saturation(n0, Decimal("0.02")),
+    )
+    converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
+    assert converted.value.point == point * _independent_factor(temperature)
+    assert converted.value.point != point * _independent_factor(temperature) / n0
+    decision = iron_saturation_composition(row)
+    assert decision.n_fe2_plus == n0
+    assert decision.notice == "composition_derived_from_source_analyses"
+    assert any(
+        notice.reason.startswith("composition_derived_from_source_analyses")
+        and "N0=0.90" in notice.reason
+        for notice in converted.notices
+    )
+
+
+def test_openimcc_branch_has_no_hardcoded_distin_ion_fraction() -> None:
+    import simulator.battery.score as feo_score
+
+    source = Path(feo_score.__file__).read_text(encoding="utf-8")
+    assert "_DISTIN_N_FE2_PLUS_FACTORS" not in source
+    for forbidden in ("0.9787", "0.9861", "0.9968"):
+        assert forbidden not in source
+
+
+def test_recorded_saturation_composition_is_part_of_identity() -> None:
+    plain = _wustite_row(Decimal("1649.15"))
+    cited = _with_saturation(plain, _cited_saturation("Fe0.947O"))
+    again = _with_saturation(plain, _cited_saturation("Fe0.947O"))
+    assert identity_equal(plain.identity, plain.identity).kind is IdentityEqualKind.EQUAL
+    assert identity_equal(cited.identity, again.identity).kind is IdentityEqualKind.EQUAL
+    differed = identity_equal(plain.identity, cited.identity)
+    assert differed.kind is IdentityEqualKind.IDENTITY_MISMATCH
+
+
+def test_cited_and_derived_saturation_round_trip_through_plain_standard_state() -> None:
+    from simulator.battery.migrate import _standard_state_from_plain
+
+    absent = _standard_state_from_plain(
+        {
+            "convention": "raoultian_pure_endmember",
+            "endmember": {"formula": "Fe(1-x)O", "phase": "l"},
+            "component_basis": "Fe(1-x)O",
+        }
+    )
+    assert absent.iron_saturation_composition is None
+    cited = _standard_state_from_plain(
+        {
+            "convention": "raoultian_pure_endmember",
+            "endmember": {"formula": "Fe(1-x)O", "phase": "l"},
+            "component_basis": "Fe(1-x)O",
+            "reference_pressure_bar": "1.01325",
+            "iron_saturation_composition": {
+                "method": "cited_standard",
+                "composition_as_printed": "Fe0.947O",
+                "quote": "Coughlin's Fe0.947O",
+                "locator": {"page": 12, "note": "fixture"},
+            },
+        }
+    )
+    recorded = cited.iron_saturation_composition
+    assert recorded is not None
+    assert recorded.method == "cited_standard"
+    assert recorded.composition_as_printed == "Fe0.947O"
+    assert recorded.n_fe2_plus is None
+    assert recorded.band_dex is None
+    assert recorded.locator.page == 12
+    derived = _standard_state_from_plain(
+        {
+            "convention": "raoultian_pure_endmember",
+            "endmember": {"formula": "Fe(1-x)O", "phase": "l"},
+            "component_basis": "Fe(1-x)O",
+            "iron_saturation_composition": {
+                "method": "derived_from_source_analyses",
+                "composition_as_printed": "zero-silica Fe2+ ion fraction",
+                "quote": "Table I",
+                "locator": {"page": 73, "table": "I"},
+                "n_fe2_plus": "0.90",
+                "provenance": "fixture reduction",
+                "band_dex": "0.02",
+            },
+        }
+    )
+    derived_recorded = derived.iron_saturation_composition
+    assert derived_recorded is not None
+    assert derived_recorded.n_fe2_plus == Decimal("0.90")
+    assert derived_recorded.band_dex == Decimal("0.02")
+    assert derived_recorded.provenance == "fixture reduction"
 
 
 if __name__ == "__main__":

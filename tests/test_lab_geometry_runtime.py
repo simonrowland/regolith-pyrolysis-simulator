@@ -2,16 +2,19 @@ from __future__ import annotations
 
 import copy
 import math
+from types import SimpleNamespace
 
 import pytest
 
 from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from simulator.accounting import AtomLedger, LedgerTransition
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.condensation import (
     CondensationModel,
     KnudsenRegimeRefusal,
+    VAPOR_PRESSURE_DATA,
     knudsen_regime_diagnostic,
 )
 from simulator.core import PyrolysisSimulator
@@ -24,7 +27,11 @@ from simulator.lab_geometry import (
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
-from simulator.runner import _wall_deposit_mol_by_species, _wall_deposit_report_kg
+from simulator.runner import (
+    WALL_DEPOSIT_ACCOUNT,
+    _wall_deposit_mol_by_species,
+    _wall_deposit_report_kg,
+)
 from simulator.runner import PyrolysisRun
 from simulator.state import (
     CondensationTrain,
@@ -919,4 +926,115 @@ def test_wall_deposit_report_includes_formula_only_species() -> None:
     assert report["In2O"] == pytest.approx(
         ledger.project_account_kg(account)["In2O"]
     )
+    assert unresolved_species_mol == {}
+
+    tiny_mol = 1.0e-18
+    tiny_mass_kg = (
+        tiny_mol
+        * resolve_species_formula("In2O", ledger.registry).molar_mass_kg_per_mol()
+    )
+    tiny_report = _wall_deposit_report_kg(
+        {account: {"In2O": tiny_mol}},
+        ledger.registry,
+        {},
+    )
+    assert tiny_report["In2O"] == pytest.approx(tiny_mass_kg)
+    assert tiny_report["In2O"] > 0.0
+
+
+def test_wall_deposit_report_tracks_condensation_bookings_and_labels() -> None:
+    pass_through_model = CondensationModel(
+        CondensationTrain.create_default(),
+        vapor_pressure_data=VAPOR_PRESSURE_DATA,
+        wall_temperature_C=1616.0,
+    )
+    pass_through_model.configure_operating_conditions(
+        wall_temperature_C=1616.0,
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={
+            "Cr": 1.0e-12,
+            "Mn": 1.0e-12,
+            "SiO": 9.999999999998,
+        },
+        stage_area_m2_by_stage={
+            f"stage_{number}": 1.0e-4 for number in range(8)
+        },
+        gas_temperature_C=1700.0,
+    )
+    pass_through_flux = EvaporationFlux(
+        species_kg_hr={"Cr": 1.0e-8, "Mn": 1.0e-8, "SiO": 1.0},
+        total_kg_hr=1.00000002,
+    )
+    pass_through = pass_through_model.route(
+        pass_through_flux,
+        MeltState(temperature_C=1700.0),
+    )
+
+    deposit_model = CondensationModel(CondensationTrain.create_default())
+    deposit_model.configure_lab_geometry(
+        parse_lab_geometry(robinot_geometry_fixture())
+    )
+    deposit_model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"SiO": 10.0},
+        gas_temperature_C=1700.0,
+    )
+    deposit_flux = EvaporationFlux(
+        species_kg_hr={"SiO": 1.0},
+        total_kg_hr=1.0,
+    )
+    deposited = deposit_model.route(
+        deposit_flux,
+        MeltState(temperature_C=1700.0),
+    )
+
+    booked_kg = dict(pass_through.wall_deposit_by_species)
+    for species, kg in deposited.wall_deposit_by_species.items():
+        booked_kg[species] = booked_kg.get(species, 0.0) + kg
+    wall_state = {
+        WALL_DEPOSIT_ACCOUNT: {
+            species: kg
+            / resolve_species_formula(species, None).molar_mass_kg_per_mol()
+            for species, kg in booked_kg.items()
+        }
+    }
+    snapshots = (
+        SimpleNamespace(evap_flux=pass_through_flux),
+        SimpleNamespace(evap_flux=deposit_flux),
+    )
+    unresolved_species_mol: dict[str, float] = {}
+    report = _wall_deposit_report_kg(
+        wall_state,
+        None,
+        unresolved_species_mol,
+        snapshots=snapshots,
+    )
+
+    assert pass_through.condensation_refusals_by_species["Cr"]["status"] == (
+        "pass_through"
+    ), pass_through.condensation_refusals_by_species["Cr"]["reason"]
+    assert pass_through.condensation_refusals_by_species["Cr"]["reason"] == (
+        "no_supersaturation"
+    )
+    assert pass_through.condensation_refusals_by_species["Mn"]["status"] == (
+        "pass_through"
+    )
+    assert pass_through.condensation_refusals_by_species["Mn"]["reason"] == (
+        "no_supersaturation"
+    )
+    assert pass_through.wall_deposit_by_species.get("Cr", 0.0) == 0.0
+    assert pass_through.wall_deposit_by_species.get("Mn", 0.0) == 0.0
+    assert pass_through.wall_deposit_by_species.get("SiO", 0.0) == 0.0
+    # A positive booked value is the wall model's deposited outcome.
+    assert deposited.wall_deposit_by_species["SiO"] > 0.0
+    assert report["Cr"] == pytest.approx(
+        pass_through.wall_deposit_by_species.get("Cr", 0.0)
+    )
+    assert report["Mn"] == pytest.approx(
+        pass_through.wall_deposit_by_species.get("Mn", 0.0)
+    )
+    assert report["SiO"] == pytest.approx(
+        deposited.wall_deposit_by_species["SiO"]
+    )
+    assert "CrO" not in report
     assert unresolved_species_mol == {}

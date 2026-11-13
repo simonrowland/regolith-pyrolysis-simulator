@@ -76,9 +76,10 @@ from simulator.mre_ladder import (
     preset_catalog as build_mre_preset_catalog,
 )
 from simulator.optimize import job_runner as optimizer_job_runner
+from simulator.optimize.job_runner import _version_badge
 from simulator.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
-from simulator.optimize.honesty import optimizer_tier_label
+from simulator.optimize.honesty import _optional_bool, optimizer_tier_label
 from simulator.optimize.import_bundle import (
     BUNDLE_CAP_BYTES,
     ImportBundleError,
@@ -132,6 +133,7 @@ from web.run_store import (
     list_runs,
     load as load_run_artifact,
 )
+from web.yaml_data import load_yaml as _load_web_yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 
 bp = Blueprint('web', __name__,
@@ -277,13 +279,7 @@ class _StoredBackendResolutionCarrier:
 
 
 def _load_yaml(filename):
-    path = DATA_DIR / filename
-    if filename == 'setpoints.yaml':
-        return _load_setpoints_file(path)
-    if not path.exists():
-        return {}
-    with open(path) as f:
-        return load_cached_safe_yaml(f.read()) or {}
+    return _load_web_yaml(filename, DATA_DIR)
 
 
 def _optimizer_runs_root() -> Path:
@@ -349,31 +345,6 @@ def _submit_optimizer_job(
         if open_jobs >= _optimizer_job_queue_cap():
             return None, 'optimizer job queue is full'
         return runner.submit(job_request), None
-
-
-def _version_badge(stored_version: Any) -> dict[str, Any]:
-    current = current_code_version()
-    if not stored_version:
-        return {
-            'status': 'unknown',
-            'label': 'version unknown',
-            'stored_version': None,
-            'current_version': current,
-        }
-    stored = str(stored_version)
-    if stored == current:
-        return {
-            'status': 'current',
-            'label': 'current',
-            'stored_version': stored,
-            'current_version': current,
-        }
-    return {
-        'status': 'stale',
-        'label': 'stale version',
-        'stored_version': stored,
-        'current_version': current,
-    }
 
 
 def _optimizer_run_dirs(root: Path) -> list[Path]:
@@ -668,25 +639,6 @@ def _latest_backend_status(carrier: Any) -> str | None:
     evidence is enough.
     """
     return select_backend_status(_backend_status_candidates(carrier))
-
-
-def _optional_bool(value: Any) -> bool | None:
-    if value is None:
-        return None
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, int) and not isinstance(value, bool):
-        if value in (0, 1):
-            return bool(value)
-        return False
-    if isinstance(value, str):
-        normalized = value.strip().lower()
-        if normalized in {'true', '1'}:
-            return True
-        if normalized in {'false', '0'}:
-            return False
-        return False
-    return False
 
 
 def _optimizer_tier_label(

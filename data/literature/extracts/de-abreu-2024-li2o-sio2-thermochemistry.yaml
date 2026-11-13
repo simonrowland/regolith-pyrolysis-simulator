@@ -2996,7 +2996,18 @@ species:
         - series: This work calculated phase boundaries
           marker: continuous line
           marker_count: not_countable_from_render
-          method_class: quoted_attributed
+          method_class: model_derived
+          derivation:
+            relation: The authors calculated the Li2O-SiO2 phase diagram with the thermodynamic parameters optimized in this work.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 11, published_page: 313, pdf_page_index: 10, section: '5.2 Thermodynamic Modeling'}
+            method:
+              state: {tag: value, value: Thermo-Calc PARROT module for CALPHAD optimization followed by POLY-3 phase-diagram calculations.}
+              locator: {page: 11, published_page: 313, pdf_page_index: 10, section: '5.2 Thermodynamic Modeling'}
+            references:
+              - 'Figure 5 caption input data: [10–12, 28, 35, 41, 54–57].'
+              - 'Thermo-Calc [43] and the CALPHAD method [44].'
         digitisation: deferred to a figure pass
         attribution: Literature datasets as named in the legend; model parameters from this work.
     - observation_id: deabreu2024_figure6_calculated_gibbs_energies

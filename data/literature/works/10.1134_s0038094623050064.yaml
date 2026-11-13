@@ -11,7 +11,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:murchison-degassing-2023-springer
       role: pdf
@@ -37,7 +37,9 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: regime 'vacuum_pyrolysis_furnace' is not a closed method token (kems_effusion alone is insufficient)
+    reason: 'unmapped published method: «экспериментов с изотермической выдержкой при различных температурах, T: 200, 500
+      и 800°C» with volatile-component analysis by «газовом хроматографе “Кристал-Люкс 4000М”»; no existing MethodToken represents
+      this thermal-degassing and gas-chromatography method.'
   sample:
     mass_kg:
       state:
@@ -123,8 +125,9 @@ experiments:
   work_id: 10.1134/s0038094623050064
   locator:
     published_page: 574
-    table: '1'
-    note: Murchison isothermal degassing series
+    pdf_page_index: 4
+    section: Eksperimentalnye issledovaniya degazatsii
+    note: The gas-chromatography method is described here; the isothermal and stepwise programs continue on pp. 575-576.
   apparatus:
     cell_material_and_liner:
       state:
@@ -141,7 +144,9 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: regime 'vacuum_pyrolysis_furnace' is not a closed method token (kems_effusion alone is insufficient)
+    reason: 'unmapped published method: «углистый хондрит Murchison подвергался ступенчатому нагреву от 50 до 800°C, с шагом
+      в 100°C» with volatile-component analysis by «газовом хроматографе “Кристал-Люкс 4000М”»; no existing MethodToken represents
+      this thermal-degassing and gas-chromatography method.'
   sample:
     mass_kg:
       state:
@@ -227,8 +232,9 @@ experiments:
   work_id: 10.1134/s0038094623050064
   locator:
     published_page: 574
-    table: '2'
-    note: Murchison stepped degassing series
+    pdf_page_index: 4
+    section: Eksperimentalnye issledovaniya degazatsii
+    note: The gas-chromatography method is described here; the isothermal and stepwise programs continue on pp. 575-576.
   apparatus:
     cell_material_and_liner:
       state:

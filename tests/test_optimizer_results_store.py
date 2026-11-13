@@ -166,12 +166,31 @@ def test_numeric_partial_objective_status_survives_result_serialization():
     assert serialized["evidence"]["excluded"] == excluded
 
 
+# Shape written by alphamelts._build_result: backend_name and engine_version
+# on the same diagnostics mapping. The version is not an allowlist entry.
+_HONEST_ADAPTER_ENGINE_VERSION = "petthermotools 1.2.3"
+
+
 def _admissible_trace(payload: Mapping[str, object] | None = None) -> dict[str, object]:
     data = dict(payload or {})
     data.setdefault("backend_status", "ok")
     data.setdefault("backend_authoritative", True)
     data.setdefault("snapshots", [{"mass_balance_error_pct": 0.0}])
     return data
+
+
+def _bind_honest_adapter_stamp(trace: dict[str, object], backend_name: str) -> None:
+    existing = trace.get("backend_name")
+    if isinstance(existing, str) and existing != backend_name:
+        return
+    diagnostics = trace.get("diagnostics")
+    if not isinstance(diagnostics, dict):
+        diagnostics = {}
+    diagnostics.setdefault("backend_name", backend_name)
+    diagnostics.setdefault("engine_version", _HONEST_ADAPTER_ENGINE_VERSION)
+    trace["diagnostics"] = diagnostics
+    trace.setdefault("backend_name", backend_name)
+    trace.setdefault("engine_version", _HONEST_ADAPTER_ENGINE_VERSION)
 
 
 def _scored(
@@ -193,6 +212,12 @@ def _scored(
         if trace.get("backend_status") == "diagnostic_stub"
         else "melts"
     )
+    if (
+        evidence_class == "melts"
+        and trace.get("backend_status") in (None, "ok")
+        and trace.get("backend_authoritative") is not False
+    ):
+        _bind_honest_adapter_stamp(trace, "alphamelts")
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -403,6 +428,12 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.trace == {
         "backend_status": "ok",
         "backend_authoritative": True,
+        "backend_name": "alphamelts",
+        "engine_version": _HONEST_ADAPTER_ENGINE_VERSION,
+        "diagnostics": {
+            "backend_name": "alphamelts",
+            "engine_version": _HONEST_ADAPTER_ENGINE_VERSION,
+        },
         "hours": [{"hour": 1}],
         "snapshots": [{"mass_balance_error_pct": 0.0}],
         "status": "ok",
@@ -1873,7 +1904,16 @@ def test_existing_row_missing_serialized_evidence_stays_missing_and_is_marked(
         base,
         run_reference=RunReference(
             status="ok",
-            trace=_admissible_trace({"backend_name": "alphamelts"}),
+            trace=_admissible_trace(
+                {
+                    "backend_name": "alphamelts",
+                    "engine_version": _HONEST_ADAPTER_ENGINE_VERSION,
+                    "diagnostics": {
+                        "backend_name": "alphamelts",
+                        "engine_version": _HONEST_ADAPTER_ENGINE_VERSION,
+                    },
+                }
+            ),
             product_summary=base.run_reference.product_summary,
             backend_name="alphamelts",
             backend_status="ok",
@@ -2653,6 +2693,137 @@ def test_store_refuses_a_feasible_row_that_never_earned_a_certification_field(
     # pass on missing_evidence_class or backend_name_non_authoritative, and
     # both of those are satisfied here precisely so they cannot mask this one.
     assert "certification_forbidden" in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
+def _certifying_alphamelts_result(
+    spec: EvalSpec,
+    trace: Mapping[str, object],
+) -> ScoredResult:
+    return replace(
+        _scored(spec),
+        run_reference=RunReference(
+            status="ok",
+            trace=dict(trace),
+            product_summary={
+                "oxygen_kg": 10.0,
+                "backend_name": "alphamelts",
+                "mass_closure": {"status": "closed", "mass_balance_error_pct": 0.0},
+            },
+            backend_name="alphamelts",
+            backend_status="ok",
+            backend_authoritative=True,
+            evidence_class="melts",
+        ),
+    )
+
+
+def test_store_refuses_consistent_fabricated_alphamelts_claim(tmp_path) -> None:
+    """Authority fields that agree are not evidence that alphamelts ran.
+
+    The omitted-field case is certification_forbidden. This row fills every
+    authority field consistently and still never carries the adapter stamp.
+    """
+    spec = _base_spec()
+    scored = _certifying_alphamelts_result(
+        spec,
+        _admissible_trace(
+            {
+                "backend_name": "alphamelts",
+                "backend_status": "ok",
+                "backend_authoritative": True,
+            }
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert "real_engine_producer_stamp_missing" in exc_info.value.reasons
+    assert "certification_forbidden" not in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
+def test_store_accepts_alphamelts_claim_bound_to_adapter_stamp(tmp_path) -> None:
+    spec = _base_spec()
+    scored = _certifying_alphamelts_result(
+        spec,
+        _admissible_trace(
+            {
+                "backend_name": "alphamelts",
+                "engine_version": _HONEST_ADAPTER_ENGINE_VERSION,
+                "diagnostics": {
+                    "backend_name": "alphamelts",
+                    "engine_version": _HONEST_ADAPTER_ENGINE_VERSION,
+                },
+            }
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    loaded = store.lookup(spec)
+    assert loaded is not None
+    assert loaded.run_reference is not None
+    assert loaded.run_reference.trace["diagnostics"] == {
+        "backend_name": "alphamelts",
+        "engine_version": _HONEST_ADAPTER_ENGINE_VERSION,
+    }
+
+
+@pytest.mark.parametrize("engine_version", ("unavailable", "unknown", "", "  "))
+def test_store_refuses_sentinel_engine_version_as_unbound(
+    tmp_path,
+    engine_version: str,
+) -> None:
+    spec = _base_spec()
+    scored = _certifying_alphamelts_result(
+        spec,
+        _admissible_trace(
+            {
+                "backend_name": "alphamelts",
+                "engine_version": engine_version,
+                "diagnostics": {
+                    "backend_name": "alphamelts",
+                    "engine_version": engine_version,
+                },
+            }
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert "real_engine_producer_stamp_unbound" in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
+def test_store_refuses_stamp_from_a_different_engine(tmp_path) -> None:
+    spec = _base_spec()
+    scored = _certifying_alphamelts_result(
+        spec,
+        _admissible_trace(
+            {
+                "backend_name": "alphamelts",
+                "diagnostics": {
+                    "backend_name": "magemin",
+                    "engine_version": "MAGEMin 1.7.0",
+                },
+            }
+        ),
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert (
+        "real_engine_producer_stamp_disagreement:magemin"
+        in exc_info.value.reasons
+    )
     assert store.lookup(spec) is None
 
 

@@ -28,7 +28,7 @@ from engines.builtin.melt_effect_adjustment import (
     strip_non_oxide_residuals,
     warn_tier_analytical_diagnostic,
 )
-from engines.builtin.cco_redox_buffer import cco_log10_fO2_bar
+from simulator.oxygen_buffers import cco_log10_fO2_bar
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
 from simulator.melt_backend.base import (
@@ -586,7 +586,11 @@ def test_t139_p2o5_model_keeps_oxide_contract_and_process_loss_bands():
 
 
 def test_t139_carbon_model_exposes_cco_negative_vapor_and_burnout_interval():
-    model = warn_tier_analytical_diagnostic("carbonaceous_organic", T_K=1500.0)
+    model = warn_tier_analytical_diagnostic(
+        "carbonaceous_organic",
+        T_K=1500.0,
+        cco_reference_log10_fO2_bar=cco_log10_fO2_bar(1500.0, 1.0),
+    )
     assert model is not None
     assert model["analytical_model_class"] == "elemental_carbon_redox_partition"
     assert model["speciation"]["routing"] == (
@@ -629,6 +633,7 @@ def test_t139_cco_diagnostic_matches_reference_output_on_temperature_grid():
         model = warn_tier_analytical_diagnostic(
             "carbonaceous_organic",
             T_K=temperature_K,
+            cco_reference_log10_fO2_bar=cco_log10_fO2_bar(temperature_K, 1.0),
         )
 
         assert model is not None

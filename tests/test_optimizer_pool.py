@@ -414,6 +414,12 @@ def _fake_evaluate(
                 "thread_env": {name: os.environ.get(name) for name in THREAD_ENV_VARS},
                 "backend_status": "ok",
                 "backend_authoritative": True,
+                "backend_name": "alphamelts",
+                "engine_version": "petthermotools 1.2.3",
+                "diagnostics": {
+                    "backend_name": "alphamelts",
+                    "engine_version": "petthermotools 1.2.3",
+                },
                 "snapshots": [{"mass_balance_error_pct": 0.0}],
             },
             product_summary={
@@ -2605,6 +2611,24 @@ def test_pool_nonpicklable_request_payload_preflight(tmp_path: Path) -> None:
             max_workers=1,
             output_root=tmp_path,
             evaluate_fn=_fake_evaluate,
+        )
+
+
+def test_supervised_process_context_refuses_unpicklable_task() -> None:
+    task = replace(
+        _pool_task(
+            0,
+            feedstock_id="lunar_mare_low_ti",
+            stage0_subprocess_required=False,
+        ),
+        profile={"bad": lambda value: value},
+    )
+
+    with pytest.raises(TypeError, match="must be picklable"):
+        pool_module._supervised_process_context(
+            task,
+            _fake_evaluate,
+            None,
         )
 
 

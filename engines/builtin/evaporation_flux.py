@@ -70,6 +70,7 @@ from simulator.chemistry.kernel.capabilities import CapabilityProfile, Chemistry
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.config_flags import bool_feature_flag
+from simulator.physical_constants import PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -1361,7 +1362,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         pipe_diameter_m = _finite_float(controls.get("pipe_diameter_m"), 0.12)
         overhead_pressure_pa = _finite_float(
             controls.get("overhead_pressure_pa"),
-            max(0.0, float(request.pressure_bar) * 100000.0),
+            max(0.0, float(request.pressure_bar) * PA_PER_BAR),
         )
         gas_temperature_K = _finite_float(controls.get("gas_temperature_K"), T_K)
         carrier_gas = str(controls.get("carrier_gas") or "N2")

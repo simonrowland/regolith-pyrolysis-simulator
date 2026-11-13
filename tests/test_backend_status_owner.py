@@ -15,6 +15,7 @@ import pathlib
 
 import pytest
 
+from simulator.fidelity_vocabulary import UnknownFidelityVocabularyTokenError
 from simulator.optimize.backend_status import (
     latest_backend_status_from_sequence,
 )
@@ -515,6 +516,20 @@ def test_a_degrading_status_survives_a_later_ok(degrading: str) -> None:
     assert select_backend_status([degrading, "ok"]) == degrading
     # and with the flattering token on both sides, so recency cannot rescue it
     assert select_backend_status(["ok", degrading, "ok"]) == degrading
+
+
+@pytest.mark.parametrize("status", ["missing", "not_run"])
+def test_runtime_only_non_certifying_status_survives_a_later_ok(status: str) -> None:
+    """The fidelity vocabulary says, "Everything else in RuntimeStatus is a
+    caveat of some kind," with ``ok`` the only certifying status. Its explicit
+    ``missing`` and ``not_run`` degradations must survive a later ``ok``.
+    """
+    assert select_backend_status([status, "ok"]) == status
+
+
+def test_unknown_status_fails_closed_before_a_later_ok() -> None:
+    with pytest.raises(UnknownFidelityVocabularyTokenError):
+        select_backend_status(["future_status", "ok"])
 
 
 def test_status_partition_covers_the_vocabulary_exactly() -> None:

@@ -772,16 +772,35 @@ species:
       units: 'atm as printed; pressure_atm is printed coefficient times 10^-9 atm'
       uncertainty:
         note: 'No individual uncertainty is printed for these calculated pressure cells.'
+      derivation:
+        relation: Atomic oxygen pressure derived from ion-current intensities using gas-phase equilibrium (1) and thermodynamic data [40].
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 2
+            published_page: 20
+            pdf_page_index: 1
+            section: Results
+            equation: '4'
+            note: Table 2 reports the derived pressures; the ion-current intensities used for each composition are not tabulated.
+        method:
+          state: {tag: value, value: 'Comparison of ion currents with thermodynamic data [40] for gas-phase equilibrium (1).'}
+          locator:
+            page: 2
+            published_page: 20
+            pdf_page_index: 1
+            section: Results
+            equation: '4'
       values:
         quantity: partial_pressure
         gas_species: O(g)
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Shornikov, Stolyarova, and Shul’ts (1997), Table 2
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        attribution: Authors' atomic-oxygen pressure reduction from KEMS ion-current measurements using gas-phase equilibrium (1) and thermodynamic data [40].
         generator: author-reported gas-equilibrium calculation
         admission_status: admitted
-        method: thermodynamic equilibrium calculation
-        method_as_printed: "Author-calculated from gas equilibrium (1): pO = I(MoO3)+ σ(MoO2) / [I(MoO2)+ σ(MoO3)] × K1°(T), using thermodynamic data [40]."
+        method: comparison of ion currents
+        method_as_printed: 'The partial pressures of molecular vapor species over CaO–Al2O3 melts (Table 2) were determined by the method of comparison of ion currents; the partial pressures of atomic and molecular oxygen were obtained by the use of thermodynamic data [40] on gas-phase equilibria.'
         composition_component: CaO–Al2O3 melt
         composition_basis: mole fraction
         temperature_K: 1933.0
@@ -1121,16 +1140,35 @@ species:
       units: 'atm as printed; pressure_atm is printed coefficient times 10^-9 atm'
       uncertainty:
         note: 'No individual uncertainty is printed for these calculated pressure cells.'
+      derivation:
+        relation: Atomic oxygen pressure derived from ion-current intensities using gas-phase equilibrium (2) and thermodynamic data [40].
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 2
+            published_page: 20
+            pdf_page_index: 1
+            section: Results
+            equation: '5'
+            note: Table 2 reports the derived pressures; the ion-current intensities used for each composition are not tabulated.
+        method:
+          state: {tag: value, value: 'Comparison of ion currents with thermodynamic data [40] for gas-phase equilibrium (2).'}
+          locator:
+            page: 2
+            published_page: 20
+            pdf_page_index: 1
+            section: Results
+            equation: '5'
       values:
         quantity: partial_pressure
         gas_species: O(g)
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Shornikov, Stolyarova, and Shul’ts (1997), Table 2
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        attribution: Authors' atomic-oxygen pressure reduction from KEMS ion-current measurements using gas-phase equilibrium (2) and thermodynamic data [40].
         generator: author-reported gas-equilibrium calculation
         admission_status: admitted
-        method: thermodynamic equilibrium calculation
-        method_as_printed: "Author-calculated from gas equilibrium (2): pO = I(AlO)+ σ(Al) / [I(Al)+ σ(AlO)] × K2°(T), using thermodynamic data [40]."
+        method: comparison of ion currents
+        method_as_printed: 'The partial pressures of molecular vapor species over CaO–Al2O3 melts (Table 2) were determined by the method of comparison of ion currents; the partial pressures of atomic and molecular oxygen were obtained by the use of thermodynamic data [40] on gas-phase equilibria.'
         composition_component: CaO–Al2O3 melt
         composition_basis: mole fraction
         temperature_K: 1933.0
@@ -1471,16 +1509,35 @@ species:
       units: 'atm as printed; pressure_atm is printed coefficient times 10^-11 atm'
       uncertainty:
         note: 'No individual uncertainty is printed for these calculated pressure cells.'
+      derivation:
+        relation: Molecular oxygen pressure derived using gas-phase equilibrium (3) and thermodynamic data [40]; the paper does not identify which atomic-oxygen estimate is used as input.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 2
+            published_page: 20
+            pdf_page_index: 1
+            section: Results
+            equation: '3'
+            note: 'The paper does not identify which atomic-oxygen estimate is used as input; Table 2 reports the final pressures, not the input ion-current intensities.'
+        method:
+          state: {tag: value, value: 'Comparison of ion currents and thermodynamic data [40] for gas-phase equilibrium (3).'}
+          locator:
+            page: 2
+            published_page: 20
+            pdf_page_index: 1
+            section: Results
+            equation: '3'
       values:
         quantity: partial_pressure
         gas_species: O2(g)
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Shornikov, Stolyarova, and Shul’ts (1997), Table 2
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        attribution: Authors' molecular-oxygen pressure reduction from KEMS ion-current measurements using gas-phase equilibrium (3) and thermodynamic data [40].
         generator: author-reported gas-equilibrium calculation
         admission_status: admitted
-        method: thermodynamic equilibrium calculation
-        method_as_printed: "Author-calculated using gas equilibrium (3), O2 = 2O, and thermodynamic data [40]. The paper does not identify which atomic-O estimate is used as input."
+        method: comparison of ion currents
+        method_as_printed: 'The partial pressures of molecular vapor species over CaO–Al2O3 melts (Table 2) were determined by the method of comparison of ion currents; the partial pressures of atomic and molecular oxygen were obtained by the use of thermodynamic data [40] on gas-phase equilibria.'
         composition_component: CaO–Al2O3 melt
         composition_basis: mole fraction
         temperature_K: 1933.0

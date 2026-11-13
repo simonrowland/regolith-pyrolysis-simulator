@@ -9,8 +9,11 @@ import yaml
 import simulator.battery.migrate as migrate_module
 from simulator.battery.enums import (
     AdmissionStatus,
+    EvidenceClass,
+    Phase,
     QUANTITY_UNITS,
     Quantity,
+    ReferenceStateConvention,
     ValueKind,
 )
 from tests.battery.test_migrate import assert_extract_source_mutation_fails
@@ -293,6 +296,148 @@ def test_every_migrated_numeric_value_and_conditions():
     excess_id = "eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k"
     assert rows[excess_id].identity.quantity.is_unknown
     assert rows[excess_id].value.kind is ValueKind.UNAVAILABLE
+
+
+def test_activity_reference_and_method_evidence():
+    doc, rows, migrator = _migrated()
+    source = _source_observations(doc)
+
+    ko_id = "eliezer_howald_1978_tridymite_ko05_activity_1743"
+    ko_source = source[ko_id]
+    ko_values = ko_source["values"]
+    assert ko_values["activity_as_printed"] == "0.7157 × 10^-6"
+    printed_definition = (
+        "With either set of equilibrium constants for tridymite, these data "
+        "give a partial molal enthalpy of KO0.5 in tridymite of about "
+        "−36 kcal mol−1. If the entropy of solution of KO0.5 is "
+        "approximately ideal and H̄1 = −36, the solubility of KO0.5 in "
+        "tridymite at 1743 K (activity of KO0.5(s) = 0.7157 × 10^-6) will be "
+        "a mole fraction of about 0.0234."
+    )
+    assert ko_source["standard_state_as_printed"] == (
+        f'"{printed_definition}"'
+    )
+    assert ko_values["derivation"]["method"]["state"]["value"] == printed_definition
+    standard_state = ko_source["standard_state"]["state"]["value"]
+    assert standard_state["convention"] == "raoultian_pure_endmember"
+    assert standard_state["endmember"]["formula"] == "KO0.5"
+    assert standard_state["endmember"]["phase"] == {"tag": "value", "value": "cr"}
+    assert standard_state["endmember"]["polymorph"]["tag"] == "unknown"
+    assert ko_source["standard_state"]["inferred"] is False
+    assert ko_source["standard_state"]["locator"]["published_page"] == 1025
+    assert "Table III" in ko_source["standard_state"]["note"]
+    ko_row = rows[ko_id]
+    assert ko_row.identity.reference_state.is_value
+    assert (
+        ko_row.identity.reference_state.value.convention
+        is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    )
+    assert ko_row.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert ko_row.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert ko_row.derivation is not None
+    assert ko_row.derived_from == (
+        "eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table3_standard_state_context",
+        "eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table4_redlich_kister_coefficients_context",
+        "eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_tridymite_solubility_context",
+    )
+
+    phase_diagram_ids = (
+        "eliezer_howald_1978_phase_diagram_x0102_loggamma2",
+        "eliezer_howald_1978_phase_diagram_x0297_loggamma2",
+        "eliezer_howald_1978_phase_diagram_x0102_sio2_activity",
+        "eliezer_howald_1978_phase_diagram_x0297_sio2_activity",
+    )
+    phase_diagram_quote = (
+        '"Log γ2 is known at several temperatures and compositions from the '
+        'phase diagram measurements."'
+    )
+    assert len(phase_diagram_ids) == 4
+    for observation_id in phase_diagram_ids:
+        observation = source[observation_id]
+        values = observation["values"]
+        assert values["method_as_printed"] == phase_diagram_quote
+        assert values["method_class"] == "quoted_attributed"
+        assert values["attribution"] == (
+            "Phase-diagram measurements, reference 15, as cited by Eliezer et al."
+        )
+        assert "standard_state" not in observation
+        assert rows[observation_id].evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert source[phase_diagram_ids[2]]["values"]["activity"] == "0.94293"
+
+    gibbs_duhem_id = "eliezer_howald_1978_gibbs_duhem_x0293_loggamma2"
+    gibbs_source = source[gibbs_duhem_id]
+    assert gibbs_source["values"]["method_class"] == "model_derived"
+    assert "Gibbs-Duhem integration" in gibbs_source["values"]["derivation"]["relation"]
+    assert rows[gibbs_duhem_id].evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert rows[gibbs_duhem_id].derived_from == (
+        "eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table4_redlich_kister_coefficients_context",
+    )
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
+    assert len(rows) == 17
+    # The six activity rows stay admitted. Partial-molar-enthalpy migration
+    # admits the five printed enthalpy rows on top of that census.
+    assert {
+        key for key, row in rows.items()
+        if row.admission.status is AdmissionStatus.ADMITTED
+    } == {
+        "eliezer_howald_1978_gibbs_duhem_x0293_loggamma2",
+        "eliezer_howald_1978_hbar2_x0297",
+        "eliezer_howald_1978_phase_diagram_x0102_loggamma2",
+        "eliezer_howald_1978_phase_diagram_x0102_sio2_activity",
+        "eliezer_howald_1978_phase_diagram_x0297_loggamma2",
+        "eliezer_howald_1978_phase_diagram_x0297_sio2_activity",
+        "eliezer_howald_1978_table1_x021537_hm827",
+        "eliezer_howald_1978_table1_x028548_hm632",
+        "eliezer_howald_1978_table1_x033497_hm594",
+        "eliezer_howald_1978_table1_x034025_hm630",
+        "eliezer_howald_1978_tridymite_ko05_activity_1743",
+    }
+    assert sum(row.admission.status is AdmissionStatus.REJECTED for row in rows.values()) == 0
+    assert {
+        key for key, row in rows.items()
+        if row.admission.status is AdmissionStatus.PENDING
+    } == {
+        "eliezer_howald_1978_K1175_0p99658",
+        "eliezer_howald_1978_K1175_1p00455",
+        "eliezer_howald_1978_K1623_0p993",
+        "eliezer_howald_1978_K1623_lt_0p99526",
+        "eliezer_howald_1978_K_approx_0p98",
+        "eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k",
+    }
+
+
+def test_activity_evidence_mutation_fails(tmp_path, monkeypatch):
+    assert_extract_source_mutation_fails(
+        EXTRACT,
+        "method_class: model_derived\n        derivation:\n          relation: >-\n            The authors use their Redlich-Kister",
+        "method_class: author_derived\n        derivation:\n          relation: >-\n            The authors use their Redlich-Kister",
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        assertion=test_activity_reference_and_method_evidence,
+    )
+
+
+def test_ko05_printed_reference_mutation_fails(tmp_path, monkeypatch):
+    assert_extract_source_mutation_fails(
+        EXTRACT,
+        "            approximately ideal and H̄1 = −36, the solubility of KO0.5 in",
+        "            approximately ideal and H̄1 = −35, the solubility of KO0.5 in",
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        assertion=test_activity_reference_and_method_evidence,
+    )
+
+
+def test_ko05_derivation_method_mutation_fails(tmp_path, monkeypatch):
+    assert_extract_source_mutation_fails(
+        EXTRACT,
+        "                approximately ideal and H̄1 = −36, the solubility of KO0.5 in",
+        "                approximately ideal and H̄1 = −35, the solubility of KO0.5 in",
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        assertion=test_activity_reference_and_method_evidence,
+    )
 
 
 def test_interior_activity_mutation_fails(tmp_path, monkeypatch):

@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:kems-119-furukawa-1975
       role: pdf
@@ -46,9 +46,9 @@ experiments:
           interval_high: '0.003'
           approximate: false
       locator:
-        page: 5
+        page: 4
         published_page: 3053
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: '3.2'
         note: Printed loading range 1-3 g; individual charge masses not assigned
     printed_composition:
@@ -64,9 +64,9 @@ experiments:
         tag: value
         value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise
       locator:
-        page: 5
+        page: 4
         published_page: 3053
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: '3.2'
         note: Printed loading range 1-3 g; individual charge masses not assigned
     characterization:
@@ -109,44 +109,6 @@ experiments:
         published_page: 3053
         section: '3.2'
         note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.0000003'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - original_high
-          - state:
-              tag: value
-              value: '0.0000015'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -256,9 +218,9 @@ experiments:
           interval_high: '0.003'
           approximate: false
       locator:
-        page: 5
+        page: 4
         published_page: 3053
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: '3.2'
         note: Printed loading range 1-3 g; individual charge masses not assigned
     printed_composition:
@@ -275,9 +237,9 @@ experiments:
         tag: value
         value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise
       locator:
-        page: 5
+        page: 4
         published_page: 3053
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: '3.2'
         note: Printed loading range 1-3 g; individual charge masses not assigned
     characterization:
@@ -319,44 +281,6 @@ experiments:
         published_page: 3053
         section: '3.2'
         note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.0000003'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - original_high
-          - state:
-              tag: value
-              value: '0.0000015'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -467,9 +391,9 @@ experiments:
           interval_high: '0.003'
           approximate: false
       locator:
-        page: 5
+        page: 4
         published_page: 3053
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: '3.2'
         note: Printed loading range 1-3 g; individual charge masses not assigned
     printed_composition:
@@ -486,9 +410,9 @@ experiments:
         tag: value
         value: Filings for solid or solid-liquid samples near 1600 C; blocks otherwise
       locator:
-        page: 5
+        page: 4
         published_page: 3053
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: '3.2'
         note: Printed loading range 1-3 g; individual charge masses not assigned
     characterization:
@@ -530,44 +454,6 @@ experiments:
         published_page: 3053
         section: '3.2'
         note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.0000003'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - original_high
-          - state:
-              tag: value
-              value: '0.0000015'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: not_applicable
@@ -836,9 +722,9 @@ benches:
         tag: value
         value: Two Pt-30%Rh/Pt-6%Rh thermocouple pairs at upper and lower susceptor
       locator:
-        page: 4
+        page: 3
         published_page: 3052
-        pdf_page_index: 3
+        pdf_page_index: 2
         section: '3.1'
   temperature_calibration:
     method:
@@ -846,9 +732,9 @@ benches:
         tag: value
         value: Pure-Fe solidification onset after supercooling detected by ion intensity; details in reference 16
       locator:
-        page: 5
+        page: 4
         published_page: 3053
-        pdf_page_index: 4
+        pdf_page_index: 3
         section: '3.2'
     uncertainty:
       state:

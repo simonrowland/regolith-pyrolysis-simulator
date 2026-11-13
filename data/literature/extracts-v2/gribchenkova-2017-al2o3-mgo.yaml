@@ -51,7 +51,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: The effusion-cell background pressure for this row is not stated; table total is vapor-species pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -119,6 +119,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgO+MgAl2O4_pMg_peff
   experiment_id: 10.1134/s0020168517050077::gribchenkova-2017-al2o3-mgo
   identity:
@@ -168,7 +170,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: The effusion-cell background pressure for this row is not stated; table total is vapor-species pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -236,6 +238,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgO_pMg_peff
   experiment_id: 10.1134/s0020168517050077::gribchenkova-2017-al2o3-mgo
   identity:
@@ -285,7 +289,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: The effusion-cell background pressure for this row is not stated; table total is vapor-species pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -353,3 +357,5 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: g

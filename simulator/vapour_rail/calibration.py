@@ -36,7 +36,7 @@ import yaml
 
 from engines.engine_commissioning import vaporock_temperature_in_domain
 from simulator.yaml_cache import load_cached_safe_yaml
-from simulator.fe_redox import feo_iw_log10_fO2_bar
+from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 from simulator.melt_backend.melt_envelope import (
     MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
     consume_melt_extrapolation_envelope,

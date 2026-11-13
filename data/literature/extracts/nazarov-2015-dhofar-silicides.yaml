@@ -705,6 +705,30 @@ species:
           B_unit: dimensionless
         provenance:
           pressure_temperature_relation: *naz15_sio_fit
+    context:
+    - observation_id: nazarov_2015_synthetic_anorthite_kems_apparatus
+      type: apparatus
+      experiment: nazarov-2015-synthetic-anorthite-kems
+      locator:
+        published_page: 168
+        pdf_page_index: 0
+        section: Methods
+      units: as printed
+      values:
+        quantity: synthetic_anorthite_kems_apparatus
+        method_class: method_only
+        apparatus: Knudsen effusion mass-spectrometric method in a molybdenum cell
+        method_as_published: >-
+          Taking into account the anorthositic composition of Dhofar 280 and possible origin of native silicon during vaporization and condensation (Nazarov et al., 2012a), the partial pressures of vapor species above a melt of synthetic anorthite were measured using the Knudsen effusion mass-spectrometric method in a molybdenum cell within the temperature range of 1833–2033 K under vacuum (at the residual pressure around 10^-10 atm). The experimental set-up and the procedure were described in detail in (Shornikov et al., 2000).
+        notes: |
+          Sample series: vapor species above a melt of synthetic anorthite from 1833–2033 K under vacuum at the residual pressure around 10^-10 atm.
+          Sample holder / cell material: molybdenum cell.
+          Cell inner dimensions and orifice size: not stated in this article; the experimental set-up and procedure are referred to Shornikov et al. (2000).
+          Sample mass: not stated.
+          Run duration at temperature: not stated.
+          Fe-presaturation of loops and how: not stated.
+          Post-run bulk analyses of the KEMS charge (total Fe, alkalis, or Mo/W/Pt/Ir/Re pickup): not stated.
+          Cell oxygen condition: not stated; the printed residual pressure is chamber vacuum, not a cell oxygen condition.
   SiO2:
     observations:
     - observation_id: nazarov_2015_table2_sio2

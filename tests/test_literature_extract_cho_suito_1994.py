@@ -130,6 +130,34 @@ def test_table5_isolated_migration_preserves_values_temperature_and_refusals(
     assert result.validation is not None
     assert not result.validation.hard_issues
 
+    sweep_context_ids = {
+        "cho_suito_1994_binary_slag_procedure",
+        "cho_suito_1994_method_equations",
+        "cho_suito_1994_p178_cao_saturated_slags",
+        "cho_suito_1994_p181_equilibrium_supersaturation_comparison",
+        "cho_suito_1994_p182_formation_energy_systems",
+    }
+    sweep_rows = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for key in ("observations", "context")
+        for row in species.get(key, [])
+        if row["observation_id"] in sweep_context_ids
+    }
+    assert set(sweep_rows) == sweep_context_ids
+    assert all(
+        row["type"] in {"method", "thermodynamic_example"}
+        for row in sweep_rows.values()
+    )
+    assert all(
+        row["values"]["method_class"] == "quoted_attributed"
+        for row in sweep_rows.values()
+    )
+    assert not sweep_context_ids & {
+        observation_id.partition("::")[2].split("::", 1)[0]
+        for observation_id in result.observations
+    }
+
     migrated = {
         observation_id.rsplit("::", 1)[-1]: observation
         for observation_id, observation in result.observations.items()

@@ -61,6 +61,23 @@ _ALL_TYPED_PHYSICS_REFUSALS = (
     *_TYPED_PHYSICS_REFUSALS,
 )
 
+
+class BackendStatusAggregationFailure(RuntimeError):
+    """Backend status could not be read or ranked for a failed run."""
+
+    def __init__(
+        self,
+        *,
+        stage: str,
+        run_exception: BaseException,
+        aggregation_exception: Exception,
+    ) -> None:
+        self.stage = stage
+        self.run_exception = run_exception
+        self.aggregation_exception = aggregation_exception
+        super().__init__(f"backend status aggregation failed during {stage}")
+
+
 def _typed_refusal_reason(exc: BaseException) -> str:
     for attr in ("reason", "category"):
         value = getattr(exc, attr, None)
@@ -551,45 +568,47 @@ class RunExecutor:
             reduced_real_cache = _safe_mapping(
                 lambda: _collect_reduced_real_cache_diagnostic(sim)
             )
-            latest_backend_status = _safe_str(
-                lambda: getattr(
-                    sim,
-                    "_backend_selection_status",
-                    getattr(sim, "_last_backend_status", "ok"),
-                ),
-                "unavailable",
-            )
-            # ★ CLASSIFY OUTSIDE THE "unavailable" FALLBACK BOUNDARY.
+            try:
+                latest_backend_status = str(
+                    getattr(
+                        sim,
+                        "_backend_selection_status",
+                        getattr(sim, "_last_backend_status", "ok"),
+                    )
+                )
+            except Exception as status_exc:
+                raise BackendStatusAggregationFailure(
+                    stage="latest-status",
+                    run_exception=failure_exc,
+                    aggregation_exception=status_exc,
+                ) from status_exc
+            # ★ Classify separately from status extraction/aggregation.
             #
-            # A first version of this fix put the classifier call inside the
-            # _safe_str(..., "unavailable") lambda. That looked tidier and was a
-            # new fail-open: _backend_status_from_honest_exception stringifies
-            # the exception to classify it, so an exception whose __str__ itself
-            # raises made the classifier fail, _safe_str swallowed it, and the
-            # run reported the FACTUAL token `unavailable` with no absence
-            # evidence behind it. The optimizer then raises
-            # BackendUnavailableAbort, cancels the batch and leaves the
-            # candidate for retry -- an unclassified programming failure
-            # rewritten as missing tooling.
+            # An exception whose __str__ itself raises cannot be classified.
+            # It contributes no status candidate; it must not become
+            # `unavailable`, which tells the optimizer to cancel the batch and
+            # retry the candidate as if tooling were missing.
             #
-            # `unavailable` must never be the fallback for FAILING TO CLASSIFY.
-            # An unclassifiable exception contributes NO candidate, so the
-            # aggregate stands on the evidence that does exist rather than on a
-            # token invented by the error path.
+            # The aggregate stands on the independent status evidence that does
+            # exist rather than on a token invented by the error path.
             try:
                 honest_exception_status = _backend_status_from_honest_exception(
                     failure_exc
                 )
             except Exception:
                 honest_exception_status = None
-            backend_status = _safe_str(
-                lambda: _aggregate_backend_status(
+            try:
+                backend_status = _aggregate_backend_status(
                     getattr(sim, "_backend_status_history", ()),
                     latest_backend_status,
                     exception_status=honest_exception_status,
-                ),
-                "unavailable",
-            )
+                )
+            except Exception as status_exc:
+                raise BackendStatusAggregationFailure(
+                    stage="aggregation",
+                    run_exception=failure_exc,
+                    aggregation_exception=status_exc,
+                ) from status_exc
             backend_authoritative = _safe_bool(
                 lambda: getattr(sim, "_backend_authoritative", False),
                 False,
@@ -714,13 +733,6 @@ def _safe_mapping(builder: Any) -> Mapping[str, Any]:
     except Exception:  # noqa: BLE001 -- degraded envelope fallback
         return {}
     return value if isinstance(value, Mapping) else {}
-
-
-def _safe_str(builder: Any, default: str) -> str:
-    try:
-        return str(builder())
-    except Exception:  # noqa: BLE001 -- degraded envelope fallback
-        return default
 
 
 def _safe_bool(builder: Any, default: bool) -> bool:

@@ -20,6 +20,7 @@ from simulator.battery.enums import (
     Quantity,
     AdmissionStatus,
     RefusalReason,
+    ResidualStatus,
 )
 from simulator.battery.identity import Identity
 from simulator.battery.records import Composition, Species, State, Value
@@ -94,6 +95,146 @@ def test_internal_analytical_cell_reports_activity_not_gamma() -> None:
     assert field_value == pytest.approx(benchmark_value, rel=1e-12)
     assert field_value != pytest.approx(benchmark_value / x_sio2, rel=0.1)
     assert cell.activities_standard_state == benchmark_standard_state
+
+
+def _markova_first_interval_moles() -> dict[str, float]:
+    # Markova 1984 first-interval residual-melt composition used by the
+    # residue prediction regressions.
+    markova_wt_pct = {
+        "SiO2": 44.02,
+        "Al2O3": 4.56,
+        "FeO": 8.04,
+        "MgO": 36.44,
+        "CaO": 6.95,
+    }
+    return composition_kg_and_mol(markova_wt_pct)[1]
+
+
+def test_internal_analytical_low_temperature_result_ignores_prior_core_diagnostic() -> None:
+    """A 100 C Markova request cannot publish a prior call's activity map."""
+    from copy import deepcopy
+
+    stale_diagnostic = {
+        "activities": {"SiO2": 0.25},
+        "vapor_pressure_authority": {"status": "authoritative"},
+    }
+    outputs = []
+    for prior_diagnostic in (stale_diagnostic, {}):
+        core = _new_internal_analytical_core()
+        core._last_vapor_pressure_diagnostic = deepcopy(prior_diagnostic)
+        output = _internal_analytical_vapor_pressure_adapter(
+            core=core,
+            temperature_C=100.0,
+            pressure_bar=0.0,
+            composition_kg=None,
+            composition_mol=_markova_first_interval_moles(),
+            fO2_log=0.0,
+            po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0),
+        )
+        outputs.append(vars(output))
+
+    assert outputs[0] == outputs[1]
+    assert outputs[0]["activity_coefficients"] == {}
+    assert "SiO2" not in outputs[0]["diagnostics"]["vapor_pressure_diagnostic"].get(
+        "activities", {}
+    )
+
+
+def test_internal_analytical_battery_results_are_independent_of_request_order() -> None:
+    """Every request keeps its full result across low-T, normal, and CO2 paths."""
+    from copy import deepcopy
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _InternalAnalyticalBatteryBackend,
+    )
+    from simulator.state import Atmosphere
+
+    composition_mol = _markova_first_interval_moles()
+    request_specs = {
+        "low_temperature": {
+            "temperature_C": 100.0,
+            "pressure_bar": 0.0,
+            "fO2_log": 0.0,
+            "po2_bar": 1.0,
+            "co2_background": False,
+        },
+        "normal": {
+            "temperature_C": 1200.0,
+            "pressure_bar": 0.0,
+            "fO2_log": 0.0,
+            "po2_bar": 1.0,
+            "co2_background": False,
+        },
+        "co2_notice": {
+            "temperature_C": 1000.0,
+            "pressure_bar": 1.0,
+            "fO2_log": math.log10(0.5),
+            "po2_bar": 0.5,
+            "co2_background": True,
+        },
+    }
+    orders = (
+        ("normal", "co2_notice", "low_temperature"),
+        ("low_temperature", "co2_notice", "normal"),
+    )
+    outputs_by_order: list[dict[str, dict[str, object]]] = []
+    for order in orders:
+        backend = _InternalAnalyticalBatteryBackend()
+        core = backend._core
+        outputs: dict[str, dict[str, object]] = {}
+        for request_name in order:
+            spec = request_specs[request_name]
+            if spec["co2_background"]:
+                core.melt.atmosphere = Atmosphere.CONTROLLED_O2
+                core.melt.temperature_C = float(spec["temperature_C"])
+                core.melt.p_total_mbar = float(spec["pressure_bar"]) * 1000.0
+                core.melt.pO2_mbar = float(spec["po2_bar"]) * 1000.0
+                core.melt.background_gas_species = "CO2"
+                core.melt.background_gas_mole_fraction = 1.0
+                core._headspace_equilibrated_pO2_bar(0.0)
+                assert core._headspace_co2_dissociation_diagnostic["notices"]
+            else:
+                core._headspace_co2_dissociation_diagnostic = {}
+            result = backend.equilibrate(
+                temperature_C=float(spec["temperature_C"]),
+                pressure_bar=float(spec["pressure_bar"]),
+                composition_mol=composition_mol,
+                fO2_log=float(spec["fO2_log"]),
+                po2_request=Po2Request(
+                    mode=PO2_COMMANDED,
+                    po2_bar=float(spec["po2_bar"]),
+                ),
+            )
+            outputs[request_name] = deepcopy(vars(result))
+            if request_name == "normal":
+                hot_diagnostic = dict(
+                    backend._core._last_vapor_pressure_diagnostic
+                )
+                assert hot_diagnostic.get("activities")
+                backend._core._last_high_t_melt_activity = {
+                    "provider": "previous_call",
+                }
+                backend._core._last_high_t_melt_activity_temperature_K = 1400.0
+                with pytest.raises(RuntimeError, match="liquid_fraction_invalid"):
+                    backend._core._refresh_vapor_pressures_from_kernel(
+                        SimpleNamespace(
+                            vapor_pressures_Pa={},
+                            vapor_pressures_source={},
+                            liquid_fraction=float("nan"),
+                            warnings=[],
+                        ),
+                        observation_pO2_bar=1.0,
+                    )
+                assert backend._core._last_vapor_pressure_diagnostic == {}
+                assert backend._core._last_high_t_melt_activity == {}
+                assert backend._core._last_high_t_melt_activity_temperature_K is None
+        outputs_by_order.append(outputs)
+
+    assert outputs_by_order[0] == outputs_by_order[1]
+    assert outputs_by_order[0]["co2_notice"]["diagnostics"][
+        "vapor_pressure_diagnostic"
+    ]["co2_dissociation"]["notices"]
 
 
 def test_internal_analytical_scores_multi_cation_parent_activity(monkeypatch) -> None:
@@ -242,9 +383,9 @@ def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
 
 
 def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
-    # d-165: the paper prints SiO2(s) but leaves its polymorph unstated. The
-    # old internal-activity residual was 0.3319086250579114; do not score it
-    # by selecting a JANAF crystal from temperature alone.
+    # d-338: the paper prints SiO2(s) and leaves its polymorph unstated.
+    # The scorer takes the JANAF crystal stable at 1873 K. The internal
+    # activity residual is the pre-d-165 production value.
     root = Path(__file__).resolve().parents[2]
     context = battery_score.load_score_context(
         root, sources=("cho-suito-1994-cas-slag-activities",)
@@ -253,24 +394,32 @@ def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
         "cho-suito-1994-cas-slag-activities::"
         "cho_suito_1994_t5_acs2_sio2_cn"
     )
+    observation = context.observations[observation_id]
+    assert observation.identity.reference_state.value.endmember.polymorph.is_unknown
     residual, _ = battery_score.compile_residual(
-        context.observations[observation_id],
+        observation,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
         comparison_ids={observation_id},
     )
-    assert residual.execution.state is ExecutionState.NOT_PROBED
-    assert residual.numeric is None
+    assert residual.execution.state is ExecutionState.PRODUCED
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.value == Decimal("0.3319086250579114")
     assert residual.score_eligible is False
     assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert residual.refusal.detail["reason"] == (
-        "fusion_source_reference_phase_unprinted"
-    )
+    assert residual.refusal.reason is not RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
+    assert residual.refusal.detail["crystal_table"] == "O-035"
     assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
+        notice.reason.startswith(
+            "reference_polymorph_inferred_stable_phase:"
+        )
+        and '"phase": "cristobalite_high"' in notice.reason
+        and '"table_id": "O-035"' in notice.reason
         for notice in residual.notices
     )
+    assert observation.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
 def test_internal_analytical_scores_feo_with_ideal_fallback_notice() -> None:

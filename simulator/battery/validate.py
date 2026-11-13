@@ -41,8 +41,9 @@ from __future__ import annotations
 
 import json
 import re
+from collections import Counter
 from contextlib import contextmanager, nullcontext
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass, field, fields, is_dataclass
 from decimal import Decimal, InvalidOperation
 from enum import Enum
 from typing import Any, Iterable, Iterator, Mapping, Sequence
@@ -123,6 +124,15 @@ class ValidationIssue:
     detail: str
 
 
+@dataclass(frozen=True)
+class ValidationNotice:
+    """A counted, non-failing validation item attributed to one source."""
+
+    code: str
+    source_id: str
+    count: int
+
+
 _ADVISORY_REASONS = frozenset({RefusalReason.IDENTITY_INCOMPLETE})
 _DERIVATION_EVIDENCE_CLASSES = frozenset(
     {EvidenceClass.MODEL_DERIVED, EvidenceClass.MEASURED_REDUCED}
@@ -150,6 +160,7 @@ _CERTIFICATION_DOWNGRADE_NOTICES = frozenset(
 @dataclass(frozen=True)
 class ValidationReport:
     issues: tuple[ValidationIssue, ...]
+    notices: tuple[ValidationNotice, ...] = ()
 
     @property
     def ok(self) -> bool:
@@ -1114,6 +1125,22 @@ def validate_observation(
     )
 
 
+def _model_derived_provenance_is_backlogged(observation: Observation) -> bool:
+    evidence = observation.evidence.class_
+    if not (
+        evidence.is_value
+        and evidence.value is EvidenceClass.MODEL_DERIVED
+        and _value_has_numeric_value(observation.value)
+    ):
+        return False
+    derivation = observation.derivation
+    return (
+        derivation is None
+        or not derivation.has_located_method
+        or not derivation.has_named_references
+    )
+
+
 def _validate_observation(
     observation: Observation,
     experiments: Mapping[str, Experiment],
@@ -1234,6 +1261,15 @@ def _validate_observation(
     ev = observation.evidence.class_
     derivation = observation.derivation
     raw_inputs = derivation.raw_inputs if derivation is not None else None
+    model_derived_backlogged = _model_derived_provenance_is_backlogged(observation)
+    method_located = derivation is not None and derivation.has_located_method
+    model_references_declared = (
+        derivation is not None and derivation.has_named_references
+    )
+    has_resolved_lineage = any(
+        parent in observations or parent in asset_ids or parent in context_ids
+        for parent in observation.derived_from or ()
+    )
     declares_printed_unresolved = (
         derivation is not None and derivation.declares_unresolved_printed_inputs
     )
@@ -1277,8 +1313,8 @@ def _validate_observation(
             derivation is not None
             and derivation.has_located_unprinted_raw_inputs
             and not derivation.inputs
-            and derivation.has_located_method
-            and derivation.has_named_references
+            and method_located
+            and model_references_declared
         )
     ):
         issues.append(
@@ -1332,6 +1368,28 @@ def _validate_observation(
         declares_unprinted_raw_inputs = (
             derivation is not None and derivation.declares_unprinted_raw_inputs
         )
+        if (
+            ev.value is EvidenceClass.MODEL_DERIVED
+            and _value_has_numeric_value(observation.value)
+            and not declares_unprinted_raw_inputs
+            and not model_derived_backlogged
+        ):
+            if not method_located:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.method",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived requires a nonempty method with a physical page and paragraph/section or equation locator",
+                    )
+                )
+            if not model_references_declared:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.references",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived requires named references",
+                    )
+                )
         if raw_inputs is not None:
             if (
                 not declares_unprinted_raw_inputs
@@ -1367,6 +1425,7 @@ def _validate_observation(
         if (
             ev.value is EvidenceClass.MODEL_DERIVED
             and declares_unprinted_raw_inputs
+            and not model_derived_backlogged
         ):
             if derivation is None or derivation.method is None:
                 issues.append(
@@ -1389,7 +1448,7 @@ def _validate_observation(
                     _issue(
                         f"{path}.derivation.method",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
+                        "model_derived raw_inputs method requires a nonempty value and a physical page with paragraph/section or equation locator",
                     )
                 )
             if derivation is not None and not derivation.has_named_references:
@@ -1397,13 +1456,9 @@ def _validate_observation(
                     _issue(
                         f"{path}.derivation.references",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires named compiled references",
+                        "model_derived raw_inputs method requires named references",
                     )
                 )
-        has_resolved_lineage = any(
-            parent in observations or parent in asset_ids or parent in context_ids
-            for parent in observation.derived_from or ()
-        )
         raw_inputs_supply_lineage = (
             derivation is not None
             and derivation.has_located_unprinted_raw_inputs
@@ -1412,11 +1467,20 @@ def _validate_observation(
                 or (
                     ev.value is EvidenceClass.MODEL_DERIVED
                     and derivation.has_located_method
-                    and derivation.has_named_references
+                    and model_references_declared
                 )
             )
         )
-        if not figure_only_without_value:
+        model_derived_unavailable = (
+            ev.value is EvidenceClass.MODEL_DERIVED
+            and observation.value.kind is ValueKind.UNAVAILABLE
+        )
+        model_derived_without_derivation = (
+            model_derived_backlogged and derivation is None
+        )
+        if not figure_only_without_value and not (
+            model_derived_without_derivation or model_derived_unavailable
+        ):
             # printed_unresolved is not complete lineage. A located
             # not_printed declaration excuses a missing derived_from for
             # measured_reduced, and for model_derived only with a located
@@ -1692,27 +1756,37 @@ def _validate_activity_coefficient_temperature_fit(
     return issues
 
 
-def _table_ids(works: Mapping[str, Work] | None) -> set[str]:
-    ids: set[str] = set()
-    if works is None:
-        return ids
+def _work_file_indexes(
+    works: Mapping[str, Work] | None,
+) -> tuple[set[str], set[str], dict[str, Work]]:
+    table_ids: set[str] = set()
+    asset_ids: set[str] = set()
+    work_by_alias: dict[str, Work] = {}
+    if not works:
+        return table_ids, asset_ids, work_by_alias
+
+    # Direct work ids take precedence over source and file aliases.
+    work_by_alias.update(works)
     for work in works.values():
+        for source_id in work.source_ids:
+            work_by_alias.setdefault(source_id, work)
         for asset in work.source_files.files:
+            asset_ids.add(asset.asset_id)
             if asset.role is AssetRole.TABLE_CSV:
-                ids.add(asset.asset_id)
-    return ids
+                table_ids.add(asset.asset_id)
+            else:
+                work_by_alias.setdefault(asset.asset_id, work)
+    return table_ids, asset_ids, work_by_alias
+
+
+def _table_ids(works: Mapping[str, Work] | None) -> set[str]:
+    return _work_file_indexes(works)[0]
 
 
 def _asset_ids(works: Mapping[str, Work] | None) -> set[str]:
     """Every registered source-file id, including non-table assets."""
 
-    ids: set[str] = set()
-    if not works:
-        return ids
-    for work in works.values():
-        for asset in work.source_files.files:
-            ids.add(asset.asset_id)
-    return ids
+    return _work_file_indexes(works)[1]
 
 
 def _is_registered_non_table(
@@ -1721,22 +1795,6 @@ def _is_registered_non_table(
     """Registered source file that stays out of the overlap id set."""
 
     return asset_ids is not None and token in asset_ids and token not in table_ids
-
-
-def _work_for_alias(src: str, works: Mapping[str, Work] | None) -> Work | None:
-    """Work owning a work id, source id, or non-table file/pdf alias."""
-
-    if not works:
-        return None
-    if src in works:
-        return works[src]
-    for work in works.values():
-        if src in work.source_ids:
-            return work
-        for asset in work.source_files.files:
-            if asset.asset_id == src and asset.role is not AssetRole.TABLE_CSV:
-                return work
-    return None
 
 
 class AncestryFailure(Enum):
@@ -1775,13 +1833,64 @@ class Ancestry:
         return Ancestry(failure=failure)
 
 
+@dataclass
+class _ValidationIndexes:
+    """Indexes and memo tables for one immutable works/experiments/observations snapshot."""
+
+    works: Mapping[str, Work] | None
+    observations: Mapping[str, Observation]
+    experiments: Mapping[str, Experiment] | None
+    table_ids: set[str]
+    asset_ids: set[str]
+    work_by_alias: Mapping[str, Work]
+    printed_thermo_index: Mapping[
+        tuple[str, Quantity], tuple[Observation, ...]
+    ]
+    observation_lineages: dict[str, Ancestry] = field(default_factory=dict)
+    coefficient_source_lineages: dict[tuple[str, ...], Ancestry] = field(
+        default_factory=dict
+    )
+    candidate_lineages: dict[
+        tuple[str, ...], tuple[bool, Ancestry | None]
+    ] = field(default_factory=dict)
+    work_inputs: dict[str, Ancestry] | None = None
+
+    def matches(
+        self,
+        works: Mapping[str, Work] | None,
+        observations: Mapping[str, Observation],
+        experiments: Mapping[str, Experiment] | None,
+    ) -> bool:
+        return (
+            self.works is works
+            and self.observations is observations
+            and self.experiments is experiments
+        )
+
+
+def _build_validation_indexes(
+    works: Mapping[str, Work] | None,
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment] | None = None,
+) -> _ValidationIndexes:
+    """Build work aliases, asset sets, table partners, and scoped memo tables."""
+
+    table_ids, asset_ids, work_by_alias = _work_file_indexes(works)
+    return _ValidationIndexes(
+        works=works,
+        observations=observations,
+        experiments=experiments,
+        table_ids=table_ids,
+        asset_ids=asset_ids,
+        work_by_alias=work_by_alias,
+        printed_thermo_index=build_printed_thermo_index(observations),
+    )
+
+
 # A scoring walk resolves the same work once per cell. The bound index is
-# that walk's snapshot: the maps must not be edited while it is entered.
-# An unbound call recomputes. It does not remember a previous map, so
-# replacing an observation in the same dict cannot return the old ids.
-_BOUND_WORK_INPUTS: dict[
-    tuple[int, int], tuple[frozenset[str], dict[str, Ancestry]]
-] = {}
+# that walk's snapshot: its works, experiments, and observations must not be
+# edited while it is entered. An unbound call recomputes from its inputs.
+_BOUND_WORK_INPUTS: dict[tuple[int, int], _ValidationIndexes] = {}
 
 
 def _experiment_membership_failure(
@@ -1806,6 +1915,7 @@ def _inputs_for_work(
     table_ids: set[str],
     obs_by_work: Mapping[str, tuple[Observation, ...]] | None = None,
     asset_ids: set[str] | None = None,
+    lineage_cache: dict[str, Ancestry] | None = None,
 ) -> Ancestry:
     membership = _experiment_membership_failure(observations, experiments)
     if membership is not None:
@@ -1838,6 +1948,7 @@ def _inputs_for_work(
             observations,
             table_ids,
             asset_ids=registered,
+            _cache=lineage_cache,
         )
         if not nested.complete:
             return nested
@@ -1852,7 +1963,7 @@ def _index_work_inputs(
     works: Mapping[str, Work],
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment] | None,
-    table_ids: set[str],
+    indexes: _ValidationIndexes,
 ) -> dict[str, Ancestry]:
     membership = _experiment_membership_failure(observations, experiments)
     if membership is not None:
@@ -1870,15 +1981,15 @@ def _index_work_inputs(
             }
         obs_by_work.setdefault(experiment.work_id, []).append(obs)
     grouped = {work_id: tuple(rows) for work_id, rows in obs_by_work.items()}
-    registered = _asset_ids(works)
     return {
         work.work_id: _inputs_for_work(
             work,
             observations,
             experiments,
-            table_ids,
+            indexes.table_ids,
             grouped,
-            registered,
+            indexes.asset_ids,
+            indexes.observation_lineages,
         )
         for work in works.values()
     }
@@ -1892,13 +2003,30 @@ def bound_work_inputs(
 ) -> Iterator[None]:
     """One work-input index for a scoring walk. Cleared on exit."""
 
+    with _bound_work_inputs(works, observations, experiments):
+        yield
+
+
+@contextmanager
+def _bound_work_inputs(
+    works: Mapping[str, Work],
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment] | None,
+    *,
+    _indexes: _ValidationIndexes | None = None,
+) -> Iterator[None]:
+    """One work-input index for a scoring walk. Cleared on exit."""
+
     key = (id(observations), id(experiments))
     previous = _BOUND_WORK_INPUTS.get(key)
-    table_ids = _table_ids(works)
-    _BOUND_WORK_INPUTS[key] = (
-        frozenset(table_ids),
-        _index_work_inputs(works, observations, experiments, table_ids),
-    )
+    indexes = _indexes
+    if indexes is None or not indexes.matches(works, observations, experiments):
+        indexes = _build_validation_indexes(works, observations, experiments)
+    if indexes.work_inputs is None:
+        indexes.work_inputs = _index_work_inputs(
+            works, observations, experiments, indexes
+        )
+    _BOUND_WORK_INPUTS[key] = indexes
     try:
         yield
     finally:
@@ -1914,10 +2042,39 @@ def _inputs_registered_under_work(
     experiments: Mapping[str, Experiment] | None,
     table_ids: set[str],
     asset_ids: set[str] | None = None,
+    *,
+    _indexes: _ValidationIndexes | None = None,
 ) -> Ancestry:
-    bound = _BOUND_WORK_INPUTS.get((id(observations), id(experiments)))
-    if bound is not None and bound[0] == frozenset(table_ids):
-        found_map = bound[1]
+    indexes = _indexes
+    if indexes is None:
+        bound = _BOUND_WORK_INPUTS.get((id(observations), id(experiments)))
+        if (
+            bound is not None
+            and bound.observations is observations
+            and bound.experiments is experiments
+            and bound.works is not None
+            and bound.works.get(work.work_id) is work
+            and asset_ids is not None
+            and bound.table_ids == table_ids
+            and bound.asset_ids == asset_ids
+        ):
+            indexes = bound
+    if indexes is not None and indexes.work_inputs is None and indexes.works is not None:
+        indexes.work_inputs = _index_work_inputs(
+            indexes.works, observations, experiments, indexes
+        )
+    if (
+        indexes is not None
+        and indexes.work_inputs is not None
+        and indexes.works is not None
+        and indexes.works.get(work.work_id) is work
+        and indexes.observations is observations
+        and indexes.experiments is experiments
+        and indexes.table_ids == table_ids
+        and asset_ids is not None
+        and indexes.asset_ids == asset_ids
+    ):
+        found_map = indexes.work_inputs
         if work.work_id in found_map:
             return found_map[work.work_id]
     return _inputs_for_work(
@@ -2029,6 +2186,8 @@ def _resolve_coefficient_sources(
     observations: Mapping[str, Observation],
     works: Mapping[str, Work] | None,
     experiments: Mapping[str, Experiment] | None = None,
+    *,
+    _indexes: _ValidationIndexes | None = None,
 ) -> Ancestry:
     """Resolve coefficient_sources to a COMPLETE id set or one failure.
 
@@ -2037,35 +2196,62 @@ def _resolve_coefficient_sources(
     the result; it is not dropped.
     """
 
-    if not sources:
-        return Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
-    table_ids = _table_ids(works)
-    asset_ids = _asset_ids(works)
+    source_key = tuple(sources)
+    indexes = _indexes
+    if indexes is None or not indexes.matches(works, observations, experiments):
+        bound = _BOUND_WORK_INPUTS.get((id(observations), id(experiments)))
+        if bound is not None and bound.matches(works, observations, experiments):
+            indexes = bound
+        else:
+            indexes = _build_validation_indexes(works, observations, experiments)
+    cached = indexes.coefficient_source_lineages.get(source_key)
+    if cached is not None:
+        return cached
+    if not source_key:
+        result = Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
+        indexes.coefficient_source_lineages[source_key] = result
+        return result
+
     resolved: set[str] = set()
-    for src in sources:
+    for src in source_key:
         if src in observations:
             nested = _observation_lineage(
-                src, observations, table_ids, asset_ids=asset_ids
+                src,
+                observations,
+                indexes.table_ids,
+                asset_ids=indexes.asset_ids,
+                _cache=indexes.observation_lineages,
             )
-        elif src in table_ids:
+        elif src in indexes.table_ids:
             nested = Ancestry.of({src})
         else:
-            work = _work_for_alias(src, works)
+            work = indexes.work_by_alias.get(src)
             if work is None:
-                return Ancestry.incomplete(AncestryFailure.UNKNOWN_ALIAS)
+                result = Ancestry.incomplete(AncestryFailure.UNKNOWN_ALIAS)
+                indexes.coefficient_source_lineages[source_key] = result
+                return result
             nested = _inputs_registered_under_work(
-                work, observations, experiments, table_ids, asset_ids
+                work,
+                observations,
+                experiments,
+                indexes.table_ids,
+                indexes.asset_ids,
+                _indexes=indexes,
             )
         if not nested.complete:
+            indexes.coefficient_source_lineages[source_key] = nested
             return nested
         assert nested.ids is not None
         resolved |= set(nested.ids)
     if not resolved:
-        return Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
-    return Ancestry.of(resolved)
+        result = Ancestry.incomplete(AncestryFailure.UNRESOLVABLE_INPUT)
+    else:
+        result = Ancestry.of(resolved)
+    indexes.coefficient_source_lineages[source_key] = result
+    return result
 
 
-def validate_residual(
+def _validate_residual_with_indexes(
     residual: Residual,
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
@@ -2073,7 +2259,11 @@ def validate_residual(
     path: str = "residual",
     *,
     point_observations: Sequence[Observation] | None = None,
+    _indexes: _ValidationIndexes | None = None,
 ) -> list[ValidationIssue]:
+    indexes = _indexes
+    if indexes is None or not indexes.matches(works, observations, experiments):
+        indexes = _build_validation_indexes(works, observations, experiments)
     issues: list[ValidationIssue] = []
     reference = observations.get(residual.reference)
     if reference is None:
@@ -2175,7 +2365,9 @@ def validate_residual(
     if reference is not None:
         experiment = experiments.get(reference.experiment_id)
         if experiment is not None:
-            tables = _table_payloads(reference, observations)
+            tables = _table_payloads(
+                reference, observations, indexes.printed_thermo_index
+            )
             gates = run_validity_gates(
                 experiment,
                 reference,
@@ -2305,18 +2497,19 @@ def validate_residual(
                             )
                         )
                     else:
-                        table_ids = _table_ids(works)
                         ref_ids = _observation_lineage(
                             reference.observation_id,
                             observations,
-                            table_ids,
-                            asset_ids=_asset_ids(works),
+                            indexes.table_ids,
+                            asset_ids=indexes.asset_ids,
+                            _cache=indexes.observation_lineages,
                         )
                         cand_ids = _resolve_coefficient_sources(
                             coefficient_lineage_sources(engine.coefficient_sources),
                             observations,
                             works,
                             experiments,
+                            _indexes=indexes,
                         )
                         if not ref_ids.complete or not cand_ids.complete:
                             issues.append(
@@ -2396,6 +2589,25 @@ def validate_residual(
     return issues
 
 
+def validate_residual(
+    residual: Residual,
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+    works: Mapping[str, Work] | None = None,
+    path: str = "residual",
+    *,
+    point_observations: Sequence[Observation] | None = None,
+) -> list[ValidationIssue]:
+    return _validate_residual_with_indexes(
+        residual,
+        observations,
+        experiments,
+        works,
+        path,
+        point_observations=point_observations,
+    )
+
+
 def _index_unique(
     items: Sequence[Any] | Mapping[str, Any],
     attr: str,
@@ -2431,6 +2643,11 @@ def validate_corpus(
     work_map = _index_unique(works, "work_id", "work", issues)
     exp_map = _index_unique(experiments, "experiment_id", "experiment", issues)
     obs_map = _index_unique(observations, "observation_id", "observation", issues)
+    validation_indexes = (
+        None
+        if residuals is None
+        else _build_validation_indexes(work_map, obs_map, exp_map)
+    )
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         obs_map.values()
     )
@@ -2489,6 +2706,11 @@ def validate_corpus(
         )
     source_owners = _source_owners(work_map)
     context_ids = frozenset(context_map or ())
+    provenance_notices_by_source: Counter[str] = Counter(
+        observation.source_id or "(no source_id)"
+        for observation in obs_map.values()
+        if _model_derived_provenance_is_backlogged(observation)
+    )
     for observation in obs_map.values():
         issues.extend(
             _validate_observation(
@@ -2534,15 +2756,17 @@ def validate_corpus(
             )
         )
     lineage_scope = (
-        bound_work_inputs(work_map, obs_map, exp_map)
-        if any(residual.score_eligible for residual in res_items)
-        else nullcontext()
+        nullcontext()
+        if validation_indexes is None
+        else _bound_work_inputs(
+            work_map, obs_map, exp_map, _indexes=validation_indexes
+        )
     )
     with lineage_scope:
         for residual in res_items:
             reference = obs_map.get(residual.reference)
             issues.extend(
-                validate_residual(
+                _validate_residual_with_indexes(
                     residual,
                     obs_map,
                     exp_map,
@@ -2555,6 +2779,15 @@ def validate_corpus(
                             reference.experiment_id, ()
                         )
                     ),
+                    _indexes=validation_indexes,
                 )
             )
-    return ValidationReport(tuple(issues))
+    notices = tuple(
+        ValidationNotice(
+            code="model_derived_provenance_unrecorded",
+            source_id=source_id,
+            count=count,
+        )
+        for source_id, count in sorted(provenance_notices_by_source.items())
+    )
+    return ValidationReport(tuple(issues), notices)

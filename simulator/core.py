@@ -640,16 +640,19 @@ from simulator.fe_redox import (
     _non_absolute_redox_state_kwargs,
     _reanchor_redox_state,
     calphad_ferrous_feo_activity_diagnostic,
-    feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
     intrinsic_melt_fO2,
-    legacy_iw_log10_fO2_bar,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
     kress91_split,
     melt_mol_fractions_for_kress91,
     normalize_redox_state,
+)
+from simulator.oxygen_buffers import (
+    delta_iw_log10,
+    feo_iw_log10_fO2_bar,
+    legacy_iw_log10_fO2_bar,
 )
 from simulator.melt_regime import (
     MeltRegime,
@@ -741,6 +744,7 @@ from simulator.chemistry.kernel import (
     normalize_chemistry_kernel_config,
     normalize_oxygen_sink_channel_mode,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 # BuiltinVaporPressureProvider is imported lazily inside
 # _build_chemistry_kernel: simulator/__init__.py -> simulator.core ->
@@ -2601,14 +2605,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         backend = provider._ensure_backend()
         if backend is None or not backend.is_available():
-            raise EvaporationFluxRefusal(
-                'liquid_fraction_provider_missing_input',
-                {
+            import multiprocessing
+
+            daemon_context = multiprocessing.current_process().daemon
+            initialization_error = getattr(
+                provider, '_backend_initialization_error', None
+            )
+            child_start_refusal = (
+                daemon_context
+                and isinstance(initialization_error, AssertionError)
+                and str(initialization_error)
+                == 'daemonic processes are not allowed to have children'
+            )
+            if child_start_refusal:
+                reason = (
+                    "liquid_fraction_provider_unavailable_daemonic_process_"
+                    "cannot_start_child_workers"
+                )
+                diagnostic = {
+                    'reason': reason,
+                    'input': 'liquid_fraction_provider',
+                    'provider': self._liquid_fraction_provider,
+                    'status': 'unavailable',
+                    'detail': (
+                        'a daemonic process cannot start child worker processes'
+                    ),
+                }
+            else:
+                diagnostic = {
                     'reason': 'missing_input',
                     'input': 'liquid_fraction_provider',
                     'provider': self._liquid_fraction_provider,
                     'status': 'unavailable',
-                },
+                }
+                if daemon_context:
+                    diagnostic['daemon_context'] = True
+                reason = 'liquid_fraction_provider_missing_input'
+            raise EvaporationFluxRefusal(
+                reason,
+                diagnostic,
             )
 
     def _register_magemin_shadow_if_available(self) -> None:
@@ -4401,7 +4436,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if volume_m3 <= 0.0 or T_head_K <= 0.0:
             return 0.0
         return o2 * GAS_CONSTANT * T_head_K / (
-            volume_m3 * 1.0e5
+            volume_m3 * PA_PER_BAR
         )
 
     def _headspace_o2_mol_for_pO2_bar(self, pO2_bar: float) -> float:
@@ -4411,7 +4446,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 0.0
         return (
             max(0.0, float(pO2_bar))
-            * 1.0e5
+            * PA_PER_BAR
             * volume_m3
             / (GAS_CONSTANT * T_head_K)
         )
@@ -4459,7 +4494,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if volume_m3 > 0.0 and T_head_K > 0.0:
                     p_total_bar = (
                         total_mol * GAS_CONSTANT * T_head_K
-                        / (volume_m3 * 1.0e5)
+                        / (volume_m3 * PA_PER_BAR)
                     )
                 from engines.builtin.overhead_bleed import (
                     compressible_pressure_capacity_fraction,
@@ -7320,7 +7355,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if capacity_result is not None
                 else self._headspace_ledger_pO2_bar_from_o2_mol(
                     self._overhead_holdup_mol().get(OXYGEN_SPECIES, 0.0)
-                ) * 100000.0
+                ) * PA_PER_BAR
             )
             controls.update({
                 'cold_train_capacity': capacity,
@@ -7346,7 +7381,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if capacity_result is not None:
                 controls['p_total_bar'] = sum(
                     capacity_result.partial_pressures_Pa.values()
-                ) / 100000.0
+                ) / PA_PER_BAR
         result = self._dispatch_and_commit(
             ChemistryIntent.OVERHEAD_BLEED,
             control_inputs=controls,
@@ -7608,7 +7643,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ),
                 ),
                 downstream_pressure_Pa=(
-                    self._headspace_downstream_pressure_bar() * 100000.0
+                    self._headspace_downstream_pressure_bar() * PA_PER_BAR
                 ),
                 k_relief_kg_hr_Pa=cold_train.relief['k_relief_kg_hr_Pa'],
                 p_open_Pa=cold_train.relief['p_open_Pa'],
@@ -7983,7 +8018,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # FeO(l) = Fe(metal) + 1/2 O2; Holzheid et al. 1997
         # doi:10.1016/S0009-2541(97)00030-2 grounds FeO(l) DeltaG in
         # feo_iw_log10_fO2_bar(), so a_FeO,sat = 10^((log fO2 - IW)/2).
-        saturation_log10 = (float(fO2_log) - pure_feo_iw) / 2.0
+        saturation_log10 = delta_iw_log10(float(fO2_log), pure_feo_iw) / 2.0
         if saturation_log10 > 300.0:
             a_feo_saturation = float('inf')
         elif saturation_log10 < -300.0:
@@ -10409,10 +10444,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         standalone equilibrium probes omit it.
 
         Behaviour:
-          - Below 400 K this method returns before kernel dispatch and preserves
+          - Below 400 K this method skips kernel vapor evaluation and preserves
             the backend vapor-pressure surface and matching activity-source
-            notices. It does not establish that either surface is empty; that
-            is a separate provider contract.
+            notices. An empty surface on this path means no prediction, not a
+            measured zero. The diagnostic records only this call's CO2 notice,
+            when present; it never reuses an earlier kernel diagnostic.
           - When the kernel returns a populated ``vapor_pressures_Pa``
             it replaces the equilibrium-result dict in place. For
             ThermoEngine-sourced species whose backend value agrees with
@@ -10433,8 +10469,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             the existing zero-state behaviour is preserved.
           - If the kernel raises, propagate — silent fallback was
             explicitly forbidden by the goal spec.
+
+        Published vapor and high-temperature diagnostics are cleared at
+        entry so a failure cannot expose a prior call's result. The prior
+        high-temperature activity snapshot is retained locally as a
+        continuation input for this dispatch; only a successful dispatch
+        publishes this call's activity state.
         """
 
+        previous_high_t_melt_activity = getattr(
+            self, '_last_high_t_melt_activity', {}
+        ) or {}
+        previous_high_t_melt_activity_temperature_K = getattr(
+            self, '_last_high_t_melt_activity_temperature_K', None
+        )
+        self._last_vapor_pressure_diagnostic = {}
+        self._last_vapor_pressures_source = {}
+        self._last_high_t_melt_activity = {}
+        self._last_high_t_melt_activity_temperature_K = None
         backend_diagnostics = dict(
             getattr(self, '_last_backend_diagnostics', {}) or {}
         )
@@ -10469,8 +10521,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     result.warnings.append(warning)
         if T_C + 273.15 < 400:
             restore_retained_backend_activity_sources()
-            self._last_high_t_melt_activity = {}
-            self._last_high_t_melt_activity_temperature_K = None
             self._last_vapor_pressures_source = dict(
                 getattr(result, 'vapor_pressures_source', {}) or {}
             )
@@ -10520,12 +10570,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'backend_vapor_pressures_source': dict(backend_sources),
                     'backend_vapor_pressures_Pa': dict(backend_vp),
                 }
-                self._last_vapor_pressures_source = {}
                 if getattr(self, '_headspace_co2_dissociation_diagnostic', None):
                     diagnostic['co2_dissociation'] = dict(self._headspace_co2_dissociation_diagnostic)
                 self._last_vapor_pressure_diagnostic = diagnostic
-                self._last_high_t_melt_activity = {}
-                self._last_high_t_melt_activity_temperature_K = None
                 return
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
@@ -10580,12 +10627,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'high_t_melt_activity': getattr(
                     self, '_high_t_melt_activity', 'openimcc'
                 ),
-                'high_t_melt_activity_previous_temperature_K': getattr(
-                    self, '_last_high_t_melt_activity_temperature_K', None
+                'high_t_melt_activity_previous_temperature_K': (
+                    previous_high_t_melt_activity_temperature_K
                 ),
-                'high_t_melt_activity_previous': getattr(
-                    self, '_last_high_t_melt_activity', {}
-                ),
+                'high_t_melt_activity_previous': previous_high_t_melt_activity,
                 'simulation_hour': simulation_hour,
             }
         dispatch_kwargs = {

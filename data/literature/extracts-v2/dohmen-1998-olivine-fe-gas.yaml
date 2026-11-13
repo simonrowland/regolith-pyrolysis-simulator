@@ -1,0 +1,437 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/dohmen-1998-olivine-fe-gas.yaml
+observations:
+- observation_id: dohmen-1998-olivine-fe-gas::dohmen_1998_table1_v892_product
+  experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v892
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition'
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dohmen-1998-olivine-fe-gas
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V892
+  read_from: pdf:dohmen-1998-olivine-fe-gas
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: below Fe-FeO buffer; absolute point not stated
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+    fO2_control:
+      state:
+        tag: value
+        value: Fe metal; O2 below Fe-FeO buffer
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+    starting_composition:
+      state:
+        tag: value
+        value: Fo100 synthetic polycrystalline forsterite
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  provenance:
+    printed_phase: cr
+- observation_id: dohmen-1998-olivine-fe-gas::dohmen_1998_table1_v893_product
+  experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v893
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition'
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dohmen-1998-olivine-fe-gas
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V893
+  read_from: pdf:dohmen-1998-olivine-fe-gas
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not published for this run
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    starting_composition:
+      state:
+        tag: value
+        value: Fo100 synthetic polycrystalline forsterite
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  provenance:
+    printed_phase: cr
+- observation_id: dohmen-1998-olivine-fe-gas::dohmen_1998_table1_v914_product
+  experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v914
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition'
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dohmen-1998-olivine-fe-gas
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V914
+  read_from: pdf:dohmen-1998-olivine-fe-gas
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: below Fe-FeO buffer; absolute point not stated
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+    fO2_control:
+      state:
+        tag: value
+        value: Fe metal; O2 below Fe-FeO buffer
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+    starting_composition:
+      state:
+        tag: value
+        value: Fo100 synthetic polycrystalline forsterite
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  provenance:
+    printed_phase: cr
+- observation_id: dohmen-1998-olivine-fe-gas::dohmen_1998_table1_v929_product
+  experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v929
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition'
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    fO2_Pa:
+      tag: value
+      value: '0.00002'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dohmen-1998-olivine-fe-gas
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V929
+  read_from: pdf:dohmen-1998-olivine-fe-gas
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00002'
+          approximate: true
+      locator:
+        page: 6
+        published_page: 975
+        pdf_page_index: 5
+        section: Results, Gas phase composition
+        note: IW buffer pressure approximately 2.0 x 10^-10 bar at 1400 C; not detected by KMS in V929.
+    fO2_control:
+      state:
+        tag: value
+        value: iron-wustite buffer (Fe + wustite)
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    starting_composition:
+      state:
+        tag: value
+        value: Fo100 synthetic polycrystalline forsterite
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  provenance:
+    printed_phase: cr
+- observation_id: dohmen-1998-olivine-fe-gas::dohmen_1998_table1_v937_product
+  experiment_id: 10.2138/am-1998-9-1005::experiment::dohmen-1998-kems-v937
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'unknown' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'olivine_product_endmember_composition_not_equilibrium_phase_composition';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: dohmen-1998-olivine-fe-gas
+  locator:
+    page: 4
+    published_page: 973
+    pdf_page_index: 3
+    table: '1'
+    note: row=V937
+  read_from: pdf:dohmen-1998-olivine-fe-gas
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: buffer assemblage is printed but no absolute fO2 point is reported
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    fO2_control:
+      state:
+        tag: value
+        value: iron metal + magnetite
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+    starting_composition:
+      state:
+        tag: value
+        value: Fo100 synthetic polycrystalline forsterite
+      locator:
+        page: 4
+        published_page: 973
+        pdf_page_index: 3
+        table: '1'
+  provenance:
+    printed_phase: unknown

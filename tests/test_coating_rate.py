@@ -645,7 +645,9 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     # constack merge: repin on gate box
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "9f83bb339e878ccc6933e629cf6642ee8c0c05720c495c9402abda2c32ef91a1"
+        # b-244: Al/Ti operator T_cond overrides removed (report-only); 14 text/audit leaves, 0 numeric; Al crossing authority -> capture_threshold_fallback.
+        # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
+        "c0925c2ef9e53894ba9ac89e748a1e1bfaba220195c29af8c8d1dcc429aaff78"
     )
 
 
