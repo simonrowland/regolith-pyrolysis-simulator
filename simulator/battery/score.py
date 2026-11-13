@@ -189,21 +189,20 @@ from simulator.battery.records import (
 from simulator.battery.score_report import (
     UNKNOWN_STORE_PROVENANCE_LINE,
     _all_numeric_markdown_lines,
-    _append_element_retention_diagnostics,
-    _append_nasa9_fit_comparison_stratum,
     _append_quench_pair_diagnostics,
     _census_count_line,
     _condition_hull_lines,
     _e15_markdown_lines,
     _e15_number,
+    format_element_retention_diagnostics,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
     render_payload_score_report_markdown,
     store_stamp_has_known_revision,
 )
+from simulator.battery.score_report_data import element_retention_report_data
 from simulator.battery.score_metrics import (
     QUANTITY_METRIC,
-    _UNIT_DIMENSION,
     _phase_component_reference_wt_percent,
     _reference_from_metric,
     _residual_metric_operation,
@@ -214,7 +213,6 @@ from simulator.battery.score_metrics import (
     metric_operation,
     metric_operation_for_identity,
     populate_numeric,
-    unit_dimension,
 )
 from simulator.melt_backend.base import (
     MULTIVALENT_MELT_ELEMENTS,
@@ -22546,8 +22544,9 @@ def render_score_report(
     report = _append_quench_pair_diagnostics(
         report, paired_quench_diagnostics(context)
     )
-    return _append_element_retention_diagnostics(
-        report, residuals, context.observations
+    return format_element_retention_diagnostics(
+        report,
+        element_retention_report_data(residuals, context.observations),
     )
 
 
@@ -24272,7 +24271,9 @@ def render_score_report_from_payloads(
     report = _append_quench_pair_diagnostics(
         report, paired_quench_diagnostics(pair_context)
     )
-    return _append_element_retention_diagnostics(report, rows, observations)
+    return format_element_retention_diagnostics(
+        report, element_retention_report_data(rows, observations)
+    )
 
 
 def _legacy_bucket(row: Mapping[str, object]) -> str:
