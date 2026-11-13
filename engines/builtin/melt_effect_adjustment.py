@@ -29,6 +29,10 @@ from simulator.chemistry.kernel import (
     BACKEND_STATUS_PRECEDENCE,
     select_backend_status,
 )
+from simulator.oxygen_buffers import (
+    CCO_PRESSURE_RANGE_BAR,
+    CCO_TEMPERATURE_RANGE_K,
+)
 from simulator.scalar_boundary import finite_float
 
 _OXIDE_SET = frozenset(OXIDE_SPECIES)
@@ -427,8 +431,14 @@ WARN_TIER_ANALYTICAL_MODELS: dict[str, dict[str, Any]] = {
             },
             "cco_buffer": {
                 "equation": "simulator.oxygen_buffers.cco_log10_fO2_bar at 1 bar",
-                "valid_range_K": (1273.15, 1873.15),
-                "error": "CCO reference only; EMOG/EMOD graphite-saturation bounds stay interval-only",
+                "valid_range_K": CCO_TEMPERATURE_RANGE_K,
+                "error": (
+                    "Jakobsson–Oskarsson fit applies at "
+                    f"{CCO_PRESSURE_RANGE_BAR[0]:g}–"
+                    f"{CCO_PRESSURE_RANGE_BAR[1]:g} bar; outside its T–P field, "
+                    "the JANAF ideal-gas prediction is flagged; EMOG/EMOD "
+                    "graphite-saturation bounds stay interval-only"
+                ),
                 "citation": "Jakobsson & Oskarsson 1994 DOI 10.1016/0016-7037(94)90442-1; Stagno & Frost 2010 EPSL 300:72-84",
             },
             "graphite_vapor": {

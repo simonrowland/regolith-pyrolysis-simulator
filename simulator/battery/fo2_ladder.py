@@ -62,8 +62,8 @@ from simulator.battery.waypoints import (
     WaypointResult,
     oxygen_condition,
 )
-from simulator.chemistry.graphite_c_co import carbon_delta_g_co_kj_per_mol_o2
-from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
+from simulator.oxygen_buffers import log10_fo2_c_co_bar
+from simulator.physical_constants import PA_PER_BAR
 from simulator.state import MOLAR_MASS
 
 _TIER1_DIRECT_ROUTES = frozenset({
@@ -307,24 +307,11 @@ def resolve_row_fo2(
             p_co_bar = total_pressure_bar - p_na_bar
             if math.isfinite(p_co_bar) and p_co_bar > 0.0:
                 # d-375 accepts the source condition as a flagged two-species
-                # approximation, not a condition fitted to residuals.
-                # Premise: Rego Table I reports graphite with flowing CO;
-                # treat pCO as total pressure less the measured Na pressure.
-                # Algebra: for 2 C + O2 -> 2 CO, K_CO = pCO/sqrt(fO2), so
-                # log10(fO2/bar) = 2*(log10(pCO/bar) - log10(K_CO));
-                # log10(K_CO) = -ΔG/(2 R T ln(10)).
-                # Units: pCO is converted Pa -> bar; ΔG is kJ/mol O2 -> J/mol;
-                # R is J/(mol K), T is K, and all log arguments are ratios.
-                # Sanity: Table I run 1 gives log10(fO2/bar) ≈ -16.6551;
-                # raising its total pressure raises pCO and fO2.
-                delta_g_j_per_mol = (
-                    carbon_delta_g_co_kj_per_mol_o2(temperature) * 1000.0
-                )
-                log10_k_co = -delta_g_j_per_mol / (
-                    2.0 * GAS_CONSTANT * temperature * math.log(10.0)
-                )
+                # approximation, not a condition fitted to residuals. The
+                # pressure complement is wiring; the reaction equilibrium is
+                # owned by simulator.oxygen_buffers.
                 return ResolvedFo2(
-                    2.0 * (math.log10(p_co_bar) - log10_k_co),
+                    log10_fo2_c_co_bar(temperature, p_co_bar),
                     3,
                     "rego_c_co_two_species_approximation",
                     False,

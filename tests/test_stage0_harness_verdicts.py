@@ -600,10 +600,11 @@ def test_t139_carbon_model_exposes_cco_negative_vapor_and_burnout_interval():
     assert redox["interval_per_wt_pct"] == pytest.approx((0.10, 0.50))
     assert "10.1016/j.gca.2003.08.019" in redox["citation"]
     cco = model["forms"]["cco_buffer"]
-    assert cco["valid_range_K"] == pytest.approx((1273.15, 1873.15))
+    assert cco["valid_range_K"] == pytest.approx((1373.15, 1773.15))
+    assert "7500–20000 bar" in cco["error"]
     assert "10.1016/0016-7037(94)90442-1" in cco["citation"]
     assert model["evaluated_at_T_K"]["cco_buffer"]["log10_fO2_bar"] == pytest.approx(
-        -10.2103333333,
+        -16.975809325319,
         abs=1e-10,
     )
     graphite_vapor = model["forms"]["graphite_vapor"]

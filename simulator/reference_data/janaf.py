@@ -1243,6 +1243,80 @@ def _compiled_table_by_id(table_id: str) -> dict[str, Any]:
     return dict(table)
 
 
+@lru_cache(maxsize=None)
+def _formation_gibbs_rows_kj_per_mol(
+    table_id: str,
+) -> tuple[tuple[Decimal, Decimal], ...]:
+    """Return printed temperature/ΔfG° rows for a JANAF table, in kJ/mol."""
+    table = _compiled_table_by_id(table_id)
+    units = table.get("units_as_published")
+    if (
+        not isinstance(units, Mapping)
+        or units.get("formation_gibbs_energy") != "kJ mol^-1"
+    ):
+        raise JanafParseError(
+            f"{table_id}: formation_gibbs_energy is not published in kJ mol^-1"
+        )
+    values = table.get("values")
+    if not isinstance(values, list):
+        raise JanafParseError(f"{table_id}: compiled values are missing")
+
+    rows_by_temperature: dict[Decimal, Decimal] = {}
+    for item in values:
+        if not isinstance(item, Mapping):
+            continue
+        temperature = item.get("temperature")
+        gibbs = item.get("formation_gibbs_energy")
+        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+            continue
+        try:
+            row_temperature = Decimal(str(temperature.get("as_published")))
+            formation_gibbs = Decimal(str(gibbs.get("as_published")))
+        except (InvalidOperation, TypeError, ValueError):
+            continue
+        if not row_temperature.is_finite() or not formation_gibbs.is_finite():
+            continue
+        previous = rows_by_temperature.get(row_temperature)
+        if previous is not None and previous != formation_gibbs:
+            raise JanafParseError(
+                f"{table_id}: conflicting ΔfG° rows at {row_temperature} K"
+            )
+        rows_by_temperature[row_temperature] = formation_gibbs
+    rows = tuple(sorted(rows_by_temperature.items()))
+    if len(rows) < 2:
+        raise JanafParseError(f"{table_id}: fewer than two printed ΔfG° rows")
+    return rows
+
+
+def _formation_gibbs_energy_kj_per_mol_at(
+    table_id: str, temperature_K: float | Decimal
+) -> Decimal:
+    """Interpolate JANAF ΔfG° in T between printed rows, without extrapolation."""
+    try:
+        temperature = Decimal(str(temperature_K))
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise JanafParseError("temperature_K must be a finite positive number") from exc
+    if not temperature.is_finite() or temperature <= 0:
+        raise JanafParseError("temperature_K must be a finite positive number")
+
+    rows = _formation_gibbs_rows_kj_per_mol(table_id)
+    if temperature < rows[0][0] or temperature > rows[-1][0]:
+        raise JanafParseError(
+            f"{table_id}: {temperature} K is outside printed ΔfG° rows "
+            f"[{rows[0][0]}, {rows[-1][0]}] K"
+        )
+    for (left_t, left_g), (right_t, right_g) in zip(rows, rows[1:]):
+        if temperature == left_t:
+            return left_g
+        if temperature == right_t:
+            return right_g
+        if left_t < temperature < right_t:
+            return left_g + (right_g - left_g) * (temperature - left_t) / (
+                right_t - left_t
+            )
+    raise JanafParseError(f"{table_id}: no printed ΔfG° bracket for {temperature} K")
+
+
 def table_delta_fh_298_uncertainty_for_table_id(
     table_id: str,
 ) -> Decimal | None:

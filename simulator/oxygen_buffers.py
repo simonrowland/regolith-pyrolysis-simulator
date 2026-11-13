@@ -1,62 +1,21 @@
 """Oxygen-fugacity buffer equations used by the simulator.
 
-Graphite / C–CO oxygen fugacity for battery oxygen_condition.
-
-Used when a paper states graphite (or C–CO) buffering and prints temperature
-and P_CO (or total pressure when CO is the stated gas). The result is always
-DERIVED — never a printed stamp.
-
-Premise
--------
-Graphite saturation with a CO-bearing C–O fluid. The elementary half-reaction
-the papers name is
-
-    C (graphite) + 1/2 O2 (g) = CO (g)
-
-At graphite saturation the laboratory C–O fluid is the published graphite–
-CO–CO2 (CCO) buffer, not the metastable pure-CO limiting case that omits
-Boudouard CO2. The certified point expression is Jakobsson & Oskarsson
-(1994, GCA), carried in LEPR / ThermoEngine and used as the CCO reference
-line by Stagno & Frost (2010, EPSL 300:72-84):
-
-Algebra
--------
-For C + 1/2 O2 = CO,
-
-    K = (P_CO / bar) / (fO2 / bar) ** (1/2)
-    log10(fO2 / bar) = 2 * (log10(P_CO / bar) - log10(K))
-
-The published CCO expression supplies the 1-atm reference value. At fixed T,
-the reaction quotient therefore gives
-
-    log10(fO2) = log10(fO2_ref) + 2 * log10(P_CO / P_ref)
-
-where P_ref = 1 atm = 1.01325 bar.
-
-Units
------
-T_K / T_K and pressure ratios are dimensionless; the constant terms are
-already on a log10(fO2/bar) scale.
-
-Sanity
-------
-At T = 1473.15 K and P_CO = 1.01325 bar (1 atm):
-    log10(fO2/bar) = -10.475256413
-This matches the published CCO line and the numeric values previously computed
-for ts1985 via engines.builtin.cco_redox_buffer (same coefficients).
-At the same T and P_CO = 0.101325 bar (0.1 atm):
-    log10(fO2/bar) = -12.475256413
-which is exactly two log units lower as required by the reaction quotient.
+Graphite / C–CO oxygen fugacity for battery ``oxygen_condition``. A stated CO
+pressure uses the JANAF graphite-to-CO reaction; a closed graphite-saturated
+CO–CO2 fluid uses its two JANAF formation equilibria outside the calibrated
+Jakobsson–Oskarsson pressure/temperature field. Predictions remain DERIVED.
 """
 
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import dataclass
 from decimal import Decimal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.physical_constants import GAS_CONSTANT
+from simulator.reference_data.janaf import _formation_gibbs_energy_kj_per_mol_at
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -218,37 +177,136 @@ def _require_finite_positive(value: float, label: str) -> float:
     return parsed
 
 
-# Jakobsson & Oskarsson 1994 CCO point coefficients via LEPR / ThermoEngine.
+# Jakobsson & Oskarsson 1994 CCO fit, coefficients as cited by LEPR / ThermoEngine.
 _CCO_A = -21_803.0
 _CCO_B = 4.325
 _CCO_C = 0.171
-_REFERENCE_PRESSURE_BAR = 1.01325
-_CCO_EQUATION = (
-    f"log10(fO2/bar) = {_CCO_A:g}/T_K + {_CCO_B:g} + "
-    f"{_CCO_C:g}*(P_bar - 1)/T_K"
-)
 
-CCO_FORMULATION = "JakobssonOskarsson1994_CCO_via_LEPR_graphite_CO_CO2"
+CCO_FORMULATION = "graphite_C_CO_CO2_JANAF_with_JakobssonOskarsson1994_in_band"
 CCO_SOURCE = (
-    "Jakobsson & Oskarsson 1994 GCA (CCO point formula, via LEPR/ThermoEngine); "
-    "Stagno & Frost 2010 EPSL 300:72-84 graphite-saturation context"
+    "NIST-JANAF C-093 CO(g) and C-095 CO2(g) formation Gibbs energies; "
+    "Jakobsson & Oskarsson 1994 GCA Table 6 fit inside its calibrated field"
 )
-CCO_TEMPERATURE_RANGE_K = (1_273.15, 1_873.15)
+CCO_TEMPERATURE_RANGE_K = (1_373.15, 1_773.15)
+CCO_PRESSURE_RANGE_BAR = (7_500.0, 20_000.0)
+CCO_OUT_OF_BAND_NOTICE = "cco_fit_out_of_band_ideal_gas_used"
 QFM_REFERENCE_SOURCE = "O'Neill 1987 QFM fit used by MAGEMin adapter"
 
 
+@dataclass(frozen=True)
+class _CCOStatedPressureResult:
+    log10_fO2_bar: float
+    p_co2_bar: float
+
+
+def _co_log10_equilibrium_constants(temperature_K: float) -> tuple[float, float]:
+    dg_co = float(_formation_gibbs_energy_kj_per_mol_at("C-093", temperature_K))
+    dg_co2 = float(_formation_gibbs_energy_kj_per_mol_at("C-095", temperature_K))
+    denominator = GAS_CONSTANT * temperature_K * math.log(10.0)
+    return -dg_co * 1000.0 / denominator, -dg_co2 * 1000.0 / denominator
+
+
+def _stated_co_pressure_result(
+    temperature_K: float, p_co_bar: float
+) -> _CCOStatedPressureResult:
+    temperature = _require_finite_positive(temperature_K, "temperature_K")
+    pressure = _require_finite_positive(p_co_bar, "p_co_bar")
+    log_k_co, log_k_co2 = _co_log10_equilibrium_constants(temperature)
+    log_fO2 = 2.0 * (math.log10(pressure) - log_k_co)
+    try:
+        p_co2 = 10.0 ** (log_k_co2 + log_fO2)
+    except OverflowError as exc:
+        raise ValueError("implied p_CO2 is outside the finite bar range") from exc
+    if not math.isfinite(p_co2) or p_co2 <= 0.0:
+        raise ValueError("implied p_CO2 is outside the finite positive bar range")
+    return _CCOStatedPressureResult(log_fO2, p_co2)
+
+
+def _closed_co_log10_fO2_bar(temperature_K: float, pressure_bar: float) -> float:
+    """Solve an ideal closed graphite-saturated CO + CO2 fluid.
+
+    Put ``s = sqrt(fO2/bar)``. JANAF gives ``pCO/bar = K_CO*s`` and
+    ``pCO2/bar = K_CO2*s²``. The total-pressure constraint is therefore
+    ``K_CO2*s² + K_CO*s - P/bar = 0``; take its positive root and return
+    ``2*log10(s)``. The rationalized root is
+    ``s = 2(P/bar)/(sqrt(K_CO² + 4*K_CO2*(P/bar)) + K_CO)``. All K values and
+    pressure ratios are dimensionless; P is bar and T is K. At 1673.15 K and
+    P=1 bar, this gives log10(fO2/bar)=-16.1403418 and pCO2=1.70938e-4 bar.
+    As pCO2 tends to zero, the root reduces to ``s=(P/bar)/K_CO``.
+    """
+    log_k_co, log_k_co2 = _co_log10_equilibrium_constants(temperature_K)
+    k_co = 10.0**log_k_co
+    k_co2 = 10.0**log_k_co2
+    # The positive quadratic root is rationalized to avoid cancellation when
+    # the CO2 term is negligible: s = 2P / (sqrt(K_CO² + 4K_CO2P) + K_CO).
+    s = (2.0 * pressure_bar) / (
+        math.sqrt(k_co**2 + 4.0 * k_co2 * pressure_bar) + k_co
+    )
+    return 2.0 * math.log10(s)
+
+
+def _cco_fit_is_calibrated(temperature_K: float, pressure_bar: float) -> bool:
+    return (
+        CCO_TEMPERATURE_RANGE_K[0] <= temperature_K <= CCO_TEMPERATURE_RANGE_K[1]
+        and CCO_PRESSURE_RANGE_BAR[0] <= pressure_bar <= CCO_PRESSURE_RANGE_BAR[1]
+    )
+
+
+def _cco_fit_out_of_band_validity() -> str:
+    t_lo, t_hi = CCO_TEMPERATURE_RANGE_K
+    p_lo, p_hi = CCO_PRESSURE_RANGE_BAR
+    return (
+        f"{CCO_OUT_OF_BAND_NOTICE}; T_K=[{t_lo:g},{t_hi:g}]; "
+        f"P_bar=[{p_lo:g},{p_hi:g}]"
+    )
+
+
+def _cco_log10_fO2_and_validity(
+    temperature_K: float, pressure_bar: float
+) -> tuple[float, str]:
+    if _cco_fit_is_calibrated(temperature_K, pressure_bar):
+        return (
+            _CCO_A / temperature_K
+            + _CCO_B
+            + _CCO_C * (pressure_bar - 1.0) / temperature_K,
+            "inside_cco_jakobsson_oskarsson_calibration",
+        )
+    return (
+        _closed_co_log10_fO2_bar(temperature_K, pressure_bar),
+        _cco_fit_out_of_band_validity(),
+    )
+
+
 def cco_log10_fO2_bar(temperature_K: float, pressure_bar: float = 1.0) -> float:
-    """Return Jakobsson & Oskarsson CCO log10(fO2/bar) at T and pressure."""
+    """Return CCO log10(fO2/bar), warning when the ideal-gas fallback is used.
+
+    The Jakobsson–Oskarsson (1994) fit applies only to its Table 6 field,
+    1373.15–1773.15 K and 7,500–20,000 bar. Elsewhere this scalar API returns
+    the closed ideal CO–CO2 result and emits ``cco_fit_out_of_band_ideal_gas_used``;
+    callers needing a structured notice use :func:`cco_buffered_fO2`.
+    """
     temperature = _require_finite_positive(temperature_K, "temperature_K")
     pressure = _require_finite_positive(pressure_bar, "pressure_bar")
-    return _CCO_A / temperature + _CCO_B + _CCO_C * (pressure - 1.0) / temperature
+    log_fO2, validity = _cco_log10_fO2_and_validity(temperature, pressure)
+    if validity != "inside_cco_jakobsson_oskarsson_calibration":
+        warnings.warn(validity, RuntimeWarning, stacklevel=2)
+    return log_fO2
 
 
 def log10_fo2_c_co_bar(temperature_K: float, p_co_bar: float) -> float:
     """Return log10(fO2/bar) for graphite / C–CO at T and P_CO.
 
-    ``p_co_bar`` is the printed CO pressure in bar (or total pressure in bar
-    when the paper states CO is the gas).
+    Premise: ``C(gr) + 1/2 O2(g) = CO(g)`` with graphite activity one. The
+    JANAF C-093 formation Gibbs energy gives ``log10(K_CO) = -ΔfG°/(RT ln10)``;
+    since ``K_CO = pCO/sqrt(fO2)``, ``log10(fO2/bar) =
+    2(log10(pCO/bar) - log10(K_CO))``. For the diagnostic, JANAF C-095 gives
+    ``K_CO2 = pCO2/fO2`` and thus ``pCO2 = K_CO2*fO2``. Units are bar for
+    pressures, K for temperature, and J mol⁻¹ for ``R*T``. At 1673.15 K and
+    pCO=1 bar, log10(fO2/bar) = -16.1401933 and implied pCO2 is
+    1.70997e-4 bar. A tenfold pCO reduction lowers log10(fO2) by exactly 2.
+
+    ``p_co_bar`` is the stated CO partial pressure in bar (or total pressure
+    when the source states CO is the gas); CO2 remains a reported diagnostic.
     """
     if not is_declared_real_scalar(temperature_K, allow_numeric_str=True):
         raise TypeError("temperature_K must be numeric")
@@ -260,13 +318,7 @@ def log10_fo2_c_co_bar(temperature_K: float, p_co_bar: float) -> float:
         raise ValueError("temperature_K must be finite and positive")
     if not math.isfinite(pressure) or pressure <= 0.0:
         raise ValueError("p_co_bar must be finite and positive")
-    reference_log10_fo2 = cco_log10_fO2_bar(
-        temperature,
-        _REFERENCE_PRESSURE_BAR,
-    )
-    return reference_log10_fo2 + 2.0 * math.log10(
-        pressure / _REFERENCE_PRESSURE_BAR
-    )
+    return _stated_co_pressure_result(temperature, pressure).log10_fO2_bar
 
 
 @dataclass(frozen=True)
@@ -293,13 +345,6 @@ class RedoxBufferInterval:
     source: str
 
 
-def _validity_for_temperature(temperature_K: float) -> str:
-    lo, hi = CCO_TEMPERATURE_RANGE_K
-    if lo <= temperature_K <= hi:
-        return "inside_cco_reference_range"
-    return "outside_cco_reference_range"
-
-
 def qfm_log10_fO2_bar(temperature_K: float) -> float:
     """Return O'Neill-style QFM log10(fO2/bar) used for buffer offsets."""
     temperature = _require_finite_positive(temperature_K, "temperature_K")
@@ -311,10 +356,10 @@ def cco_buffered_fO2(
     pressure_bar: float = 1.0,
     reference_buffer: str | None = "QFM",
 ) -> RedoxBufferPoint:
-    """Return absolute CCO fO2 plus optional delta from a named reference buffer."""
+    """Return CCO fO2 and a structured in-band or fallback validity notice."""
     temperature = _require_finite_positive(temperature_K, "temperature_K")
     pressure = _require_finite_positive(pressure_bar, "pressure_bar")
-    log_fO2 = cco_log10_fO2_bar(temperature, pressure)
+    log_fO2, validity = _cco_log10_fO2_and_validity(temperature, pressure)
 
     reference_name: str | None
     reference_log: float | None
@@ -340,7 +385,7 @@ def cco_buffered_fO2(
         pressure_bar=pressure,
         formulation=CCO_FORMULATION,
         source=CCO_SOURCE,
-        validity=_validity_for_temperature(temperature),
+        validity=validity,
     )
 
 
@@ -355,13 +400,18 @@ def cco_log10_fO2_interval_for_pressure_range(
     p0 = _require_finite_positive(pressure_bar_range[0], "pressure_bar_range[0]")
     p1 = _require_finite_positive(pressure_bar_range[1], "pressure_bar_range[1]")
     low_p, high_p = sorted((p0, p1))
-    low = cco_log10_fO2_bar(temperature, low_p)
-    high = cco_log10_fO2_bar(temperature, high_p)
+    low, low_validity = _cco_log10_fO2_and_validity(temperature, low_p)
+    high, high_validity = _cco_log10_fO2_and_validity(temperature, high_p)
+    reason = "pressure_range_not_certified_point"
+    if low_validity != "inside_cco_jakobsson_oskarsson_calibration" or (
+        high_validity != "inside_cco_jakobsson_oskarsson_calibration"
+    ):
+        reason = f"{reason}; {_cco_fit_out_of_band_validity()}"
     return RedoxBufferInterval(
         low_log10_fO2_bar=min(low, high),
         high_log10_fO2_bar=max(low, high),
         certified_point=None,
-        reason="pressure_range_not_certified_point",
+        reason=reason,
         formulation=CCO_FORMULATION,
         source=CCO_SOURCE,
     )

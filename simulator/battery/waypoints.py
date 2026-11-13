@@ -1924,7 +1924,7 @@ def oxygen_condition(
         from simulator.chemistry.graphite_c_co import is_c_co_buffer_token
         from simulator.oxygen_buffers import (
             frost_condensed_buffer_log10_fO2_bar,
-            log10_fo2_c_co_bar,
+            _stated_co_pressure_result,
         )
         from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
 
@@ -1939,18 +1939,21 @@ def oxygen_condition(
                 pressure_value, pressure_inputs = p_co
                 if temperature.kind is ValueKind.POINT and pressure_value.kind is ValueKind.POINT:
                     T = temperature.point
-                    # Premise: paper states graphite / C–CO buffering and prints
-                    # T and P_CO (or total P when CO is the stated gas); the
-                    # Jakobsson & Oskarsson 1994 CCO calibration is in
-                    # simulator.oxygen_buffers.
+                    # The oxygen-buffer owner evaluates the stated-CO JANAF
+                    # equilibrium and returns its implied CO2 partial pressure
+                    # for this route's diagnostic notice.
                     P_bar = pressure_value.point / BAR_PA_DECIMAL
-                    log_fo2 = log10_fo2_c_co_bar(float(T), float(P_bar))
+                    c_co_state = _stated_co_pressure_result(float(T), float(P_bar))
                     routes.append(Waypoint(
                         "oxygen_condition",
-                        Value.point_of(log_fo2),
+                        Value.point_of(c_co_state.log10_fO2_bar),
                         "graphite_c_co_buffer",
                         WaypointAuthority.DERIVED,
                         ("experiment.fO2_control.buffer", *thermal.inputs, *pressure_inputs),
+                        notice=(
+                            "implied_pCO2_bar="
+                            f"{c_co_state.p_co2_bar:.12g}; JANAF C-095"
+                        ),
                     ))
         else:
             buffer = PUBLISHED_BUFFERS.get(buffer_token.upper())
