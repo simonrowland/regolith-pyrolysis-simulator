@@ -842,6 +842,34 @@ def test_stolyarova_1995_measured_eqn1_commands_all_eight_ca_points():
         assert "cell-metal activity as assumed by the source" in selected.observation.derivation.relation
 
 
+@pytest.mark.parametrize("oxygen_reduction", (False, True))
+def test_unprinted_currents_do_not_imply_an_unidentified_oxygen_input(oxygen_reduction):
+    from simulator.battery.enums import RawInputStatus
+
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(
+        evidence=EvidenceClass.MEASURED_REDUCED,
+    )
+    molecular = _partial_pressure("measured-o2", "O2", Decimal("1e-12"))
+    molecular = replace(
+        molecular,
+        derived_from=(),
+        derivation=Derivation(
+            relation="printed reduction", inputs=(), parameters=(), output_unit="Pa",
+            raw_inputs=Located(State.of(RawInputStatus.NOT_PRINTED), locator=molecular.locator),
+        ),
+        identity=replace(molecular.identity, reaction=(
+            State.of(Reaction((
+                ReactionTerm(Species("O2", Phase.G), -1),
+                ReactionTerm(Species("O", Phase.G), 2),
+            ))) if oxygen_reduction else State.unknown("direct KEMS pressure reduction")
+        )),
+    )
+    selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic, molecular), bench)
+    assert isinstance(selected, SourceOxygenCondition)
+    expected = atomic if oxygen_reduction else molecular
+    assert selected.used_observations == frozenset({expected.observation_id})
+
+
 def test_mo_pair_atomic_oxygen_with_derived_from_is_admitted():
     sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=EvidenceClass.MODEL_DERIVED)
     atomic = replace(
