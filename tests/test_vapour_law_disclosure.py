@@ -29,11 +29,17 @@ including a gas-fugacity pressure past the fit). Antoine is only the
 direct coefficient continuation, including out-of-band SiO. A compiled
 evaluator executed in that dispatch keeps its own family and temperature
 band; an extrapolated source-activity floor does not rename it to Antoine.
-A positive provider activity is never published as 0.0. Parent-oxide basis
-is ``a(single)**cations`` in ``thermodynamic_parent_activity``. A
-representable power is that power. When the power underflows, the published
-activity stays the positive provider activity. K2 and Na2 at the 1e-310
-floor pin are that case (two cations; the square is 0.0 in float64).
+Parent-oxide basis is ``a(parent) = a(single)**cations`` in
+``thermodynamic_parent_activity``. A representable power is that power.
+When the power underflows, the result is 0.0, never the single-cation
+activity. K2O and Na2O have two cations: ``(1e-200)**2`` and ``(1e-310)**2``
+are both 0.0 in float64, and 1e-200 is above the 1e-300 evaluator floor.
+The vapour law then uses that floor and discloses
+``source_activity_floor_notice``. K2 and Na2 have activity exponent 1 and
+pO2 exponent -0.5, so at the request melt pO2 of 1e-9 bar the floor
+pressure sits ``-295.5`` dex from the unit-activity reference:
+``log10(1e-300) + (-0.5)*log10(1e-9/1)``. K2O_gas and Na2O_gas have no
+oxygen exponent, so the same floor is ``-300`` dex.
 A compiled neighbour does not name the Ellingham
 law. A non-diagnostic law is registered when the evaluation leaves a
 certified domain: the temperature band, the Ellingham fit, the oxygen
@@ -967,8 +973,112 @@ def _compiled_floor_species(provider):
     return selected
 
 
-def _floor_activity_dispatch(provider, parent: str, temperature_K: float):
-    """Production dispatch with the parent activity below the compiled floor."""
+def _parent_power(activity: float, cations: float) -> float:
+    """Float result of a(single)**cations. Underflow is 0.0, not a(single)."""
+
+    powered = float(activity) ** float(cations)
+    if powered > 0.0 and math.isfinite(powered):
+        return powered
+    return 0.0
+
+
+def _hand_compiled_log10_pressure(
+    *,
+    p_reference_pa: float,
+    activity_exponent: float,
+    activity_used: float,
+    pO2_exponent: float,
+    pO2_bar: float,
+    pO2_reference_bar: float,
+) -> float:
+    """log10(P/Pa) from the published unit-activity reference.
+
+    This is the evaluator's mass-action arithmetic, written out so the
+    expected pressure is not ``evaluate()``'s return value. ``P_ref`` is
+    the dispatch's unit-activity pressure at ``pO2_ref``, where both the
+    activity term and the oxygen term are zero. Algebra:
+
+        log10(P) = log10(P_ref) + e_a*log10(a) + e_O2*log10(pO2/pO2_ref)
+
+    A zero exponent omits that term, matching ``if self.activity_exponent``
+    and ``if pO2_exponent``. Units: the log is log10(Pa). Sanity: a = 1 and
+    pO2 = pO2_ref leaves log10(P_ref).
+    """
+
+    log_p = math.log10(p_reference_pa)
+    if activity_exponent:
+        log_p += float(activity_exponent) * math.log10(activity_used)
+    if pO2_exponent:
+        log_p += float(pO2_exponent) * (
+            math.log10(pO2_bar) - math.log10(pO2_reference_bar)
+        )
+    return log_p
+
+
+def _pressure_versus_hand_log(published: float, log_expected: float) -> str | None:
+    """Compare a published pressure with the hand log, including the IEEE ends.
+
+    The ends are the evaluator's documented numerical clamp
+    (``nextafter`` of 0 and of the float maximum). The activity scaling
+    inside ``log_expected`` is the hand literal.
+    """
+
+    import sys
+
+    minimum_positive_pa = math.nextafter(0.0, math.inf)
+    maximum_finite_pa = math.nextafter(sys.float_info.max, 0.0)
+    if log_expected < math.log10(minimum_positive_pa):
+        if published != minimum_positive_pa:
+            return (
+                f"pressure {published!r} != numerical floor "
+                f"{minimum_positive_pa!r} for hand log {log_expected}"
+            )
+        return None
+    if log_expected > math.log10(maximum_finite_pa):
+        if published != maximum_finite_pa:
+            return (
+                f"pressure {published!r} != numerical ceiling "
+                f"for hand log {log_expected}"
+            )
+        return None
+    try:
+        published_log = math.log10(float(published))
+    except (TypeError, ValueError):
+        return f"pressure {published!r} is not a positive float"
+    # 1e-6 dex is the log10(P_ref) round trip. A substituted activity is
+    # tens to hundreds of dex away.
+    if abs(published_log - log_expected) > 1.0e-6:
+        return f"pressure log10 {published_log} != hand {log_expected}"
+    return None
+
+
+# Request melt pO2 is 10**(-9) = 1e-9 bar. K2 and Na2: e_a = 1, e_O2 = -0.5,
+# pO2_ref = 1, a = 1e-300.
+#   log10(P/P_ref) = log10(1e-300) + (-0.5)*log10(1e-9/1) = -300 + 4.5
+# K2O_gas and Na2O_gas: e_O2 = 0, so the oxygen term is absent and the
+# ratio is log10(1e-300) = -300.
+_HAND_LOG10_RATIO_AT_FLOOR = {
+    "K2": -295.5,
+    "Na2": -295.5,
+    "K2O_gas": -300.0,
+    "Na2O_gas": -300.0,
+}
+_FLOOR_LAW_EXPONENTS = {
+    "K2": (1.0, -0.5, 1.0),
+    "Na2": (1.0, -0.5, 1.0),
+    "K2O_gas": (1.0, 0.0, 1.0),
+    "Na2O_gas": (1.0, 0.0, 1.0),
+}
+
+
+def _floor_activity_dispatch(
+    provider,
+    parent: str,
+    temperature_K: float,
+    *,
+    activity: float = 1.0e-310,
+):
+    """Production dispatch with one injected single-cation activity."""
 
     import warnings
 
@@ -976,8 +1086,6 @@ def _floor_activity_dispatch(provider, parent: str, temperature_K: float):
     from simulator.chemistry.kernel.capabilities import ChemistryIntent
     from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
     from simulator.chemistry.melt_activity import MeltOxideActivity
-
-    activity = 1.0e-310
 
     def with_activity(*args, **kwargs):
         del kwargs
@@ -1039,12 +1147,14 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
         COMPILED_SOURCE_ACTIVITY_FLOOR,
         BuiltinVaporPressureProvider,
     )
+    from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
     from simulator.physical_constants import (
         MELT_DISSOCIATION_PO2_MAX_BAR,
         MELT_DISSOCIATION_PO2_MIN_BAR,
     )
 
     provider = BuiltinVaporPressureProvider(_live_vapor())
+    oxides = provider._vapor_pressure_data.get("oxide_vapors") or {}
     species_rows = _compiled_floor_species(provider)
     names = {name for name, _parent, _evaluator in species_rows}
     assert "TiO" in names
@@ -1091,6 +1201,18 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
         provenance = (
             diagnostic.get("vapor_pressure_numerator_provenance") or {}
         ).get(name) or {}
+        # 1e-310 is below the floor on every basis. Parent-oxide basis
+        # publishes a(single)**cations, which is 0.0 when two cations
+        # square it. The notice records that parent activity, not 1e-310.
+        species_row = oxides.get(name) or {}
+        parent_basis = species_row.get("source_activity_basis") == "parent_oxide"
+        if parent_basis:
+            expected_reported = _parent_power(
+                1.0e-310,
+                MELT_OXIDE_CATIONS_PER_FORMULA.get(parent, 1.0),
+            )
+        else:
+            expected_reported = 1.0e-310
         floor = provenance.get("source_activity_floor_notice")
         if floor != [
             {
@@ -1099,21 +1221,25 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
                 "certified_band": {
                     "source_activity": (COMPILED_SOURCE_ACTIVITY_FLOOR, 1.0)
                 },
-                "source_activity_used": 1.0e-310,
+                "source_activity_used": expected_reported,
             }
         ]:
             mismatches.append(f"{name}: floor notice {floor!r}")
             continue
-        # The injected provider activity is positive. Parent-oxide basis
-        # (K2, Na2, and every other di-cation law) must not publish the
-        # underflow of a(single)**cations as a measured 0.0.
         published_activity = (diagnostic.get("activities") or {}).get(name)
-        if published_activity != 1.0e-310:
+        if published_activity != expected_reported:
             mismatches.append(
                 f"{name}: published activity {published_activity!r}"
             )
             continue
-        if provenance.get("equivalent_parent_oxide_activity") == 0.0:
+        equivalent = provenance.get("equivalent_parent_oxide_activity")
+        if parent_basis:
+            if equivalent != expected_reported:
+                mismatches.append(
+                    f"{name}: equivalent parent activity {equivalent!r}"
+                )
+                continue
+        elif equivalent == 0.0:
             mismatches.append(f"{name}: equivalent parent activity 0.0")
             continue
         used = provenance.get("pO2_bar")
@@ -1154,19 +1280,55 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
             problems.append(f"band {row.get('certified_band_K')}")
         if row.get("evaluation_count") != 1:
             problems.append(f"count {row.get('evaluation_count')}")
-        try:
-            reference = evaluator.evaluate(
-                temperature_K,
-                source_activity=COMPILED_SOURCE_ACTIVITY_FLOOR,
-                pO2_bar=oxygen,
-            )
-            published_hex = pressures[name].hex()
-            reference_hex = reference.pressure_pa.hex()
-        except Exception as exc:
-            problems.append(f"reference {type(exc).__name__}: {exc}")
+        # The law receives the floor, not the reported parent activity.
+        # K2/Na2: -295.5 dex. K2O_gas/Na2O_gas: -300 dex. Other species
+        # use the same algebra with their own exponents.
+        literal_exponents = _FLOOR_LAW_EXPONENTS.get(name)
+        if literal_exponents is not None:
+            activity_exponent, pO2_exponent, pO2_reference_bar = literal_exponents
+            if float(evaluator.activity_exponent) != activity_exponent:
+                problems.append(
+                    f"activity exponent {evaluator.activity_exponent}"
+                )
+            if float(evaluator.pO2_exponent) != pO2_exponent:
+                problems.append(f"pO2 exponent {evaluator.pO2_exponent}")
+            if float(evaluator.pO2_reference_bar) != pO2_reference_bar:
+                problems.append(
+                    f"pO2 reference {evaluator.pO2_reference_bar}"
+                )
         else:
-            if published_hex != reference_hex:
-                problems.append("pressure moved")
+            activity_exponent = float(evaluator.activity_exponent)
+            pO2_exponent = float(evaluator.pO2_exponent)
+            pO2_reference_bar = float(evaluator.pO2_reference_bar)
+        p_reference = provenance.get("P_reference_Antoine_Pa")
+        try:
+            p_reference_pa = float(p_reference)
+        except (TypeError, ValueError):
+            problems.append(f"reference pressure {p_reference!r}")
+        else:
+            if not (p_reference_pa > 0.0 and math.isfinite(p_reference_pa)):
+                problems.append(f"reference pressure {p_reference_pa!r}")
+            elif oxygen != 1.0e-9:
+                problems.append(f"request pO2 {oxygen} != 1e-9")
+            else:
+                log_expected = _hand_compiled_log10_pressure(
+                    p_reference_pa=p_reference_pa,
+                    activity_exponent=activity_exponent,
+                    activity_used=COMPILED_SOURCE_ACTIVITY_FLOOR,
+                    pO2_exponent=pO2_exponent,
+                    pO2_bar=1.0e-9,
+                    pO2_reference_bar=pO2_reference_bar,
+                )
+                literal = _HAND_LOG10_RATIO_AT_FLOOR.get(name)
+                if literal is not None:
+                    delta = log_expected - math.log10(p_reference_pa)
+                    if delta != literal:
+                        problems.append(f"hand delta {delta} != {literal}")
+                pressure_problem = _pressure_versus_hand_log(
+                    pressures[name], log_expected
+                )
+                if pressure_problem:
+                    problems.append(pressure_problem)
         if cold_snapshot != one:
             problems.append("run snapshot is not the computation")
         with disclosure_scope(inherit=False) as warm:
@@ -1175,7 +1337,6 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
                 problems.append("cache replay diverged")
         if problems:
             mismatches.append(f"{name}: {', '.join(problems)}")
-    oxides = provider._vapor_pressure_data.get("oxide_vapors") or {}
     # Same 400 K gate as the loop. A parent-oxide law the provider can
     # publish has to be in the checked set, including K2 and Na2.
     hot_parent_basis: set[str] = set()
@@ -1193,77 +1354,211 @@ def test_source_activity_floor_discloses_the_executed_compiled_law() -> None:
     assert mismatches == []
 
 
-def test_parent_oxide_basis_never_publishes_a_silent_zero() -> None:
-    """Every parent oxide keeps a positive activity at the floor pin.
+def test_parent_oxide_power_never_substitutes_single_cation_activity() -> None:
+    """Every parent oxide keeps a(parent) = a(single)**cations.
 
-    Invariant: a positive provider activity is never published as 0.0.
-    ``thermodynamic_parent_activity`` is the only parent-oxide power.
-    The input class is every oxide in ``MELT_OXIDE_CATIONS_PER_FORMULA``,
-    not only K2O and Na2O. A representable power stays that power. The
-    1e-310 pin squared by two cations is 0.0 in float64; the published
-    activity stays 1e-310. A true zero provider activity stays 0.0.
+    Invariant: ``thermodynamic_parent_activity`` is the only parent-oxide
+    power, and it never returns the single-cation activity in place of an
+    underflowed power. The input class is every oxide in
+    ``MELT_OXIDE_CATIONS_PER_FORMULA``. A representable power stays that
+    power. ``(1e-200)**2`` and ``(1e-310)**2`` are 0.0 in float64; 1e-200
+    is above the 1e-300 evaluator floor, so substituting it would change
+    physics. A true zero provider activity stays 0.0.
     """
+
+    import inspect
 
     from simulator.chemistry.melt_activity import (
         MELT_OXIDE_CATIONS_PER_FORMULA,
         MeltOxideActivity,
     )
 
-    pin = 1.0e-310
-    ordinary = 0.25
-    representable = 1.0e-100
+    source = inspect.getsource(MeltOxideActivity.thermodynamic_parent_activity)
+    assert "return self.activity\n" not in source
+    assert "return self.activity ** float(cations)" in source
+    # Sol's interval: the square underflows, the cation activity does not.
+    assert (1.0e-200) ** 2.0 == 0.0
+    assert 1.0e-200 > 1.0e-300
+    assert (1.0e-310) ** 2.0 == 0.0
     assert MELT_OXIDE_CATIONS_PER_FORMULA["K2O"] == 2.0
     assert MELT_OXIDE_CATIONS_PER_FORMULA["Na2O"] == 2.0
-    # (1e-310)**2 = 1e-620, below the smallest positive float64.
-    assert pin ** 2.0 == 0.0
+    di_cation = {
+        parent
+        for parent, cations in MELT_OXIDE_CATIONS_PER_FORMULA.items()
+        if float(cations) >= 2.0
+    }
+    assert {"K2O", "Na2O", "Al2O3", "Fe2O3", "Cr2O3", "P2O5"} <= di_cation
     mismatches: list[str] = []
     saw_underflow = False
     for parent, cations in sorted(MELT_OXIDE_CATIONS_PER_FORMULA.items()):
         cations_f = float(cations)
-        pinned = MeltOxideActivity(
-            parent_oxide=parent,
-            single_cation_component=parent,
-            gamma=1.0,
-            x_single_cation=pin,
-            activity=pin,
-            citation="floor pin",
-        )
-        published = pinned.thermodynamic_parent_activity()
-        powered = pin ** cations_f
-        if powered == 0.0:
-            saw_underflow = True
-            if published != pin:
-                mismatches.append(f"{parent}: underflow published {published!r}")
-        elif published != powered:
-            mismatches.append(f"{parent}: pin power {published!r} != {powered!r}")
-        for activity in (ordinary, representable, 1.0):
+        for activity in (1.0e-200, 1.0e-310, 0.25, 1.0e-100, 1.0, 0.0):
             row = MeltOxideActivity(
                 parent_oxide=parent,
                 single_cation_component=parent,
                 gamma=1.0,
                 x_single_cation=activity,
                 activity=activity,
-                citation="value identity",
+                citation="parent basis",
             )
-            expected = activity ** cations_f
-            actual = row.thermodynamic_parent_activity()
-            if not (expected > 0.0 and math.isfinite(expected)):
-                mismatches.append(f"{parent}: {activity} power {expected!r} not representable")
-            elif actual != expected:
+            published = row.thermodynamic_parent_activity()
+            expected = 0.0 if activity <= 0.0 else _parent_power(activity, cations_f)
+            if activity > 0.0 and expected == 0.0:
+                saw_underflow = True
+                if published == activity:
+                    mismatches.append(
+                        f"{parent}: substituted single-cation {activity}"
+                    )
+                    continue
+            if published != expected:
                 mismatches.append(
-                    f"{parent}: activity {activity} published {actual!r} != {expected!r}"
+                    f"{parent}: activity {activity} published {published!r} "
+                    f"!= {expected!r}"
                 )
-        zero = MeltOxideActivity(
-            parent_oxide=parent,
-            single_cation_component=parent,
-            gamma=1.0,
-            x_single_cation=0.0,
-            activity=0.0,
-            citation="measured zero",
-        )
-        if zero.thermodynamic_parent_activity() != 0.0:
-            mismatches.append(f"{parent}: measured zero moved")
     assert saw_underflow
+    assert mismatches == []
+
+
+def test_parent_oxide_underflow_above_the_floor_uses_the_evaluator_floor() -> None:
+    """A parent power that underflows still publishes the 1e-300 floor.
+
+    Invariant: a(parent) = a(single)**n. When that power is 0.0 and
+    a(single) is above 1e-300, the vapour law uses the floor and discloses
+    ``source_activity_floor_notice``. It does not evaluate at a(single).
+    The input class is every hot compiled parent-oxide species. K2 and Na2
+    are the pressure pin: activity exponent 1, so 1e-200 versus the floor
+    is 100 dex. The expected dex is the hand literal, not ``evaluate()``.
+    """
+
+    from engines.builtin.vapor_pressure import (
+        COMPILED_SOURCE_ACTIVITY_FLOOR,
+        BuiltinVaporPressureProvider,
+    )
+    from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
+
+    injected = 1.0e-200
+    provider = BuiltinVaporPressureProvider(_live_vapor())
+    oxides = provider._vapor_pressure_data.get("oxide_vapors") or {}
+    species_rows = _compiled_floor_species(provider)
+    mismatches: list[str] = []
+    checked: set[str] = set()
+    for name, parent, evaluator in species_rows:
+        row = oxides.get(name) or {}
+        if row.get("source_activity_basis") != "parent_oxide":
+            continue
+        low, high = evaluator.valid_temperature_K
+        temperature_K = (float(low) + float(high)) / 2.0
+        if temperature_K < 400.0:
+            continue
+        cations = float(MELT_OXIDE_CATIONS_PER_FORMULA.get(parent, 1.0))
+        expected_parent = _parent_power(injected, cations)
+        checked.add(name)
+        try:
+            result = _floor_activity_dispatch(
+                provider,
+                parent,
+                temperature_K,
+                activity=injected,
+            )
+        except Exception as exc:
+            mismatches.append(f"{name}: dispatch {type(exc).__name__}: {exc}")
+            continue
+        if result.status != "ok":
+            mismatches.append(f"{name}: status {result.status}")
+            continue
+        diagnostic = result.diagnostic or {}
+        pressures = diagnostic.get("vapor_pressures_Pa") or {}
+        if name not in pressures:
+            mismatches.append(f"{name}: unpublished")
+            continue
+        provenance = (
+            diagnostic.get("vapor_pressure_numerator_provenance") or {}
+        ).get(name) or {}
+        published_activity = (diagnostic.get("activities") or {}).get(name)
+        if published_activity != expected_parent:
+            mismatches.append(
+                f"{name}: published activity {published_activity!r} "
+                f"!= parent {expected_parent!r}"
+            )
+            continue
+        if provenance.get("equivalent_parent_oxide_activity") != expected_parent:
+            mismatches.append(
+                f"{name}: equivalent "
+                f"{provenance.get('equivalent_parent_oxide_activity')!r}"
+            )
+            continue
+        literal_exponents = _FLOOR_LAW_EXPONENTS.get(name)
+        if literal_exponents is not None:
+            activity_exponent, pO2_exponent, pO2_reference_bar = literal_exponents
+            if (
+                float(evaluator.activity_exponent) != activity_exponent
+                or float(evaluator.pO2_exponent) != pO2_exponent
+                or float(evaluator.pO2_reference_bar) != pO2_reference_bar
+            ):
+                mismatches.append(
+                    f"{name}: exponents "
+                    f"{evaluator.activity_exponent}, {evaluator.pO2_exponent}, "
+                    f"{evaluator.pO2_reference_bar}"
+                )
+                continue
+        else:
+            activity_exponent = float(evaluator.activity_exponent)
+            pO2_exponent = float(evaluator.pO2_exponent)
+            pO2_reference_bar = float(evaluator.pO2_reference_bar)
+        if expected_parent < COMPILED_SOURCE_ACTIVITY_FLOOR:
+            floor = provenance.get("source_activity_floor_notice")
+            if floor != [
+                {
+                    "authority_level": "extrapolated",
+                    "reason": "source_activity_floored",
+                    "certified_band": {
+                        "source_activity": (COMPILED_SOURCE_ACTIVITY_FLOOR, 1.0)
+                    },
+                    "source_activity_used": expected_parent,
+                }
+            ]:
+                mismatches.append(f"{name}: floor notice {floor!r}")
+                continue
+            activity_used = COMPILED_SOURCE_ACTIVITY_FLOOR
+        else:
+            if "source_activity_floor_notice" in provenance:
+                mismatches.append(f"{name}: floored a representable parent")
+                continue
+            activity_used = expected_parent
+        p_reference = provenance.get("P_reference_Antoine_Pa")
+        try:
+            p_reference_pa = float(p_reference)
+        except (TypeError, ValueError):
+            mismatches.append(f"{name}: reference pressure {p_reference!r}")
+            continue
+        oxygen = provenance.get("pO2_bar")
+        if oxygen != 1.0e-9 or not (
+            p_reference_pa > 0.0 and math.isfinite(p_reference_pa)
+        ):
+            mismatches.append(
+                f"{name}: pO2 {oxygen!r} reference {p_reference_pa!r}"
+            )
+            continue
+        log_expected = _hand_compiled_log10_pressure(
+            p_reference_pa=p_reference_pa,
+            activity_exponent=activity_exponent,
+            activity_used=activity_used,
+            pO2_exponent=pO2_exponent,
+            pO2_bar=1.0e-9,
+            pO2_reference_bar=pO2_reference_bar,
+        )
+        literal = _HAND_LOG10_RATIO_AT_FLOOR.get(name)
+        if literal is not None:
+            delta = log_expected - math.log10(p_reference_pa)
+            if delta != literal:
+                mismatches.append(f"{name}: hand delta {delta} != {literal}")
+                continue
+        pressure_problem = _pressure_versus_hand_log(
+            pressures[name], log_expected
+        )
+        if pressure_problem:
+            mismatches.append(f"{name}: {pressure_problem}")
+    assert {"K2", "Na2", "K2O_gas", "Na2O_gas"} <= checked
     assert mismatches == []
 
 
