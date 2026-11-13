@@ -29,7 +29,7 @@ notes:
   and norris_2017_figure3_volatility_factors_neg13. That separate extract is unchanged.
 - The values above 1 for Cr, Ga, V, W, and other cells are retained exactly as printed; the thesis discusses these
   as within-error constancy or contamination rather than physical negative loss.
-- FM is element retention X_final/X_initial; no battery quantity for per-element retention exists yet (separate schema task).
+- FM: “final concentration of the trace element divided by the initial concentration” (Norris 2016, p. 201); concentrations are single-cation oxide mole fractions.
 - Table 5.7 run preparation prints 3 g charge mass and a 1 cm diameter pressed pellet; pellet thickness is not stated.
 - The furnace used a CO–CO2 mixture and 300 mL/min total flow, but this thesis does not give the per-run gas ratio or component flows; fO2-control ratios are referred to Deines et al. (1976).
 benches:
@@ -110,15 +110,18 @@ experiments:
       state:
         tag: value
         value: &id001
-          SiO2: '50.66'
-          TiO2: '0.96'
-          Al2O3: '15.11'
-          FeO: '9.69'
-          MnO: '0.20'
-          MgO: '8.90'
-          CaO: '12.28'
-          Na2O: '1.96'
-          K2O: '0.07'
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components:
+          - [SiO2, '50.66']
+          - [TiO2, '0.96']
+          - [Al2O3, '15.11']
+          - [FeO, '9.69']
+          - [MnO, '0.20']
+          - [MgO, '8.90']
+          - [CaO, '12.28']
+          - [Na2O, '1.96']
+          - [K2O, '0.07']
       locator:
         page: 220
         pdf_page_index: 219
@@ -672,19 +675,22 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
-        composition:
+        fm_definition: &norris_fm_definition
           state:
             tag: value
             value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+              definition: concentration_retention
+              quote: final concentration of the trace element divided by the initial concentration
+              page: 201
+          locator:
+            page: 231
+            pdf_page_index: 230
+            published_page: 201
+            section: 5.5.6 Introducing the Volatility Factor
+        composition:
+          state:
+            tag: value
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -693,6 +699,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -777,19 +786,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -798,6 +799,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -882,19 +886,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -903,6 +899,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -987,19 +986,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1008,6 +999,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -1094,19 +1088,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1115,6 +1101,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -1199,19 +1188,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1220,6 +1201,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -1304,19 +1288,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1325,6 +1301,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -1409,19 +1388,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1430,6 +1401,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -1516,19 +1490,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1537,6 +1503,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -1621,19 +1590,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1642,6 +1603,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -1726,19 +1690,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1747,6 +1703,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -1831,19 +1790,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1852,6 +1803,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -1938,19 +1892,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -1959,6 +1905,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -2043,19 +1992,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -2064,6 +2005,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -2148,19 +2092,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -2169,6 +2105,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -2253,19 +2192,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -2274,6 +2205,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -2360,19 +2294,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -2381,6 +2307,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -2465,19 +2394,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -2486,6 +2407,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -2570,19 +2494,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -2591,6 +2507,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -2675,19 +2594,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -2696,6 +2607,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -2782,19 +2696,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -2803,6 +2709,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -2887,19 +2796,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -2908,6 +2809,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -2992,19 +2896,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3013,6 +2909,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -3097,19 +2996,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3118,6 +3009,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -3204,19 +3098,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3225,6 +3111,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -3309,19 +3198,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3330,6 +3211,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -3414,19 +3298,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3435,6 +3311,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -3519,19 +3398,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3540,6 +3411,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -3626,19 +3500,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3647,6 +3513,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -3731,19 +3600,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3752,6 +3613,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -3836,19 +3700,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3857,6 +3713,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -3941,19 +3800,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -3962,6 +3813,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -4048,19 +3902,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -4069,6 +3915,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -4153,19 +4002,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -4174,6 +4015,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -4258,19 +4102,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -4279,6 +4115,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -4363,19 +4202,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -4384,6 +4215,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -4470,19 +4304,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -4491,6 +4317,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -4575,19 +4404,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -4596,6 +4417,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -4680,19 +4504,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -4701,6 +4517,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -4785,19 +4604,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -4806,6 +4617,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -4892,19 +4706,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -4913,6 +4719,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -4997,19 +4806,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5018,6 +4819,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -5102,19 +4906,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5123,6 +4919,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -5207,19 +5006,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5228,6 +5019,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -5314,19 +5108,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5335,6 +5121,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -5419,19 +5208,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5440,6 +5221,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -5524,19 +5308,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5545,6 +5321,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -5629,19 +5408,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5650,6 +5421,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -5736,19 +5510,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5757,6 +5523,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -5841,19 +5610,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5862,6 +5623,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -5946,19 +5710,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -5967,6 +5723,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -6051,19 +5810,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -6072,6 +5823,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -6158,19 +5912,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -6179,6 +5925,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -6263,19 +6012,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -6284,6 +6025,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -6368,19 +6112,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -6389,6 +6125,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -6473,19 +6212,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -6494,6 +6225,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -6580,19 +6314,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -6601,6 +6327,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -6685,19 +6414,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -6706,6 +6427,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -6790,19 +6514,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -6811,6 +6527,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -6895,19 +6614,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-13'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -6916,6 +6627,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'
@@ -7002,19 +6716,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-7'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -7023,6 +6729,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-7'
@@ -7107,19 +6816,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-9'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -7128,6 +6829,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-9'
@@ -7212,19 +6916,11 @@ species:
             published_page: 202
             table: '5.7'
             row: '-11'
+        fm_definition: *norris_fm_definition
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -7233,6 +6929,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-11'
@@ -7320,16 +7019,7 @@ species:
         composition:
           state:
             tag: value
-            value:
-              SiO2: '50.66'
-              TiO2: '0.96'
-              Al2O3: '15.11'
-              FeO: '9.69'
-              MnO: '0.20'
-              MgO: '8.90'
-              CaO: '12.28'
-              Na2O: '1.96'
-              K2O: '0.07'
+            value: *id001
           locator:
             page: 220
             pdf_page_index: 219
@@ -7338,6 +7028,9 @@ species:
             row: EBT1
       values:
         method_class: measured_tabulated
+        quantity: element_retention_ratio
+        subtype: concentration_retention
+        composition_wt_pct: *id001
         T_C: 1300
         log_fO2:
           value: '-13'

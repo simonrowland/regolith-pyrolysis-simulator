@@ -15093,6 +15093,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity | str, tuple[str, ...]] = {
         "fraction_of_feedstock_oxygen_percent",
     ),
     Quantity.MASS_LOSS_FRACTION: _MASS_LOSS_YIELD_FIELDS,
+    Quantity.ELEMENT_RETENTION_RATIO: ("FM",),
     Quantity.YIELD_FRACTION: (
         "yield_fraction",
         "mass_yield_percent",
@@ -26441,6 +26442,10 @@ class Migrator:
             subtype = _residue_component_subtype(value_sel.field_name)
             if subtype is not None:
                 ident_kwargs["subtype"] = State.of(subtype)
+        if q_token is Quantity.ELEMENT_RETENTION_RATIO:
+            subtype = values.get("subtype")
+            if isinstance(subtype, str) and subtype.strip():
+                ident_kwargs["subtype"] = State.of(subtype.strip())
         if (
             admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
             and not _value_has_numeric_value(value)
