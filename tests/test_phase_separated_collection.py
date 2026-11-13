@@ -433,7 +433,7 @@ def test_vanishing_stream_oxygen_disables_reaction_despite_stale_headspace_pO2(m
     assert stage3.get('K', 0.0) == 0.0
 
 
-@pytest.mark.parametrize('oxygen_mol', [1.0, 1e-7, 0.0])
+@pytest.mark.parametrize('oxygen_mol', [20.0, 1e-7, 0.0])
 def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mol, monkeypatch):
     import simulator.evaporation as source_owner
     monkeypatch.setattr(source_owner, "_project_evaporation_overhead_source_mol_hr",
@@ -471,12 +471,20 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
                         or sim.vapor_pressures['oxide_vapors'].get(sp) or {})
         credited = sim._dispatch_condensation_route(
             sp, rate - result.remaining_by_species[sp], metadata, result)
-        sim._project_condensed_stage_collection(
-            result, sp, credited, sim._condensed_products_kg(sp, credited, metadata))
+        sim._project_routed_condensate(result, sp, credited, metadata)
     for transition in sim.atom_ledger.transitions[first_transition:]:
         transition.validate_conservation(registry)
-        assert transition.debit_atom_moles(registry) == pytest.approx(
-            transition.credit_atom_moles(registry))
+        debit_atoms = transition.debit_atom_moles(registry)
+        credit_atoms = transition.credit_atom_moles(registry)
+        for element in set(debit_atoms) | set(credit_atoms):
+            debit_mol = debit_atoms.get(element, 0.0)
+            credit_mol = credit_atoms.get(element, 0.0)
+            atom_abs_tolerance = 1e-12 * max(
+                abs(debit_mol), abs(credit_mol), 1e-30,
+            )
+            assert debit_mol == pytest.approx(
+                credit_mol, rel=1e-12, abs=atom_abs_tolerance,
+            )
     stage3 = sim.train.stages[3].collected_kg
     oxide_mol = sum(stage3.get(oxide, 0.0) / resolve_species_formula(
         oxide, registry).molar_mass_kg_per_mol() for oxide in ('Na2O', 'K2O'))
@@ -488,18 +496,58 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
         for reaction in result.stage3_reactive_alkali_by_species.values()
     )
     assert stage3_oxygen_debit_mol <= oxygen_mol
-    assert oxide_mol * 0.5 == pytest.approx(stage3_oxygen_debit_mol)
+    actual_stage3_o2_debit_mol = sum(
+        sim._transition_species_mol(
+            transition,
+            side='debits',
+            account='process.overhead_gas',
+            species='O2',
+        )
+        for transition in sim.atom_ledger.transitions[first_transition:]
+        if transition.name in {'condense_Na', 'condense_K'}
+    )
     assert not stage3.get('Na', 0.0) and not stage3.get('K', 0.0)
-    for sp in ('Na2O', 'K2O'):
+    for sp in ('Na', 'K', 'Na2O', 'K2O', 'Si', 'SiO', 'SiO2'):
         projected = sum(stage.collected_kg.get(sp, 0.0) for stage in sim.train.stages)
-        # Reactive oxide products are solid stage inventory backed by the
-        # collection accounts; elemental alkali and SiO follow other routes.
         backed = sum(
             sim.atom_ledger.kg_by_account(account).get(sp, 0.0)
             for account in STAGE_COLLECTION_BACKING_ACCOUNTS
         )
-        assert projected == pytest.approx(backed)
-    if oxide_mol > 0.0:
+        mass_abs_tolerance = 1e-10 * max(abs(projected), abs(backed), 1e-30)
+        assert projected == pytest.approx(
+            backed, rel=1e-12, abs=mass_abs_tolerance,
+        )
+    if oxygen_mol == 20.0:
+        stage3_debit_abs_tolerance = 1e-12 * max(
+            abs(actual_stage3_o2_debit_mol), abs(stage3_oxygen_debit_mol), 1e-30,
+        )
+        assert actual_stage3_o2_debit_mol == pytest.approx(
+            stage3_oxygen_debit_mol,
+            rel=1e-12,
+            abs=stage3_debit_abs_tolerance,
+        )
+        oxide_debit_abs_tolerance = 1e-12 * max(
+            abs(oxide_mol * 0.5), abs(actual_stage3_o2_debit_mol), 1e-30,
+        )
+        assert oxide_mol * 0.5 == pytest.approx(
+            actual_stage3_o2_debit_mol,
+            rel=1e-12,
+            abs=oxide_debit_abs_tolerance,
+        )
+        assert oxide_mol > 1e-2
+        assert actual_stage3_o2_debit_mol > 1e-3
+        stage3_oxide_kg = sum(stage3.get(oxide, 0.0) for oxide in ('Na2O', 'K2O'))
+        projected_oxide_impurity_kg = sum(
+            sim._last_impurity_delta.get((3, oxide), 0.0)
+            for oxide in ('Na2O', 'K2O')
+        )
+        assert projected_oxide_impurity_kg > 1e-4
+        impurity_abs_tolerance = 1e-12 * max(
+            abs(projected_oxide_impurity_kg), abs(stage3_oxide_kg), 1e-30,
+        )
+        assert projected_oxide_impurity_kg == pytest.approx(
+            stage3_oxide_kg, rel=1e-12, abs=impurity_abs_tolerance,
+        )
         assert stage_purity_report(sim.train)['stage_3_sio_zone']['purity_fraction'] < 1.0
         # Stage number 4 is the Na collector plus the K trap. The through
         # path has already taken alkali at stage 3, so less of it reaches
@@ -513,8 +561,14 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
         assert sum(
             sim.train.stages[4].collected_kg.get(sp, 0.0) for sp in ('Na', 'K')
         ) < bypass_stage4
+    elif oxygen_mol == 0.0:
+        assert oxide_mol == 0.0
+        assert stage3_oxygen_debit_mol == 0.0
+        assert actual_stage3_o2_debit_mol == 0.0
     else:
         assert oxide_mol == 0.0
+        assert actual_stage3_o2_debit_mol == 0.0
+        assert stage3_oxygen_debit_mol <= 1e-12 * oxygen_mol
 
 
 @pytest.mark.parametrize("carrier", ["Na", "K", "Na2", "K2O", "NaCl", "Na2O"])
