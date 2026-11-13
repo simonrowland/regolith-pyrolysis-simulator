@@ -3562,8 +3562,16 @@ corrections:
     Our preferred value is an average of those marked in red in Fig. 5a plus the isotherm value, yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K. The value of γ(InO1.5) is within error for all runs (Fig. 5b), too, giving γ(InO1.5) = 0.017(12) at an average T of 1674 K.
     [...]
     Given that the oxygen fugacities under which equilibrium was achieved in the melts studied herein (ΔIW+1.5 to ΔIW+2.5) [...]
-  page: '23, 24'
-  line_range: '593-596; 610-611'
+  page: 23
+  line_range: '593-596'
+  quote: *preferred_quote
+- observation_id: bischof_2023_gao15_gamma_preferred_1700k
+  field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
+  old: absent
+  new: *preferred_quote
+  page: 24
+  line_range: '610-611'
   quote: *preferred_quote
 - observation_id: bischof_2023_table8_x_gao15
   field: printed_quote
@@ -3582,8 +3590,16 @@ corrections:
     1_low, initially [...] | 1742 | [...] | 1585-1695 | [...]
     2_low, initially [...] | - | [...] | 1400-1730 | [...]
     3_high, initially [...] | - | [...] | 1540-1640 | [...]
-  page: '22, 6'
-  table: '8 (page 22); 2 (page 6)'
+  page: 22
+  table: '8'
+  quote: *table8_quote
+- observation_id: bischof_2023_table8_x_gao15
+  field: printed_quote
+  source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
+  old: absent
+  new: *table8_quote
+  page: 6
+  table: '2'
   quote: *table8_quote
 - observation_id: bischof_2023_gao15_gamma_s1_1low_polytherm
   field: printed_quote
@@ -3721,8 +3737,8 @@ corrections:
   source_path: docs/references/pdfs/99-kems-langmuir/kems-137-bischof-2023.pdf
   old: absent
   new: *preferred_quote
-  page: '23, 24'
-  line_range: '593-596; 610-611'
+  page: 23
+  line_range: '593-596'
   quote: *preferred_quote
 - observation_id: bischof_2023_ino15_gamma_s1_1low_polytherm
   field: printed_quote
