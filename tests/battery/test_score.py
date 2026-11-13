@@ -6356,6 +6356,7 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
         "expected_n",
         "expected_slope",
         "expected_population",
+        "expected_nonmeasured_oxygen_sources",
     ),
     (
         (
@@ -6366,24 +6367,21 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             6,
             Decimal("-7.33"),
             "contested",
+            frozenset({"kems-053-stolyarova-1991"}),
         ),
-        # 4e0819f6d types the 26 Table 2 oxygen columns quoted_attributed
-        # (Eq. (4) and Eqns 1–2 with Eqs. (5)–(6), p. 688). The 8 measured
-        # pCa rows are unchanged. resolve_source_oxygen commands that printed
-        # cell pO as fO2, so this residual slope is 2.33 dex per x(CaO).
-        # 1.04 was the engine oxygen-balance slope while those columns were
-        # model_derived. The committed sibling is still that class until
-        # regen; _context_for_sibling_oxygen scores the fresh migration
-        # then, and the store once it is quoted_attributed. b162 does not
-        # edit this extract. The paper prints the pressures, not this slope.
+        # The eight Ca pressure points link to the 18 atomic-O Table 2
+        # reductions (9 Eqn. 1 + 9 Eqn. 2). Eq. (5), p. 688 reduces measured
+        # KEMS currents to those pressures, so measured_reduced source oxygen
+        # enters the residuals; the accumulator's slope is 1.04, not 2.33.
         (
             "stolyarova-1995",
             "stolyarova-1995-cao-alumina-kems",
             "stolyarova_1995_ca_partial_pressure_table2",
             "x(CaO)",
             8,
-            Decimal("2.33"),
+            Decimal("1.04"),
             "liquid",
+            frozenset(),
         ),
     ),
 )
@@ -6396,6 +6394,7 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     expected_n: int,
     expected_slope: Decimal,
     expected_population: str,
+    expected_nonmeasured_oxygen_sources: frozenset[str],
 ) -> None:
     from simulator.battery import score as score_mod
     from simulator.battery.score import _ScorePayloadAccumulator
@@ -6408,12 +6407,41 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
             extract_name=f"{source}.yaml",
             oxygen_id_contains="stolyarova_1995_o",
         )
+        # Mutation check on a copied store context: one Table 2 oxygen row
+        # reverting to quoted_attributed must trip the mixed-class guard.
+        oxygen_row_id = next(
+            observation_id
+            for observation_id, observation in context.observations.items()
+            if "stolyarova_1995_o_partial_pressure_eqn1_table2" in observation_id
+            and observation.evidence.class_.is_value
+            and observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        )
+        mutated_observations = dict(context.observations)
+        oxygen_row = mutated_observations[oxygen_row_id]
+        mutated_observations[oxygen_row_id] = replace(
+            oxygen_row,
+            evidence=replace(
+                oxygen_row.evidence,
+                class_=State.of(EvidenceClass.QUOTED_ATTRIBUTED),
+            ),
+        )
+        with pytest.raises(AssertionError):
+            _context_for_sibling_oxygen(
+                replace(context, observations=mutated_observations),
+                tmp_path,
+                extract_name=f"{source}.yaml",
+                oxygen_id_contains="stolyarova_1995_o",
+            )
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     payloads = [residual_to_plain(residual) for residual in residuals]
     aggregate = _ScorePayloadAccumulator.from_rows(
         payloads, context=context, engines=(Engine.OPENIMCC,)
     )
-    _assert_no_model_derived_e15_points(residuals, context)
+    _assert_no_model_derived_e15_points(
+        residuals,
+        context,
+        expected_nonmeasured_oxygen_sources=expected_nonmeasured_oxygen_sources,
+    )
     shape = next(
         row
         for row in score_mod._e15_level_shape_rows(aggregate.e15_points)
@@ -6448,13 +6476,12 @@ def _context_for_sibling_oxygen(
 ) -> ScoreContext:
     """Score the store, or a fresh migration when its oxygen is stale.
 
-    The regenerated sibling is ``quoted_attributed`` and its observation
-    ids match a fresh migration of ``extract_name``. Anything else is
-    stale: ``model_derived``, or a quoted relabel that kept the previous
-    ``:h=`` ids (stable_ids.py hashes the extract row). Every store
-    series stem, that suffix stripped, must still be in the fresh
-    migration. A fresh stem the store does not have is allowed only when
-    every observation on it is figure-only evidence.
+    The 1995 Table 2 sibling is ``measured_reduced`` and the 1996 sibling is
+    ``quoted_attributed``. A stale class or row hash triggers a fresh
+    migration of ``extract_name``. Every store series stem, that suffix
+    stripped, must still be in the fresh migration. A fresh stem the store
+    does not have is allowed only when every observation on it is figure-only
+    evidence.
     """
     from simulator.battery.migrate import load_migrated_context
     from tests.battery.test_migrate import _migrate_real_extract
@@ -6476,6 +6503,7 @@ def _context_for_sibling_oxygen(
     assert oxygen_class in {
         EvidenceClass.QUOTED_ATTRIBUTED,
         EvidenceClass.MODEL_DERIVED,
+        EvidenceClass.MEASURED_REDUCED,
     }
     fresh = _migrate_real_extract(
         tmp_path,
@@ -6483,7 +6511,8 @@ def _context_for_sibling_oxygen(
         use_repository_index_row=True,
     )
     if (
-        oxygen_class is EvidenceClass.QUOTED_ATTRIBUTED
+        oxygen_class
+        in {EvidenceClass.QUOTED_ATTRIBUTED, EvidenceClass.MEASURED_REDUCED}
         and set(fresh.observations) == set(context.observations)
     ):
         return context
@@ -6520,6 +6549,8 @@ def _context_for_sibling_oxygen(
 def _assert_no_model_derived_e15_points(
     residuals: tuple[Residual, ...],
     context: ScoreContext,
+    *,
+    expected_nonmeasured_oxygen_sources: frozenset[str],
 ) -> None:
     from simulator.battery import score as score_mod
     nonmeasured_oxygen_sources = {
@@ -6532,10 +6563,9 @@ def _assert_no_model_derived_e15_points(
         and observation.evidence.class_.value
         in {EvidenceClass.MODEL_DERIVED, EvidenceClass.QUOTED_ATTRIBUTED}
     }
-    # The exclusion is vacuous unless this context still holds non-measured
-    # oxygen. 1995 (4e0819f6d) and 1996 Table 2 (t-1534 / car) are
-    # quoted_attributed. Either class counts.
-    assert nonmeasured_oxygen_sources
+    # 1991 and 1996 Table 2 still have non-measured oxygen; the reclassified
+    # 1995 context intentionally has none.
+    assert nonmeasured_oxygen_sources == set(expected_nonmeasured_oxygen_sources)
     for residual in residuals:
         observation = context.observations.get(residual.reference)
         if observation is None:
@@ -6868,7 +6898,13 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
     aggregate = _ScorePayloadAccumulator.from_rows(
         payloads, context=context, engines=(Engine.OPENIMCC,)
     )
-    _assert_no_model_derived_e15_points(residuals, context)
+    _assert_no_model_derived_e15_points(
+        residuals,
+        context,
+        expected_nonmeasured_oxygen_sources=frozenset(
+            {"stolyarova-1996-cao-alumina-silica-kems"}
+        ),
+    )
     production_shape = next(
         row
         for row in score_mod._e15_level_shape_rows(aggregate.e15_points)
