@@ -268,10 +268,11 @@ signs are ASCII plus and hyphen-minus plus the certification sign class
 `UNICODE_MINUS_SIGNS` and `UNICODE_PLUS_SIGNS` (superscript and subscript
 plus and minus included), anywhere in the token, before formula folding.
 `Cl−,`, `SO₄−`, `SO_{4}−`, and `Fe-rich` do not certify the neutral
-label. `Cl` does. `-6.98` still certifies `-6.98`. That token, and an
-HTML, CSV, or TSV cell that contains it, certifies no formula or species
-label, neither the neutral prefix nor a charged label, and certifies no
-number. The charged
+label. `Cl` does. `-6.98` still certifies `-6.98`. The charge guard is a
+formula or species label, so a measured leaf such as `-1Pa` or
+`1.2E-3K` still certifies. A charged token, and an HTML, CSV, or TSV
+cell that contains it, certifies no formula or species label, neither
+the neutral prefix nor a charged label, and certifies no number. The charged
 reason compares element symbols, lowercase letters included, after the
 subscript fold. `SO₄−` does not type `SiO2`, `F−` does not type `Fe`, and
 `MnO−` does not type `MgO`. For a charge sign that is not a superscript,

@@ -115,8 +115,9 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   inside the cell does not split it. ``Fe -`` is
   ``charged_species_unsupported`` for ``Fe``. ``SiO2 ⁿ`` is
   ``charged_species_unsupported`` for ``SiO2``. Only prose is split
-  on whitespace. A numeric token has
-  no element letter, so ``-6.98`` still certifies ``-6.98``. ``Fe`` is not
+  on whitespace. That guard is a formula or species label. A numeric
+  or measured leaf, including a unit, does not take it, so ``-6.98``,
+  ``-1Pa``, and ``1.2E-3K`` still certify. ``Fe`` is not
   ``$\\mathrm{Fe}^{2+}$`` and ``Fe^{2+}`` is not an identical CSV cell.
   A plain numeric cell with no element symbol is still a power.
   A subscript digit inside a formula token is not a number: ``SiO_{2}``
@@ -628,7 +629,12 @@ def _span_is_formula_subscript(text: str, start: int) -> bool:
 
 
 def _token_holds_superscript(text: str, start: int, end: int) -> bool:
-    """True when the whitespace token covering ``[start, end)`` contains ``^``."""
+    """True when the whitespace token covering ``[start, end)`` contains ``^``.
+
+    This is the numeric span. A caret still blocks a plain number. The
+    charge guard is not applied here. It belongs to a formula or species
+    label, so ``-1Pa`` and ``1.2E-3K`` certify.
+    """
     left = start
     while left > 0 and not text[left - 1].isspace():
         left -= 1
@@ -636,9 +642,7 @@ def _token_holds_superscript(text: str, start: int, end: int) -> bool:
     limit = len(text)
     while right < limit and not text[right].isspace():
         right += 1
-    token = text[left:right]
-    # A caret, or a charged species token, is not a plain number.
-    return "^" in token or _raw_token_is_charged_species(token)
+    return "^" in text[left:right]
 
 
 def _printed_value_carried(leaf: str, text: str) -> bool:
@@ -4133,9 +4137,11 @@ def fidelity_source_warnings(
     carries ``^``, ``<sup>``, a Unicode superscript, or a charge sign
     beside an uppercase element letter is unsupported. ``Cl−,``,
     ``SO₄−``, ``SO_{4}−``, and ``Fe-rich`` certify no neutral label.
-    ``Cl`` does, and ``-6.98`` still certifies. The same rule applies
-    to a whole HTML, CSV, or TSV cell. The comparison is that one
-    guard, before a raw cell match. The refusal is
+    ``Cl`` does, and ``-6.98`` still certifies. The charge guard is a
+    formula or species label, so a measured leaf such as ``-1Pa`` or
+    ``1.2E-3K`` still certifies. A whole HTML, CSV, or TSV cell takes
+    that guard for a formula or species label. The comparison is that
+    one guard, before a raw cell match. The refusal is
     ``charged_species_unsupported`` when the label is that token's
     element symbols, lowercase letters included, after the subscript
     fold. ``SO₄−`` does not type ``SiO2``, ``F−`` does not type ``Fe``,
