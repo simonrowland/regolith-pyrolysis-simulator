@@ -312,11 +312,13 @@ after removing one wrapping `$...$` pair, must equal the folded label. In
 running text the folded label must equal one whole formula run. A run is
 a maximal span of element symbols, digits, parentheses, square brackets,
 and the charge marks ·, +, and -. Whitespace or any other character
-delimits it. A `.` followed by a digit, inside or right after a count,
-stays in the run, including a folded `_{2.5}`. `SiO2.5` and `SiO_{2.5}`
-do not certify `SiO2`. `FeO1.5` does not certify `FeO`. A period that is
-not followed by a digit is still a boundary, so `SiO2.` at the end of a
-sentence certifies `SiO2`. `CO` does not certify text that contains only `CO₂`, and
+delimits it. A `.` followed by a digit, directly after an element
+letter, a digit, or `)`, stays in the run. `_{.5}` folds to `.5`.
+`FeO.5`, `FeO_{.5}`, and `FeO_{0.5}` do not certify `FeO`. `SiO2.5`
+and `SiO_{2.5}` do not certify `SiO2`. `FeO1.5` does not certify
+`FeO`. A period that is not followed by a digit is still a boundary,
+so `FeO.` and `SiO2.` at the end of a sentence certify `FeO` and
+`SiO2`. `CO` does not certify text that contains only `CO₂`, and
 `SiO₂` does not certify `SiO₂₂`. `SO4` does not certify `Fe₂(SO₄)₃`.
 `Fe2(SO4)3` does. `CaO·SiO2` certifies only as that whole run, so `SiO2`
 does not.

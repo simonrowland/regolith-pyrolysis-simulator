@@ -11852,6 +11852,82 @@ def test_decimal_stoichiometry_is_part_of_the_formula_run(tmp_path: Path):
     assert failures == []
 
 
+def test_leading_decimal_count_is_part_of_the_formula_run(tmp_path: Path):
+    """A fractional count with no leading digit stays in the formula run.
+
+    ``FeO.5``, ``FeO_{.5}``, and ``FeO_{0.5}`` do not certify ``FeO``.
+    ``_{.5}`` folds to ``.5`` and certifies ``FeO.5``. ``_{0.5}`` folds
+    to ``FeO0.5``. A period that is not followed by a digit is still a
+    boundary, so ``FeO.`` at the end of a sentence certifies ``FeO``.
+    An ordinary underscore is not a subscript count.
+    """
+    assert vle._normalize_formula_label("FeO_{.5}") == "FeO.5"
+    assert vle._normalize_formula_label("FeO_.5") == "FeO.5"
+    assert vle._normalize_formula_label("FeO_{0.5}") == "FeO0.5"
+    assert vle._normalize_formula_label("FeO_{2.5}") == "FeO2.5"
+    assert vle._normalize_formula_label("FeO_bar") == "FeO_bar"
+    assert vle._formula_label_in_text("FeO", "FeO.5") is False
+    assert vle._formula_label_in_text("FeO", "FeO_{.5}") is False
+    assert vle._formula_label_in_text("FeO", "FeO_{0.5}") is False
+    assert vle._formula_label_in_text("FeO.5", "FeO.5") is True
+    assert vle._formula_label_in_text("FeO.5", "FeO_{.5}") is True
+    assert vle._formula_label_in_text("FeO0.5", "FeO_{0.5}") is True
+    assert vle._formula_label_in_text("FeO", "(FeO).5") is False
+    assert vle._formula_label_in_text("(FeO).5", "(FeO).5") is True
+    assert vle._formula_label_in_text("FeO", "FeO.") is True
+    assert vle._formula_label_in_text("FeO", "The oxide is FeO.") is True
+    assert vle._formula_label_in_text("FeO", "FeO. Next") is True
+    failures: list[str] = []
+    refusals = (
+        ("FeO.5\n", "FeO", "text/feo-leading-decimal.md"),
+        ("FeO_{.5}\n", "FeO", "text/feo-latex-leading.md"),
+        ("FeO_{0.5}\n", "FeO", "text/feo-latex-zero-decimal.md"),
+    )
+    for source, label, relative in refusals:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path, label, source, key=key, relative=relative
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc, label=f"leading-{key}-{relative}", artifact_root=tmp_path
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {"cited_token_absent"}:
+                failures.append(f"refuse {key} {source!r}: {codes}")
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"leading-cert-{key}-{relative}", artifact_root=tmp_path
+            )
+            joined = "\n".join(errors)
+            if (
+                "source_blind_pin" not in joined
+                or "charged_species_unsupported" in joined
+            ):
+                failures.append(f"certify {key} {source!r}: {errors}")
+    for key in ("formula", "species"):
+        doc = _html_source_document(
+            tmp_path,
+            "FeO",
+            "The oxide is FeO.\n",
+            key=key,
+            relative="text/feo-sentence.md",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"feo-sentence-{key}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"sentence {key}: {errors}")
+    assert failures == []
+
+
 def test_superscript_span_does_not_type_an_unrelated_formula(tmp_path: Path):
     """A superscript types its own token or cell, not the cited span.
 

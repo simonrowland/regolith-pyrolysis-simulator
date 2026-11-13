@@ -1816,7 +1816,8 @@ def _blank_or_dash(text: str) -> bool:
 # One LaTeX-formula command list. ``printed_formula`` is the only unwrap.
 _PRINTED_FORMULA_COMMAND_RE = re.compile(r"\\(?:mathrm|text|rm)\b")
 # A detector only. ``printed_formula`` strips the subscript characters.
-_PRINTED_FORMULA_SUBSCRIPT_RE = re.compile(r"_\{?\d")
+# ``_{.5}`` and ``_.5`` are the same markup as ``_{2}`` and fold to ``.5``.
+_PRINTED_FORMULA_SUBSCRIPT_RE = re.compile(r"_\{?(?:\d|\.\d)")
 
 
 def printed_formula(text: str) -> str:

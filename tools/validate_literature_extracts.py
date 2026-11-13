@@ -120,11 +120,13 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   run of element symbols, digits, parentheses, square brackets, and the
   charge marks ·, +, and -. ``SO4`` is not ``Fe₂(SO₄)₃``. ``Fe2(SO4)3``
   is. ``CaO·SiO2`` certifies only as that whole run, so ``SiO2`` does not.
-  A ``.`` followed by a digit, inside or right after a count, stays in
-  the run, including a folded ``_{2.5}``. ``SiO2.5`` and ``SiO_{2.5}``
-  do not certify ``SiO2``, and ``FeO1.5`` does not certify ``FeO``.
-  A period that is not followed by a digit is still a boundary, so
-  ``SiO2.`` at the end of a sentence certifies ``SiO2``.
+  A ``.`` followed by a digit, directly after an element letter, a
+  digit, or ``)``, stays in the run. ``_{.5}`` folds to ``.5`` in
+  ``printed_formula``. ``FeO.5``, ``FeO_{.5}``, and ``FeO_{0.5}`` do
+  not certify ``FeO``. ``SiO2.5`` and ``SiO_{2.5}`` do not certify
+  ``SiO2``, and ``FeO1.5`` does not certify ``FeO``. A period that is
+  not followed by a digit is still a boundary, so ``FeO.`` and
+  ``SiO2.`` at the end of a sentence certify ``FeO`` and ``SiO2``.
   A token with no internal space, including
   ``${\\mathrm{{Al}}}_{2}{\\mathrm{O}}_{3}$``, goes through
   ``printed_formula``. A space always separates tokens, so ``SiO 2``
@@ -3397,8 +3399,9 @@ def _formula_cell_matches(leaf: str, cell: str) -> bool:
 
 # A formula run is element symbols, digits, parentheses, square brackets,
 # and the charge marks · U+00B7, +, and -. A '.' followed by a digit,
-# inside or right after a count, stays in the run. Any other character,
-# including a sentence period, ends it. Parentheses do not.
+# directly after an element letter, a digit, or ')', stays in the run.
+# A folded '_{.5}' is that same count. Any other character, including a
+# sentence period, ends it. Parentheses do not.
 _FORMULA_RUN_MARKS = "()[]+-\u00b7"
 
 
@@ -3618,12 +3621,15 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
 
     The run is a maximal span of element symbols, digits, parentheses,
     square brackets, and the charge marks ·, +, and -. A ``.`` followed
-    by a digit, inside or right after a count, stays in the run, so
-    ``SiO2.5`` and a folded ``_{2.5}`` are one token and do not certify
-    ``SiO2``. ``FeO1.5`` does not certify ``FeO``. A period that is not
-    followed by a digit is still a boundary, so ``SiO2.`` certifies
-    ``SiO2``. Whitespace, either end of the text, or any other character
-    delimits the run. The stored label matches only that whole run.
+    by a digit, directly after an element letter, a digit, or ``)``,
+    stays in the run. ``_{.5}`` folds to ``.5`` before the scan, so
+    ``FeO.5``, ``FeO_{.5}``, and ``FeO_{0.5}`` do not certify ``FeO``.
+    ``SiO2.5`` and a folded ``_{2.5}`` do not certify ``SiO2``.
+    ``FeO1.5`` does not certify ``FeO``. A period that is not followed
+    by a digit is still a boundary, so ``FeO.`` and ``SiO2.`` certify
+    ``FeO`` and ``SiO2``. Whitespace, either end of the text, or any
+    other character delimits the run. The stored label matches only
+    that whole run.
     ``SO4`` is not ``Fe2(SO4)3``. ``SiO2`` is not ``CaO·SiO2``. ``CO``
     is not ``CO2``. A raw token that carries
     ``^``, ``<sup>``, a Unicode superscript, a modifier letter, or a
@@ -3653,10 +3659,15 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
             or (
                 folded[end] == "."
                 and end + 1 < limit
-                and folded[end - 1].isascii()
-                and folded[end - 1].isdigit()
                 and folded[end + 1].isascii()
                 and folded[end + 1].isdigit()
+                and (
+                    folded[end - 1] == ")"
+                    or (
+                        folded[end - 1].isascii()
+                        and folded[end - 1].isalnum()
+                    )
+                )
             )
         ):
             end += 1
@@ -4127,11 +4138,14 @@ def fidelity_source_warnings(
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
     measurement still does. A formula label equals one whole run of
     element symbols, digits, parentheses, square brackets, and the
-    charge marks ·, +, and -. A ``.`` followed by a digit, inside or
-    right after a count, stays in the run. ``SiO2.5`` and ``SiO_{2.5}``
+    charge marks ·, +, and -. A ``.`` followed by a digit, directly
+    after an element letter, a digit, or ``)``, stays in the run.
+    ``_{.5}`` folds to ``.5``. ``FeO.5``, ``FeO_{.5}``, and
+    ``FeO_{0.5}`` do not certify ``FeO``. ``SiO2.5`` and ``SiO_{2.5}``
     do not certify ``SiO2``. ``FeO1.5`` does not certify ``FeO``. A
-    period not followed by a digit is still a boundary, so ``SiO2.``
-    at the end of a sentence certifies ``SiO2``. ``SO4`` is not
+    period not followed by a digit is still a boundary, so ``FeO.``
+    and ``SiO2.`` at the end of a sentence certify ``FeO`` and
+    ``SiO2``. ``SO4`` is not
     ``Fe2(SO4)3``. ``SiO2`` is not ``CaO·SiO2``.
     ``printed_formula`` unwraps one token, including a
     ``\\mathrm`` / ``\\text`` / ``\\rm`` command, so
