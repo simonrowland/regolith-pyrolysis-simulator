@@ -3232,7 +3232,7 @@ class CondensationModel:
             temperature = _deposition_finite_scalar('bypass.wall_temperature_C', cfg['wall_temperature_C'])
             if not all(math.isfinite(v) and v > 0 for v in (length, diameter)):
                 raise ValueError('bypass dimensions must be finite and positive')
-            if not math.isfinite(temperature) or temperature <= -273.15:
+            if not math.isfinite(temperature) or temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError('bypass temperature must exceed absolute zero')
         except (KeyError, TypeError, ValueError) as exc:
             raise DepositionInputRefusal('stage3_bypass', cfg, str(exc)) from exc
