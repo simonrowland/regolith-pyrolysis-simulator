@@ -45,7 +45,6 @@ from simulator.battery.pins import (  # noqa: E402
 )
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
-    _append_nasa9_fit_comparison_stratum,
     _render_score_report_from_payloads_legacy,
     _ResidualJsonlRows,
     _count_residuals_jsonl,
@@ -65,6 +64,12 @@ from simulator.battery.score import (  # noqa: E402
     write_headline_summary_from_payloads_json,
     _write_headline_summary_from_accumulator_json,
     measured_engine_rail_records,
+)
+from simulator.battery.score_report import (  # noqa: E402
+    format_nasa9_fit_comparison_stratum,
+)
+from simulator.battery.score_report_data import (  # noqa: E402
+    nasa9_fit_comparison_report_data,
 )
 
 def _scoring_filter_record(
@@ -561,9 +566,11 @@ def main(argv: list[str] | None = None) -> int:
             observations=context.observations,
             origins=context.origins,
         )
-        report = _append_nasa9_fit_comparison_stratum(
+        report = format_nasa9_fit_comparison_stratum(
             report,
-            iter_compilation_comparisons_jsonl(compilation_comparisons_path),
+            nasa9_fit_comparison_report_data(
+                iter_compilation_comparisons_jsonl(compilation_comparisons_path)
+            ),
         )
         summary_path = args.root / "data" / "battery" / "score-summary.json"
         summary_partial_path = summary_path.with_name(summary_path.name + ".partial")
@@ -754,9 +761,11 @@ def main(argv: list[str] | None = None) -> int:
             store_stamp=recorded,
             _aggregate=report_aggregate,
         )
-        report = _append_nasa9_fit_comparison_stratum(
+        report = format_nasa9_fit_comparison_stratum(
             report,
-            iter_compilation_comparisons_jsonl(compilation_comparisons_partial_path),
+            nasa9_fit_comparison_report_data(
+                iter_compilation_comparisons_jsonl(compilation_comparisons_partial_path)
+            ),
         )
         summary_options = (
             {
