@@ -116,7 +116,8 @@ def _upstream_wall_search_floor_C(
     Algebra: floor = min(collector band low of each downstream stage).
     Unit check: collector bands are degrees Celsius.
     Sanity: the shipped stage-7 band starts at 20 C, below Na bake-off
-    (~486 C) and Mg bake-off (~586 C).
+    (~425 C at 100 Pa / 1 mbar from the Browning-Potter owner, extrapolated
+    below its certified band) and Mg bake-off (~586 C at 100 Pa).
     """
 
     stage_ranges = resolve_collector_bands_C(setpoints)
