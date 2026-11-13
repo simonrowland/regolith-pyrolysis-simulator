@@ -20,11 +20,21 @@ LEGACY_CORPUS_ROOT = Path.home() / "Repos" / ".regolith-main-review" / "corpus-m
 
 def _changed_extracts() -> list[Path]:
     names = subprocess.check_output(
-        ["git", "diff", "--name-only", f"{MERGE_BASE}...HEAD", "--", "data/literature/extracts"],
+        # Added/changed extracts only, matching the migrator's discovery
+        # (migrate.discover_extracts globs "*.yaml" in the extracts directory, not
+        # its subdirectories). The tree also holds Markdown (SCHEMA.md, READMEs)
+        # and audit artefacts under audits/ that are not extracts, and a deleted
+        # extract has no file to read (--diff-filter=d drops deletions).
+        ["git", "diff", "--name-only", "--diff-filter=d", f"{MERGE_BASE}...HEAD", "--",
+         "data/literature/extracts/*.yaml"],
         cwd=REPO_ROOT,
         text=True,
     ).splitlines()
-    return [REPO_ROOT / name for name in names]
+    return [
+        REPO_ROOT / name
+        for name in names
+        if Path(name).parent == Path("data/literature/extracts")
+    ]
 
 
 def _walk(value, ancestors=()):
