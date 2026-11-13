@@ -155,44 +155,141 @@ def _load_t609_proof():
     return module
 
 
-def test_additivity_proof_code_canonicalizes_owned_numeric_constants() -> None:
+def _load_temp_module(tmp_path: Path, name: str, source: str):
+    path = tmp_path / f"{name}.py"
+    path.write_text(source, encoding="utf-8")
+    spec = importlib.util.spec_from_file_location(name, path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_additivity_proof_canonicalizes_owned_numeric_constants_from_module(
+    tmp_path: Path,
+) -> None:
     proof = _load_t609_proof()
+    module = _load_temp_module(
+        tmp_path,
+        "proof_owned_constant_positive",
+        "from simulator.physical_constants import PA_PER_BAR\n"
+        "_NOT_OWNER_PA_PER_BAR = 1.0e5\n"
+        "def owner(value):\n"
+        "    return value * PA_PER_BAR\n"
+        "def literal(value):\n"
+        "    return value * 1.0e5\n"
+        "def changed(value):\n"
+        "    return value * 1.0e4\n"
+        "def unrelated(value):\n"
+        "    return value * _NOT_OWNER_PA_PER_BAR\n",
+    )
+    for function in (module.literal, module.changed, module.unrelated):
+        function.__qualname__ = module.owner.__qualname__
 
-    def literal_closure(offset: float):
-        def calculate(value: float) -> float:
-            return value * 1.0e5 + offset
+    canonical = proof._canonical(module.owner)
+    assert canonical == proof._canonical(module.literal)
+    assert canonical != proof._canonical(module.changed)
+    assert canonical != proof._canonical(module.unrelated)
 
-        return calculate
 
-    def owner_closure(offset: float):
-        def calculate(value: float) -> float:
-            return value * PA_PER_BAR + offset
+@pytest.mark.parametrize(
+    ("case", "source"),
+    [
+        pytest.param(
+            "sibling_mutator",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    global PA_PER_BAR\n"
+            "    PA_PER_BAR = 7.0\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="sibling-mutator",
+        ),
+        pytest.param(
+            "globals_delete",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    del globals()['PA_PER_BAR']\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="globals-delete",
+        ),
+        pytest.param(
+            "globals_assignment",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    globals()['PA_PER_BAR'] = 7.0\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="globals-assignment",
+        ),
+        pytest.param(
+            "exec_mutation",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    exec('global PA_PER_BAR; PA_PER_BAR = 7.0')\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="exec-mutation",
+        ),
+        pytest.param(
+            "eval_mutation",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def mutate():\n"
+            "    eval(\"globals().__setitem__('PA_PER_BAR', 7.0)\")\n"
+            "def owner(value):\n"
+            "    mutate()\n"
+            "    return value * PA_PER_BAR\n"
+            "def literal(value):\n"
+            "    mutate()\n"
+            "    return value * 1.0e5\n",
+            id="eval-mutation",
+        ),
+        pytest.param(
+            "dynamic_helper",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "dynamic = {'__name__': 'dynamic_constant_helper', 'PA_PER_BAR': PA_PER_BAR}\n"
+            "exec('def owner(value):\\n return value * PA_PER_BAR\\n'\n"
+            "     'def literal(value):\\n return value * 1.0e5', dynamic)\n",
+            id="dynamic-helper",
+        ),
+        pytest.param(
+            "inlined_comprehension",
+            "from simulator.physical_constants import PA_PER_BAR\n"
+            "def owner(items):\n"
+            "    return [(globals().__setitem__('PA_PER_BAR', 7.0), value * PA_PER_BAR)[1] for value in items]\n"
+            "def literal(items):\n"
+            "    return [(globals().__setitem__('PA_PER_BAR', 7.0), value * 1.0e5)[1] for value in items]\n",
+            id="inlined-comprehension",
+        ),
+    ],
+)
+def test_additivity_proof_keeps_unstable_module_constant_loads_exact(
+    tmp_path: Path, case: str, source: str
+) -> None:
+    proof = _load_t609_proof()
+    module = _load_temp_module(tmp_path, f"proof_unstable_{case}", source)
+    owner = module.owner if case != "dynamic_helper" else module.dynamic["owner"]
+    literal = module.literal if case != "dynamic_helper" else module.dynamic["literal"]
+    literal.__qualname__ = owner.__qualname__
 
-        return calculate
-
-    def changed_literal_closure(offset: float):
-        def calculate(value: float) -> float:
-            return value * 1.0e4 + offset
-
-        return calculate
-
-    def unrelated_global_closure(offset: float):
-        def calculate(value: float) -> float:
-            return value * _NOT_OWNER_PA_PER_BAR + offset
-
-        return calculate
-
-    literal = literal_closure(2.0)
-    owner = owner_closure(2.0)
-    changed = changed_literal_closure(2.0)
-    unrelated = unrelated_global_closure(2.0)
-    for function in (owner, changed, unrelated):
-        function.__qualname__ = literal.__qualname__
-
-    canonical = proof._canonical(literal)
-    assert canonical == proof._canonical(owner)
-    assert canonical != proof._canonical(changed)
-    assert canonical != proof._canonical(unrelated)
+    assert proof._canonical(owner) != proof._canonical(literal)
 
 
 def test_additivity_proof_does_not_normalize_class_local_load_name() -> None:
