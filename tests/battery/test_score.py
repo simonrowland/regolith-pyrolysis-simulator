@@ -6367,15 +6367,10 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             Decimal("-7.33"),
             "contested",
         ),
-        # 4e0819f6d types the 26 Table 2 oxygen columns quoted_attributed
-        # (Eq. (4) and Eqns 1–2 with Eqs. (5)–(6), p. 688). The 8 measured
-        # pCa rows are unchanged. resolve_source_oxygen commands that printed
-        # cell pO as fO2, so this residual slope is 2.33 dex per x(CaO).
-        # 1.04 was the engine oxygen-balance slope while those columns were
-        # model_derived. The committed sibling is still that class until
-        # regen; _context_for_sibling_oxygen scores the fresh migration
-        # then, and the store once it is quoted_attributed. b162 does not
-        # edit this extract. The paper prints the pressures, not this slope.
+        # Table 2 oxygen is measured_reduced (author reduction of KEMS
+        # currents, Eq. (5), p. 688). The printed-cell-pO slope is 2.33;
+        # 1.04 is the engine-balance slope when that command is dropped.
+        # The paper prints the pressures, not this residual slope.
         (
             "stolyarova-1995",
             "stolyarova-1995-cao-alumina-kems",
@@ -6401,13 +6396,6 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     from simulator.battery.score import _ScorePayloadAccumulator
 
     context = load_score_context(sources=(source_token,))
-    if source == "stolyarova-1995-cao-alumina-kems":
-        context = _context_for_sibling_oxygen(
-            context,
-            tmp_path,
-            extract_name=f"{source}.yaml",
-            oxygen_id_contains="stolyarova_1995_o",
-        )
     residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
     payloads = [residual_to_plain(residual) for residual in residuals]
     aggregate = _ScorePayloadAccumulator.from_rows(
@@ -6532,10 +6520,15 @@ def _assert_no_model_derived_e15_points(
         and observation.evidence.class_.value
         in {EvidenceClass.MODEL_DERIVED, EvidenceClass.QUOTED_ATTRIBUTED}
     }
-    # The exclusion is vacuous unless this context still holds non-measured
-    # oxygen. 1995 (4e0819f6d) and 1996 Table 2 (t-1534 / car) are
-    # quoted_attributed. Either class counts.
-    assert nonmeasured_oxygen_sources
+    # 1995 now has measured oxygen; 1991/1996 retain quoted oxygen.
+    expected = {
+        row.source_id for row in context.observations.values()
+        if row.source_id in {
+            "kems-053-stolyarova-1991",
+            "stolyarova-1996-cao-alumina-silica-kems",
+        }
+    }
+    assert nonmeasured_oxygen_sources == expected
     for residual in residuals:
         observation = context.observations.get(residual.reference)
         if observation is None:
