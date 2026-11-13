@@ -1825,6 +1825,8 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             )
             fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
             record = fixture["records"]["c2b7b4e:62"]
+            assert record["ok"] is True
+            assert "allow_extrapolation=False" in fixture["provenance"]
             package_result = SimpleNamespace(
                 parent_oxides=tuple(record["parent_oxides"]),
                 parent_activity=tuple(record["parent_activity"]),
@@ -1839,6 +1841,9 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
                     flags=(),
                     notices=(),
                     acid_sink_ratio=None,
+                    # This successful recorded call used strict evaluation;
+                    # its envelope label was omitted from the older capture.
+                    envelope_status="inside",
                 ),
                 extrapolated=False,
             )

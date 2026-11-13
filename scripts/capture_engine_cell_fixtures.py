@@ -5,7 +5,9 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+from functools import wraps
 import importlib.metadata
+import inspect
 import json
 import os
 from pathlib import Path
@@ -86,6 +88,7 @@ def _capture(handle: Any, pot: Any, po2_request: Any) -> dict[str, Any]:
     original_equilibrate = backend.equilibrate
     calls: list[tuple[tuple[Any, ...], dict[str, Any], Any]] = []
 
+    @wraps(original_equilibrate)
     def record_call(*args: Any, **kwargs: Any) -> Any:
         result = original_equilibrate(*args, **kwargs)
         calls.append((args, dict(kwargs), result))
@@ -112,7 +115,28 @@ def _capture(handle: Any, pot: Any, po2_request: Any) -> dict[str, Any]:
         raise CaptureError(
             f"{handle.name}: cell refused the capture request: {cell.refusal_reason}"
         )
-    _args, _kwargs, result = calls[0]
+    _args, kwargs, result = calls[0]
+    parameters = inspect.signature(original_equilibrate).parameters
+    expected_kwargs = {
+        "temperature_C",
+        "composition_kg",
+        "composition_mol",
+        "pressure_bar",
+    }
+    if "fO2_log" in parameters:
+        expected_kwargs.add("fO2_log")
+    for optional_name in ("po2_request", "call_timeout_s"):
+        if optional_name in parameters:
+            expected_kwargs.add(optional_name)
+    from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
+
+    expected_kwargs.update(isothermal_run_kwargs(handle.name, parameters))
+    missing_kwargs = expected_kwargs.difference(kwargs)
+    if missing_kwargs:
+        raise CaptureError(
+            f"{handle.name}: equilibrate_cell omitted backend kwargs "
+            f"{sorted(missing_kwargs)} from the captured call"
+        )
     if not isinstance(result, EquilibriumResult):
         raise CaptureError(
             f"{handle.name}: backend returned {type(result).__name__}, "
