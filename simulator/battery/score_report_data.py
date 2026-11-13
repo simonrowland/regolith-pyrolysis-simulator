@@ -10,7 +10,6 @@ from typing import Iterable, Mapping, NamedTuple
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import Observation, Residual, Uncertainty
-from simulator.battery import score_metrics  # noqa: F401 -- required owner dependency
 
 
 _RETENTION_LOSS_BINS = (

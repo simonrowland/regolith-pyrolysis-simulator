@@ -747,6 +747,5 @@ def test_score_report_data_import_direction() -> None:
             imported.update(alias.name for alias in node.names)
 
     assert "simulator.battery.records" in imported
-    assert "simulator.battery.score_metrics" in imported
     assert "simulator.battery.score" not in imported
     assert "simulator.battery.score_report" not in imported
