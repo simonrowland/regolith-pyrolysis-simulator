@@ -207952,6 +207952,8 @@
             "reason": "K2O remains excluded from the openimcc activity authority above the cap by owner ruling of 2026-09-26, retained pending re-evaluation under the D066 pack (t-1194). The original ruling was established using published-core. For loaded pack default (IMCC-SF04-D066, version 1.0.3-d066-v1, digest 02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75), KCaAlSi2O7 is inactive at 1473 K and inactive at 1673 K, with Gamma(KO0.5) values 1.67e-6 and 9.44e-6. Zhang et al. (2021, ACS Earth Space Chem.) measured alpha*Gamma(KO0.5) = 6.9e-8 at 1473 K and 1.11e-6 at 1673 K for the cited N-MORB-like basalt. At this evaluated above-cap input, the OpenIMCC over constant-gamma K2O activity step is -0.47 dex. Constant-gamma K is also uncertified (t-999)."
           }
         },
+        "consecutive_refusal_count": 0,
+        "last_extrapolated_gamma_by_parent": {},
         "certified_effective_gamma_by_parent": {},
         "activities_by_oxide": {
           "Na2O": 3.0493742388591213e-06,
@@ -208583,8 +208585,6 @@
           "message": "Cr2O3 and MnO remain projected from the openimcc input, but do not count toward the shared 1.0 wt% gate"
         },
         "seam_max_abs_ratio_dex": 1.1991399810660641,
-        "consecutive_refusal_count": 0,
-        "last_extrapolated_gamma_by_parent": {},
         "selected_parent_activities": {
           "Al2O3": 0.022915460899076808,
           "CaO": 8.768412976099772e-05,
@@ -225738,6 +225738,8 @@
             "reason": "K2O remains excluded from the openimcc activity authority above the cap by owner ruling of 2026-09-26, retained pending re-evaluation under the D066 pack (t-1194). The original ruling was established using published-core. For loaded pack default (IMCC-SF04-D066, version 1.0.3-d066-v1, digest 02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75), KCaAlSi2O7 is inactive at 1473 K and inactive at 1673 K, with Gamma(KO0.5) values 1.67e-6 and 9.44e-6. Zhang et al. (2021, ACS Earth Space Chem.) measured alpha*Gamma(KO0.5) = 6.9e-8 at 1473 K and 1.11e-6 at 1673 K for the cited N-MORB-like basalt. At this evaluated above-cap input, the OpenIMCC over constant-gamma K2O activity step is -0.47 dex. Constant-gamma K is also uncertified (t-999)."
           }
         },
+        "consecutive_refusal_count": 0,
+        "last_extrapolated_gamma_by_parent": {},
         "certified_effective_gamma_by_parent": {},
         "activities_by_oxide": {
           "Na2O": 3.034185694090176e-06,
@@ -226369,8 +226371,6 @@
           "message": "Cr2O3 and MnO remain projected from the openimcc input, but do not count toward the shared 1.0 wt% gate"
         },
         "seam_max_abs_ratio_dex": 1.1993676753137499,
-        "consecutive_refusal_count": 0,
-        "last_extrapolated_gamma_by_parent": {},
         "selected_parent_activities": {
           "Al2O3": 0.022920102586590885,
           "CaO": 8.764362890557039e-05,
@@ -260228,17 +260228,7 @@
             "message": "ferric component collapsed until d-072"
           }
         },
-        "notices": [
-          {
-            "code": "openimcc_activity_cap_step_exceeds_0_1_dex",
-            "type": "typed_notice",
-            "temperature_K": 2023.15,
-            "cap_K": 1950.0,
-            "max_abs_ratio_dex": 1.042593621895382,
-            "threshold_dex": 0.1,
-            "message": "openimcc/below-cap activity source switch exceeds the provisional cap seam screen"
-          }
-        ],
+        "notices": [],
         "seam": {
           "Na2O": {
             "below_cap_activity": 7.518997847205378e-06,
@@ -260344,12 +260334,14 @@
             "reason": "K2O remains excluded from the openimcc activity authority above the cap by owner ruling of 2026-09-26, retained pending re-evaluation under the D066 pack (t-1194). The original ruling was established using published-core. For loaded pack default (IMCC-SF04-D066, version 1.0.3-d066-v1, digest 02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75), KCaAlSi2O7 is inactive at 1473 K and inactive at 1673 K, with Gamma(KO0.5) values 1.67e-6 and 9.44e-6. Zhang et al. (2021, ACS Earth Space Chem.) measured alpha*Gamma(KO0.5) = 6.9e-8 at 1473 K and 1.11e-6 at 1673 K for the cited N-MORB-like basalt. At this evaluated above-cap input, the OpenIMCC over constant-gamma K2O activity step is -0.03 dex. Constant-gamma K is also uncertified (t-999)."
           }
         },
+        "consecutive_refusal_count": 0,
+        "last_extrapolated_gamma_by_parent": {},
         "certified_effective_gamma_by_parent": {
           "Na2O": {
             "gamma_last": 0.0008871981065022794,
             "temperature_K": 2023.15,
-            "hour": 16.0,
-            "window_K": 300.0,
+            "hour": null,
+            "window_K": null,
             "composition_single_cation": {
               "Al2O3": 0.15604505585659617,
               "CaO": 0.11559107880568734,
@@ -260360,15 +260352,15 @@
               "SiO2": 0.4364322744045626,
               "TiO2": 0.01106754151060354
             },
-            "composition_window_L1": 0.0,
+            "composition_window_L1": null,
             "coefficient_basis": "bulk_single_cation",
             "ln_gamma_last": -7.027442256170386
           },
           "SiO2": {
             "gamma_last": 0.6701477264153701,
             "temperature_K": 2023.15,
-            "hour": 16.0,
-            "window_K": 300.0,
+            "hour": null,
+            "window_K": null,
             "composition_single_cation": {
               "Al2O3": 0.15604505585659617,
               "CaO": 0.11559107880568734,
@@ -260379,15 +260371,15 @@
               "SiO2": 0.4364322744045626,
               "TiO2": 0.01106754151060354
             },
-            "composition_window_L1": 0.0,
+            "composition_window_L1": null,
             "coefficient_basis": "bulk_single_cation",
             "ln_gamma_last": -0.4002571037137332
           },
           "FeO": {
             "gamma_last": 1.059879378509635,
             "temperature_K": 2023.15,
-            "hour": 16.0,
-            "window_K": 300.0,
+            "hour": null,
+            "window_K": null,
             "composition_single_cation": {
               "Al2O3": 0.15604505585659617,
               "CaO": 0.11559107880568734,
@@ -260398,15 +260390,15 @@
               "SiO2": 0.4364322744045626,
               "TiO2": 0.01106754151060354
             },
-            "composition_window_L1": 0.0,
+            "composition_window_L1": null,
             "coefficient_basis": "bulk_single_cation",
             "ln_gamma_last": 0.05815510779012849
           },
           "MgO": {
             "gamma_last": 0.09065805097985559,
             "temperature_K": 2023.15,
-            "hour": 16.0,
-            "window_K": 300.0,
+            "hour": null,
+            "window_K": null,
             "composition_single_cation": {
               "Al2O3": 0.15604505585659617,
               "CaO": 0.11559107880568734,
@@ -260417,15 +260409,15 @@
               "SiO2": 0.4364322744045626,
               "TiO2": 0.01106754151060354
             },
-            "composition_window_L1": 0.0,
+            "composition_window_L1": null,
             "coefficient_basis": "bulk_single_cation",
             "ln_gamma_last": -2.400660531826977
           },
           "CaO": {
             "gamma_last": 0.0013012250372030187,
             "temperature_K": 2023.15,
-            "hour": 16.0,
-            "window_K": 300.0,
+            "hour": null,
+            "window_K": null,
             "composition_single_cation": {
               "Al2O3": 0.15604505585659617,
               "CaO": 0.11559107880568734,
@@ -260436,15 +260428,15 @@
               "SiO2": 0.4364322744045626,
               "TiO2": 0.01106754151060354
             },
-            "composition_window_L1": 0.0,
+            "composition_window_L1": null,
             "coefficient_basis": "bulk_single_cation",
             "ln_gamma_last": -6.644449121924758
           },
           "Al2O3": {
             "gamma_last": 1.021226642595638,
             "temperature_K": 2023.15,
-            "hour": 16.0,
-            "window_K": 300.0,
+            "hour": null,
+            "window_K": null,
             "composition_single_cation": {
               "Al2O3": 0.15604505585659617,
               "CaO": 0.11559107880568734,
@@ -260455,15 +260447,15 @@
               "SiO2": 0.4364322744045626,
               "TiO2": 0.01106754151060354
             },
-            "composition_window_L1": 0.0,
+            "composition_window_L1": null,
             "coefficient_basis": "bulk_single_cation",
             "ln_gamma_last": 0.02100449554314125
           },
           "TiO2": {
             "gamma_last": 0.29961847560276184,
             "temperature_K": 2023.15,
-            "hour": 16.0,
-            "window_K": 300.0,
+            "hour": null,
+            "window_K": null,
             "composition_single_cation": {
               "Al2O3": 0.15604505585659617,
               "CaO": 0.11559107880568734,
@@ -260474,7 +260466,7 @@
               "SiO2": 0.4364322744045626,
               "TiO2": 0.01106754151060354
             },
-            "composition_window_L1": 0.0,
+            "composition_window_L1": null,
             "coefficient_basis": "bulk_single_cation",
             "ln_gamma_last": -1.205245361674478
           }
@@ -261109,8 +261101,6 @@
           "message": "Cr2O3 and MnO remain projected from the openimcc input, but do not count toward the shared 1.0 wt% gate"
         },
         "seam_max_abs_ratio_dex": 1.042593621895382,
-        "consecutive_refusal_count": 0,
-        "last_extrapolated_gamma_by_parent": {},
         "selected_parent_activities": {
           "Al2O3": 0.025394770890808445,
           "CaO": 0.00015041000581926756,
