@@ -50,19 +50,41 @@ def _sha256_file(path: Path) -> str:
     return _sha256_bytes(path.read_bytes())
 
 
-def _canonical_code(
-    code: CodeType, global_namespace: Mapping[str, Any] | None = None
-) -> dict[str, Any]:
-    """Fingerprint code instructions, equating literals with owned constants.
+def _global_writes(code: CodeType) -> frozenset[str]:
+    writes: set[str] = set()
+    pending = [code]
+    while pending:
+        current = pending.pop()
+        for instruction in dis.get_instructions(current):
+            if instruction.opname in {"STORE_GLOBAL", "DELETE_GLOBAL"}:
+                writes.add(instruction.argval)
+        pending.extend(
+            value for value in current.co_consts if isinstance(value, CodeType)
+        )
+    return frozenset(writes)
 
-    A module-level immutable numeric constant with the same value as a literal
-    produces identical results on every input. Only constants defined in
-    ``simulator.physical_constants`` receive this normalization, keeping the
-    proof relaxation narrow while allowing its owner module to replace a
-    duplicated numeric literal. Jump destinations are represented by
-    instruction index because inline cache slots shift byte offsets without
-    changing control flow.
+
+def _canonical_code(
+    code: CodeType,
+    global_namespace: Mapping[str, Any] | None = None,
+    written_globals: frozenset[str] | None = None,
+) -> dict[str, Any]:
+    """Fingerprint instructions, normalizing only stable owner globals.
+
+    This normalization is sound under four premises: (a) the instruction is
+    ``LOAD_GLOBAL``; (b) its name resolves in the function's globals to an
+    exact ``int`` or ``float`` exported under that same name by
+    ``simulator.physical_constants``; (c) no code object in the function's
+    nested code tree stores or deletes that global; and (d) the owner binding
+    is not rebound at runtime, as pinned by
+    ``tests/test_physical_constant_ownership.py``. Under these premises the
+    load yields the same numeric value as the literal on every input. The
+    exact finite evaluation grid is supporting evidence, not the proof of
+    equivalence. Jump destinations use instruction indexes because inline
+    cache slots shift byte offsets without changing control flow.
     """
+    if written_globals is None:
+        written_globals = _global_writes(code)
     physical_constants = sys.modules.get("simulator.physical_constants")
     physical_constant_names = (
         vars(physical_constants) if physical_constants is not None else {}
@@ -79,24 +101,32 @@ def _canonical_code(
             argument = ("TARGET", offset_to_index[argument])
 
         if instruction.opname == "LOAD_CONST":
-            instructions.append(("CONST", _canonical(argument, global_namespace)))
+            instructions.append(
+                ("CONST", _canonical(argument, global_namespace, written_globals))
+            )
             continue
 
         if (
-            instruction.opname in {"LOAD_GLOBAL", "LOAD_NAME"}
+            instruction.opname == "LOAD_GLOBAL"
             and global_namespace is not None
         ):
             name = instruction.argval
             value = global_namespace.get(name)
             if (
-                type(value) in (int, float)
+                name not in written_globals
+                and type(value) in (int, float)
                 and physical_constant_names.get(name) is value
             ):
-                instructions.append(("CONST", _canonical(value, global_namespace)))
+                instructions.append(
+                    ("CONST", _canonical(value, global_namespace, written_globals))
+                )
                 continue
 
         instructions.append(
-            (instruction.opname, _canonical(argument, global_namespace))
+            (
+                instruction.opname,
+                _canonical(argument, global_namespace, written_globals),
+            )
         )
 
     return {
@@ -114,7 +144,9 @@ def _canonical_code(
 
 
 def _canonical(
-    value: Any, global_namespace: Mapping[str, Any] | None = None
+    value: Any,
+    global_namespace: Mapping[str, Any] | None = None,
+    written_globals: frozenset[str] | None = None,
 ) -> Any:
     """Return an exact, JSON-safe representation of compiled values."""
 
@@ -129,13 +161,17 @@ def _canonical(
     if isinstance(value, float):
         return {"__float_hex__": value.hex()}
     if isinstance(value, CodeType):
-        return {"__code__": _canonical_code(value, global_namespace)}
+        return {
+            "__code__": _canonical_code(value, global_namespace, written_globals)
+        }
     if is_dataclass(value) and not isinstance(value, type):
         cls = type(value)
         return {
             "__dataclass__": f"{cls.__module__}.{cls.__qualname__}",
             "fields": {
-                field.name: _canonical(getattr(value, field.name), global_namespace)
+                field.name: _canonical(
+                    getattr(value, field.name), global_namespace, written_globals
+                )
                 for field in fields(value)
             },
         }
@@ -143,20 +179,28 @@ def _canonical(
         return {
             "__mapping__": [
                 [
-                    _canonical(key, global_namespace),
-                    _canonical(item, global_namespace),
+                    _canonical(key, global_namespace, written_globals),
+                    _canonical(item, global_namespace, written_globals),
                 ]
                 for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
             ]
         }
     if isinstance(value, tuple):
         return {
-            "__tuple__": [_canonical(item, global_namespace) for item in value]
+            "__tuple__": [
+                _canonical(item, global_namespace, written_globals) for item in value
+            ]
         }
     if isinstance(value, list):
-        return {"__list__": [_canonical(item, global_namespace) for item in value]}
+        return {
+            "__list__": [
+                _canonical(item, global_namespace, written_globals) for item in value
+            ]
+        }
     if isinstance(value, (set, frozenset)):
-        items = [_canonical(item, global_namespace) for item in value]
+        items = [
+            _canonical(item, global_namespace, written_globals) for item in value
+        ]
         items.sort(key=_canonical_json)
         return {"__set__": items, "frozen": isinstance(value, frozenset)}
     if isinstance(value, bytes):
@@ -170,11 +214,18 @@ def _canonical(
                 closure.append(_canonical(cell.cell_contents))
             except ValueError:
                 closure.append({"__empty_cell__": True})
+        written_globals = _global_writes(value.__code__)
         return {
             "__function__": f"{value.__module__}.{value.__qualname__}",
-            "code": _canonical_code(value.__code__, value.__globals__),
-            "defaults": _canonical(value.__defaults__, value.__globals__),
-            "kwdefaults": _canonical(value.__kwdefaults__, value.__globals__),
+            "code": _canonical_code(
+                value.__code__, value.__globals__, written_globals
+            ),
+            "defaults": _canonical(
+                value.__defaults__, value.__globals__, written_globals
+            ),
+            "kwdefaults": _canonical(
+                value.__kwdefaults__, value.__globals__, written_globals
+            ),
             "closure": closure,
         }
     raise TypeError(
