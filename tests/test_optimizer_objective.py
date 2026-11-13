@@ -1313,10 +1313,12 @@ def test_nonnegligible_refused_wall_species_uses_supply_bound_and_stays_ranked(
             }
         }
     }
+    measured = SimpleNamespace(species_kg_hr={"SiO": 0.25})
+    _stamp_flux_measured_rates(measured)
     execution.snapshots = (
         SimpleNamespace(
             duration_h=1.0,
-            evap_flux=SimpleNamespace(species_kg_hr={"SiO": 0.25}),
+            evap_flux=measured,
         ),
     )
     reference = _run_reference(
@@ -1773,6 +1775,48 @@ def _transport_refusal_channel(species: str) -> dict[str, object]:
     }
 
 
+def _stamp_measured_rate_operands(
+    channels: Mapping[str, object] | None,
+    rate_names: Mapping[str, object] | tuple | list,
+) -> dict[str, object]:
+    """Private parent for a measured rate that is not a stoich-gap fixture.
+
+    The supply-interval rows publish a computed kilogram. They do not
+    omit conservation operands on purpose. A computed carrier with
+    neither operand is a typed gap, so each of these rates names its
+    own oxide. That oxide is not shared with a refused carrier, and
+    the published kilogram stays the rate.
+    """
+
+    stamped = {
+        str(name): dict(record) if isinstance(record, Mapping) else record
+        for name, record in dict(channels or {}).items()
+    }
+    for name in rate_names:
+        species = str(name)
+        current = stamped.get(species)
+        record = dict(current) if isinstance(current, Mapping) else {}
+        record.setdefault("parent_oxide", f"_measured_{species}")
+        record.setdefault("stoich_oxide_per_vapor", 1.0)
+        stamped[species] = record
+    return stamped
+
+
+def _stamp_flux_measured_rates(flux: object) -> None:
+    """Stamp whatever rate map the supply integral will read."""
+
+    published = getattr(flux, "published_species_kg_hr", None)
+    fallback = getattr(flux, "species_kg_hr", None)
+    rates = published if isinstance(published, Mapping) else fallback
+    if not isinstance(rates, Mapping) or not rates:
+        return
+    channels = getattr(flux, "carrier_authority_by_species", None)
+    flux.carrier_authority_by_species = _stamp_measured_rate_operands(
+        channels if isinstance(channels, Mapping) else None,
+        rates,
+    )
+
+
 def _wall_bound_evap_flux(window: Mapping[str, object]) -> SimpleNamespace | None:
     if window.get("unavailable"):
         return None
@@ -1793,7 +1837,19 @@ def _wall_bound_evap_flux(window: Mapping[str, object]) -> SimpleNamespace | Non
     }
     for species in tuple(window.get("eligible_channels") or ()):
         channels[str(species)] = _eligible_channel_record(str(species))
-    if channels:
+    # The integral reads the published map when it is present, and the
+    # committed map otherwise. Stamp only that map. A committed-only
+    # carrier stays a refusal.
+    if published is not None:
+        rate_names = tuple(str(species) for species, _kg in published)
+    else:
+        rate_names = tuple(flux)
+    if rate_names:
+        fields["carrier_authority_by_species"] = _stamp_measured_rate_operands(
+            channels,
+            rate_names,
+        )
+    elif channels:
         fields["carrier_authority_by_species"] = channels
     interval_zero = window.get("interval_physical_zero")
     if interval_zero:
@@ -2644,7 +2700,15 @@ def _interval_flux_snapshot(
         fields["species_kg_hr"] = {
             species: float(rate) for species, rate in rates.items()
         }
-    if records:
+    # ``rates`` is the map the integral reads: the published argument
+    # when this hour publishes, otherwise species_kg_hr. A committed
+    # kilogram that is not in ``rates`` is not stamped.
+    if rates:
+        fields["carrier_authority_by_species"] = _stamp_measured_rate_operands(
+            records,
+            rates,
+        )
+    elif records:
         fields["carrier_authority_by_species"] = dict(records)
     if interval_physical_zero:
         fields["wall_supply_interval_physical_zero"] = {
@@ -3005,6 +3069,7 @@ def test_publisher_projection_keeps_every_computed_rate(
     )
     assert flux.species_kg_hr == projected.debit_kg_hr
     assert flux.published_species_kg_hr[species] == _approx_kg(expected_supply)
+    _stamp_flux_measured_rates(flux)
 
     bounds = _optimizer_refused_flux_bounds(
         (
@@ -3076,6 +3141,7 @@ def test_mixed_subthreshold_hours_book_the_full_integral() -> None:
             projected.supply_kg_hr,
             debit_kg_hr=projected.debit_kg_hr,
         )
+        _stamp_flux_measured_rates(flux)
         return flux
 
     snapshots = (
@@ -3172,6 +3238,7 @@ def test_subthreshold_supply_does_not_depend_on_species_order(order: tuple[str, 
         projected.supply_kg_hr,
         debit_kg_hr=projected.debit_kg_hr,
     )
+    _stamp_flux_measured_rates(flux)
     bounds = _optimizer_refused_flux_bounds(
         (SimpleNamespace(hour=1, duration_h=1.0, evap_flux=flux),),
         order,
@@ -3195,6 +3262,7 @@ def test_all_subthreshold_hours_still_return_a_supply_bound() -> None:
     )
     flux = SimpleNamespace(species_kg_hr={})
     publish_wall_supply_on_flux(flux, projected.supply_kg_hr)
+    _stamp_flux_measured_rates(flux)
     bounds = _optimizer_refused_flux_bounds(
         (
             SimpleNamespace(hour=1, duration_h=1.0, evap_flux=flux),
@@ -3406,6 +3474,23 @@ def _below_bound_zero_record(species: str) -> dict[str, object]:
     }
 
 
+def _catalog_sibling_flux(sibling: str) -> SimpleNamespace:
+    """Measured sibling rate beside a catalog ceiling.
+
+    The sibling is not the ceiling under test. It still publishes a
+    kilogram, so it names its own oxide. That oxide is not the
+    ceiling's parent, and the sibling kilogram stays the rate.
+    """
+
+    flux = SimpleNamespace(
+        published_species_kg_hr={sibling: _WALL_SUPPLY_SIBLING_KG_HR},
+        species_kg_hr={sibling: _WALL_SUPPLY_SIBLING_KG_HR},
+        melt_surface_area_m2=_CEILING_AREA_M2,
+    )
+    _stamp_flux_measured_rates(flux)
+    return flux
+
+
 def _supply_kind_snapshot(
     hour: int,
     species: str,
@@ -3501,11 +3586,7 @@ def _supply_kind_snapshot(
             inventory=SimpleNamespace(
                 melt_oxide_kg={_NONBINDING_PARENT_OXIDE: _NONBINDING_OXIDE_KG}
             ),
-            evap_flux=SimpleNamespace(
-                published_species_kg_hr={sibling: _WALL_SUPPLY_SIBLING_KG_HR},
-                species_kg_hr={sibling: _WALL_SUPPLY_SIBLING_KG_HR},
-                melt_surface_area_m2=_CEILING_AREA_M2,
-            ),
+            evap_flux=_catalog_sibling_flux(sibling),
         )
     else:
         raise AssertionError(kind)
@@ -3788,10 +3869,13 @@ def _activity_one_refusal_snapshot(
     # bound is the typed stoichiometry gap, which is a different test.
     record["parent_oxide"] = _NONBINDING_PARENT_OXIDE
     record["stoich_oxide_per_vapor"] = 1.0
+    # The subject already names its oxide. setdefault keeps that. A
+    # sibling rate on this hour is a measured kilogram, not a gap.
+    channels = _stamp_measured_rate_operands({species: record}, rates or ())
     fields: dict[str, object] = {
         "published_species_kg_hr": dict(rates or {}),
         "species_kg_hr": dict(rates or {}),
-        "carrier_authority_by_species": {species: record},
+        "carrier_authority_by_species": channels,
     }
     if area_m2 is not None:
         fields["melt_surface_area_m2"] = area_m2
@@ -4953,6 +5037,422 @@ def test_computed_ratio_without_parent_withholds_every_refused_sibling(
     assert mutated["K2O_gas"] == _approx_kg(1.0)
     assert mutated["Na2O_gas"] == _approx_kg(1.0)
     assert mutated["K2O_gas"] + k2_oxide > 1.0
+
+
+# Computed K2 is 0.4 kg/h. A stored ratio is 2 kg oxide per kg vapour,
+# so a reservable computed debit is 0.8 kg of the 1 kg K2O charge.
+# K2O_gas and Na2O_gas are stoich 1. The kinetic ceiling is the same
+# for every carrier and is above that charge.
+_OPERAND_COMPUTED_KG_HR = 0.4
+_OPERAND_SUBJECT_STOICH = 2.0
+_OPERAND_CHARGE_KG = 1.0
+_CONSERVATION_OPERAND_CASES = tuple(
+    (kind, operands, include_subject)
+    for kind in ("computed", "refused")
+    for operands in ("both", "parent_only", "ratio_only", "neither")
+    for include_subject in (True, False)
+)
+
+
+def _oracle_operand_publication(
+    *,
+    kind: str,
+    operands: str,
+    include_subject: bool,
+) -> dict[str, float | str]:
+    """Vapour kilograms, or the typed reason, for one operand cell.
+
+    Written from the conservation ruling. It does not walk hours, read
+    a snapshot, or call the allocator. The kinetic rates are equal and
+    above the charge, so a shared capped oxide splits as
+    ``charge / sum(stoich)`` kilograms of each vapour. A computed debit
+    that can name its oxide and its ratio is reserved first. A computed
+    carrier that names its parent and not its ratio blocks that parent
+    only. A computed carrier with a ratio and no parent, or with neither
+    operand, blocks every refused bound, whether or not the computed
+    carrier is itself in the requested set. A refused carrier's own gap
+    blocks only that carrier, and only when it is requested.
+    """
+
+    reason = MISSING_PARENT_OXIDE_STOICHIOMETRY
+    full = _OPERAND_CHARGE_KG
+    published: dict[str, float | str] = {}
+    if kind == "computed" and operands == "both":
+        reserved = _OPERAND_COMPUTED_KG_HR * _OPERAND_SUBJECT_STOICH
+        if include_subject:
+            published["K2"] = _OPERAND_COMPUTED_KG_HR
+        published["K2O_gas"] = full - reserved
+        published["Na2O_gas"] = full
+        return published
+    if kind == "computed" and operands == "parent_only":
+        if include_subject:
+            published["K2"] = reason
+        published["K2O_gas"] = reason
+        published["Na2O_gas"] = full
+        return published
+    if kind == "computed" and operands in {"ratio_only", "neither"}:
+        if include_subject:
+            published["K2"] = reason
+        published["K2O_gas"] = reason
+        published["Na2O_gas"] = reason
+        return published
+    if kind == "refused" and operands == "both":
+        if include_subject:
+            share = full / (_OPERAND_SUBJECT_STOICH + 1.0)
+            published["K2"] = share
+            published["K2O_gas"] = share
+        else:
+            published["K2O_gas"] = full
+        published["Na2O_gas"] = full
+        return published
+    if include_subject:
+        published["K2"] = reason
+    published["K2O_gas"] = full
+    published["Na2O_gas"] = full
+    return published
+
+
+def _oracle_operand_capped(
+    *,
+    kind: str,
+    operands: str,
+    published: Mapping[str, float | str],
+) -> dict[str, bool]:
+    """Refused masses under the kinetic ceiling are capped.
+
+    The computed subject, when both operands are present, is its
+    measured rate. It is not a refused bound. This does not read the
+    allocator's flag.
+    """
+
+    capped: dict[str, bool] = {}
+    for name, value in published.items():
+        if isinstance(value, str):
+            continue
+        if kind == "computed" and operands == "both" and name == "K2":
+            continue
+        capped[name] = True
+    return capped
+
+
+def _operand_presence_channel(
+    species: str,
+    operands: str,
+    *,
+    parent: str,
+    ratio: float,
+) -> dict[str, object]:
+    record = _transport_refusal_channel(species)
+    record["activity_one_psat_pa"] = _OXIDE_HK_PRESSURE_PA
+    record["molar_mass_kg_per_mol"] = _ACTIVITY_ONE_MASS_KG_PER_MOL
+    if operands in {"both", "parent_only"}:
+        record["parent_oxide"] = parent
+    if operands in {"both", "ratio_only"}:
+        record["stoich_oxide_per_vapor"] = ratio
+    return record
+
+
+def _operand_presence_snapshot(kind: str, operands: str) -> SimpleNamespace:
+    channels = {
+        "K2": _operand_presence_channel(
+            "K2",
+            operands,
+            parent="K2O",
+            ratio=_OPERAND_SUBJECT_STOICH,
+        ),
+        "K2O_gas": _operand_presence_channel(
+            "K2O_gas",
+            "both",
+            parent="K2O",
+            ratio=1.0,
+        ),
+        "Na2O_gas": _operand_presence_channel(
+            "Na2O_gas",
+            "both",
+            parent="Na2O",
+            ratio=1.0,
+        ),
+    }
+    rates = {"K2": _OPERAND_COMPUTED_KG_HR} if kind == "computed" else {}
+    return SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        inventory=SimpleNamespace(melt_oxide_kg={"K2O": 1.0, "Na2O": 1.0}),
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr=dict(rates),
+            species_kg_hr=dict(rates),
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species=channels,
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("kind", "operands", "include_subject"),
+    _CONSERVATION_OPERAND_CASES,
+    ids=[
+        f"{kind}-{operands}-subject-{included}"
+        for kind, operands, included in _CONSERVATION_OPERAND_CASES
+    ],
+)
+def test_conservation_operand_matrix_keeps_one_element_budget(
+    kind: str,
+    operands: str,
+    include_subject: bool,
+) -> None:
+    """Every missing operand is a typed gap, including both at once.
+
+    Computed and refused carriers cross both operands, parent only,
+    ratio only, and neither. The computed carrier is requested and
+    also left only in the rate map. K2O_gas shares K2O. Na2O_gas is
+    the other element. A computed K2 with neither operand must not
+    leave K2O_gas the whole 1 kg charge. Species order does not
+    change the kilograms.
+    """
+
+    assert _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA) > _OPERAND_CHARGE_KG
+    assert (
+        _OPERAND_COMPUTED_KG_HR * _OPERAND_SUBJECT_STOICH < _OPERAND_CHARGE_KG
+    )
+    expected = _oracle_operand_publication(
+        kind=kind,
+        operands=operands,
+        include_subject=include_subject,
+    )
+    capped = _oracle_operand_capped(
+        kind=kind,
+        operands=operands,
+        published=expected,
+    )
+    snapshot = _operand_presence_snapshot(kind, operands)
+    requested = (
+        ("K2", "K2O_gas", "Na2O_gas")
+        if include_subject
+        else ("K2O_gas", "Na2O_gas")
+    )
+    results = [
+        _optimizer_refused_flux_bounds((snapshot,), order)
+        for order in (requested, tuple(reversed(requested)))
+    ]
+    for bounds in results:
+        for name, value in expected.items():
+            if isinstance(value, str):
+                assert name not in bounds
+                assert bounds.supply_unavailable[name] == value
+            else:
+                assert bounds[name] == _approx_kg(value)
+        assert set(bounds) == {
+            name for name, value in expected.items() if not isinstance(value, str)
+        }
+        assert bounds.inventory_capped == capped
+    assert dict(results[0]) == dict(results[1])
+    assert results[0].supply_unavailable == results[1].supply_unavailable
+
+
+def test_skipping_an_unparented_computed_rate_respends_the_charge(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Dropping the unnamed-oxide flag gives the sibling the whole charge.
+
+    1 kg of K2O, computed K2 at 0.4 kg/h with neither operand, and a
+    fully described K2O_gas. The fixed integral withholds K2O_gas.
+    Clearing the flag is the old skip: K2O_gas receives 1 kg while the
+    computed potassium stays unreserved. Na2O_gas does the same.
+    """
+
+    snapshot = _operand_presence_snapshot("computed", "neither")
+    held = _optimizer_refused_flux_bounds(
+        (snapshot,),
+        ("K2", "K2O_gas", "Na2O_gas"),
+    )
+    assert "K2O_gas" not in held
+    assert held.supply_unavailable["K2O_gas"] == (
+        MISSING_PARENT_OXIDE_STOICHIOMETRY
+    )
+    real_draws = evaluate_module._computed_parent_oxide_draws
+
+    def drop_unattributed(snapshot_arg: object, catalog: object) -> object:
+        draw = real_draws(snapshot_arg, catalog)
+        return evaluate_module._ComputedOxideDraws(
+            draw.oxide_kg,
+            draw.missing_stoich_species,
+            draw.unreservable_parents,
+            False,
+        )
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_computed_parent_oxide_draws",
+        drop_unattributed,
+    )
+    mutated = _optimizer_refused_flux_bounds(
+        (snapshot,),
+        ("K2O_gas", "Na2O_gas"),
+    )
+    assert mutated["K2O_gas"] == _approx_kg(_OPERAND_CHARGE_KG)
+    assert mutated["Na2O_gas"] == _approx_kg(_OPERAND_CHARGE_KG)
+
+
+# A recorded 0.4 kg is not the composition's 1 kg. Empty is zero even
+# when that composition is also present.
+_INVENTORY_RECORDED_KG = 0.4
+_INVENTORY_COMPOSITION_KG = 1.0
+_INVENTORY_PRECEDENCE_CASES = tuple(
+    (inventory, composition)
+    for inventory in ("absent", "missing_key", "empty", "populated")
+    for composition in ("absent", "present")
+)
+
+
+def _oracle_inventory_charge(
+    inventory: str,
+    composition: str,
+) -> float | None:
+    """Charge kilograms, or None when no map was recorded.
+
+    A recorded mapping wins, including an empty one. Composition is
+    used only when the mapping is absent or the key is missing. This
+    does not read a snapshot.
+    """
+
+    if inventory == "populated":
+        return _INVENTORY_RECORDED_KG
+    if inventory == "empty":
+        return 0.0
+    if composition == "present":
+        return _INVENTORY_COMPOSITION_KG
+    return None
+
+
+def _inventory_precedence_snapshot(
+    inventory: str,
+    composition: str,
+) -> SimpleNamespace:
+    channel = _alkali_inventory_channel(
+        "K2O_gas",
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide="K2O",
+        stoich_oxide_per_vapor=1.0,
+    )
+    snapshot = SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={},
+            species_kg_hr={},
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={"K2O_gas": dict(channel)},
+        ),
+    )
+    if inventory == "empty":
+        snapshot.inventory = SimpleNamespace(melt_oxide_kg={})
+    elif inventory == "populated":
+        snapshot.inventory = SimpleNamespace(
+            melt_oxide_kg={"K2O": _INVENTORY_RECORDED_KG}
+        )
+    elif inventory == "missing_key":
+        snapshot.inventory = SimpleNamespace()
+    elif inventory != "absent":
+        raise AssertionError(inventory)
+    if composition == "present":
+        snapshot.melt_mass_kg = _INVENTORY_COMPOSITION_KG
+        snapshot.composition_wt_pct = {"K2O": 100.0}
+    return snapshot
+
+
+@pytest.mark.parametrize(
+    ("inventory", "composition"),
+    _INVENTORY_PRECEDENCE_CASES,
+    ids=[
+        f"{inventory}-{composition}"
+        for inventory, composition in _INVENTORY_PRECEDENCE_CASES
+    ],
+)
+def test_recorded_inventory_precedes_composition(
+    inventory: str,
+    composition: str,
+) -> None:
+    """An empty recorded melt stays empty when a composition is present.
+
+    Absent and missing-key inventories take the composition when it
+    exists, and are typed unavailable when it does not. A populated
+    map of 0.4 kg is not replaced by the composition's 1 kg. An empty
+    map books zero, not that 1 kg.
+    """
+
+    kinetic = _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA)
+    assert kinetic > _INVENTORY_COMPOSITION_KG
+    charge = _oracle_inventory_charge(inventory, composition)
+    bounds = _optimizer_refused_flux_bounds(
+        (_inventory_precedence_snapshot(inventory, composition),),
+        ("K2O_gas",),
+    )
+    if charge is None:
+        assert "K2O_gas" not in bounds
+        assert (
+            bounds.supply_unavailable["K2O_gas"]
+            == MISSING_PARENT_OXIDE_INVENTORY
+        )
+        return
+    if charge == 0.0:
+        assert bounds["K2O_gas"] == 0.0
+    else:
+        assert bounds["K2O_gas"] == _approx_kg(charge)
+    assert bounds["K2O_gas"] < kinetic
+    assert bounds.inventory_capped == {"K2O_gas": True}
+
+
+def test_empty_inventory_truthiness_lets_composition_fund_the_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Treating {} as missing turns the composition into a 1 kg budget.
+
+    The snapshot records an empty oxide map, melt mass 1 kg, and
+    100 percent K2O. The fixed reader books zero. The mutation is the
+    truthiness check: a falsy map falls through to the composition,
+    and K2O_gas receives 1 kg from a recorded empty charge.
+    """
+
+    snapshot = _inventory_precedence_snapshot("empty", "present")
+    held = _optimizer_refused_flux_bounds((snapshot,), ("K2O_gas",))
+    assert held["K2O_gas"] == 0.0
+
+    def composition_overrides_empty(snapshot_arg: object) -> dict[str, float] | None:
+        inventory = getattr(snapshot_arg, "inventory", None)
+        oxides = None
+        if isinstance(inventory, Mapping):
+            oxides = inventory.get("melt_oxide_kg")
+        elif inventory is not None:
+            oxides = getattr(inventory, "melt_oxide_kg", None)
+        if isinstance(oxides, Mapping) and oxides:
+            return {str(name): float(kg) for name, kg in oxides.items()}
+        composition = getattr(snapshot_arg, "composition_wt_pct", None)
+        mass = getattr(snapshot_arg, "melt_mass_kg", None)
+        if (
+            isinstance(composition, Mapping)
+            and composition
+            and isinstance(mass, int | float)
+            and not isinstance(mass, bool)
+            and float(mass) > 0.0
+        ):
+            return {
+                str(name): float(mass) * float(pct) / 100.0
+                for name, pct in composition.items()
+            }
+        if isinstance(oxides, Mapping):
+            return {}
+        return None
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_snapshot_oxide_inventory_kg",
+        composition_overrides_empty,
+    )
+    mutated = _optimizer_refused_flux_bounds((snapshot,), ("K2O_gas",))
+    assert mutated["K2O_gas"] == _approx_kg(_INVENTORY_COMPOSITION_KG)
+    assert mutated["K2O_gas"] > held["K2O_gas"]
 
 
 def _oracle_frozen_first_charge(
@@ -7680,6 +8180,7 @@ def test_zero_net_bucket_is_supply_zero_and_not_a_debit() -> None:
     assert "Na" not in projected.supply_kg_hr
     flux = SimpleNamespace(species_kg_hr=dict(projected.debit_kg_hr))
     publish_wall_supply_on_flux(flux, projected.supply_kg_hr)
+    _stamp_flux_measured_rates(flux)
     # Hour 1 publishes SiO only. Mg is absent and has no physical-zero
     # record, so the classifier withholds Mg (absent_no_record). The
     # 0.4 kg/h hour is not a partial supply (d-367).
@@ -9036,16 +9537,20 @@ def test_booked_refusal_keeps_furnace_price_when_coating_margin_rate_is_null(
 def test_tap_supply_bound_stops_at_the_tap_hour() -> None:
     """Later vapour is outside the tap-hour integral and does not raise it."""
 
+    early_flux = SimpleNamespace(species_kg_hr={"SiO": 0.25})
+    later_flux = SimpleNamespace(species_kg_hr={"SiO": 10.0})
+    _stamp_flux_measured_rates(early_flux)
+    _stamp_flux_measured_rates(later_flux)
     early = SimpleNamespace(
         hour=1,
         duration_h=1.0,
-        evap_flux=SimpleNamespace(species_kg_hr={"SiO": 0.25}),
+        evap_flux=early_flux,
         wall_deposit_by_segment_species_delta={("cold_wall", "SiO"): 0.1},
     )
     later = SimpleNamespace(
         hour=2,
         duration_h=1.0,
-        evap_flux=SimpleNamespace(species_kg_hr={"SiO": 10.0}),
+        evap_flux=later_flux,
         wall_deposit_by_segment_species_delta={},
     )
     execution, _snapshots, _deposit = _wall_bound_execution({

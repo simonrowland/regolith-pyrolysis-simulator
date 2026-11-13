@@ -3200,6 +3200,22 @@ def test_diverted_stage3_bypass_wall_deposit_is_scored_as_upstream() -> None:
     assert record["segment"] == "stage_3_bypass_to_stage_4"
 
 
+def _measured_carrier_flux(species: str, kg_hr: float) -> EvaporationFlux:
+    """Computed rate that names its own parent oxide.
+
+    The coating overlay treats this kilogram as supply. A carrier with
+    neither parent nor ratio is a typed conservation gap, so the fixture
+    names a private oxide and the published kilogram stays the rate.
+    """
+
+    flux = EvaporationFlux(species_kg_hr={species: kg_hr})
+    flux.carrier_authority_by_species[species] = {
+        "parent_oxide": f"_measured_{species}",
+        "stoich_oxide_per_vapor": 1.0,
+    }
+    return flux
+
+
 def test_optimizer_overlay_bounds_refused_wall_species_from_snapshot_flux() -> None:
     trace = _trace()
     trace.wall_deposit_sticking_authority = {
@@ -3209,7 +3225,7 @@ def test_optimizer_overlay_bounds_refused_wall_species_from_snapshot_flux() -> N
     }
     snapshot = _snapshot()
     snapshot.duration_h = 2.0
-    snapshot.evap_flux = EvaporationFlux(species_kg_hr={"CrO2": 2.0e-4})
+    snapshot.evap_flux = _measured_carrier_flux("CrO2", 2.0e-4)
     execution = _execution(trace=trace, snapshots=(snapshot,))
 
     overlay = evaluate_module._trace_with_optimizer_coating_report(
@@ -3260,7 +3276,7 @@ def test_optimizer_overlay_null_species_does_not_hide_behind_other_refusal() -> 
     }
     snapshot = _snapshot()
     snapshot.duration_h = 2.0
-    snapshot.evap_flux = EvaporationFlux(species_kg_hr={"CrO2": 1.0e-4})
+    snapshot.evap_flux = _measured_carrier_flux("CrO2", 1.0e-4)
     execution = _execution(trace=trace, snapshots=(snapshot,))
     overlay = evaluate_module._trace_with_optimizer_coating_report(
         execution,
@@ -3354,7 +3370,7 @@ def test_optimizer_overlay_null_refused_species_stays_flux_bounded() -> None:
     }
     snapshot = _snapshot()
     snapshot.duration_h = 2.0
-    snapshot.evap_flux = EvaporationFlux(species_kg_hr={"CrO2": 2.0e-4})
+    snapshot.evap_flux = _measured_carrier_flux("CrO2", 2.0e-4)
     execution = _execution(trace=trace, snapshots=(snapshot,))
     overlay = evaluate_module._trace_with_optimizer_coating_report(
         execution,
