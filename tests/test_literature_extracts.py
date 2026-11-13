@@ -5235,10 +5235,15 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # samples (re-derived with vle.fidelity_source_warnings over every extract; no other extract moved).
 # So uncovered observations 48661 -> 48664, uncovered extracts 616 -> 617, unattested 3128 -> 3131.
 # Not a fidelity regression.
+# b261 landing: the main join adds 67 extracts (782 -> 849). Re-derived with
+# vle.fidelity_source_warnings over every extract on the regen tree cf19376f3:
+# uncovered observations 48664 -> 50791, uncovered extracts 617 -> 639,
+# unattested 3131 -> 3385; pilot pins unchanged at 57. New extracts, not a
+# fidelity regression in existing ones.
 # Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 48664
-_UNCOVERED_EXTRACTS_CEILING = 617
-_UNATTESTED_SAMPLES_CEILING = 3131
+_UNCOVERED_OBSERVATIONS_CEILING = 50791
+_UNCOVERED_EXTRACTS_CEILING = 639
+_UNATTESTED_SAMPLES_CEILING = 3385
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.

@@ -17011,7 +17011,8 @@ def test_store_pyrolysis_yield_census_is_honest() -> None:
                 continue
             if rail_for_quantity(q, species_formula=formula) is Rail.PYROLYSIS_YIELD:
                 rows.append(obs)
-    assert len(rows) == 30
+    # b261: the main join adds kems-044-robinot-2026 o2_comparable_run_1p17.
+    assert len(rows) == 31
     tokens = {quantity_token(o.identity) for o in rows}
     assert Quantity.MASS_LOSS_FRACTION in tokens
     assert Quantity.YIELD_FRACTION in tokens

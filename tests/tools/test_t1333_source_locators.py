@@ -265,7 +265,7 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
 
 def test_extract_discovery_matches_migrator() -> None:
     extracts = _all_extracts()
-    assert len(extracts) == 782
+    assert len(extracts) == 849  # b261: main join adds 67 extracts
     assert extracts == discover_extracts(EXTRACTS_DIR)
 
 
