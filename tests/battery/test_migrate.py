@@ -595,6 +595,23 @@ def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
         assert {"temperature_K", "fO2_log"} <= set(
             observation.point_conditions
         )
+        from simulator.battery.residue import _printed_fm_definition
+
+        located = observation.point_conditions["fm_definition"]
+        definition, record = _printed_fm_definition(located)
+        assert definition == "concentration_retention"
+        assert record["concentration_basis"] == "mole_fraction_single_cation_oxide"
+        assert record["quote"] == (
+            "final concentration of the trace element divided by the initial concentration"
+        )
+        assert record["page"] == 201
+        assert (located.locator.page, located.locator.published_page) == (231, 201)
+        assert record["concentration_basis_quote"] == (
+            "concentration values are expressed as mole fraction single cation oxide"
+        )
+        assert record["concentration_basis_locator"] == {
+            "page": 232, "pdf_page_index": 231, "published_page": 202, "equation": "5.1",
+        }
 
 
 def test_identity_equal_transition_temperature_conflict_and_green_unknown(
