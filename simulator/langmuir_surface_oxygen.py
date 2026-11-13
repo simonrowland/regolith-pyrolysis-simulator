@@ -83,9 +83,15 @@ below 1e-12 kg or the alpha-1 baseline is at or below the
 nontrivial-flux threshold, so the persisted pressure would be that
 emission. A measured alpha of 0 emits no flux, so it is not a
 residual term, and its pressure is still the surface law. Nothing writes
-``0.0`` in place of a published pressure. Nothing drops a
-participating carrier's reaction oxygen demand because a cap zeroed
-the local slope. A condensed-metal rail never publishes above
+``0.0`` in place of a published pressure. A log-pressure the IEEE
+format can represent is that power, including below the old ``-300``
+cutoff: ``10**(-302.5) = 3.162277660168379e-303`` Pa is still a
+pressure. The scaled law and the condensed cap both realize the power
+through ``realize_log10_pressure_pa``. A log below the minimum
+positive float is that minimum, flagged
+``numerical_underflow_floor``. Overflow refuses the carrier. Nothing
+drops a participating carrier's reaction oxygen demand because a cap
+zeroed the local slope. A condensed-metal rail never publishes above
 ``P_sat``, including when the solve itself drives a subunit activity
 across 1.
 
@@ -176,7 +182,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from simulator.accounting.formulas import (
@@ -230,6 +236,9 @@ class LangmuirSurfaceOxygen:
     capacity_negligible: bool = False
     eval_pO2_below_physical_floor: bool = False
     overhead_bounded: bool = False
+    # Species whose published pressure is the IEEE floor, not a computed
+    # power. Empty when every published log-pressure was representable.
+    pressure_continuations: Mapping[str, str] = field(default_factory=dict)
 
     def as_diagnostic(self) -> dict[str, Any]:
         return {
@@ -247,6 +256,7 @@ class LangmuirSurfaceOxygen:
                 self.eval_pO2_below_physical_floor
             ),
             "overhead_bounded": self.overhead_bounded,
+            "pressure_continuations": dict(self.pressure_continuations),
         }
 
 
@@ -902,27 +912,53 @@ def _parent_oxygen_demand(oxygen_atoms: float, exponent: float) -> float:
     return oxygen_atoms - 2.0 * exponent
 
 
+def _surface_log_pressure(log_p: float) -> tuple[float, str | None]:
+    """Realize ``10**log_p`` Pa. Both surface laws call only this.
+
+    d-367. A representable power is that pressure. The old cutoff
+    ``log_p < -300`` returned 0.0, and the flux publisher then recorded
+    a computed zero (``P_eq <= 0``). ``10**(-302.5)`` Pa is
+    representable and is published. A finite log below the minimum
+    positive float is the catalog floor, flagged
+    ``numerical_underflow_floor``. A non-finite log, or a log above the
+    largest finite float, raises: an infinite drive is a typed refusal,
+    not a ceiling pressure. Finite endpoints are
+    ``realize_log10_pressure_pa``.
+    """
+
+    from simulator.vapour_rail.catalog import realize_log10_pressure_pa
+
+    if not math.isfinite(log_p):
+        raise ValueError("langmuir pressure law overflowed")
+    pressure, status = realize_log10_pressure_pa(log_p)
+    if (
+        status == "numerical_overflow_ceiling"
+        or not math.isfinite(pressure)
+        or pressure <= 0.0
+    ):
+        raise ValueError("langmuir pressure law overflowed")
+    return pressure, status
+
+
 def _scaled_pressure_Pa(
     pressure_Pa: float,
     exponent: float,
     p_ref_bar: float,
     surface_pO2_bar: float,
-) -> float:
+) -> tuple[float, str | None]:
     if exponent == 0.0 or surface_pO2_bar == p_ref_bar:
-        return pressure_Pa
+        return pressure_Pa, None
     # log10(P) = log10(P_pub) + n * log10(p / p_ref). Log space keeps a
     # floor pressure of 1e18 Pa from overflowing before the ratio is applied.
     log_p = math.log10(pressure_Pa) + exponent * math.log10(
         surface_pO2_bar / p_ref_bar
     )
-    if not math.isfinite(log_p) or log_p > 300.0:
-        raise ValueError("langmuir pressure law overflowed")
-    if log_p < -300.0:
-        return 0.0
-    return 10.0 ** log_p
+    return _surface_log_pressure(log_p)
 
 
-def _capped_pressure_Pa(carrier: _Carrier, surface_pO2_bar: float) -> float:
+def _capped_pressure_Pa(
+    carrier: _Carrier, surface_pO2_bar: float
+) -> tuple[float, str | None]:
     """Condensed-metal pressure, capped at P_sat until the activity uncapped.
 
     ``P = P_sat`` while ``raw*(p/p_ref)^n >= 1``. Above that pO2,
@@ -943,17 +979,20 @@ def _capped_pressure_Pa(carrier: _Carrier, surface_pO2_bar: float) -> float:
         * math.log10(surface_pO2_bar / carrier.p_ref_bar)
     )
     if log_raw >= 0.0:
-        return carrier.cap_psat_Pa
+        return carrier.cap_psat_Pa, None
     log_p = math.log10(carrier.cap_psat_Pa) + log_raw
-    if not math.isfinite(log_p) or log_p > 300.0:
-        raise ValueError("langmuir pressure law overflowed")
-    if log_p < -300.0:
-        return 0.0
-    return 10.0 ** log_p
+    return _surface_log_pressure(log_p)
 
 
-def _pressure_at_surface(carrier: _Carrier, surface_pO2_bar: float) -> float:
-    """Melt-surface pressure law. Transport carriers never reach this."""
+def _pressure_at_surface(
+    carrier: _Carrier, surface_pO2_bar: float
+) -> tuple[float, str | None]:
+    """Melt-surface pressure law. Transport carriers never reach this.
+
+    The second value is ``numerical_underflow_floor`` when the power
+    is below the IEEE minimum, otherwise None. Callers publish the
+    pressure and keep the flag. A zero is not a result of this law.
+    """
 
     if carrier.cap_psat_Pa is not None and carrier.raw_activity is not None:
         return _capped_pressure_Pa(carrier, surface_pO2_bar)
@@ -1142,8 +1181,11 @@ def _solve_net_surface_balance(
     channels: list[Any],
     *,
     law: Mapping[str, tuple[float, float]],
-) -> Any:
+) -> tuple[Any, dict[str, str]]:
     """Root of the publisher net-flux balance, cap included.
+
+    The second value maps species to ``numerical_underflow_floor`` for
+    pressures the root itself published below the IEEE minimum.
 
     ``law[species]`` is ``(k, bulk)`` with ``J = k*max(0, P - bulk)``
     in mol m^-2 s^-1. ``k`` already contains alpha and gas resistance.
@@ -1175,6 +1217,9 @@ def _solve_net_surface_balance(
 
     by_species = {carrier.species: carrier for carrier in coupled}
     low, high = _surface_balance_log10_bracket()
+    # Rebuilt on every probe. The copy taken after the root call is the
+    # published set. Intermediate bracket probes are not notices.
+    published_continuations: dict[str, str] = {}
 
     def parts(
         logp: float,
@@ -1184,13 +1229,18 @@ def _solve_net_surface_balance(
         parent = 0.0
         pressures: dict[str, float] = {}
         fluxes: dict[str, float] = {}
+        published_continuations.clear()
         for channel in channels:
             carrier = by_species.get(channel.species)
             if carrier is None:
                 pressure = surface * PA_PER_BAR
             else:
-                pressure = _pressure_at_surface(carrier, surface)
-            if not math.isfinite(pressure) or pressure < 0.0:
+                pressure, continuation = _pressure_at_surface(carrier, surface)
+                if continuation:
+                    published_continuations[channel.species] = continuation
+            # A non-positive pressure is not a surface law result. Publishing
+            # it would be the silent zero the cutoff used to write (d-367).
+            if not math.isfinite(pressure) or pressure <= 0.0:
                 raise ValueError(
                     f"pressure law returned invalid {channel.species!r} pressure"
                 )
@@ -1245,7 +1295,7 @@ def _solve_net_surface_balance(
 
     residual, pressures, oxygen, parent, fluxes = parts(root)
     relative = abs(residual) / max(oxygen, parent, 1.0e-300)
-    return _VacuumOxygenBalance(
+    balance = _VacuumOxygenBalance(
         pO2_bar=10.0 ** root,
         bracket_boundary=bracket,
         pressures_Pa=pressures,
@@ -1257,6 +1307,7 @@ def _solve_net_surface_balance(
             channel.species: channel.alpha_source for channel in channels
         },
     )
+    return balance, dict(published_continuations)
 
 
 def _solve_or_refuse(
@@ -1442,7 +1493,7 @@ def _solve_or_refuse(
                 temperature_K=temperature_K,
                 transport=transport,
             )
-        balance = _solve_net_surface_balance(
+        balance, continuations = _solve_net_surface_balance(
             coupled,
             channels,
             law=law,
@@ -1513,9 +1564,14 @@ def _solve_or_refuse(
         if carrier.species in refused:
             continue
         try:
-            solved_Pa[carrier.species] = _pressure_at_surface(
+            pressure, continuation = _pressure_at_surface(
                 carrier, surface_pO2_bar
             )
+            if not math.isfinite(pressure) or pressure <= 0.0:
+                raise ValueError("langmuir pressure law returned a non-positive pressure")
+            solved_Pa[carrier.species] = pressure
+            if continuation:
+                continuations[carrier.species] = continuation
         except ValueError as exc:
             refused[carrier.species] = (
                 "surface pressure omitted: " + str(exc)
@@ -1527,6 +1583,11 @@ def _solve_or_refuse(
         refused=refused,
         detail="open-gate carrier was not on the solved surface",
     )
+    continuations = {
+        species: status
+        for species, status in continuations.items()
+        if species in adjusted
+    }
     warning = (
         f"{LANGMUIR_SURFACE_PO2_REASON}: "
         f"surface_pO2_bar={surface_pO2_bar:.6e} "
@@ -1536,6 +1597,11 @@ def _solve_or_refuse(
         warning += f" overhead_pO2_bar={physical_o2_Pa / PA_PER_BAR:.6e}"
     if refused:
         warning += " refused=" + ",".join(sorted(refused))
+    if continuations:
+        warning += (
+            " numerical_underflow_floor="
+            + ",".join(sorted(continuations))
+        )
     return LangmuirSurfaceOxygen(
         pressures_Pa=adjusted,
         applied=True,
@@ -1547,6 +1613,7 @@ def _solve_or_refuse(
         capacity_negligible=capacity_negligible,
         eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
         overhead_bounded=overhead_bounded,
+        pressure_continuations=dict(continuations),
     )
 
 

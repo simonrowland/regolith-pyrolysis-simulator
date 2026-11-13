@@ -918,6 +918,34 @@ class _ReferencePressureModel:
         )
 
 
+def realize_log10_pressure_pa(log10_pressure: float) -> tuple[float, str | None]:
+    """Map ``log10(P/Pa)`` onto a finite positive pressure.
+
+    Representable powers are bit-for-bit ``10**log10_pressure``. A log
+    below ``log10`` of the minimum positive float returns that minimum
+    and ``numerical_underflow_floor``: activity depletion can drive a
+    trace carrier under the IEEE range, and substituting 0 would be a
+    silent zero (d-367). A log above ``log10`` of the largest finite
+    float returns that ceiling and ``numerical_overflow_ceiling``, so
+    the escape direction stays finite. A non-finite power that is
+    neither clamp is returned unchanged; the caller refuses it. Units
+    remain Pa. The Langmuir surface laws call this same function. Their
+    overflow disposition is a typed refusal rather than the ceiling.
+    """
+
+    minimum_positive_pa = math.nextafter(0.0, math.inf)
+    maximum_finite_pa = math.nextafter(sys.float_info.max, 0.0)
+    # Premise: P = 10**log10(P) Pa. Compare the log to the endpoint logs
+    # so a representable power is never replaced. Sanity: log10 = -302.5
+    # is 3.162277660168379e-303 Pa, above the ~5e-324 Pa minimum, and is
+    # returned unchanged. log10 = -330 is the minimum, flagged.
+    if log10_pressure < math.log10(minimum_positive_pa):
+        return minimum_positive_pa, "numerical_underflow_floor"
+    if log10_pressure > math.log10(maximum_finite_pa):
+        return maximum_finite_pa, "numerical_overflow_ceiling"
+    return 10.0**log10_pressure, None
+
+
 @dataclass(frozen=True)
 class CompiledPressureEvaluator:
     """One immutable pressure path shared by evaporation and condensation.
@@ -1101,25 +1129,11 @@ class CompiledPressureEvaluator:
                         f"evaluation failed: {exc}"
                     ) from exc
 
-        # A finite continued log-pressure can lie outside IEEE-754's representable
-        # pressure interval: activity depletion drives trace carriers below the
-        # minimum, while far-above-window Stage-0 correlations can exceed the
-        # maximum. Premise: P=10^logP Pa. Clamp only at the numerical endpoints so
-        # the first case never invents zero and the second retains the limiting
-        # escape direction without returning inf. Units remain Pa. Sanity: every
-        # representable pressure is bit-for-bit unchanged; both cases remain typed
-        # non-certifying continuations.
-        minimum_positive_pa = math.nextafter(0.0, math.inf)
-        maximum_finite_pa = math.nextafter(sys.float_info.max, 0.0)
-        numerical_underflow = log10_pressure < math.log10(minimum_positive_pa)
-        numerical_overflow = log10_pressure > math.log10(maximum_finite_pa)
-        pressure_pa = (
-            minimum_positive_pa
-            if numerical_underflow
-            else maximum_finite_pa
-            if numerical_overflow
-            else 10.0**log10_pressure
-        )
+        # Endpoint policy lives in realize_log10_pressure_pa. Out-of-range
+        # thermo status still wins over the numerical continuation flag.
+        pressure_pa, numerical_status = realize_log10_pressure_pa(log10_pressure)
+        numerical_underflow = numerical_status == "numerical_underflow_floor"
+        numerical_overflow = numerical_status == "numerical_overflow_ceiling"
         if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
             raise CatalogCompileError(
                 f"{self.species_id}: evaluator produced invalid pressure"
