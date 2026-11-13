@@ -3296,8 +3296,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         temperature_C: float,
         pressure_kbar: float,
         fO2_log: float,
+        capture_native_activities: bool = False,
     ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
-        """Build the canonical MAGEMin argv and resolved buffer values."""
+        """Build MAGEMin argv, optionally requesting native activities."""
         if self._binary_path is None:
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
         binary_path = self._binary_path.resolve()
@@ -3318,6 +3319,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             f'--buffer={buffer_name}',
             f'--buffer_n={buffer_n:.6f}',
         ]
+        if capture_native_activities:
+            args = [
+                '--Verb=1' if item == '--Verb=0' else item
+                for item in args
+            ]
+            args.append('--out_matlab=1')
         return args, buffer_name, buffer_n, tuple(buffer_warnings)
 
     def _call_magemin_subprocess(
@@ -3358,6 +3365,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
+                capture_native_activities=capture_native_activities,
             )
         )
         solved_fO2_log: Optional[float]
@@ -3390,14 +3398,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status_reason': 'clamped_operating_point',
             })
 
-        if capture_native_activities:
-            # Same argv owner as the Verb=0 golden. Native activities only
-            # raise verbosity and request the matlab dump the parser reads.
-            args = [
-                '--Verb=1' if item == '--Verb=0' else item
-                for item in args
-            ]
-            args.append('--out_matlab=1')
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
         if call_timeout_s is None:
             timeout_s = configured_timeout_s

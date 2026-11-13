@@ -7255,11 +7255,13 @@ def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> Non
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
 
+    subset_residuals = tuple(
+        (tmp_path / "data" / "battery" / "subsets").glob("*/residuals.jsonl")
+    )
+    assert len(subset_residuals) == 1
     wrapper_rows = tuple(
         json.loads(line)
-        for line in (tmp_path / "data" / "battery" / "residuals.jsonl")
-        .read_text(encoding="utf-8")
-        .splitlines()
+        for line in subset_residuals[0].read_text(encoding="utf-8").splitlines()
         if line.strip()
     )
     wrapper_records = tuple(
@@ -10027,10 +10029,11 @@ def test_hashimoto_integrator_preserves_failure_reason_for_scorer(
     assert prediction.execution.state.value == expected_state
     assert prediction.refusal_reason.value == expected_refusal
     if failure_kind in {"timeout", "transport"}:
-        assert ("kems-015-hashimoto-1983", Engine.OPENIMCC) in cache
-        assert "__cohort_error__" not in cache[
-            ("kems-015-hashimoto-1983", Engine.OPENIMCC)
-        ]
+        cached_cohort = score._residue_prediction_cache_entry(
+            cache, "kems-015-hashimoto-1983", Engine.OPENIMCC
+        )
+        assert cached_cohort is not None
+        assert "__cohort_error__" not in cached_cohort
 
 
 def test_residue_area_is_not_identity_but_per_area_rate_still_requires_it() -> None:
@@ -10881,8 +10884,9 @@ def _count_work_input_lookups(
 def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A scoring snapshot reuses a shared parent without changing decisions."""
+    """One bound snapshot serves four resolutions and preserves residual bytes."""
 
+    import simulator.battery.score as score_module
     from simulator.battery.records import Derivation
     from simulator.battery.validate import (
         _resolve_coefficient_sources,
@@ -10941,6 +10945,7 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
         (work.work_id,), observations, works, experiments
     )
     assert baseline.complete and baseline.ids is not None
+    single_resolution_lookups = observations.lineage_lookups
     for _ in range(3):
         assert (
             _resolve_coefficient_sources(
@@ -10949,6 +10954,11 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
             == baseline
         )
     uncached_lookups = observations.lineage_lookups
+    assert single_resolution_lookups > 0
+    # Each unbound call builds its own validation index and walks the four-row
+    # derivation chain. No index is shared between these calls, so all four
+    # repeats pay one full resolution each.
+    assert uncached_lookups == 4 * single_resolution_lookups
 
     observations.lineage_lookups = 0
     context = replace(
@@ -10972,6 +10982,16 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
         residual_without_cache, candidate_without_cache
     )
 
+    score_index_builds = [0]
+    original_build_validation_indexes = score_module._build_validation_indexes
+
+    def count_score_index_builds(*args, **kwargs):
+        score_index_builds[0] += 1
+        return original_build_validation_indexes(*args, **kwargs)
+
+    monkeypatch.setattr(
+        score_module, "_build_validation_indexes", count_score_index_builds
+    )
     work_expansions, registered_lookup_walks = _count_work_input_lookups(monkeypatch)
     observations.lineage_lookups = 0
     with bound_work_inputs(works, observations, experiments):
@@ -10982,6 +11002,7 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
             for _ in range(4)
         ]
         index_lookups = observations.lineage_lookups
+        score_index_builds_before_compile = score_index_builds[0]
         assert work_expansions[0] == 1
         registered_lookup_walks.clear()
         residual_with_cache, candidate_with_cache = compile_residual(
@@ -10991,19 +11012,22 @@ def test_bound_lineage_cache_preserves_ancestry_and_residual_bytes(
             prediction=prediction,
             comparison_ids={reference.observation_id},
         )
+        score_index_builds_after_compile = score_index_builds[0]
         work_expansions_after_compile = work_expansions[0]
-        cached_lookups = observations.lineage_lookups
 
     assert cached_results == [baseline] * 4
-    assert uncached_lookups == 40
-    assert index_lookups == 10
-    assert index_lookups < uncached_lookups
+    # Binding eagerly builds the same one-work snapshot index used by one
+    # unbound resolution. Its source-lineage memo makes the next three calls
+    # free, so the bound four-pack costs exactly one resolution.
+    assert index_lookups == single_resolution_lookups
     assert work_expansions_after_compile == 1
-    assert len(registered_lookup_walks) == 2
-    assert all(
-        walks == 0 and complete for walks, complete in registered_lookup_walks
-    )
-    assert cached_lookups >= index_lookups
+    # The compiled residual reuses that already complete source lineage. It
+    # does not repeat a registered-input walk or rebuild the scorer index.
+    assert registered_lookup_walks == []
+    assert score_index_builds_before_compile == 0
+    assert score_index_builds_after_compile == 0
+    assert residual_without_cache.source_relation is SourceRelation.SAME_INPUT
+    assert residual_with_cache.source_relation is SourceRelation.SAME_INPUT
     assert dumps_residual_line(
         residual_with_cache, candidate_with_cache
     ) == residual_line_without_cache
@@ -11136,13 +11160,16 @@ def test_nasa9_comparisons_reuse_one_work_lineage_index(
         for item in comparisons
     )
     assert work_expansions[0] == 1
-    assert len(registered_lookup_walks) == 4
+    # The first comparison resolves the work's registered inputs; the shared
+    # snapshot memo serves the second comparison without another registered
+    # lookup. Two references still each get their own ancestry classification.
+    assert len(registered_lookup_walks) == 1
     assert all(
         walks == 0 and complete for walks, complete in registered_lookup_walks
     )
-    # Two source-root walks build the index; the two remaining walks are the
-    # per-comparison reference ancestry checks. Work aliases are cache hits.
-    assert observations.lineage_lookups == 4
+    # Building that index reads each of the two fixture observations once;
+    # both comparison lookups then hit its memoized lineages.
+    assert observations.lineage_lookups == len(rows)
 
 
 def _alias_fixture(prefix: str):
@@ -13201,9 +13228,20 @@ def test_battery_failed_rerun_preserves_published_output_set(
     )
     context = _context(work, experiment, *references)
     root = tmp_path / "rerun-root"
-    battery = root / "data" / "battery"
+    battery_root = root / "data" / "battery"
+    battery_root.mkdir(parents=True)
+    (battery_root / "pins.yaml").touch()
+    filters = battery_score._scoring_filter_record(
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=None,
+        work_id=None,
+        limit=None,
+        species_formulas=(),
+    )
+    battery = battery_score._scoring_output_directory(
+        root, filters, subset=True
+    )
     battery.mkdir(parents=True)
-    (battery / "pins.yaml").touch()
     paths = {
         "residuals": battery / "residuals.jsonl",
         "summary": battery / "score-summary.json",
@@ -13254,8 +13292,13 @@ def test_battery_failed_rerun_preserves_published_output_set(
     if failure_stage == "summary":
         original_write_summary = battery_score._write_headline_summary_from_accumulator_json
 
-        def write_then_fail(aggregate, path, *, store_stamp):
-            original_write_summary(aggregate, path, store_stamp=store_stamp)
+        def write_then_fail(aggregate, path, *, store_stamp, **summary_options):
+            original_write_summary(
+                aggregate,
+                path,
+                store_stamp=store_stamp,
+                **summary_options,
+            )
             raise RuntimeError("injected summary stop")
 
         monkeypatch.setattr(
@@ -13441,6 +13484,16 @@ def test_battery_normal_report_includes_fit_comparison_stratum(
     context = _context(work, experiment, reference)
     root = tmp_path / "normal-report-root"
     (root / "data" / "battery").mkdir(parents=True)
+    filters = battery_score._scoring_filter_record(
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=None,
+        work_id=None,
+        limit=1,
+        species_formulas=(),
+    )
+    output_directory = battery_score._scoring_output_directory(
+        root, filters, subset=True
+    )
     stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
     monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
     monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
@@ -13448,9 +13501,21 @@ def test_battery_normal_report_includes_fit_comparison_stratum(
     monkeypatch.setattr(battery_score, "emit_store_stamp_mismatch_warning", lambda *_: None)
     monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
 
-    def write_fit_rows(_context, path, *, engines, invoke_pure_phase):
+    def write_fit_rows(
+        _context,
+        path,
+        *,
+        engines,
+        invoke_pure_phase,
+        work_id=None,
+        rail=None,
+        observation_filter=None,
+    ):
         assert engines == (Engine.INTERNAL_ANALYTICAL,)
         assert invoke_pure_phase is True
+        assert work_id is None
+        assert rail is None
+        assert observation_filter is None
         path.write_text(
             json.dumps(
                 {
@@ -13487,13 +13552,13 @@ def test_battery_normal_report_includes_fit_comparison_stratum(
         )
         == 0
     )
-    report = (root / "data" / "battery" / "score-report.md").read_text(
+    report = (output_directory / "score-report.md").read_text(
         encoding="utf-8"
     )
     assert "## NASA-9 fit comparison stratum" in report
     assert "| internal-analytical | cp | 1 | 1 | 0 |" in report
     residual_rows = score_mod.load_residuals_jsonl(
-        root / "data" / "battery" / "residuals.jsonl"
+        output_directory / "residuals.jsonl"
     )
     assert not any(
         "nasa9_fit" in str(row.get("source_relation")) for row in residual_rows
