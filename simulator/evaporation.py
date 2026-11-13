@@ -429,6 +429,44 @@ def evaporation_flux_for_campaign_hour(
     return flux
 
 
+# Dynamic attribute, not an EvaporationFlux field. The snapshot inventory
+# is copied after evaporation has already debited the melt. This map is
+# the parent-oxide inventory at the start of the hour, before that debit.
+PRE_EVAPORATION_MELT_OXIDE_KG_ATTR = "pre_evaporation_melt_oxide_kg"
+
+
+def note_pre_evaporation_melt_oxide_kg(host: Any) -> None:
+    """Remember the melt oxides before this hour's evaporation debit.
+
+    ``_update_melt_composition`` projects the ledger after the debit.
+    The snapshot then stores that remainder. The wall-supply charge is
+    this earlier map, not the remainder. A missing inventory is left
+    unset so the allocator does not invent a zero charge.
+    """
+
+    inventory = getattr(host, "inventory", None)
+    raw = getattr(inventory, "melt_oxide_kg", None)
+    if not isinstance(raw, Mapping):
+        host._pre_evaporation_melt_oxide_kg = None
+        return
+    host._pre_evaporation_melt_oxide_kg = {
+        str(oxide): kg for oxide, kg in raw.items()
+    }
+
+
+def attach_pre_evaporation_melt_oxide_kg(flux: Any, host: Any) -> None:
+    """Copy the pre-evaporation oxide map onto the flux the snapshot keeps.
+
+    Condensation may replace the flux object after the note. The host
+    holds the map; this writes it onto whatever flux is stored.
+    """
+
+    raw = getattr(host, "_pre_evaporation_melt_oxide_kg", None)
+    if not isinstance(raw, Mapping):
+        return
+    setattr(flux, PRE_EVAPORATION_MELT_OXIDE_KG_ATTR, dict(raw))
+
+
 def attach_wall_supply_interval_physical_zero(flux: Any, host: Any) -> None:
     """Copy the hour's interval zero onto the flux the snapshot keeps."""
 

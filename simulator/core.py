@@ -672,8 +672,10 @@ from simulator.evaporation import (
     EvaporationMixin,
     _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
     attach_evaluated_transport_pO2,
+    attach_pre_evaporation_melt_oxide_kg,
     attach_wall_supply_interval_physical_zero,
     evaporation_flux_for_campaign_hour,
+    note_pre_evaporation_melt_oxide_kg,
     pressure_vapour_evaluation_consumed,
     publish_wall_supply_on_flux,
     remember_evaluated_transport_pO2,
@@ -15936,6 +15938,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # the interval physical zero, so the empty map is not a gap.
         self._wall_supply_computed_kg_hr = {}
         self._wall_supply_interval_physical_zero = None
+        self._pre_evaporation_melt_oxide_kg = None
         evap_flux = evaporation_flux_for_campaign_hour(
             evaporation_campaign=evaporation_campaign,
             host=self,
@@ -16090,7 +16093,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._pending_knudsen_zero_overhead_flow_marker = None
 
         # --- 6. Update melt composition ---
-        # Subtract evaporated mass from the melt.
+        # Subtract evaporated mass from the melt. The note is the
+        # pre-debit inventory; the projection that follows is the
+        # remainder the snapshot copies.
+        note_pre_evaporation_melt_oxide_kg(self)
         self._update_melt_composition(evap_flux)
         self._settle_evaporative_redox_after_batch()
 
@@ -16302,7 +16308,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         attach_wall_supply_interval_physical_zero(evap_flux, self)
         # After the bleed refresh. The reservoir on the snapshot is the
         # later oxygen state; this copies the pressure vapour evaluation
-        # consumed.
+        # consumed. The oxide map was noted before the evaporation
+        # projection, so the remainder on the snapshot is not the charge.
+        attach_pre_evaporation_melt_oxide_kg(evap_flux, self)
         attach_evaluated_transport_pO2(evap_flux, self)
         publish_wall_supply_on_flux(
             evap_flux,

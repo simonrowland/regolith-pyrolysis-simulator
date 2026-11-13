@@ -3,6 +3,7 @@ from __future__ import annotations
 import inspect
 import math
 from dataclasses import replace
+from itertools import permutations
 from types import MethodType, SimpleNamespace
 from typing import Mapping
 
@@ -40,6 +41,7 @@ import simulator.optimize.evaluate as evaluate_module
 from simulator.optimize.evaluate import (
     INVENTORY_CAPPED,
     MISSING_PARENT_OXIDE_INVENTORY,
+    MISSING_PARENT_OXIDE_STOICHIOMETRY,
     SUPPLY_INTERVAL_UPPER_BOUND_USED,
     SUPPLY_UNAVAILABLE,
     RunReference,
@@ -3874,8 +3876,13 @@ def test_refused_interval_contributes_the_activity_one_bound() -> None:
 
 # Sanity value from the parent-oxide debit. M(K) = 39.0983 g/mol and
 # M(K2O) = 94.1956 g/mol, so 1 kg of K2O is 0.8301513021839662 kg of K.
+# M(Na) = 22.98976928 g/mol and M(O) = 15.999 g/mol, so M(Na2O) is
+# 61.97853856 g/mol and 1 kg of Na2O is that oxide over 2 M(Na) of Na.
 _K_SANITY_OXIDE_PER_VAPOUR = 94.1956 / (2.0 * 39.0983)
 _K_SANITY_ELEMENT_FRACTION = (2.0 * 39.0983) / 94.1956
+_NA_SANITY_OXIDE_PER_VAPOUR = (2.0 * 22.98976928 + 15.999) / (
+    2.0 * 22.98976928
+)
 
 
 def _alkali_inventory_channel(
@@ -4071,12 +4078,13 @@ def test_shared_k_budget_never_exceeds_the_charge_potassium() -> None:
     }
 
 
-# Invariant. Computed vapour and refused upper bounds that share a parent
-# oxide spend that oxide once. The charge is the first recorded inventory.
-# D is the oxide-equivalent of every computed rate in the window. At a
-# refused interval whose snapshot still holds S, with B already allocated:
-# available = min(S, max(0, C - D)) - B, floored at 0. The oracle below
-# is that sentence. It does not call the supply integral or its helpers.
+# Invariant. For each parent oxide, computed debits plus refused bounds
+# stay within the inventory at the start of the window. That start is
+# ``window_start_kg`` when the first snapshot is already post-debit, and
+# the first interval's recorded inventory otherwise. The oracle is the
+# closed form D + min(R, max(0, C - D)), split by kinetic oxide demand.
+# It does not walk intervals subtracting a running balance, and it does
+# not call the supply integral or its helpers.
 _OXIDE_HK_PRESSURE_PA = 10.0
 _OXIDE_HK_R_J_MOL_K = 8.314462618
 
@@ -4091,68 +4099,58 @@ def _oracle_hk_kg_hr(pressure_pa: float) -> float:
     return pressure_pa * coefficient * _ACTIVITY_ONE_AREA_M2 * 3600.0
 
 
-def _oracle_shared_oxide_vapour(case: Mapping[str, object]) -> dict[str, float]:
-    """Allocate one parent-oxide charge from the invariant above."""
+def _oracle_window_start_kg(case: Mapping[str, object]) -> dict[str, float]:
+    """Window-start oxide, named by the case. Not reconstructed."""
 
-    stoich = dict(case["stoich"])
-    parent_of = dict(case["parent"])
-    charge: dict[str, float] = {}
-    computed_oxide: dict[str, float] = {}
-    computed_vapour = {name: 0.0 for name in stoich}
-    refused_vapour = {name: 0.0 for name in stoich}
-    refused_groups: list[tuple[Mapping[str, float], list[tuple[str, float, float, str]]]] = []
+    named = case.get("window_start_kg")
+    if isinstance(named, Mapping):
+        return {str(oxide): float(kg) for oxide, kg in named.items()}
+    inventory = case["intervals"][0]["inventory"]
+    return {str(oxide): float(kg) for oxide, kg in inventory.items()}
+
+
+def _oracle_shared_oxide_vapour(case: Mapping[str, object]) -> dict[str, float]:
+    """Closed-form split of one window-start charge.
+
+    C is the window-start oxide. D is every computed rate times its
+    stoich. R is every refused kinetic ceiling times its stoich. The
+    booked oxide is D + min(R, max(0, C - D)). Carriers of one oxide
+    split the refused part in proportion to kinetic oxide demand.
+    Interval order and the snapshot remainder are not inputs.
+    """
+
+    stoich = {str(name): float(ratio) for name, ratio in case["stoich"].items()}
+    parent_of = {str(name): str(oxide) for name, oxide in case["parent"].items()}
+    charge = _oracle_window_start_kg(case)
+    computed = {name: 0.0 for name in stoich}
+    refused_kinetic = {name: 0.0 for name in stoich}
     for interval in case["intervals"]:
-        inventory = dict(interval["inventory"])
-        for oxide, kg in inventory.items():
-            if oxide not in charge:
-                charge[oxide] = float(kg)
-        group: list[tuple[str, float, float, str]] = []
         duration_h = float(interval["duration_h"])
-        for name, pressure in interval["refused_pressure_pa"].items():
-            vapour = _oracle_hk_kg_hr(float(pressure)) * duration_h
-            group.append((name, vapour, float(stoich[name]), parent_of[name]))
-        refused_groups.append((inventory, group))
         for name, rate in interval["computed"].items():
-            vapour = float(rate) * duration_h
-            computed_vapour[name] += vapour
-            parent = parent_of[name]
-            computed_oxide[parent] = (
-                computed_oxide.get(parent, 0.0) + vapour * float(stoich[name])
+            computed[str(name)] += float(rate) * duration_h
+        for name, pressure in interval["refused_pressure_pa"].items():
+            refused_kinetic[str(name)] += (
+                _oracle_hk_kg_hr(float(pressure)) * duration_h
             )
-    booked = {oxide: 0.0 for oxide in charge}
-    for inventory, group in refused_groups:
-        by_parent: dict[str, list[tuple[str, float, float]]] = {}
-        for name, vapour, ratio, parent in group:
-            by_parent.setdefault(parent, []).append((name, vapour, ratio))
-        for parent, rows in by_parent.items():
-            snapshot_kg = float(inventory.get(parent, 0.0))
-            ceiling = charge.get(parent, snapshot_kg) - computed_oxide.get(parent, 0.0)
-            if ceiling < 0.0:
-                ceiling = 0.0
-            available = min(snapshot_kg, ceiling) - booked.get(parent, 0.0)
-            if available < 0.0:
-                available = 0.0
-            demands = [
-                (name, vapour * ratio, ratio) for name, vapour, ratio in rows
-            ]
-            total = sum(demand for _name, demand, _ratio in demands)
-            if total <= 0.0:
-                continue
-            if total <= available or math.isclose(
-                total, available, rel_tol=1e-12, abs_tol=1e-15
-            ):
-                scale = 1.0
-            else:
-                scale = available / total
-            used = 0.0
-            for name, demand, ratio in demands:
-                allocated = demand * scale
-                used += allocated
-                refused_vapour[name] += allocated / ratio
-            booked[parent] = booked.get(parent, 0.0) + used
-    return {
-        name: computed_vapour[name] + refused_vapour[name] for name in stoich
-    }
+    vapour = dict(computed)
+    for parent in set(parent_of.values()):
+        names = [name for name, oxide in parent_of.items() if oxide == parent]
+        spent = sum(computed[name] * stoich[name] for name in names)
+        demands = {
+            name: refused_kinetic[name] * stoich[name]
+            for name in names
+            if refused_kinetic[name] > 0.0
+        }
+        kinetic_oxide = sum(demands.values())
+        room = float(charge.get(parent, 0.0)) - spent
+        if room < 0.0:
+            room = 0.0
+        refused_oxide = kinetic_oxide if kinetic_oxide < room else room
+        if kinetic_oxide <= 0.0:
+            continue
+        for name, demand in demands.items():
+            vapour[name] += (demand / kinetic_oxide) * refused_oxide / stoich[name]
+    return vapour
 
 
 def _shared_oxide_snapshots(case: Mapping[str, object]) -> tuple[SimpleNamespace, ...]:
@@ -4174,6 +4172,15 @@ def _shared_oxide_snapshots(case: Mapping[str, object]) -> tuple[SimpleNamespace
             if name in refused:
                 continue
             rates[name] = float(computed.get(name, 0.0))
+        flux = SimpleNamespace(
+            published_species_kg_hr=rates,
+            species_kg_hr=dict(rates),
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species=channels,
+        )
+        pre = interval.get("pre_evaporation_kg")
+        if isinstance(pre, Mapping):
+            flux.pre_evaporation_melt_oxide_kg = dict(pre)
         built.append(
             SimpleNamespace(
                 hour=index,
@@ -4182,12 +4189,7 @@ def _shared_oxide_snapshots(case: Mapping[str, object]) -> tuple[SimpleNamespace
                 inventory=SimpleNamespace(
                     melt_oxide_kg=dict(interval["inventory"])
                 ),
-                evap_flux=SimpleNamespace(
-                    published_species_kg_hr=rates,
-                    species_kg_hr=dict(rates),
-                    melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
-                    carrier_authority_by_species=channels,
-                ),
+                evap_flux=flux,
             )
         )
     return tuple(built)
@@ -4457,6 +4459,32 @@ _SHARED_OXIDE_CASES = (
             },
         ),
     },
+    {
+        # The first snapshot is already the post-debit remainder. The
+        # undepleted charge lives on the pre-evaporation map, not on
+        # that remainder. 1 kg at the start, 0.4 kg computed, 0.6 kg left.
+        "name": "first_snapshot_is_post_debit",
+        "stoich": {"K2O_gas": 1.0},
+        "parent": {"K2O_gas": "K2O"},
+        "capped": ("K2O_gas",),
+        "mutation_exceeds": (),
+        "window_start_kg": {"K2O": 1.0},
+        "intervals": (
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 0.6},
+                "pre_evaporation_kg": {"K2O": 1.0},
+                "computed": {"K2O_gas": 0.4},
+                "refused_pressure_pa": {},
+            },
+            {
+                "duration_h": 1.0,
+                "inventory": {"K2O": 0.6},
+                "computed": {},
+                "refused_pressure_pa": {"K2O_gas": _OXIDE_HK_PRESSURE_PA},
+            },
+        ),
+    },
 )
 
 
@@ -4499,24 +4527,428 @@ def test_computed_parent_oxide_is_reserved_before_refused_bounds(
         for name, mass_kg in oracle.items():
             assert bounds[name] == _approx_kg(mass_kg)
         assert bounds.inventory_capped == {name: True for name in case["capped"]}
+        window_start = _oracle_window_start_kg(case)
         for parent in set(case["parent"].values()):
             assert _parent_oxide_kg(bounds, case, parent) <= (
-                float(case["intervals"][0]["inventory"].get(parent, 0.0)) + 1e-12
+                float(window_start.get(parent, 0.0)) + 1e-12
             )
     monkeypatch.setattr(
         evaluate_module,
         "_computed_parent_oxide_draws",
-        lambda *args, **kwargs: {},
+        lambda *args, **kwargs: evaluate_module._empty_oxide_draws(),
     )
     for order in orders:
         mutated = _optimizer_refused_flux_bounds(snapshots, order)
         if case["mutation_exceeds"]:
+            window_start = _oracle_window_start_kg(case)
             for parent in case["mutation_exceeds"]:
-                charge = float(case["intervals"][0]["inventory"][parent])
+                charge = float(window_start[parent])
                 assert _parent_oxide_kg(mutated, case, parent) > charge
         else:
             for name, mass_kg in oracle.items():
                 assert mutated[name] == _approx_kg(mass_kg)
+
+
+def test_first_post_debit_snapshot_keeps_the_pre_evaporation_charge(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """1 kg at the start, 0.4 kg computed, 0.6 kg still in the melt.
+
+    Production copies the snapshot after evaporation, so the first melt
+    map is already the 0.6 kg remainder. The refused hour must receive
+    that 0.6 kg. Treating the remainder as the charge and subtracting
+    the 0.4 kg debit again leaves 0.2 kg. Dropping the pre-evaporation
+    map is that defect.
+    """
+
+    assert _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA) > 1.0
+    channel = _alkali_inventory_channel(
+        "K2O_gas",
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide="K2O",
+        stoich_oxide_per_vapor=1.0,
+    )
+    first = SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        inventory=SimpleNamespace(melt_oxide_kg={"K2O": 0.6}),
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={"K2O_gas": 0.4},
+            species_kg_hr={"K2O_gas": 0.4},
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={"K2O_gas": dict(channel)},
+            pre_evaporation_melt_oxide_kg={"K2O": 1.0},
+        ),
+    )
+    second = SimpleNamespace(
+        hour=2,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        inventory=SimpleNamespace(melt_oxide_kg={"K2O": 0.6}),
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={},
+            species_kg_hr={},
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={"K2O_gas": dict(channel)},
+        ),
+    )
+    bounds = _optimizer_refused_flux_bounds((first, second), ("K2O_gas",))
+    assert bounds["K2O_gas"] == _approx_kg(1.0)
+    assert bounds["K2O_gas"] - 0.4 == _approx_kg(0.6)
+    assert bounds["K2O_gas"] < 0.4 + _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA)
+    assert bounds.inventory_capped == {"K2O_gas": True}
+    monkeypatch.setattr(
+        evaluate_module,
+        "_pre_evaporation_oxide_kg",
+        lambda _snapshot: None,
+    )
+    stripped = _optimizer_refused_flux_bounds((first, second), ("K2O_gas",))
+    assert stripped["K2O_gas"] == _approx_kg(0.6)
+    assert stripped["K2O_gas"] - 0.4 == _approx_kg(0.2)
+
+
+def test_missing_vapour_stoichiometry_does_not_publish_the_kinetic_ceiling() -> None:
+    """A parent without a ratio, or a ratio without a parent, is not a mass.
+
+    K2 from K2O has no elemental fallback. The refused ceiling is above
+    the 1 kg charge, and publishing it would spend more oxide than the
+    melt held. Elemental K on the same melt still uses the owner's
+    ratio and books that 1 kg. A stored ratio with the parent removed
+    is the same typed gap, and it does not take K's budget.
+    """
+
+    host = EvaporationMixin.__new__(EvaporationMixin)
+    host.species_formula_registry = {}
+    owned = host._evaporation_stoich("K", {"parent_oxide": "K2O"})
+    owner_ratio = float(owned["oxide_per_product_kg"])
+    assert owner_ratio == pytest.approx(_K_SANITY_OXIDE_PER_VAPOUR, rel=1e-12)
+    kinetic = _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA)
+    assert kinetic > 1.0
+    charge = 1.0
+    k2 = _alkali_inventory_channel(
+        "K2",
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide="K2O",
+        stoich_oxide_per_vapor=None,
+    )
+    metal = _alkali_inventory_channel(
+        "K",
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide="K2O",
+        stoich_oxide_per_vapor=None,
+    )
+    snapshot = SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        inventory=SimpleNamespace(melt_oxide_kg={"K2O": charge}),
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={},
+            species_kg_hr={},
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={"K2": k2, "K": metal},
+        ),
+    )
+    for order in (("K2", "K"), ("K", "K2")):
+        bounds = _optimizer_refused_flux_bounds((snapshot,), order)
+        assert "K2" not in bounds
+        assert bounds.supply_unavailable["K2"] == (
+            MISSING_PARENT_OXIDE_STOICHIOMETRY
+        )
+        assert bounds["K"] == _approx_kg(charge / owner_ratio)
+        assert bounds["K"] * owner_ratio == _approx_kg(charge)
+        assert bounds["K"] < kinetic
+        assert bounds.inventory_capped == {"K": True}
+    ratio_without_parent = dict(k2)
+    ratio_without_parent["stoich_oxide_per_vapor"] = 2.0
+    del ratio_without_parent["parent_oxide"]
+    gap = SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        inventory=SimpleNamespace(melt_oxide_kg={"K2O": charge}),
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={},
+            species_kg_hr={},
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={
+                "K2": ratio_without_parent,
+                "K": dict(metal),
+            },
+        ),
+    )
+    bounds = _optimizer_refused_flux_bounds((gap,), ("K2", "K"))
+    assert "K2" not in bounds
+    assert bounds.supply_unavailable["K2"] == MISSING_PARENT_OXIDE_STOICHIOMETRY
+    assert bounds["K"] * owner_ratio == _approx_kg(charge)
+    assert bounds["K"] < kinetic
+
+
+def test_computed_missing_stoichiometry_withholds_the_parent() -> None:
+    """A computed K2 rate with no ratio makes K2O unreservable.
+
+    The 0.4 kg/h rate is a real debit whose oxide mass cannot be named.
+    Booking the refused K2O_gas at the 1 kg charge would spend that
+    oxide with the debit left out. Both carriers are typed unavailable.
+    """
+
+    assert _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA) > 1.0
+    k2 = _alkali_inventory_channel(
+        "K2",
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide="K2O",
+        stoich_oxide_per_vapor=None,
+    )
+    k2o = _alkali_inventory_channel(
+        "K2O_gas",
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide="K2O",
+        stoich_oxide_per_vapor=1.0,
+    )
+    snapshot = SimpleNamespace(
+        hour=1,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        inventory=SimpleNamespace(melt_oxide_kg={"K2O": 1.0}),
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr={"K2": 0.4},
+            species_kg_hr={"K2": 0.4},
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={"K2": k2, "K2O_gas": k2o},
+        ),
+    )
+    for order in (("K2", "K2O_gas"), ("K2O_gas", "K2")):
+        bounds = _optimizer_refused_flux_bounds((snapshot,), order)
+        assert "K2" not in bounds
+        assert "K2O_gas" not in bounds
+        assert bounds.supply_unavailable["K2"] == (
+            MISSING_PARENT_OXIDE_STOICHIOMETRY
+        )
+        assert bounds.supply_unavailable["K2O_gas"] == (
+            MISSING_PARENT_OXIDE_STOICHIOMETRY
+        )
+        assert bounds.inventory_capped == {}
+
+
+# Withheld oxide-gas debit on the computed hour. The metals stay refused
+# on every hour. 0.20 and 0.10 are kilograms of vapour; the oxide-gas
+# stoich is 1, so they are also kilograms of oxide.
+_ELEMENT_COMPUTED_K2O_GAS_KG = 0.20
+_ELEMENT_COMPUTED_NA2O_GAS_KG = 0.10
+_ELEMENT_CHARGE_KG = {"K2O": 1.0, "Na2O": 1.0}
+_ELEMENT_CARRIERS = ("K2O_gas", "K2", "K", "Na2O_gas", "Na2", "Na")
+_ELEMENT_INTERVAL_ORDERS = tuple(
+    permutations(("computed", "refused", "withheld"))
+)
+_ELEMENT_WINDOWS = tuple(
+    (mode, order)
+    for mode in ("pre_debit", "post_debit")
+    for order in _ELEMENT_INTERVAL_ORDERS
+)
+
+
+def _oracle_element_vapour_kg() -> dict[str, float]:
+    """Closed form for one K budget and one Na budget.
+
+    The withheld computed debit is 0.20 kg of K2O and 0.10 kg of Na2O.
+    What remains of the 1 kg charge is split between the elemental metal
+    and the dimer. Those two carriers have the same kinetic rate, so
+    each vapour mass is ``remainder / (element_stoich + dimer_stoich)``.
+    Interval order, the snapshot remainder, and species order are not
+    inputs. This does not walk hours or subtract a running balance.
+    """
+
+    k_room = _ELEMENT_CHARGE_KG["K2O"] - _ELEMENT_COMPUTED_K2O_GAS_KG
+    na_room = _ELEMENT_CHARGE_KG["Na2O"] - _ELEMENT_COMPUTED_NA2O_GAS_KG
+    k_vapour = k_room / (_K_SANITY_OXIDE_PER_VAPOUR + 2.0)
+    na_vapour = na_room / (_NA_SANITY_OXIDE_PER_VAPOUR + 2.0)
+    return {"K": k_vapour, "K2": k_vapour, "Na": na_vapour, "Na2": na_vapour}
+
+
+def _element_budget_snapshots(
+    mode: str,
+    order: tuple[str, ...],
+) -> tuple[SimpleNamespace, ...]:
+    """One window. The first post-debit snapshot carries the start charge."""
+
+    charge = dict(_ELEMENT_CHARGE_KG)
+    final = {
+        "K2O": charge["K2O"] - _ELEMENT_COMPUTED_K2O_GAS_KG,
+        "Na2O": charge["Na2O"] - _ELEMENT_COMPUTED_NA2O_GAS_KG,
+    }
+    built: list[SimpleNamespace] = []
+    for index, kind in enumerate(order, start=1):
+        rates: dict[str, float] = {}
+        hour_debit = {"K2O": 0.0, "Na2O": 0.0}
+        if kind == "computed":
+            rates = {
+                "K2O_gas": _ELEMENT_COMPUTED_K2O_GAS_KG,
+                "Na2O_gas": _ELEMENT_COMPUTED_NA2O_GAS_KG,
+            }
+            hour_debit = {
+                "K2O": _ELEMENT_COMPUTED_K2O_GAS_KG,
+                "Na2O": _ELEMENT_COMPUTED_NA2O_GAS_KG,
+            }
+        channels: dict[str, dict[str, object]] = {}
+        for species, parent, stoich in (
+            ("K2O_gas", "K2O", 1.0),
+            ("K2", "K2O", 2.0),
+            ("K", "K2O", None),
+            ("Na2O_gas", "Na2O", 1.0),
+            ("Na2", "Na2O", 2.0),
+            ("Na", "Na2O", None),
+        ):
+            record = _alkali_inventory_channel(
+                species,
+                pressure_pa=_OXIDE_HK_PRESSURE_PA,
+                parent_oxide=parent,
+                stoich_oxide_per_vapor=stoich,
+            )
+            if kind != "computed" and species.endswith("_gas"):
+                record["activity_one_psat_pa"] = None
+            channels[species] = record
+        if mode == "pre_debit":
+            recorded = dict(charge)
+            pre = None
+        elif index == 1:
+            recorded = {
+                oxide: charge[oxide] - hour_debit[oxide] for oxide in charge
+            }
+            pre = dict(charge)
+        else:
+            recorded = dict(final)
+            pre = None
+        flux = SimpleNamespace(
+            published_species_kg_hr=dict(rates),
+            species_kg_hr=dict(rates),
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species=channels,
+        )
+        if pre is not None:
+            flux.pre_evaporation_melt_oxide_kg = pre
+        built.append(
+            SimpleNamespace(
+                hour=index,
+                duration_h=1.0,
+                temperature_C=_ACTIVITY_ONE_T_C,
+                inventory=SimpleNamespace(melt_oxide_kg=recorded),
+                evap_flux=flux,
+            )
+        )
+    return tuple(built)
+
+
+@pytest.mark.parametrize(
+    ("mode", "order"),
+    _ELEMENT_WINDOWS,
+    ids=[
+        f"{mode}-" + "-".join(order) for mode, order in _ELEMENT_WINDOWS
+    ],
+)
+def test_shared_element_mass_stays_inside_the_pre_evaporation_charge(
+    mode: str,
+    order: tuple[str, ...],
+) -> None:
+    """K and Na each have one charge, shared by every carrier.
+
+    Computed, refused, and withheld hours run in every order. The first
+    snapshot is either the pre-evaporation charge or the post-debit
+    remainder with that charge stored beside it. K2O_gas, K2, and K
+    share K2O. Na2O_gas, Na2, and Na share Na2O. The oxide gases are
+    withheld after a computed debit, and that debit stays in the sum.
+    The expected vapour is the closed form above, not a running balance.
+    """
+
+    host = EvaporationMixin.__new__(EvaporationMixin)
+    host.species_formula_registry = {}
+    owned_k = host._evaporation_stoich("K", {"parent_oxide": "K2O"})
+    owned_na = host._evaporation_stoich("Na", {"parent_oxide": "Na2O"})
+    assert float(owned_k["oxide_per_product_kg"]) == pytest.approx(
+        _K_SANITY_OXIDE_PER_VAPOUR,
+        rel=1e-12,
+    )
+    assert float(owned_na["oxide_per_product_kg"]) == pytest.approx(
+        _NA_SANITY_OXIDE_PER_VAPOUR,
+        rel=1e-12,
+    )
+    assert _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA) > 1.0
+    expected = _oracle_element_vapour_kg()
+    snapshots = _element_budget_snapshots(mode, order)
+    species_orders = (_ELEMENT_CARRIERS, tuple(reversed(_ELEMENT_CARRIERS)))
+    results = [
+        _optimizer_refused_flux_bounds(snapshots, species_order)
+        for species_order in species_orders
+    ]
+    for bounds in results:
+        assert "K2O_gas" not in bounds
+        assert "Na2O_gas" not in bounds
+        for name, mass_kg in expected.items():
+            assert bounds[name] == _approx_kg(mass_kg)
+        potassium_oxide = (
+            bounds["K"] * _K_SANITY_OXIDE_PER_VAPOUR
+            + bounds["K2"] * 2.0
+            + _ELEMENT_COMPUTED_K2O_GAS_KG
+        )
+        sodium_oxide = (
+            bounds["Na"] * _NA_SANITY_OXIDE_PER_VAPOUR
+            + bounds["Na2"] * 2.0
+            + _ELEMENT_COMPUTED_NA2O_GAS_KG
+        )
+        assert potassium_oxide == _approx_kg(_ELEMENT_CHARGE_KG["K2O"])
+        assert sodium_oxide == _approx_kg(_ELEMENT_CHARGE_KG["Na2O"])
+        assert bounds.inventory_capped == {
+            "K": True,
+            "K2": True,
+            "Na": True,
+            "Na2": True,
+        }
+    assert dict(results[0]) == dict(results[1])
+
+
+def test_stripping_the_pre_evaporation_map_understates_a_leading_debit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Without the pre-evaporation map the first remainder becomes the charge.
+
+    Computed hour first, then refused, then withheld. The snapshot shows
+    0.80 kg of K2O after the 0.20 kg debit. Subtracting that debit again
+    leaves 0.60 kg for the metals. The withheld 0.20 kg is still real, so
+    the element sum is 0.80 kg against a 1 kg charge.
+    """
+
+    order = ("computed", "refused", "withheld")
+    snapshots = _element_budget_snapshots("post_debit", order)
+    species_orders = (_ELEMENT_CARRIERS, tuple(reversed(_ELEMENT_CARRIERS)))
+    for species_order in species_orders:
+        held = _optimizer_refused_flux_bounds(snapshots, species_order)
+        held_oxide = (
+            held["K"] * _K_SANITY_OXIDE_PER_VAPOUR
+            + held["K2"] * 2.0
+            + _ELEMENT_COMPUTED_K2O_GAS_KG
+        )
+        assert held_oxide == _approx_kg(1.0)
+    monkeypatch.setattr(
+        evaluate_module,
+        "_pre_evaporation_oxide_kg",
+        lambda _snapshot: None,
+    )
+    for species_order in species_orders:
+        stripped = _optimizer_refused_flux_bounds(snapshots, species_order)
+        refused_oxide = (
+            stripped["K"] * _K_SANITY_OXIDE_PER_VAPOUR + stripped["K2"] * 2.0
+        )
+        element_oxide = refused_oxide + _ELEMENT_COMPUTED_K2O_GAS_KG
+        assert refused_oxide == _approx_kg(0.60)
+        assert element_oxide == _approx_kg(0.80)
+        assert element_oxide < 1.0
+        sodium_oxide = (
+            stripped["Na"] * _NA_SANITY_OXIDE_PER_VAPOUR
+            + stripped["Na2"] * 2.0
+            + _ELEMENT_COMPUTED_NA2O_GAS_KG
+        )
+        assert sodium_oxide == _approx_kg(0.90)
+        assert sodium_oxide < 1.0
 
 
 # Invariant. For one parent oxide, the oxide-equivalent of every computed
@@ -5020,7 +5452,7 @@ def test_dropping_a_withheld_computed_debit_respends_the_charge(
     monkeypatch.setattr(
         evaluate_module,
         "_computed_parent_oxide_draws",
-        lambda *args, **kwargs: {},
+        lambda *args, **kwargs: evaluate_module._empty_oxide_draws(),
     )
     bounds = _optimizer_refused_flux_bounds(
         _withheld_k2o_gas_snapshots(),
@@ -7310,6 +7742,24 @@ def test_wall_supply_map_has_one_writer() -> None:
     assert "publish_wall_supply_on_flux(" in hour
     evaporation_text = inspect.getsource(inspect.getmodule(publish_wall_supply_on_flux))
     assert evaporation_text.count("published_species_kg_hr =") == 1
+
+
+def test_pre_evaporation_oxide_is_noted_before_the_snapshot_remainder() -> None:
+    """The snapshot inventory is the post-debit remainder.
+
+    The note runs before the evaporation projection. The attach runs
+    after condensation may have replaced the flux, and before the
+    snapshot stores that flux. The hour-start clear is not the note.
+    """
+
+    hour = inspect.getsource(PyrolysisSimulator._step_one_hour)
+    pause = hour.index("if self.paused_for_decision:")
+    clear = hour.index("self._pre_evaporation_melt_oxide_kg = None")
+    note = hour.index("note_pre_evaporation_melt_oxide_kg(")
+    update = hour.index("_update_melt_composition(")
+    attach = hour.index("attach_pre_evaporation_melt_oxide_kg(")
+    stored = hour.index("snapshot.evap_flux = evap_flux")
+    assert pause < clear < note < update < attach < stored
 
 
 def test_refused_supply_is_booked_on_the_segment_that_maximises_binding_load(
