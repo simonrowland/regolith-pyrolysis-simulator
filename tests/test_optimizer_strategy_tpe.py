@@ -47,7 +47,6 @@ from simulator.optimize.strategy.bayesian import (
     _BAD_MAXIMIZE_VALUE,
     _BAD_MINIMIZE_VALUE,
     _resolve_n_startup_trials,
-    objective_values_for_executed_spec,
     _CONSTRAINT_NAMES_ATTR,
     _CANDIDATE_ID_ATTR,
     _CONSTRAINT_VALUES_ATTR,
@@ -71,6 +70,48 @@ PROFILE = {
     ]
 }
 PATH = ("campaigns", "C0", "dT_dt_C_per_hr")
+# Product-class masses the engine stores on the run summary. The tell
+# assertion reads these fields itself. Energy, duration, and the SSO-2
+# score are not class masses; those raw values stay on the objective vector.
+_ENGINE_PRODUCT_CLASS_PATHS = {
+    "oxygen_kg": ("metals_plus_O2", "O2_kg"),
+    "metals_total_kg": ("metals_plus_O2", "metals_total_kg"),
+    "pure_silica_glass_kg": ("pure_silica_glass", "class_total_kg"),
+    "industrial_mixed_glass_kg": ("industrial_mixed_glass", "class_total_kg"),
+}
+
+
+def _engine_raw_for_told_objective(metric: str, result) -> float:
+    """Raw objective from engine evidence, not from the tell helper."""
+
+    summary = result.run_reference.product_summary
+    path = _ENGINE_PRODUCT_CLASS_PATHS.get(metric)
+    if path is not None:
+        node = summary["product_classes"]
+        for key in path:
+            node = node[key]
+        return float(node)
+    value = result.objectives.as_mapping()[metric]
+    if value is None:
+        raise AssertionError(f"{metric} has no engine value")
+    return float(value)
+
+
+def _told_native_value(raw: float, sense: str, cost_factor: float) -> float:
+    """Value in the objective's own direction.
+
+    Maximize divides by the furnace factor. Minimize multiplies. A factor
+    of 1 is the raw metric, which is what an infeasible run is told when
+    the engine summary has no available furnace record. This does not call
+    the strategy helper. That helper reaches the same figure by negating
+    minimize objectives twice.
+    """
+
+    if sense == "maximize":
+        return raw / cost_factor
+    if sense == "minimize":
+        return raw * cost_factor
+    raise AssertionError(f"unsupported objective sense {sense!r}")
 
 
 def _available_run_reference(
@@ -800,19 +841,51 @@ def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> No
 
     strategy.tell(list(zip(candidates, results, strict=True)))
     trials = _trials_by_candidate(strategy)
+    # Coordinate order is the study's declared list. The numbers below are
+    # read from the engine summary, not from the tell helper.
+    definitions = strategy.objective_definitions
+    metal_index = next(
+        index
+        for index, definition in enumerate(definitions)
+        if definition.metric == "metals_total_kg"
+    )
+    engine_metals_pair = []
+    told_metals = []
     for candidate, result in zip(candidates, results, strict=True):
         trial = trials[candidate.id]
-        expected = objective_values_for_executed_spec(
-            profile,
-            strategy.objective_definitions,
-            result,
-        )
-        assert expected is not None
-        assert all(math.isfinite(value) for value in expected)
-        assert _BAD_MAXIMIZE_VALUE not in expected
-        assert _BAD_MINIMIZE_VALUE not in expected
+        summary = result.run_reference.product_summary
+        furnace_status = summary.get("furnace_amortization_status")
+        if furnace_status == "available":
+            penalty = float(summary["furnace_amortization_batch_cost_equivalents"])
+            assert math.isfinite(penalty) and penalty >= 0.0
+            cost_factor = 1.0 + penalty
+        elif not result.feasible:
+            # No available furnace record. An infeasible yield is told raw.
+            cost_factor = 1.0
+        else:
+            raise AssertionError(
+                "feasible run without available furnace amortization is "
+                f"unscoreable, not a yield: status={furnace_status!r}"
+            )
+        assert trial.values is not None
+        assert len(trial.values) == len(definitions)
+        expected = []
+        for definition in definitions:
+            raw = _engine_raw_for_told_objective(definition.metric, result)
+            assert math.isfinite(raw) and raw >= 0.0
+            expected.append(
+                _told_native_value(raw, definition.sense, cost_factor)
+            )
         assert trial.state.name == "COMPLETE"
+        assert _BAD_MAXIMIZE_VALUE not in trial.values
+        assert _BAD_MINIMIZE_VALUE not in trial.values
         assert trial.values == [pytest.approx(value) for value in expected]
+        engine_metals_pair.append(
+            float(summary["product_classes"]["metals_plus_O2"]["metals_total_kg"])
+        )
+        told_metals.append(trial.values[metal_index])
+    assert engine_metals_pair[0] != engine_metals_pair[1]
+    assert told_metals[0] != told_metals[1]
 
 
 def test_tpe_infeasible_objectives_without_furnace_cost_use_raw_metrics() -> None:

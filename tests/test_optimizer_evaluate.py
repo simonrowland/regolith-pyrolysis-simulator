@@ -7482,6 +7482,270 @@ def test_c4_refusal_diagnostic_is_not_priced_as_a_c6_refusal() -> None:
     assert "priced_unavailable:" not in " ".join(result.notes)
 
 
+def _score_producing_functions(tree: ast.AST) -> set[str]:
+    """Functions that can return a numeric objective vector."""
+
+    producers: set[str] = set()
+    for node in getattr(tree, "body", ()):
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        for call in ast.walk(node):
+            if not isinstance(call, ast.Call):
+                continue
+            func = call.func
+            if not isinstance(func, ast.Name) or func.id != "ScoredResult":
+                continue
+            for keyword in call.keywords:
+                if (
+                    keyword.arg == "feasible"
+                    and isinstance(keyword.value, ast.Constant)
+                    and keyword.value.value is True
+                ):
+                    producers.add(node.name)
+                if keyword.arg == "objectives" and not (
+                    isinstance(keyword.value, ast.Constant)
+                    and keyword.value.value is None
+                ):
+                    producers.add(node.name)
+    return producers
+
+
+def _function_callees(node: ast.AST) -> set[str]:
+    names: set[str] = set()
+    for call in ast.walk(node):
+        if isinstance(call, ast.Call) and isinstance(call.func, ast.Name):
+            names.add(call.func.id)
+    return names
+
+
+def _reaches_score_producer(
+    name: str,
+    producers: set[str],
+    graph: dict[str, set[str]],
+    seen: set[str],
+) -> bool:
+    if name in seen:
+        return False
+    seen.add(name)
+    if name in producers:
+        return True
+    return any(
+        _reaches_score_producer(callee, producers, graph, seen)
+        for callee in graph.get(name, ())
+    )
+
+
+def test_c6_refusal_chokepoint_dominates_every_score_producer() -> None:
+    """A stored C6 refusal is priced before any numeric score.
+
+    The grid is every function that builds a feasible vector or attaches
+    objectives. The single ``_stored_c6_campaign_refusal_result`` call in
+    ``evaluate`` dominates each of them. Environment-failure aborts stay
+    ahead of that call.
+    """
+
+    tree = ast.parse(inspect.getsource(evaluate_module))
+    functions = {
+        node.name: node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+    }
+    producers = _score_producing_functions(tree)
+    assert {"evaluate", "_out_of_domain_result", "_infeasible_result"} <= producers
+    graph = {name: _function_callees(node) for name, node in functions.items()}
+    evaluate_fn = functions["evaluate"]
+    post_execution: list[ast.stmt] = []
+    saw_execute = False
+    for statement in evaluate_fn.body:
+        if saw_execute:
+            post_execution.append(statement)
+            continue
+        if _function_callees(statement) & {"_execute_run"}:
+            saw_execute = True
+    assert saw_execute
+
+    gate_at = None
+    for index, statement in enumerate(post_execution):
+        if "_stored_c6_campaign_refusal_result" in _function_callees(statement):
+            gate_at = index
+            break
+    assert gate_at is not None
+    gate_calls = [
+        node
+        for node in ast.walk(evaluate_fn)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_stored_c6_campaign_refusal_result"
+    ]
+    assert len(gate_calls) == 1
+
+    before = post_execution[:gate_at]
+    assert any(
+        "_run_execution_has_environment_failure_disposition" in _function_callees(statement)
+        for statement in before
+    )
+    reached = sorted(
+        callee
+        for statement in before
+        for callee in _function_callees(statement)
+        if _reaches_score_producer(callee, producers, graph, set())
+    )
+    assert reached == []
+
+    after_callees = set().union(
+        *(_function_callees(statement) for statement in post_execution[gate_at + 1 :])
+    )
+    assert "_out_of_domain_result" in after_callees
+    assert "_infeasible_result" in after_callees
+    gate_line = gate_calls[0].lineno
+    scored_returns = [
+        call
+        for call in ast.walk(evaluate_fn)
+        if isinstance(call, ast.Call)
+        and isinstance(call.func, ast.Name)
+        and call.func.id == "ScoredResult"
+        and any(
+            keyword.arg == "feasible"
+            and isinstance(keyword.value, ast.Constant)
+            and keyword.value.value is True
+            for keyword in call.keywords
+        )
+    ]
+    assert scored_returns
+    assert all(call.lineno > gate_line for call in scored_returns)
+
+
+def _attach_stored_c6(execution, reason: str = "c6_hold_target_not_acquired"):
+    execution.refusal_diagnostic = {
+        "status": "refused",
+        "reaction_family": "c6_mg_thermite",
+        "campaign": "C6",
+        "diagnostic": {"reason_refused": reason},
+    }
+    return execution
+
+
+def _feasible_score_envelope():
+    return PROFILE, _execution(), "fast", {}
+
+
+def _ood_status_earned_rump_envelope():
+    execution = _execution(
+        backend_status="out_of_domain",
+        backend_diagnostics=_crash_diagnostics(temperature_C=1100.0),
+        freeze_curve=_kernel_curve(),
+    )
+    profile = {
+        **PROFILE,
+        "run": {**PROFILE["run"], "backend_name": "alphamelts"},
+        "fidelities": {"high": {"backend_name": "alphamelts", "hours": 1}},
+    }
+    return profile, execution, "high", {}
+
+
+def _ood_trace_earned_rump_envelope():
+    trace = _trace()
+    trace.backend_status = "out_of_domain"
+    trace.backend_diagnostics = _crash_diagnostics(temperature_C=1100.0)
+    execution = _execution(trace=trace, freeze_curve=_kernel_curve())
+    profile = _composition_eval_profile(
+        "terminal_rump_earned",
+        target_id="pc-ceramic-test",
+        oxides={"CaO": {"min": 0.0, "max": 100.0, "weight": 1.0}},
+    )
+    return profile, execution, "fast", {}
+
+
+def _infeasible_retained_vector_envelope():
+    return (
+        _product_claiming_profile(),
+        _execution(trace=_trace(mixed_stream=True)),
+        "fast",
+        {
+            "constraints": PhysicsConstraintSet(
+                active_gates=("delivered_stream_purity",),
+                enforce_delivered_stream_purity=True,
+            )
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "envelope",
+    (
+        _feasible_score_envelope,
+        _ood_status_earned_rump_envelope,
+        _ood_trace_earned_rump_envelope,
+        _infeasible_retained_vector_envelope,
+    ),
+)
+def test_stored_c6_refusal_prices_every_score_producing_envelope(envelope) -> None:
+    """Each envelope scores without a C6 refusal and is unavailable with one.
+
+    The out-of-domain earned rump is the combined case: batch status stays
+    ok, the domain signal is present, and the refusal is still not a score.
+    """
+
+    profile, execution, fidelity, kwargs = envelope()
+    scored = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        fidelity,
+        profile=profile,
+        executor=FakeExecutor(execution),
+        **kwargs,
+    )
+    assert scored.objectives is not None
+
+    profile, execution, fidelity, kwargs = envelope()
+    refused = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        fidelity,
+        profile=profile,
+        executor=FakeExecutor(_attach_stored_c6(execution)),
+        **kwargs,
+    )
+    assert refused.feasible is False
+    assert refused.objectives is None
+    assert refused.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert refused.run_reference is not None
+    assert refused.run_reference.reason == "c6_hold_target_not_acquired"
+    assert "priced_unavailable:c6_hold_target_not_acquired" in refused.notes
+
+
+def test_environment_failure_aborts_before_c6_pricing() -> None:
+    """An environment disposition stays an abort when a C6 refusal is also stored."""
+
+    diagnostic = {
+        "status": "refused",
+        "campaign": "C6",
+        "reaction_family": "c6_mg_thermite",
+        "diagnostic": {"reason_refused": "c6_hold_target_not_acquired"},
+        "provider_diagnostic": {
+            "backend_diagnostics": {
+                "projected_liquidus_diagnostics": {
+                    "backend_failure_disposition": "environment",
+                },
+            },
+        },
+    }
+    with pytest.raises(EngineBugAbort, match="environment"):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(
+                _execution(
+                    status="refused",
+                    error_message="MAGEMin worker could not be restarted",
+                    refusal_diagnostic=diagnostic,
+                )
+            ),
+        )
+
+
 def continuation_metal_delta(
     baseline_kg: float | None,
     capped_kg: float | None,
@@ -8147,6 +8411,109 @@ def test_ranking_trace_keeps_each_step_stop_reason() -> None:
     assert refused is not None
     assert refused["stop_reason"] == "refused"
     assert refused["detail"] == "c6_hold_target_not_acquired"
+
+
+def _stop_reasons(stops) -> list[str]:
+    return [str(stop["stop_reason"]) for stop in stops]
+
+
+def test_every_rump_trace_projection_keeps_campaign_stops() -> None:
+    """Every study trace allowlist that keeps rump evidence keeps step stops."""
+
+    tree = ast.parse(inspect.getsource(study_module))
+    projections = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Tuple, ast.List)):
+            continue
+        strings = [
+            element.value
+            for element in node.elts
+            if isinstance(element, ast.Constant) and isinstance(element.value, str)
+        ]
+        starred = [
+            element.value.id
+            for element in node.elts
+            if isinstance(element, ast.Starred) and isinstance(element.value, ast.Name)
+        ]
+        if "rump_terminal" not in strings:
+            continue
+        projections.append((strings, starred))
+    assert len(projections) >= 2
+    for strings, starred in projections:
+        assert (
+            "campaign_stops" in strings or "_CAMPAIGN_STOP_TRACE_KEYS" in starred
+        )
+
+
+def test_ranking_artifact_keeps_time_cap_after_continuation() -> None:
+    """A C4 time_cap followed by a later step survives ranking serialization.
+
+    Both study trace filters copy the stop records. The ranked record and
+    its payload are the artifact written beside the leaderboard.
+    """
+
+    execution = _execution()
+    execution.campaign_stops = (
+        {
+            "campaign": "C0",
+            "stop_reason": "endpoint_met",
+            "duration_h": 1,
+            "detail": "computed_exit",
+        },
+        {
+            "campaign": "C4",
+            "stop_reason": "time_cap",
+            "duration_h": 62,
+            "detail": "max_hold_no_signal",
+        },
+        {
+            "campaign": "C2A_continuous",
+            "stop_reason": "endpoint_met",
+            "duration_h": 82,
+            "detail": "min_hold",
+        },
+    )
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=copy.deepcopy(PROFILE),
+        executor=FakeExecutor(execution),
+    )
+    assert result.run_reference is not None
+    expected_reasons = ["endpoint_met", "time_cap", "endpoint_met"]
+    light = study_module._strip_heavy_result(result)
+    assert light.run_reference is not None
+    stripped = light.run_reference.trace["campaign_stops"]
+    assert _stop_reasons(stripped) == expected_reasons
+    assert stripped[1]["detail"] == "max_hold_no_signal"
+    record = study_module._to_record(
+        study_module.Candidate("stop-000000", _valid_patch()),
+        result,
+        cache_hit=False,
+    )
+    definitions = objective_definitions(PROFILE)
+    leaderboard = tuple(
+        sorted(
+            (record,),
+            key=lambda row: study_module._rank_key(
+                row,
+                definitions,
+                profile=PROFILE,
+            ),
+        )
+    )
+    ranked = leaderboard[0]
+    payload = study_module._record_payload(ranked, RecipeSchema(), PROFILE)
+    for carrier in (
+        ranked.trace_summary["campaign_stops"],
+        payload["trace_summary"]["campaign_stops"],
+        ranked.result_blob["campaign_stops"],
+    ):
+        assert _stop_reasons(carrier) == expected_reasons
+        assert carrier[1]["campaign"] == "C4"
+        assert carrier[1]["detail"] == "max_hold_no_signal"
+        assert carrier[2]["campaign"] == "C2A_continuous"
 
 
 class _LoopSession:

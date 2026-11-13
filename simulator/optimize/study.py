@@ -4424,6 +4424,11 @@ def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
     return replace(scored, run_reference=light_reference)
 
 
+# Completed-step stop records. Both light-trace projections spread this
+# tuple. A C4 time_cap that continues must stay on the ranking record.
+_CAMPAIGN_STOP_TRACE_KEYS = ("campaign_stops",)
+
+
 def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | None:
     reference = scored.run_reference
     status = _result_backend_status(scored)
@@ -4454,6 +4459,7 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "refusal_reason",
             "refusal_diagnostic",
             "rump_terminal",
+            *_CAMPAIGN_STOP_TRACE_KEYS,
             "terminal_rump_by_species_kg",
             "composition_target",
             "vapor_pressure_source_report",
@@ -4776,6 +4782,7 @@ def _light_backend_status_trace_for_reference(
             "refusal_reason",
             "refusal_diagnostic",
             "rump_terminal",
+            *_CAMPAIGN_STOP_TRACE_KEYS,
             "terminal_rump_by_species_kg",
             "composition_target",
             "vapor_pressure_source_report",

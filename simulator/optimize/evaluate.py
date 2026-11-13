@@ -1094,6 +1094,20 @@ def evaluate(
             cache_key_value=key,
         )
 
+    # INVARIANT: a stored C6 refusal is never a numeric score. This is the
+    # only pricing return. It stands after environment-failure aborts and
+    # after failed-status results, and before every score-producing return
+    # (earned out-of-domain rump, infeasible retained vector, feasible vector).
+    stored_c6_refusal = _stored_c6_campaign_refusal_result(
+        candidate_id,
+        spec,
+        key,
+        run_execution,
+        profile,
+    )
+    if stored_c6_refusal is not None:
+        return stored_c6_refusal
+
     backend_status = _latest_backend_status(run_execution)
     if _has_out_of_domain_backend_signal(
         run_execution,
@@ -1150,22 +1164,6 @@ def evaluate(
         candidate_id=candidate_id,
         key=key,
     )
-
-    c6_refusal_reason = _c6_campaign_refusal_reason(run_execution)
-    if c6_refusal_reason:
-        # C6's refusal is campaign-scoped, so the executor leaves batch
-        # status ok and keeps the diagnostic. Every such reason is priced
-        # unavailable. A partial product total is not a score.
-        return _physics_refused_result(
-            candidate_id,
-            spec,
-            key,
-            reason=c6_refusal_reason,
-            error_message=f"priced_unavailable:{c6_refusal_reason}",
-            run_execution=run_execution,
-            profile=profile,
-            diagnostic=getattr(run_execution, "refusal_diagnostic", None),
-        )
 
     snapshots = getattr(run_execution, "snapshots", None)
     if status != "refused" or snapshots is None or snapshots:
@@ -3158,6 +3156,38 @@ def _c6_campaign_refusal_reason(run_execution: Any) -> str:
             continue
         return _reason_from_mapping(blob) or "c6_campaign_refused"
     return ""
+
+
+def _stored_c6_campaign_refusal_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+) -> ScoredResult | None:
+    """The single C6 pricing return, or None when the run stored no refusal.
+
+    ``evaluate`` calls this once, before any return that can attach a
+    numeric objective vector. An earned out-of-domain rump is still a
+    score, so it does not pass this gate. Environment-failure disposition
+    aborts earlier and is not relabeled. Behaviour-changing scoring edits
+    require a VERSION bump (simulator/optimize/evalspec.py). Do not bump
+    data/corpus_version.yaml.
+    """
+
+    reason = _c6_campaign_refusal_reason(run_execution)
+    if not reason:
+        return None
+    return _physics_refused_result(
+        candidate_id,
+        spec,
+        key,
+        reason=reason,
+        error_message=f"priced_unavailable:{reason}",
+        run_execution=run_execution,
+        profile=profile,
+        diagnostic=getattr(run_execution, "refusal_diagnostic", None),
+    )
 
 
 def _build_eval_inputs_impl(
