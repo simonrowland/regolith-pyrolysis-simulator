@@ -8446,6 +8446,7 @@ def _assign_declared_wall_capture(
         }
         legs.append({
             "reaction_id": reaction.reaction_id,
+            "notices": reaction.notices,
             "products_mol": products,
             "oxygen_debit_mol": debit,
             "oxygen_credit_mol": credit,
@@ -8503,6 +8504,9 @@ def _keep_declared_wall_deposit(
     if legs:
         booking = bookings.setdefault(species, _empty_wall_reaction_booking())
         for leg in legs:
+            booking.setdefault("reaction_legs", []).append({
+                **leg, "surface": surface, "stage_key": stage_key, "account": account,
+            })
             products = leg["products_mol"]
             if surface == "wall":
                 account_products = booking["wall_products_mol_by_account"].setdefault(

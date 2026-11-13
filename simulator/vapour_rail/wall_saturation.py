@@ -24,8 +24,8 @@ and it is not given Psat = 0.
 
 A declaration with ``missing: wall_condensation_thermo_missing`` refuses with
 that reason. NiO, CoO and MnO are that case: the corpus has no condensed row
-to evaluate. A missing parcel pO2 still refuses when any admissible reaction
-has ν_O2 ≠ 0, which :func:`operative_wall_saturation` already enforces.
+to evaluate. With missing parcel pO2, the law uses a flagged pO2-free route when
+available; otherwise it refuses wall_pO2_required.
 """
 
 from __future__ import annotations
@@ -78,6 +78,7 @@ class ResolvedWallSaturation:
     phase_note: str
     thermo: str
     participants: tuple[ResolvedParticipant, ...]
+    notices: tuple[str, ...] = ()
 
 
 def wall_reactions_declaration(species_row: Mapping[str, Any]) -> Mapping[str, Any] | None:
@@ -203,6 +204,7 @@ def resolve_wall_saturation(
         phase_note=note,
         thermo=thermo,
         participants=chosen.participants,
+        notices=winner.notices,
     )
 
 

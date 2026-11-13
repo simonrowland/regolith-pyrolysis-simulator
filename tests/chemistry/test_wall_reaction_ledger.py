@@ -436,13 +436,24 @@ def test_oxidant_limit_books_the_next_reaction_only_when_it_is_supersaturated(
         assert abs(net) < 1e-9
 
 
-def test_missing_po2_refuses_instead_of_booking_disproportionation() -> None:
-    with pytest.raises(WallSaturationPressureRefusal) as exc_info:
-        _assign_declared_wall_capture(
-            "SiO", 1.0, T_K=_TABLE_T_K, p_local_pa=1.0e6,
-            pO2_Pa=None, oxygen_mol=1.0, vapor_pressure_data=None,
-        )
-    assert exc_info.value.reason == "wall_pO2_required"
+def test_missing_po2_books_flagged_cold_sio_disproportionation(formula_registry) -> None:
+    bookings = {}
+    molar_mass = resolve_species_formula("SiO", formula_registry).molar_mass_kg_per_mol()
+    kept, oxygen = _keep_declared_wall_deposit(
+        "SiO", molar_mass, surface="baffle", T_K=313.15,
+        p_local_pa=1.0, pO2_Pa=None, oxygen_mol=0.0,
+        vapor_pressure_data=None, registry=formula_registry, bookings=bookings,
+        stage_key=K_TRAP_STAGE_KEY,
+    )
+    assert kept == pytest.approx(molar_mass)
+    assert oxygen == 0.0
+    booking = bookings["SiO"]
+    assert booking["baffle_products_mol"] == {"Si": 0.5, "SiO2": 0.5}
+    leg = booking["reaction_legs"][0]
+    assert leg["reaction_id"] == "disproportionation"
+    assert leg["notices"] == ("wall_pO2_unknown_pO2_free_route_used",)
+    proposal = _dispatch_booking(formula_registry, "SiO", booking, kept)
+    assert all(abs(net) < 1e-9 for net in _atom_net(proposal, formula_registry).values())
 
 
 def test_species_without_a_wall_block_is_unchanged(formula_registry) -> None:

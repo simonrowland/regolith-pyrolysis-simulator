@@ -136,15 +136,18 @@ def test_sio_undersaturation_is_zero_not_the_reactive_backstop() -> None:
 
 
 def test_covered_species_missing_po2_does_not_drive_with_full_pressure() -> None:
-    for species, stable in (("SiO", False), ("CrO2", True)):
-        with pytest.raises(WallSaturationPressureRefusal, match="wall_pO2_required"):
-            _wall_deposition_driving_pressure_pa(
-                species,
-                10.0,
-                _WALL_K,
-                reactive_product_backstop=not stable,
-                stable_condensation_product_backstop=stable,
-            )
+    from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
+    row = condensation._species_vapor_data("SiO")
+    result = resolve_wall_saturation(row, species_id="SiO", T_K=_WALL_K)
+    driving = _wall_deposition_driving_pressure_pa(
+        "SiO", 2.0 * result.pressure_Pa, _WALL_K, reactive_product_backstop=True,
+    )
+    assert driving == pytest.approx(result.pressure_Pa)
+    assert 0.0 < driving < 2.0 * result.pressure_Pa
+    with pytest.raises(WallSaturationPressureRefusal, match="wall_pO2_required"):
+        _wall_deposition_driving_pressure_pa(
+            "CrO2", 10.0, _WALL_K, stable_condensation_product_backstop=True,
+        )
 
 
 def test_mutation_reactivity_class_is_what_drives_reactive_auth(monkeypatch) -> None:

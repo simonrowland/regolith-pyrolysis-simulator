@@ -762,6 +762,7 @@ class WallSaturationLawResult:
     # Signed O2 per mole of vapour. Positive is a debit, negative a credit.
     o2_mol_per_mol_vapour: float
     products_mol_per_mol_vapour: tuple[tuple[str, float], ...]
+    notices: tuple[str, ...] = ()
 
 
 def _wall_g_over_rt(
@@ -933,10 +934,12 @@ def wall_saturation_pressure_pa(
 def _wall_saturation_result(
     reaction: WallSaturationReaction,
     pressure_Pa: float,
+    notices: tuple[str, ...] = (),
 ) -> WallSaturationLawResult:
     nu_v = float(reaction.nu_vapour)
     return WallSaturationLawResult(
         pressure_Pa=pressure_Pa,
+        notices=notices,
         reaction_id=str(reaction.reaction_id),
         nu_vapour=nu_v,
         nu_O2=float(reaction.nu_O2),
@@ -958,8 +961,11 @@ def wall_saturation_ladder(
     """Admissible reactions ordered by ascending saturation pressure.
 
     The first entry is :func:`operative_wall_saturation`. An exact pressure
-    tie keeps declaration order. A missing parcel pO2 refuses the species
-    when any reaction has ν_O2 ≠ 0, before any pressure is returned.
+    tie keeps declaration order. With unknown pO2, use only pO2-free routes
+    and flag the result. Their Psat is a conservative upper bound: adding
+    O2 can only lower the operative Psat by enabling an oxidative route.
+    Thus capture is under-predicted, and the pO2-free products are booked.
+    Refuse only when every admissible route requires pO2.
     """
 
     if not reactions:
@@ -967,11 +973,15 @@ def wall_saturation_ladder(
             "wall_condensation_thermo_missing",
             "no admissible wall reaction",
         )
-    if any(reaction.nu_O2 != 0.0 for reaction in reactions) and pO2_Pa is None:
-        raise WallSaturationLawRefusal(
-            "wall_pO2_required",
-            "at least one admissible wall reaction consumes or releases O2",
-        )
+    notices: tuple[str, ...] = ()
+    if pO2_Pa is None:
+        reactions = tuple(reaction for reaction in reactions if reaction.nu_O2 == 0.0)
+        if not reactions:
+            raise WallSaturationLawRefusal(
+                "wall_pO2_required",
+                "every admissible wall reaction consumes or releases O2",
+            )
+        notices = ("wall_pO2_unknown_pO2_free_route_used",)
     ranked = [
         _wall_saturation_result(
             reaction,
@@ -981,6 +991,7 @@ def wall_saturation_ladder(
                 pO2_Pa=pO2_Pa,
                 standard_pressure_Pa=standard_pressure_Pa,
             ),
+            notices=notices,
         )
         for reaction in reactions
     ]

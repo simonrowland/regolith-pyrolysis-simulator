@@ -139,13 +139,14 @@ def test_sio_oxidative_pressures_and_crossover() -> None:
     assert above.o2_mol_per_mol_vapour == pytest.approx(0.5)
 
 
-def test_missing_po2_refuses_even_when_a_zero_oxygen_reaction_exists() -> None:
+def test_missing_po2_uses_flagged_free_route_and_refuses_only_without_one() -> None:
+    result = operative_wall_saturation((_sio_disp(), _sio_ox()), T_K=_T_K)
+    assert result.reaction_id == _sio_disp().reaction_id
+    assert result.pressure_Pa == pytest.approx(1.14529, rel=1e-5)
+    assert result.notices == ("wall_pO2_unknown_pO2_free_route_used",)
     with pytest.raises(WallSaturationLawRefusal) as exc_info:
-        operative_wall_saturation((_sio_disp(), _sio_ox()), T_K=_T_K, pO2_Pa=None)
+        operative_wall_saturation((_sio_ox(),), T_K=_T_K)
     assert exc_info.value.reason == "wall_pO2_required"
-    # The disproportionation reaction on its own does not read pO2.
-    alone = operative_wall_saturation((_sio_disp(),), T_K=_T_K, pO2_Pa=None)
-    assert alone.pressure_Pa == pytest.approx(1.14529, rel=1e-5)
 
 
 def test_po2_limits_match_the_signed_oxygen_coefficient() -> None:
@@ -519,7 +520,7 @@ def test_production_resolver_over_every_truthy_exponent_species(species_id: str)
             assert at_high > at_low
         else:
             assert at_high == pytest.approx(at_low, rel=0.0, abs=0.0)
-    needs_oxygen = any(reaction.nu_O2 != 0.0 for reaction in low)
+    needs_oxygen = all(reaction.nu_O2 != 0.0 for reaction in low)
     if needs_oxygen:
         with pytest.raises(WallSaturationLawRefusal) as exc_info:
             resolve_wall_saturation(
@@ -530,7 +531,9 @@ def test_production_resolver_over_every_truthy_exponent_species(species_id: str)
         without_oxygen = resolve_wall_saturation(
             row, species_id=species_id, T_K=_TABLE_T_K, pO2_Pa=None
         )
-        assert without_oxygen.pressure_Pa == pytest.approx(result.pressure_Pa)
+        assert without_oxygen.nu_O2 == 0.0
+        assert without_oxygen.pressure_Pa >= result.pressure_Pa
+        assert "wall_pO2_unknown_pO2_free_route_used" in without_oxygen.notices
 
 
 def test_sio_resolver_matches_the_published_anchors() -> None:
@@ -558,9 +561,10 @@ def test_sio_resolver_matches_the_published_anchors() -> None:
     )
     assert at_floor.pressure_Pa == pytest.approx(1.793e-9, rel=1.0e-3)
     assert at_parcel.pressure_Pa == pytest.approx(1.849e-12, rel=1.0e-3)
-    with pytest.raises(WallSaturationLawRefusal) as exc_info:
-        resolve_wall_saturation(row, species_id="SiO", T_K=_T_K, pO2_Pa=None)
-    assert exc_info.value.reason == "wall_pO2_required"
+    unknown = resolve_wall_saturation(row, species_id="SiO", T_K=_T_K)
+    assert unknown.reaction_id == "disproportionation"
+    assert unknown.pressure_Pa == below.pressure_Pa
+    assert unknown.notices == ("wall_pO2_unknown_pO2_free_route_used",)
 
 
 def test_phase_at_1323_selects_cristobalite_not_beta_quartz() -> None:
