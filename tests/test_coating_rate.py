@@ -134,6 +134,7 @@ def test_production_series_resistance_exports_rate_decomposition() -> None:
         regime_factor=0.0,
         T_gas_K=1700.0,
         overhead_pressure_pa=1000.0,
+        wall_pO2_Pa=1.0e-4,
         diagnostic_out=diagnostic,
     )
 
@@ -268,7 +269,7 @@ def test_hot_wall_above_certified_antoine_range_is_status_bearing() -> None:
 def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
     monkeypatch, invalid_data,
 ) -> None:
-    from simulator.condensation import DepositionInputRefusal, _species_vapor_data
+    from simulator.condensation import _species_vapor_data
 
     species = "SiO"
     source_data = copy.deepcopy(_species_vapor_data(species))
@@ -295,21 +296,18 @@ def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
         melt_temperature_C=1800.0, wall_temperature_C=1800.0,
         surface_area_m2=1.0,
     )
-    if invalid_data:
-        with pytest.raises(DepositionInputRefusal) as refused:
-            wall_deposit_candidate_for_surface_kg(model, **kwargs)
-        assert refused.value.terminal_refusal is True
-    else:
-        record = wall_deposit_candidate_for_surface_kg(model, **kwargs)
-        assert record["status"] == "unavailable"
-        assert "no extrapolation available" in record["reason"]
-        assert record["terminal_refusal"] is False
-        assert record["wall_temperature_K"] == pytest.approx(2073.15)
+    record = wall_deposit_candidate_for_surface_kg(model, **kwargs)
+    # The wall-reaction block is the saturation curve. A corrupt legacy
+    # Antoine coefficient is not consulted, and missing parcel pO2 refuses.
+    assert record["status"] == "unavailable"
+    assert "wall_pO2_required" in record["reason"]
+    assert record["terminal_refusal"] is False
+    assert record["wall_temperature_K"] == pytest.approx(2073.15)
     assert model.last_wall_deposition_rate_shadow_candidate == {}
 
 
-def test_source_only_antoine_pole_is_terminal_input_refusal(monkeypatch) -> None:
-    from simulator.condensation import DepositionInputRefusal, _species_vapor_data
+def test_sio_legacy_antoine_pole_is_not_the_wall_refusal(monkeypatch) -> None:
+    from simulator.condensation import _species_vapor_data
 
     source_data = copy.deepcopy(_species_vapor_data("SiO"))
     source_data["antoine"]["C"] = -2073.15
@@ -324,14 +322,15 @@ def test_source_only_antoine_pole_is_terminal_input_refusal(monkeypatch) -> None
         gas_temperature_C=1800.0, campaign_name="C0",
     )
 
-    with pytest.raises(DepositionInputRefusal, match="T_wall_K \\+ C") as refused:
-        wall_deposit_candidate_for_surface_kg(
-            model, species="SiO", rate_kg_hr=1.0,
-            T_cond_C=model.condensation_temperatures_C["SiO"],
-            melt_temperature_C=1800.0, wall_temperature_C=1800.0,
-            surface_area_m2=1.0,
-        )
-    assert refused.value.terminal_refusal is True
+    record = wall_deposit_candidate_for_surface_kg(
+        model, species="SiO", rate_kg_hr=1.0,
+        T_cond_C=model.condensation_temperatures_C["SiO"],
+        melt_temperature_C=1800.0, wall_temperature_C=1800.0,
+        surface_area_m2=1.0,
+    )
+    assert record["status"] == "unavailable"
+    assert "wall_pO2_required" in record["reason"]
+    assert record["terminal_refusal"] is False
     assert model.last_wall_deposition_rate_shadow_candidate == {}
 
 

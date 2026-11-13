@@ -350,10 +350,13 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # Reverting only _route to its pre-21f065338 version recovers the old
         # 8.428322859789999e-06 kg pin; preserving flow gives the measured value below.
         # With c679673f5/85fedcb8e band-integrated capture across collector
-        # and saturation thresholds, the unavailable-MAGEMin run measures
-        # 5.12945178146e-06 kg at 1050 C.
+        # and saturation thresholds, the unavailable-MAGEMin run measured
+        # 5.12945178146e-06 kg at 1050 C under the Psat = 0 backstop.
+        # b-1188 removes the Psat = 0 backstop. Re-running this unavailable-
+        # MAGEMin report deposits 0 kg of wall Si+SiO2 at 1050 C. The trace
+        # was not a supersaturated wall-law capture.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            5.12945178146e-06, rel=1e-9
+            0.0, abs=1e-24
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9
@@ -367,13 +370,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
 
 def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     wall_T_K = 1700.0 + 273.15
-    p_local_pa = 1.0
     alpha_s = 0.04
 
-    # SiO now carries the melt standard-reaction term, which must not be
-    # consumed as a pure-vapor wall saturation pressure. The authorized
-    # disproportionation-product backstop supplies the P_sat ~= 0 limit.
-    with pytest.raises(WallSaturationPressureRefusal):
+    # Missing pO2 is a refusal, not the retired Psat = 0 backstop.
+    with pytest.raises(WallSaturationPressureRefusal, match="wall_pO2_required"):
         _antoine_psat_pa("SiO", wall_T_K)
     sio_psat_pa, refused = condensation_module._try_antoine_psat_pa(
         "SiO", wall_T_K
@@ -381,9 +381,23 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     assert sio_psat_pa is None
     assert refused is True
 
+    po2_pa = 1.0e-4
+    psat = _antoine_psat_pa("SiO", wall_T_K, wall_pO2_Pa=po2_pa)
+    assert psat is not None and psat > 0.0
+    # One pascal is below this wall law. Supersaturation is a multiple of Psat.
+    p_local_pa = psat * 4.0
+    undersaturated = _hkl_surface_deposition_flux_mol_m2_s(
+        "SiO",
+        P_local_pa=psat * 0.5,
+        T_surface_K=wall_T_K,
+        alpha_s=alpha_s,
+        wall_pO2_Pa=po2_pa,
+    )
+    assert undersaturated == 0.0
+    driving = p_local_pa - psat
     expected_hkl = alpha_s * _hkl_impingement_flux_mol_m2_s(
         "SiO",
-        p_local_pa,
+        driving,
         wall_T_K,
     )
     hkl_flux = _hkl_surface_deposition_flux_mol_m2_s(
@@ -391,6 +405,7 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
         P_local_pa=p_local_pa,
         T_surface_K=wall_T_K,
         alpha_s=alpha_s,
+        wall_pO2_Pa=po2_pa,
     )
     series_flux = _series_resistance_deposition_flux_mol_m2_s(
         "SiO",
@@ -398,11 +413,15 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
         T_surface_K=wall_T_K,
         alpha_s=alpha_s,
         regime_factor=1.0,
+        wall_pO2_Pa=po2_pa,
     )
 
     assert hkl_flux == pytest.approx(expected_hkl)
     assert series_flux == pytest.approx(expected_hkl)
     assert hkl_flux > 0.0
+    assert hkl_flux < alpha_s * _hkl_impingement_flux_mol_m2_s(
+        "SiO", p_local_pa, wall_T_K,
+    )
 
 
 @pytest.mark.parametrize(
@@ -890,4 +909,4 @@ def test_stage_scoped_no_reactive_backstop_skips_reactivity_metadata(monkeypatch
             alpha_s=1.0,
             reactive_product_backstop=False,
         )
-    assert exc_info.value.reason == "source_certified_range_refused"
+    assert exc_info.value.reason == "wall_pO2_required"

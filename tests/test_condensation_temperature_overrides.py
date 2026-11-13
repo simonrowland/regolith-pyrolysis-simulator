@@ -620,6 +620,11 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
     )
     _configure_knudsen_policy(default_model)
     if subpath == "stage_efficiency":
+        # Stage capture reads parcel pO2 only when stage 3 is through.
+        # SiO evaporates as SiO2 -> SiO + 1/2 O2, so that route carries
+        # the oxygen the wall law needs. Divert leaves pO2 unset and the
+        # law refuses. The 1300 C versus 900 C cutoff is unchanged.
+        default_model.train.collection_route["stage3_route"] = "through"
         default_model.pipe_segments = []
     default_result = default_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
@@ -633,6 +638,7 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
     overridden_model.condensation_temperatures_C['SiO'] = 900.0
     _configure_knudsen_policy(overridden_model)
     if subpath == "stage_efficiency":
+        overridden_model.train.collection_route["stage3_route"] = "through"
         overridden_model.pipe_segments = []
     overridden_result = overridden_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
@@ -807,8 +813,10 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
         condensation_module._antoine_psat_pa(
             "SiO", 1700.0, vapor_pressure_data=custom_vapor_pressures,
         )
-    assert fallback.value.reason == default.value.reason
-    assert fallback.value.valid_range_K == default.value.valid_range_K
+    # SiO is not in the custom row, so both calls resolve the global wall
+    # block. Missing parcel pO2 is wall_pO2_required. The law refusal does
+    # not carry the legacy source valid_range_K.
+    assert fallback.value.reason == default.value.reason == "wall_pO2_required"
 
 
 def test_partial_custom_antoine_block_falls_back_to_global_coefficients():

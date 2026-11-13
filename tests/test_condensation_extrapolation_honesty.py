@@ -830,9 +830,8 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
         for warning in antoine_warnings
     )
 
-    # SiO standard-reaction term: no pure wall Antoine, no false extrapolation
-    # telemetry, and non-reactive driving pressure is zero without a product
-    # backstop (documented; not a silent pure-SiO Psat).
+    # SiO's wall reaction needs a parcel pO2. Missing pO2 refuses. It does
+    # not invent a pure-SiO Antoine pressure or a Psat = 0 backstop.
     sio_range = condensation.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"][
         "valid_range_K"
     ]
@@ -841,7 +840,7 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
     sio_warns: list[str] = []
     with pytest.raises(
         condensation.WallSaturationPressureRefusal,
-        match="reason=source_certified_range_refused",
+        match="reason=wall_pO2_required",
     ):
         condensation._wall_deposition_driving_pressure_pa(
             "SiO",
@@ -853,7 +852,7 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
         )
     refusal = sio_extrap["SiO#wall:1173.15"]
     assert refusal["authority_level"] == "unavailable"
-    assert "no extrapolation available" in refusal["reason"]
+    assert refusal["reason"] == "wall_pO2_required"
 
 
 def test_wall_deposit_query_reports_out_of_domain_antoine_prediction():

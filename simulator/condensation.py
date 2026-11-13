@@ -3838,6 +3838,9 @@ class CondensationModel:
                 for sp in stream_source if sp != 'O2')
             stream_po2_bar = (
                 stream_source['O2'] / vapor_mol * vapor_pressure_pa / PA_PER_BAR)
+        stream_po2_Pa = (
+            None if stream_po2_bar is None else stream_po2_bar * PA_PER_BAR
+        )
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             if (
                 carrier_authority_status_by_species.get(species)
@@ -4063,6 +4066,7 @@ class CondensationModel:
                             antoine_extrapolations=antoine_extrapolations,
                             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                             efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
+                            wall_pO2_Pa=stream_po2_Pa,
                         )
                     else:
                         eta = self._condensation_efficiency(
@@ -4077,6 +4081,7 @@ class CondensationModel:
                             antoine_extrapolations=antoine_extrapolations,
                             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                             efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
+                            wall_pO2_Pa=stream_po2_Pa,
                             reactive_alkali_silica=reaction is not None,
                             flowing_pressure_pa=(
                                 partials.get(species) if reaction is not None else None
@@ -5246,6 +5251,7 @@ class CondensationModel:
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
         antoine_extrapolation_warnings: list[str] | None,
         efficiency_outcomes: list[dict[str, Any]] | None,
+        wall_pO2_Pa: float | None = None,
     ) -> tuple[float, dict[str, Any]]:
         """Vapour e-NTU on the freeze-out cartridge, plus an aerosol flag.
 
@@ -5314,6 +5320,7 @@ class CondensationModel:
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             diagnostic_out=saturation_diagnostic,
+            wall_pO2_Pa=wall_pO2_Pa,
         )
         if saturation_diagnostic.get('wall_saturation_pressure_refused'):
             raise WallSaturationPressureRefusal(
@@ -5401,6 +5408,7 @@ class CondensationModel:
         reactive_alkali_silica: bool = False,
         flowing_pressure_pa: float | None = None,
         bulk_gas_inlet_K: float | None = None,
+        wall_pO2_Pa: float | None = None,
     ) -> float:
         """Equilibrium-capped kinetic capture integrated over the stage band."""
         def _mint_zero(reason: str, **detail: Any) -> float:
@@ -5547,6 +5555,7 @@ class CondensationModel:
                 antoine_extrapolations=notices,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=diagnostic,
+                wall_pO2_Pa=wall_pO2_Pa,
             )
             try:
                 flux = _series_resistance_deposition_flux_mol_m2_s(
@@ -5582,11 +5591,21 @@ class CondensationModel:
                 0.0 if reactive_alkali_silica
                 else diagnostic.get('wall_saturation_pressure_pa')
             )
-            if saturation_pressure is None or not math.isfinite(float(saturation_pressure)):
+            if saturation_pressure is None or not isinstance(saturation_pressure, (int, float)):
                 raise WallSaturationPressureRefusal(
                     species, sample_T_K, 'saturation_pressure_unavailable',
                 )
-            sample_driving_pressure = max(0.0, p_in - float(saturation_pressure))
+            saturation_pressure = float(saturation_pressure)
+            # +∞ is the oxidative pO2 → 0 limit: no supersaturation, not a
+            # missing pressure. NaN is still a refusal.
+            if math.isnan(saturation_pressure):
+                raise WallSaturationPressureRefusal(
+                    species, sample_T_K, 'saturation_pressure_unavailable',
+                )
+            if math.isinf(saturation_pressure):
+                sample_driving_pressure = 0.0
+            else:
+                sample_driving_pressure = max(0.0, p_in - saturation_pressure)
             band_flux_sum += flux
             if sample_driving_pressure > 0.0:
                 positive_driving_samples += 1
@@ -6326,7 +6345,7 @@ def antoine_dew_temperature_diagnostic(
     try:
         p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
         p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
-    except (KeyError, ValueError) as exc:
+    except (KeyError, ValueError, WallSaturationPressureRefusal) as exc:
         return {
             "status": "refused_outside_certified_surface",
             "temperature_K": None,
@@ -8190,6 +8209,83 @@ def _pure_sodium_saturation_pa(
     return saturation.pressure_pa
 
 
+def _declared_wall_saturation_pressure_pa(
+    species: str,
+    T_K: float,
+    data: Mapping[str, Any],
+    *,
+    wall_pO2_Pa: float | None,
+) -> float | None:
+    """Wall-law Psat for a species that declares ``wall_reactions``.
+
+    Returns None when the row has no block, so the caller keeps the legacy
+    pure-component curve. A declared block that cannot be evaluated raises
+    ``WallSaturationPressureRefusal`` with the law's reason. It does not
+    fall through to a source-exponent refusal or to Psat = 0.
+
+    The Gibbs algebra stays in ``wall_saturation_pressure_pa``. This
+    function only chooses the species row, the temperature, and the parcel
+    pO2, then translates the law's refusal onto the deposition boundary.
+    """
+
+    from simulator.vapour_rail.nasa_cea import NasaCeaError, WallSaturationLawRefusal
+    from simulator.vapour_rail.wall_saturation import (
+        resolve_wall_saturation,
+        wall_reactions_declaration,
+    )
+
+    try:
+        declaration = wall_reactions_declaration(data)
+    except WallSaturationLawRefusal as exc:
+        temperature = float(T_K) if isinstance(T_K, (int, float)) else float("nan")
+        raise WallSaturationPressureRefusal(species, temperature, exc.reason) from exc
+    if declaration is None:
+        return None
+    temperature = _deposition_finite_scalar("T_wall_K", T_K)
+    if temperature <= 0.0:
+        raise DepositionInputRefusal(
+            "T_wall_K",
+            temperature,
+            "must be above absolute zero",
+        )
+    try:
+        resolved = resolve_wall_saturation(
+            data,
+            species_id=species,
+            T_K=temperature,
+            pO2_Pa=wall_pO2_Pa,
+        )
+    except WallSaturationLawRefusal as exc:
+        raise WallSaturationPressureRefusal(
+            species, temperature, exc.reason,
+        ) from exc
+    except NasaCeaError as exc:
+        raise WallSaturationPressureRefusal(
+            species, temperature, "wall_saturation_law_refused",
+        ) from exc
+    return float(resolved.pressure_Pa)
+
+
+def _species_declares_wall_reactions(
+    species: str,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> bool:
+    """True when the species row has a wall-reaction block.
+
+    An ill-typed block is still declared: the law refuses it, and the
+    deposition backstop must not replace that refusal with Psat = 0.
+    """
+
+    from simulator.vapour_rail.nasa_cea import WallSaturationLawRefusal
+    from simulator.vapour_rail.wall_saturation import wall_reactions_declaration
+
+    data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
+    try:
+        return wall_reactions_declaration(data) is not None
+    except WallSaturationLawRefusal:
+        return True
+
+
 def _antoine_psat_pa(
     species: str,
     T_K: float,
@@ -8198,6 +8294,7 @@ def _antoine_psat_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     enforce_hot_train_applicability: bool = True,
+    wall_pO2_Pa: float | None = None,
 ) -> float | None:
     if enforce_hot_train_applicability:
         _assert_condensation_applicable(
@@ -8217,6 +8314,17 @@ def _antoine_psat_pa(
     )
     if sodium_pressure is not None:
         return sodium_pressure
+    # One call covers both former refusal sites: the source-exponent gate
+    # (no legacy Antoine) and the empty wall fit (SiO's legacy block skipped
+    # that gate). A species with a wall-reaction block never reaches either.
+    wall_pressure = _declared_wall_saturation_pressure_pa(
+        species,
+        T_K,
+        data,
+        wall_pO2_Pa=wall_pO2_Pa,
+    )
+    if wall_pressure is not None:
+        return wall_pressure
     has_legacy_antoine = any(
         isinstance(block, Mapping)
         for block_name in _ANTOINE_COEFFICIENT_BLOCKS
@@ -8400,6 +8508,7 @@ def _try_antoine_psat_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     enforce_hot_train_applicability: bool = True,
+    wall_pO2_Pa: float | None = None,
 ) -> tuple[float | None, bool]:
     """Return a wall pressure or a named, fail-closed range refusal.
 
@@ -8427,6 +8536,7 @@ def _try_antoine_psat_pa(
             antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             enforce_hot_train_applicability=enforce_hot_train_applicability,
+            wall_pO2_Pa=wall_pO2_Pa,
         )
     except (CatalogCompileError, VaporPressureRangeError, NasaCeaDomainError, ShomateDomainError,
             WallSaturationPressureRefusal) as exc:
@@ -8978,6 +9088,76 @@ def _wall_antoine_temperature_relation(
     return None
 
 
+def _declared_wall_driving_pressure_pa(
+    species: str,
+    local_pressure_pa: float,
+    T_surface_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
+    antoine_extrapolation_warnings: list[str] | None,
+    diagnostic_out: MutableMapping[str, Any] | None,
+    wall_pO2_Pa: float | None,
+) -> float:
+    """Driving pressure from the wall law, never from a Psat = 0 backstop.
+
+    Premise. A declared wall reaction has a saturation pressure. The force
+    on the wall is the supersaturation of that pressure.
+
+    Algebra. ``driving = max(0, p_local − Psat)``. Units are pascals.
+    ``Psat ≥ p_local`` gives 0, the same limit as
+    ``equilibrium_capture_fraction``. ``Psat → +∞`` (oxidative reaction at
+    pO2 = 0) is that limit, not a missing pressure.
+
+    A law refusal is re-raised. It is not replaced by ``p_local``.
+    """
+
+    try:
+        P_sat_pa = _antoine_psat_pa(
+            species,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            wall_pO2_Pa=wall_pO2_Pa,
+        )
+    except WallSaturationPressureRefusal as exc:
+        record = {
+            "temperature_K": T_surface_K,
+            "status": "refused",
+            "reason": exc.reason,
+            "authority_level": "unavailable",
+            "valid_range_K": getattr(exc, "valid_range_K", None),
+            "band_scope": getattr(exc, "band_scope", "wall_saturation_pressure"),
+            "refusal_type": type(exc).__name__,
+        }
+        if antoine_extrapolations is not None:
+            antoine_extrapolations[f"{species}#wall:{T_surface_K}"] = record
+        if (
+            antoine_extrapolation_warnings is not None
+            and str(exc) not in antoine_extrapolation_warnings
+        ):
+            antoine_extrapolation_warnings.append(str(exc))
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_pa"] = None
+            diagnostic_out["wall_saturation_pressure_refused"] = True
+            diagnostic_out["wall_saturation_pressure_refusal_reason"] = exc.reason
+            diagnostic_out["wall_saturation_pressure_notice"] = dict(record)
+        raise
+    if diagnostic_out is not None:
+        diagnostic_out["wall_saturation_pressure_pa"] = P_sat_pa
+        diagnostic_out["wall_saturation_pressure_refused"] = False
+    if P_sat_pa is None or not math.isfinite(P_sat_pa):
+        if P_sat_pa is not None and math.isinf(P_sat_pa) and P_sat_pa > 0.0:
+            return 0.0
+        raise WallSaturationPressureRefusal(
+            species,
+            T_surface_K,
+            "saturation_pressure_unavailable",
+        )
+    return max(0.0, local_pressure_pa - P_sat_pa)
+
+
 def _wall_deposition_driving_pressure_pa(
     species: str,
     P_local_pa: float,
@@ -8989,6 +9169,7 @@ def _wall_deposition_driving_pressure_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
     diagnostic_out: MutableMapping[str, Any] | None = None,
+    wall_pO2_Pa: float | None = None,
 ) -> float:
     try:
         local_pressure_pa = float(P_local_pa)
@@ -9035,12 +9216,28 @@ def _wall_deposition_driving_pressure_pa(
             "MissingReactivityClassRefusal"
         )
         return 0.0
+    if _species_declares_wall_reactions(species, vapor_pressure_data):
+        # The three Psat = 0 branches below are not a fallback for a
+        # declared wall reaction. Driving force is max(0, p_local − Psat).
+        # Psat ≥ p_local, including +∞ when an oxidative reaction is given
+        # pO2 = 0, deposits nothing. A law refusal stays a refusal.
+        return _declared_wall_driving_pressure_pa(
+            species,
+            local_pressure_pa,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            diagnostic_out=diagnostic_out,
+            wall_pO2_Pa=wall_pO2_Pa,
+        )
     P_sat_pa, saturation_pressure_refused = _try_antoine_psat_pa(
         species,
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        wall_pO2_Pa=wall_pO2_Pa,
     )
     if stable_condensation_product_backstop:
         if not _stable_condensation_product_backstop_authorized(species):
@@ -9058,10 +9255,10 @@ def _wall_deposition_driving_pressure_pa(
     reactivity_class = declared_reactivity_class
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         if reactivity_class == 'reactive':
-            # SiO has a melt standard-reaction pressure, not a stable pure-SiO
-            # wall P_sat. Its authorized wall product is disproportionated
-            # Si/SiO2 with the existing first-order P_sat ~= 0 backstop, so the
-            # full local SiO pressure remains the deposition driving pressure.
+            # A declared wall reaction returned above and never reaches this
+            # branch. What remains is a reactive species with no wall block
+            # and no saturation pressure. Its driving force is the full
+            # local pressure.
             if diagnostic_out is not None:
                 diagnostic_out["wall_saturation_pressure_pa"] = 0.0
                 diagnostic_out["wall_saturation_pressure_refused"] = False
@@ -9124,9 +9321,10 @@ def _wall_deposition_driving_pressure_pa(
     if reactivity_class == 'reactive':
         if P_sat_pa < local_pressure_pa:
             return max(0.0, local_pressure_pa - P_sat_pa)
-        # Reactive deposits are less-volatile wall products, not the vapor
-        # species. Today SiO uses the disproportionation-product limit
-        # P_sat ~= 0; this explicit hook can grow a real product P_sat later.
+        # Same uncovered reactive species as above, now with a finite
+        # saturation pressure at or above the local pressure. Driving force
+        # stays the full local pressure. A declared wall reaction does not
+        # reach this branch.
         effective_product_psat_pa = 0.0
         if diagnostic_out is not None:
             diagnostic_out["wall_saturation_pressure_pa"] = effective_product_psat_pa
@@ -9148,6 +9346,7 @@ def _hkl_surface_deposition_flux_mol_m2_s(
     reactive_product_backstop: bool = True,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
+    wall_pO2_Pa: float | None = None,
 ) -> float:
     # b-304: same category-1 gate as the series-resistance helper below.
     # Pre-fix this helper had NO input gate: alpha_s multiplies the flux
@@ -9171,6 +9370,7 @@ def _hkl_surface_deposition_flux_mol_m2_s(
         reactive_product_backstop=reactive_product_backstop,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+        wall_pO2_Pa=wall_pO2_Pa,
     )
     if driving_pressure_pa <= 0.0:
         return 0.0
@@ -9221,6 +9421,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     diagnostic_out: MutableMapping[str, Any] | None = None,
     equilibrium_pressure_pa: float | None = None,
     diffusivity_temperature_K: float | None = None,
+    wall_pO2_Pa: float | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -9268,8 +9469,9 @@ def _series_resistance_deposition_flux_mol_m2_s(
     ``_stirring_enhanced_sherwood`` for the Frössling rationale.
 
     Returns 0 only for category-3 real limits: no driving force
-    (physisorber ``P_local <= P_sat`` at ``T_surface``; reactive species
-    use the product-P_sat floor) or ``alpha_s == 0.0`` exactly (a
+    (``P_local <= P_sat`` at ``T_surface``; a declared wall reaction uses
+    that law, and undersaturation is zero force) or ``alpha_s == 0.0``
+    exactly (a
     perfectly non-sticking surface — see the gate comment below).
     Category-1 degenerate inputs — non-positive pipe diameter or
     absolute temperatures, sticking coefficient outside [0, 1], any
@@ -9352,6 +9554,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=diagnostic_out,
+                wall_pO2_Pa=wall_pO2_Pa,
             )
         except WallSaturationPressureRefusal as exc:
             if diagnostic_out is not None:
@@ -10114,19 +10317,28 @@ def cold_spot_diagnostic(
                     ),
                 })
             if p_local_pa is not None:
-                # Premise: fouling requires p_i > P_sat(T_wall) (mandate
-                # hot-wall invariant). Algebra: supersaturation iff
-                # p_local_Pa - P_sat_Pa > 0. Units: both pressures are Pa.
-                # Sanity: Fe P_sat(1673.15 K) ≈ 1.14 Pa, so a 100 Pa
-                # (1 mbar) Fe stream is ~88-fold supersaturated; Na
-                # P_sat at the same wall is ~0.93 MPa, so 100 Pa Na is
-                # undersaturated. SiO wall Antoine is not a P_sat
-                # curve; a refused P_sat does not invent a flag here
-                # (reactive P_sat ~= 0 is M30 deposition policy).
+                # Premise: fouling requires p_i > P_sat(T_wall). Algebra:
+                # supersaturation iff p_local_Pa - P_sat_Pa > 0. Both
+                # pressures are pascals. Fe P_sat(1673.15 K) ≈ 1.14 Pa, so
+                # 100 Pa Fe is supersaturated; Na at the same wall is not.
+                # A declared wall reaction uses that law. Its parcel pO2 is
+                # the O2 entry of this partial-pressure map when the key is
+                # present, and missing otherwise. A refused Psat does not
+                # invent a flag, and Psat >= p_local is not a flag.
+                wall_pO2_Pa = None
+                if (
+                    species_partial_pressures_pa is not None
+                    and "O2" in species_partial_pressures_pa
+                ):
+                    wall_pO2_Pa = _finite_nonnegative_value(
+                        species_partial_pressures_pa["O2"],
+                        label="O2 partial pressure",
+                    )
                 P_sat_pa, saturation_refused = _try_antoine_psat_pa(
                     str(species),
                     wall_T_C + CELSIUS_TO_KELVIN_OFFSET,
                     vapor_pressure_data=vapor_pressure_data,
+                    wall_pO2_Pa=wall_pO2_Pa,
                 )
                 if (
                     not saturation_refused

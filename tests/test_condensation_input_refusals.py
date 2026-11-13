@@ -235,15 +235,17 @@ def _series_call(**overrides):
     return condensation._series_resistance_deposition_flux_mol_m2_s(**kwargs)
 
 
-def test_series_flux_missing_saturation_refuses_with_diagnostic(monkeypatch):
-    monkeypatch.setattr(
-        condensation,
-        "_try_antoine_psat_pa",
-        lambda *_args, **_kwargs: (None, False),
-    )
+def test_series_flux_missing_po2_refuses_with_diagnostic():
+    """SiO's wall block refuses when pO2 is absent. The diagnostic records
+    that refusal. It does not mint a flux from the retired Psat = 0 backstop.
+    """
+
     diagnostic = {}
 
-    with pytest.raises(condensation.WallSaturationPressureRefusal):
+    with pytest.raises(
+        condensation.WallSaturationPressureRefusal,
+        match="reason=wall_pO2_required",
+    ):
         _series_call(
             reactive_product_backstop=False,
             diagnostic_out=diagnostic,
@@ -251,6 +253,7 @@ def test_series_flux_missing_saturation_refuses_with_diagnostic(monkeypatch):
 
     assert diagnostic["wall_saturation_pressure_refused"] is True
     assert diagnostic["wall_saturation_pressure_pa"] is None
+    assert diagnostic["wall_saturation_pressure_refusal_reason"] == "wall_pO2_required"
 
 
 def test_wall_candidate_keeps_missing_saturation_diagnostic(monkeypatch):
@@ -389,10 +392,35 @@ def test_hkl_surface_flux_zero_alpha_returns_zero():
     assert _hkl_call(alpha_s=0.0) == 0.0
 
 
-def test_hkl_surface_flux_healthy_input_unchanged():
-    """Continuity: a healthy call still returns the alpha-weighted HKL
-    impingement flux (the gate adds refusals, not new physics)."""
-    assert _hkl_call() > 0.0
+def test_hkl_surface_flux_healthy_input_uses_the_wall_law():
+    """A healthy SiO call needs parcel pO2. Driving force is p_local - Psat.
+
+    Missing pO2 refuses. It does not return the full local pressure.
+    """
+
+    with pytest.raises(
+        condensation.WallSaturationPressureRefusal,
+        match="reason=wall_pO2_required",
+    ):
+        _hkl_call()
+    po2_pa = 1.0e-4
+    psat = condensation._antoine_psat_pa(
+        "SiO", _HKL_SIO_KWARGS["T_surface_K"], wall_pO2_Pa=po2_pa,
+    )
+    assert psat is not None and 0.0 < psat < _HKL_SIO_KWARGS["P_local_pa"]
+    flux = _hkl_call(wall_pO2_Pa=po2_pa)
+    expected = _HKL_SIO_KWARGS["alpha_s"] * condensation._hkl_impingement_flux_mol_m2_s(
+        "SiO",
+        _HKL_SIO_KWARGS["P_local_pa"] - psat,
+        _HKL_SIO_KWARGS["T_surface_K"],
+    )
+    full = _HKL_SIO_KWARGS["alpha_s"] * condensation._hkl_impingement_flux_mol_m2_s(
+        "SiO",
+        _HKL_SIO_KWARGS["P_local_pa"],
+        _HKL_SIO_KWARGS["T_surface_K"],
+    )
+    assert flux == pytest.approx(expected)
+    assert 0.0 < flux < full
 
 
 # ---------------------------------------------------------------------------

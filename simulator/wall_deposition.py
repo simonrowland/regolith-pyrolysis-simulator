@@ -210,6 +210,7 @@ def wall_deposit_candidate_for_surface_kg(
         _reactive_product_backstop_authorized,
         _required_record_alpha_s,
         _series_resistance_deposition_flux_mol_m2_s,
+        _species_declares_wall_reactions,
         _species_vapor_data,
         _transport_parameter_notice,
         _wall_alpha_record,
@@ -366,6 +367,19 @@ def wall_deposit_candidate_for_surface_kg(
         applied_regime_factor = _deposition_finite_scalar(
             "regime_factor", applied_regime_factor
         )
+        # The segment gas map's O2 partial is the wall pO2. Absence is
+        # missing, not a floor: reactions that need pO2 then refuse.
+        wall_pO2_Pa = None
+        if isinstance(pressure_source, Mapping) and "O2" in pressure_source:
+            wall_pO2_Pa = _deposition_finite_scalar(
+                "wall_pO2_Pa", pressure_source["O2"],
+            )
+            if wall_pO2_Pa < 0.0:
+                raise DepositionInputRefusal(
+                    "wall_pO2_Pa",
+                    wall_pO2_Pa,
+                    "must be non-negative",
+                )
         try:
             flux = _series_resistance_deposition_flux_mol_m2_s(
                 species, P_local_pa, T_wall_K, alpha_s,
@@ -377,6 +391,7 @@ def wall_deposit_candidate_for_surface_kg(
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
                 vapor_pressure_data=vapor_pressure_data,
+                wall_pO2_Pa=wall_pO2_Pa,
                 # Same eligibility gate as the stage band-sampling site in
                 # condensation.py: the SiO disproportionation backstop may
                 # materialize product only at/below the declared condensation
@@ -409,6 +424,9 @@ def wall_deposit_candidate_for_surface_kg(
         source_only_wall_channel = (
             source_data.get("fit_target") == "standard_reaction_term"
             and "pure_component_antoine" not in source_data
+            and not _species_declares_wall_reactions(
+                species, vapor_pressure_data,
+            )
         )
         if source_only_wall_channel:
             from engines.builtin.vapor_pressure import _coefficient_mapping

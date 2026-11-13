@@ -61,8 +61,9 @@ def _assert_synthetic_sio_route_authority(route) -> None:
         "pa": 100.0,
         "valid_range_K": [1323.0, 1324.0],
     }
-    # t-1217: extrapolated stage-surface saturation is visible but not authoritative.
-    assert "antoine_psat_unavailable_at_T" in {
+    # The empty-fit extrapolation is not the wall law. A covered species
+    # either evaluates Psat or refuses wall_pO2_required.
+    assert "antoine_psat_unavailable_at_T" not in {
         outcome["reason"] for outcome in stage_outcomes
     }
 
@@ -798,9 +799,7 @@ def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
     assert refusal["upstream_authority_status"] == "missing"
     assert refusal["authoritative_for_condensation"] is False
     assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
-    assert authority["authority_level"] == "extrapolated"
-    assert authority["reason"] == "antoine_psat_unavailable_at_T"
-    assert authority["valid_range_K"]
+    assert "authority_level" not in authority
     assert (route.condensed_for_species("SiO") + route.wall_deposit_by_species.get("SiO", 0.0)
             + route.remaining_by_species["SiO"]) == pytest.approx(1.0)
 
@@ -934,13 +933,10 @@ def test_wall_mg_psat_uses_reconstructed_segment_and_flags_outside_envelope():
     ] is True
 
 
-def test_wall_deposit_uses_reactive_product_backstop_not_sio_reaction_term():
+def test_wall_deposit_does_not_use_the_reactive_psat_zero_backstop():
     sio_data = condensation_module.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
-    # Bug A source-range contract; B1 vapor package extends the SiO band to
-    # the declared gas-rail certified edge (data/vapor_pressures.yaml:
-    # total_source_certified_range_K upper bound 2273.15 K).
-    certified_range_K = sio_data["valid_range_K"]
-    assert certified_range_K == [1400, 2273.15]
+    # The source band stays a citation. It is not a wall saturation curve.
+    assert sio_data["valid_range_K"] == [1400, 2273.15]
 
     model = CondensationModel(
         CondensationTrain.create_default(),
@@ -955,10 +951,20 @@ def test_wall_deposit_uses_reactive_product_backstop_not_sio_reaction_term():
     )
 
     authority = route.condensation_authority_by_species["SiO"]
-    assert authority["authority_level"] == "extrapolated"
-    assert authority["reason"] == "antoine_psat_unavailable_at_T"
-    assert authority["valid_range_K"] == certified_range_K
-    assert route.wall_deposit_by_species["SiO"] > 0.0
+    assert authority["authoritative_for_condensation"] is False
+    outcomes = route.condensation_refusals_by_species["SiO"].get(
+        "stage_outcomes", []
+    )
+    assert any(
+        "wall_pO2_required" in str(outcome.get("reason", ""))
+        for outcome in outcomes
+    )
+    # Default stage 3 is divert and the SiO partial map has no O2 key.
+    # The retired backstop deposited the whole local pressure. The law
+    # refuses, so the parcel stays in the vapour.
+    assert route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
+    assert route.condensed_for_species("SiO") == pytest.approx(0.0)
+    assert route.remaining_by_species["SiO"] == pytest.approx(1.0)
 
 
 def test_cold_liner_routes_sio_to_wall_deposit_bucket():
@@ -974,10 +980,10 @@ def test_cold_liner_routes_sio_to_wall_deposit_bucket():
         melt,
     )
 
-    assert route.wall_deposit_by_species["SiO"] > 0.0
+    assert route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
     destinations = (
         route.condensed_for_species("SiO")
-        + route.wall_deposit_by_species["SiO"]
+        + route.wall_deposit_by_species.get("SiO", 0.0)
         + route.remaining_by_species["SiO"]
     )
     assert destinations == pytest.approx(1.0)
@@ -1006,14 +1012,13 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate(stage3_route):
         melt,
     )
 
-    # t-1217: the first cold wall captures the full inlet parcel on the causal route.
-    assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        1.0,
-        rel=1e-12,
-    )
+    # The pipe partial map in this test has SiO and no O2. The law refuses
+    # wall_pO2_required. The retired backstop captured the whole parcel.
+    wall_sio = route.wall_deposit_by_species.get("SiO", 0.0)
+    assert wall_sio == 0.0
     assert (
         route.condensed_for_species("SiO")
-        + route.wall_deposit_by_species["SiO"]
+        + wall_sio
         + route.remaining_by_species["SiO"]
     ) == pytest.approx(1.0)
     notice = route.sticking_alpha_provenance_notice
@@ -1091,7 +1096,7 @@ def test_per_segment_wall_deposits_sum_to_aggregate_bucket():
         for species_kg in route.wall_deposit_by_segment_species.values()
     )
     assert segment_total == pytest.approx(
-        route.wall_deposit_by_species["SiO"]
+        route.wall_deposit_by_species.get("SiO", 0.0)
     )
     assert set(route.wall_deposit_by_segment_species).issubset({
         segment.name for segment in model.pipe_segments
@@ -1142,9 +1147,10 @@ def test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit(
         f["species"] == "SiO"
         for f in cold.last_cold_spot_diagnostic["findings"]
     )
-    assert cold_route.wall_deposit_by_species["SiO"] < (
-        hot_route.wall_deposit_by_species.get("SiO", 0.0)
-    )
+    # No O2 key in the segment map, so neither temperature deposits SiO.
+    # The cold-spot flag above is the temperature finding. It is not a deposit.
+    assert cold_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
+    assert hot_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
 
 
 def test_cached_condensation_model_uses_updated_liner_temperature(
@@ -1168,18 +1174,26 @@ def test_cached_condensation_model_uses_updated_liner_temperature(
 
     _assert_synthetic_sio_route_authority(cold_route)
     _assert_synthetic_sio_route_authority(hot_route)
-    assert cold_route.wall_deposit_by_species["SiO"] > 0.0
-    # 2026-07-21 B1 wall-gate fix: the old expectation (hotter liner deposits
-    # MORE SiO) was an artifact of the unguarded hot-wall reactive backstop —
-    # physically backwards, and the exact failure mode the hot-walls design
-    # invariant exists to prevent. The subject under test is that the cached
-    # model REFRESHES its operating conditions: the 1650 C (> T_cond) liner
-    # must show ZERO wall SiO, and the routing must visibly differ from the
-    # 900 C route — proving the reconfiguration took effect.
+    # Neither visit has an O2 partial, so the wall law deposits nothing.
+    # The refreshed liner is the temperature the law refuses at:
+    # 1650 + 273.15 = 1923.15 K.
+    assert cold_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
     assert hot_route.wall_deposit_by_species.get("SiO", 0.0) == 0.0
-    assert hot_route.condensed_by_stage_species != (
-        cold_route.condensed_by_stage_species
-    )
+    hot_wall_keys = [
+        key for key in hot_route.antoine_extrapolations if key.startswith("SiO#wall:")
+    ]
+    cold_wall_keys = [
+        key for key in cold_route.antoine_extrapolations if key.startswith("SiO#wall:")
+    ]
+    assert hot_wall_keys
+    assert set(hot_wall_keys) != set(cold_wall_keys)
+    refreshed = [
+        hot_route.antoine_extrapolations[key]
+        for key in hot_wall_keys
+        if key.endswith("1923.15")
+    ]
+    assert refreshed
+    assert "reason=wall_pO2_required" in refreshed[0]["reason"]
 
 
 def test_knudsen_regime_factor_rises_toward_ballistic():

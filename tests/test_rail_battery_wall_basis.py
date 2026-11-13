@@ -9,8 +9,9 @@ stream exceeds it ~88-fold.
 
 Successful-value controls named by the verifiers: adequately hot or
 diluted Fe stays clear; a wall below the SiO engineering landing T
-still sets has_cold_spot; the 1300 C uniform-minimum warning remains;
-SiO reactive P_sat ~= 0 deposition policy is untouched (M30 / D04).
+still sets has_cold_spot; the 1300 C uniform-minimum warning remains.
+SiO uses the wall-saturation law: missing pO2 refuses, and a real Psat
+above the local pressure drives nothing.
 """
 
 from __future__ import annotations
@@ -22,6 +23,8 @@ from simulator.condensation import (
     CONDENSATION_TEMPS_C,
     DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
     CondensationModel,
+    WallSaturationPressureRefusal,
+    _antoine_psat_pa,
     _try_antoine_psat_pa,
     _wall_deposition_driving_pressure_pa,
     cold_spot_diagnostic,
@@ -144,23 +147,37 @@ def test_wall_below_sio_landing_temperature_still_has_cold_spot():
     )
 
 
-def test_sio_reactive_wall_saturation_backstop_unchanged():
-    """D04 / M30: diagnostic must not retune SiO reactive deposition P_sat."""
+def test_sio_wall_saturation_uses_the_law_not_the_zero_backstop():
+    """Missing pO2 refuses. A real Psat at or above p_local drives nothing.
+
+    Restoring the reactive branch that wrote effective Psat = 0 fails the
+    undersaturated driving-pressure assertion.
+    """
 
     sio_psat, refused = _try_antoine_psat_pa("SiO", WALL_1400_K)
     assert refused is True
     assert sio_psat is None
+    with pytest.raises(WallSaturationPressureRefusal, match="wall_pO2_required"):
+        _wall_deposition_driving_pressure_pa(
+            "SiO",
+            MILLIBAR_BAKEOFF_PA,
+            WALL_1400_K,
+        )
 
+    po2_pa = 1.0e-4
+    psat = _antoine_psat_pa("SiO", WALL_1400_K, wall_pO2_Pa=po2_pa)
+    assert psat is not None and psat > 0.0
     notice: dict[str, object] = {}
     driving = _wall_deposition_driving_pressure_pa(
         "SiO",
-        MILLIBAR_BAKEOFF_PA,
+        psat * 0.5,
         WALL_1400_K,
+        wall_pO2_Pa=po2_pa,
         diagnostic_out=notice,
     )
-    assert driving == pytest.approx(MILLIBAR_BAKEOFF_PA)
-    assert notice["wall_saturation_pressure_pa"] == 0.0
-    assert notice["wall_saturation_pressure_status"] == "reactive_product_backstop"
+    assert driving == 0.0
+    assert notice["wall_saturation_pressure_pa"] == pytest.approx(psat)
+    assert notice.get("wall_saturation_pressure_status") != "reactive_product_backstop"
 
     sio_only = cold_spot_diagnostic(
         [_upstream_segment("stage_3", 1400.0)],
@@ -168,6 +185,15 @@ def test_sio_reactive_wall_saturation_backstop_unchanged():
         species_partial_pressures_pa={"SiO": MILLIBAR_BAKEOFF_PA},
     )
     assert sio_only["has_upstream_hot_wall_violation"] is False
+    supersaturated = cold_spot_diagnostic(
+        [_upstream_segment("stage_3", 1400.0)],
+        {"SiO": 1.0},
+        species_partial_pressures_pa={
+            "SiO": MILLIBAR_BAKEOFF_PA,
+            "O2": po2_pa,
+        },
+    )
+    assert supersaturated["has_upstream_hot_wall_violation"] is True
 
 
 def test_route_millibar_fe_at_1400_c_uses_wall_partial_pressure():
