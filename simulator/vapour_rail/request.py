@@ -1485,11 +1485,19 @@ def refusal_closure(
                             "intrinsic_melt oxygen fugacity must be finite and positive",
                             source_reaction_activity=source_reaction_activity,
                         )
-                evaluation = compiled.evaluator.evaluate(
-                    state.temperature_K,
-                    source_activity=source_activity,
-                    pO2_bar=evaluator_fO2_bar,
+                provenance = state.source_reaction_activity_provenance.get(
+                    rule.species_id, {}
                 )
+                from simulator.vapour_rail.run_disclosure import (
+                    _source_domain_disclosure,
+                )
+
+                with _source_domain_disclosure(provenance):
+                    evaluation = compiled.evaluator.evaluate(
+                        state.temperature_K,
+                        source_activity=source_activity,
+                        pO2_bar=evaluator_fO2_bar,
+                    )
                 pressure_pa = evaluation.pressure_pa
                 # VR-11: thread real evaluator range/acquisition state — never
                 # synthesize out_of_range=false when the evaluator fired
@@ -1504,9 +1512,6 @@ def refusal_closure(
                     ),
                     "status": getattr(evaluation, "status", None),
                 }
-                provenance = state.source_reaction_activity_provenance.get(
-                    rule.species_id, {}
-                )
                 # Every *_notice on the source provenance and on the
                 # evaluation. A diagnostic admission that is the only notice
                 # on either carrier is included. Callers do not select

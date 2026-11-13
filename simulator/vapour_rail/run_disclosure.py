@@ -19,8 +19,9 @@ a measured row with empty authority.
   A diagnostic admission registers from the evaluator notice. Any other
   continuation registers once when the evaluation is outside a certified
   domain: temperature ``out_of_range``, or a carrier notice whose
-  ``authority_level`` is ``extrapolated`` (oxygen evaluator band and the
-  oxygen mass-action floor). Temperature alone does not define the domain.
+  ``authority_level`` is ``extrapolated`` (oxygen evaluator band, oxygen
+  mass-action floor, or source-activity floor). Temperature alone does not
+  define the domain.
 - A cache hit does not execute the law. It re-registers the disclosure stored
   with that computation. Counts from two computations add.
 - Disclosure is metadata on the cached row, not a cache-key dimension.
@@ -62,6 +63,10 @@ from typing import Any
 
 _ACTIVE: ContextVar[RunDisclosure | None] = ContextVar(
     "vapour_law_run_disclosure",
+    default=None,
+)
+_SOURCE_DOMAIN_STATE: ContextVar[Mapping[str, Any] | None] = ContextVar(
+    "vapour_law_source_domain_state",
     default=None,
 )
 
@@ -141,8 +146,14 @@ class RunDisclosure:
             # not add a second row for a law that is already diagnostic.
             self._register_notice(evaluator, notices[0])
             return
-        if evaluation is not None and _evaluation_is_extrapolated(evaluation):
-            self._register_extrapolated(evaluator, evaluation)
+        source_domain_state = _SOURCE_DOMAIN_STATE.get()
+        if evaluation is not None and (
+            _evaluation_is_extrapolated(evaluation)
+            or _domain_extrapolation_notice(source_domain_state) is not None
+        ):
+            self._register_extrapolated(
+                evaluator, evaluation, source_domain_state
+            )
 
     def _register_notice(self, evaluator: Any, notice: Mapping[str, Any]) -> None:
         species = str(
@@ -169,7 +180,12 @@ class RunDisclosure:
             evaluation_count=1,
         )
 
-    def _register_extrapolated(self, evaluator: Any, evaluation: Any) -> None:
+    def _register_extrapolated(
+        self,
+        evaluator: Any,
+        evaluation: Any,
+        source_domain_state: Mapping[str, Any] | None = None,
+    ) -> None:
         """One out-of-band continuation. Authority is extrapolated, not diagnostic."""
 
         species = str(getattr(evaluator, "species_id", "") or "")
@@ -183,7 +199,9 @@ class RunDisclosure:
             return
         self.entries[law_id] = LawDisclosure(
             law_id=law_id,
-            provenance=_extrapolated_provenance(evaluation),
+            provenance=_extrapolated_provenance(
+                evaluation, source_domain_state
+            ),
             authority="extrapolated",
             certified_band_K=_certified_band(evaluator),
             anchor_gaps_dex={},
@@ -242,7 +260,9 @@ class RunDisclosure:
             )
 
 
-def _domain_extrapolation_notice(evaluation: Any) -> Mapping[str, Any] | None:
+def _domain_extrapolation_notice(
+    evaluation: Any,
+) -> Mapping[str, Any] | None:
     """First carrier notice that admits an extrapolated continuation.
 
     Temperature ``out_of_range`` is only the thermal class. Oxygen-band and
@@ -266,18 +286,23 @@ def _evaluation_is_extrapolated(evaluation: Any) -> bool:
     return _domain_extrapolation_notice(evaluation) is not None
 
 
-def _extrapolated_provenance(evaluation: Any) -> str:
+def _extrapolated_provenance(
+    evaluation: Any,
+    source_domain_state: Mapping[str, Any] | None = None,
+) -> str:
     """Thermal status and the domain reason, as one execution.
 
     A temperature continuation keeps ``out_of_range_conservative_continuation``.
-    An in-temperature oxygen continuation keeps the notice reason
-    (``pO2_outside_evaluator_band`` or the mass-action floor). Both domains
-    on one evaluation stay one row: the thermal status, then the reason.
+    An in-temperature oxygen or source-activity continuation keeps the notice
+    reason. Both domains on one evaluation stay one row: the thermal status,
+    then the reason.
     """
 
     status = getattr(evaluation, "status", None)
     status_text = str(status).strip() if status else ""
-    notice = _domain_extrapolation_notice(evaluation)
+    notice = _domain_extrapolation_notice(evaluation) or (
+        _domain_extrapolation_notice(source_domain_state)
+    )
     reason = ""
     if isinstance(notice, Mapping):
         reason = str(notice.get("reason") or "").strip()
@@ -376,6 +401,19 @@ def bind_run_registry(registry: RunDisclosure) -> Iterator[RunDisclosure]:
         yield registry
     finally:
         _ACTIVE.reset(token)
+
+
+@contextmanager
+def _source_domain_disclosure(
+    provenance: Mapping[str, Any] | None,
+) -> Iterator[None]:
+    """Supply source-domain notices to the evaluator's single registration."""
+
+    token = _SOURCE_DOMAIN_STATE.set(provenance)
+    try:
+        yield
+    finally:
+        _SOURCE_DOMAIN_STATE.reset(token)
 
 
 def disclosure_delta(

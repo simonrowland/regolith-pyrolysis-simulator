@@ -543,6 +543,67 @@ def test_source_provenance_collision_keeps_both_diagnostic_notices() -> None:
     )
 
 
+def test_source_activity_floor_disclosure_registers_and_replays() -> None:
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.vapour_rail.batch import (
+        FLUX_ACTIVATION_EPOCH_RG_MANIFEST,
+        FluxActivationContext,
+    )
+
+    provider = BuiltinVaporPressureProvider(_live_vapor())
+    catalog = provider._vapour_rail_catalog
+    declaration = catalog.species["TiO"].source_reaction_activity
+    assert declaration is not None
+    state = {
+        "temperature_K": 2100.0,
+        "process_phase": "hot_train",
+        "stage": "evaporation",
+        "fO2_bar": 1.0e-9,
+        "source_reaction_fO2_bar": 1.0e-9,
+        "source_reaction_activities": {"TiO": 1.0e-300},
+        "source_reaction_activity_provider": "review-b119-source-floor",
+        "source_reaction_activity_evidence_refs": {
+            "TiO": "tests/test_vapour_law_disclosure.py:source-floor"
+        },
+        "source_reaction_activity_standard_states": {
+            "TiO": declaration.standard_state
+        },
+        "source_reaction_activity_provenance": {
+            "TiO": {
+                "source_activity_floor_notice": {
+                    "authority_level": "extrapolated",
+                    "reason": "source_activity_floored",
+                    "certified_band": {"source_activity": (1.0e-300, 1.0)},
+                    "source_activity_used": 1.0e-300,
+                }
+            }
+        },
+    }
+    activation = FluxActivationContext(epoch=FLUX_ACTIVATION_EPOCH_RG_MANIFEST)
+    with disclosure_scope(inherit=False) as run_a:
+        with computation_disclosure() as computation:
+            batch = catalog.resolve_batch(
+                {"process.cleaned_melt": {"TiO2": 1.0}},
+                state,
+                flux_activation_context=activation,
+            )
+            answer = batch.channel("TiO")
+            assert answer.refusal_code is None
+            assert isinstance(answer.extra["source_activity_floor_notice"], list)
+        cached = computation.snapshot()
+        assert run_a.snapshot() == cached
+
+    law = next(item for item in cached if item["law_id"] == "TiO:nasa_cea_9")
+    assert law["authority"] == "extrapolated"
+    assert law["provenance"] == "source_activity_floored"
+    assert law["evaluation_count"] == 1
+    cached_record = {"law_disclosures": [dict(item) for item in cached]}
+    with disclosure_scope(inherit=False) as run_b:
+        assert accept_stored_memo(cached_record) == cached_record["law_disclosures"]
+        replayed = run_b.snapshot()
+    assert replayed == cached
+
+
 def test_plural_notice_key_reaches_diagnostics() -> None:
     from types import SimpleNamespace
 
