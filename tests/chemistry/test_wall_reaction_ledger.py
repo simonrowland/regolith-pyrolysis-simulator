@@ -857,6 +857,41 @@ def test_complete_dalton_mixture_closes_at_every_segment(carrier) -> None:
         assert local["O2"] > 0.0
 
 
+def test_flagged_cro_commits_condensate_with_upstream_flag_and_reaction(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+) -> None:
+    from tests.chemistry.conftest import _build_sim
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    sim.melt.temperature_C = 1600.0
+    carrier = {
+        "species_id": "CrO",
+        "pressure": {"kind": "value", "pa": 100.0},
+        "flux": {"kind": "eligible", "alpha_ref": "test:alpha"},
+        "is_flux_active": True,
+        "validation_status": "modeled-PENDING",
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+    }
+    flux = EvaporationFlux(
+        species_kg_hr={"CrO": 0.001}, total_kg_hr=0.001,
+        carrier_authority_by_species={"CrO": carrier},
+    )
+    sim._configure_condensation_operating_conditions(flux)
+    route = sim.condensation_model.route(flux, sim.melt)
+    assert route.condensed_for_species("CrO") + route.wall_deposit_by_species.get("CrO", 0.0) > 0.0
+    outcome = sim._route_evaporated_species_to_condensation(
+        route, "CrO", 0.001, apply_evaporative_redox_source_terms=False,
+    )
+    assert outcome["evaporation_transition"] is not None
+    lots = [lot for transition in sim.atom_ledger.transitions
+            for lot in transition.credits if "condensation_authority" in lot.meta]
+    assert lots
+    for lot in lots:
+        assert lot.meta["condensation_authority"]["carrier_authority"] == carrier
+        assert lot.meta["condensation_authority"]["authoritative_for_condensation"] is False
+        assert lot.meta["wall_reaction_booking"]["reaction_legs"]
 
 
 def test_complete_mixture_does_not_invent_roundoff_carrier_after_capture() -> None:
