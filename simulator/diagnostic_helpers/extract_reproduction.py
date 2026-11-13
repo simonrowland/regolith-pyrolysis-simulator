@@ -1649,38 +1649,25 @@ def _read_melt_psat_cache(cache_key: tuple[Any, ...]) -> Mapping[str, Any] | Non
 
 
 def _published_law_disclosures(*groups: Any) -> list[dict[str, Any]]:
-    """Merge disclosure rows the way a replay adds counts.
+    """Publish disclosure groups through the run registry.
 
-    The returned list is what a ranking or pressure publication carries.
-    The same law from two computations keeps one row and adds the counts.
+    Count coercion, the minimum count, additive merge, and law-id order
+    belong to ``RunDisclosure.reregister_public`` and ``snapshot``. A bare
+    mapping is not a group: the registry takes one sequence of rows.
     """
 
-    merged: dict[str, dict[str, Any]] = {}
+    from simulator.vapour_rail.run_disclosure import RunDisclosure
+
+    registry = RunDisclosure()
     for group in groups:
         if isinstance(group, Mapping) or isinstance(group, (str, bytes)):
             continue
         if not isinstance(group, (list, tuple)):
             continue
-        for item in group:
-            if not isinstance(item, Mapping):
-                continue
-            law_id = str(item.get("law_id") or "")
-            if not law_id:
-                continue
-            try:
-                extra = int(item.get("evaluation_count") or 1)
-            except (TypeError, ValueError):
-                extra = 1
-            if extra < 1:
-                extra = 1
-            current = merged.get(law_id)
-            if current is None:
-                copied = dict(item)
-                copied["evaluation_count"] = extra
-                merged[law_id] = copied
-                continue
-            current["evaluation_count"] = int(current.get("evaluation_count") or 1) + extra
-    return [merged[key] for key in sorted(merged)]
+        registry.reregister_public(
+            [item for item in group if isinstance(item, Mapping)]
+        )
+    return [dict(item) for item in registry.snapshot()]
 
 
 def _store_melt_psat_cache(

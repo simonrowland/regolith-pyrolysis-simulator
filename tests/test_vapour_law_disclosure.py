@@ -3076,6 +3076,74 @@ def test_typed_publication_notice_is_always_a_list(key: str, count: int) -> None
     assert len(coating[key]) == count
 
 
+def test_published_law_disclosures_follow_the_run_registry() -> None:
+    """Ranking disclosure is the registry snapshot, not a second merger.
+
+    Fe is counted by hand: one computation recorded 2 and the next recorded
+    3, so the published row is 5. ``nope`` and 0 are not positive counts, so
+    each becomes 1. An empty law id, a bare mapping, and a string are not
+    rows. Order is law id.
+    """
+
+    from simulator.diagnostic_helpers.extract_reproduction import (
+        _published_law_disclosures,
+    )
+
+    fe = {
+        "law_id": "Fe:pseudo",
+        "provenance": "backsolved from VapoRock, no coefficients fitted",
+        "authority": "diagnostic/extrapolated",
+        "certified_band_K": [1400.0, 1900.0],
+        "anchor_gaps_dex": {
+            "rail": 1.1127636390496998,
+            "vaporock": 1.4535567803078235,
+        },
+        "closer": "t-1723",
+        "certification_route": ["d-383", "d-381"],
+        "evaluation_count": 2,
+    }
+    fe_again = dict(fe)
+    fe_again["evaluation_count"] = 3
+    fe_again["provenance"] = "ignored-on-merge"
+    blank = {
+        "provenance": "fit",
+        "authority": "extrapolated",
+        "certified_band_K": None,
+        "anchor_gaps_dex": {},
+        "closer": "",
+        "certification_route": [],
+    }
+
+    def row(law_id: str, count: object) -> dict[str, object]:
+        return {"law_id": law_id, "evaluation_count": count, **blank}
+
+    published = _published_law_disclosures(
+        [fe, {"law_id": ""}, "not-a-row"],
+        {"law_id": "dict-group"},
+        "string-group",
+        [row("SiO:antoine", 1), fe_again, row("bad", "nope"), row("zero", 0)],
+        None,
+    )
+    assert published == [
+        {
+            "law_id": "Fe:pseudo",
+            "provenance": "backsolved from VapoRock, no coefficients fitted",
+            "authority": "diagnostic/extrapolated",
+            "certified_band_K": [1400.0, 1900.0],
+            "anchor_gaps_dex": {
+                "rail": 1.1127636390496998,
+                "vaporock": 1.4535567803078235,
+            },
+            "closer": "t-1723",
+            "certification_route": ["d-383", "d-381"],
+            "evaluation_count": 5,
+        },
+        {**row("SiO:antoine", 1)},
+        {**row("bad", 1)},
+        {**row("zero", 1)},
+    ]
+
+
 def _assigned_notice_key(node: object) -> str | None:
     """Constant ``*_notice`` key of a subscript assignment, if it has one."""
 
