@@ -15,24 +15,29 @@ review_status: draft
 fidelity_samples:
 - path: species.sample_15013.observations[lpi_15013_carbon_and_nitrogen].equipment.sample.value.sample_mass_g.value
   value: 296.2
-  locator: {pdf_page_index: 1, section: Introduction, figure: '1'}
+  locator: {page: 1, pdf_page_index: 0, section: Introduction, figure: '1'}
 source_locators:
   page_1: &page_1
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
   page_2: &page_2
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 2
+    page: 2
+    pdf_page_index: 1
   page_3: &page_3
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 3
+    page: 3
+    pdf_page_index: 2
   table_1: &table_1
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 4
+    page: 4
+    pdf_page_index: 3
     table: '1'
   page_5: &page_5
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 5
+    page: 5
+    pdf_page_index: 4
   page_6: &page_6
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
     page: 6
@@ -56,7 +61,7 @@ sample_characterization:
     observations: &sample_15013_observations
     - observation_id: lpi_15013_carbon_and_nitrogen
       type: concentration_series
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Chemistry, figure: '2'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 1, pdf_page_index: 0, section: Chemistry, figure: '2'}
       units: as_published
       values:
         method_class: quoted_attributed
@@ -76,16 +81,16 @@ sample_characterization:
             sample_mass_g:
               value: 296.2
               units: g
-              locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+              locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 1, pdf_page_index: 0, section: Introduction, figure: '1'}
             form:
               value: lunar soil
-              locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
-          locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+              locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 1, pdf_page_index: 0, section: Introduction, figure: '1'}
+          locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 1, pdf_page_index: 0, section: Introduction, figure: '1'}
   figure_only_characterization:
     observations: &sample_15013_figure_observations
     - observation_id: lpi_15013_grain_size_distribution_figure_only
       type: figure_summary
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '5'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 2, pdf_page_index: 1, figure: '5'}
       units: as_published
       values:
         method_class: figure_only
@@ -96,7 +101,7 @@ sample_characterization:
         plotted_values: not_digitized
     - observation_id: lpi_15013_maturity_carbon_figure_only
       type: figure_summary
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, figure: '2'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 1, pdf_page_index: 0, figure: '2'}
       units: as_published
       values:
         method_class: figure_only
@@ -106,7 +111,7 @@ sample_characterization:
         attribution: 'Moore et al. 1973; Morris 1978'
     - observation_id: lpi_15013_ree_normalized_pattern_figure_only
       type: figure_summary
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '4'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 2, pdf_page_index: 1, figure: '4'}
       units: normalized_to_chondrite_as_plotted
       values:
         method_class: figure_only
@@ -184,7 +189,7 @@ chemical_composition:
     observations: &sample_15013_volatile_observations
     - observation_id: lpi_15013_lm_exhaust_release_context
       type: source_context
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '6'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 3, pdf_page_index: 2, figure: '6'}
       units: as_published
       values:
         method_class: quoted_attributed
@@ -195,7 +200,7 @@ chemical_composition:
         note: 'The page text says these products could be released at relatively low temperatures in a vacuum; it gives no numeric release temperature in prose.'
     - observation_id: lpi_15013_volatile_release_curve_figure_only
       type: figure_summary
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 3, figure: '7'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 3, pdf_page_index: 2, figure: '7'}
       units: as_plotted
       values:
         method_class: figure_only
@@ -210,7 +215,7 @@ species:
     context: &sample_15013_context
     - observation_id: lpi_15013_sample_mass_and_collection
       type: sample_characterization
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Introduction, figure: '1'}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 1, pdf_page_index: 0, section: Introduction, figure: '1'}
       units: as_published
       values:
         method_class: measured_tabulated
@@ -225,7 +230,7 @@ species:
       reason: 'no closed observation type; off-rail sample characterization (decision d-126)'
     - observation_id: lpi_15013_maturity_and_grain_size
       type: sample_characterization
-      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 1, section: Petrography}
+      locator: {source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, page: 1, pdf_page_index: 0, section: Petrography}
       units: as_published
       values:
         method_class: quoted_attributed
