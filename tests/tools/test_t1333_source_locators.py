@@ -6,10 +6,13 @@ from decimal import Decimal
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 import yaml
+from simulator.battery.extract_gate import _as_decimal
+from simulator.battery.migrate import discover_extracts
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -19,8 +22,14 @@ LEGACY_CORPUS_ROOT = Path.home() / "Repos" / ".regolith-main-review" / "corpus-m
 
 
 def _all_extracts() -> list[Path]:
-    # Match migrate.discover_extracts: top-level YAML files only.
-    return sorted(EXTRACTS_DIR.glob("*.yaml"))
+    # Keep discovery exclusions identical to migrate.discover_extracts.
+    return sorted(
+        path
+        for path in EXTRACTS_DIR.glob("*.yaml")
+        if path.is_file()
+        and not path.name.startswith("_")
+        and not path.name.upper().startswith("SCHEMA")
+    )
 
 
 def _walk(value, ancestors=()):
@@ -83,14 +92,13 @@ def _line_ranges(value: str) -> list[tuple[int, int]]:
 
 
 def _source_file(source_path: str, roots: list[Path], source_id: str | None = None) -> Path | None:
-    relative_paths = [source_path]
+    relative_path = Path(source_path)
     if source_path.startswith("corpus/"):
-        relative_paths.append(source_path.removeprefix("corpus/"))
+        relative_path = Path(source_path.removeprefix("corpus/"))
     for root in roots:
-        for relative_path in relative_paths:
-            candidate = root / relative_path
-            if candidate.is_file():
-                return candidate
+        candidate = root / relative_path
+        if candidate.is_file():
+            return candidate
         if source_id and source_path.startswith("docs/references/pdfs/"):
             raw_dir = root / "raw" / source_id
             for filename in (Path(source_path).name, f"{source_id}.pdf"):
@@ -220,16 +228,11 @@ def pdf_page_counts() -> dict[Path, int]:
 
 
 def _pdf_page_numbers(page, extract: Path, locator: dict) -> list[int]:
-    if isinstance(page, str):
-        page = re.sub(r"^\s*(?:PDF\s*)?p(?:age)?\.?\s*", "", page, flags=re.I)
-        pages = [item.strip() for item in re.split(r"[,;]", page) if item.strip()]
-        page_numbers = [int(item) for item in pages if item.isdigit()]
-        assert len(page_numbers) == len(pages) and page_numbers, (
-            f"{extract.name}: PDF page is not numeric: {locator}"
-        )
-        return page_numbers
-    assert type(page) is int, f"{extract.name}: PDF page is not numeric: {locator}"
-    return [page]
+    numeric_page = _as_decimal(page)
+    assert numeric_page is not None and numeric_page == numeric_page.to_integral_value(), (
+        f"{extract.name}: PDF page is not one numeric integer: {locator}"
+    )
+    return [int(numeric_page)]
 
 
 def _record_demaria_table_8_pin() -> None:
@@ -258,6 +261,43 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
     richter_locator = {"paragraph": "2.5 and 6 mm samples"}
     unrelated_richter_range = "Temperature 4.6; evaporation fluxes -6.6 and -6.7."
     assert _citation_matches(richter_locator, unrelated_richter_range, [[2.5, 6.0]]) is False
+
+
+def test_extract_discovery_matches_migrator() -> None:
+    extracts = _all_extracts()
+    assert len(extracts) == 782
+    assert extracts == discover_extracts(EXTRACTS_DIR)
+
+
+@pytest.mark.parametrize("page", ["23, 24", "22, 6", "23; 24", "1-7", "1–7"])
+def test_pdf_page_is_one_numeric_token(page: str) -> None:
+    with pytest.raises(AssertionError, match="one numeric integer"):
+        _pdf_page_numbers(page, Path("extract.yaml"), {"page": page})
+
+
+def test_tables_only_root_does_not_resolve_raw_locator(tmp_path: Path, monkeypatch) -> None:
+    tables_root = tmp_path / "tables-only"
+    raw_locator = "corpus/raw/example/example.pdf"
+    decoy = tables_root / "tables" / "example.pdf"
+    decoy.parent.mkdir(parents=True)
+    decoy.touch()
+    monkeypatch.setattr(sys.modules[__name__], "LEGACY_CORPUS_ROOT", tmp_path / "absent-legacy")
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tables_root))
+    extract = tmp_path / "example.yaml"
+    extract.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "example",
+                "locator": {"source_path": raw_locator, "page": 1},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert _source_file(raw_locator, [tables_root], "example") is None
+    assert _source_file("tables/example.pdf", [tables_root]) == decoy
+    with pytest.raises(pytest.skip.Exception, match="example.yaml: cited corpus source absent"):
+        test_extract_locators_resolve_to_corpus_sources(extract, {})
 
 
 def _record_lamoreaux_page_pins() -> None:
@@ -357,7 +397,7 @@ def test_extract_locators_resolve_to_corpus_sources(
                 continue
             if not all(1 <= page_number <= count for page_number in pages):
                 failures.append((
-                    "other",
+                    "physical page beyond PDF page count",
                     repr(locator),
                     f"PDF page(s) {pages} outside 1..{count}: {source_path}",
                 ))
