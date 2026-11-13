@@ -15507,6 +15507,7 @@ def _hashimoto_residue_prediction(
                 primary.primary_inventory_mol,
                 formula,
                 definition,
+                concentration_basis=definition_record.get("concentration_basis"),
             )
             band = None
         else:
@@ -15762,6 +15763,7 @@ def _knudsen_residue_prediction(
                 result.get("final_inventory_mol") or {},
                 reference.identity.species.formula,
                 definition,
+                concentration_basis=definition_record.get("concentration_basis"),
                 final_bulk_mass_adjustment_kg=float(
                     result.get("final_bulk_mass_adjustment_kg") or 0.0
                 ),
@@ -15973,6 +15975,7 @@ def _sossi_residue_prediction(
                 provenance.get("integrated_inventory_mol") or {},
                 formula,
                 definition,
+                concentration_basis=definition_record.get("concentration_basis"),
                 final_oxygen_exchange_mol=float(final_buffer_exchange),
             )
             band = None

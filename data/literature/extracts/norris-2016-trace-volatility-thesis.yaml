@@ -29,7 +29,7 @@ notes:
   and norris_2017_figure3_volatility_factors_neg13. That separate extract is unchanged.
 - The values above 1 for Cr, Ga, V, W, and other cells are retained exactly as printed; the thesis discusses these
   as within-error constancy or contamination rather than physical negative loss.
-- FM: “final concentration of the trace element divided by the initial concentration” (Norris 2016, p. 201); concentrations are single-cation oxide mole fractions.
+- 'FM: “final concentration of the trace element divided by the initial concentration” (Norris 2016, p. 201); concentrations are single-cation oxide mole fractions.'
 - Table 5.7 run preparation prints 3 g charge mass and a 1 cm diameter pressed pellet; pellet thickness is not stated.
 - The furnace used a CO–CO2 mixture and 300 mL/min total flow, but this thesis does not give the per-run gas ratio or component flows; fO2-control ratios are referred to Deines et al. (1976).
 benches:
@@ -680,6 +680,13 @@ species:
             tag: value
             value:
               definition: concentration_retention
+              concentration_basis: mole_fraction_single_cation_oxide
+              concentration_basis_quote: concentration values are expressed as mole fraction single cation oxide
+              concentration_basis_locator:
+                page: 232
+                pdf_page_index: 231
+                published_page: 202
+                equation: '5.1'
               quote: final concentration of the trace element divided by the initial concentration
               page: 201
           locator:
