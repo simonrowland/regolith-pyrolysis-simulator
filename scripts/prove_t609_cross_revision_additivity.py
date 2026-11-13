@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
+import dis
 from enum import Enum
 import hashlib
 import inspect
@@ -49,8 +50,54 @@ def _sha256_file(path: Path) -> str:
     return _sha256_bytes(path.read_bytes())
 
 
-def _canonical_code(code: CodeType) -> dict[str, Any]:
-    """Fingerprint executable semantics without path/line-number noise."""
+def _canonical_code(
+    code: CodeType, global_namespace: Mapping[str, Any] | None = None
+) -> dict[str, Any]:
+    """Fingerprint code instructions, equating literals with owned constants.
+
+    A module-level immutable numeric constant with the same value as a literal
+    produces identical results on every input. Only constants defined in
+    ``simulator.physical_constants`` receive this normalization, keeping the
+    proof relaxation narrow while allowing its owner module to replace a
+    duplicated numeric literal. Jump destinations are represented by
+    instruction index because inline cache slots shift byte offsets without
+    changing control flow.
+    """
+    physical_constants = sys.modules.get("simulator.physical_constants")
+    physical_constant_names = (
+        vars(physical_constants) if physical_constants is not None else {}
+    )
+    jump_opcodes = set(dis.hasjabs) | set(dis.hasjrel)
+    decoded = tuple(dis.get_instructions(code))
+    offset_to_index = {
+        instruction.offset: index for index, instruction in enumerate(decoded)
+    }
+    instructions = []
+    for instruction in decoded:
+        argument = instruction.argval
+        if instruction.opcode in jump_opcodes:
+            argument = ("TARGET", offset_to_index[argument])
+
+        if instruction.opname == "LOAD_CONST":
+            instructions.append(("CONST", _canonical(argument, global_namespace)))
+            continue
+
+        if (
+            instruction.opname in {"LOAD_GLOBAL", "LOAD_NAME"}
+            and global_namespace is not None
+        ):
+            name = instruction.argval
+            value = global_namespace.get(name)
+            if (
+                type(value) in (int, float)
+                and physical_constant_names.get(name) is value
+            ):
+                instructions.append(("CONST", _canonical(value, global_namespace)))
+                continue
+
+        instructions.append(
+            (instruction.opname, _canonical(argument, global_namespace))
+        )
 
     return {
         "argcount": code.co_argcount,
@@ -59,16 +106,16 @@ def _canonical_code(code: CodeType) -> dict[str, Any]:
         "nlocals": code.co_nlocals,
         "stacksize": code.co_stacksize,
         "flags": code.co_flags,
-        "bytecode": code.co_code.hex(),
-        "constants": _canonical(code.co_consts),
-        "names": list(code.co_names),
+        "instructions": instructions,
         "varnames": list(code.co_varnames),
         "freevars": list(code.co_freevars),
         "cellvars": list(code.co_cellvars),
     }
 
 
-def _canonical(value: Any) -> Any:
+def _canonical(
+    value: Any, global_namespace: Mapping[str, Any] | None = None
+) -> Any:
     """Return an exact, JSON-safe representation of compiled values."""
 
     if isinstance(value, Enum):
@@ -82,29 +129,34 @@ def _canonical(value: Any) -> Any:
     if isinstance(value, float):
         return {"__float_hex__": value.hex()}
     if isinstance(value, CodeType):
-        return {"__code__": _canonical_code(value)}
+        return {"__code__": _canonical_code(value, global_namespace)}
     if is_dataclass(value) and not isinstance(value, type):
         cls = type(value)
         return {
             "__dataclass__": f"{cls.__module__}.{cls.__qualname__}",
             "fields": {
-                field.name: _canonical(getattr(value, field.name))
+                field.name: _canonical(getattr(value, field.name), global_namespace)
                 for field in fields(value)
             },
         }
     if isinstance(value, Mapping):
         return {
             "__mapping__": [
-                [_canonical(key), _canonical(item)]
+                [
+                    _canonical(key, global_namespace),
+                    _canonical(item, global_namespace),
+                ]
                 for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
             ]
         }
     if isinstance(value, tuple):
-        return {"__tuple__": [_canonical(item) for item in value]}
+        return {
+            "__tuple__": [_canonical(item, global_namespace) for item in value]
+        }
     if isinstance(value, list):
-        return {"__list__": [_canonical(item) for item in value]}
+        return {"__list__": [_canonical(item, global_namespace) for item in value]}
     if isinstance(value, (set, frozenset)):
-        items = [_canonical(item) for item in value]
+        items = [_canonical(item, global_namespace) for item in value]
         items.sort(key=_canonical_json)
         return {"__set__": items, "frozen": isinstance(value, frozenset)}
     if isinstance(value, bytes):
@@ -120,9 +172,9 @@ def _canonical(value: Any) -> Any:
                 closure.append({"__empty_cell__": True})
         return {
             "__function__": f"{value.__module__}.{value.__qualname__}",
-            "code": _canonical_code(value.__code__),
-            "defaults": _canonical(value.__defaults__),
-            "kwdefaults": _canonical(value.__kwdefaults__),
+            "code": _canonical_code(value.__code__, value.__globals__),
+            "defaults": _canonical(value.__defaults__, value.__globals__),
+            "kwdefaults": _canonical(value.__kwdefaults__, value.__globals__),
             "closure": closure,
         }
     raise TypeError(
