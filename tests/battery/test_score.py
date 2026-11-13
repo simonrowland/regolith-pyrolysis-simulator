@@ -7229,6 +7229,9 @@ def test_studio_dispatch_uses_caller_host(monkeypatch: pytest.MonkeyPatch) -> No
         assert remote_output_directory.parts
         raise RuntimeError("dispatch host recorded")
 
+    # Host dispatch is the assertion. The full store load is a separate path
+    # and exceeds the default process CPU budget on its own.
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: None)
     monkeypatch.setattr(battery_score, "_run_studio", record_host)
     with pytest.raises(RuntimeError, match="dispatch host recorded"):
         battery_score.main(["--studio", "--engines", "magemin"])
