@@ -4818,9 +4818,9 @@ def _book_wall_deposits_at_vapour_supply(
     raw_unavailable = getattr(supply_kg, SUPPLY_UNAVAILABLE, None)
     if isinstance(raw_unavailable, MappingABC) and raw_unavailable:
         notice_authority[SUPPLY_UNAVAILABLE] = {
-            str(species): str(reason)
-            for species, reason in raw_unavailable.items()
-            if str(species) not in supply_kg and str(reason)
+            str(species): list(reasons)
+            for species, reasons in raw_unavailable.items()
+            if str(species) not in supply_kg and reasons
         }
     charge_kg = _run_charge_mass_kg(run_execution)
     if charge_kg is None or not supply_kg:

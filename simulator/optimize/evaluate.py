@@ -1915,8 +1915,8 @@ def _trace_with_optimizer_coating_report(
         unavailable = getattr(refused_flux_bounds, SUPPLY_UNAVAILABLE, None)
         if isinstance(unavailable, MappingABC) and unavailable:
             report[SUPPLY_UNAVAILABLE] = {
-                str(species): str(reason)
-                for species, reason in unavailable.items()
+                str(species): list(reasons)
+                for species, reasons in unavailable.items()
             }
     if threshold_parametric:
         raw_rate = runner_report.get("wall_deposit_kg_per_campaign", 0.0)
@@ -2071,7 +2071,7 @@ class _WallSupplyIntegral(dict):
         masses: Mapping[str, float],
         counts: Mapping[str, int] | None = None,
         inventory_capped: Mapping[str, bool] | None = None,
-        supply_unavailable: Mapping[str, str] | None = None,
+        supply_unavailable: Mapping[str, Sequence[str]] | None = None,
         computed_exceeds_inventory: Mapping[str, bool] | None = None,
     ) -> None:
         super().__init__(masses)
@@ -2093,9 +2093,9 @@ class _WallSupplyIntegral(dict):
         # Reasons for species this integral did not publish. A published
         # species is not unavailable. Dict equality ignores this attribute.
         self.supply_unavailable = {
-            str(species): str(reason)
-            for species, reason in (supply_unavailable or {}).items()
-            if str(reason) and str(species) not in self
+            str(species): list(reasons)
+            for species, reasons in (supply_unavailable or {}).items()
+            if reasons and str(species) not in self
         }
 
 
@@ -3548,7 +3548,7 @@ class _ParentOxideAllocation:
     upper_bound_kg: tuple[Mapping[str, float], ...]
     inventory_capped: frozenset[str]
     withheld: frozenset[str]
-    unavailable: Mapping[str, str]
+    unavailable: Mapping[str, list[str]]
 
 
 def _allocate_parent_oxide_supply(
@@ -3596,23 +3596,26 @@ def _allocate_parent_oxide_supply(
     Species order does not change the kilograms.
     """
 
-    unavailable: dict[str, str] = {}
+    unavailable: dict[str, list[str]] = {}
+
+    def record_unavailable(species: str, reason: str) -> None:
+        normalized = str(reason).strip()
+        if normalized:
+            reasons = unavailable.setdefault(species, [])
+            if normalized not in reasons:
+                reasons.append(normalized)
+
     classifier_withheld: set[str] = set()
     for _snapshot, classified in classified_window:
         for species, contribution in classified:
             if contribution.kind != _WALL_SUPPLY_UNAVAILABLE:
                 continue
             classifier_withheld.add(species)
-            # The classifier evidence is the typed gap (missing
-            # temperature, molar mass, recorded pO2, and the other
-            # ceiling refusals). The first unavailable interval in the
-            # window is the reason. setdefault keeps it when a later
-            # conservation reason also applies. A conservation-only
-            # withhold has no classifier evidence, so it still records
-            # its own token below.
+            # Preserve distinct classifier gaps in interval order. A
+            # conservation-only withhold adds its own token below.
             reason = str(contribution.evidence or "").strip()
             if reason:
-                unavailable.setdefault(species, reason)
+                record_unavailable(species, reason)
     snapshots = tuple(snapshot for snapshot, _classified in classified_window)
     budget = _window_parent_oxide_budget(snapshots, catalog)
     charge_oxide_kg = budget.charge_kg
@@ -3625,7 +3628,7 @@ def _allocate_parent_oxide_supply(
     withheld = set(classifier_withheld)
     for species in budget.missing_stoich_species:
         withheld.add(species)
-        unavailable.setdefault(species, MISSING_PARENT_OXIDE_STOICHIOMETRY)
+        record_unavailable(species, MISSING_PARENT_OXIDE_STOICHIOMETRY)
     for snapshot, classified in classified_window:
         for species, contribution in classified:
             if species in withheld:
@@ -3642,26 +3645,17 @@ def _allocate_parent_oxide_supply(
                 # with no parent, or neither operand. It may belong to
                 # any oxide, so no refused bound is provable.
                 withheld.add(species)
-                unavailable.setdefault(
-                    species,
-                    MISSING_PARENT_OXIDE_STOICHIOMETRY,
-                )
+                record_unavailable(species, MISSING_PARENT_OXIDE_STOICHIOMETRY)
                 continue
             if debit.status in {"missing_stoichiometry", "unparented"}:
                 withheld.add(species)
-                unavailable.setdefault(
-                    species,
-                    MISSING_PARENT_OXIDE_STOICHIOMETRY,
-                )
+                record_unavailable(species, MISSING_PARENT_OXIDE_STOICHIOMETRY)
             elif (
                 debit.status == "resolved"
                 and debit.parent in budget.unreservable_parents
             ):
                 withheld.add(species)
-                unavailable.setdefault(
-                    species,
-                    MISSING_PARENT_OXIDE_STOICHIOMETRY,
-                )
+                record_unavailable(species, MISSING_PARENT_OXIDE_STOICHIOMETRY)
     if not inventory_map_recorded:
         for snapshot, classified in classified_window:
             for species, contribution in classified:
@@ -3679,7 +3673,7 @@ def _allocate_parent_oxide_supply(
                 if debit.parent in charge_oxide_kg:
                     continue
                 withheld.add(species)
-                unavailable.setdefault(species, MISSING_PARENT_OXIDE_INVENTORY)
+                record_unavailable(species, MISSING_PARENT_OXIDE_INVENTORY)
     booked_oxide_kg: dict[str, float] = {}
     inventory_capped: set[str] = set()
     upper_rows: list[dict[str, float]] = []
@@ -3722,30 +3716,32 @@ def _allocate_parent_oxide_supply(
 
 def _enforce_published_element_inventory(
     totals: dict[str, float],
-    published: AbstractSet[str],
+    candidates: AbstractSet[str],
     computed_vapour_kg: Mapping[str, float],
     snapshots: Sequence[Any],
     catalog: Any | None,
 ) -> tuple[set[str], set[str]]:
-    """Cap every published element supply at the window-start charge.
+    """Cap candidate supplies using every computed carrier's debit.
 
     This is the only publication of a wall-supply kilogram. Computed
     rates and refused bounds are already summed into ``totals``. Both
     go through this comparison. Nothing downstream integrates a flux.
 
     Invariant. For every element whose window-start inventory is known,
-    the oxide-equivalent of the published supply — computed vapour plus
-    bounded refused supply — is at most that inventory. The inventory
-    is the pre-evaporation charge. A recorded map that omits the oxide,
-    including an empty map, is a charge of zero. No recorded map is an
-    unknown charge: this function does not invent one and does not
-    scale that element.
+    the oxide-equivalent of all computed carriers plus the bounded
+    refused supplies in this candidate set is at most that inventory.
+    Computed debits come from the full window budget, including carriers
+    outside the returned map and carriers withheld from it. The
+    inventory is the pre-evaporation charge. A recorded map that omits
+    the oxide, including an empty map, is a charge of zero. No recorded
+    map is an unknown charge: this function does not invent one and does
+    not scale that element.
 
-    When the published oxide exceeds the charge, every carrier of that
-    element is scaled by ``charge / published_oxide``. The scale does
-    not depend on species order or on which interval held the kilogram.
-    Splitting a carrier across intervals does not change it. The
-    comparison is on the summed publication.
+    When the all-carrier oxide exceeds the charge, each candidate total
+    is scaled by ``charge / all_carrier_oxide`` before the caller selects
+    the returned subset. The scale does not depend on species order or
+    on which interval held the kilogram. Splitting a carrier across
+    intervals does not change it.
 
     The first returned set is ``computed_exceeds_inventory``: carriers
     whose computed vapour was reduced because that computed oxide
@@ -3764,7 +3760,7 @@ def _enforce_published_element_inventory(
     budget = _window_parent_oxide_budget(snapshots, catalog)
     recorded = _window_inventory_recorded(snapshots)
     grouped: dict[str, list[tuple[str, float]]] = {}
-    for species in published:
+    for species in candidates:
         if species not in totals:
             continue
         resolved: tuple[str, float] | None = None
@@ -3790,11 +3786,13 @@ def _enforce_published_element_inventory(
             charge = 0.0
         else:
             continue
-        published_oxide = 0.0
-        computed_oxide = 0.0
+        bounded_oxide = 0.0
         for species, stoich in rows:
-            published_oxide += float(totals[species]) * stoich
-            computed_oxide += float(computed_vapour_kg.get(species, 0.0)) * stoich
+            computed_kg = float(computed_vapour_kg.get(species, 0.0))
+            bounded_kg = max(float(totals[species]) - computed_kg, 0.0)
+            bounded_oxide += bounded_kg * stoich
+        computed_oxide = float(budget.computed_kg.get(parent, 0.0))
+        published_oxide = computed_oxide + bounded_oxide
         if published_oxide <= charge or math.isclose(
             published_oxide,
             charge,
@@ -3810,14 +3808,15 @@ def _enforce_published_element_inventory(
             abs_tol=1e-15,
         )
         for species, _stoich in rows:
-            old = float(totals[species])
+            computed_kg = float(computed_vapour_kg.get(species, 0.0))
+            bounded_kg = max(float(totals[species]) - computed_kg, 0.0)
+            old = computed_kg + bounded_kg
             new = old * scale
             if new < 0.0:
                 new = 0.0
             totals[species] = new
             if math.isclose(old, new, rel_tol=1e-12, abs_tol=1e-15):
                 continue
-            computed_kg = float(computed_vapour_kg.get(species, 0.0))
             if cause_is_computed and computed_kg > 0.0:
                 computed_flags.add(species)
             else:
@@ -3862,11 +3861,11 @@ def _optimizer_refused_flux_bounds(
     and no parent, or with neither operand, withholds every refused
     bound in the window. ``inventory_capped`` names the species for
     which a refused limit bound. ``supply_unavailable`` names a species
-    omitted from the map and the typed reason. A classifier-unavailable
-    interval keeps its evidence (``missing_temperature``,
-    ``missing_molar_mass``, ``missing_recorded_pO2``, and the other
-    ceiling gaps) as that reason. The first unavailable interval in
-    the window supplies the token. ``supply_interval_upper_bound_used``
+    omitted from the map and its ordered, deduplicated typed reasons.
+    Every classifier-unavailable interval keeps its evidence
+    (``missing_temperature``, ``missing_molar_mass``,
+    ``missing_recorded_pO2``, and the other ceiling gaps).
+    ``supply_interval_upper_bound_used``
     counts the bounded refused intervals. That count is not divided by
     ``campaigns_elapsed``. An evidenced physical zero adds nothing and
     keeps the species observed. One unavailable interval drops that
@@ -3966,18 +3965,17 @@ def _optimizer_refused_flux_bounds(
                 ) from exc
             observed.add(species)
             bound_counts[species] += 1
-    published = frozenset(
-        species
-        for species in refused_species
-        if species in observed and species not in withheld
+    candidates = frozenset(
+        species for species in refused_species if species not in withheld
     )
     computed_flags, extra_capped = _enforce_published_element_inventory(
         totals,
-        published,
+        candidates,
         computed_vapour_kg,
         window,
         catalog,
     )
+    published = frozenset(species for species in candidates if species in observed)
     capped = {species: True for species in allocation.inventory_capped}
     for species in extra_capped:
         capped[species] = True
