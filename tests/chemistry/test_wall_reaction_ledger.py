@@ -30,6 +30,10 @@ from simulator.condensation import (
     _assign_declared_wall_capture,
     _keep_declared_wall_deposit,
     _species_vapor_data,
+    _segment_species_partial_pressures_pa,
+    _molar_flow_partials_pa,
+    _inlet_carrier_molar_flow_mol_s,
+    _partial_pressure_closure_diagnostic,
 )
 from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
@@ -740,3 +744,192 @@ def test_stage_baffle_snapshot_keeps_train_and_chromia_solids(formula_registry) 
     assert snapped[_CHROMIA]["Cr2O3"] == pytest.approx(
         0.5 * chromia.molar_mass_kg_per_mol(),
     )
+
+
+def test_supplied_oxygen_partial_survives_segment_depletion() -> None:
+    partials = _segment_species_partial_pressures_pa(
+        {"SiO": 20.0, "O2": 30.0}, 100.0,
+        {"SiO": 1.0}, {"stage": {"SiO": 0.5}},
+    )["stage"]
+    # Unit inlet basis: .1 SiO + .3 O2 + .5 carrier = .9 total.
+    assert partials == pytest.approx({"SiO": 100.0 / 9.0, "O2": 100.0 / 3.0})
+
+
+@pytest.mark.usefixtures("production_configured_condensation_route")
+def test_stage_wall_law_uses_supplied_stream_oxygen(formula_registry) -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.train.collection_route["stage3_route"] = "divert"
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0, pipe_diameter_m=0.12,
+        gas_temperature_C=1600.0, carrier_gas="Kr",
+        species_partial_pressures_mbar={"SiO": 1.0, "O2": 1.0},
+    )
+    # A finite, existing parcel budget; pO2 comes from the supplied composition.
+    model.retained_vapor_mol["O2"] = 100.0
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0), MeltState(),
+    )
+    booking = route.wall_reaction_booking_by_species["SiO"]
+    assert booking["reaction_legs"]
+    assert any(leg["reaction_id"] == "oxidative" for leg in booking["reaction_legs"])
+    assert all("wall_pO2_unknown_pO2_free_route_used" not in leg["notices"]
+               for leg in booking["reaction_legs"])
+    assert all("O2" in partials for partials in
+               model.wall_species_partial_pressures_pa_by_segment.values())
+
+
+@pytest.mark.usefixtures("production_configured_condensation_route")
+@pytest.mark.parametrize("species", ["CrO", "CrO2", "CrO3"])
+def test_flagged_chromium_carriers_capture_at_stage2_with_lineage(
+    formula_registry, vapor_pressure_data, species,
+) -> None:
+    carrier = {
+        "species_id": species,
+        "pressure": {"kind": "value", "pa": 100.0},
+        "flux": {"kind": "eligible", "alpha_ref": "test:alpha"},
+        "is_flux_active": True,
+        "validation_status": "modeled-PENDING",
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+    }
+    model = CondensationModel(CondensationTrain.create_default(),
+                              vapor_pressure_data=vapor_pressure_data)
+    flux = EvaporationFlux(
+        species_kg_hr={species: 1.0}, total_kg_hr=1.0,
+        carrier_authority_by_species={species: carrier},
+    )
+    melt = MeltState()
+    melt.temperature_C = 1600.0
+    # The production fixture supplies the real transport/collector geometry.
+    generated_oxygen = model.route(flux, melt)
+    assert model.operating_history[-1]["mixture_input_path"] == (
+        "committed_oxygen_with_transport_carrier"
+    )
+    for partials in model.wall_species_partial_pressures_pa_by_segment.values():
+        assert math.fsum(partials.values()) == pytest.approx(
+            model.overhead_pressure_mbar * 100.0, rel=1e-9,
+        )
+    if species == "CrO":
+        assert generated_oxygen.condensed_by_stage_species[
+            STAGE_KEY_BY_NUMBER[2]
+        ][species] > 0.0
+    model.configure_operating_conditions(
+        species_partial_pressures_mbar={
+            species: model.overhead_pressure_mbar * 0.1,
+            "O2": model.overhead_pressure_mbar * 0.1,
+        },
+    )
+    model.retained_vapor_mol["O2"] = 100.0
+    route = model.route(flux, melt)
+    capture = route.condensed_by_stage_species.get(STAGE_KEY_BY_NUMBER[2], {}).get(species, 0.0)
+    assert capture > 0.0, str(route.condensation_refusals_by_species)
+    authority = route.condensation_authority_by_species[species]
+    assert authority["carrier_authority"] == carrier
+    assert authority["authoritative_for_condensation"] is False
+    assert authority["condensed_mass_kg_hr"] > 0.0
+    assert route.carrier_authority_by_species[species] == carrier
+    booking = route.wall_reaction_booking_by_species[species]
+    legs = booking["reaction_legs"]
+    assert any(leg["stage_key"] == STAGE_KEY_BY_NUMBER[2] for leg in legs)
+    condensed = route.condensed_for_species(species)
+    wall = route.wall_deposit_by_species.get(species, 0.0)
+    proposal = _dispatch_booking(
+        formula_registry, species, booking, condensed + wall,
+        wall_fraction=wall / (condensed + wall),
+    )
+    assert all(abs(net) < 1e-9 for net in _atom_net(proposal, formula_registry).values())
+
+
+@pytest.mark.parametrize("carrier", ["Kr", "Ar", "N2", "O2"])
+def test_complete_dalton_mixture_closes_at_every_segment(carrier) -> None:
+    flows = {"SiO": 2.0, "CrO": 1.0, "O2": 3.0}
+    flows[carrier] = flows.get(carrier, 0.0) + 4.0
+    partials = _molar_flow_partials_pa(flows, 900.0)
+    assert math.fsum(partials.values()) == pytest.approx(900.0, rel=1e-9)
+    assert partials["SiO"] / partials["CrO"] == pytest.approx(2.0)
+    stages = _segment_species_partial_pressures_pa(
+        partials, 900.0, {"SiO": 1.0, "CrO": 1.0},
+        {"first": {"SiO": 0.5, "CrO": 0.8},
+         "second": {"SiO": 0.1, "CrO": 0.1}},
+    )
+    for local in stages.values():
+        assert math.fsum(local.values()) == pytest.approx(900.0, rel=1e-9)
+        assert local["O2"] > 0.0
+
+
+
+
+def test_complete_mixture_does_not_invent_roundoff_carrier_after_capture() -> None:
+    partials = _molar_flow_partials_pa(
+        {"Fe": 5.0, "Na": 3.14159, "Kr": 0.0, "O2": 0.0}, 900.0,
+    )
+    downstream = _segment_species_partial_pressures_pa(
+        partials, 900.0, {"Fe": 1.0, "Na": 1.0},
+        {"cold": {"Fe": 1e-10, "Na": 1e-10}},
+    )["cold"]
+    # Uniform removal changes flow, not mole fraction. An inlet rounding
+    # residual cannot become a physical carrier when vapours disappear.
+    assert downstream == pytest.approx(partials, rel=1e-9, abs=1e-12)
+    assert math.fsum(downstream.values()) == pytest.approx(900.0, rel=1e-9)
+
+@pytest.mark.usefixtures("production_configured_condensation_route")
+def test_wall_capture_spends_only_committed_oxygen(formula_registry) -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.train.collection_route["stage3_route"] = "divert"
+    model.retained_vapor_mol["O2"] = 0.01
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1600.0),
+    )
+    booking = route.wall_reaction_booking_by_species["SiO"]
+    debit = booking["baffle_oxygen_debit_mol"] + booking["wall_oxygen_debit_mol"]
+    credit = booking["baffle_oxygen_credit_mol"] + booking["wall_oxygen_credit_mol"]
+    assert debit <= 0.01 + credit
+    assert any(leg["reaction_id"] == "disproportionation"
+               for leg in booking["reaction_legs"])
+    assert any(leg["reaction_id"] == "oxidative"
+               for leg in booking["reaction_legs"])
+
+
+def test_zero_flow_closure_is_not_applicable() -> None:
+    for partials in ({}, {"O2": 0.0, "Kr": 0.0}):
+        assert _partial_pressure_closure_diagnostic(partials, 900.0) == {
+            "status": "not_applicable", "reason": "no_advective_parcel",
+            "relative_error": None,
+        }
+
+
+def test_uncommitted_reductive_credit_is_not_lent_to_next_capture() -> None:
+    legs, oxygen_left, unbooked = _assign_declared_wall_capture(
+        "CrO2", 1.0, T_K=_TABLE_T_K, p_local_pa=1.0e6,
+        pO2_Pa=50.0, oxygen_mol=0.0, vapor_pressure_data=None,
+    )
+    assert unbooked == 0.0
+    assert sum(leg["oxygen_credit_mol"] for leg in legs) == pytest.approx(0.25)
+    assert oxygen_left == 0.0
+
+
+def test_transport_does_not_promote_complete_map_roundoff_to_carrier() -> None:
+    partials = _molar_flow_partials_pa({"Fe": 5.0, "Na": 3.14159}, 900.0)
+    carrier, _ = _inlet_carrier_molar_flow_mol_s(
+        {"Fe": 1.0, "Na": 1.0}, partials, 900.0, vapor_pressure_data=None,
+    )
+    assert carrier == 0.0
+
+
+@pytest.mark.usefixtures("production_configured_condensation_route")
+def test_zero_flow_route_counts_na_closure_without_deposit() -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    result = model.route(EvaporationFlux(), MeltState(temperature_C=1600.0))
+    assert result.wall_deposit_by_species == {}
+    assert result.condensed_by_stage_species == {}
+    stages = model.last_stage_bulk_gas
+    assert stages
+    history = model.operating_history[-1]
+    walls = history["segment_partial_pressure_closure"]
+    for closure in [*walls.values(), *(row["partial_pressure_closure"] for row in stages)]:
+        assert closure == {
+            "status": "not_applicable", "reason": "no_advective_parcel",
+            "relative_error": None,
+        }
+    assert history["no_advective_parcel_count"] == len(walls) + len(stages)

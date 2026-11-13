@@ -372,14 +372,18 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     wall_T_K = 1700.0 + 273.15
     alpha_s = 0.04
 
-    # Missing pO2 is a refusal, not the retired Psat = 0 backstop.
-    with pytest.raises(WallSaturationPressureRefusal, match="wall_pO2_required"):
-        _antoine_psat_pa("SiO", wall_T_K)
+    # Unknown O2 uses the conservative disproportionation pressure.
+    from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
+    resolved = resolve_wall_saturation(
+        condensation_module._species_vapor_data("SiO"), species_id="SiO", T_K=wall_T_K,
+    )
+    assert resolved.reaction_id == "disproportionation"
+    assert resolved.notices == ("wall_pO2_unknown_pO2_free_route_used",)
     sio_psat_pa, refused = condensation_module._try_antoine_psat_pa(
         "SiO", wall_T_K
     )
-    assert sio_psat_pa is None
-    assert refused is True
+    assert sio_psat_pa == pytest.approx(resolved.pressure_Pa)
+    assert refused is False
 
     po2_pa = 1.0e-4
     psat = _antoine_psat_pa("SiO", wall_T_K, wall_pO2_Pa=po2_pa)
@@ -733,10 +737,11 @@ def test_wall_route_uses_segment_local_partial_pressure_after_capture() -> None:
     assert sodium_by_segment
     assert max(sodium_by_segment) <= 1000.0
     # Na remains unsaturated here; removing Fe raises its Dalton fraction.
-    assert sodium_by_segment[0] == pytest.approx(100.0)
-    assert max(sodium_by_segment) > 100.0
+    inlet_na = model.wall_species_partial_pressures_pa["Na"]
+    assert sodium_by_segment[0] == pytest.approx(inlet_na)
+    assert max(sodium_by_segment) > inlet_na
     iron_by_segment = [partials["Fe"] for partials in model.wall_species_partial_pressures_pa_by_segment.values()]
-    assert min(iron_by_segment) < 100.0
+    assert min(iron_by_segment) < model.wall_species_partial_pressures_pa["Fe"]
     for segment_name, species_records in (
         model.last_wall_deposition_rate_shadow_candidate.items()
     ):
@@ -816,7 +821,7 @@ def test_wall_route_depletes_partial_pressure_after_upstream_wall_capture(
             f"wall_{wall_index}"
         ]["Cr"] == pytest.approx(
             _dalton_partial_pa(
-                inlet_partial_mbar=partial_pressure_mbar,
+                inlet_partial_mbar=model.wall_species_partial_pressures_pa["Cr"] / 100.0,
                 total_mbar=10.0,
                 rate_kg_hr=rate_kg_hr,
                 remaining_kg_hr=remaining_kg_hr,
@@ -901,12 +906,7 @@ def test_stage_scoped_no_reactive_backstop_skips_reactivity_metadata(monkeypatch
         condensation_module.STICKING_DATA["reactivity_class_by_species"],
         "SiO",
     )
-    with pytest.raises(WallSaturationPressureRefusal) as exc_info:
-        _hkl_surface_deposition_flux_mol_m2_s(
-            "SiO",
-            P_local_pa=1.0,
-            T_surface_K=1700.0 + 273.15,
-            alpha_s=1.0,
-            reactive_product_backstop=False,
-        )
-    assert exc_info.value.reason == "wall_pO2_required"
+    assert _hkl_surface_deposition_flux_mol_m2_s(
+        "SiO", P_local_pa=1.0, T_surface_K=1700.0 + 273.15,
+        alpha_s=1.0, reactive_product_backstop=False,
+    ) == 0.0

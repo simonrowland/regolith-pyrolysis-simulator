@@ -3780,6 +3780,21 @@ class CondensationModel:
         # VR-11 / B3: stage-local efficiency zeros mint typed pass-through
         # outcomes (no longer silent return 0.0 without a consumer channel).
         efficiency_outcomes_by_species: dict[str, list[dict[str, Any]]] = {}
+        stage3_through = (
+            self.train.collection_route.get('stage3_route') == 'through'
+        )
+        source_rates = {
+            sp: rate for sp, rate in evap_flux.species_kg_hr.items()
+            if carrier_authority_status_by_species.get(sp) not in non_debiting_carrier_statuses
+            and sp not in cleanup_offgas_authorization
+        }
+        # This snapshot is supplied by PyrolysisSimulator.condensation_model
+        # from committed process.overhead_gas mol. A projected evaporation
+        # coproduct is not a reactant: its writer may refuse materialization.
+        oxygen_mol = _finite_nonnegative_value(
+            self.retained_vapor_mol.get('O2', 0.0), label='committed overhead O2 mol',
+        )
+        inlet_molar_flows: dict[str, float] = {}
         self.wall_species_partial_pressures_pa = (
             _flowing_species_partial_pressures_pa(
                 evap_flux.species_kg_hr,
@@ -3789,6 +3804,53 @@ class CondensationModel:
             if self._species_partial_pressures_configured
             else {}
         )
+        if self.wall_species_partial_pressures_pa:
+            inlet_partials = self.wall_species_partial_pressures_pa
+            total_pa = self.overhead_pressure_mbar * 100.0
+            if "O2" not in inlet_partials:
+                carrier_mol_s, _ = _inlet_carrier_molar_flow_mol_s(
+                    evap_flux.species_kg_hr, inlet_partials, total_pa,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                )
+                # The existing parcel interval is one hour. Committed O2
+                # mol / 3600 s and vapour kg/hr / M / 3600 are mol/s.
+                # Normalize with the explicit transport carrier once.
+                mixture_mol_s = {
+                    sp: _species_molar_flow_mol_s(
+                        sp, rate, vapor_pressure_data=self.vapor_pressure_data,
+                    ) for sp, rate in source_rates.items()
+                }
+                mixture_mol_s["O2"] = oxygen_mol / 3600.0
+                carrier = self.carrier_gas
+                # Oxygen cover is already in the committed O2 snapshot.
+                # An inert carrier is an explicit transport flow, including 0.
+                mixture_mol_s.setdefault(carrier, 0.0)
+                if carrier != "O2":
+                    mixture_mol_s[carrier] += carrier_mol_s
+                inlet_molar_flows = mixture_mol_s
+                self.wall_species_partial_pressures_pa = _molar_flow_partials_pa(
+                    mixture_mol_s, total_pa,
+                )
+                mixture_input_path = "committed_oxygen_with_transport_carrier"
+            else:
+                # An explicitly supplied full mixture is already on the
+                # shared pressure basis. Name its implicit carrier remainder.
+                partials = dict(inlet_partials)
+                remainder = total_pa - math.fsum(partials.values())
+                if abs(remainder) <= _partial_pressure_roundoff_pa(partials, total_pa):
+                    remainder = 0.0
+                remainder = max(0.0, remainder)
+                partials[self.carrier_gas] = partials.get(self.carrier_gas, 0.0) + remainder
+                self.wall_species_partial_pressures_pa = partials
+                # The supplied full mixture is an equivalent unit-flow basis;
+                # keep its explicit carrier component through depletion.
+                inlet_molar_flows = dict(partials)
+                mixture_input_path = "supplied_full_mixture"
+            if self.operating_history:
+                self.operating_history[-1]["mixture_input_path"] = mixture_input_path
+                self.operating_history[-1]["inlet_species_partial_pressures_pa"] = dict(
+                    self.wall_species_partial_pressures_pa
+                )
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             [segment for segment in self.active_pipe_segments
@@ -3811,56 +3873,10 @@ class CondensationModel:
 
         stage_route_by_species: dict[str, dict[str, Any]] = {}
         reactive_alkali: dict[str, dict[str, Any]] = {}
-        from simulator.evaporation import (
-            _evaporation_stoich, _project_evaporation_overhead_source_mol_hr,
-        )
-
-        stream_source = {}
-        stage3_through = (
-            self.train.collection_route.get('stage3_route') == 'through'
-        )
-        if stage3_through:
-            source_rates = {
-                sp: rate for sp, rate in evap_flux.species_kg_hr.items()
-                if carrier_authority_status_by_species.get(sp) not in non_debiting_carrier_statuses
-                and sp not in cleanup_offgas_authorization
-            }
-            source_stoich = {}
-            for sp in source_rates:
-                data = _species_vapor_data(sp, vapor_pressure_data=self.vapor_pressure_data)
-                if data.get('parent_oxide'):
-                    source_stoich[sp] = _evaporation_stoich(
-                        sp, data, self.species_formula_registry)
-            stream_source = _project_evaporation_overhead_source_mol_hr(
-                source_rates, source_stoich, self.species_formula_registry)
-        retained_oxygen_mol = (_finite_nonnegative_value(
-            self.retained_vapor_mol.get('O2', 0.0), label='headspace O2 mol')
-            if stage3_through else 0.0)
-        # Premise: each one-hour parcel carries its evaporation coproducts.
-        # The shared source owner projects sum(rate[kg/h]*O2_per_product[kg/kg]
-        # /M_O2[kg/mol])*1 h, excluding oxygen sent to the melt buffer.
-        # Thus n_available = n_retained + n_stream, including signed O2 sinks.
-        # For SiO2 -> SiO + 1/2 O2 this reduces to 0.5*rate_SiO/M_SiO + retained
-        # [mol]. Zero source recovers the retained-only budget; no terminal
-        # store or melt-buffer oxygen is available to this reaction.
-        oxygen_mol = max(0.0, retained_oxygen_mol + stream_source.get('O2', 0.0))
         wall_reaction_bookings: dict[str, dict[str, Any]] = {}
-        stream_po2_bar = None
-        vapor_mol = sum(mol for sp, mol in stream_source.items() if sp != 'O2')
-        if stream_source.get('O2', 0.0) > 0.0 and vapor_mol > 0.0:
-            # The reported vapor partials already include carrier dilution.
-            # For an ideal co-flowing parcel p_O2,source / sum(p_vapor) =
-            # n_O2,source / sum(n_vapor). The one-hour amounts share a time
-            # basis, so mol/mol is dimensionless; Pa/1e5 converts to bar.
-            # Add the ledger carried-in O2 partial pressure. Zero fresh
-            # source recovers the retained-headspace pressure exactly.
-            vapor_pressure_pa = sum(
-                self.wall_species_partial_pressures_pa.get(sp, 0.0)
-                for sp in stream_source if sp != 'O2')
-            stream_po2_bar = (
-                stream_source['O2'] / vapor_mol * vapor_pressure_pa / PA_PER_BAR)
-        stream_po2_Pa = (
-            None if stream_po2_bar is None else stream_po2_bar * PA_PER_BAR
+        stream_po2_bar = (
+            self.wall_species_partial_pressures_pa["O2"] / PA_PER_BAR
+            if "O2" in self.wall_species_partial_pressures_pa else None
         )
         for species, rate_kg_hr in evap_flux.species_kg_hr.items():
             if (
@@ -3948,8 +3964,19 @@ class CondensationModel:
                     self.wall_species_partial_pressures_pa,
                     self.overhead_pressure_mbar * 100.0,
                     inlet_rates, {segment.name: flowing_rates},
+                    inlet_molar_flows=inlet_molar_flows,
                 )[segment.name]
                 self.wall_species_partial_pressures_pa_by_segment[segment.name] = partials
+                if self.operating_history:
+                    closure = _partial_pressure_closure_diagnostic(partials, overhead_pressure_pa)
+                    self.operating_history[-1].setdefault(
+                        "segment_partial_pressure_closure", {},
+                    )[segment.name] = closure
+                    if closure["reason"] == "no_advective_parcel":
+                        history = self.operating_history[-1]
+                        history["no_advective_parcel_count"] = (
+                            history.get("no_advective_parcel_count", 0) + 1
+                        )
                 wall_removed: dict[str, float] = {}
                 for species, route in stage_route_by_species.items():
                     supply = flowing_rates.get(species, 0.0)
@@ -3995,6 +4022,7 @@ class CondensationModel:
                 self.wall_species_partial_pressures_pa,
                 self.overhead_pressure_mbar * 100.0,
                 inlet_rates, {stage_key: flowing_rates},
+                inlet_molar_flows=inlet_molar_flows,
             )[stage_key]
             stage_inlet_K = bulk_gas_K
             stage_area_m2 = self._stage_area_m2_for_stage(stage)
@@ -4043,9 +4071,17 @@ class CondensationModel:
                 'T_bulk_mean_K': stage_mean_K,
                 'ntu': stage_ntu,
                 'n_total_mol_s': stage_molar_flow_mol_s,
+                'species_partial_pressures_pa': dict(partials),
+                'partial_pressure_closure': _partial_pressure_closure_diagnostic(
+                    partials, overhead_pressure_pa,
+                ),
             }
             if heat_transfer_notice is not None:
                 bulk_record['heat_transfer_notice'] = heat_transfer_notice
+            if (self.operating_history
+                    and bulk_record['partial_pressure_closure']['reason'] == 'no_advective_parcel'):
+                history = self.operating_history[-1]
+                history["no_advective_parcel_count"] = history.get("no_advective_parcel_count", 0) + 1
             self.last_stage_bulk_gas.append(bulk_record)
             self.stage_bulk_gas_history.append(bulk_record)
             bulk_gas_K = stage_outlet_K
@@ -4072,7 +4108,7 @@ class CondensationModel:
                     )
                     reaction.update(
                         available_oxygen_mol=oxygen_mol,
-                        stream_oxygen_mol=stream_source.get('O2', 0.0),
+                        stream_oxygen_mol=0.0,
                     )
                     reactive_alkali[species] = reaction
                     if not reaction['favoured']:
@@ -4101,7 +4137,7 @@ class CondensationModel:
                             antoine_extrapolations=antoine_extrapolations,
                             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                             efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
-                            wall_pO2_Pa=stream_po2_Pa,
+                            wall_pO2_Pa=partials.get("O2"),
                         )
                     else:
                         eta = self._condensation_efficiency(
@@ -4116,7 +4152,7 @@ class CondensationModel:
                             antoine_extrapolations=antoine_extrapolations,
                             antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                             efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
-                            wall_pO2_Pa=stream_po2_Pa,
+                            wall_pO2_Pa=partials.get("O2"),
                             reactive_alkali_silica=reaction is not None,
                             flowing_pressure_pa=(
                                 partials.get(species) if reaction is not None else None
@@ -4185,7 +4221,7 @@ class CondensationModel:
                         surface="baffle",
                         T_K=_stage_midpoint_temperature_K(stage),
                         p_local_pa=partials.get(species),
-                        pO2_Pa=stream_po2_Pa,
+                        pO2_Pa=partials.get("O2"),
                         oxygen_mol=oxygen_mol,
                         vapor_pressure_data=self.vapor_pressure_data,
                         registry=self.species_formula_registry,
@@ -4846,6 +4882,9 @@ class CondensationModel:
                 condensation_authority_by_species
             )
             if self.operating_history:
+                self.operating_history[-1]['wall_reaction_booking_by_species'] = (
+                    copy.deepcopy(wall_reaction_bookings)
+                )
                 self.operating_history[-1][
                     'wall_deposition_rate_shadow_candidate'
                 ] = copy.deepcopy(
@@ -7574,7 +7613,8 @@ def _inlet_carrier_molar_flow_mol_s(
 
     if not inlet_partials_pa:
         return 0.0, None
-    species_names = tuple(str(species) for species in inlet_partials_pa)
+    species_names = tuple(str(species) for species in inlet_partials_pa
+                          if species in inlet_species_kg_hr)
     if total_pressure_pa <= 0.0:
         return 0.0, species_names
     vapour_mol_s = _tracked_molar_flow_mol_s(
@@ -7583,12 +7623,15 @@ def _inlet_carrier_molar_flow_mol_s(
         vapor_pressure_data=vapor_pressure_data,
     )
     partial_sum_pa = math.fsum(
-        float(pressure) for pressure in inlet_partials_pa.values()
+        float(inlet_partials_pa[species]) for species in species_names
     )
     if (
         vapour_mol_s <= 0.0
         or partial_sum_pa <= 0.0
-        or partial_sum_pa >= total_pressure_pa
+        or total_pressure_pa - partial_sum_pa <= _partial_pressure_roundoff_pa(
+            {species: inlet_partials_pa[species] for species in species_names},
+            total_pressure_pa,
+        )
     ):
         return 0.0, species_names
     return (
@@ -8371,13 +8414,21 @@ def _assign_declared_wall_capture(
     pressure. This assigns that captured extent to the same reactions.
     It does not recompute K.
 
+    Oxygen is the committed parcel inventory, never a forecast coproduct.
+    For n_v mol captured and a = ν_O2/ν_v mol O2 per mol vapour,
+    n_oxidised = min(n_v, n_O2/a); n_free = n_v - n_oxidised.
+    Units: mol/(mol/mol) = mol. n_O2 = 0 leaves only the free route;
+    n_O2 >= a*n_v permits full oxidation. The residual uses the free
+    route only if supersaturated; otherwise it remains vapour.
+
     Algebra. Walk the reactions in ascending Psat. A reaction takes
     vapour only while ``Psat < p_local``. An oxidative leg takes
     ``min(remaining, n_O2 / (ν_O2/ν_v))`` and debits that times
     ``ν_O2/ν_v``. When the budget is short, the take is rounded down
     by one ULP so the debit cannot exceed ``n_O2``. A leg with
     ``ν_O2 <= 0`` takes the rest; a credit adds ``|ν_O2/ν_v|`` mol O2
-    per mol vapour back to the budget. The next reaction is reached
+    per mol vapour to the ledger proposal (not the available budget).
+    The next reaction is reached
     only when it is itself supersaturated. Anything left is unbooked
     vapour, not a deposit.
 
@@ -8438,7 +8489,8 @@ def _assign_declared_wall_capture(
             take = remaining
             debit = 0.0
             credit = take * (-o2_per) if o2_per < 0.0 else 0.0
-            oxygen_mol += credit
+            # This credit is part of a proposal, not committed inventory.
+            # Book it, but do not lend it to a later carrier's capture.
         products = {
             str(product): take * float(ratio)
             for product, ratio in reaction.products_mol_per_mol_vapour
@@ -8856,6 +8908,11 @@ def _record_wall_surface_antoine_telemetry(
     )
 
 
+def _partial_pressure_roundoff_pa(partials: Mapping[str, float], total_pa: float) -> float:
+    """Float64 summation bound, in Pa; not a physical carrier allowance."""
+    return max(math.ulp(total_pa), math.ulp(sum(partials.values()))) * max(1, len(partials))
+
+
 def _flowing_species_partial_pressures_pa(
     species_kg_hr: Mapping[str, float],
     total_pressure_pa: float,
@@ -8918,13 +8975,9 @@ def _flowing_species_partial_pressures_pa(
             molar_flow_by_species[str(species)] = (
                 rate_kg_hr / (molar_mass_g_mol / 1000.0)
             )
-        total_molar_flow = sum(molar_flow_by_species.values())
-        if total_molar_flow <= 0.0:
+        if not molar_flow_by_species:
             return {}
-        partial_pressures_pa = {
-            species: molar_flow / total_molar_flow * pressure_pa
-            for species, molar_flow in molar_flow_by_species.items()
-        }
+        return _molar_flow_partials_pa(molar_flow_by_species, pressure_pa)
 
     for species, partial_pressure_pa in partial_pressures_pa.items():
         if not math.isfinite(partial_pressure_pa) or partial_pressure_pa < 0.0:
@@ -8940,10 +8993,7 @@ def _flowing_species_partial_pressures_pa(
             )
     partial_pressure_sum_pa = sum(partial_pressures_pa.values())
     if partial_pressure_sum_pa > pressure_pa:
-        roundoff_pa = max(
-            math.ulp(pressure_pa),
-            math.ulp(partial_pressure_sum_pa),
-        ) * max(1, len(partial_pressures_pa))
+        roundoff_pa = _partial_pressure_roundoff_pa(partial_pressures_pa, pressure_pa)
         if (
             pressure_pa > 0.0
             and partial_pressure_sum_pa - pressure_pa <= roundoff_pa
@@ -8988,11 +9038,49 @@ def _flowing_species_partial_pressures_pa(
     return partial_pressures_pa
 
 
+def _partial_pressure_closure_diagnostic(
+    partials: Mapping[str, float], total_pa: float,
+) -> dict[str, Any]:
+    if not any(value > 0.0 for value in partials.values()):
+        return {"status": "not_applicable", "reason": "no_advective_parcel",
+                "relative_error": None}
+    return {"status": "evaluated", "reason": None,
+            "relative_error": abs(math.fsum(partials.values()) - total_pa) / total_pa
+            if total_pa > 0.0 else 0.0}
+
+
+def _molar_flow_partials_pa(
+    molar_flows: Mapping[str, float], total_pressure_pa: float,
+    *, background_molar_flow: float = 0.0,
+) -> dict[str, float]:
+    """Dalton mixture, with all flows in one common mol/time basis.
+
+    p_i = P_total * n_dot_i / sum_j(n_dot_j). mol/time cancels, leaving Pa.
+    Including carrier and oxygen makes sum(p_i) = P_total; removing a vapour
+    renormalizes the remaining gas without adding an independent O2 pressure.
+    """
+    flows = {
+        str(species): _finite_nonnegative_value(value, label=f"{species} molar flow")
+        for species, value in molar_flows.items()
+    }
+    total = math.fsum(flows.values()) + background_molar_flow
+    if total <= 0.0:
+        return {species: 0.0 for species in flows}
+    partials = {species: total_pressure_pa * (value / total)
+                for species, value in flows.items()}
+    return _flowing_species_partial_pressures_pa(
+        {}, total_pressure_pa,
+        reported_partial_pressures_mbar={sp: p / 100.0 for sp, p in partials.items()},
+    )
+
+
 def _segment_species_partial_pressures_pa(
     inlet_partial_pressures_pa: Mapping[str, float],
     total_pressure_pa: float,
     inlet_species_kg_hr: Mapping[str, float],
     species_kg_hr_by_segment: Mapping[str, Mapping[str, float]],
+    *,
+    inlet_molar_flows: Mapping[str, float] | None = None,
 ) -> dict[str, dict[str, float]]:
     # Premise: carrier molar flow persists while upstream capture reduces each
     # vapor flow. On a unit inlet-total-molar-flow basis, y_c=1-sum_i(y_i,0)
@@ -9018,25 +9106,25 @@ def _segment_species_partial_pressures_pa(
             for segment in species_kg_hr_by_segment
         }
 
-    inlet_mole_fraction = {
-        species: partial_pressure_pa / pressure_pa
-        for species, partial_pressure_pa in inlet_partials.items()
-    }
-    inlet_partial_pressure_sum_pa = sum(inlet_partials.values())
-    # Premise: _flowing_species_partial_pressures_pa already proves
-    # sum(p_i) <= P_total (or refuses a physical overfill). Derive the carrier
-    # on that same pressure basis: y_c=(P_total-sum(p_i))/P_total. Unit check:
-    # Pa/Pa is dimensionless. This avoids independently summing p_i/P_total,
-    # which can round to >1 even when the pressure sum is exactly P_total.
-    carrier_mole_fraction = (
-        pressure_pa - inlet_partial_pressure_sum_pa
-    ) / pressure_pa
+    if inlet_molar_flows is None:
+        # Compatibility for explicitly supplied partial maps: a common
+        # pressure unit is a molar-flow basis. Only a resolved, non-roundoff
+        # pressure remainder represents an implicit carrier.
+        inlet_molar_flows = dict(inlet_partials)
+        residual_pa = pressure_pa - math.fsum(inlet_partials.values())
+        carrier_basis = (
+            residual_pa
+            if residual_pa > _partial_pressure_roundoff_pa(inlet_partials, pressure_pa)
+            else 0.0
+        )
+    else:
+        carrier_basis = 0.0  # Production includes carrier as an explicit flow.
 
     by_segment: dict[str, dict[str, float]] = {}
     for raw_segment, segment_rates in species_kg_hr_by_segment.items():
         segment = str(raw_segment)
         local_molar_basis: dict[str, float] = {}
-        for species, inlet_fraction in inlet_mole_fraction.items():
+        for species, inlet_flow in inlet_molar_flows.items():
             inlet_rate = float(inlet_species_kg_hr.get(species, 0.0))
             local_rate = float(segment_rates.get(species, 0.0))
             if (
@@ -9049,7 +9137,12 @@ def _segment_species_partial_pressures_pa(
                     f'wall flowing mass rate for {species} must be finite '
                     'and non-negative'
                 )
-            if inlet_rate <= 0.0:
+            if species not in inlet_species_kg_hr:
+                # This is a supplied background gas, not a tracked condensable
+                # mass rate. It persists with the carrier; reaction
+                # booking separately enforces the finite O2 inventory.
+                depletion_fraction = 1.0
+            elif inlet_rate <= 0.0:
                 if local_rate > 0.0:
                     raise ValueError(
                         f'wall segment {segment} has {species} flow without '
@@ -9064,28 +9157,12 @@ def _segment_species_partial_pressures_pa(
                     )
                 depletion_fraction = local_rate / inlet_rate
             local_molar_basis[species] = (
-                inlet_fraction * depletion_fraction
+                inlet_flow * depletion_fraction
             )
 
-        local_total_basis = (
-            carrier_mole_fraction + sum(local_molar_basis.values())
-        )
-        if local_total_basis <= 0.0:
-            by_segment[segment] = {
-                species: 0.0 for species in inlet_partials
-            }
-            continue
-        local_partials = {
-            species: local_basis / local_total_basis * pressure_pa
-            for species, local_basis in local_molar_basis.items()
-        }
-        by_segment[segment] = _flowing_species_partial_pressures_pa(
-            {},
-            pressure_pa,
-            reported_partial_pressures_mbar={
-                species: partial_pressure_pa / 100.0
-                for species, partial_pressure_pa in local_partials.items()
-            },
+        by_segment[segment] = _molar_flow_partials_pa(
+            local_molar_basis, pressure_pa,
+            background_molar_flow=carrier_basis,
         )
     return by_segment
 
