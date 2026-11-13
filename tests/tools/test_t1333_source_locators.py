@@ -24,7 +24,12 @@ def _changed_extracts() -> list[Path]:
         cwd=REPO_ROOT,
         text=True,
     ).splitlines()
-    return [REPO_ROOT / name for name in names]
+    return [
+        REPO_ROOT / name
+        for name in names
+        if Path(name).parent == Path("data/literature/extracts")
+        and Path(name).suffix.lower() in {".yaml", ".yml"}
+    ]
 
 
 def _walk(value, ancestors=()):
