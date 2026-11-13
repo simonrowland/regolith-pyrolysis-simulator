@@ -1699,21 +1699,165 @@ def test_alphamelts_runtime_metadata_is_outside_the_prediction_projection(
 
 
 @pytest.mark.parametrize("engine", CACHEABLE_TEST_ENGINES, ids=lambda value: value.value)
-def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
+def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
     engine: Engine,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    import json
     from simulator import engine_cache
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        _OpenImccBatteryBackend,
         Po2Request,
         close_battery_engine_handle,
         equilibrate_cell,
         load_binary_pots,
+        normalize_engine_settings,
+        open_battery_engine,
     )
-    from tests.battery.cache_test_support import open_available_engine
+    from tests.battery.cache_test_support import missing_engine_reason
 
-    handle = open_available_engine(engine, nodeid="real backend cache warm pair")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    handle = open_battery_engine(engine.value)
+    if not handle.available or handle.backend is None:
+        missing_reason = missing_engine_reason(handle, engine.value)
+        assert missing_reason is not None
+        close_battery_engine_handle(handle)
+
+        class _RecordedBackend:
+            def __init__(self, result: Any) -> None:
+                self.result = result
+
+            def equilibrate(self, **_kwargs: Any) -> Any:
+                return self.result
+
+        recorded_openimcc_result = None
+        if engine is Engine.ALPHAMELTS:
+            from tests.battery.test_melts_fe_redox_known_engine_output import (
+                _load as load_melts_fixture,
+                _parse_alphamelts,
+            )
+
+            recorded_result = _parse_alphamelts(load_melts_fixture())
+        elif engine is Engine.THERMOENGINE:
+            from tests.battery.test_melts_fe_redox_known_engine_output import (
+                _FIXTURE as melts_fixture_path,
+            )
+
+            fixture = json.loads(melts_fixture_path.read_text(encoding="utf-8"))
+            recorded_result = EquilibriumResult(
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct=dict(
+                    fixture["thermoengine_liquid_composition_wt_pct"]
+                ),
+            )
+            recorded_result.fe_redox_split = dict(
+                fixture["thermoengine_fe_redox_split"]
+            )
+        elif engine is Engine.MAGEMIN:
+            from simulator.melt_backend.magemin import MAGEMinBackend
+
+            recorded_result = EquilibriumResult(liquid_fraction=0.0)
+            stdout = (
+                Path(__file__).resolve().parents[1]
+                / "fixtures"
+                / "magemin"
+                / "lfdrop-diag-1-1700-phase-mode.stdout"
+            ).read_text(encoding="utf-8")
+            magemin = MAGEMinBackend()
+            magemin._populate_result(
+                recorded_result,
+                {"phases": magemin._parse_subprocess_stdout(stdout)},
+            )
+        elif engine is Engine.VAPOROCK:
+            import yaml
+
+            fixture_path = (
+                Path(__file__).resolve().parents[1]
+                / "fixtures"
+                / "corpus"
+                / "wolf-2022-vaporock"
+                / "benchmark-fixture.yaml"
+            )
+            fixture = yaml.safe_load(fixture_path.read_text(encoding="utf-8"))
+            anchor = fixture["expected"]["vapor_partial_pressures_Pa"]["anchors"][0]
+            recorded_result = EquilibriumResult(
+                phase_assemblage_available=False,
+                vapor_pressures_Pa=dict(anchor["vapor_partial_pressures_Pa"]),
+            )
+        else:
+            from simulator.melt_backend import openimcc_bridge
+            from simulator.melt_backend.imcc_adapter_labels import ImccAdapterLabels
+            from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+
+            fixture_path = (
+                Path(__file__).resolve().parents[1]
+                / "fixtures"
+                / "openimcc_temperature_bridge.json"
+            )
+            fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+            record = fixture["records"]["c2b7b4e:62"]
+            activities = dict(
+                zip(record["parent_oxides"], record["parent_activity"], strict=True)
+            )
+            recorded_openimcc_result = OpenImccBridgeResult(
+                parent_oxide_activities=activities,
+                parent_oxides=tuple(record["parent_oxides"]),
+                flags=(),
+                notices=(),
+                acid_sink_ratio=None,
+                pack_model_id="openimcc-recorded-fixture",
+                pack_version="recorded",
+                pack_digest=fixture["provenance"],
+                openimcc_version="recorded",
+                envelope_status="inside",
+                extrapolated=False,
+                labels=ImccAdapterLabels(
+                    identity={},
+                    coverage={},
+                    trust="internal-analytical",
+                    envelope_status="inside",
+                ),
+                coverage={},
+                activity_coefficients={},
+            )
+            monkeypatch.setattr(
+                openimcc_bridge,
+                "_evaluate_uncached",
+                lambda **_kwargs: recorded_openimcc_result,
+            )
+            backend = object.__new__(_OpenImccBatteryBackend)
+            backend.engine_name = engine.value
+            backend._bridge = openimcc_bridge
+            backend._pack_name = "openimcc-v1.0.2"
+            backend._gas_pack_name = "default"
+            backend._identity = {"pack": backend._pack_name}
+            backend.model_id = "openimcc-recorded-fixture"
+            backend._gas = None
+            backend._gas_error = None
+            backend._certified_temperature_domain = None
+            handle = EngineHandle(
+                name=engine.value,
+                backend=backend,
+                available=True,
+                unavailable_reason=None,
+                takes_fo2=False,
+                supports_intrinsic_fo2=False,
+                engine_settings=normalize_engine_settings(engine.value, None),
+            )
+
+        if engine is not Engine.OPENIMCC:
+            backend = _RecordedBackend(recorded_result)
+            handle = EngineHandle(
+                name=engine.value,
+                backend=backend,
+                available=True,
+                unavailable_reason=None,
+                takes_fo2=False,
+                supports_intrinsic_fo2=False,
+                engine_settings=normalize_engine_settings(engine.value, None),
+            )
     pots, _metadata = load_binary_pots()
     if engine is Engine.ALPHAMELTS:
         from simulator.diagnostic_helpers.binary_pot_battery import BinaryPot
@@ -1744,27 +1888,43 @@ def test_each_real_backend_equilibrate_warm_pair_matches_cache_off(
     def stable(cell: Any) -> Any:
         return cell.to_engine_cache_value()
 
-    def consumer_flags(cell: Any) -> Any:
-        return (
-            cell.authority,
-            cell.authoritative_for_requested_vapor_pressure,
-            cell.vapor_pressure_backend_status,
-            cell.vapor_pressure_backend_status_reason,
-            tuple(dict(notice) for notice in cell.notices),
+    def scorer_fields(cell: Any) -> dict[str, Any]:
+        names = (
+            "status",
+            "refusal_reason",
+            "engine_status",
+            "engine_reason",
+            "exit_signal",
+            "exit_code",
+            "model_id",
+            "melt_activities",
+            "gas_partial_pressures_Pa",
+            "invalid_gas_partial_pressure_components",
+            "melt_activity_coefficients",
+            "melt_activity_coefficient_details",
+            "vapor_pressure_backend_status",
+            "vapor_pressure_backend_status_reason",
+            "notices",
+            "authority",
+            "certified_band",
+            "liquid_composition_wt_pct",
+            "fe_redox_split",
         )
+        return {name: getattr(cell, name) for name in names}
 
     try:
-        monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
         cache_off = equilibrate_cell(handle, pot, **common)
         monkeypatch.setenv(
             "REGOLITH_ENGINE_CACHE", str(tmp_path / f"{engine.value}.sqlite")
         )
         engine_cache.engine_cache_counters(reset=True)
         cold = equilibrate_cell(handle, pot, **common)
+        # Force the warm request through SQLite's decoder, not the process LRU.
+        engine_cache._MEMORY_CACHE.clear()
         warm = equilibrate_cell(handle, pot, **common)
 
         assert stable(cache_off) == stable(cold) == stable(warm)
-        assert consumer_flags(cache_off) == consumer_flags(cold) == consumer_flags(warm)
+        assert scorer_fields(cache_off) == scorer_fields(cold) == scorer_fields(warm)
         assert engine_cache.engine_cache_counters(reset=True)[engine.value] == {
             "hits": 1,
             "misses": 1,

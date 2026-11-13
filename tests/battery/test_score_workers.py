@@ -248,7 +248,19 @@ def test_score_cli_publishes_partial_crash_run_with_success_exit(
 
     assert result == 0
     assert "score run notice" in capsys.readouterr().err
-    residual_lines = (battery_path / "residuals.jsonl").read_text(
+    filters = battery_score._scoring_filter_record(
+        engines=(Engine.VAPOROCK,),
+        rail=None,
+        work_id=None,
+        limit=None,
+        species_formulas=(),
+    )
+    subset = battery_score._is_subset_run(filters)
+    assert subset
+    output_directory = battery_score._scoring_output_directory(
+        root, filters, subset=subset
+    )
+    residual_lines = (output_directory / "residuals.jsonl").read_text(
         encoding="utf-8"
     ).splitlines()
     rows = [json.loads(line) for line in residual_lines[1:]]
@@ -260,8 +272,9 @@ def test_score_cli_publishes_partial_crash_run_with_success_exit(
         for row in rows
     )
     summary = json.loads(
-        (battery_path / "score-summary.json").read_text(encoding="utf-8")
+        (output_directory / "score-summary.json").read_text(encoding="utf-8")
     )
+    assert summary["subset"] is True
     assert len(summary["score_shard_failures"]) == 1
     assert summary["engine_cache"]["by_engine"][Engine.VAPOROCK.value]["hits"] > 0
 
