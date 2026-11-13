@@ -75,7 +75,16 @@ import math
 from dataclasses import dataclass, field
 from typing import Any, Callable, Sequence
 
-GAS_CONSTANT_J_MOL_K = 8.314462618
+from simulator.oxygen_buffers import (
+    FROST_IW_COEFFICIENTS,
+    FROST_NNO_COEFFICIENTS,
+    FROST_QFM_BETA_COEFFICIENTS,
+    FROST_WM_COEFFICIENTS,
+    frost_condensed_buffer_log10_fO2_bar,
+)
+from simulator.physical_constants import GAS_CONSTANT_10SIG
+
+GAS_CONSTANT_J_MOL_K = GAS_CONSTANT_10SIG
 LN10 = math.log(10.0)
 
 #: THE one policy number. Residual tolerance in log10 fO2 units ("dex").
@@ -134,7 +143,13 @@ class PublishedBuffer:
     notes: str = ""
 
     def log10_fo2(self, T_K: float) -> float:
-        return self.A_K / float(T_K) + self.B
+        return frost_condensed_buffer_log10_fO2_bar(
+            self.A_K,
+            self.B,
+            self.pressure_coefficient_K_per_bar,
+            float(T_K),
+            1.0,
+        )
 
 
 #: Coefficients AND windows read from Frost (1991) Table 1 and checked against
@@ -146,11 +161,11 @@ class PublishedBuffer:
 PUBLISHED_BUFFERS: dict[str, PublishedBuffer] = {
     "IW": PublishedBuffer(
         name="IW",
-        A_K=-27489.0,
-        B=6.702,
+        A_K=FROST_IW_COEFFICIENTS[0],
+        B=FROST_IW_COEFFICIENTS[1],
         T_min_K=838.15,   # 565 C
         T_max_K=1473.15,  # 1200 C
-        pressure_coefficient_K_per_bar=0.055,
+        pressure_coefficient_K_per_bar=FROST_IW_COEFFICIENTS[2],
         citation="Frost (1991) Rev. Mineral. 25, 1-10, Table 1 (iron-wustite)",
         ellingham_species="Fe",
         provenance=PROVENANCE_VERIFIED,
@@ -170,11 +185,11 @@ PUBLISHED_BUFFERS: dict[str, PublishedBuffer] = {
     ),
     "NNO": PublishedBuffer(
         name="NNO",
-        A_K=-24930.0,
-        B=9.36,
+        A_K=FROST_NNO_COEFFICIENTS[0],
+        B=FROST_NNO_COEFFICIENTS[1],
         T_min_K=873.15,   # 600 C
         T_max_K=1473.15,  # 1200 C
-        pressure_coefficient_K_per_bar=0.046,
+        pressure_coefficient_K_per_bar=FROST_NNO_COEFFICIENTS[2],
         citation="Frost (1991) Rev. Mineral. 25, 1-10, Table 1 (nickel-nickel oxide)",
         ellingham_species="Ni",
         provenance=PROVENANCE_VERIFIED,
@@ -184,11 +199,11 @@ PUBLISHED_BUFFERS: dict[str, PublishedBuffer] = {
     ),
     "QFM": PublishedBuffer(
         name="QFM",
-        A_K=-25096.3,
-        B=8.735,
+        A_K=FROST_QFM_BETA_COEFFICIENTS[0],
+        B=FROST_QFM_BETA_COEFFICIENTS[1],
         T_min_K=846.15,   # ~573 C, the beta-quartz branch
         T_max_K=1473.15,  # 1200 C
-        pressure_coefficient_K_per_bar=0.110,
+        pressure_coefficient_K_per_bar=FROST_QFM_BETA_COEFFICIENTS[2],
         citation=(
             "Frost (1991) Rev. Mineral. 25, 1-10, Table 1 (quartz-fayalite-"
             "magnetite, beta-quartz branch); the same coefficients are carried "
@@ -202,11 +217,11 @@ PUBLISHED_BUFFERS: dict[str, PublishedBuffer] = {
     ),
     "WM": PublishedBuffer(
         name="WM",
-        A_K=-32807.0,
-        B=13.012,
+        A_K=FROST_WM_COEFFICIENTS[0],
+        B=FROST_WM_COEFFICIENTS[1],
         T_min_K=838.15,   # 565 C
         T_max_K=1473.15,  # 1200 C
-        pressure_coefficient_K_per_bar=0.083,
+        pressure_coefficient_K_per_bar=FROST_WM_COEFFICIENTS[2],
         citation="Frost (1991) Rev. Mineral. 25, 1-10, Table 1 (wustite-magnetite)",
         ellingham_species=None,
         provenance=PROVENANCE_VERIFIED,

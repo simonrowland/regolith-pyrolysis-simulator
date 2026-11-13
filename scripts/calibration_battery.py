@@ -25,6 +25,7 @@ import traceback
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.physical_constants import PA_PER_BAR  # noqa: E402
 from simulator.config import _load_setpoints_file
 
 AUTHORITIES = ("certified", "bridge", "extrapolated", "refused")
@@ -438,7 +439,7 @@ def na_rows():
             measured=heldout["measured_pNa_Pa"], predicted=predicted,
             status="refused" if refusal else "out-of-domain", authority="extrapolated",
             evidence="derived measurement", split="holdout", selected=False,
-            conditions={"temperature_K": temperature, "pO2_bar": pO2, "total_pressure_Pa": pO2 * 1e5,
+            conditions={"temperature_K": temperature, "pO2_bar": pO2, "total_pressure_Pa": pO2 * PA_PER_BAR,
                         "composition_wt_pct": composition, "partial_melt": True},
             raw={"runtime": runtime, "source_binding": heldout, "source_observation": asdict(obs)},
             uncertainty={"kind": "log10_decades", "value": 0.30, "role": "digitization; correlated cell offset; extrapolated line points have larger unknown uncertainty"},

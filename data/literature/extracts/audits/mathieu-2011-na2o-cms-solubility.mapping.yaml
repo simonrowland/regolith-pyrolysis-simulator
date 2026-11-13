@@ -1,0 +1,32 @@
+source_id: mathieu-2011-na2o-cms-solubility
+source: Mathieu et al. (2011), Table 6, PDF page 11
+extraction: Manual transcription of unique CMS glass rows; Table 6 alternate mol% values are retained as source-value strings, not duplicate composition observations.
+tables:
+- page: 11
+  published_page: 618
+  table_index: 6
+  type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  evidence_class: measured_reduced
+  unit: '%'
+  phase: glass
+  values:
+  - column: 2
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: glass
+    unit: '%'
+  - column: 3
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: glass
+    unit: mol%
+  - column: 4
+    species: Na2O
+    quantity: activity_coefficient
+    phase: glass
+    unit: dimensionless
+    scale_factor:
+      header: ' $\gamma Na_{2}O^{b} (×10^{06})$ '
+      exponent: 6
+      direction: quantity_times_factor_equals_cell

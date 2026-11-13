@@ -1,0 +1,611 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 8680ad1c3c11185a7884533a2cb067039232f5bbc9d94b1c08ad1b7c3528ffef
+  citation: Yakovlev, O. I., and Shornikov, S. I. (2017). Analysis of experimental data on the olivine evaporation. Experiment
+    in Geosciences, volume 23, number 1, pages 82–84. The supplied three-page PDF also includes an incomplete platinum-disulfide
+    heat-capacity abstract whose author and title are not visible, and an excerpt titled 'An experimental study of the solubility
+    of tin in H2O vapor' by Ildar V. Zakirov, Valeria A. Suvorova, and Valentin O. Osadchii on page 84.
+  source_ids:
+  - yakovlev-2017-olivine-vaporization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:yakovlev-2017-olivine-vaporization
+      role: pdf
+      path: raw/yakovlev-2017-olivine-vaporization/yakovlev-2017-olivine-vaporization.pdf
+      sha256:
+        tag: value
+        value: 6b27afa136cbd2cd00a2d986199f450cd22a59cbd371bb19a4c6cad332432b1f
+    - asset_id: pdftotext:yakovlev-2017-olivine-vaporization
+      role: pdftotext
+      path: text/yakovlev-2017-olivine-vaporization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:yakovlev-2017-olivine-vaporization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: yakovlev_2017_olivine_abstract_claims
+  type: experiment_series
+  locator:
+    published_page: 82
+    pdf_page_index: 0
+    section: Abstract and Introduction
+  units: qualitative claims and ratios as printed
+  values:
+    statements_as_printed:
+    - All authors both past and modern experimental works suggested that forsterite evaporates congruently (without changing
+      the solid state composition).
+    - Evaporation of olivine as a phase of variable composition, occurs in such a way that between the substance in a condensed
+      state (liquid or solid) and in gas phase may be the difference in Fe-contents, while the 'olivine' stoichiometry [(Mg
+      + Fe) / Si = 2] remains unchanged.
+    - A critical analysis of almost all experimental data showed that actually the process of olivine evaporation from the
+      solid phase (sublimation) is really close to congruent, while the liquid phase evaporation is clearly incongruent.
+    - As shown by our study, the olivine evaporation depends on the kinetics of the process.
+    - In the evaporation pulsed mode the ratio of the Mg / Si was close to 1, which does not correspond to the olivine stoichiometry
+      and therefore congruent evaporation character.
+    - A high degree of relative content of olivine in chondrites explains the interest of researchers to its primary condensation
+      from a gas phase and its evaporation at the stage of nebular evolution.
+    - In the last decades there were published a lot of experimental works for determining the total pressure of forsterite
+      and the partial pressure of the forsterite components depending on the temperature.
+    - Thus, Fig. 1 presents mainly data on the vapor pressure of forsterite at its sublimation.
+    - Fig. 1 shows for comparison the temperature dependence of the vapor pressure of magnesium (MgO) and silicon oxides (SiO2).
+  context_id: yakovlev-2017-olivine-vaporization::context::yakovlev_2017_olivine_abstract_claims
+  work_id: 8680ad1c3c11185a7884533a2cb067039232f5bbc9d94b1c08ad1b7c3528ffef
+  source_id: yakovlev-2017-olivine-vaporization
+  species: olivine
+- observation_id: yakovlev_2017_olivine_discussion_claims
+  type: experiment_series
+  locator:
+    published_page: 83
+    pdf_page_index: 1
+    section: Discussion
+  units: qualitative claims and ratios as printed
+  values:
+    statements_as_printed:
+    - Many authors both past and contemporary experimental works suggested that forsterite evaporates congruently, i.e. without
+      changing the composition.
+    - Moreover, the evaporation of olivine as a phase of variable composition occurs in such a way that between the substance
+      in a condensed state (liquid or solid) and gas may be the difference in FeO contents, but olivine stoichiometry [(Mg
+      + Fe) / Si = 2] remains unchanged, that is, olivine evaporates congruently too.
+    - Critical analysis of experimental data showed, however, that the process of evaporation from the solid phase (sublimation)
+      is really close to congruent, then as evaporation of liquid phase is clearly incongruent in nature.
+    - Well known that the sublimation only affects the surface layer of crystalline substances, while leaving the inner part
+      of the crystal unchanged. In this case, the evaporation process can be described as congruent, as the olivine in the
+      process of evaporation keeps generally the unchanging of the composition. However, in the surface layer composition
+      may be essentially different.
+    - Interestingly, that at the sublimation of forsterite in a narrow surface zone of a crystal with a thickness of only
+      ~5 microns recorded a strong isotopic fractionation of magnesium (Wang et al., 1999).
+    - As for evaporation from the liquid phase any clear data on the nature of evaporation of olivine melt is absent.
+    - Many authors often refer to the results of the work A. Hashimoto (Hashimoto, 1990) where in some experiments the temperature
+      was beyond the melting temperature of forsterite (Fig. 1) and where, as believed, given the proofs of congruence of
+      the melt evaporation.
+    - 'But in reality, there are no any evidences in the Hashimoto''s work, while it was written literally the following:
+      ''Molten forsterite also evaporates almost stoichiometrically. Only the most highly evaporated residues contained a
+      trace (~5 vol. %) of SiO2-rich glass (~65 wt. % SiO2)''.'
+    - Hashimoto's article contains no data on 'almost congruent' evaporation of forsterite melt and does not give interpretation
+      on the fact of SiO2 accumulation in the residual melt.
+    - In recent works on evaporation (Mendybaev et al., 2014) it is also argued that the melts close to forsterite compositions
+      evaporate congruently.
+    - However, our calculations of the Mendybaev’s and his colleagues analytical data showed the wrongness of this proposition
+      (Fig. 2).
+    - In addition, as shown by our study (Yakovlev et. al., 1995; Gerasimov et. al., 2015) the evaporation of olivine is determined
+      by the kinetics of the process.
+    - The results of experiments on of high-mg olivine evaporation in the condition of impact and laser-pulse heating showed
+      that the condensed vapor compositions differed from the residual melt ones.
+    - In the conditions of high temperature and rapid evaporation the ratio of elements Mg/Si in a vapor was close to 1 (Fig.
+      3) that does not correspond to the olivine stoichiometry and, therefore, congruent character of evaporation.
+    hashimoto_quote:
+      method_class: quoted_attributed
+      attribution: Hashimoto (1990), quoted in this source
+      residue_glass_volume_percent_approx: 5
+      glass_silica_mass_percent_approx: 65
+    pulse_evaporation_ratio:
+      method_class: quoted_attributed
+      attribution: Yakovlev et al. (1995) and Gerasimov et al. (2015), summarized by this source
+      Mg_to_Si_vapor_ratio_approx: 1
+      initial_olivine_stoichiometric_Mg_plus_Fe_to_Si_ratio: 2
+    internal_qualification:
+      reason: source_internally_inconsistent
+      note: The p. 82 abstract says past and modern works suggested congruent evaporation and that pulsed vapor Mg/Si is close
+        to 1 rather than the olivine ratio 2. On p. 83 the authors repeat the stoichiometric congruence claim, then distinguish
+        near-congruent solid sublimation from clearly incongruent liquid evaporation. These claims are retained as competing
+        statements, not reconciled.
+  context_id: yakovlev-2017-olivine-vaporization::context::yakovlev_2017_olivine_discussion_claims
+  work_id: 8680ad1c3c11185a7884533a2cb067039232f5bbc9d94b1c08ad1b7c3528ffef
+  source_id: yakovlev-2017-olivine-vaporization
+  species: olivine
+- observation_id: yakovlev_2017_olivine_experimental_scope
+  type: method
+  locator:
+    published_page: 82
+    pdf_page_index: 0
+    section: Abstract and Introduction
+  units: as printed
+  values:
+    stated_scope: This abstract critically analyzes prior olivine evaporation studies; it does not report a new run series
+      or give a run-assigned apparatus.
+    bibliographic_context:
+      locator:
+        published_page: 84
+        pdf_page_index: 2
+        section: Olivine references
+      method_class: quoted_attributed
+      attribution: Olivine article bibliography as printed
+      note: Reference-title 1973 K belongs to Kambayashi and Kato (1984), not a new run reported here.
+      references:
+      - reference: 1
+        authors: Gerasimov et al.
+        year: 2015
+        volume: 1
+        pages:
+        - 234
+        - 237
+      - reference: 2
+        authors: Glushko et al.
+        years:
+        - 1978
+        - 1982
+      - reference: 3
+        authors: Hashimoto
+        year: 1990
+        volume: 347
+        issue: 6288
+        pages:
+        - 53
+        - 55
+      - reference: 4
+        authors: Kambayashi and Kato
+        year: 1983
+        volume: 15
+        issue: 6
+        pages:
+        - 701
+        - 707
+      - reference: 5
+        authors: Kambayashi and Kato
+        year: 1984
+        volume: 16
+        issue: 2
+        pages:
+        - 241
+        - 248
+        title_as_printed: A thermodynamic study of (magnesium oxide – silicon dioxide) by mass spectrometry at 1973 K.
+      - reference: 6
+        authors: Mendybaev et al.
+        year: 2014
+        conference: LPSC-XLV
+        abstract_number: 2782
+      - reference: 7
+        authors: Nagahara et al.
+        year: 1994
+        volume: 58
+        issue: 8
+        pages:
+        - 1951
+        - 1963
+      - reference: 8
+        authors: Nagahara and Ozawa
+        year: 1999
+        volume: 75
+        issue: 2
+        pages:
+        - 29
+        - 34
+      - reference: 9
+        authors: Shornikov et al.
+        year: 2000
+        volume: 70
+        issue: 3
+        pages:
+        - 360
+        - 370
+        title_part: III
+      - reference: 10
+        authors: Stolyarova et al.
+        year: 2004
+        volume: 399
+        issue: 1
+        pages:
+        - 82
+        - 84
+      - reference: 11
+        authors: Wang et al.
+        year: 1999
+        volume: 63
+        issue: 6
+        pages:
+        - 953
+        - 966
+      - reference: 12
+        authors: Yakovlev et al.
+        year: 1995
+        volume: 33
+        issue: 8
+        pages:
+        - 1235
+        - 1247
+      - reference: 13
+        authors: Zaitsev et al.
+        year: 2006
+        volume: 80
+        issue: 3
+        pages:
+        - 335
+        - 344
+    published_methods_as_described:
+    - evaporation from the exposed surface in the vacuum
+    - quasiequilibrium regime of evaporation in the Knudsen cell with the mass spectrometric determination of the vapor composition
+    method_tokens_for_mixed_prior_literature:
+    - langmuir_free_evaporation
+    - knudsen_effusion
+    run_specific_method_assignment:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    cell_material_and_liner:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    cell_material_enum:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    pressure_calibration_substance:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    pressure_calibration_method:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    ionisation_cross_sections:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    ionisation_cross_sections_source:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    ionisation_energy_eV:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    multiplier_or_isotope_corrections:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    temperature_measurement:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    temperature_calibration:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    temperature_uncertainty:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    chamber_background_pressure:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    sample_preparation:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    starting_materials:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    starting_material_purity:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    sample_composition_as_prepared:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    sample_composition_as_analysed_after_runs:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    activity_defining_ions:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    activity_standard_states:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source
+    reported_vapor_species:
+    - Mg
+    - SiO
+    - O
+    - O2
+    statement_as_printed: Experiments have shown that the main forms of vapor particles above the forsterite were the atomic
+      magnesium (Mg) and molecular suboxide silicon (SiO). The oxygen presented in the vapor in atomic and molecular forms
+      (O and O2).
+    translation_note: The source's wording 'molecular suboxide silicon' and the sentence fragment 'The oxygen presented...'
+      are retained as printed.
+    numeric_background:
+    - quantity: forsterite_melting_point_C
+      value: 1890
+      attribution: this source's introduction, citing literature generally
+      statement_as_printed: One may notice that they are obtained at relatively low temperatures, seldom exceeding the melting
+        point of the mineral (1890 °C).
+  context_id: yakovlev-2017-olivine-vaporization::context::yakovlev_2017_olivine_experimental_scope
+  work_id: 8680ad1c3c11185a7884533a2cb067039232f5bbc9d94b1c08ad1b7c3528ffef
+  source_id: yakovlev-2017-olivine-vaporization
+  species: olivine
+- observation_id: yakovlev_2017_olivine_figure1_context
+  type: figure_only
+  locator:
+    published_page: 83
+    pdf_page_index: 1
+    figure: '1'
+  units: vapor pressure on a logarithmic axis versus reciprocal temperature; values not digitized
+  values:
+    figure_status: figure_only
+    axes_as_printed: 10^4/T (K^-1); lg p_tot (atm)
+    printed_axis_tick_ranges:
+      ten_thousand_over_temperature_K_inverse:
+      - '4.5'
+      - '6'
+      temperature_K:
+      - 1600
+      - 2400
+      lg_total_pressure_atm:
+      - -8
+      - -4
+    caption_formula_as_printed: Mg2SiO2
+    caption_formula_note: The figure caption prints Mg2SiO2, while the surrounding text identifies forsterite; the subscript
+      is transcribed as printed and not silently corrected.
+    series:
+    - series: 1
+      method: langmuir_free_evaporation
+      attribution: Hashimoto (1990)
+    - series: 2
+      method: langmuir_free_evaporation
+      attribution: Nagahara and Ozawa (1999)
+    - series: 3
+      method: knudsen_effusion
+      attribution: Nagahara et al. (1994)
+    - series: 4
+      method: knudsen_effusion
+      attribution: Kambayashi and Kato (1983–1984)
+    - series: 5
+      method: knudsen_effusion
+      attribution: Stolyarova et al. (2004)
+    - series: 6
+      method: knudsen_effusion
+      attribution: Zaitsev et al. (2006)
+    - series: 7
+      species: MgO
+      method: model_derived
+      attribution: present study using Glushko et al. (1978–1982)
+    - series: 8
+      species: SiO2
+      method: model_derived
+      attribution: present study using Shornikov et al. (2000)
+    melting_point_marker_as_printed: The dashed vertical line indicates the forsterite melting point.
+    note: No plotted points were digitized. Series 1–6 are cited literature; series 7 and 8 are comparison vapor-pressure
+      curves calculated in the present study. Ranges give first and last printed ticks, not graphical extents or experimental
+      coverage.
+  context_id: yakovlev-2017-olivine-vaporization::context::yakovlev_2017_olivine_figure1_context
+  work_id: 8680ad1c3c11185a7884533a2cb067039232f5bbc9d94b1c08ad1b7c3528ffef
+  source_id: yakovlev-2017-olivine-vaporization
+  species: olivine
+- observation_id: yakovlev_2017_olivine_figure2_context
+  type: figure_only
+  locator:
+    published_page: 83
+    pdf_page_index: 1
+    figure: '2'
+  units: plotted composition/ratio axes; values not digitized
+  values:
+    figure_2:
+      figure_status: figure_only
+      title_as_printed: Estimated and actual evaporation trends of the melt FUN1 evolution according to the Mendybaev’s data
+        (Mendybaev et al., 2014).
+      axes:
+      - MgO_wt_percent
+      - SiO2_wt_percent
+      printed_axis_ranges:
+        MgO_wt_percent:
+        - 15
+        - 55
+        SiO2_wt_percent:
+        - 10
+        - 45
+      series:
+      - '1: evolution trend of the melt FUN1 composition in the case of congruent forsterite evaporation of forsterite'
+      - '2: evolution trend of the melt FUN1 composition in the case of experimental evaporation'
+      star: initial composition of FUN1
+      note: Neither curve nor star coordinates were digitized.
+  context_id: yakovlev-2017-olivine-vaporization::context::yakovlev_2017_olivine_figure2_context
+  work_id: 8680ad1c3c11185a7884533a2cb067039232f5bbc9d94b1c08ad1b7c3528ffef
+  source_id: yakovlev-2017-olivine-vaporization
+  species: olivine
+- observation_id: yakovlev_2017_olivine_figure3_context
+  type: figure_only
+  locator:
+    published_page: 84
+    pdf_page_index: 2
+    figure: '3'
+  units: plotted ratio vs depth; values not digitized
+  values:
+    figure_status: figure_only
+    title_as_printed: Ratio variations of (Mg + Fe2+) / Si in the vapor-condensate layers. Cross shows the ratio in the initial
+      olivines.
+    panels:
+    - chrysolite
+    - forsterite
+    horizontal_axis: depth from the surface of the condensate in angstroms
+    printed_axis_ranges:
+      depth_angstrom:
+      - 0
+      - 12000
+      Mg_plus_Fe2_over_Si:
+      - '0.6'
+      - '2'
+    note: Scatter points and initial-olivine cross were visually reviewed but not digitized. The text's separate approximate
+      Mg/Si ratio statement is preserved in yakovlev_2017_olivine_discussion_claims.
+  context_id: yakovlev-2017-olivine-vaporization::context::yakovlev_2017_olivine_figure3_context
+  work_id: 8680ad1c3c11185a7884533a2cb067039232f5bbc9d94b1c08ad1b7c3528ffef
+  source_id: yakovlev-2017-olivine-vaporization
+  species: olivine
+- observation_id: yakovlev_2017_pts2_heat_capacity_context
+  type: thermodynamic_example
+  locator:
+    published_page: 82
+    pdf_page_index: 0
+    section: Abstract
+  units: J mol^-1 K^-1 for heat capacity; equation units as specified by the incomplete abstract
+  values:
+    abstract_identity: Incomplete abstract about isobaric heat capacity of crystalline platinum disulphide; author and title
+      are not visible in the supplied extract.
+    bibliographic_context:
+      locator:
+        published_page: 82
+        pdf_page_index: 0
+        section: PtS2 references
+      method_class: quoted_attributed
+      attribution: PtS2 fragment bibliography as printed
+      references:
+      - reference: 1
+        authors: Iorish and Tolmach
+        year: 1986
+        volume: 60
+        issue: 10
+        pages:
+        - 2583
+        - 2587
+      - reference: 2
+        authors: Malyshev et al.
+        year: 1985
+        issue: 6
+        pages:
+        - 195
+        - 197
+      - reference: 3
+        url: http://www.physics.nist.gov/PhysRefData/Compositions
+      - reference: 4
+        authors: Khodakovsky
+        volume: 4
+        year: 2012
+        doi: 10.2205/2012NZ_ASEMPG
+      - reference: 5
+        authors: Westrum and Carlson
+        year: 1961
+        volume: 35
+        issue: 5
+        pages:
+        - 1670
+        - 1676
+        title_part_as_printed: II. Dichalcogenides; PtS2, PtTe2, and PdTe2.
+    method_class: model_derived
+    equation_1_as_printed: Cp° = 74.98 + 8.53·10^-4·T - 8.00·10^5·T^-2 (1)
+    equation_2_as_printed: Cp° = 78.92 - 3Rn(36.55·T^-1 + 39.20·T^-2 + 1.11·10^6·T^-3) - 1.16·10^-3·T (2)
+    equation_2_transcription_note: The page image reads '3Rn'; retained literally as printed, not silently changed to '3R
+      ln'.
+    thermodynamic_functions_temperature_range_K:
+    - 298
+    - 875
+    condensed_species_as_printed: PtS2(c)
+    calculation_species_as_printed: PtS2(k)
+    heat_capacity_Mayer_Kelly_at_298_15_K_J_per_mol_K: '66.23'
+    heat_capacity_Khodakovsky_at_298_15_K_J_per_mol_K: '66.24'
+    method_class_for_values: model_derived
+    interpolation_as_printed: Interpolation of the obtained dependences (1) and (2) leaded to the values of Cp°(PtS2, cr,
+      298.15 K) = 66.23 J/(mol·K) for the Mayer-Kelly equation (1) and 66.24 J/(mol·K) for the Khodakovsky equation (2).
+    comparison:
+      method_class: quoted_attributed
+      attribution: Iorish spline approximation, as cited in the fragment
+      heat_capacity_at_298_15_K_J_per_mol_K: '66.18'
+      uncertainty_plus_minus_J_per_mol_K: '0.33'
+    adiabatic_calorimetry_temperature_range_K:
+    - 5
+    - 345
+    qualifiers_as_printed:
+    - The results of experimental determination of the isobaric heat capacity of crystalline substances at temperatures above
+      298.15 K could be represented by approximation by empirical or semiempirical equations [Khodakovsky].
+    - 'In present paper the Mayer-Kelly (1) and Khodakovsky (2) nonlinear regression equations parametres for the heat capacity
+      of crystalline platinum disulphide (Fig. 3) were calculated and the adequacy of the models:'
+    - 'The values of the thermodynamic functions for PtS2(c) in the temperature range of 298 – 875 K are calculated using
+      complex integration at the appropriate calculation temperature for PtS2(k): Cp°(T), S°(T), H°(T) − H°(298.15 K) and
+      Φ°(T)'' = −[G°(T) − H°(298.15 K)]/T.'
+    - The calculated values are in agreement with the literature data [Westrum] and the value 66.18 ± 0.33 J/(mol·K) which
+      was received by the spline approximation [Iorish] on the basis of authors studies using adiabatic calorimetry in the
+      range from 5-345 K.
+    - The data received in the work can be used for construction of the phase diagram S-Pt.
+    note: These model and cited numeric values occur in prose/equations, not in a numerical data table. The malformed expression
+      '3Rn' and grammatical 'parametres'/'leaded' are retained as printed. No unsupported model observation was invented.
+  context_id: yakovlev-2017-olivine-vaporization::context::yakovlev_2017_pts2_heat_capacity_context
+  work_id: 8680ad1c3c11185a7884533a2cb067039232f5bbc9d94b1c08ad1b7c3528ffef
+  source_id: yakovlev-2017-olivine-vaporization
+  species: PtS2
+- observation_id: yakovlev_2017_tin_solubility_current_study_context
+  type: laboratory_conditions
+  locator:
+    published_page: 84
+    pdf_page_index: 2
+    section: Abstract and Introduction
+  units: as printed
+  values:
+    fragment_identity: Ildar V. Zakirov, Valeria A. Suvorova, and Valentin O. Osadchii, 'An experimental study of the solubility
+      of tin in H2O vapor'; abstract and introduction excerpt.
+    method_as_printed: autoclave method with in-situ sampling of vapor
+    method_token:
+      state:
+        tag: unknown
+        reason: no_corresponding_closed_experiment_method_token
+    current_study_temperature_C: 400
+    current_study_pressure_bar:
+    - 250
+    - 290
+    analyte: SnO2
+    medium: supercritical water vapor
+    numerical_solubility_value:
+      state:
+        tag: unknown
+        reason: not_stated_in_this_source_fragment
+    prior_study:
+      attribution: Zakirov et al. (2016)
+      system: SnO2-H2O
+      temperature_C:
+      - 330
+      - 360
+      pressure: saturated water pressure
+    statements_as_printed:
+    - The behavior of tin in hydrothermal geological processes is primarily controlled by the solubility of cassiterite (Migdisov,
+      Williams-Jones, 2005).
+    - In the chlorine-free environment, tin is usually present in the form of either Sn(OH)2 or Sn(OH)4 in both aqueous solutions
+      and water vapor.
+    - The thermodynamic parameters of the former are well-studied (Cigala, 2012), while the properties of the latter are still
+      unknown.
+    - Previously, we reported solubility of SnO2 in water vapor in the system SnO2-H2O at 330-360°C and saturated water pressure
+      (Zakirov et al., 2016).
+    - In this study, we present solubility of SnO2 at 400°C and 250-290 bar.
+    note: No numerical dissolved Sn or SnO2 concentration is present in the supplied fragment.
+  context_id: yakovlev-2017-olivine-vaporization::context::yakovlev_2017_tin_solubility_current_study_context
+  work_id: 8680ad1c3c11185a7884533a2cb067039232f5bbc9d94b1c08ad1b7c3528ffef
+  source_id: yakovlev-2017-olivine-vaporization
+  species: SnO2

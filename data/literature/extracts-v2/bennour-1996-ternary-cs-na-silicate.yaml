@@ -2,13 +2,12 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/bennour-1996-ternary-cs-na-silicate.yaml
 observations:
-- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=10:h=f122aaf66460
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
     quantity:
-      tag: unknown
-      reason: 'unsupported quantity ''FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O
-        + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'''
+      tag: value
+      value: activity
     species:
       formula: Cs2O
       phase:
@@ -20,12 +19,66 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.1'
+        - - Cs2O
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: point
+    point: '0.73086'
     approximate: false
   uncertainty:
     kind: none
@@ -40,16 +93,17 @@ observations:
     reason: admission_from_legacy_token:figure_only
   notices:
   - kind: admission_from_legacy_token
-    affected_quantities: []
+    affected_quantities:
+    - activity
     reason: admission_from_legacy_token:figure_only
-    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=10:h=f122aaf66460
   source_id: bennour-1996-ternary-cs-na-silicate
   locator:
     page: 14
     published_page: 241
     pdf_page_index: 13
     figure: '7'
-    note: X_SiO2 = 0.5 curve; caption as published
+    note: row=10
   read_from: pdf:bennour-1996-ternary-cs-na-silicate
   point_conditions:
     temperature_K:
@@ -61,14 +115,79 @@ observations:
         published_page: 241
         pdf_page_index: 13
         figure: '7'
-        note: X_SiO2 = 0.5 curve; caption as published
-- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.1'
+          - - Cs2O
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=11:h=303b8d1a3901
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
     quantity:
-      tag: unknown
-      reason: 'unsupported quantity ''FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O
-        + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'''
+      tag: value
+      value: activity
     species:
       formula: Cs2O
       phase:
@@ -80,12 +199,66 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.075'
+        - - Cs2O
+          - '0.425'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: point
+    point: '0.8126'
     approximate: false
   uncertainty:
     kind: none
@@ -100,16 +273,17 @@ observations:
     reason: admission_from_legacy_token:figure_only
   notices:
   - kind: admission_from_legacy_token
-    affected_quantities: []
+    affected_quantities:
+    - activity
     reason: admission_from_legacy_token:figure_only
-    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=11:h=303b8d1a3901
   source_id: bennour-1996-ternary-cs-na-silicate
   locator:
     page: 14
     published_page: 241
     pdf_page_index: 13
     figure: '7'
-    note: X_SiO2 = 0.85 curve; caption as published
+    note: row=11
   read_from: pdf:bennour-1996-ternary-cs-na-silicate
   point_conditions:
     temperature_K:
@@ -121,16 +295,81 @@ observations:
         published_page: 241
         pdf_page_index: 13
         figure: '7'
-        note: X_SiO2 = 0.85 curve; caption as published
-- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_na2o_x_sio2_0p5
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.075'
+          - - Cs2O
+            - '0.425'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=12:h=7f3d84e5f8cb
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
     quantity:
-      tag: unknown
-      reason: 'unsupported quantity ''FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O
-        + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'''
+      tag: value
+      value: activity
     species:
-      formula: Na2O
+      formula: Cs2O
       phase:
         tag: value
         value: l
@@ -140,12 +379,66 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.05'
+        - - Cs2O
+          - '0.45'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: point
+    point: '0.87178'
     approximate: false
   uncertainty:
     kind: none
@@ -160,16 +453,17 @@ observations:
     reason: admission_from_legacy_token:figure_only
   notices:
   - kind: admission_from_legacy_token
-    affected_quantities: []
+    affected_quantities:
+    - activity
     reason: admission_from_legacy_token:figure_only
-    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_na2o_x_sio2_0p5
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=12:h=7f3d84e5f8cb
   source_id: bennour-1996-ternary-cs-na-silicate
   locator:
     page: 14
     published_page: 241
     pdf_page_index: 13
     figure: '7'
-    note: X_SiO2 = 0.5 curve; caption as published
+    note: row=12
   read_from: pdf:bennour-1996-ternary-cs-na-silicate
   point_conditions:
     temperature_K:
@@ -181,16 +475,81 @@ observations:
         published_page: 241
         pdf_page_index: 13
         figure: '7'
-        note: X_SiO2 = 0.5 curve; caption as published
-- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_na2o_x_sio2_0p85
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.05'
+          - - Cs2O
+            - '0.45'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=13:h=9ae87955c74f
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
     quantity:
-      tag: unknown
-      reason: 'unsupported quantity ''FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O
-        + xCs2O] vs. the mole fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'''
+      tag: value
+      value: activity
     species:
-      formula: Na2O
+      formula: Cs2O
       phase:
         tag: value
         value: l
@@ -200,12 +559,66 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0'
+        - - Cs2O
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: point
+    point: '1'
     approximate: false
   uncertainty:
     kind: none
@@ -220,16 +633,17 @@ observations:
     reason: admission_from_legacy_token:figure_only
   notices:
   - kind: admission_from_legacy_token
-    affected_quantities: []
+    affected_quantities:
+    - activity
     reason: admission_from_legacy_token:figure_only
-    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_na2o_x_sio2_0p85
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=13:h=9ae87955c74f
   source_id: bennour-1996-ternary-cs-na-silicate
   locator:
     page: 14
     published_page: 241
     pdf_page_index: 13
     figure: '7'
-    note: X_SiO2 = 0.85 curve; caption as published
+    note: row=13
   read_from: pdf:bennour-1996-ternary-cs-na-silicate
   point_conditions:
     temperature_K:
@@ -241,7 +655,4007 @@ observations:
         published_page: 241
         pdf_page_index: 13
         figure: '7'
-        note: X_SiO2 = 0.85 curve; caption as published
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0'
+          - - Cs2O
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=1:h=29cb81cd5618
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.5'
+        - - Cs2O
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=1:h=29cb81cd5618
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=1
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.5'
+          - - Cs2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=2:h=b0fd39b01579
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.45'
+        - - Cs2O
+          - '0.05'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.02023'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=2:h=b0fd39b01579
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=2
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.45'
+          - - Cs2O
+            - '0.05'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=3:h=b557283f0ba6
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.4'
+        - - Cs2O
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.05283'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=3:h=b557283f0ba6
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=3
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.4'
+          - - Cs2O
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=4:h=861d716eac37
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.35'
+        - - Cs2O
+          - '0.15'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.1085'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=4:h=861d716eac37
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=4
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.35'
+          - - Cs2O
+            - '0.15'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=5:h=f2a547319152
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.3'
+        - - Cs2O
+          - '0.2'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.18723'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=5:h=f2a547319152
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=5
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.3'
+          - - Cs2O
+            - '0.2'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=6:h=1d934e882892
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.275'
+        - - Cs2O
+          - '0.225'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.23939'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=6:h=1d934e882892
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=6
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.275'
+          - - Cs2O
+            - '0.225'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=7:h=a36789237eaa
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.225'
+        - - Cs2O
+          - '0.275'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.36276'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=7:h=a36789237eaa
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=7
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.225'
+          - - Cs2O
+            - '0.275'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=8:h=548d597a9ccb
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.2'
+        - - Cs2O
+          - '0.3'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.43246'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=8:h=548d597a9ccb
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=8
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.2'
+          - - Cs2O
+            - '0.3'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=9:h=e95ece67beea
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.50; a=1 at the section end x(Cs2O) = 0.50. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.15'
+        - - Cs2O
+          - '0.35'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.5774'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p5::points:row=9:h=e95ece67beea
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=9
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.50; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.50; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.15'
+          - - Cs2O
+            - '0.35'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=10:h=232ae9d3cb11
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.03'
+        - - Cs2O
+          - '0.12'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.7113'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=10:h=232ae9d3cb11
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=10
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.03'
+          - - Cs2O
+            - '0.12'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=11:h=245886d1e210
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.0225'
+        - - Cs2O
+          - '0.1275'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.78953'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=11:h=245886d1e210
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=11
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.0225'
+          - - Cs2O
+            - '0.1275'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=12:h=a937af9bef98
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.015'
+        - - Cs2O
+          - '0.135'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.85523'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=12:h=a937af9bef98
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=12
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.015'
+          - - Cs2O
+            - '0.135'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=13:h=070479187551
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0'
+        - - Cs2O
+          - '0.15'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=13:h=070479187551
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=13
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0'
+          - - Cs2O
+            - '0.15'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=1:h=1aab0f3e34cd
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.15'
+        - - Cs2O
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=1:h=1aab0f3e34cd
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=1
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.15'
+          - - Cs2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=2:h=b22272d27b1b
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.135'
+        - - Cs2O
+          - '0.015'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.01171'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=2:h=b22272d27b1b
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=2
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.135'
+          - - Cs2O
+            - '0.015'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=3:h=5be3b344ba91
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.12'
+        - - Cs2O
+          - '0.03'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.03427'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=3:h=5be3b344ba91
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=3
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.12'
+          - - Cs2O
+            - '0.03'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=4:h=4ed421a63966
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.105'
+        - - Cs2O
+          - '0.045'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.07439'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=4:h=4ed421a63966
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=4
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.105'
+          - - Cs2O
+            - '0.045'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=5:h=07c03f0b7429
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.09'
+        - - Cs2O
+          - '0.06'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.1441'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=5:h=07c03f0b7429
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=5
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.09'
+          - - Cs2O
+            - '0.06'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=6:h=9d33c5f73127
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.0825'
+        - - Cs2O
+          - '0.0675'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.19375'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=6:h=9d33c5f73127
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=6
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.0825'
+          - - Cs2O
+            - '0.0675'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=7:h=883c2f8660b7
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.0675'
+        - - Cs2O
+          - '0.0825'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.31461'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=7:h=883c2f8660b7
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=7
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.0675'
+          - - Cs2O
+            - '0.0825'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=8:h=fb721f8d5b12
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.06'
+        - - Cs2O
+          - '0.09'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.38181'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=8:h=fb721f8d5b12
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=8
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.06'
+          - - Cs2O
+            - '0.09'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=9:h=de1547cb8f94
+  experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Cs2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Second reference state (dimer hypothesis): Cs2Si_nO_(2n+1) silicate end
+        member for XSiO2 = 0.85; a=1 at the section end x(Cs2O) = 0.15. Our results on the mixing of {(1 − X₂ − X₃) SiO₂,
+        X₂Cs₂O, X₃Na₂O} are calculated by assuming the second reference state that means that the oxide activities are related
+        to the square of the ionic intensities.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.85'
+        - - Na2O
+          - '0.045'
+        - - Cs2O
+          - '0.105'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.53979'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: bennour-1996-ternary-cs-na-silicate::bennour_1996_fig7_cs2o_x_sio2_0p85::points:row=9:h=de1547cb8f94
+  source_id: bennour-1996-ternary-cs-na-silicate
+  locator:
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    figure: '7'
+    note: row=9
+  read_from: pdf:bennour-1996-ternary-cs-na-silicate
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+        note: X_SiO2 = 0.85; digitized Cs2O activity curve
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1299.85'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 241
+              pdf_page_index: 13
+              figure: '7'
+              note: X_SiO2 = 0.85; digitized Cs2O activity curve
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_quasi_binary
+          components:
+          - - SiO2
+            - '0.85'
+          - - Na2O
+            - '0.045'
+          - - Cs2O
+            - '0.105'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: 241
+        pdf_page_index: 13
+        figure: '7'
+  derived_from:
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+  - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+  derivation:
+    relation: Figure 7 activity values are digitized from the authors' calculated curve based on the Table I ionic-intensity
+      ratios and the matching Table II fit.
+    inputs:
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
+    - bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=28a1f2d5bfb6
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -386,6 +4800,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (a)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=3706ffe75426
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -530,6 +4946,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (a)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=5618668e8086
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -674,6 +5092,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (a)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=8407305c0e84
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -818,6 +5238,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (a)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p5_log_ion_ratio::T=1573.00:h=f876d895c3be
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -962,6 +5384,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (a)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p667_log_ion_ratio::T=1573.00:h=048a3b231918
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -1106,6 +5530,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (b)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p667_log_ion_ratio::T=1573.00:h=0b428077243e
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -1250,6 +5676,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (b)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p667_log_ion_ratio::T=1573.00:h=a88e1e79d487
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -1394,6 +5822,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (b)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p667_log_ion_ratio::T=1573.00:h=ef636256a68b
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -1538,6 +5968,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (b)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p667_log_ion_ratio::T=1573.00:h=fc39ed236085
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -1682,6 +6114,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (b)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p75_log_ion_ratio::T=1573.00:h=11c72ebd0e1b
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -1826,6 +6260,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (c)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p75_log_ion_ratio::T=1573.00:h=1fce3c6dc5fd
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -1970,6 +6406,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (c)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p75_log_ion_ratio::T=1573.00:h=2022151413df
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -2114,6 +6552,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (c)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p75_log_ion_ratio::T=1573.00:h=2842b275e5dd
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -2258,6 +6698,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (c)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p75_log_ion_ratio::T=1573.00:h=8efccb3237fb
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -2402,6 +6844,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (c)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p75_log_ion_ratio::T=1573.00:h=91f379c82e61
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -2546,6 +6990,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (c)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p75_log_ion_ratio::T=1573.00:h=d4402b3a753e
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -2690,6 +7136,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (c)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p75_log_ion_ratio::T=1573.00:h=e42003ea1823
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -2834,6 +7282,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (c)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p75_log_ion_ratio::T=1573.00:h=e676c10d0b60
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -2978,6 +7428,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (c)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=2ef485f1dbf7
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -3122,6 +7574,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (d)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=4dd07d53cbb0
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -3266,6 +7720,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (d)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=e9b44c63b263
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -3410,6 +7866,8 @@ observations:
         pdf_page_index: 12
         table: I
         note: (d)
+  provenance:
+    printed_phase: basaltic_silicate_melt
 - observation_id: bennour-1996-ternary-cs-na-silicate::bennour_1996_table_i_x_sio2_0p85_log_ion_ratio::T=1573.00:h=f28b27e2025a
   experiment_id: 10.1080/00319109608039824::bennour-1996-ternary-cs-na-silicate
   identity:
@@ -3554,3 +8012,5 @@ observations:
         pdf_page_index: 12
         table: I
         note: (d)
+  provenance:
+    printed_phase: basaltic_silicate_melt

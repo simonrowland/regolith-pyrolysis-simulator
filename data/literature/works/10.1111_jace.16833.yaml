@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
       role: pdf
@@ -3262,8 +3262,8 @@ experiments:
 - experiment_id: 10.1111/jace.16833::experiment::yan_2020_yan_2020_gamma_ca_calculated
   kind: literature
   method:
-    tag: unknown
-    reason: source does not assign a single mapped method token to this row
+    tag: value
+    value: quench_equilibration
   sample:
     printed_composition:
       state:
@@ -3300,10 +3300,11 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1111/jace.16833
   locator:
-    page: 17
-    pdf_page_index: 16
-    table: text
-    note: Section 3.2; Ca activity coefficient in liquid Cu relative to pure gaseous Ca, calculated using Equation (8).
+    page: 5
+    pdf_page_index: 4
+    section: 2.2 Measurement of the standard Gibbs energy of formation of the vanadium compounds
+    note: The paper names this the chemical equilibrium method. The described experiments equilibrate at 1873 K for 24 h and
+      then quench; mapped to the existing quench_equilibration method token.
     source_path: raw/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.pdf
   fO2_control:
     channel:

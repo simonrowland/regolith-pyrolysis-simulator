@@ -258,7 +258,7 @@ def test_raw_point_map_suppresses_sample_printed_composition():
     migrator.finalize()
     observation_id = (
         "cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::"
-        "T=1623.15:row=aii_-35:h=c7e50fa38368"
+        "T=1623.15:row=aii_-35:h=dc8f96f1a132"
     )
     observation = migrator.result.observations[observation_id]
     experiment = migrator.result.experiments[observation.experiment_id]

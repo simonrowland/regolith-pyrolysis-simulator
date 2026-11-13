@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:kems-031-halwax-2024
       role: pdf
@@ -395,7 +395,9 @@ experiments:
         tag: value
         value: Pure nickel standard
       locator:
-        page: 826
+        page: 6
+        published_page: 826
+        pdf_page_index: 5
         section: A. Calibration
   conditions:
     temperature_K:
@@ -420,7 +422,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1007/s11663-024-02995-6
   locator:
-    page: 826
+    page: 6
+    published_page: 826
+    pdf_page_index: 5
     section: A. Calibration
   apparatus:
     geometry:
@@ -598,7 +602,9 @@ benches:
           point: '70'
           approximate: false
       locator:
-        page: 826
+        page: 5
+        published_page: 825
+        pdf_page_index: 4
         section: III. Experimental
   temperature_measurement:
     sensor:

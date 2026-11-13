@@ -464,15 +464,21 @@ species:
           pdf_page_index: 10
           section: Zusammenfassung
         units: Ω⁻¹ cm⁻¹; kcal/mol; eV; °C as printed
+        derivation:
+          relation: >-
+            The printed conductivity Arrhenius parameters are fits to the authors'
+            measured Figure 7 conductivity series; the numerical points are not tabulated.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 6, published_page: 55, pdf_page_index: 5, figure: '7', note: 'Raw conductivity points are plotted, not numerically printed.'}
         values:
           quantity: electrical_conductivity_arrhenius_fit
-          method_class: quoted_attributed
+          method_class: measured_reduced
           admission_status: typed_unavailable
           schema_gap: >-
             Electrical conductivity exists as a scalar Quantity, but its
             Arrhenius fit parameters have no exact quantity or observation
             type. The raw Fig. 7 conductivity points remain undigitized.
-          attribution: Frischat and Oel (1966), this work
           fits:
             - phase: glass
               phase_as_printed: Glas
@@ -496,9 +502,17 @@ species:
         type: transport_context
         locator: {page: 1, published_page: 50, pdf_page_index: 0, section: Abstract}
         units: dimensionless as printed
+        derivation:
+          relation: >-
+            The authors reduce measured Na self-diffusion and conductivity using the
+            Nernst-Einstein relation with correlation factor f, Eq. (14), p. 58; Fig. 10
+            compares the measured diffusion with the conductivity-derived values.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 9, published_page: 58, pdf_page_index: 8, figure: '10', note: Underlying diffusion and conductivity values are not tabulated as numeric fit inputs.}
         values:
           quantity: sodium_self_diffusion_correlation_factor
-          method_class: quoted_attributed
+          method_class: measured_reduced
           admission_status: typed_unavailable
           schema_gap: No exact store Quantity or observation type represents a correlation factor.
           value_as_printed: 'f ≈ 0,2'

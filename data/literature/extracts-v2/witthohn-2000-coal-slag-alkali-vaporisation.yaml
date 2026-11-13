@@ -67,28 +67,25 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: quantity, label, method_as_published, method_class,
-      attribution, status, reason, admission_status, value_cells_printed'
+      method_locator, references_as_published, reason, admission_status, value_cells_printed'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Witthohn et al. (2000), Fig. 6; FACT calculation curves
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
-    status: rejected
-    reason: Figure-only model values are outside this extraction wave; no measured K2O activity data are tabulated.
-    decided_by:
-      worker: fam22-1020
-      date: '2026-10-20'
-      evidence:
-        page: 18
-        figure: '6'
-        note: FACT calculation curves for K2O-SiO2-Al2O3; the paper describes these as calculated activities, not measured
-          activity points.
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:figure_only
+    origin: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_k2o_fig6_model_figure_only
   source_id: witthohn-2000-coal-slag-alkali-vaporisation
   locator:
     page: 18
@@ -111,6 +108,8 @@ observations:
       locator:
         page: 18
         figure: '6'
+  provenance:
+    printed_phase: l
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_k_g_fig2_figure_only
   experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
   identity:
@@ -231,6 +230,8 @@ observations:
         page: 5
         note: Detector-signal rows and calibration inputs are not tabulated.
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_k_g_fig3_figure_only
   experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
   identity:
@@ -351,6 +352,8 @@ observations:
         page: 5
         note: Detector-signal rows and calibration inputs are not tabulated.
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na2o_fig4_figure_only
   experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
   identity:
@@ -460,6 +463,8 @@ observations:
       locator:
         page: 17
         figure: '4'
+  provenance:
+    printed_phase: l
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na2o_fig5_figure_only
   experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
   identity:
@@ -571,6 +576,8 @@ observations:
         figure: '5'
         note: Quasi-ternary Na2O-SiO2-CaO comparison; experimental points attributed to Neudorf and Elliott (1980). No numeric
           table is printed.
+  provenance:
+    printed_phase: l
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na_g_fig2_figure_only
   experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
   identity:
@@ -691,6 +698,8 @@ observations:
         page: 5
         note: Detector-signal rows and calibration inputs are not tabulated.
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na_g_fig3_figure_only
   experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
   identity:
@@ -811,3 +820,5 @@ observations:
         page: 5
         note: Detector-signal rows and calibration inputs are not tabulated.
     references: []
+  provenance:
+    printed_phase: gas

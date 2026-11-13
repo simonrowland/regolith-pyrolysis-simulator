@@ -30,6 +30,7 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.physical_constants import PA_PER_BAR
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -655,7 +656,7 @@ def _evaluate_correlation(row: _CorrelationRow, T_K: float) -> float:
                 float(coefficient) / T_K**index
                 for index, coefficient in enumerate(coefficients["A"])
             )
-            pressure = 1.0e5 * math.exp(ln_pressure_bar)
+            pressure = PA_PER_BAR * math.exp(ln_pressure_bar)
         else:  # pragma: no cover - loader closes this branch
             raise _fail(
                 "unknown_correlation_family",

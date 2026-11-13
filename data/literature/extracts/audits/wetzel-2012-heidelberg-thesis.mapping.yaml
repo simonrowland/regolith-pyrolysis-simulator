@@ -1,0 +1,128 @@
+source_id: wetzel-2012-heidelberg-thesis
+input_order:
+- MinerU content lists and Markdown
+- pdftotext-layout machine text
+- rendered PDF pages for verification
+mineru:
+  table_draft_count: 0
+  table_qa_count: 0
+  disposition: >-
+    The available MinerU chunks cover PDF pages 2–10, 165–166, and 176–178;
+    no SiO chapter table blocks were present. No MinerU cell source was used.
+printed_tables:
+- table: '2.2'
+  page: 36
+  published_page: 26
+  row_count: 2
+  columns:
+  - this work
+  - '[58]'
+  - '[60]'
+  - '[61]'
+  - '[62]'
+  rows:
+  - printed_row: ΔH1400K
+    extraction_observation: wetzel_2012_sio_sublimation_enthalpy_1400K
+    occupied_cells:
+    - column: this work
+      printed: '419 ± 4'
+  - printed_row: ΔH298K
+    extraction_observation: wetzel_2012_sio_sublimation_enthalpy_298K
+    occupied_cells:
+    - column: this work
+      printed: '432 ± 4'
+    - column: '[58]'
+      printed: '321'
+    - column: '[60]'
+      printed: '410'
+    - column: '[61]'
+      printed: '360 ± 4'
+    - column: '[62]'
+      printed: '351 ± 11'
+  render_verified: true
+equations:
+- equation: '2.25'
+  page: 34
+  published_page: 24
+  observation: wetzel_2012_sio_evaporation_coefficient_fit_eq_2_25
+  mapping: quadratic alpha fit; preserve three printed coefficients and German decimal forms
+  render_verified: true
+- equation: '2.26'
+  page: 36
+  published_page: 26
+  observation: wetzel_2012_sio_equilibrium_pressure_fit_eq_2_26
+  mapping: ln equilibrium pressure over solid SiO; preserve both coefficient widths and signs
+  render_verified: true
+- equation: '2.27'
+  page: 36
+  published_page: 26
+  observation: wetzel_2012_sio_sublimation_enthalpy_298K
+  mapping: repeated printed value 432 ± 4; not stored as a duplicate observation
+  render_verified: true
+figure_only_candidates:
+- figure: '2.11'
+  page: 35
+  quantities:
+  - alpha versus temperature
+  - equilibrium vapor pressure versus temperature
+  disposition: >-
+    Numeric points are plotted only; not transcribed. The printed fit equations
+    are retained in their separate equation observations.
+- figure: '2.8'
+  page: 28
+  quantity: copper-melting-point calibration check
+  disposition: Graph-only calibration point; not transcribed.
+apparatus_mapping:
+  page_renders:
+  - page: 21
+    facts: QCM-cell distance, post-bake chamber pressure, QCM frequency and mass sensitivity
+  - page: 23
+    facts: four-filament arrangement and approximate filament length
+  - page: 27
+    facts: ice-water reference temperature, thermocouple accuracy, calibration error
+  - page: 30
+    facts: assumed geometry, QCM rate, temperature and alpha error values
+  - page: 34
+    facts: SiO powder size and purity, both Knudsen-cell orifice diameters
+evidence_class_decisions:
+- observation: wetzel_2012_sio_evaporation_coefficient_fit_eq_2_25
+  class: measured_reduced
+  reason: >-
+    The authors' alpha fit reduces the two Knudsen-cell measurement series.
+    Keep it measured evidence so an apparatus or calibration gate cannot be
+    bypassed by reclassing; raw plotted inputs are excluded as figure-only.
+- observation: wetzel_2012_sio_equilibrium_pressure_fit_eq_2_26
+  class: measured_reduced
+  reason: >-
+    Equation (2.20) reduces QCM mass rate to equilibrium pressure and Equation
+    (2.26) fits the authors' own measurements. Preserve the measured evidence
+    class; the raw graph points are excluded and the pressure law remains an
+    unavailable series in migration.
+- observation: wetzel_2012_sio_sublimation_enthalpy_1400K
+  class: measured_reduced
+  reason: Derived from the stored measured pressure fit by Equation (2.4).
+- observation: wetzel_2012_sio_sublimation_enthalpy_298K
+  class: quoted_attributed
+  reason: >-
+    The authors report a reduction from the 1400 K result using heat-capacity
+    and integral inputs cited to [48] and [38]; those numeric inputs are not
+    present in this chapter's extract.
+quantity_schema_gap:
+- printed_quantity: ΔH_sublimation(SiO)
+  exact_label: sublimation_enthalpy
+  affected_observations:
+  - wetzel_2012_sio_sublimation_enthalpy_1400K
+  - wetzel_2012_sio_sublimation_enthalpy_298K
+  code_symbols_checked:
+  - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+  - simulator/battery/migrate.py::QUANTITY_ALIASES
+  - simulator/battery/migrate.py::TYPE_QUANTITY
+  - simulator/battery/enums.py::Quantity
+  result: >-
+    No exact sublimation-enthalpy quantity exists. Quantity has enthalpy of
+    vaporization second-law and third-law members but no sublimation member;
+    QUANTITY_ALIASES has no exact label; TYPE_QUANTITY defaults gibbs_table to
+    delta_fG if the explicit descriptive label is omitted. Both table rows are
+    intentionally quantity-unknown typed refusals. Existing
+    kems-057-kambayashi-1985 uses sublimation_enthalpy as the same descriptive
+    non-token label.

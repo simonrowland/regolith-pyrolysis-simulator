@@ -1,0 +1,486 @@
+schema_version: literature_extract.v1
+source_id: liao-zhao-2023-metals-cmas-phase-eq-review
+source:
+  citation: 'J. Liao, G. Qing and B. Zhao, "Phase Equilibrium Studies of the CaO-MgO-Al2O3-SiO2 System for Iron
+    Blast Furnace Slag: A Review", Metals 13 (2023) 801.'
+  doi: 10.3390/met13040801
+  url: https://www.mdpi.com/2075-4701/13/4/801
+  year: 2023
+extraction:
+  method: 'scoped read of a born-digital review; text layer used where clean, and every quoted number read from
+    90 dpi page renders (figure pages carry an overlaid draft text layer, "x FOR PEER REVIEW", that garbles pdftotext).
+    Fix round 2026-10-05 (main''s review of 79fed982): all 21 pages re-rendered at 220 dpi with pdftoppm; every
+    added or extended value was read from those renders.'
+  date: '2026-10-05'
+  worker: backlog30-liaozhao2023
+review_status: draft
+scope_assessment:
+  in_scope:
+  - technique summary
+  - FactSage 8.2 set-up
+  - the review's numeric comparison statements (exp vs FactSage), each attributed to its primary study
+  - cited primary-study pointers
+  out_of_scope:
+  - Figures 1-20 (all reproduced from cited primary studies; figure_only)
+  - primary data of refs [5]-[23] (separate sources, not item 30)
+  battery_relevance_note: 'A review: it prints no tables, and its numbers summarise cited primary studies (several
+    from the same group). Everything is context, flagged secondary (review_flag), with 0 observations, no bench
+    and no experiment.'
+fidelity_samples:
+- species: CaO
+  observation_id: liao2023_melilite_gehlenite_vs_factsage
+  field: attribution
+  value: Liao, Qing & Zhao 2023, Metall. Mater. Trans. B 54, 793 (ref. [23])
+  locator:
+    page: 19
+    published_page: 19
+- species: CaO
+  observation_id: liao2023_osborn_optimum_slags
+  field: optimum_10pct_Al2O3_as_printed
+  value:
+    MgO: 14
+    CaO: 44
+    SiO2: 32
+  locator:
+    page: 7
+    published_page: 7
+- species: CaO
+  observation_id: liao2023_basicity_liquidus
+  field: liquidus_at_basicity_1p32_1p40_as_printed
+  value:
+    10pct_Al2O3: below 1414 °C (close to the Ca2SiO4 field)
+    15pct_Al2O3: 1427 °C
+    20pct_Al2O3: 1475 °C
+  locator:
+    page: 17
+    published_page: 17
+- species: CaO
+  observation_id: liao2023_constant_cs_sections
+  field: bosh_slag_section_CaO_SiO2_as_printed
+  value: '1.5'
+  locator:
+    page: 10
+    published_page: 10
+species:
+  CaO:
+    observations: []
+    context:
+    - observation_id: liao2023_hot_metal_liquidus_background
+      type: background_statement
+      locator:
+        page: 1
+        published_page: 1
+        section: 1. Introduction
+      units: °C
+      values:
+        method_class: quoted_unattributed
+        evidence_class: quoted_unattributed
+        review_flag: background statement by the review authors; no reference is attached to the sentence; context
+          only, not a measurement in this paper
+        hot_metal_liquidus_as_printed: below 1200 °C
+        statement_as_printed: '"The hot metal bearing carbon has a liquidus temperature below 1200 °C which is much
+          lower than the liquidus temperature of the slag." (p. 1)'
+    - observation_id: liao2023_techniques_summary
+      type: method_note
+      locator:
+        page: 2
+        published_page: 2
+        section: 2. Research Techniques
+        note: pp. 2-4
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        atmosphere_note_as_printed: '"The components of the BF slag CaO-MgO-Al2O3-SiO2 do not have valence changes
+          in the condensed system. High-temperature experiments for the determination of the phase equilibria in
+          this system can be carried out in air." (p. 2)'
+        conventional_quench_as_printed: 'Refs [5,7]: 10 g mixtures fused repeatedly in Pt, crystallised near 1000
+          °C; about 20 mg in a Pt envelope held at temperature and quenched in mercury; phases by petrographic microscope
+          and XRD; liquidus bracketed by runs (p. 2).'
+        prince_as_printed: 'Refs [6,8]: about 20 mg powdered glass in Pt foil in a vertical tube furnace; a maximum
+          of 90 min at temperatures slightly above 1400 °C to 10 min near 1600 °C to attain equilibrium; most runs
+          30-60 min; dropped into water or mercury (p. 3).'
+        prince_sample_prep_as_printed: '"The Al2O3·xHzO was calcined to 1250 °C for several hours and used immediately
+          after calcination. The silicic acid was leached with 1:1 HC1 in an extractor to remove traces of impurities.
+          After three or four fusions, about 20 mg of powdered glass enclosed in a Pt foil envelope was suspended
+          in a vertical tube furnace for equilibration." (p. 3; Prince [6,8], introduced on p. 2)'
+        prince_calcination_T_as_printed: 1250 °C (several hours)
+        prince_silicic_acid_leach_as_printed: 1:1 HC1
+        prince_fusions_as_printed: three or four
+        prince_sample_prep_print_note: The p. 3 hydrate is printed "Al2O3·xHzO" (text layer and 220 dpi render;
+          the p. 2 starting-material list prints "Al2O3·xH2O"), and the acid is printed "1:1 HC1" (digit one in
+          the text layer and the render). Both are kept as printed, not corrected.
+        hot_stage_as_printed: 'Refs [10,11]: hot-stage microscope, several mg of fused slag; liquidus by direct
+          observation on cooling/heating (p. 3).'
+        hot_stage_citation_swap_note: p. 3 prints "Gutt et al. [10] and Cavalier et al. [11]", but the reference
+          list has [10] Cavalier & Sandrea-Deudon 1960 and [11] Gutt & Russel 1977; pp. 9-10 use the list numbering.
+          Kept as printed, not corrected.
+        improved_quench_epma_as_printed: 'Refs [17-23,29]: 0.1-0.5 g pellet in a Pt or graphite crucible in a vertical
+          tube furnace, dropped into water; EPMA-WDS at 15 kV, 15-50 nA, 1 μm probe, ZAF; standards Al2O3 (Al),
+          MgO (Mg), CaSiO3 (Ca, Si); average accuracy within ±1 wt%; 8-20 liquid points and 3-5 solid points, standard
+          deviation less than 1 % (pp. 3-4).'
+        temperature_measurement_as_printed: '"The sample is placed in the hot zone of the furnace next to a thermocouple
+          so that the equilibration temperature can be accurately monitored [13]." (p. 3); Figure 1 [13] labels
+          a "Working thermocouple" and a "Controller Thermocouple".'
+    - observation_id: liao2023_solid_solution_techniques
+      type: method_note
+      locator:
+        page: 5
+        published_page: 5
+        section: 2.2. Solid Solutions
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Osborn & Schairer 1941, Am. J. Sci. 239, 715 (ref. [5]) for the akermanite-gehlenite statements;
+          the EPMA size limit is the review's statement about the improved quenching technique (Figure 2 cites ref.
+          [22])
+        akermanite_isotropic_as_printed: 55% akermanite (melilite solid solution isotropic in sodium light)
+        akermanite_colour_estimate_range_as_printed: 40-70% akermanite
+        akermanite_colour_estimate_error_as_printed: less than ±5% akermanite
+        statement_as_printed: '"They observed that the melilite solid solution with 55% akermanite is isotropic
+          in sodium light. ... By using this technique, the composition of a melilite solid solution with 40–70%
+          akermanite can be estimated from its interference colour with an error of less than ±5% akermanite." (p.
+          5)'
+        epma_phase_size_limit_as_printed: greater than 2 μm
+        epma_statement_as_printed: '"EPMA can accurately measure the compositions of any phases greater than 2 μm."
+          (p. 5)'
+        percent_basis_note: The page does not say whether the akermanite percentages are wt% or mol%; kept as printed
+          ("%").
+    - observation_id: liao2023_factsage_setup
+      type: method_note
+      locator:
+        page: 6
+        published_page: 6
+        section: 2.3. Thermodynamic Software
+      units: as printed
+      values:
+        method_class: method_only
+        evidence_class: method_only
+        software_as_printed: FactSage 8.2, databases FactPS and FToxid in the Equilib module; solution phases FToxide-SLAGA,
+          -SPINC, -MeO_A, -bC2S, -aC2S, -Mel_A, -WOLLA, -Mull (p. 6).
+    - observation_id: liao2023_osborn_constant_al2o3_sections
+      type: literature_comparison
+      locator:
+        page: 6
+        published_page: 6
+        section: 3. Experimentally Determined Phase Diagrams; 3.1
+        note: pp. 6-7; Figures 3-6 cite [7]
+      units: wt%
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Osborn et al., cited in the p. 6 body as ref. [6] (as printed; ref. [6] in the list is Prince
+          1951) and in the Figure 3-6 captions as ref. [7] (Osborn, DeVries, Gee & Kraner 1954)
+        compositions_studied_as_printed: 446
+        Al2O3_sections_range_as_printed: 5 to 35% at 5% intervals
+        Al2O3_planes_shown_as_printed: 10, 15 and 20% (Figure 3; Figures 4-6)
+        statement_as_printed: '"446 compositions were studied by Osborn et al. [6] to construct pseudo-ternary sections
+          CaO-MgO-SiO2 with constant Al2O3 concentrations of 5 to 35% at 5% intervals." (p. 6)'
+        plane_meaning_as_printed: A slag with 10% Al2O3 represents the use of high-quality iron ores, rare at present;
+          "15% Al2O3 is an average for most of the current BF slag compositions"; low-quality, cheap iron ores give
+          a BF slag with 20% Al2O3 (p. 7).
+        plane_trend_as_printed: From 10 to 15% Al2O3 the monticellite primary phase field is replaced by spinel;
+          at 20% Al2O3 the spinel primary phase field expands significantly (p. 7).
+        citation_discrepancy_note: The p. 6 body cites Osborn et al. as [6] in both sentences ("The first set was
+          reported by Osborn et al. [6]" and "446 compositions were studied by Osborn et al. [6]"); kept as printed,
+          not corrected to [7].
+    - observation_id: liao2023_constant_mgo_sections
+      type: literature_comparison
+      locator:
+        page: 8
+        published_page: 8
+        section: 3.2. CaO-MgO-Al2O3-SiO2 System with Fixed MgO
+        note: pp. 8-10; Figures 7-8
+      units: wt%
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Prince 1954 (ref. [8]); Cavalier & Sandrea-Deudon 1960 (ref. [10]); Gutt & Russell 1977 (ref.
+          [11]; "Russell" in the body, "Russel" in the reference list)
+        prince_plane_as_printed: constant 10% MgO (conventional quenching and petrographic microscope; Figure 7)
+          (p. 8)
+        cavalier_planes_as_printed: constant 5, 10 and 15% MgO, respectively (high-temperature / hot-stage microscopy)
+          (p. 9)
+        cavalier_vs_prince_as_printed: The 10% MgO plane reported by Cavalier and Sandrea-Deudon [10] is slightly
+          below that reported by Prince [8] (p. 9).
+        gutt_plane_as_printed: constant 5% MgO (hot-stage microscope technique; Figure 8 compares it with Cavalier
+          [10]) (p. 9)
+        gutt_vs_cavalier_as_printed: The C6MA4S phase reported by Gutt and Russell [11] is not present on the plane
+          reported by Cavalier and Sandrea-Deudon [10]; the merwinite primary phase field was not mentioned by Cavalier
+          and Sandrea-Deudon [10] (p. 9).
+        phase_name_as_printed: C6MA4S (cement notation, as printed on p. 9; not expanded)
+    - observation_id: liao2023_constant_cs_sections
+      type: literature_comparison
+      locator:
+        page: 10
+        published_page: 10
+        section: 3.3. (CaO + SiO2)-Al2O3-MgO System at Constant CaO/SiO2
+        note: also p. 6; refs [13-16]
+      units: CaO/SiO2 ratio
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: refs [13]-[16] (Wang et al. 2020; Ma et al. 2016; Ma et al. 2015; Kou et al. 2016)
+        CaO_SiO2_sections_as_printed: 0.9, 1.1, 1.3 and 1.5
+        final_BF_slag_range_CaO_SiO2_as_printed: 0.9-1.3
+        bosh_slag_section_CaO_SiO2_as_printed: '1.5'
+        statement_as_printed: '"Four pseudo-ternary sections with the CaO/SiO2 ratios of 0.9, 1.1, 1.3 and 1.5 were
+          constructed experimentally. The sections with the CaO/SiO2 ratios 0.9-1.3 represent the composition range
+          for the final BF slags and the section with the CaO/SiO2 ratio of 1.5 represents the compositions of the
+          bosh slag." (p. 10; p. 6 prints the same four ratios with refs [13-16])'
+    - observation_id: liao2023_osborn_optimum_slags
+      type: literature_comparison
+      locator:
+        page: 7
+        published_page: 7
+        section: '3.1'
+        note: Figures 4-6 cite [7]
+      units: wt%
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Osborn et al. (Figures 4-6 cite ref. [7], Osborn, DeVries, Gee & Kraner 1954)
+        optimum_10pct_Al2O3_as_printed:
+          MgO: 14
+          CaO: 44
+          SiO2: 32
+        optimum_20pct_Al2O3_as_printed:
+          MgO: 11
+          CaO: 45
+          SiO2: 24
+        review_comment_as_printed: These suggested "optimum" compositions were not used by BF operators as they
+          are too close to the MgO and Ca2SiO4 primary phase fields (p. 7).
+        citation_discrepancy_note: p. 6 says the first set of diagrams "was reported by Osborn et al. [6]", but
+          ref. [6] is Prince 1951; the figure captions cite [7] (Osborn et al. 1954). Kept as printed.
+    - observation_id: liao2023_cs0p9_vs_factsage
+      type: literature_comparison
+      locator:
+        page: 11
+        published_page: 11
+        figure: '10'
+        note: CaO/SiO2 = 0.9, ref. [13]
+      units: °C
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Wang et al. 2020, J. Am. Ceram. Soc. 103, 7299 (ref. [13])
+        statement_as_printed: Good agreement of isotherms only in the spinel primary field; isotherms in periclase,
+          olivine, melilite and wollastonite changed significantly. FactSage predicts the olivine primary phase
+          field fully liquid at 1400 °C, but the measurements identified a small area with liquidus above 1400 °C
+          (pp. 10-11).
+    - observation_id: liao2023_cs1p1_vs_factsage
+      type: literature_comparison
+      locator:
+        page: 12
+        published_page: 12
+        figure: '11'
+        note: CaO/SiO2 = 1.1, ref. [14]
+      units: °C
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Ma et al. 2016, ISIJ Int. 56, 513 (ref. [14])
+        statement_as_printed: Experimental liquidus approximately 20 °C higher than FactSage in the melilite field;
+          usually 20 °C lower in the MgO and spinel fields; agree in the merwinite field. FactSage predicts a small
+          Ca3Si2O7 field not observed experimentally; a wollastonite field is present instead (pp. 12-13).
+        agreement_with_previous_work_as_printed: '"the experimental results have a good agreement with previous
+          work reported by Osborn et al. [7], Cavalier and Sandrea-Deudon [10] and Muan and Osborn [24] at 1400
+          °C." (p. 12; the Figure 11 legend shows Osborn et al., Cavalier et al. and Muan et al. points at 1400
+          °C)'
+        ca2sio4_corner_as_printed: '"Additionally, the Ca2SiO4 primary phase was observed by the present experiments
+          at the high (CaO + SiO2) corner, which is not shown by FactSage predictions." (p. 13)'
+    - observation_id: liao2023_cs1p3_vs_factsage
+      type: literature_comparison
+      locator:
+        page: 13
+        published_page: 13
+        figure: '12'
+        note: CaO/SiO2 = 1.3, ref. [15]
+      units: °C
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Ma et al. 2015, ISIJ Int. 55, 2310 (ref. [15])
+        statement_as_printed: Osborn et al. Ca2SiO4-field liquidus much higher than the present results. Experimental
+          liquidus approximately 50 °C lower than FactSage in the spinel and Ca2SiO4 fields and approximately 50
+          °C higher in the merwinite field (merwinite area larger than predicted); usually 20 °C different in the
+          melilite field (p. 13).
+    - observation_id: liao2023_typical_bf_slag_al2o3_sio2_0p4
+      type: literature_comparison
+      locator:
+        page: 14
+        published_page: 14
+        figure: '14'
+        note: Al2O3/SiO2 = 0.4, ref. [22]
+      units: °C
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Liao, Qing & Zhao 2023, Metals 13, 224 (ref. [22])
+        typical_bf_slag_liquidus_as_printed: approximately 1420 °C (melilite primary phase field)
+        statement_as_printed: '"A typical BF slag composition is also shown in the figure. It can be seen that this
+          BF slag is in the melilite primary phase field with a liquidus temperature of approximately 1420 °C."
+          (p. 14; the Figure 14 legend marks it "Average composition of Shougang BF slag"; its composition is not
+          printed as numbers)'
+        quaternary_basicity_definition_as_printed: (CaO + MgO)/(Al2O3 + SiO2)
+        quaternary_basicity_statement_as_printed: '"... to discuss the effects of MgO/CaO ratio and quaternary basicity
+          (CaO + MgO)/(Al2O3 + SiO2) on liquidus temperatures of the BF slags." (p. 14)'
+    - observation_id: liao2023_mgo_cao_pseudobinary
+      type: literature_comparison
+      locator:
+        page: 15
+        published_page: 15
+        figure: '15'
+        note: (Al2O3 + SiO2) = 50 and 55 wt%, Al2O3/SiO2 = 0.4, ref. [22]
+      units: °C
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Liao, Qing & Zhao 2023, Metals 13, 224 (ref. [22])
+        statement_as_printed: Melilite primary at low MgO/CaO and spinel at high MgO/CaO; liquidus higher at 55
+          than at 50 wt% (Al2O3 + SiO2). Experimental melilite and spinel fields much larger than FactSage predicts;
+          in some areas a 100 °C liquidus difference (p. 15).
+    - observation_id: liao2023_basicity_liquidus
+      type: literature_comparison
+      locator:
+        page: 17
+        published_page: 17
+        figure: '18'
+        note: ref. [23]
+      units: °C; wt%
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Liao, Qing & Zhao 2023, Metall. Mater. Trans. B 54, 793 (ref. [23])
+        liquidus_at_basicity_1p32_1p40_as_printed:
+          10pct_Al2O3: below 1414 °C (close to the Ca2SiO4 field)
+          15pct_Al2O3: 1427 °C
+          20pct_Al2O3: 1475 °C
+        max_basicity_without_Ca2SiO4_as_printed:
+          15pct_Al2O3: up to 1.6 (with lower liquidus)
+          20pct_Al2O3: up to 1.8
+        basicity_naming_note: The text calls 1.32-1.40 a "ternary basicity"; the Figure 18 caption says "quaternary
+          basicity" and its axis is (CaO + MgO)/SiO2 (weight). Kept as printed. p. 14 defines quaternary basicity
+          as (CaO + MgO)/(Al2O3 + SiO2) (see liao2023_typical_bf_slag_al2o3_sio2_0p4).
+    - observation_id: liao2023_al2o3_optimum_vs_factsage
+      type: literature_comparison
+      locator:
+        page: 18
+        published_page: 18
+        figure: '19'
+        note: MgO/CaO = 0.2, ref. [23]
+      units: °C; wt%
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Liao, Qing & Zhao 2023, Metall. Mater. Trans. B 54, 793 (ref. [23])
+        lowest_liquidus_as_printed:
+        - basicity_(MgO+CaO)/SiO2: '1.2'
+          T_C: 1360
+          Al2O3_wt_percent: '8'
+        - basicity_(MgO+CaO)/SiO2: '1.4'
+          T_C: 1380
+          Al2O3_wt_percent: '11.5'
+        - basicity_(MgO+CaO)/SiO2: '1.6'
+          T_C: 1398
+          Al2O3_wt_percent: '14.4'
+        factsage_comparison_as_printed: 'FactSage 8.2 section at (MgO + CaO)/SiO2 = 1.4 significantly different
+          at low Al2O3: dicalcium silicate predicted as primary phase where merwinite was observed; FactSage liquidus
+          up to 120 °C higher than experiment (p. 18).'
+    - observation_id: liao2023_melilite_gehlenite_vs_factsage
+      type: literature_comparison
+      locator:
+        page: 19
+        published_page: 19
+        figure: '20'
+        note: ref. [23]
+      units: mol%
+      values:
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        review_flag: 'secondary: summarised by the review from the cited primary study; not new data in this paper'
+        attribution: Liao, Qing & Zhao 2023, Metall. Mater. Trans. B 54, 793 (ref. [23])
+        statement_as_printed: Predicted gehlenite mol fractions in melilite follow the experimental trend but differ
+          by up to 23.4 mol%; no clear correlation with the liquidus difference (pp. 18-19).
+    - observation_id: liao2023_cited_primary_studies
+      type: source_pointer
+      locator:
+        page: 20
+        published_page: 20
+        section: References
+      units: citations
+      values:
+        method_class: method_only
+        evidence_class: method_only
+        primary_phase_equilibrium_studies_as_cited:
+        - '[5] Osborn & Schairer 1941, Am. J. Sci. 239, 715'
+        - '[6] Prince 1951, J. Am. Ceram. Soc. 34, 44'
+        - '[7] Osborn, DeVries, Gee & Kraner 1954, Trans. AIME 6, 33'
+        - '[8] Prince 1954, J. Am. Ceram. Soc. 37, 402 (title: "Liquidus relationships on 10% MgO plane of the system
+          lime-magnesia-alumina-silica")'
+        - '[9] DeVries & Osborn 1957, J. Am. Ceram. Soc. 40, 6'
+        - '[10] Cavalier & Sandrea-Deudon 1960, Rev. Metall. 5, 1143'
+        - '[11] Gutt & Russel 1977, J. Mater. Sci. 12, 1869'
+        - '[12] Dahl, Brandberg & Du 2006, ISIJ Int. 46, 614'
+        - '[13] Wang et al. 2020, J. Am. Ceram. Soc. 103, 7299 (title: "... system with CaO/SiO2 ratio of 0.9")'
+        - '[14] Ma et al. 2016, ISIJ Int. 56, 513 (title: "... system with CaO/SiO2 ratio of 1.10"; the body uses
+          1.1)'
+        - '[15] Ma et al. 2015, ISIJ Int. 55, 2310 (title: "... System with CaO/SiO2 ratio of 1.3 relevant to iron
+          blast furnace slags")'
+        - '[16] Kou et al. 2016, Metall. Mater. Trans. B 47, 1093 (title: "... system with binary basicity of 1.5
+          related to blast furnace slag")'
+        - '[17] Gran, Wang & Du 2011, Calphad 35, 249 (title: "... high basicity region in the Al2O3 (30 mass%)-CaO-MgO-SiO2
+          system")'
+        - '[18] Gran, Yan & Du 2011, Metall. Mater. Trans. B 42, 1008 (title: "... high-basicity region in the Al2O3
+          (25 mass pct)-CaO-MgO-SiO2 and Al2O3 (35 mass pct)-CaO-MgO-SiO2 systems")'
+        - '[21] Yao, Ma & Lyu 2021, Calphad 72, 102227 (title: "Phase equilibria of the Al2O3-CaO-SiO2-(0%, 5%,
+          10%) MgO slag system for non-metallic inclusions control")'
+        - '[22] Liao, Qing & Zhao 2023, Metals 13, 224 (title: "... CaO-MgO-Al2O3-SiO2 system with Al2O3/SiO2 weight
+          ratio of 0.4")'
+        - '[23] Liao, Qing & Zhao 2023, Metall. Mater. Trans. B 54, 793 (title: "... CaO-SiO2-Al2O3-MgO system with
+          MgO/CaO ratio of 0.2")'
+        - '[24] Muan & Osborn 1965, Phase Equilibria Among Oxides in Steelmaking (Addison-Wesley), pp. 148-157'
+        note: Pointers only; the primary data live in these papers. Not seated here (outside item 30). Title compositions
+          are copied from the p. 20 reference list as printed (en dashes in the titles written as hyphens); end
+          pages of page ranges are not copied.
+    - observation_id: liao2023_figures_context
+      type: figure_only
+      locator:
+        page: 3
+        published_page: 3
+        figure: 1-20
+      units: figure-only context
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        figures:
+        - 1 quench-furnace schematic [13] (p. 3)
+        - 2 typical microstructures [22]
+        - 4 CaO-MgO-SiO2 at 10 % Al2O3 [7] (p. 7)
+        - 9 schematic of the constant CaO/SiO2 sections (p. 11)
+        - 10 CaO/SiO2 = 0.9 [13] (p. 11)
+        - 11 CaO/SiO2 = 1.1 [14] (p. 12)
+        - 12 CaO/SiO2 = 1.3 [15] (p. 13)
+        - 15 MgO/CaO pseudo-binary [22] (p. 15)
+        - 17 (CaO + MgO)-Al2O3-SiO2 at MgO/CaO = 0.2 [23]
+        - 18 liquidus vs basicity [23] (p. 17)
+        - 19 liquidus vs Al2O3 [23] (p. 18)
+        - 20 melilite gehlenite, exp vs FactSage [23] (p. 19)
+        - 'Figures 3, 5-8, 13, 14, 16: further pseudo-ternary diagrams and schematics reproduced from cited studies
+          (captions not individually transcribed)'
+        digitization_status: Not digitised. Every figure reproduces a cited primary study; digitising the review
+          copy would duplicate those sources.

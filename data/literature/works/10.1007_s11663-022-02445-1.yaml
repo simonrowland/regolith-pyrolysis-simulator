@@ -1,0 +1,2078 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s11663-022-02445-1
+  citation: Hoseinpur, A. et al. (2022), “On the Phosphorus Evaporation from Liquid Silicon by Knudsen Effusion Mass Spectrometry,”
+    Metallurgical and Materials Transactions B 53B, 1066–1081.
+  source_ids:
+  - kems-210-hoseinpur-2022
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:kems-210-hoseinpur-2022
+      role: pdf
+      path: raw/kems-210-hoseinpur-2022/kems-210-hoseinpur-2022.pdf
+      sha256:
+        tag: value
+        value: 39c36f88be5fb1450d302f6e8263e64811f55709e33109dfae2453cec8a2f250
+    - asset_id: pdftotext:kems-210-hoseinpur-2022
+      role: pdftotext
+      path: text/kems-210-hoseinpur-2022
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-210-hoseinpur-2022
+      role: table_csv
+      path: tables/kems-210-hoseinpur-2022
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:kems-210-hoseinpur-2022
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s11663-022-02445-1
+experiments:
+- experiment_id: 10.1007/s11663-022-02445-1::experiment::hoseinpur-2022-liquid-si-p-kems-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00005'
+          interval_high: '0.000075'
+          approximate: true
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+        note: Printed about 50–75 mg; approximate interval, conversion to kg.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          nominal_phosphorus_content: about 100, 1250, and 3000 ppmw in the three samples
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: Experimental procedure
+    form:
+      state:
+        tag: value
+        value: Si-P alloy
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: Experimental procedure
+    container:
+      state:
+        tag: value
+        value: SiC crucible inside graphite Knudsen cell; Ta crucible with 1 mm aperture as outer enclosure
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+    characterization:
+      state:
+        tag: value
+        value: 'After remelting, phosphorus measured by ICP-MS: Si-3000 P = 3100 ± 136 ppma; Si-1250 P = 1227 ± 25 ppma; Si-100
+          P = 97.3 ± 2 ppma.'
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: Experimental procedure
+    pretreatment:
+      state:
+        tag: value
+        value: FBR silicon (8N) vacuum induction melted under Ar (6N); red phosphorus added; cast in water-cooled copper mold;
+          high-P alloy remelted with 8N FBR silicon.
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: Experimental procedure
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1442'
+      locator:
+        page: 13
+        published_page: 1078
+        pdf_page_index: 12
+        table: V
+        note: Table V reports pressure fits at 1442 °C; experimental uncertainty stated as ±2 °C.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000001'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+        note: The chamber was vacuumed down to 10^-6 Pa before power was switched on; this is chamber background/pre-run pressure,
+          not sample vapor pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Knudsen-cell pressure condition is <10 Pa; molecule–wall collisions are assumed to dominate molecule–molecule
+          collisions, producing a molecular beam. Gases are considered ideal under these conditions.
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+  work_id: 10.1007/s11663-022-02445-1
+  locator:
+    page: 3
+    published_page: 1068
+    pdf_page_index: 2
+    section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0003'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1068
+          pdf_page_index: 2
+          section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+          note: Printed 0.3 mm; unit conversion only.
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.3'
+              locator:
+                page: 3
+                published_page: 1068
+                pdf_page_index: 2
+                section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+                note: Printed 0.3 mm; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 3
+                published_page: 1068
+                pdf_page_index: 2
+                section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+                note: Printed 0.3 mm; unit conversion only.
+          output_unit: m
+          references: []
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 3
+          published_page: 1068
+          pdf_page_index: 2
+          section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+          note: The source gives orifice diameter but no channel length.
+    calibration:
+      pressure_conversion:
+        state:
+          tag: value
+          value: p_i = k I_i T / σ_i
+        locator:
+          page: 7
+          published_page: 1072
+          pdf_page_index: 6
+          equation: '1'
+      calibration_standard:
+        state:
+          tag: value
+          value: Pure Si (8N), with known Si+ pressure from Ref. [75]; k determined from Si+ current.
+        locator:
+          page: 7
+          published_page: 1072
+          pdf_page_index: 6
+          equation: '1'
+      instrument_sensitivity_k:
+        state:
+          tag: value
+          value: '0.000000000000000000000000272'
+        locator:
+          page: 7
+          published_page: 1072
+          pdf_page_index: 6
+          equation: '1'
+          note: Printed 2.72 × 10^-25 Pa cm^2 counts^-1 K^-1 at 1442 °C.
+      cross_section_source_and_method:
+        state:
+          tag: value
+          value: Molecular cross sections calculated by authors using the atomic-sum formula attributed to Ref. [56]; individual
+            atomic Si and P input sources are not specified in the text. Values listed in Table II.
+        locator:
+          page: 7
+          published_page: 1072
+          pdf_page_index: 6
+          table: II
+      instrument_sensitivity_k_units:
+        state:
+          tag: value
+          value: Pa cm^2 counts^-1 K^-1
+        locator:
+          page: 7
+          published_page: 1072
+          pdf_page_index: 6
+          equation: '1'
+      calibration_temperature_C:
+        state:
+          tag: value
+          value: '1442'
+        locator:
+          page: 7
+          published_page: 1072
+          pdf_page_index: 6
+          equation: '1'
+      molecular_cross_section_formula:
+        state:
+          tag: value
+          value: σ_molecule = 0.75 Σ_i σ_atom(i)
+        locator:
+          page: 7
+          published_page: 1072
+          pdf_page_index: 6
+          table: II
+          note: Molecular total cross sections calculated using atomic cross sections, with method attributed to Ref. [56].
+  bench_id: 10.1007/s11663-022-02445-1::bench::hoseinpur-2022-kems-graphite-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Isothermal and polythermal KEMS; electron bombardment of Ta crucible for rapid heating.
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.3333333333'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1069
+          pdf_page_index: 3
+          section: Experimental procedure
+          note: Average 20 °C/min to 400 °C; conversion to K/s.
+      start_temperature_K:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 1069
+          pdf_page_index: 3
+          section: Experimental procedure
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1069
+          pdf_page_index: 3
+          section: Experimental procedure
+          note: Printed 400 °C; conversion to K.
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1.6666666667'
+            approximate: true
+        locator:
+          page: 4
+          published_page: 1069
+          pdf_page_index: 3
+          section: Experimental procedure
+          note: Printed around 100 °C/min; converted to K/s.
+      start_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '673.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1069
+          pdf_page_index: 3
+          section: Experimental procedure
+          note: Printed after the 400 °C stage.
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1373.15'
+            interval_high: '1473.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1069
+          pdf_page_index: 3
+          section: Experimental procedure
+          note: Printed around 1100–1200 °C; converted to K.
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.1666666667'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1069
+          pdf_page_index: 3
+          section: Experimental procedure
+          note: Printed 10 °C/min; converted to K/s.
+      start_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1373.15'
+            interval_high: '1473.15'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1069
+          pdf_page_index: 3
+          section: Experimental procedure
+          note: Printed around 1100–1200 °C; converted to K.
+      end_temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1648.15'
+            approximate: true
+        locator:
+          page: 4
+          published_page: 1069
+          pdf_page_index: 3
+          section: Experimental procedure
+          note: Printed about 1375 °C; converted to K.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1375'
+              locator:
+                page: 4
+                published_page: 1069
+                pdf_page_index: 3
+                section: Experimental procedure
+                note: Printed about 1375 °C; converted to K.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                page: 4
+                published_page: 1069
+                pdf_page_index: 3
+                section: Experimental procedure
+                note: Printed about 1375 °C; converted to K.
+          output_unit: K
+          references: []
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1715.15'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1070
+          pdf_page_index: 4
+          section: A. Isothermal KEMS Experiments
+          note: Printed 1442 ± 2 °C; conversion to K. Figure 4 caption on PDF page 7 separately prints 1440 ± 2 °C.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '28800'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1070
+          pdf_page_index: 4
+          figure: '2'
+          note: Printed 8 h isothermal experiment; conversion to seconds.
+benches:
+- id: 10.1007/s11663-022-02445-1::bench::hoseinpur-2022-kems-graphite-cell
+  work_id: 10.1007/s11663-022-02445-1
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 3
+      published_page: 1068
+      pdf_page_index: 2
+      section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Graphite Knudsen cell; SiC sample crucible; tantalum outer crucible and cap
+    locator:
+      page: 3
+      published_page: 1068
+      pdf_page_index: 2
+      section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+      note: The SiC crucible sits inside the graphite Knudsen cell, which sits inside a tantalum crucible with a cap.
+  cell_materials:
+  - state:
+      tag: value
+      value: C_graphite
+    locator:
+      page: 3
+      published_page: 1068
+      pdf_page_index: 2
+      section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+  - state:
+      tag: value
+      value: SiC
+    locator:
+      page: 3
+      published_page: 1068
+      pdf_page_index: 2
+      section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+  - state:
+      tag: value
+      value: Ta
+    locator:
+      page: 3
+      published_page: 1068
+      pdf_page_index: 2
+      section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+  geometry:
+    cell_internal_dimensions:
+      sample_crucible_height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.01'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1068
+          pdf_page_index: 2
+          section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+          note: Printed 10 mm height; unit conversion only.
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '10'
+              locator:
+                page: 3
+                published_page: 1068
+                pdf_page_index: 2
+                section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+                note: Printed 10 mm height; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 3
+                published_page: 1068
+                pdf_page_index: 2
+                section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+                note: Printed 10 mm height; unit conversion only.
+          output_unit: m
+          references: []
+      sample_crucible_inner_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.007'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1068
+          pdf_page_index: 2
+          section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+          note: Printed 7 mm inner diameter; unit conversion only.
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '7'
+              locator:
+                page: 3
+                published_page: 1068
+                pdf_page_index: 2
+                section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+                note: Printed 7 mm inner diameter; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 3
+                published_page: 1068
+                pdf_page_index: 2
+                section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+                note: Printed 7 mm inner diameter; unit conversion only.
+          output_unit: m
+          references: []
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: value
+        value: '70'
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+        note: 15, 50, and 70 eV preliminary fragment tests; 70 eV used in all subsequent experiments.
+    preliminary_fragment_test_energies:
+      state:
+        tag: value
+        value: 15, 50, and 70 eV
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+    emission_current_mA:
+      state:
+        tag: value
+        value: '0.15'
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+    mass_range_mz:
+      state:
+        tag: value
+        value: 10 to 200 m/z
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+    multiplier_and_isotope_corrections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+        note: No multiplier or isotope correction stated.
+  temperature_measurement:
+    cell_temperature_sensor:
+      state:
+        tag: value
+        value: Pyrometer measuring cell temperature
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+    sample_temperature_caveat:
+      state:
+        tag: value
+        value: The measured temperature and actual sample temperature may differ.
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+  temperature_calibration:
+    standard_silicon:
+      state:
+        tag: value
+        value: Pure silicon, 8N; in-situ melting point detected by ion current while heating at 1 °C/min.
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+    additional_standards:
+      state:
+        tag: value
+        value: Ni and Ag melting points.
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1069
+        pdf_page_index: 3
+        section: Experimental procedure
+  other_facts:
+  - name: tantalum_outer_cap_orifice_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1068
+        pdf_page_index: 2
+        section: B. Knudsen Effusion Mass Spectrometry (KEMS) Study
+    unit: mm
+context:
+- observation_id: hoseinpur_2022_HSC_decomposition_model
+  type: thermodynamic_example
+  locator:
+    page: 13
+    published_page: 1078
+    pdf_page_index: 12
+    section: C. Mechanisms of P Evaporation from Liquid Si
+  units: °C
+  values:
+    quantity: superheated_phosphide_decomposition_model
+    method_class: model_derived
+    software: HSC chemistry
+    software_version: '10'
+    software_version_locator:
+      page: 16
+      published_page: 1081
+      pdf_page_index: 15
+      reference: '84'
+    calculated_temperature_C_up_to: 2000
+    dagger_definition: Superscript † denotes superheated compounds over the study temperature range; it is not an ion charge.
+    reaction_e_negative_sign_transition_temperature_C_range:
+    - 1560
+    - 1600
+    reactions_a_to_d_negative_temperature_C_beyond: 1750
+    P4_formation_temperature_C_beyond: 1550
+    AtP_increase_temperature_C_beyond: 1750
+    qualifier: Reaction (e) shifts to negative values over 1560–1600 °C; no upper bound on its negative region is asserted.
+      These are author-calculated thermodynamics, not measured Gibbs values.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_HSC_decomposition_model
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_abstract_experiment_limits
+  type: experiment_series
+  locator:
+    page: 1
+    published_page: 1066
+    pdf_page_index: 0
+    section: Abstract
+  units: °C; ppmw; pct
+  values:
+    quantity: aggregate_experiment_and_removal_summary
+    method_class: author_estimate
+    nominal_phosphorus_ppmw:
+    - 100
+    - 1250
+    - 3000
+    experiment_temperature_C_up_to: 1840
+    pressure_composition_temperature_C: 1442
+    removal_temperature_C_exceeds: 1750
+    initial_phosphorus_ppmw: 100
+    phosphorus_removal_via_phosphides_and_P4_pct_about: 71
+    note: Aggregate abstract claims; compositions are nominal preparation targets and 71 pct is the authors' removal interpretation.
+      No allocation of individual graph coordinates or independently measured activity is implied.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_abstract_experiment_limits
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_after_remelt_si_p_100_analysis
+  type: sample_characterization
+  units: ppma P
+  locator:
+    page: 3
+    published_page: 1068
+    pdf_page_index: 2
+    section: Experimental procedure
+  values:
+    quantity: ICP-MS_phosphorus_analysis_after_remelting
+    method_class: measured_direct
+    sample: Si-100 P
+    phosphorus_ppma: '97.3'
+    uncertainty_ppma: 2
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_after_remelt_si_p_100_analysis
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_after_remelt_si_p_1250_analysis
+  type: sample_characterization
+  units: ppma P
+  locator:
+    page: 3
+    published_page: 1068
+    pdf_page_index: 2
+    section: Experimental procedure
+  values:
+    quantity: ICP-MS_phosphorus_analysis_after_remelting
+    method_class: measured_direct
+    sample: Si-1250 P
+    phosphorus_ppma: 1227
+    uncertainty_ppma: 25
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_after_remelt_si_p_1250_analysis
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_after_remelt_si_p_3000_analysis
+  type: sample_characterization
+  units: ppma P
+  locator:
+    page: 3
+    published_page: 1068
+    pdf_page_index: 2
+    section: Experimental procedure
+  values:
+    quantity: ICP-MS_phosphorus_analysis_after_remelting
+    method_class: measured_direct
+    sample: Si-3000 P
+    phosphorus_ppma: 3100
+    uncertainty_ppma: 136
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_after_remelt_si_p_3000_analysis
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_atom_weighted_evaporation_relations
+  type: method
+  locator:
+    page: 10
+    published_page: 1075
+    pdf_page_index: 9
+    equation: 5–6
+    section: B. Mass Transport of Phosphorus Via Evaporation
+  units: intensity/cm^2; pct
+  values:
+    quantity: atom_weighted_evaporation_measure_and_impact_relations
+    method_class: model_derived
+    inline_pressure_relation: p_i = n_i p_t/n_t
+    equation_5_as_printed: A_t−P [intensity/cm²] = Σ_i κ I_i/σ_i
+    equation_6_as_printed: χ_i[pct] = {κ(I_i/σ_i)/A_t−P}100
+    kappa_definition: Number of phosphorus atoms in species i; distinct from instrumental sensitivity k in Eq. (1).
+    kappa_P4_example: 4
+    measured_input_species:
+    - P
+    - P2
+    - P4
+    - SiP
+    - Si2P
+    - Si3P
+    - SiP2
+    qualification: A_t−P is proportional to total phosphorus atoms effusing from the cell; multiatomic species may contribute
+      more phosphorus even at lower molecular amounts. This is an intensity-based measure, not a new direct mass-loss measurement.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_atom_weighted_evaporation_relations
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_conclusion_numeric_claims
+  type: thermodynamic_example
+  locator:
+    page: 15
+    published_page: 1080
+    pdf_page_index: 14
+    section: V. CONCLUSIONS
+  units: °C; ppmw; pct; temperature ratio
+  values:
+    quantity: authors_conclusion_thresholds_and_contributions
+    method_class: author_estimate
+    overall_evaporation_intensifies_temperature_C_above: 1650
+    initial_P_ppmw_below: 100
+    phosphide_removal_temperature_C_above: 1750
+    phosphide_removal_pct_up_to_about: 40
+    P4_considerable_temperature_C_beyond: 1550
+    P4_removal_pct_up_to: 40
+    UHT_condition_as_printed: T_UHT ≥ 1.25 T_m,Si
+    pressure_composition_relation_temperature_C: 1442
+    pressure_composition_relation_species:
+    - P
+    - P2
+    - P4
+    - SiP
+    - Si2P
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_conclusion_numeric_claims
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_equilibrium_relations_and_reference_conventions
+  type: thermodynamic_relation
+  locator:
+    page: 9
+    published_page: 1074
+    pdf_page_index: 8
+    equation: 2–4
+    section: A. Liquid/Vapor Equilibrium for Si–P System
+  units: Pa; J mol^-1 K^-1; concentration as stated
+  values:
+    quantity: literature_equilibrium_relations_and_conventions
+    method_class: quoted_attributed
+    equation_2_as_printed: p_P = p° xP γP∞ exp[−(ΔG°_ii + G°_iii)/(RT)]
+    equation_3_as_printed: p_P2 = p° [xP γP∞ exp(−ΔG°_iii/(RT))]^2
+    equation_4_as_printed: p_P4 = p° [xP γP∞ exp(−(ΔG°_iii − 0.25ΔG°_i)/(RT))]^4
+    equation_2_symbol_qualifier: G°_iii is printed without Δ in Eq. (2); retained without repair.
+    gas_constant_J_mol_K: '8.314'
+    T_definition: Absolute temperature in Kelvin.
+    xP_and_gamma_definition: Phosphorus molar fraction and activity coefficient in liquid Si, respectively; Miki's convention
+      differs as stated below.
+    Zaitsev_reference_pressure: Saturation vapor pressure of pure phosphorus at the studying temperature, [63, 71].
+    Miki_reference_pressure_Pa: 101325
+    Miki_concentration_convention: Phosphorus weight percent in liquid silicon (P wt pct).
+    Miki_weight_percent_interaction_coefficient_fP: 1
+    chosen_relation: Authors use Zaitsev et al. [63]; Zaitsev criticized the processing of Miki et al. [62] and showed corrected
+      processing agrees for P2.
+    attribution: Relations use Table IV thermodynamic functions from Schlesinger [71], Zaitsev [63], and Miki [62]; Table
+      IV on PDF page 11 separately gives pure-P and 1 atm reference-state notes.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_equilibrium_relations_and_reference_conventions
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure10_evaporation_contributions
+  type: figure_only
+  locator:
+    page: 13
+    published_page: 1078
+    pdf_page_index: 12
+    figure: '10'
+  values:
+    quantity: contribution_of_evaporating_species
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    reason: Figure 10 on PDF page 13 is not digitized. Prose on PDF pages 10–11 states P and P2 dominate below 1500 °C; for
+      very dilute Si–P (<100 ppm) above 1750 °C, P4 plus phosphides account for almost 71–76 pct removal. Conclusions on PDF
+      page 15 state up to about 40 pct via phosphides for initial P <100 ppmw and T >1750 °C, and up to 40 pct via P4 at T_UHT
+      ≥1.25 T_m,Si.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure10_evaporation_contributions
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure11_reaction_gibbs_curves
+  type: figure_only
+  locator:
+    page: 14
+    published_page: 1079
+    pdf_page_index: 13
+    figure: '11'
+  values:
+    quantity: Gibbs_energy_of_reactions
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    reason: Calculated Gibbs-energy curves are not digitized; prose on PDF page 13 states reaction (e) ΔG° shifts to negative
+      values over 1560–1600 °C and reactions (a)–(d) shift to negative values beyond 1750 °C. The former range describes a
+      sign transition, not an interval bounding all negative values.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure11_reaction_gibbs_curves
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure11_reaction_identities
+  type: figure_only
+  locator:
+    page: 14
+    published_page: 1079
+    pdf_page_index: 13
+    figure: '11'
+  units: reaction stoichiometry as printed
+  values:
+    quantity: superheated_phosphide_reaction_identities
+    method_class: figure_only
+    reactions_as_printed:
+      a: SiP2† + 3Si(l) = 2Si2P(g)
+      b: SiP2† = SiP(g) + P(g)
+      c: SiP2† = 0.5Si2P(g) + 1.5P(g)
+      d: SiP2† = Si(l) + 2P(g)
+      e: SiP2† = Si(g) + 0.5P4(g)
+      f: SiP2† = SiP(s) + P(g)
+      g: SiP† = Si(l) + 0.5P2(g)
+    note: † means superheated. Reaction labels and coefficients are printed figure text; no Gibbs-energy curve coordinates
+      are digitized.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure11_reaction_identities
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure12_mechanism
+  type: figure_only
+  locator:
+    page: 14
+    published_page: 1079
+    pdf_page_index: 13
+    figure: '12'
+  values:
+    quantity: proposed_evaporation_mechanism
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    reason: Schematic not digitized. Proposed routes are desorption of P/P2/P4 from the melt surface; decomposition of transient
+      silicon phosphides into phosphorus species and lower phosphides; and evaporation of lower silicon phosphides formed
+      by that decomposition. Figure and explanatory prose are on PDF page 14.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure12_mechanism
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure1_apparatus
+  type: apparatus_context
+  locator:
+    page: 4
+    published_page: 1069
+    pdf_page_index: 3
+    figure: '1'
+  values:
+    quantity: kems_apparatus_schematic
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    note: Schematic labels include 70 eV ionization, liquid-nitrogen cold trap, Ta shield and crucible, Knudsen cell, SiC
+      sample crucible, tungsten wire, and pyrometer; schematic not digitized.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure1_apparatus
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure2_cell_after_isothermal_run
+  type: apparatus_context
+  locator:
+    page: 5
+    published_page: 1070
+    pdf_page_index: 4
+    figure: '2'
+  values:
+    quantity: post-run_cell_image
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    duration_h: 8
+    temperature_C: 1442
+    note: Photograph caption identifies cell after 8 hours at 1442 °C; image not digitized.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure2_cell_after_isothermal_run
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure3_mass_spectra
+  type: ion_current_series
+  locator:
+    page: 6
+    published_page: 1071
+    pdf_page_index: 5
+    figure: '3'
+  values:
+    quantity: mass_spectra_ion_signals
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    temperatures_C: 1395 ± 2 (solid Si); 1500 ± 2 °C (just after melting)
+    note: Figure on PDF page 6; signal comparison and gas assignments in prose on PDF page 5. Spectral curves are not digitized.
+      Source says P2+ and P+ are strong; SiP+ and Si2P+ are low; P4+; SiP2+; and Si3P+ are visible in liquid spectrum; P3+
+      barely detected. In melt spectrum P2+ signal is five times Si+; SiO+ is attributed to residual oxygen reacting with
+      silicon; Ar+ and H2O+ are residual gases.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure3_mass_spectra
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure4_caption_temperature_difference
+  type: temperature_context
+  units: °C
+  locator:
+    page: 7
+    published_page: 1072
+    pdf_page_index: 6
+    figure: '4'
+  values:
+    quantity: printed_temperature_labels
+    method_class: quoted_unattributed
+    figure_caption_center_C: 1440
+    figure_caption_uncertainty_C: 2
+    prose_isothermal_setpoint_C: 1442
+    prose_uncertainty_C: 2
+    note: Figure 4 caption on PDF page 7 says 1440 ± 2 °C; isothermal prose on PDF page 5 says 1442 ± 2 °C. Both are retained;
+      their ranges overlap. Figure 2 caption on PDF page 5 gives 1442 °C without uncertainty.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure4_caption_temperature_difference
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure4_isothermal_time_series
+  type: figure_only
+  locator:
+    page: 7
+    published_page: 1072
+    pdf_page_index: 6
+    figure: '4'
+  phase: Si-1250 P liquid sample
+  values:
+    quantity: ion_current_and_pressure_trends
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    duration_h: 8
+    sample_endpoint_xP_ppma: '20.03'
+    reason: Setup and first-hour exclusion in prose on PDF page 5; endpoint and figure on PDF page 7. Figure curves not digitized.
+      About the first hour from melting to steady temperature is not recorded; P-containing ion signals decrease over time
+      while Si signal is stable.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure4_isothermal_time_series
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure5_polythermal_trends
+  type: figure_only
+  locator:
+    page: 8
+    published_page: 1073
+    pdf_page_index: 7
+    figure: '5'
+  values:
+    quantity: temperature_and_pressure_trends
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    reason: Figure 5 pressure versus experiment time and temperature is not digitized. The prose about Figure 6 on PDF page
+      8 reports P2/P crossovers at 1450 °C (Si–100 P), 1470 °C (Si–1250 P), and 1550 °C (Si–3000 P); P4 intensity initially
+      decreases and then increases at 1550–1600 °C, and Si–3000 P P4 pressure turns upward above 1550 °C.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure5_polythermal_trends
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure6_temperature_pressure_curves
+  type: figure_only
+  locator:
+    page: 9
+    published_page: 1074
+    pdf_page_index: 8
+    figure: '6'
+  phase: liquid_Si-P
+  values:
+    quantity: phosphorus_species_pressure_temperature_curves
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    note: P; P2; P4; and silicon-phosphide vapor pressure curves plotted versus temperature. No curve coordinates digitized.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure6_temperature_pressure_curves
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure7_model_comparison
+  type: figure_only
+  locator:
+    page: 12
+    published_page: 1077
+    pdf_page_index: 11
+    figure: '7'
+  values:
+    quantity: model_comparison_curves
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    reason: Comparison curves from Zaitsev, Schlesinger, and FactSage-SGTE are not digitized. Figure 7 is on PDF page 12;
+      prose on PDF page 9 states FactSage underestimates P, SiP, and Si2P by about ten times; both FactSage and Eq. (4) underestimate
+      P4 by about 10 billion times. Experimental P2 agrees with Zaitsev and FactSage.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure7_model_comparison
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure8_pressures
+  type: figure_only
+  locator:
+    page: 12
+    published_page: 1077
+    pdf_page_index: 11
+    figure: '8'
+  units: vapor pressure as plotted
+  values:
+    quantity: plotted_partial_pressure_curves
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    species: P
+    temperature_C: 1442 ± 2
+    composition: dilute Si-P melts
+    concentration_provenance: Filled points use terminal ICP-MS xP; remaining xP inferred from P2 pressure using Zaitsev Eq.
+      (3), as described on PDF pages 9–10.
+    note: Measured pressure curves for P, P2, P4, SiP, and Si2P are plotted without tabulated coordinates; not digitized.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure8_pressures
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_figure8_pressures_p2
+  type: figure_only
+  locator:
+    page: 12
+    published_page: 1077
+    pdf_page_index: 11
+    figure: '8'
+  units: vapor pressure as plotted
+  values:
+    quantity: plotted_partial_pressure_curves
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    species: P2
+    temperature_C: 1442 ± 2
+    composition: dilute Si-P melts
+    concentration_provenance: Filled points use terminal ICP-MS xP; remaining xP inferred from P2 pressure using Zaitsev Eq.
+      (3), as described on PDF pages 9–10.
+    note: Measured P2 pressure plotted without tabulated coordinates; not digitized.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure8_pressures_p2
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P2
+- observation_id: hoseinpur_2022_figure8_pressures_p4
+  type: figure_only
+  locator:
+    page: 12
+    published_page: 1077
+    pdf_page_index: 11
+    figure: '8'
+  units: vapor pressure as plotted
+  values:
+    quantity: plotted_partial_pressure_curves
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    species: P4
+    temperature_C: 1442 ± 2
+    composition: dilute Si-P melts
+    concentration_provenance: Filled points use terminal ICP-MS xP; remaining xP inferred from P2 pressure using Zaitsev Eq.
+      (3), as described on PDF pages 9–10.
+    note: Measured P4 pressure plotted without tabulated coordinates; not digitized.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure8_pressures_p4
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P4
+- observation_id: hoseinpur_2022_figure8_pressures_si2p
+  type: figure_only
+  locator:
+    page: 12
+    published_page: 1077
+    pdf_page_index: 11
+    figure: '8'
+  units: vapor pressure as plotted
+  values:
+    quantity: plotted_partial_pressure_curves
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    species: Si2P
+    temperature_C: 1442 ± 2
+    composition: dilute Si-P melts
+    concentration_provenance: Filled points use terminal ICP-MS xP; remaining xP inferred from P2 pressure using Zaitsev Eq.
+      (3), as described on PDF pages 9–10.
+    note: Measured Si2P pressure plotted without tabulated coordinates; not digitized.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure8_pressures_si2p
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: Si2P
+- observation_id: hoseinpur_2022_figure8_pressures_sip
+  type: figure_only
+  locator:
+    page: 12
+    published_page: 1077
+    pdf_page_index: 11
+    figure: '8'
+  units: vapor pressure as plotted
+  values:
+    quantity: plotted_partial_pressure_curves
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    species: SiP
+    temperature_C: 1442 ± 2
+    composition: dilute Si-P melts
+    concentration_provenance: Filled points use terminal ICP-MS xP; remaining xP inferred from P2 pressure using Zaitsev Eq.
+      (3), as described on PDF pages 9–10.
+    note: Measured SiP pressure plotted without tabulated coordinates; not digitized.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure8_pressures_sip
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: SiP
+- observation_id: hoseinpur_2022_figure9_refining_context
+  type: figure_only
+  locator:
+    page: 13
+    published_page: 1078
+    pdf_page_index: 12
+    figure: '9'
+  values:
+    quantity: cited_industrial_refining_comparison
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    note: Figure on PDF page 13; previous-work prose on PDF page 10 quotes previous refining of a 400 g melt with <15 ppmw
+      P; report 1500–1900 °C operating range and a change in kp at 1750 °C averaging 2.6 times the lower-temperature extrapolation.
+      Curve not digitized.
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_figure9_refining_context
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_fragmentation_assignment
+  type: mass_spectrometry_context
+  units: eV; relative ion intensity as printed
+  locator:
+    page: 5
+    published_page: 1070
+    pdf_page_index: 4
+    section: A. Isothermal KEMS Experiments
+  values:
+    quantity: P_ion_assignment
+    method_class: author_estimate
+    prior_study_P_to_P2_intensity_pct: 2
+    prior_study_fragmentation_energy_eV: '15.56'
+    this_study_test_energies_eV:
+    - 15
+    - 50
+    - 70
+    this_study_P_atom_ionization_energy_eV: '10.49'
+    statement: The P+ peak had the same intensity at each tested voltage; the authors assign it to ionization of atomic P,
+      rather than fragmentation of P2+.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_fragmentation_assignment
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_high_P_monoatomic_removal_range
+  type: thermodynamic_example
+  locator:
+    page: 11
+    published_page: 1076
+    pdf_page_index: 10
+    section: B. Mass Transport of Phosphorus Via Evaporation
+  units: °C
+  values:
+    quantity: high_P_sample_main_removal_mechanism
+    method_class: author_estimate
+    sample: Si–1250 P
+    temperature_C_range:
+    - 1500
+    - 1820
+    statement: Monoatomic phosphorus remains the main removal mechanism over 1500–1820 °C because of the high P content; silicon
+      phosphides and P4 become considerable at higher temperatures.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_high_P_monoatomic_removal_range
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_high_phosphorus_alloy_initial_analysis
+  type: sample_characterization
+  units: ppmw P
+  locator:
+    page: 2
+    published_page: 1067
+    pdf_page_index: 1
+    section: A. Si-P Sample Preparation
+  values:
+    quantity: initial_high_phosphorus_alloy_assay
+    method_class: measured_direct
+    phosphorus_ppmw: 3715
+    uncertainty_ppmw: 200
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_high_phosphorus_alloy_initial_analysis
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_industrial_silicon_context
+  type: literature_context
+  units: ppmw P
+  locator:
+    page: 11
+    published_page: 1076
+    pdf_page_index: 10
+    section: B. Mass Transport of Phosphorus Via Evaporation
+  values:
+    quantity: industrial_metallurgical_grade_silicon_phosphorus_background
+    method_class: quoted_attributed
+    phosphorus_ppmw_below: 50
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_industrial_silicon_context
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_intro_silicon_purity_market
+  type: literature_context
+  units: pct; ppmw; fold change as printed
+  locator:
+    page: 2
+    published_page: 1067
+    pdf_page_index: 1
+    section: Introduction
+  values:
+    quantity: silicon_purity_and_solar_market_background
+    method_class: quoted_attributed
+    silicon_purity_pct: '99.9999'
+    silicon_purity_grade: 6N
+    photovoltaic_modules_pct_gt: 90
+    module_production_growth_fold_2010_to_2019: 7
+    accepted_phosphorus_ppmw_limit: '0.2'
+    note: Nowadays up to 0.2 ppmw is accepted as the limit for SoG-Si production; it could be reduced in the future if higher
+      efficiencies are required (Ref. [20]).
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_intro_silicon_purity_market
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_introduction_refining_background
+  type: literature_context
+  locator:
+    page: 2
+    published_page: 1067
+    pdf_page_index: 1
+    section: I. INTRODUCTION
+  units: years; temperature ratio
+  values:
+    quantity: prior_vacuum_refining_background
+    method_class: quoted_attributed
+    vacuum_refining_history_years: 30
+    attribution: Vacuum refining history [1, 41]; previous UHT work [6]
+    UHT_definition_as_printed: T_UHT ≥ 1.25 T_m,Si
+    note: The ≥ definition is separate from the prior-work prose on PDF page 10 defining T >1762 °C =1.25 T_m,Si.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_introduction_refining_background
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_isothermal_and_polythermal_qualifiers
+  type: experiment_series
+  locator:
+    page: 7
+    published_page: 1072
+    pdf_page_index: 6
+    section: Isothermal and polythermal KEMS experiments
+  units: species count; h; ppma
+  values:
+    quantity: depletion_equilibrium_and_measurement_limits
+    method_class: measured_direct
+    Si_3000_P_measured_species_count: 5
+    Si_3000_P_measured_species:
+    - Si
+    - P
+    - P2
+    - P4
+    - SiP
+    limited_species_reason: Intensive P evaporation from Si–3000 P could damage the instruments; PDF page 8 states only SiP
+      was recorded to represent the other phosphides in this sample.
+    run_duration_h: 8
+    terminal_phosphorus_ppma: '20.03'
+    quench_qualifier: Sample cooled below Si melting point in some seconds to prevent liquid-composition change; terminal
+      residue represents the last experimental point.
+    isothermal_trends: On PDF page 6, P2+ loses intensity faster than P+; P+ dominates at longer times. Si2P+ and SiP+ initially
+      lie below P2+/P+ and above P4+, and decrease over time. SiP2+ was not detected in this isothermal run, probably because
+      of lower P concentration than the preliminary 1500 °C test.
+    equilibrium_qualifier: Stable Si current may indicate equilibrium and saturated Si pressure at least in short intervals;
+      this does not hold for the depleting phosphorus species (PDF pages 6–7).
+    heating_cooling_qualifier: Symmetric Si profile suggests steady Si evaporation, while phosphorus-containing species decrease
+      in both heating and cooling cycles because of depletion; increasing temperature eventually raises their intensities
+      again.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_isothermal_and_polythermal_qualifiers
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_isothermal_residue_analysis
+  type: sample_characterization
+  units: ppma P
+  locator:
+    page: 7
+    published_page: 1072
+    pdf_page_index: 6
+    figure: '4'
+    note: Endpoint after long isothermal run; authors report ICP-MS analysis.
+  values:
+    quantity: phosphorus_in_residue_at_endpoint
+    method_class: measured_direct
+    sample: Si-1250 P isothermal series
+    phosphorus_ppma: '20.03'
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_isothermal_residue_analysis
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_mass_transport_numeric_trends
+  type: thermodynamic_example
+  locator:
+    page: 10
+    published_page: 1075
+    pdf_page_index: 9
+    section: B. Mass Transport of Phosphorus Via Evaporation
+  units: °C; ppm; pct
+  values:
+    quantity: authors_mass_transport_and_species_impact_trends
+    method_class: author_estimate
+    AtP_decrease_temperature_C_up_to: 1650
+    AtP_tangent_increase_temperature_C_above_by_sample:
+      Si–100 P: 1730
+      Si–1250 P: 1750
+    Si_100_P_phosphide_main_mechanism_temperature_C_above: 1650
+    Si_100_P_P4_second_most_effective_temperature_C_above: 1720
+    P_and_P2_dominance_temperature_C_below: 1500
+    dilute_P_content_ppm_below_as_printed: 100
+    P4_plus_phosphides_removal_temperature_C_above: 1750
+    P4_plus_phosphides_removal_pct_almost:
+    - 71
+    - 76
+    statement: Total phosphorus measure decreases from melting to 1650 °C due to P loss, then rises rapidly. Tangent increases
+      occur above 1730 °C for Si–100 P and 1750 °C for Si–1250 P. P4 becomes second most effective above 1720 °C in Si–100
+      P; the 71–76 pct sentence continues on PDF page 11.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_mass_transport_numeric_trends
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_model_comparison_numeric_claims
+  type: thermodynamic_example
+  locator:
+    page: 9
+    published_page: 1074
+    pdf_page_index: 8
+    section: A. Liquid/Vapor Equilibrium for Si–P System
+  units: °C; pressure ratios
+  values:
+    quantity: authors_comparison_of_models_and_measurements
+    method_class: author_estimate
+    temperature_C: 1442
+    uncertainty_C: 2
+    FactSage_version: '7.3'
+    database: SGTE
+    FactSage_underestimate_factor_about_for_P_SiP_Si2P: 10
+    FactSage_and_equation_4_P4_underestimate_factor_about: 10000000000
+    equations_2_and_4_P_overestimate_factor_about: 10
+    FactSage_P3_pressure_below_measured_estimate_factor_at_least: 100
+    P3_estimate_sample: Si–1250 P
+    P3_spectrum_temperature_C: 1500
+    P3_estimate_method: Authors use measured P3+ intensity in the spectrum; no plotted coordinate is transcribed.
+    qualification: Authors suggest inaccurate Gibbs functions for reactions (i)/(ii), and extrapolation or modeling in SGTE,
+      may explain the disagreements; experimental P2 agrees with Zaitsev and FactSage. The source says Eqs. (2)/(4) overestimate
+      P; that wording is retained.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_model_comparison_numeric_claims
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_nominal_si_p_100_sample
+  type: sample_characterization
+  units: ppmw P
+  locator:
+    page: 3
+    published_page: 1068
+    pdf_page_index: 2
+    section: Experimental procedure
+  values:
+    quantity: nominal_starting_phosphorus_content
+    method_class: author_estimate
+    sample: Si-100 P
+    phosphorus_ppmw: 100
+    approximate: true
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_nominal_si_p_100_sample
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_nominal_si_p_1250_sample
+  type: sample_characterization
+  units: ppmw P
+  locator:
+    page: 3
+    published_page: 1068
+    pdf_page_index: 2
+    section: Experimental procedure
+  values:
+    quantity: nominal_starting_phosphorus_content
+    method_class: author_estimate
+    sample: Si-1250 P
+    phosphorus_ppmw: 1250
+    approximate: true
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_nominal_si_p_1250_sample
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_nominal_si_p_3000_sample
+  type: sample_characterization
+  units: ppmw P
+  locator:
+    page: 3
+    published_page: 1068
+    pdf_page_index: 2
+    section: Experimental procedure
+  values:
+    quantity: nominal_starting_phosphorus_content
+    method_class: author_estimate
+    sample: Si-3000 P
+    phosphorus_ppmw: 3000
+    approximate: true
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_nominal_si_p_3000_sample
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_polythermal_composition_thresholds
+  type: thermodynamic_example
+  locator:
+    page: 8
+    published_page: 1073
+    pdf_page_index: 7
+    section: B. Polythermal KEMS Experiments
+  units: °C
+  values:
+    quantity: reported_temperature_and_composition_trends
+    method_class: author_estimate
+    P2_P_crossover_temperature_C_by_sample:
+      Si–100 P: 1450
+      Si–1250 P: 1470
+      Si–3000 P: 1550
+    P4_turn_up_temperature_C_range:
+    - 1550
+    - 1600
+    Si_3000_P_P4_turn_up_temperature_C_above: 1550
+    Si_100_P_intensive_phosphide_evaporation_temperature_C_above: 1680
+    low_P_phosphide_dominance_temperature_C_above: 1650
+    statement: Crossover shifts to higher temperature as initial P increases. P2 initially dominates and declines faster than
+      other species. Si–100 P evaporates intensively via SiP, Si2P, and Si3P above 1680 °C; at low P and higher temperature
+      (>1650 °C), silicon phosphides dominate. In Si–1250 P, P remains dominant as P2 declines.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_polythermal_composition_thresholds
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_polythermal_schedule_and_preliminary_spectra
+  type: method
+  locator:
+    page: 4
+    published_page: 1069
+    pdf_page_index: 3
+    section: Experimental procedure
+  units: °C; h
+  values:
+    quantity: polythermal_increment_and_preliminary_spectral_limit
+    method_class: measured_direct
+    preliminary_spectra_temperature_C_up_to: 1800
+    polythermal_temperature_increment_C: 25
+    polythermal_hold_h_per_step: 1
+    note: Increment and hold apply to each polythermal step; no unprinted absolute step temperatures are assigned. The 8 h
+      isothermal hold is recorded separately.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_polythermal_schedule_and_preliminary_spectra
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_preparation_starting_materials
+  type: sample_preparation
+  units: g; purity N as printed
+  locator:
+    page: 2
+    published_page: 1067
+    pdf_page_index: 1
+    section: A. Si-P Sample Preparation
+    note: 400 g and 1500 °C on PDF page 2; purity and remelting details continue on PDF page 3 (published 1068, index 2).
+  values:
+    quantity: starting_materials_and_preparation
+    method_class: measured_direct
+    silicon_mass_g: 400
+    alloy_preparation_temperature_C: 1500
+    silicon_purity_N: 8
+    argon_purity_N: 6
+    starting_phosphorus: red phosphorus
+    preparation: Vacuum-induction melt in graphite crucible under Ar; add red phosphorus; cast in water-cooled copper mold;
+      remelt with 8N FBR silicon to prepare the three concentrations.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_preparation_starting_materials
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_pressure_to_composition_reduction
+  type: method
+  locator:
+    page: 10
+    published_page: 1075
+    pdf_page_index: 9
+    section: A. Liquid/Vapor Equilibrium for Si–P System
+    note: Relation and terminal anchor introduced on PDF page 9; terminal assay reported on PDF page 7.
+  units: ppma; °C
+  values:
+    quantity: authors_pressure_to_composition_reduction_chain
+    method_class: measured_reduced
+    terminal_measured_phosphorus_ppma: '20.03'
+    measured_anchor_context_id: hoseinpur_2022_isothermal_residue_analysis
+    pressure_input: P2 pressures calculated from measured ion currents using Eq. (1).
+    reduction_relation: Eq. (3) with Zaitsev thermodynamics and pure-P saturation reference pressure; map each P2 pressure
+      to the relation to infer corresponding liquid xP.
+    concentration_provenance: Solid fill-in points in Fig. 8 use xP measured by ICP-MS; the remaining xP values are calculated
+      by this reduction.
+    temperature_C: 1442
+    fit_status: Table V contains author-fitted pressure versus inferred/measured xP relations for five species, rather than
+      independently measured activities.
+    note: No new pressure or concentration coordinates are computed or digitized here; this context describes the authors'
+      chain and measured anchor. There are no reduced observation rows.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_pressure_to_composition_reduction
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_previous_refining_comparison
+  type: literature_context
+  units: g; ppmw P; °C; fold ratio
+  locator:
+    page: 10
+    published_page: 1075
+    pdf_page_index: 9
+    note: Previous-work prose is on PDF page 10; Figure 9 itself is on PDF page 13.
+    section: B. Mass Transport of Phosphorus Via Evaporation
+  values:
+    quantity: prior_vacuum_refining_result
+    attribution: Hoseinpur and Safarian [6]
+    method_class: quoted_attributed
+    melt_mass_g: 400
+    phosphorus_ppmw_below: 15
+    temperature_C_range:
+    - 1500
+    - 1900
+    ultra_high_temperature_C_above: 1762
+    ultra_high_temperature_multiple_of_silicon_melting_point: '1.25'
+    mass_transfer_coefficient_multiplier_over_low_temperature_extrapolation: '2.6'
+    comparison_temperature_C_about: 1750
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_previous_refining_comparison
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_prior_zaitsev_composition_range
+  type: literature_context
+  units: molar fraction xP
+  locator:
+    page: 5
+    published_page: 1070
+    pdf_page_index: 4
+    section: A. Isothermal KEMS Experiments
+  values:
+    quantity: prior_Zaitsev_study_composition_range
+    method_class: quoted_attributed
+    xP_low: '0.0035'
+    xP_high: '0.265'
+    note: The current authors say Zaitsev et al. reported P+ and P2+ only.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_prior_zaitsev_composition_range
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_prose_ion_assignments_and_reactions
+  type: mass_spectrometry_context
+  locator:
+    page: 5
+    published_page: 1070
+    pdf_page_index: 4
+    section: A. Isothermal KEMS Experiments
+  units: m/z; eV; intensity ratio
+  values:
+    quantity: printed_ion_assignments_and_ionization_relations
+    method_class: measured_direct
+    ion_mz:
+      Si+: 28
+      P2+: 62
+      P+: 31
+      SiP+: 59
+      Si2P+: 87
+      P4+: 124
+      SiP2+: 90
+      Si3P+: 115
+      P3+: 93
+      Ar+: 40
+      H2O+: 18
+      SiO+: 44
+    liquid_P2_to_Si_intensity_ratio: 5
+    prior_fragmentation_relation: P2 + e− = P+ + P + 2e−
+    prior_fragmentation_energy_eV: '15.56'
+    prior_fragmentation_attribution: Zaitsev et al. [63]
+    atomic_ionization_relation: P + e− = P+ + 2e−
+    atomic_ionization_energy_eV: '10.49'
+    test_energies_eV:
+    - 15
+    - 50
+    - 70
+    reaction_provenance: Fragmentation relation and 15.56 eV are quoted from Zaitsev [63]; the atomic-ionization relation
+      and 10.49 eV have no individual citation. Test energies and ion assignments describe this study.
+    assignments_qualifier: Authors assign unchanged P+ peak intensity across test energies to atomic P ionization; Ar+ and
+      H2O+ are remaining chamber gases and SiO+ is attributed to residual oxygen reacting with Si. P3+ is barely detectable.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_prose_ion_assignments_and_reactions
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_residue_digestion_and_spectrum_acquisition
+  type: method
+  locator:
+    page: 5
+    published_page: 1070
+    pdf_page_index: 4
+    section: Experimental procedure and A. Isothermal KEMS Experiments
+  units: h; mg; min; °C
+  values:
+    quantity: residue_analysis_and_acquisition_procedure
+    method_class: measured_direct
+    acid_digestion_duration_h: 24
+    digestion_temperature: room temperature
+    digestion_acids: HNO3 and HF
+    balance_readability_mg: '0.1'
+    balance: Mettler Toledo, model Excellence
+    balance_result: No sensible SiC crucible weight change after acid digestion.
+    residue_analysis_instrument: Agilent-8800 ICP-MS Triple Quad
+    spectrum_acquisition_duration_min_about: 20
+    solid_spectrum_temperature_C: 1395
+    liquid_spectrum_temperature_C: 1500
+    liquid_spectrum_temperature_uncertainty_C: 2
+    isothermal_temperature_C: 1442
+    isothermal_temperature_uncertainty_C: 2
+    intensity_measurement_interval_h: 1
+    first_hour_qualifier: About 1 h from melting to steady 1442 °C was not recorded; characterization started afterward.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_residue_digestion_and_spectrum_acquisition
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_surface_mechanism_dilution_argument
+  type: thermodynamic_example
+  locator:
+    page: 14
+    published_page: 1079
+    pdf_page_index: 13
+    section: C. Mechanisms of P Evaporation from Liquid Si
+  units: atom counts; °C
+  values:
+    quantity: authors_surface_mechanism_argument
+    method_class: author_estimate
+    monoatomic_desorption_required_P_atoms: 1
+    P2_formation_required_P_atoms: 2
+    P4_formation_required_P_atoms: 4
+    reference_Si_atoms: 1000000
+    P_atoms_as_printed: few or tens per 1 million atoms of Si
+    mechanism_3_more_important_temperature_C_above: 1750
+    statement: P2/P4 formation by joining atoms is less feasible in dilute solution and important at higher P concentration.
+      Authors observe higher SiP than SiP2 intensity and suggest decomposition of transient phosphides; formation of Si_xP_y
+      is proposed to be more favorable at lower P and higher T. At lower T they may decompose more to P/P2/P4; direct lower-phosphide
+      evaporation becomes more important with increasing T, particularly above 1750 °C. These are proposed mechanisms.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_surface_mechanism_dilution_argument
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_table_i_literature_summary
+  type: literature_summary
+  locator:
+    page: 3
+    published_page: 1068
+    pdf_page_index: 2
+    table: I
+    source_path: tables/kems-210-hoseinpur-2022/t1.csv
+  values:
+    quantity: prior_work_summary
+    method_class: quoted_attributed
+    admission_status: context_only
+    row_count: 5
+    note: Table summarizes Schlesinger [71], Zaitsev et al. [63], Miki et al. [62], Safarian and Tangstad [72], and Liang
+      and Fetzer [61].
+    sample_row:
+      study: Schlesinger [71]
+      subject: Thermodynamic data of phosphorus and phosphorus gases (P, P2, P4)
+      contribution: Gibbs free energy functions for evaporation of phosphorus species and formation of silicon phosphides
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_i_literature_summary
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_table_ii_cross_sections
+  type: ionization_cross_sections
+  locator:
+    page: 7
+    published_page: 1072
+    pdf_page_index: 6
+    table: II
+    source_path: tables/kems-210-hoseinpur-2022/t2.csv
+  units: 10^-16 cm2
+  values:
+    quantity: relative_ionization_cross_sections
+    method_class: model_derived
+    ionization_energy_eV: 70
+    calibration_species: Si
+    note: Molecular rows are author-calculated using the atomic-sum formula attributed to Ref. [56]; individual atomic Si
+      and P input sources are unspecified.
+    calibration_relation: p_i = k I_i T / σ_i
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_ii_cross_sections
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_table_ii_numeric_example
+  type: ionization_cross_sections
+  locator:
+    page: 7
+    published_page: 1072
+    pdf_page_index: 6
+    table: II
+    row: Si
+    source_path: tables/kems-210-hoseinpur-2022/t2.csv
+  units: 10^-16 cm2
+  values:
+    quantity: relative_ionization_cross_sections
+    method_class: quoted_unattributed
+    admission_status: table_value
+    species: Si
+    ionization_energy_eV: 70
+    cross_section: '4.905'
+    note: Atomic Si input is tabulated without an individual source; the molecular-sum method is attributed to Ref. [56].
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_ii_numeric_example
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_table_iii_conditions_sample
+  type: ion_detection_conditions
+  locator:
+    page: 11
+    published_page: 1076
+    pdf_page_index: 10
+    table: III
+    row: P2+
+    source_path: tables/kems-210-hoseinpur-2022/t3.csv
+  values:
+    quantity: qualitative_ion_detection_condition
+    method_class: measured_tabulated
+    admission_status: context_only
+    ion: P2+
+    note: Experimental detection summary with author interpretation, rather than an estimated numerical quantity.
+    condition_as_printed: the dominant phosphorus species when Si is solid and at the beginning of melting
+  units: as printed or qualitative context
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_iii_conditions_sample
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_table_iv_thermodynamic_example
+  type: thermodynamic_relation
+  locator:
+    page: 11
+    published_page: 1076
+    pdf_page_index: 10
+    table: IV
+    row: (i)
+    source_path: tables/kems-210-hoseinpur-2022/t4.csv
+  units: J mol^-1
+  values:
+    quantity: literature_gibbs_energy_relation
+    method_class: quoted_attributed
+    admission_status: context_only
+    relation: P4(g) = 2P2(g)
+    intercept_J_mol: -229500
+    linear_coefficient_J_mol_K: '154.5'
+    quadratic_coefficient_J_mol_K2: '-0.00313'
+    attribution: Schlesinger [71]
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_iv_thermodynamic_example
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_table_v_fit_p
+  type: author_model_table_row
+  locator:
+    page: 13
+    published_page: 1078
+    pdf_page_index: 12
+    table: V
+    source_path: tables/kems-210-hoseinpur-2022/t5.csv
+    row: P
+  units: ln[p(Pa)] as a function of ln(xP), as printed
+  values:
+    quantity: fitted_log_partial_pressure_relation
+    method_class: model_derived
+    admission_status: model_derived
+    semantics: bound_not_point_ordering
+    temperature_C: 1442
+    formula_as_published: ln[p(Pa)] = 1.362 ln(xP) + 6.4602
+    slope: '1.362'
+    intercept: '6.4602'
+    pressure_points_digitized: false
+    reason: Authors report a fitted relation; underlying figure values are not tabulated.
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_v_fit_p
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P
+- observation_id: hoseinpur_2022_table_v_fit_p2
+  type: author_model_table_row
+  locator:
+    page: 13
+    published_page: 1078
+    pdf_page_index: 12
+    table: V
+    source_path: tables/kems-210-hoseinpur-2022/t5.csv
+    row: P2
+  units: ln[p(Pa)] as a function of ln(xP), as printed
+  values:
+    quantity: fitted_log_partial_pressure_relation
+    method_class: model_derived
+    admission_status: model_derived
+    semantics: bound_not_point_ordering
+    temperature_C: 1442
+    formula_as_published: ln[p(Pa)] = 0.8686 ln(xP) + 5.0356
+    slope: '0.8686'
+    intercept: '5.0356'
+    pressure_points_digitized: false
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_v_fit_p2
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P2
+- observation_id: hoseinpur_2022_table_v_fit_p4
+  type: author_model_table_row
+  locator:
+    page: 13
+    published_page: 1078
+    pdf_page_index: 12
+    table: V
+    source_path: tables/kems-210-hoseinpur-2022/t5.csv
+    row: P4
+  units: ln[p(Pa)] as a function of ln(xP), as printed
+  values:
+    quantity: fitted_log_partial_pressure_relation
+    method_class: model_derived
+    admission_status: model_derived
+    semantics: bound_not_point_ordering
+    temperature_C: 1442
+    formula_as_published: ln[p(Pa)] = 1.2864 ln(xP) + 1.7528
+    slope: '1.2864'
+    intercept: '1.7528'
+    pressure_points_digitized: false
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_v_fit_p4
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P4
+- observation_id: hoseinpur_2022_table_v_fit_si2p
+  type: author_model_table_row
+  locator:
+    page: 13
+    published_page: 1078
+    pdf_page_index: 12
+    table: V
+    source_path: tables/kems-210-hoseinpur-2022/t5.csv
+    row: Si2P
+  units: ln[p(Pa)] as a function of ln(xP), as printed
+  values:
+    quantity: fitted_log_partial_pressure_relation
+    method_class: model_derived
+    admission_status: model_derived
+    semantics: bound_not_point_ordering
+    temperature_C: 1442
+    formula_as_published: ln[p(Pa)] = 0.6566 ln(xP) − 2.4033
+    slope: '0.6566'
+    intercept: '-2.4033'
+    pressure_points_digitized: false
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_v_fit_si2p
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: Si2P
+- observation_id: hoseinpur_2022_table_v_fit_sip
+  type: author_model_table_row
+  locator:
+    page: 13
+    published_page: 1078
+    pdf_page_index: 12
+    table: V
+    source_path: tables/kems-210-hoseinpur-2022/t5.csv
+    row: SiP
+  units: ln[p(Pa)] as a function of ln(xP), as printed
+  values:
+    quantity: fitted_log_partial_pressure_relation
+    method_class: model_derived
+    admission_status: model_derived
+    semantics: bound_not_point_ordering
+    temperature_C: 1442
+    formula_as_published: ln[p(Pa)] = 0.7735 ln(xP) − 1.1535
+    slope: '0.7735'
+    intercept: '-1.1535'
+    pressure_points_digitized: false
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_v_fit_sip
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: SiP
+- observation_id: hoseinpur_2022_table_v_regression_sample
+  type: author_model_table_row
+  locator:
+    page: 13
+    published_page: 1078
+    pdf_page_index: 12
+    table: V
+    row: P
+    source_path: tables/kems-210-hoseinpur-2022/t5.csv
+  units: ln[p(Pa)] as a function of ln(xP)
+  values:
+    quantity: fitted_log_partial_pressure_relation
+    method_class: model_derived
+    admission_status: model_derived
+    temperature_C: 1442
+    species: P
+    slope: '1.362'
+    intercept: '6.4602'
+    formula_as_published: ln[p(Pa)] = 1.362 ln(xP) + 6.4602
+  context_id: kems-210-hoseinpur-2022::context::hoseinpur_2022_table_v_regression_sample
+  work_id: 10.1007/s11663-022-02445-1
+  source_id: kems-210-hoseinpur-2022
+  species: P

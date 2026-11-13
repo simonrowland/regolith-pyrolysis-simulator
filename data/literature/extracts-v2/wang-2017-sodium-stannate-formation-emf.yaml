@@ -74,9 +74,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Wang et al. (2017), Equation (12), as printed
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -87,3 +86,19 @@ observations:
     equation: '12'
     note: Equation image embedded in the HTML article
   read_from: pdftotext:wang-2017-sodium-stannate-formation-emf
+  derivation:
+    relation: The authors derived the sodium-stannate formation Gibbs-energy function from their measured cell EMF fit using
+      the cell relation in Eq. (10) and formation relation in Eq. (11).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        figure: '5'
+        section: Results of sodium stannate’s formation free energy
+        equation: '12'
+        note: The measured EMF points used for the fit appear in Fig. 5 and are not digitized.
+    references: []

@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:shornikov-2017-spinel-thermodynamics
       role: pdf
@@ -72,7 +72,35 @@ experiments:
     section: INTRODUCTION
     note: Final introductory paragraph. Stoichiometric spinel was studied by Knudsen effusion mass spectrometry at 1850–2300
       K. Experimental details of the apparatuses are described in reference [52]. This paper does not restate the cell metal.
+  equipment_context_id: shornikov-2017-spinel-thermodynamics::context::shornikov_2017_spinel_thermodynamics_apparatus_record
 context:
+- observation_id: shornikov_2017_spinel_thermodynamics_apparatus_record
+  type: apparatus
+  experiment: shornikov_2017_spinel_thermodynamics_kems
+  locator:
+    page: 5
+    published_page: 291
+    pdf_page_index: 4
+    section: RESULTS OF EXPERIMENT
+  units: as printed
+  values:
+    apparatus: Knudsen effusion mass spectrometry is named for the starting data from [1]; apparatus hardware is not stated
+      in this paper's experimental section.
+    source_data_as_printed: The starting data for calculating the activities of oxides in stoichiometric spinel are the partial
+      pressures of the components of the gas phase over spinel (Fig. 3) determined by the Knudsen effusion mass spectrometry
+      in the temperature range 1851–2089 K [1]
+    sample_holder_or_cell_material_as_printed: not stated
+    loop_wire_diameter_as_printed: not stated
+    cell_inner_dimensions_and_orifice_size_as_printed: not stated
+    sample_mass_as_printed: not stated
+    run_duration_at_temperature_as_printed: not stated
+    loop_Fe_presaturation_and_method_as_printed: not stated
+    post_run_bulk_analysis_of_total_Fe_alkalis_or_cell_material_pickup: not stated
+    cell_oxygen_condition_as_printed: not stated
+  context_id: shornikov-2017-spinel-thermodynamics::context::shornikov_2017_spinel_thermodynamics_apparatus_record
+  work_id: 10.1134/s0036024417020303
+  source_id: shornikov-2017-spinel-thermodynamics
+  species: MgAl2O4
 - observation_id: shornikov_2017_spinel_thermodynamics_fig1_heat_capacity
   type: figure_context_not_digitised
   locator:

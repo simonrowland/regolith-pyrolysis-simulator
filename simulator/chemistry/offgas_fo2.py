@@ -222,6 +222,15 @@ class OffgasFO2:
         }
 
 
+@dataclass(frozen=True)
+class _DirectGasCoupleFO2:
+    log10_fO2: float
+    mix_precision_band_dex: float
+    thermo_spread_dex: float | None
+    band_dex: float
+    authority: str
+
+
 def load_buffer_polynomials(
     extract_path: pathlib.Path | str = DEFAULT_CEA_EXTRACT,
 ) -> dict[str, NasaCeaPolynomial]:
@@ -587,7 +596,11 @@ def _validate_T_K(
 
 
 def _log10_K_couple(
-    polynomials: Mapping[str, NasaCeaPolynomial], couple: str, T_K: float
+    polynomials: Mapping[str, NasaCeaPolynomial],
+    couple: str,
+    T_K: float,
+    *,
+    allow_extrapolation: bool = False,
 ) -> float:
     """log10 K for H2 + 1/2 O2 <-> H2O ('H2') or CO + 1/2 O2 <-> CO2 ('CO').
 
@@ -608,21 +621,123 @@ def _log10_K_couple(
         raise ValueError(
             f"unknown couple {couple!r}; expected 'H2' or 'CO'"
         ) from None
-    T_K = _validate_T_K(polynomials, T_K, records, f"log10 K({couple})")
+    T_K = _coerce_T_K(T_K)
+    lo, hi = _effective_domain_K(polynomials, records)
+    in_domain = lo <= T_K <= hi
+    if not in_domain and not allow_extrapolation:
+        T_K = _validate_T_K(polynomials, T_K, records, f"log10 K({couple})")
+
+    def g_over_RT(species: str) -> float:
+        polynomial = polynomials[species]
+        if polynomial.T_min_K <= T_K <= polynomial.T_max_K:
+            return polynomial.evaluate(T_K).g_over_RT
+        # NASA9 evaluates one segment without rechecking its declared domain.
+        # d-332 permits direct printed-couple matching beyond the CEA range,
+        # but the caller must carry Authority.EXTRAPOLATED on that result.
+        segment = polynomial.segments[0 if T_K < polynomial.T_min_K else -1]
+        return segment.evaluate_ratios(T_K)[3]
 
     if couple == "H2":
         terms = [
-            (+1.0, polynomials["H2O"].evaluate(T_K)),
-            (-1.0, polynomials["H2"].evaluate(T_K)),
-            (-0.5, polynomials["O2"].evaluate(T_K)),
+            (+1.0, g_over_RT("H2O")),
+            (-1.0, g_over_RT("H2")),
+            (-0.5, g_over_RT("O2")),
         ]
     else:  # "CO"; _COUPLE_RECORDS lookup above rejected anything else
         terms = [
-            (+1.0, polynomials["CO2"].evaluate(T_K)),
-            (-1.0, polynomials["CO"].evaluate(T_K)),
-            (-0.5, polynomials["O2"].evaluate(T_K)),
+            (+1.0, g_over_RT("CO2")),
+            (-1.0, g_over_RT("CO")),
+            (-0.5, g_over_RT("O2")),
         ]
     return math.log10(reaction_equilibrium_constant(terms, T_K=T_K))
+
+
+def _couple_log10_fO2(ratio: float, log10_K: float) -> float:
+    """Invert one of the two direct oxygen couples from its oxidised/reduced ratio."""
+
+    return 2.0 * (math.log10(ratio) - log10_K)
+
+
+def _direct_gas_couple_fo2(
+    species_mol: Mapping[str, float],
+    relative_precision: Mapping[str, float],
+    T_K: float,
+    *,
+    formation_gibbs_J_per_mol: Mapping[str, float] | None = None,
+    gas_constant_J_per_mol_K: float | None = None,
+    polynomials: Mapping[str, NasaCeaPolynomial] | None = None,
+) -> _DirectGasCoupleFO2:
+    """Resolve a printed direct couple and its prescribed consistency band.
+
+    For CO + 1/2 O2 ⇌ CO2, log10(fO2) = 2 log10(CO2/CO) - 2 log10 K;
+    the H2/H2O couple has the same form. From printed component-flow errors,
+    dlog10(ratio) = (dF_oxidised/F_oxidised + dF_reduced/F_reduced)/ln(10),
+    so the fO2 mix band is twice that term. Sanity at 1682.15 K for the printed
+    Jayasuriya CO2 51.0×200 / CO 5.1×10 SCCM mix: CEA gives -3.9080 and JANAF
+    gives -3.9107, a computed thermo spread of 0.0027 dex.
+    """
+
+    keys = set(species_mol)
+    if keys == {"CO", "CO2"}:
+        couple, oxidised, reduced = "CO", "CO2", "CO"
+    elif keys == {"H2", "H2O"}:
+        couple, oxidised, reduced = "H2", "H2O", "H2"
+    else:
+        raise OffgasFO2Unavailable(
+            "gas_mix_fo2_band_unavailable: only direct CO2/CO and H2O/H2 "
+            "couples have a sized consistency band"
+        )
+    try:
+        oxidised_mol = float(species_mol[oxidised])
+        reduced_mol = float(species_mol[reduced])
+        uncertainty = sum(float(relative_precision[name]) for name in (oxidised, reduced))
+        T = _coerce_T_K(T_K)
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        raise OffgasFO2Unavailable(
+            "direct gas couple needs finite flows and printed precision"
+        ) from exc
+    if (
+        not math.isfinite(oxidised_mol)
+        or not math.isfinite(reduced_mol)
+        or oxidised_mol <= 0.0
+        or reduced_mol <= 0.0
+        or not math.isfinite(uncertainty)
+        or uncertainty < 0.0
+        or T <= 0.0
+    ):
+        raise OffgasFO2Unavailable("direct gas couple inputs must be finite and positive")
+
+    polys = polynomials if polynomials is not None else load_buffer_polynomials()
+    lo, hi = _effective_domain_K(polys, _COUPLE_RECORDS[couple])
+    authority = "certified" if lo <= T <= hi else "extrapolated"
+    log10_K = _log10_K_couple(
+        polys, couple, T, allow_extrapolation=True
+    )
+    log10_fO2 = _couple_log10_fO2(oxidised_mol / reduced_mol, log10_K)
+    mix_band = 2.0 * uncertainty / math.log(10.0)
+    thermo_spread: float | None = None
+    if formation_gibbs_J_per_mol is not None and gas_constant_J_per_mol_K:
+        if all(name in formation_gibbs_J_per_mol for name in (oxidised, reduced, "O2")):
+            delta_g = (
+                float(formation_gibbs_J_per_mol[oxidised])
+                - float(formation_gibbs_J_per_mol[reduced])
+                - 0.5 * float(formation_gibbs_J_per_mol["O2"])
+            )
+            janaf_log10_K = -delta_g / (
+                float(gas_constant_J_per_mol_K) * T * math.log(10.0)
+            )
+            janaf_log10_fO2 = _couple_log10_fO2(
+                oxidised_mol / reduced_mol, janaf_log10_K
+            )
+            thermo_spread = abs(log10_fO2 - janaf_log10_fO2)
+    band = math.hypot(mix_band, thermo_spread or 0.0)
+    return _DirectGasCoupleFO2(
+        log10_fO2=log10_fO2,
+        mix_precision_band_dex=mix_band,
+        thermo_spread_dex=thermo_spread,
+        band_dex=band,
+        authority=authority,
+    )
 
 
 def water_gas_shift_log10_K(
@@ -922,12 +1037,12 @@ def imposed_fo2(
     def fo2_h2(h2: float, h2o: float) -> float | None:
         if h2 <= 0.0 or h2o <= 0.0:
             return None
-        return 2.0 * (math.log10(h2o / h2) - log10_K("H2"))
+        return _couple_log10_fO2(h2o / h2, log10_K("H2"))
 
     def fo2_co(co: float, co2: float) -> float | None:
         if co <= 0.0 or co2 <= 0.0:
             return None
-        return 2.0 * (math.log10(co2 / co) - log10_K("CO"))
+        return _couple_log10_fO2(co2 / co, log10_K("CO"))
 
     raw_h2 = fo2_h2(n_H2, n_H2O)
     raw_co = fo2_co(n_CO, n_CO2)

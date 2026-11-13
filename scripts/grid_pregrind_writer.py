@@ -24,6 +24,7 @@ import yaml
 
 from simulator.accounting.formulas import load_species_formulas
 from simulator.config import ENGINE_MODEL_UNAVAILABLE, resolve_grid_engine_model
+from simulator.battery.enums import refuse_proprietary_engine_use
 from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -923,6 +924,7 @@ def _engine_result_namespace(
     backend_name: str | None = None,
 ) -> str:
     selected = str(backend_name or inputs.get("mode") or "").strip().lower()
+    refuse_proprietary_engine_use(selected, mode="grid_pregrind")
     if selected in {"subprocess", "alphamelts", "petthermotools"}:
         return "alphamelts-equilibrium-grid"
     if selected in {"thermoengine", "thermo-engine"}:
@@ -1510,6 +1512,9 @@ class GridCacheWriter:
         self.path = Path(path)
         self.engine_epoch = int(engine_epoch)
         self.backend_name = None if backend_name is None else str(backend_name)
+        refuse_proprietary_engine_use(
+            self.backend_name or "", mode="grid_pregrind"
+        )
         self.claim_owner = f"{socket.gethostname()}:{os.getpid()}:{uuid.uuid4()}"
         if self.engine_epoch < 1:
             raise ValueError("engine_epoch must be >= 1")
@@ -2742,6 +2747,9 @@ class GridCacheWriter:
         grid_key_id: int,
         output: Mapping[str, Any],
     ) -> bool:
+        refuse_proprietary_engine_use(
+            str(output.get("engine_mode") or ""), mode="grid_pregrind"
+        )
         output = self.contain_cache_v2_unknown_dictionary(output)
         if output.get("failure_reason_code") == "cache_v2_unknown_backend":
             contained_backend = self.backend_name

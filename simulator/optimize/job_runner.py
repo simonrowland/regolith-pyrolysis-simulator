@@ -522,28 +522,32 @@ class OptimizerJobRunner:
         return max(0.0, (end_dt - start_dt).total_seconds())
 
     def _version_badge(self, stored_version: Any) -> dict[str, Any]:
-        current = current_code_version()
-        if not stored_version:
-            return {
-                "status": "unknown",
-                "label": "version unknown",
-                "stored_version": None,
-                "current_version": current,
-            }
-        stored = str(stored_version)
-        if stored == current:
-            return {
-                "status": "current",
-                "label": "current",
-                "stored_version": stored,
-                "current_version": current,
-            }
+        return _version_badge(stored_version)
+
+
+def _version_badge(stored_version: Any) -> dict[str, Any]:
+    current = current_code_version()
+    if not stored_version:
         return {
-            "status": "stale",
-            "label": "stale version",
+            "status": "unknown",
+            "label": "version unknown",
+            "stored_version": None,
+            "current_version": current,
+        }
+    stored = str(stored_version)
+    if stored == current:
+        return {
+            "status": "current",
+            "label": "current",
             "stored_version": stored,
             "current_version": current,
         }
+    return {
+        "status": "stale",
+        "label": "stale version",
+        "stored_version": stored,
+        "current_version": current,
+    }
 
 
 _RUNNERS: dict[tuple[Path, int], OptimizerJobRunner] = {}

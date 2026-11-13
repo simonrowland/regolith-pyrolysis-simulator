@@ -17,7 +17,7 @@ Reductions (derivation in simulator/battery/migrate.py, b-686 block):
 from __future__ import annotations
 
 import copy
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 from typing import Any
 
@@ -25,14 +25,18 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
+    Authority,
     EvidenceClass,
     IdentityEqualKind,
+    NoticeKind,
     Quantity,
     ValueKind,
 )
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
+    _band_text,
+    _log_fO2_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     fe3_fe2_ratio_reduction,
@@ -40,6 +44,7 @@ from simulator.battery.migrate import (
     oxide_molar_mass,
     select_declared_source,
 )
+from simulator.chemistry.fo2_buffers import evaluate_buffer
 from simulator.battery.records import Evidence, Locator, State
 from tests.battery.factories import migrate_one_extract
 
@@ -547,9 +552,46 @@ def test_valence_rows_stamp_printed_po2_and_absolute_log(tmp_path: Path) -> None
     outcome = identity_equal(first.identity, second.identity)
     assert outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH
     assert "fO2_Pa" in outcome.fields
-    assert delta_iw.identity.fO2_Pa.is_unknown
-    assert "buffer-relative fO2" in delta_iw.identity.fO2_Pa.reason
-    assert "delta-IW" in delta_iw.identity.fO2_Pa.reason
+    # log10(IW) = -1 at 1250 °C = 1523.15 K. O'Neill (1988) eq. 11 third
+    # segment, μ° = -551159 + 269.404 T - 16.9484 T ln(T) J/mol, then
+    # μ°/(R T ln 10) with R = 8.31446261815324 J mol-1 K-1. That is
+    # -11.316814211 log10(fO2/bar) at 1 bar (no Frost term: P is not above
+    # 1 bar). The printed offset -1 gives -12.316814211. 1523.15 K is above
+    # the 833–1450 K EMF window, so the value is predicted and flagged.
+    # J/mol over (J mol-1 K-1)·K is dimensionless; ln(10) changes bases.
+    oxygen = delta_iw.identity.fO2_Pa
+    assert oxygen.is_value
+    expected_log = Decimal("-12.316814211")
+    assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and "833" in (notice.band or "")
+        and "1450" in (notice.band or "")
+        for notice in delta_iw.notices
+    )
+    pressure = delta_iw.identity.total_pressure_Pa
+    pressure_bar = (
+        pressure.value / Decimal("100000")
+        if pressure is not None and pressure.is_value and pressure.value > 0
+        else None
+    )
+    evaluation = evaluate_buffer("IW", Decimal("1523.15"), pressure_bar=pressure_bar)
+    assert delta_iw.identity.fO2_Pa.value == _log_fO2_to_pa(
+        evaluation.log10_fO2_bar + Decimal("-1")
+    )
+    converted = [
+        notice
+        for notice in delta_iw.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    ]
+    assert len(converted) == 1
+    assert converted[0].authority is Authority.EXTRAPOLATED
+    assert converted[0].band == _band_text(evaluation.band_dex)
+    assert "buffer=IW" in converted[0].reason
+    assert "offset=-1" in converted[0].reason
+    assert "calibration=oneill_1988_ammin_73_eq11" in converted[0].reason
+    assert "T_K=1523.15" in converted[0].reason
+    assert "authority=extrapolated" in converted[0].reason
     assert delta_iw.point_conditions["fO2_control"].state.value == "delta-IW"
 
 
@@ -767,40 +809,79 @@ def test_absolute_typed_row_log_overrides_series_oxygen(
         assert located.state.value.point == Decimal("-8")
 
 
+# Series oxygen on every row is 1e-7 bar = 0.01 Pa. None means the row must
+# stay unknown. A Decimal is the row's own absolute fO2_Pa. A log is
+# log10(fO2/bar) after converting the row's own buffer offset.
+_SERIES_FO2_PA = Decimal("0.01")
+# Unprinted IW at the fixture temperature, 1473 K, from the owner. The
+# series partial pressure is not the buffer pressure, so this is the 1 bar curve.
+_IW_1473_MINUS_2 = evaluate_buffer("IW", Decimal(1473)).log10_fO2_bar + Decimal("-2")
+
+
 @pytest.mark.parametrize(
-    "row_fields",
+    ("row_fields", "expected_pa", "expected_log10_bar"),
     [
-        {
-            "point_conditions": {
-                "fO2_log": {
-                    "state": {
-                        "tag": "value",
-                        "value": {
-                            "kind": "bound",
-                            "bound_operator": "<",
-                            "bound_value": "-8",
+        (
+            {
+                "point_conditions": {
+                    "fO2_log": {
+                        "state": {
+                            "tag": "value",
+                            "value": {
+                                "kind": "bound",
+                                "bound_operator": "<",
+                                "bound_value": "-8",
+                            },
                         },
-                    },
-                    "locator": {"published_page": 1},
-                }
-            }
-        },
-        {
-            "point_conditions": {
-                "fO2_log": {
-                    "state": {"tag": "value", "value": "-8"},
-                    "locator": {"published_page": 1},
+                        "locator": {"published_page": 1},
+                    }
                 }
             },
-            "oxygen_buffer_as_published": "IW",
-        },
-        {"log_fO2": {"value": -2, "units": "log10(IW)"}},
-        {"log_fO2": {"value": -8, "units": "log10(Pa)"}},
-        {"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"},
+            None,
+            None,
+        ),
+        (
+            # Typed fO2_log with no unit is the 1 bar frame. The buffer name
+            # has no numeric offset, so the absolute log wins: 10^-8 bar.
+            {
+                "point_conditions": {
+                    "fO2_log": {
+                        "state": {"tag": "value", "value": "-8"},
+                        "locator": {"published_page": 1},
+                    }
+                },
+                "oxygen_buffer_as_published": "IW",
+            },
+            Decimal("0.001"),
+            None,
+        ),
+        (
+            # log10(IW) = -2 at the row temperature 1473 K, gate-8 O'Neill.
+            {"log_fO2": {"value": -2, "units": "log10(IW)"}},
+            None,
+            _IW_1473_MINUS_2,
+        ),
+        (
+            # log10(Pa) is not an absolute frame this collector accepts, and
+            # it is not a buffer offset. It must not inherit the series point.
+            {"log_fO2": {"value": -8, "units": "log10(Pa)"}},
+            None,
+            None,
+        ),
+        (
+            # Unitless -10.5 uses the 1 bar convention. 10^-10.5 × 10^5 Pa/bar.
+            # The buffer name is not an offset, so the log is not shifted.
+            {"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"},
+            Decimal("0.000003162277660168379331998893544"),
+            None,
+        ),
     ],
 )
 def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
-    tmp_path: Path, row_fields: dict
+    tmp_path: Path,
+    row_fields: dict,
+    expected_pa: Decimal | None,
+    expected_log10_bar: Decimal | None,
 ) -> None:
     path = _fixture_extract(tmp_path, [{
         "observation_id": "fixture_bounded_row",
@@ -812,7 +893,7 @@ def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
             "admission_status": "admitted",
             "oxygen_partial_pressure": {"value": "1e-7", "units": "bar"},
             "series": [{
-                "T_C": 1250,
+                "T_K": 1473,
                 "Fe3_over_FeT": 0.5,
                 **row_fields,
             }],
@@ -823,7 +904,20 @@ def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
         if "fixture_bounded_row::" in obs.observation_id
     ]
     assert len(rows) == 1
-    assert rows[0].identity.fO2_Pa.is_unknown
+    oxygen = rows[0].identity.fO2_Pa
+    # The series point is 1e-7 bar = 0.01 Pa. A bound stays unknown. A printed
+    # log or a buffer offset keeps its own oxygen and does not inherit that point.
+    if expected_pa is None and expected_log10_bar is None:
+        assert oxygen.is_unknown
+        return
+    assert oxygen.is_value
+    assert oxygen.value != _SERIES_FO2_PA
+    if expected_pa is not None:
+        assert oxygen.value == expected_pa
+    else:
+        assert abs(
+            oxygen.value.log10() - Decimal(5) - expected_log10_bar
+        ) < Decimal("5e-9")
 
 
 def test_declared_ratio_from_ferric_fraction_is_r_over_one_minus_r() -> None:

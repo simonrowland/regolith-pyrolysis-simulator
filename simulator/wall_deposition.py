@@ -203,7 +203,7 @@ def wall_deposit_candidate_for_surface_kg(
         _flowing_species_partial_pressures_pa,
         _knudsen_number,
         _liner_material_config,
-        _reactive_product_backstop_authorized,
+        reactive_product_backstop_enabled,
         _required_record_alpha_s,
         _series_resistance_deposition_flux_mol_m2_s,
         _species_vapor_data,
@@ -373,15 +373,10 @@ def wall_deposit_candidate_for_surface_kg(
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
                 vapor_pressure_data=vapor_pressure_data,
-                # Same eligibility gate as the stage band-sampling site in
-                # condensation.py: the SiO disproportionation backstop may
-                # materialize product only at/below the declared condensation
-                # temperature. Without this the helper's True default let a HOT
-                # wall (above T_cond) mass-deposit reactive products — the inverse
-                # of the 07fa3fe stage fix (wall-path residual tracked as t-404).
-                reactive_product_backstop=(
-                    _reactive_product_backstop_authorized(species)
-                    and float(wall_temperature_C) <= float(T_cond_C)
+                # Same gate as the stage integrator. The helper's default is
+                # True; passing the gate result keeps a hot wall reversible.
+                reactive_product_backstop=reactive_product_backstop_enabled(
+                    species, wall_temperature_C, T_cond_C
                 ),
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=rate_diagnostic,

@@ -1,0 +1,340 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1c1c1dc714414f74ef9f2846824513df76391bf794384714f2440be2d55aa796
+  citation: Mendybaev, R. A., and Shornikov, S. I. (2019). “Thermodynamics and kinetics of evaporation of CMAS melts,” Goldschmidt2019
+    Abstract [one-page abstract; further venue details are not visible in the supplied copy].
+  source_ids:
+  - mendybaev-2019-cai-evaporation-kinetics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:mendybaev-2019-cai-evaporation-kinetics
+      role: pdf
+      path: raw/mendybaev-2019-cai-evaporation-kinetics/mendybaev-2019-cai-evaporation-kinetics.pdf
+      sha256:
+        tag: value
+        value: b4b6d195a23d89f71550f27a527513b24fdc950903e45ffd4a67fedc1261a2f6
+    - asset_id: pdftotext:mendybaev-2019-cai-evaporation-kinetics
+      role: pdftotext
+      path: text/mendybaev-2019-cai-evaporation-kinetics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:mendybaev-2019-cai-evaporation-kinetics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: mendybaev_2019_abstract_background_and_model_comparison
+  type: thermodynamic_example
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Abstract
+  units: as reported
+  values:
+    quantity: author_reported_model_scope_and_comparison
+    method_class: model_derived
+    comparison_temperature_K: '2173'
+    maximum_activity_variation_factor_as_reported: '10'
+    maximum_activity_variation_approximate: true
+    activities_compared:
+    - aCaO
+    - aMgO
+    - aAl2O3
+    models_compared:
+    - FactSage
+    - Thermocalc
+    - CMAS
+    model_compositions:
+    - melilitic
+    - anorthitic
+    - forsteritic
+    melilitic_evaporation_coefficients_used:
+      gamma_Mg: '1'
+      gamma_Si: '1'
+    theory: ideal_associated_solutions
+    model_assumption_verbatim: The model is based on the theory of ideal associated solutions, which consider a solution as
+      an ideal mixture of monomeric molecules and associative complexes at all concentrations.
+    qualifications_verbatim:
+    - The calculated a_i in several melts using different available models (FactSage, Thermocalc, CMAS) showed variations
+      in a_CaO, a_MgO and a_Al2O3 up to a factor of ~10 at 2173 K which results in very different evaporation trends.
+    - We have calculated the evaporation trajectories for a number of melt compositions (melilitic, anorthitic, forsteritic)
+      using model of [6] which showed very good agreement with the experimental data.
+    - For example, in agreement with the experiments the calculated trajectories for melilitic melts show very weak temperature
+      dependence and did not require adjusting γ_Mg and γ_Si to fit the experimental trends (γ_Mg=γ_Si=1 was used in our calculations)
+      unlike CMAS based calculations.
+    locator_note: Numeric model comparison is reported in prose; no corresponding data table is supplied.
+  context_id: mendybaev-2019-cai-evaporation-kinetics::context::mendybaev_2019_abstract_background_and_model_comparison
+  work_id: 1c1c1dc714414f74ef9f2846824513df76391bf794384714f2440be2d55aa796
+  source_id: mendybaev-2019-cai-evaporation-kinetics
+  species: CMAS_melts
+- observation_id: mendybaev_2019_abstract_evaporation_relation
+  type: thermodynamic_example
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Abstract
+  units: as reported
+  values:
+    quantity: stated_qualitative_flux_relation
+    method_class: quoted_unattributed
+    species:
+    - Mg
+    - Si
+    coefficients_and_activities:
+    - evaporation_coefficients
+    - melt_activities
+    statement_verbatim: The evaporation process can be described by the Hertz-Knudsen equation and for the CMAS system the
+      ratio of the evaporative fluxes of Mg and Si is proportional to their evaporation coefficients (γ_i) and activities
+      (a_i) in the melt.
+    locator_note: Relation is retained as qualitative prose; no derived flux or measurement is created.
+  context_id: mendybaev-2019-cai-evaporation-kinetics::context::mendybaev_2019_abstract_evaporation_relation
+  work_id: 1c1c1dc714414f74ef9f2846824513df76391bf794384714f2440be2d55aa796
+  source_id: mendybaev-2019-cai-evaporation-kinetics
+  species: CMAS_melts
+- observation_id: mendybaev_2019_abstract_experimental_scope_and_missing_apparatus
+  type: method
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Abstract
+  units: as reported
+  values:
+    quantity: generic_prior_measurements_and_apparatus_details
+    method_class: quoted_unattributed
+    direct_activity_measurement_temperature_range_K:
+    - '1600'
+    - '2500'
+    stated_method: Knudsen cell experiments
+    method_token: knudsen_effusion
+    apparatus_details:
+      cell_material_and_liner:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No cell material or liner is given.
+      orifice_diameter:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No orifice diameter is given.
+      orifice_channel_length:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No channel length is given.
+      pressure_calibration_substance_and_method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No pressure calibration is described.
+      intensity_to_pressure_conversion_relation:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No intensity-to-pressure conversion is described.
+      ionization_cross_sections_and_source:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No cross sections or source are stated.
+      ionization_energy_eV:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No ionization energy is stated.
+      multiplier_and_isotope_corrections:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No corrections are described.
+      temperature_measurement_and_calibration:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No temperature sensor or calibration is described.
+      chamber_background_pressure:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No chamber or residual pressure is stated.
+      sample_preparation_starting_materials_and_purity:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: The abstract gives no sample preparation or purity details.
+      sample_composition_as_prepared:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No starting composition is given.
+      sample_composition_after_runs:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1
+          pdf_page_index: 0
+          section: Abstract
+          note: No post-run composition is given.
+    activities_and_reference_states:
+      aCaO:
+        defining_ion:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            pdf_page_index: 0
+            section: Abstract
+            note: No defining ion is stated.
+        standard_state:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            pdf_page_index: 0
+            section: Abstract
+            note: No activity standard state is stated.
+      aMgO:
+        defining_ion:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            pdf_page_index: 0
+            section: Abstract
+            note: No defining ion is stated.
+        standard_state:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            pdf_page_index: 0
+            section: Abstract
+            note: No activity standard state is stated.
+      aAl2O3:
+        defining_ion:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            pdf_page_index: 0
+            section: Abstract
+            note: No defining ion is stated.
+        standard_state:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            pdf_page_index: 0
+            section: Abstract
+            note: No activity standard state is stated.
+    method_scope_verbatim:
+    - Majority of Ca-,Al-rich inclusions (CAIs) in chondrites have experienced high-temperature melting followed by slow cooling
+      as indicated by their coarse-grained igneous textures.
+    - The melting and evaporation under low-pressure conditions result in chemical and mass-dependent isotopic fractionations
+      as recorded in CAIs.
+    - The effects have been successfully reproduced in vacuum and in low-pressure H2 laboratory evaporation experiments [1,
+      2].
+    - Several attemps have been made to model the evaporation thermodynamically [3−5] using Berman’s CMAS model or its combination
+      with the MELTS.
+    - The major advantage of the model is that it utilizes a_i directly measured in Knudsen cell experiments at 1600–2500
+      K rather than being obtained indirectly.
+    - We will expand the experimental database on evaporation kinetics (to CMAS + TiO2 system first) to further check correctness
+      of the model for complex systems.
+    bibliography_as_printed:
+    - '[1] Richter et al (2007) GCA 71, 5544–5564.'
+    - '[2] Mendybaev et al. (2013) GCA 123, 368–384.'
+    - '[3] Grossman et al. (2000) GCA 64, 2879–2894.'
+    - '[4] Alexander et al. (2002) MAPS 37, 245–256.'
+    - '[5] Ebel (2005) GCA 69, 3183–3193.'
+    - '[6] Shornikov (2009) Heralds Earth Sci. Rus. Acad. Sci. 27, 1–3.'
+  context_id: mendybaev-2019-cai-evaporation-kinetics::context::mendybaev_2019_abstract_experimental_scope_and_missing_apparatus
+  work_id: 1c1c1dc714414f74ef9f2846824513df76391bf794384714f2440be2d55aa796
+  source_id: mendybaev-2019-cai-evaporation-kinetics
+  species: CMAS_melts
+- observation_id: mendybaev_2019_author_affiliations
+  type: statement
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Author affiliations
+  units: bibliographic postal codes and affiliation labels
+  values:
+    method_class: quoted_unattributed
+    affiliations:
+    - label: '1'
+      author: R. A. Mendybaev
+      institution: University of Chicago
+      address_as_printed: Chicago, IL 60637, USA
+      postal_code_as_printed: '60637'
+    - label: '2'
+      author: S. I. Shornikov
+      institution: V.I. Vernadsky Institute of Geochemistry and Analytical Chemistry
+      address_as_printed: Moscow 119991, Russia
+      postal_code_as_printed: '119991'
+  context_id: mendybaev-2019-cai-evaporation-kinetics::context::mendybaev_2019_author_affiliations
+  work_id: 1c1c1dc714414f74ef9f2846824513df76391bf794384714f2440be2d55aa796
+  source_id: mendybaev-2019-cai-evaporation-kinetics
+  species: CMAS_melts
