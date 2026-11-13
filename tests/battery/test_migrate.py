@@ -18,7 +18,6 @@ from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
-from types import MappingProxyType
 
 import pytest
 import yaml
@@ -8930,39 +8929,63 @@ def _series_census_source_documents() -> dict[str, object]:
     )
     store_paths = [extracts_v2 / path.name for path in source_paths]
     source_documents = {
-        path.name: _freeze_census_yaml(
-            yaml.load(
-                path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
-            )
+        path.name: yaml.load(
+            path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
         )
         for path in source_paths
     }
     store_documents = {
-        path.name: _freeze_census_yaml(
-            yaml.load(
-                path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
-            )
+        path.name: yaml.load(
+            path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
         )
         for path in store_paths
     }
-    return MappingProxyType(
-        {
-            "source_documents": _freeze_census_yaml(source_documents),
-            "store_documents": _freeze_census_yaml(store_documents),
-            "source_build_count": len(source_paths),
-            "store_build_count": len(store_paths),
-        }
-    )
+    return {
+        "source_documents": source_documents,
+        "store_documents": store_documents,
+        "source_build_count": len(source_paths),
+        "store_build_count": len(store_paths),
+    }
 
 
-def _freeze_census_yaml(value: object) -> object:
-    if isinstance(value, dict):
-        return MappingProxyType(
-            {key: _freeze_census_yaml(child) for key, child in value.items()}
+def _match_census_row_extra(
+    stable_points: list[Mapping[str, object]], row_extra: str
+) -> Mapping[str, object] | None:
+    full_suffix = f":{row_extra}"
+    exact_matches = [
+        observation
+        for observation in stable_points
+        if str(observation.get("observation_id") or "").endswith(full_suffix)
+    ]
+    if exact_matches:
+        return exact_matches[0] if len(exact_matches) == 1 else None
+
+    row_label = row_extra.split(":h=", 1)[0]
+    if not row_label.startswith("row="):
+        return None
+    label_suffix = f":{row_label}"
+    label_matches = [
+        observation
+        for observation in stable_points
+        if str(observation.get("observation_id") or "")
+        .rsplit(":h=", 1)[0]
+        .endswith(label_suffix)
+    ]
+    return label_matches[0] if len(label_matches) == 1 else None
+
+
+def test_census_row_extra_prefers_live_hash_with_shared_label() -> None:
+    live = {"observation_id": "source::series::point:0:row=shared:h=live"}
+    other = {"observation_id": "source::series::point:1:row=shared:h=other"}
+
+    assert _match_census_row_extra([live, other], "row=shared:h=live") is live
+    assert (
+        _match_census_row_extra(
+            [{"observation_id": "source::series::point:2:row=unique:h=old"}],
+            "row=unique:h=new",
         )
-    if isinstance(value, list):
-        return tuple(_freeze_census_yaml(child) for child in value)
-    return value
+        == {"observation_id": "source::series::point:2:row=unique:h=old"}
+    )
 
 
 def _series_census(
@@ -9117,14 +9140,9 @@ def _series_census(
                             if row_extra is not None:
                                 row_label = row_extra.split(":h=", 1)[0]
                                 if row_label.startswith("row="):
-                                    row_suffix = f":{row_label}"
-                                    row_matches = [
-                                        observation
-                                        for observation in stable_points
-                                        if str(
-                                            observation.get("observation_id") or ""
-                                        ).rsplit(":h=", 1)[0].endswith(row_suffix)
-                                    ]
+                                    stored_obs = _match_census_row_extra(
+                                        stable_points, row_extra
+                                    )
                                 else:
                                     temperature_value = item.get(
                                         "T_K", item.get("temperature_K")
@@ -9152,8 +9170,8 @@ def _series_census(
                                         and point_id not in used_stable_ids
                                         else []
                                     )
-                                if len(row_matches) == 1:
-                                    stored_obs = row_matches[0]
+                                    if len(row_matches) == 1:
+                                        stored_obs = row_matches[0]
                         else:
                             stored_obs = next(
                                 (
@@ -9211,7 +9229,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
         pytest.skip("migrated store not generated yet")
-    source_documents = _series_census_source_documents
+    source_documents = deepcopy(_series_census_source_documents)
     assert source_documents["source_build_count"] == sum(
         (extracts_v2 / path.name).is_file() for path in extracts.glob("*.yaml")
     )
@@ -10063,6 +10081,7 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(
     import shutil
     from decimal import Decimal
 
+    source_documents = deepcopy(_series_census_source_documents)
     extracts = REPO_ROOT / "data" / "literature" / "extracts"
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
@@ -10090,13 +10109,13 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(
     assert n_mutated == 6, n_mutated
     shirai.write_text(yaml.safe_dump(stored, sort_keys=False), encoding="utf-8")
     changed_store_documents = dict(
-        _series_census_source_documents["store_documents"]
+        source_documents["store_documents"]
     )
     changed_store_documents[shirai.name] = stored
     _census, mismatches, _n_numeric, _n_unavailable, _per_source = _series_census(
         extracts,
         dest,
-        source_documents=_series_census_source_documents["source_documents"],
+        source_documents=source_documents["source_documents"],
         store_documents=changed_store_documents,
     )
     assert mismatches, "census must go red when stored alpha points are corrupted"
