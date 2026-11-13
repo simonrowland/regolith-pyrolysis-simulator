@@ -8,6 +8,7 @@ from enum import StrEnum
 from collections.abc import Iterator, Mapping
 
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.composition import (
     excluded_component_notice_reason,
@@ -998,10 +999,7 @@ def _printed_wt_token(raw: object, amount: Decimal) -> str:
         return raw.strip()
     if isinstance(raw, int) and not isinstance(raw, bool):
         return str(raw)
-    text = format(amount, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text or "0"
+    return decimal_token(amount)
 
 
 def normalized_composition(

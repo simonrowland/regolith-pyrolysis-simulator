@@ -76,6 +76,7 @@ from simulator.battery.identity import (
     quantity_token,
     validate_quantity_profile,
 )
+from simulator.battery.source_declarations import SOURCE_DECLARATIONS
 from simulator.battery.records import (
     Bench,
     Experiment,
@@ -670,9 +671,14 @@ def _check_identity(
                 )
             )
     if identity.reaction is not None and identity.reaction.is_value and identity.reaction.value is not None:
+        decimal_subscripts = SOURCE_DECLARATIONS.get(source_id or "", {}).get(
+            "reaction_decimal_subscripts"
+        )
         residual = _reaction_atom_balance(
             identity.reaction.value,
-            janaf_decimal_subscripts=source_id == "nist-janaf-4th",
+            janaf_decimal_subscripts=(
+                decimal_subscripts is not None and decimal_subscripts.value is True
+            ),
         )
         if residual:
             issues.append(

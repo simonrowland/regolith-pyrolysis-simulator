@@ -19480,6 +19480,27 @@ def test_hashimoto_row_left_live_diagnostics_are_final(
     assert len(left_live) == 0
 
 
+def test_residue_component_source_phase_outputs_are_pinned(tmp_path: Path) -> None:
+    from simulator.battery.enums import Quantity
+
+    expected = {
+        "kems-015-hashimoto-1983": Phase.L,
+        "kems-012-sossi-2019": Phase.GLASS,
+    }
+    for source_id, phase in expected.items():
+        result = _migrate_real_extract(tmp_path / source_id, f"{source_id}.yaml")
+        rows = [
+            row
+            for row in result.observations.values()
+            if row.source_id == source_id
+            and row.identity.quantity.is_value
+            and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and row.value.point is not None
+        ]
+        assert rows
+        assert {row.identity.species.phase.value for row in rows} == {phase}
+
+
 def test_residue_store_write_files_cells_under_their_extract_sources(
     tmp_path: Path,
 ) -> None:
