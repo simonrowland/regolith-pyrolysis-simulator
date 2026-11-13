@@ -294,6 +294,13 @@ def _source_data():
     )
 
 
+# PROVISIONAL CPU budget from the one usable historical sample: 665 CPU s on
+# Mac-Studio-256-3 (s3, loaded). Spread is unavailable (n=1); three fresh
+# whole-file cpu_budget(1) probes returned no receipt within 75 min. The cap
+# is ceil(665 * 1.5) = 998 CPU s. CPU sizes the budget; wall/CPU remains a
+# tripwire once an uncensored run is available.
+@pytest.mark.nightly
+@pytest.mark.cpu_budget(998)
 @pytest.mark.xdist_group("hashimoto_real_cohort")
 def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
     pytest.importorskip("openimcc")
