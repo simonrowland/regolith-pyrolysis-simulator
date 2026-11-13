@@ -34,6 +34,7 @@ from simulator.wall_deposit_availability import (
     wall_deposit_refusal_events,
 )
 from simulator.vapour_rail.instrumentation import (
+    merge_public_notice,
     merge_vapour_carrier_lineage,
     public_carrier_notices,
     vapour_carrier_authority_severity,
@@ -283,29 +284,22 @@ def _distinct_public_notices(
 ) -> dict[str, list[dict[str, Any]]]:
     """Every distinct notice across carriers, in encounter order.
 
-    The collector folds singular and plural keys. Exact duplicates collapse.
-    The merged extra stores that list on the singular key.
+    Filtering and exact-duplicate collapse belong to ``merge_public_notice``.
+    The sticking-authority record then stores that list through the authority
+    copier, which turns tuples into lists. The public helper keeps tuples.
     """
 
     collected: dict[str, list[dict[str, Any]]] = {}
-
-    def add(key: str, notice: object) -> None:
-        if not key.endswith("_notice"):
-            return
-        if not isinstance(notice, Mapping) or not notice:
-            return
-        plain = _plain_authority_mapping(notice)
-        bucket = collected.setdefault(key, [])
-        if plain not in bucket:
-            bucket.append(plain)
-
     for carrier in carriers:
         if not isinstance(carrier, Mapping):
             continue
         for key, items in public_carrier_notices(carrier).items():
             for item in items:
-                add(key, item)
-    return collected
+                merge_public_notice(collected, key, item)
+    return {
+        key: [_plain_authority_mapping(item) for item in items]
+        for key, items in collected.items()
+    }
 
 
 def _merged_wall_deposit_sticking_authority(

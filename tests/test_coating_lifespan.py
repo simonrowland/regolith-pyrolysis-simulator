@@ -558,3 +558,59 @@ def test_overlay_module_has_no_commit_batch_or_atomledger_dependency() -> None:
 
     assert calls == []
     assert names == []
+
+
+def test_distinct_public_notices_keep_the_authority_record_shape() -> None:
+    """Duplicate collapse and the authority copier stay on this surface.
+
+    A list band and the same band as a tuple are one notice. A nested tuple
+    becomes a list. A mapping proxy is a plain dict. A non-notice key and an
+    empty notice are absent. This is the shape recorded before the local
+    ``add`` loop was removed.
+    """
+
+    from types import MappingProxyType
+
+    from simulator.coating_lifespan import _distinct_public_notices
+
+    first = {
+        "authority_level": "extrapolated",
+        "temperature_K": 1500.0,
+        "valid_range_K": [701.0, 1361.0],
+        "reason": "outside source band",
+    }
+    published = _distinct_public_notices(
+        (
+            {"extra": {"extrapolation_notice": dict(first), "notes": {"reason": "ignored"}}},
+            {
+                "extrapolation_notice": MappingProxyType({
+                    **first,
+                    "valid_range_K": (701.0, 1361.0),
+                }),
+            },
+            {
+                "extrapolation_notice": MappingProxyType({
+                    **first,
+                    "valid_range_K": (701.0, 1361.0),
+                    "nested": MappingProxyType({"band": (1.0, 2.0)}),
+                }),
+                "diagnostic_admission_notice": {
+                    "authority": "diagnostic/extrapolated",
+                    "marker": "second",
+                },
+                "empty_notice": {},
+            },
+        )
+    )
+    assert published == {
+        "extrapolation_notice": [
+            first,
+            {
+                **first,
+                "nested": {"band": [1.0, 2.0]},
+            },
+        ],
+        "diagnostic_admission_notice": [
+            {"authority": "diagnostic/extrapolated", "marker": "second"}
+        ],
+    }
