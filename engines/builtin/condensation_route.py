@@ -146,6 +146,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         # description.
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.accounting.lots import EMPTY_KG_TOLERANCE
+        from simulator.vapour_rail.nasa_cea import WallSaturationLawRefusal
 
         wrong_intent = reject_wrong_intent(
             request, ChemistryIntent.CONDENSATION_ROUTE
@@ -313,12 +314,20 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         if isinstance(booking, Mapping):
             wall_plan = self._booked_wall_plan(booking)
         else:
-            wall_plan = self._wall_reaction_plan(
-                species,
-                wall_deposit_mol_by_account,
-                request.account_view.accounts,
-                controls,
-            )
+            try:
+                wall_plan = self._wall_reaction_plan(
+                    species,
+                    wall_deposit_mol_by_account,
+                    request.account_view.accounts,
+                    controls,
+                )
+            except WallSaturationLawRefusal as exc:
+                return self._route_refusal(
+                    exc.reason,
+                    control_audit,
+                    species=species,
+                    detail=exc.detail,
+                )
 
         # MaterialLot applies its floor independently to every account/species
         # component on both sides.  Roll back only wall parcels whose coupled
@@ -905,15 +914,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         alkali_state_by_account = self._copy_alkali_state(
             controls.get("wall_alkali_binding_diagnostic_state_by_account")
         )
-        species_row = controls.get("sp_data")
-        declared_wall_reactions = None
-        if species == "SiO" and isinstance(species_row, Mapping):
-            from simulator.vapour_rail.wall_saturation import (
-                resolve_wall_saturation,
-                wall_reactions_declaration,
-            )
+        raw_species_row = controls.get("sp_data")
+        species_row = raw_species_row if isinstance(raw_species_row, Mapping) else {}
+        from simulator.vapour_rail.nasa_cea import WallSaturationLawRefusal
+        from simulator.vapour_rail.wall_saturation import (
+            resolve_wall_saturation,
+            wall_reactions_declaration,
+        )
 
-            declared_wall_reactions = wall_reactions_declaration(species_row)
+        declared_wall_reactions = wall_reactions_declaration(species_row)
 
         for account, arrival_mol in wall_deposit_mol_by_account.items():
             if arrival_mol <= 0.0:
@@ -926,11 +935,17 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 "source": str(WALL_REACTIVITY_MATRIX_PATH),
             }
 
-            if species == "SiO" and declared_wall_reactions is not None:
+            if declared_wall_reactions is not None or species == "SiO":
+                if declared_wall_reactions is None:
+                    raise WallSaturationLawRefusal(
+                        "wall_reactions_absent",
+                        f"{species} has no wall_reactions declaration",
+                    )
                 wall_temperature_K = self._wall_temperature_K(controls, account)
                 if wall_temperature_K is None:
-                    raise ValueError(
-                        "declared wall reaction requires wall temperature"
+                    raise WallSaturationLawRefusal(
+                        "wall_temperature_required",
+                        f"{species} wall reaction at {account} has no temperature",
                     )
                 reaction = resolve_wall_saturation(
                     species_row,
@@ -943,14 +958,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 diagnostic.update({
                     "mechanism": reaction.reaction_id,
                     "status": "DECLARED_WALL_REACTION",
-                })
-            elif species == "SiO":
-                reaction = self._matrix_reaction("SiO_disproportionation")
-                for product, ratio in dict(reaction["product_credits"]).items():
-                    products[str(product)] = arrival_mol * float(ratio)
-                diagnostic.update({
-                    "mechanism": reaction.get("mechanism"),
-                    "status": reaction.get("status"),
+                    "source": "sp_data.wall_reactions",
                 })
             elif species == "Mg":
                 reaction = self._matrix_reaction("Mg_silica_reduction")

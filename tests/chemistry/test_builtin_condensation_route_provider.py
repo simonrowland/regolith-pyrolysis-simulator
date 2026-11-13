@@ -1945,11 +1945,12 @@ def test_provider_splits_baffle_product_from_wall_deposit(
     condensed_kg = 0.44
     wall_fraction = 0.25
     expected_sio_mol = condensed_kg / mw_sio
-    sp_data = {
-        "condensation_products_mol_per_mol_vapor": {
-            "Si": 0.5,
-            "SiO2": 0.5,
-        },
+    sp_data = dict(_species_vapor_data(
+        "SiO", vapor_pressure_data=vapor_pressure_data,
+    ))
+    sp_data["condensation_products_mol_per_mol_vapor"] = {
+        "Si": 0.5,
+        "SiO2": 0.5,
     }
     request = IntentRequest(
         intent=ChemistryIntent.CONDENSATION_ROUTE,
@@ -1962,6 +1963,10 @@ def test_provider_splits_baffle_product_from_wall_deposit(
             "sp_data": sp_data,
             "wall_deposit_fraction": wall_fraction,
             "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
+            "wall_temperature_K": 1100.0,
+            "wall_deposit_account_temperatures_K": {
+                "process.wall_deposit": 1100.0,
+            },
             "dt_hr": 1.0,
         },
     )
@@ -2036,6 +2041,44 @@ def test_provider_sio_wall_plan_matches_declared_free_reaction(
     )
 
 
+def test_provider_cro_wall_plan_uses_its_declared_free_reaction(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
+
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    sp_data = _species_vapor_data(
+        "CrO", vapor_pressure_data=vapor_pressure_data,
+    )
+    expected = resolve_wall_saturation(
+        sp_data, species_id="CrO", T_K=1100.0, pO2_Pa=None,
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(
+            sim,
+            species="CrO",
+            sp_data=dict(sp_data),
+            controls={
+                "wall_deposit_fraction": 1.0,
+                "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
+                "wall_temperature_K": 1100.0,
+                "wall_deposit_account_temperatures_K": {
+                    "process.wall_deposit": 1100.0,
+                },
+            },
+        )
+    )
+
+    assert expected.reaction_id == "disproportionation"
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.transition.credits["process.wall_deposit"] == pytest.approx(
+        dict(expected.products_mol_per_mol_vapour)
+    )
+
+
 def test_provider_folds_only_same_species_subfloor_baffle_product_into_wall(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -2068,6 +2111,9 @@ def test_provider_folds_only_same_species_subfloor_baffle_product_into_wall(
             "species": "SiO",
             "condensed_kg": condensed_kg,
             "sp_data": {
+                **_species_vapor_data(
+                    "SiO", vapor_pressure_data=vapor_pressure_data,
+                ),
                 "condensation_products_mol_per_mol_vapor": {
                     "Si": 0.5,
                     "SiO2": 0.5,
@@ -2077,6 +2123,10 @@ def test_provider_folds_only_same_species_subfloor_baffle_product_into_wall(
                 condensed_kg - baffle_residual_kg
             ) / condensed_kg,
             "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
+            "wall_temperature_K": 1100.0,
+            "wall_deposit_account_temperatures_K": {
+                "process.wall_deposit": 1100.0,
+            },
             "dt_hr": 1.0,
         },
     )
@@ -2179,6 +2229,9 @@ def test_provider_rolls_back_near_floor_wall_chemistry_to_unchanged_species(
             "species": "SiO",
             "condensed_kg": condensed_kg,
             "sp_data": {
+                **_species_vapor_data(
+                    "SiO", vapor_pressure_data=vapor_pressure_data,
+                ),
                 "condensation_products_mol_per_mol_vapor": {
                     "Si": 0.5,
                     "SiO2": 0.5,
@@ -2187,6 +2240,10 @@ def test_provider_rolls_back_near_floor_wall_chemistry_to_unchanged_species(
             "wall_deposit_fraction": 1.0,
             "wall_deposit_account_fractions": {
                 "process.wall_deposit": 1.0,
+            },
+            "wall_temperature_K": 1100.0,
+            "wall_deposit_account_temperatures_K": {
+                "process.wall_deposit": 1100.0,
             },
             "dt_hr": 1.0,
         },
@@ -2433,11 +2490,12 @@ def test_provider_routes_wall_deposit_to_segment_accounts(
     ).molar_mass_kg_per_mol()
     condensed_kg = 0.44
     wall_fraction = 0.25
-    sp_data = {
-        "condensation_products_mol_per_mol_vapor": {
-            "Si": 0.5,
-            "SiO2": 0.5,
-        },
+    sp_data = dict(_species_vapor_data(
+        "SiO", vapor_pressure_data=vapor_pressure_data,
+    ))
+    sp_data["condensation_products_mol_per_mol_vapor"] = {
+        "Si": 0.5,
+        "SiO2": 0.5,
     }
     request = IntentRequest(
         intent=ChemistryIntent.CONDENSATION_ROUTE,
@@ -2452,6 +2510,11 @@ def test_provider_routes_wall_deposit_to_segment_accounts(
             "wall_deposit_account_fractions": {
                 first_account: 0.75,
                 second_account: 0.25,
+            },
+            "wall_temperature_K": 1100.0,
+            "wall_deposit_account_temperatures_K": {
+                first_account: 1100.0,
+                second_account: 1100.0,
             },
             "dt_hr": 1.0,
         },

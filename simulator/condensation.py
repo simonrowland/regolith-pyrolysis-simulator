@@ -755,13 +755,6 @@ def _load_wall_reactivity_matrix(
         raise ValueError(f'{path}: missing reactions table')
     _validate_wall_reaction(
         path,
-        'SiO_disproportionation',
-        reactions.get('SiO_disproportionation'),
-        species='SiO',
-        status='GROUNDED_STOICHIOMETRY',
-    )
-    _validate_wall_reaction(
-        path,
         'Mg_silica_reduction',
         reactions.get('Mg_silica_reduction'),
         species='Mg',
