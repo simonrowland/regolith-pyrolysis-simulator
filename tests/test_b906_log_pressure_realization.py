@@ -10,14 +10,26 @@ reach that result through ``_surface_log_pressure``:
 - the IEEE minimum positive pressure, flagged
   ``numerical_underflow_floor``, when the log is below that minimum.
 
-A non-finite log and a log above the largest finite float raise. They
-are not published as 0. The oracle below is this rule written out. It
-does not call ``realize_log10_pressure_pa`` or ``_surface_log_pressure``.
+A non-finite log and a log whose power is not a finite positive float
+raise on the surface laws. They are not published as 0. That set
+includes the overflow endpoint ``log10`` of the largest finite float:
+the strict comparison against itself is false, and ``10**`` of the
+rounded logarithm raises ``OverflowError``. The catalog helper turns
+that overflow into the flagged ceiling. The surface laws turn the
+ceiling into ``ValueError``. The adjacent float below the endpoint is
+the representable power 1.7976931348620926e+308 Pa. The oracle below
+is this rule written out. It does not call ``realize_log10_pressure_pa``
+or ``_surface_log_pressure``.
 
 The mutation that puts ``if log_p < -300.0: return 0.0, None`` back at
 the start of ``_surface_log_pressure`` fails
 ``representable_below_minus_300`` on both branches: the published
 pressure is 0.0 instead of 3.162277660168379e-303 Pa.
+
+The mutation that deletes the ``OverflowError`` handler in
+``realize_log10_pressure_pa`` fails ``endpoint`` on every path: the
+helper and both laws raise ``OverflowError`` instead of the ceiling
+flag and ``ValueError`` (``langmuir pressure law overflowed``).
 """
 
 from __future__ import annotations
@@ -207,6 +219,32 @@ def _case_log(case: dict) -> float | None:
     return math.log10(case["p_sat"]) + log_raw
 
 
+def _exponentiation_class(
+    log_p: float,
+) -> tuple[str, float | None, str | None]:
+    """Independent outcome of ``10**log_p``.
+
+    ``('value', pressure, status)`` or ``('raise', None, None)``. This
+    does not call ``realize_log10_pressure_pa``. A log above the largest
+    finite float, and the endpoint equal to ``log10`` of that float,
+    are refusals: ``10**`` of the endpoint raises ``OverflowError``
+    because the rounded logarithm sits above every finite power of ten.
+    The adjacent float toward zero is a finite power.
+    """
+
+    if not math.isfinite(log_p) or log_p > math.log10(_maximum_finite_pa()):
+        return "raise", None, None
+    if log_p < math.log10(_minimum_positive_pa()):
+        return "value", _minimum_positive_pa(), _UNDERFLOW
+    try:
+        pressure = 10.0 ** log_p
+    except OverflowError:
+        return "raise", None, None
+    if not math.isfinite(pressure) or pressure <= 0.0:
+        return "raise", None, None
+    return "value", pressure, None
+
+
 def _oracle(case: dict) -> tuple[str, float | None, str | None]:
     """Independent outcome: ('value', pressure, status) or ('raise', None, None)."""
 
@@ -221,14 +259,7 @@ def _oracle(case: dict) -> tuple[str, float | None, str | None]:
         assert log_p < -300.0
         assert _REVIEWER_PA > _minimum_positive_pa()
         return "value", _REVIEWER_PA, None
-    if not math.isfinite(log_p) or log_p > math.log10(_maximum_finite_pa()):
-        return "raise", None, None
-    if log_p < math.log10(_minimum_positive_pa()):
-        return "value", _minimum_positive_pa(), _UNDERFLOW
-    pressure = 10.0 ** log_p
-    if not math.isfinite(pressure) or pressure <= 0.0:
-        return "raise", None, None
-    return "value", pressure, None
+    return _exponentiation_class(log_p)
 
 
 def _call(case: dict) -> tuple[float, str | None]:
@@ -280,24 +311,149 @@ def test_surface_log_pressure_is_a_power_or_a_flagged_floor(case: dict) -> None:
 def test_finite_logs_share_the_catalog_endpoints() -> None:
     """The surface chokepoint does not keep a second cutoff.
 
-    Overflow stays a refusal here. The catalog evaluator ceilings it.
-    Underflow and every representable power agree, including the old
-    ±300 guards.
+    Overflow stays a refusal here, including the endpoint whose power
+    raises ``OverflowError``. The catalog evaluator ceilings that
+    overflow. Underflow and every representable power agree, including
+    the old ±300 guards and the float adjacent to the endpoint.
     """
 
     from simulator.vapour_rail.catalog import realize_log10_pressure_pa
 
-    for log_p in (-330.0, -323.4, -323.0, -302.5, -300.0, 0.0, 300.0, 306.0):
+    endpoint = math.log10(_maximum_finite_pa())
+    adjacent_below = math.nextafter(endpoint, 0.0)
+    adjacent_above = math.nextafter(endpoint, math.inf)
+    for log_p in (
+        -330.0,
+        -323.4,
+        -323.0,
+        -302.5,
+        -300.0,
+        0.0,
+        300.0,
+        306.0,
+        adjacent_below,
+    ):
+        kind, expected, status = _exponentiation_class(log_p)
+        assert kind == "value"
         catalog_pressure, catalog_status = realize_log10_pressure_pa(log_p)
         surface_pressure, surface_status = _surface_log_pressure(log_p)
+        assert catalog_pressure == expected
         assert surface_pressure == catalog_pressure
-        assert surface_status == catalog_status
+        assert surface_status == catalog_status == status
         assert surface_pressure > 0.0
-    with pytest.raises(ValueError, match="langmuir pressure law overflowed"):
-        _surface_log_pressure(400.0)
-    ceiling, ceiling_status = realize_log10_pressure_pa(400.0)
-    assert ceiling == _maximum_finite_pa()
-    assert ceiling_status == "numerical_overflow_ceiling"
+    assert adjacent_below < endpoint < adjacent_above
+    assert 10.0 ** adjacent_below == 1.7976931348620926e308
+    for log_p in (endpoint, adjacent_above, 400.0):
+        assert _exponentiation_class(log_p)[0] == "raise"
+        with pytest.raises(ValueError, match="langmuir pressure law overflowed"):
+            _surface_log_pressure(log_p)
+        ceiling, ceiling_status = realize_log10_pressure_pa(log_p)
+        assert ceiling == _maximum_finite_pa()
+        assert ceiling_status == "numerical_overflow_ceiling"
+
+
+def _overflow_endpoint_cases() -> tuple[dict, ...]:
+    """Every path through the shared helper at the overflow boundary.
+
+    The capped law enters the helper only when ``log_raw < 0``. ``log10``
+    of a finite ``P_sat`` is at most the endpoint, so a negative
+    ``log_raw`` cannot form the adjacent float above it. That cell is
+    not an input. The endpoint itself is formable: a tiny negative
+    ``log_raw`` rounds away when added to ``log10(P_sat)``.
+    """
+
+    endpoint = math.log10(_maximum_finite_pa())
+    logs = {
+        "adjacent_below": math.nextafter(endpoint, 0.0),
+        "endpoint": endpoint,
+        "adjacent_above": math.nextafter(endpoint, math.inf),
+    }
+    cases: list[dict] = []
+    for name, log_p in logs.items():
+        cases.append({"path": "helper", "name": name, "log": log_p})
+        cases.append({"path": "surface", "name": name, "log": log_p})
+        # n = -1/2 and surface/p_ref = 1e-2 contribute +1. P = 10**(log-1)
+        # makes the formed log the boundary float.
+        cases.append(
+            {
+                "path": "scaled",
+                "name": name,
+                "log": log_p,
+                "branch": "scaled",
+                "pressure": 10.0 ** (log_p - 1.0),
+                "exponent": -0.5,
+                "p_ref": 1.0,
+                "surface": 1.0e-2,
+            }
+        )
+    for name, p_sat in (
+        ("adjacent_below", 1.7976931348620926e308),
+        ("endpoint", _maximum_finite_pa()),
+    ):
+        cases.append(
+            {
+                "path": "capped",
+                "name": name,
+                "log": logs[name],
+                "branch": "capped",
+                "p_sat": p_sat,
+                "raw": 1.0,
+                "exponent": -1.0,
+                "p_ref": 1.0,
+                "surface": math.nextafter(1.0, math.inf),
+            }
+        )
+    return tuple(cases)
+
+
+@pytest.mark.parametrize(
+    "case",
+    _overflow_endpoint_cases(),
+    ids=lambda case: f"{case['path']}-{case['name']}",
+)
+def test_overflow_endpoint_is_a_typed_ceiling_not_an_abort(case: dict) -> None:
+    """Both laws and the helper. Exponentiation overflow is never an abort.
+
+    The helper publishes the flagged ceiling. The surface laws refuse
+    with ``ValueError``. The adjacent float below stays the power.
+    """
+
+    from simulator.vapour_rail.catalog import realize_log10_pressure_pa
+
+    kind, expected, status = _exponentiation_class(case["log"])
+    if case["name"] == "adjacent_below":
+        assert kind == "value"
+        assert expected == 1.7976931348620926e308
+        assert status is None
+    else:
+        assert kind == "raise"
+
+    if case["path"] == "helper":
+        got, got_status = realize_log10_pressure_pa(case["log"])
+        if kind == "raise":
+            assert got == _maximum_finite_pa()
+            assert got_status == "numerical_overflow_ceiling"
+        else:
+            assert got == expected
+            assert got_status is None
+        return
+
+    if case["path"] in ("scaled", "capped"):
+        assert _case_log(case) == case["log"]
+
+    def call() -> tuple[float, str | None]:
+        if case["path"] == "surface":
+            return _surface_log_pressure(case["log"])
+        return _call(case)
+
+    if kind == "raise":
+        with pytest.raises(ValueError, match="langmuir pressure law overflowed"):
+            call()
+        return
+    pressure, continuation = call()
+    assert pressure == expected
+    assert continuation is None
+    assert pressure == 1.7976931348620926e308
 
 
 def test_log_pressure_cutoff_has_one_chokepoint() -> None:

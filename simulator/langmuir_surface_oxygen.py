@@ -89,7 +89,11 @@ cutoff: ``10**(-302.5) = 3.162277660168379e-303`` Pa is still a
 pressure. The scaled law and the condensed cap both realize the power
 through ``realize_log10_pressure_pa``. A log below the minimum
 positive float is that minimum, flagged
-``numerical_underflow_floor``. Overflow refuses the carrier. Nothing
+``numerical_underflow_floor``. Overflow refuses the carrier, including
+the endpoint ``log10`` of the largest finite float: ``10**`` of that
+rounded logarithm raises ``OverflowError`` inside the shared helper,
+which returns the ceiling flag, and this module turns the flag into
+the refusal. Nothing
 drops a participating carrier's reaction oxygen demand because a cap
 zeroed the local slope. A condensed-metal rail never publishes above
 ``P_sat``, including when the solve itself drives a subunit activity
@@ -920,9 +924,15 @@ def _surface_log_pressure(log_p: float) -> tuple[float, str | None]:
     a computed zero (``P_eq <= 0``). ``10**(-302.5)`` Pa is
     representable and is published. A finite log below the minimum
     positive float is the catalog floor, flagged
-    ``numerical_underflow_floor``. A non-finite log, or a log above the
-    largest finite float, raises: an infinite drive is a typed refusal,
-    not a ceiling pressure. Finite endpoints are
+    ``numerical_underflow_floor``. A non-finite log, or a log whose
+    power is not a finite positive float, raises ``ValueError``: an
+    infinite drive is a typed refusal, not a ceiling pressure. The
+    overflow endpoint is in that set. ``log10`` of the largest finite
+    float is not strictly above itself, and ``10**`` of it raises
+    ``OverflowError`` inside ``realize_log10_pressure_pa``. The helper
+    returns the ceiling flag; this function turns that flag into the
+    refusal. Callers catch ``ValueError`` only. The adjacent float
+    below the endpoint is the representable power. Finite endpoints are
     ``realize_log10_pressure_pa``.
     """
 

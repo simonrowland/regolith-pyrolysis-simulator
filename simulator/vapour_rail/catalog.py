@@ -926,8 +926,13 @@ def realize_log10_pressure_pa(log10_pressure: float) -> tuple[float, str | None]
     and ``numerical_underflow_floor``: activity depletion can drive a
     trace carrier under the IEEE range, and substituting 0 would be a
     silent zero (d-367). A log above ``log10`` of the largest finite
-    float returns that ceiling and ``numerical_overflow_ceiling``, so
-    the escape direction stays finite. A non-finite power that is
+    float, and the endpoint equal to that logarithm, return that
+    ceiling and ``numerical_overflow_ceiling``. ``10**`` of the endpoint
+    raises ``OverflowError``: ``log10`` rounds the ceiling above every
+    finite power of ten, and the strict ``>`` comparison is false for
+    the logarithm of itself. That overflow is the ceiling, not an abort
+    (d-367). The adjacent float toward zero is the power
+    1.7976931348620926e+308 Pa with no flag. A non-finite power that is
     neither clamp is returned unchanged; the caller refuses it. Units
     remain Pa. The Langmuir surface laws call this same function. Their
     overflow disposition is a typed refusal rather than the ceiling.
@@ -939,11 +944,18 @@ def realize_log10_pressure_pa(log10_pressure: float) -> tuple[float, str | None]
     # so a representable power is never replaced. Sanity: log10 = -302.5
     # is 3.162277660168379e-303 Pa, above the ~5e-324 Pa minimum, and is
     # returned unchanged. log10 = -330 is the minimum, flagged.
+    # log10(maximum_finite_pa) is not strictly above itself, but 10** of
+    # that rounded log overflows. The adjacent log toward zero does not:
+    # 10**nextafter(endpoint, 0) = 1.7976931348620926e+308 Pa.
     if log10_pressure < math.log10(minimum_positive_pa):
         return minimum_positive_pa, "numerical_underflow_floor"
     if log10_pressure > math.log10(maximum_finite_pa):
         return maximum_finite_pa, "numerical_overflow_ceiling"
-    return 10.0**log10_pressure, None
+    try:
+        pressure = 10.0**log10_pressure
+    except OverflowError:
+        return maximum_finite_pa, "numerical_overflow_ceiling"
+    return pressure, None
 
 
 @dataclass(frozen=True)
