@@ -245,7 +245,10 @@ def test_parsed_yaml_cache_obeys_byte_cap_after_many_writes(
 
     cache_entries = list(cache_root.rglob("*.pickle"))
     assert cache_entries
-    assert sum(path.stat().st_size for path in cache_entries) <= 2048
+    total_bytes = sum(path.stat().st_size for path in cache_entries)
+    target_bytes = yaml_cache_module._cache_eviction_target_bytes(2048)
+    assert target_bytes == 1843
+    assert total_bytes <= target_bytes
 
 
 def test_first_write_in_fresh_process_evicts_over_cap(
@@ -276,9 +279,9 @@ payload = f"value: item-{1000:064d}\\n".encode("ascii")
 cache.load_cached_safe_yaml(payload)
 root = Path(os.environ["REGOLITH_PARSED_YAML_CACHE_DIR"])
 entries = list(root.rglob("*.pickle"))
-assert sum(path.stat().st_size for path in entries) <= int(
-    os.environ["REGOLITH_PARSED_YAML_CACHE_MAX_BYTES"]
-)
+max_bytes = int(os.environ["REGOLITH_PARSED_YAML_CACHE_MAX_BYTES"])
+total_bytes = sum(path.stat().st_size for path in entries)
+assert total_bytes <= cache._cache_eviction_target_bytes(max_bytes)
 assert cache._cache_path(sha256(payload).hexdigest()).exists()
 """
     subprocess.run(
@@ -327,12 +330,36 @@ def test_parsed_yaml_cache_hit_refreshes_lru_mtime(
     assert not second_path.exists()
 
 
-def test_parsed_yaml_cache_rejects_unparseable_byte_cap(
+def test_zero_byte_yaml_cache_budget_keeps_only_the_just_written_entry(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
+    cache_root = tmp_path / "yaml-cache"
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "0")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    monkeypatch.setattr(
+        yaml_cache_module,
+        "_CACHE_WRITES_SINCE_EVICTION",
+        yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL,
+    )
+    payload = _unique_cache_payload(0)
+
+    load_cached_safe_yaml(payload)
+
+    cache_entries = list(cache_root.rglob("*.pickle"))
+    just_written = yaml_cache_module._cache_path(sha256(payload).hexdigest())
+    assert cache_entries == [just_written]
+
+
+@pytest.mark.parametrize("value", ["a lot", "-1"])
+def test_parsed_yaml_cache_rejects_invalid_byte_cap(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    value: str,
+) -> None:
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
-    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "a lot")
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", value)
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
 
     with pytest.raises(
@@ -348,7 +375,7 @@ def test_parsed_yaml_cache_eviction_ignores_racing_deleted_file(
 ) -> None:
     cache_root = tmp_path / "yaml-cache"
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
-    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "1")
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "off")
     monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
     monkeypatch.setattr(
         yaml_cache_module,
@@ -362,7 +389,13 @@ def test_parsed_yaml_cache_eviction_ignores_racing_deleted_file(
     ]
     for payload in payloads[:-1]:
         load_cached_safe_yaml(payload)
-    raced_path = yaml_cache_module._cache_path(sha256(payloads[0]).hexdigest())
+    cache_entries = list(cache_root.rglob("*.pickle"))
+    cap_bytes = cache_entries[0].stat().st_size * 4
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", str(cap_bytes))
+    raced_path = min(
+        cache_entries,
+        key=lambda path: (path.stat().st_mtime_ns, str(path)),
+    )
     original_unlink = Path.unlink
     raced = False
 
@@ -378,6 +411,73 @@ def test_parsed_yaml_cache_eviction_ignores_racing_deleted_file(
     load_cached_safe_yaml(payloads[-1])
 
     assert raced
+    assert not raced_path.exists()
+    cache_entries = list(cache_root.rglob("*.pickle"))
+    total_bytes = sum(path.stat().st_size for path in cache_entries)
+    assert total_bytes <= yaml_cache_module._cache_eviction_target_bytes(cap_bytes)
+
+
+def test_failed_yaml_cache_write_still_runs_eviction(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    cache_root = tmp_path / "yaml-cache"
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(cache_root))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "off")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    monkeypatch.setattr(yaml_cache_module, "_CACHE_WRITES_SINCE_EVICTION", 0)
+
+    for index in range(12):
+        load_cached_safe_yaml(_unique_cache_payload(index))
+    prior_entries = list(cache_root.rglob("*.pickle"))
+    cap_bytes = prior_entries[0].stat().st_size * 4
+    assert sum(path.stat().st_size for path in prior_entries) > cap_bytes
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", str(cap_bytes))
+    monkeypatch.setattr(
+        yaml_cache_module,
+        "_CACHE_WRITES_SINCE_EVICTION",
+        yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL,
+    )
+
+    def fail_replace(*_args, **_kwargs) -> None:
+        raise OSError("disk full")
+
+    monkeypatch.setattr(yaml_cache_module.os, "replace", fail_replace)
+    payload = _unique_cache_payload(1000)
+
+    parsed = load_cached_safe_yaml(payload)
+
+    assert parsed == {"value": f"item-{1000:064d}"}
+    cache_entries = list(cache_root.rglob("*.pickle"))
+    total_bytes = sum(path.stat().st_size for path in cache_entries)
+    assert total_bytes <= yaml_cache_module._cache_eviction_target_bytes(cap_bytes)
+
+
+def test_yaml_cache_walk_oserror_does_not_interrupt_parse(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_DIR", str(tmp_path / "yaml-cache"))
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", "1")
+    monkeypatch.delenv("REGOLITH_PARSED_YAML_CACHE", raising=False)
+    monkeypatch.setattr(
+        yaml_cache_module,
+        "_CACHE_WRITES_SINCE_EVICTION",
+        yaml_cache_module._CACHE_EVICTION_WRITE_INTERVAL,
+    )
+    walk_attempted = False
+
+    def fail_directory_walk(_root: Path, _pattern: str):
+        nonlocal walk_attempted
+        walk_attempted = True
+        raise OSError("directory unavailable")
+
+    monkeypatch.setattr(Path, "rglob", fail_directory_walk)
+
+    assert load_cached_safe_yaml(b"value: parse survives\n") == {
+        "value": "parse survives"
+    }
+    assert walk_attempted
 
 
 def test_evicted_yaml_cache_entry_reparses_to_same_bytes_as_cache_off(

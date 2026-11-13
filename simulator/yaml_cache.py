@@ -238,8 +238,9 @@ def load_cached_safe_yaml(
     The pickle value preserves the safe loader's Python types and YAML aliases.
     Set ``REGOLITH_PARSED_YAML_CACHE=off`` to bypass the process-shared cache;
     ``REGOLITH_PARSED_YAML_CACHE_DIR`` selects its private root, and
-    ``REGOLITH_PARSED_YAML_CACHE_MAX_BYTES`` sets its byte cap (``off`` removes
-    the cap without changing the cache enable switch).
+    ``REGOLITH_PARSED_YAML_CACHE_MAX_BYTES`` sets its byte cap (default 1.5 GiB).
+    A value of ``0`` keeps only the entry just written at each sweep; the literal
+    ``off`` removes the byte cap while leaving the cache enabled.
     """
 
     raw = payload.encode("utf-8") if isinstance(payload, str) else payload
@@ -257,8 +258,8 @@ def load_cached_safe_yaml(
         return cached
 
     parsed = yaml.load(payload, Loader=YAML12SafeLoader)
-    if _write_cache(cache_path, digest, loader_identity, parsed):
-        _evict_after_write(cache_path, max_bytes)
+    _write_cache(cache_path, digest, loader_identity, parsed)
+    _evict_after_write(cache_path, max_bytes)
     return parsed
 
 
@@ -271,11 +272,10 @@ def _cache_max_bytes() -> int | None:
     value = os.environ.get(_CACHE_MAX_BYTES_ENV)
     if value is None:
         return _DEFAULT_CACHE_MAX_BYTES
-    normalized = value.strip().casefold()
-    if normalized == "off":
+    if value == "off":
         return None
     try:
-        max_bytes = int(normalized, 10)
+        max_bytes = int(value, 10)
     except ValueError as exc:
         raise ValueError(
             f"{_CACHE_MAX_BYTES_ENV} must be a non-negative integer or 'off'"
@@ -284,7 +284,7 @@ def _cache_max_bytes() -> int | None:
         raise ValueError(
             f"{_CACHE_MAX_BYTES_ENV} must be a non-negative integer or 'off'"
         )
-    return max_bytes or None
+    return max_bytes
 
 
 def _loader_identity() -> str:
@@ -416,7 +416,7 @@ def _read_cache(path: Path, content_sha256: str, loader_identity: str) -> Any:
 
 def _write_cache(
     path: Path, content_sha256: str, loader_identity: str, value: Any
-) -> bool:
+) -> None:
     envelope = {
         "cache_format": _CACHE_FORMAT,
         "content_sha256": content_sha256,
@@ -438,14 +438,12 @@ def _write_cache(
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temp_path, path)
-        return True
     except Exception:
         if temp_path is not None:
             try:
                 temp_path.unlink()
             except OSError:
                 pass
-        return False
 
 
 def _evict_after_write(path: Path, max_bytes: int | None) -> None:
@@ -456,11 +454,15 @@ def _evict_after_write(path: Path, max_bytes: int | None) -> None:
     _CACHE_WRITES_SINCE_EVICTION = 0
 
     # The cache path is root/version/loader-token/format/file.pickle.
-    _evict_cache(
-        root=path.parents[3],
-        just_written=path,
-        max_bytes=max_bytes,
-    )
+    try:
+        _evict_cache(
+            root=path.parents[3],
+            just_written=path,
+            max_bytes=max_bytes,
+        )
+    except OSError:
+        # Cache cleanup must not turn a successful YAML parse into a failure.
+        pass
 
 
 def _evict_cache(
@@ -485,7 +487,7 @@ def _evict_cache(
         return
 
     total_bytes = sum(size for _mtime_ns, _path, size in entries)
-    target_bytes = max_bytes * 9 // 10
+    target_bytes = _cache_eviction_target_bytes(max_bytes)
     if total_bytes <= target_bytes:
         return
 
@@ -504,3 +506,7 @@ def _evict_cache(
             continue
         else:
             total_bytes -= size
+
+
+def _cache_eviction_target_bytes(max_bytes: int) -> int:
+    return max_bytes * 9 // 10
