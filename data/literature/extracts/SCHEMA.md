@@ -213,13 +213,16 @@ position of one cell, header rows included. `table_row_number` and
 validator parses that complete table, expanding `rowspan` and `colspan`,
 and the stored number or ordinary string must be that whole trimmed cell.
 A cell that contains a superscript certifies only when the cell is a
-complete power and nothing else: an optional sign, a base number, an
-optional × or x or ·, then 10 and the superscript exponent, or the base
-raised to that exponent. `10<sup>3</sup>` certifies `1e3`.
+complete power and nothing else: exactly one optional leading sign and
+an unsigned base, an optional × or x or ·, then 10 and the superscript
+exponent, or the unsigned base raised to that exponent. `10<sup>3</sup>`
+certifies `1e3`.
 `1.5×10<sup>3</sup>` certifies 1500 / `1.5e3`. A leading minus applies
 to the whole power. The HTML cell and the caret spelling use that one
 parser, so `-10<sup>2</sup>` and `-10^2` are -100 and `100` does not
-certify. `-1.5×10<sup>3</sup>` is -1500. `10<sup>3</sup>2` and any
+certify. A second sign is not that grammar: `--10<sup>2</sup>`,
+`+-10<sup>2</sup>`, and `-−10<sup>2</sup>` are `superscript_in_cell`.
+`-1.5×10<sup>3</sup>` is -1500. `10<sup>3</sup>2` and any
 other leading or trailing content are `superscript_in_cell`. A stored
 integer uses the same numeric equality as a float, so `10<sup>3</sup>`
 certifies `1000` and `1000.0`, and `103` does not. A string certifies
@@ -248,14 +251,17 @@ not certify `SiO2100`. A caret is a superscript. A whitespace token that
 contains `^` does not certify as a plain formula or a plain number, so
 `$O^{2-}$` does not certify `O2`, `$Fe^{2+}$` does not certify `Fe2`,
 and `$SiO^{2}$` does not certify `SiO2`. Charged or powered species
-labels are unsupported. Before any wrapper is removed, a raw token that
-carries `^`, `<sup>`, a Unicode superscript, or a trailing charge sign
-on a formula is charged. The sign is one set: ASCII plus and
-hyphen-minus, minus sign, en dash, figure dash, small hyphen-minus,
-fullwidth plus and hyphen-minus, and superscript or subscript plus and
-minus. `Cl−` does not certify `Cl`. That token, and an HTML, CSV, or
-TSV cell that contains it, certifies no formula or species label, neither the
-neutral prefix nor a charged label, and certifies no number. Formula
+labels are unsupported. Before any wrapper is removed, a raw whitespace
+token that carries `^`, `<sup>`, a Unicode superscript, or any charge
+sign together with an uppercase element letter is charged. The charge
+signs are ASCII plus and hyphen-minus plus the certification sign class
+`UNICODE_MINUS_SIGNS` and `UNICODE_PLUS_SIGNS` (superscript and subscript
+plus and minus included), anywhere in the token, before formula folding.
+`Cl−,`, `SO₄−`, `SO_{4}−`, and `Fe-rich` do not certify the neutral
+label. `Cl` does. `-6.98` still certifies `-6.98`. That token, and an
+HTML, CSV, or TSV cell that contains it, certifies no formula or species
+label, neither the neutral prefix nor a charged label, and certifies no
+number. An unrelated formula miss stays `cited_token_absent`. Formula
 and species labels take that guarded comparison first, on prose, an
 HTML cell, a CSV or TSV cell, and repository text, so an identical
 `Fe^{2+}` cell does not certify. The refusal is

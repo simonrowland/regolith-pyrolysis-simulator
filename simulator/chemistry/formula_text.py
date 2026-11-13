@@ -1,8 +1,12 @@
-"""Unicode subscript digits as plain digits, and the one charge-sign set.
+"""Unicode subscript digits as plain digits, and the certification sign class.
 
 This is the one map from subscript digits to ASCII digits. A caller that
-also removes spaces or braces keeps that rule itself. ``FORMULA_CHARGE_SIGNS``
-is the one set of formula charge signs.
+also removes spaces or braces keeps that rule itself.
+
+``UNICODE_MINUS_SIGNS`` and ``UNICODE_PLUS_SIGNS`` are the one class of
+signs that fold onto ASCII ``-`` and ``+``. Superscript and subscript plus
+and minus are in that class. Charge detection uses these same characters.
+Plus-minus is not here: it stays a distinct numeric sign.
 """
 
 from __future__ import annotations
@@ -11,19 +15,30 @@ _SUBSCRIPT_DIGITS = "₀₁₂₃₄₅₆₇₈₉"
 _ASCII_DIGITS = "0123456789"
 _SUBSCRIPT_DIGIT_FOLD = str.maketrans(_SUBSCRIPT_DIGITS, _ASCII_DIGITS)
 
-# ASCII plus and hyphen-minus, minus sign, en dash, figure dash, small
-# hyphen-minus, fullwidth plus and hyphen-minus, superscript plus and
-# minus, subscript plus and minus. Not a second superscript alphabet.
-FORMULA_CHARGE_SIGNS = (
-    "+-"
-    "\u2212"
-    "\u2013"
-    "\u2012"
-    "\ufe63"
-    "\uff0b"
-    "\uff0d"
-    "\u207a\u207b"
-    "\u208a\u208b"
+# Signs the certification grammar folds onto ASCII "-".
+UNICODE_MINUS_SIGNS = (
+    "\u2212"  # MINUS SIGN
+    "\u2010"  # HYPHEN
+    "\u2011"  # NON-BREAKING HYPHEN
+    "\u2012"  # FIGURE DASH
+    "\u2013"  # EN DASH
+    "\u2014"  # EM DASH
+    "\u2015"  # HORIZONTAL BAR
+    "\ufe63"  # SMALL HYPHEN-MINUS
+    "\uff0d"  # FULLWIDTH HYPHEN-MINUS
+    "\u02d7"  # MODIFIER LETTER MINUS SIGN
+    "\u207b"  # SUPERSCRIPT MINUS
+    "\u208b"  # SUBSCRIPT MINUS
+    "\u2796"  # HEAVY MINUS SIGN
+)
+# Signs the certification grammar folds onto ASCII "+".
+# Superscript and subscript plus are in this string.
+UNICODE_PLUS_SIGNS = (
+    "\uff0b"  # FULLWIDTH PLUS SIGN
+    "\ufe62"  # SMALL PLUS SIGN
+    "\u207a"  # SUPERSCRIPT PLUS
+    "\u208a"  # SUBSCRIPT PLUS
+    "\u2795"  # HEAVY PLUS SIGN
 )
 
 

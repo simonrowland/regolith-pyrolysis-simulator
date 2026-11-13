@@ -55,12 +55,15 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   refuses with ``html_table_requires_cell_address``. A value on a prose
   line in that span still certifies. A value present only in the table
   does not. A superscript cell certifies only when that cell is a
-  complete power and nothing else: an optional sign, a base number, an
-  optional × or x or ·, then 10 and the superscript exponent, or the
-  base raised to that exponent. ``10<sup>3</sup>`` certifies ``1e3``.
+  complete power and nothing else: exactly one optional leading sign
+  and an unsigned base, an optional × or x or ·, then 10 and the
+  superscript exponent, or the unsigned base raised to that exponent.
+  ``10<sup>3</sup>`` certifies ``1e3``.
   ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``. A leading minus
   applies to the whole power, so ``-10<sup>2</sup>`` and the caret
-  spelling ``-10^2`` are ``-100`` and not ``100``. ``10<sup>3</sup>2``
+  spelling ``-10^2`` are ``-100`` and not ``100``. A second sign is not
+  that grammar: ``--10<sup>2</sup>``, ``+-10<sup>2</sup>``, and
+  ``-−10<sup>2</sup>`` are ``superscript_in_cell``. ``10<sup>3</sup>2``
   and any other leading or trailing content are ``superscript_in_cell``,
   as is a plain number. A value in another row
   does not certify. Formula and species labels are normalized before every
@@ -73,13 +76,17 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   A caret is a superscript. A token that contains ``^`` is not unwrapped
   and does not certify as a plain formula or a plain number, so
   ``$O^{2-}$`` is not ``O2`` and ``$SiO^{2}$`` is not ``SiO2``.
-  A raw token that carries ``^``, ``<sup>``, a Unicode superscript, or a
-  trailing charge sign is a charged species. The charge sign is
-  ``FORMULA_CHARGE_SIGNS``, so ``Cl−`` does not certify ``Cl``. It
-  certifies no formula or species label and no number, on prose, an HTML
-  cell, a CSV or TSV cell, and repository text. The refusal is
-  ``charged_species_unsupported``. ``Fe`` is not ``$\\mathrm{Fe}^{2+}$``
-  and ``Fe^{2+}`` is not an identical CSV cell.
+  A raw whitespace token, before formula folding, that carries ``^``,
+  ``<sup>``, a Unicode superscript, or any charge sign together with an
+  uppercase element letter is a charged species. The charge signs are
+  ASCII plus and hyphen-minus plus ``UNICODE_MINUS_SIGNS`` and
+  ``UNICODE_PLUS_SIGNS``, anywhere in the token. ``Cl−,``, ``SO₄−``,
+  ``SO_{4}−``, and ``Fe-rich`` do not certify the neutral label. ``Cl``
+  does. The same rule applies to a whole HTML, CSV, or TSV cell. It
+  certifies no formula or species label and no number. The refusal is
+  ``charged_species_unsupported``. A numeric token has no element letter,
+  so ``-6.98`` still certifies ``-6.98``. ``Fe`` is not
+  ``$\\mathrm{Fe}^{2+}$`` and ``Fe^{2+}`` is not an identical CSV cell.
   A plain numeric cell with no element symbol is still a power.
   A subscript digit inside a formula token is not a number: ``SiO_{2}``
   and ``SiO₂`` do not certify 2, and ``Fe_{2}O_{3}`` does not certify 2.
@@ -195,7 +202,11 @@ from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
     iter_unsupported_context_container_paths,
 )
-from simulator.chemistry.formula_text import FORMULA_CHARGE_SIGNS, fold_subscript_digits
+from simulator.chemistry.formula_text import (
+    UNICODE_MINUS_SIGNS,
+    UNICODE_PLUS_SIGNS,
+    fold_subscript_digits,
+)
 from simulator.state_types import StateTag
 from tools.mineru_table_draft import (
     UNICODE_SUPERSCRIPTS,
@@ -317,31 +328,12 @@ def _valid_source_sha256(value: Any) -> bool:
 # Unicode minus and the other dash/plus signs are not ASCII "+" or "-".
 # The citation grammar below only sees ASCII signs, so a raw scan of
 # "−0.24" (U+2212) yields the token "0.24" and certifies the opposite
-# sign. Fold these onto ASCII before that grammar runs. Plus-minus is
-# absent here on purpose: it is neither "+" nor "-" and stays in the
-# grammar as its own sign.
-_UNICODE_MINUS_SIGNS = (
-    "\u2212"  # MINUS SIGN
-    "\u2010"  # HYPHEN
-    "\u2011"  # NON-BREAKING HYPHEN
-    "\u2012"  # FIGURE DASH
-    "\u2013"  # EN DASH
-    "\u2014"  # EM DASH
-    "\u2015"  # HORIZONTAL BAR
-    "\ufe63"  # SMALL HYPHEN-MINUS
-    "\uff0d"  # FULLWIDTH HYPHEN-MINUS
-    "\u02d7"  # MODIFIER LETTER MINUS SIGN
-    "\u207b"  # SUPERSCRIPT MINUS
-    "\u208b"  # SUBSCRIPT MINUS
-    "\u2796"  # HEAVY MINUS SIGN
-)
-_UNICODE_PLUS_SIGNS = (
-    "\uff0b"  # FULLWIDTH PLUS SIGN
-    "\ufe62"  # SMALL PLUS SIGN
-    "\u207a"  # SUPERSCRIPT PLUS
-    "\u208a"  # SUBSCRIPT PLUS
-    "\u2795"  # HEAVY PLUS SIGN
-)
+# sign. Fold the owned class onto ASCII before that grammar runs.
+# Plus-minus is absent from that class on purpose: it is neither "+" nor
+# "-" and stays in the grammar as its own sign. Charge detection uses
+# the same characters.
+_UNICODE_MINUS_SIGNS = UNICODE_MINUS_SIGNS
+_UNICODE_PLUS_SIGNS = UNICODE_PLUS_SIGNS
 _NUMERIC_SIGN_FOLD = str.maketrans(
     {ord(ch): "-" for ch in _UNICODE_MINUS_SIGNS}
     | {ord(ch): "+" for ch in _UNICODE_PLUS_SIGNS}
@@ -860,8 +852,9 @@ _EXPLICIT_SCIENCE_RE = re.compile(
 # × U+00D7, ASCII x, · U+00B7. The optional group is mantissa times 10.
 # Without it the prefix is the base of base**exponent.
 _SUPERSCRIPT_TIMES = "\u00d7x\u00b7"
+# Unsigned base. The one optional leading sign is stripped before this match.
 _SUPERSCRIPT_CELL_RE = re.compile(
-    r"([+\-]?(?:\d+(?:\.\d+)?|\.\d+))(?:\s*(["
+    r"((?:\d+(?:\.\d+)?|\.\d+))(?:\s*(["
     + _SUPERSCRIPT_TIMES
     + r"])\s*10)?"
 )
@@ -880,16 +873,19 @@ def _power_product(base: Decimal, exponent: int) -> Decimal | None:
 def _superscript_power_decimal(
     text: str, spans: tuple[tuple[int, int], ...]
 ) -> Decimal | None:
-    """One complete power. The unary sign applies to the whole value.
+    """One complete power. One leading sign applies to the whole value.
 
-    The cell is an optional sign, a base number, an optional × or x or
-    middle dot, then 10, and one superscript exponent. Or that base raised
-    to the exponent. ``-10<sup>2</sup>`` and the caret spelling ``-10^2``
-    are ``-(10**2)`` = ``-100``, not ``(-10)**2``. ``-1.5×10<sup>3</sup>``
-    is ``-1500``. ``10<sup>3</sup>`` is ``10**3``, which is ``1e3``.
-    ``1.5×10<sup>3</sup>`` is ``1.5 * 10**3``. A trailing or leading extra,
-    including ``10<sup>3</sup>2``, is not a power. This is the only
-    signed-power parser.
+    The grammar is exactly one optional leading sign and an unsigned
+    base, an optional × or x or middle dot, then 10, and one superscript
+    exponent. Or that unsigned base raised to the exponent. A second
+    sign does not match: ``--10<sup>2</sup>``, ``+-10<sup>2</sup>``, and
+    ``-−10<sup>2</sup>`` are not powers. ``-10<sup>2</sup>`` and the
+    caret spelling ``-10^2`` are ``-(10**2)`` = ``-100``, not
+    ``(-10)**2``. ``-1.5×10<sup>3</sup>`` is ``-1500``. ``10<sup>3</sup>``
+    is ``10**3``, which is ``1e3``. ``1.5×10<sup>3</sup>`` is
+    ``1.5 * 10**3``. A trailing or leading extra, including
+    ``10<sup>3</sup>2``, is not a power. This is the only signed-power
+    parser.
     """
     if len(spans) != 1:
         return None
@@ -903,6 +899,8 @@ def _superscript_power_decimal(
         return None
     prefix = _fold_numeric_signs(text[:start].strip())
     sign = Decimal(1)
+    # One optional leading sign. The base pattern is unsigned, so a
+    # second sign, including ``--``, ``+-``, and a folded ``-−``, refuses.
     if prefix[:1] in "+-":
         if prefix[0] == "-":
             sign = Decimal(-1)
@@ -3333,11 +3331,10 @@ def _formula_run_char(ch: str) -> bool:
 _SUP_TAG_RE = re.compile(r"</?\s*sup\b[^>]*>", re.IGNORECASE)
 # The numeric times sign in ``1.5x10``. It is not an element symbol.
 _TIMES_X_RE = re.compile(r"(?<=\d)\s*[xX]\s*(?=10)")
-# A trailing charge sign on a formula, optionally inside a closing ``$``.
-# The sign is ``FORMULA_CHARGE_SIGNS``, not only ASCII plus and hyphen-minus.
-_TRAILING_FORMULA_CHARGE_RE = re.compile(
-    r"[A-Za-z)\]]\d*\s*[" + re.escape(FORMULA_CHARGE_SIGNS) + r"]\s*\$?\s*$"
-)
+# ASCII plus and hyphen-minus, plus the owned certification sign class.
+# Superscript and subscript plus and minus are already in that class.
+# Plus-minus is a distinct numeric sign, not a charge sign.
+_CHARGE_SIGNS = frozenset("+-" + UNICODE_MINUS_SIGNS + UNICODE_PLUS_SIGNS)
 
 
 def _raw_has_element_symbol(text: str) -> bool:
@@ -3346,23 +3343,44 @@ def _raw_has_element_symbol(text: str) -> bool:
     return re.search(r"[A-Za-z]", stripped) is not None
 
 
-def _raw_token_is_charged_species(token: str) -> bool:
-    """True before wrapper removal when this raw token is a charged species.
+def _has_uppercase_element_letter(token: str) -> bool:
+    """True when ``token`` has an uppercase element letter.
 
-    A caret, a ``<sup>``, a Unicode superscript, or a trailing charge
-    sign from ``FORMULA_CHARGE_SIGNS``. ``Cl−`` is charged, so it does
-    not certify ``Cl``. A closing brace between ``Fe`` and ``^{2+}`` does
-    not make ``Fe`` a neutral label. ``10<sup>3</sup>`` and
-    ``1.5x10<sup>3</sup>`` have no element symbol, so they are not this.
+    The check is on the raw token. Numeric signs are folded only so the
+    certification grammar sees ASCII signs; formula markup is not folded.
+    A match of that same numeric grammar, and the times sign in
+    ``1.5x10``, are not element letters, so ``-6.98`` and ``1.2E-3``
+    are not charged species.
+    """
+    folded = _fold_numeric_signs(_TIMES_X_RE.sub("", token))
+    without_number = _NUMERIC_TOKEN_RE.sub("", folded)
+    return re.search(r"[A-Z]", without_number) is not None
+
+
+def _raw_token_is_charged_species(token: str) -> bool:
+    """True before folding when this raw token is a charged species.
+
+    A caret, a ``<sup>``, or a Unicode superscript, when the token has
+    an element letter. Or any charge sign anywhere in the token together
+    with an uppercase element letter. ``Cl−,``, ``SO₄−``, ``SO_{4}−``,
+    and ``Fe-rich`` are charged, so they do not certify the neutral
+    label. A closing brace between ``Fe`` and ``^{2+}`` does not make
+    ``Fe`` a neutral label. ``10<sup>3</sup>``, ``1.5x10<sup>3</sup>``,
+    and ``-6.98`` have no element letter, so they are not this.
     """
     raw = token.strip()
-    if not raw or not _raw_has_element_symbol(raw):
+    if not raw:
         return False
-    if "^" in raw or "<sup" in raw.lower():
+    powered = (
+        "^" in raw
+        or "<sup" in raw.lower()
+        or any(ch in UNICODE_SUPERSCRIPTS for ch in raw)
+    )
+    if powered and _raw_has_element_symbol(raw):
         return True
-    if any(ch in UNICODE_SUPERSCRIPTS for ch in raw):
-        return True
-    return _TRAILING_FORMULA_CHARGE_RE.search(raw) is not None
+    return any(ch in _CHARGE_SIGNS for ch in raw) and _has_uppercase_element_letter(
+        raw
+    )
 
 
 def _label_is_charged_species(label: str) -> bool:
@@ -3414,8 +3432,33 @@ def _formula_text_without_charged_tokens(text: str) -> str:
     return "".join(pieces)
 
 
+def _uppercase_element_letters(text: str) -> str:
+    """Uppercase ASCII letters, in order. Digits and markup stay out."""
+    return "".join(ch for ch in text if "A" <= ch <= "Z")
+
+
+def _charged_token_carries_label(token: str, label: str) -> bool:
+    """True when ``token`` contains the label's element letters in order."""
+    wanted = _uppercase_element_letters(label)
+    if not wanted:
+        return False
+    found = _uppercase_element_letters(token)
+    start = 0
+    for ch in wanted:
+        index = found.find(ch, start)
+        if index < 0:
+            return False
+        start = index + 1
+    return True
+
+
 def _charged_formula_miss(missing: Sequence[_PinnedLeaf], text: str) -> bool:
-    """True when a formula miss is the unsupported charged-species refusal."""
+    """True when a formula miss is the unsupported charged-species refusal.
+
+    A charged token elsewhere in the text does not type an unrelated
+    miss. The label is charged, or a charged raw token carries that
+    label's element letters in order.
+    """
     formula_miss = [
         leaf
         for leaf in missing
@@ -3425,8 +3468,15 @@ def _charged_formula_miss(missing: Sequence[_PinnedLeaf], text: str) -> bool:
         return False
     if any(_label_is_charged_species(leaf.value) for leaf in formula_miss):
         return True
+    charged = [
+        token
+        for token in re.findall(r"\S+", text)
+        if _raw_token_is_charged_species(token)
+    ]
     return any(
-        _raw_token_is_charged_species(token) for token in re.findall(r"\S+", text)
+        _charged_token_carries_label(token, leaf.value)
+        for leaf in formula_miss
+        for token in charged
     )
 
 
@@ -3438,9 +3488,10 @@ def _formula_label_in_text(leaf: str, text: str) -> bool:
     end of the text, or any other character delimits it. The stored label
     matches only that whole run. ``SO4`` is not ``Fe2(SO4)3``. ``SiO2``
     is not ``CaO·SiO2``. ``CO`` is not ``CO2``. A raw token that carries
-    ``^``, ``<sup>``, a Unicode superscript, or a trailing charge sign is
-    a charged species. It is dropped before this scan, so it certifies
-    no formula, and a charged label never matches. A numeric string does
+    ``^``, ``<sup>``, a Unicode superscript, or a charge sign beside an
+    uppercase element letter is a charged species. It is dropped before
+    this scan, so it certifies no formula, and a charged label never
+    matches. A numeric string does
     not match here. This path does not fold digit groups, so ``SiO2 100``
     is ``SiO2`` and is not ``SiO2100``.
     """
@@ -3845,11 +3896,14 @@ def fidelity_source_warnings(
     inside ``$...$`` stays a separator, so ``$H_{2} O_{2}$`` is not
     ``H2O2``. A token that contains ``^`` holds a superscript and does
     not certify as a plain formula or a plain number. A raw token that
-    carries ``^``, ``<sup>``, a Unicode superscript, or a trailing charge
-    sign is unsupported. It certifies no formula or species label, on
-    prose, an HTML cell, a CSV or TSV cell, and repository text. The
-    comparison is that one guard, before a raw cell match. The
-    refusal is ``charged_species_unsupported``.
+    carries ``^``, ``<sup>``, a Unicode superscript, or a charge sign
+    beside an uppercase element letter is unsupported. ``Cl−,``,
+    ``SO₄−``, ``SO_{4}−``, and ``Fe-rich`` certify no neutral label.
+    ``Cl`` does, and ``-6.98`` still certifies. The same rule applies
+    to a whole HTML, CSV, or TSV cell. The comparison is that one
+    guard, before a raw cell match. The refusal is
+    ``charged_species_unsupported``. An unrelated formula miss stays
+    ``cited_token_absent``.
     A subscript digit inside a formula token is not a number, so
     ``SiO_{2}`` and ``SiO₂`` do not certify 2. A neighbouring
     measurement still does. A formula label equals one whole run of
@@ -3869,7 +3923,9 @@ def fidelity_source_warnings(
     ``1e3``. ``1.5×10<sup>3</sup>`` certifies 1500 / ``1.5e3``.
     A leading minus applies to the whole power, so ``-10<sup>2</sup>``
     and the caret spelling ``-10^2`` are ``-100``. ``100`` does not
-    certify.
+    certify. A second sign refuses, so ``--10<sup>2</sup>``,
+    ``+-10<sup>2</sup>``, and ``-−10<sup>2</sup>`` are
+    ``superscript_in_cell``.
     ``10<sup>3</sup>2`` and a number that is not that power are
     ``superscript_in_cell``. ``103`` is not. A stored integer uses the
     same equality as a float, so ``1000`` certifies ``10<sup>3</sup>``.

@@ -62,7 +62,10 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
-from simulator.chemistry.formula_text import FORMULA_CHARGE_SIGNS  # noqa: E402
+from simulator.chemistry.formula_text import (  # noqa: E402
+    UNICODE_MINUS_SIGNS,
+    UNICODE_PLUS_SIGNS,
+)
 from tools.mineru_table_draft import printed_formula as draft_printed_formula  # noqa: E402
 from simulator.battery import migrate as battery_migrate  # noqa: E402
 from simulator.battery.waypoints import oxygen_condition  # noqa: E402
@@ -10295,6 +10298,20 @@ def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
         ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", -100.0, True),
         ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", 100.0, False),
         ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", "-10^2", True),
+        ("<table><tr><td>--10<sup>2</sup></td></tr></table>\n", -100.0, False),
+        ("<table><tr><td>--10<sup>2</sup></td></tr></table>\n", 100.0, False),
+        ("<table><tr><td>+-10<sup>2</sup></td></tr></table>\n", -100.0, False),
+        ("<table><tr><td>+-10<sup>2</sup></td></tr></table>\n", 100.0, False),
+        (
+            "<table><tr><td>-\u221210<sup>2</sup></td></tr></table>\n",
+            -100.0,
+            False,
+        ),
+        (
+            "<table><tr><td>-\u221210<sup>2</sup></td></tr></table>\n",
+            100.0,
+            False,
+        ),
         (
             "<table><tr><td>-1.5\u00d710<sup>3</sup></td></tr></table>\n",
             -1500.0,
@@ -10370,7 +10387,13 @@ def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
     assert "UNICODE_SUPERSCRIPTS" in validator_text
     assert vle._explicit_power_decimal("-10^2") == Decimal("-100")
     assert vle._explicit_power_decimal("-10^2") != Decimal("100")
+    assert vle._explicit_power_decimal("--10^2") is None
+    assert vle._explicit_power_decimal("+-10^2") is None
+    assert vle._explicit_power_decimal("-\u221210^2") is None
     assert vle._superscript_power_decimal("-102", ((3, 4),)) == Decimal("-100")
+    assert vle._superscript_power_decimal("--102", ((4, 5),)) is None
+    assert vle._superscript_power_decimal("+-102", ((4, 5),)) is None
+    assert vle._superscript_power_decimal("-\u2212102", ((4, 5),)) is None
     for numeric in ("2", "2.0", "6.98", "1e-999"):
         assert vle._formula_label_in_text(numeric, "SiO_{2}") is False
         assert vle._formula_label_in_text(numeric, "SiO₂") is False
@@ -10784,13 +10807,14 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
     wrapper. A separate number token still certifies. A sub-formula inside
     a compound is not the compound: ``SO4`` is not ``Fe2(SO4)3``, and
     ``SiO2`` is not ``CaO·SiO2``. A raw token with a caret, ``<sup>``,
-    a Unicode superscript, or a trailing charge is unsupported.
-    ``Fe``, ``Fe2``, and ``Fe^{2+}`` refuse with
+    a Unicode superscript, or a charge sign beside an uppercase element
+    letter is unsupported. ``Fe``, ``Fe2``, and ``Fe^{2+}`` refuse with
     ``charged_species_unsupported``, including a CSV cell. A neutral
-    ``Fe`` elsewhere still certifies. A Unicode charge sign is that
-    same refusal: ``Cl−``, ``Cl⁻``, ``Na⁺``, and ``SO₄²⁻`` refuse
-    ``Cl``, ``Cl``, ``Na``, and ``SO4`` on prose, an HTML cell, CSV,
-    and TSV.
+    ``Fe`` elsewhere still certifies. Every sign in the certification
+    class does that, anywhere in the raw token: ``Cl−,``, ``SO₄−``,
+    ``SO_{4}−``, and ``Fe-rich`` refuse the neutral label on prose, an
+    HTML cell, CSV, and TSV. ``Cl`` certifies ``Cl``. ``-6.98``
+    certifies ``-6.98``. An unrelated formula miss is not that refusal.
     """
     assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
     assert (
@@ -11057,19 +11081,44 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                 failures.append(
                     f"charged csv neighbour {label!r} {kind}: {errors}"
                 )
-    assert FORMULA_CHARGE_SIGNS == (
-        "+-\u2212\u2013\u2012\ufe63\uff0b\uff0d\u207a\u207b\u208a\u208b"
-    )
-    assert "FORMULA_CHARGE_SIGNS" in inspect.getsource(vle)
-    charge_pattern = vle._TRAILING_FORMULA_CHARGE_RE.pattern
-    for sign in FORMULA_CHARGE_SIGNS:
-        assert sign in charge_pattern or re.escape(sign) in charge_pattern
+    assert vle._UNICODE_MINUS_SIGNS is UNICODE_MINUS_SIGNS
+    assert vle._UNICODE_PLUS_SIGNS is UNICODE_PLUS_SIGNS
+    assert "FORMULA_CHARGE_SIGNS" not in inspect.getsource(vle)
+    assert not hasattr(vle, "_TRAILING_FORMULA_CHARGE_RE")
+    charge_signs = "+-" + UNICODE_MINUS_SIGNS + UNICODE_PLUS_SIGNS
+    for sign in charge_signs:
         if not vle._raw_token_is_charged_species(f"Cl{sign}"):
             failures.append(f"charge sign {sign!r} does not charge Cl")
         if vle._formula_label_in_text("Cl", f"Cl{sign}"):
             failures.append(f"charge sign {sign!r} certifies Cl")
     assert vle._raw_token_is_charged_species("Cl") is False
-    for neutral, source in _UNICODE_CHARGE_SOURCES:
+    assert vle._raw_token_is_charged_species("-6.98") is False
+    assert vle._raw_token_is_charged_species("1.2E-3") is False
+    assert vle._raw_token_is_charged_species("0.24E+2.") is False
+    assert vle._raw_token_is_charged_species("1.2E\u22123") is False
+    assert vle._formula_label_in_text("Cl", "Cl\u2212,") is False
+    assert vle._formula_label_in_text("SO4", "SO\u2084\u2212") is False
+    assert vle._formula_label_in_text("SO4", "SO_{4}\u2212") is False
+    assert vle._formula_label_in_text("Fe", "Fe-rich") is False
+    assert vle._formula_label_in_text("Fe", "Fe-Ti") is False
+    assert vle._formula_label_in_text("Cl", "Cl") is True
+    assert vle._formula_label_in_text("Fe", "Fe Fe-rich") is True
+    assert vle._leaf_in_text(-6.98, "-6.98") is True
+    charge_sources = [("Cl", f"Cl{sign}") for sign in charge_signs]
+    charge_sources.extend(_UNICODE_CHARGE_SOURCES)
+    charge_sources.extend(
+        (
+            ("Cl", "Cl\u2212,"),
+            ("SO4", "SO\u2084\u2212"),
+            ("SO4", "SO_{4}\u2212"),
+            ("Fe", "Fe-rich"),
+        )
+    )
+    for neutral, source in charge_sources:
+        # A comma stays inside the CSV cell. ``Cl−,`` is one cell.
+        csv_cell = source
+        if any(ch in source for ch in ",\"\n"):
+            csv_cell = '"' + source.replace('"', '""') + '"'
         surfaces = (
             ("prose", source + "\n", "text/unicode-charge.md", None),
             (
@@ -11078,7 +11127,7 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                 "text/unicode-charge.html",
                 {"table_row": 1, "table_column": 1},
             ),
-            ("csv", source + "\n", "tables/unicode-charge.csv", None),
+            ("csv", csv_cell + "\n", "tables/unicode-charge.csv", None),
             ("tsv", source + "\n", "tables/unicode-charge.tsv", None),
         )
         for kind, text, relative, locator_extra in surfaces:
@@ -11109,6 +11158,76 @@ def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
                     failures.append(
                         f"unicode charge {kind} blind {neutral!r}: {errors}"
                     )
+    neutral_surfaces = (
+        ("prose", "Cl\n", "text/neutral-cl.md", None),
+        (
+            "html",
+            "<table><tr><td>Cl</td></tr></table>\n",
+            "text/neutral-cl.html",
+            {"table_row": 1, "table_column": 1},
+        ),
+        ("csv", "Cl\n", "tables/neutral-cl.csv", None),
+        ("tsv", "Cl\n", "tables/neutral-cl.tsv", None),
+    )
+    for kind, text, relative, locator_extra in neutral_surfaces:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path,
+                "Cl",
+                text,
+                key=key,
+                relative=relative,
+                locator_extra=locator_extra,
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"neutral-cl-{kind}-{key}", artifact_root=tmp_path
+            )
+            if errors:
+                failures.append(f"neutral Cl {kind} {key}: {errors}")
+    number_surfaces = (
+        ("prose", "-6.98\n", "text/signed-number.md", None),
+        (
+            "html",
+            "<table><tr><td>-6.98</td></tr></table>\n",
+            "text/signed-number.html",
+            {"table_row": 1, "table_column": 1},
+        ),
+        ("csv", "-6.98\n", "tables/signed-number.csv", None),
+        ("tsv", "-6.98\n", "tables/signed-number.tsv", None),
+    )
+    for kind, text, relative, locator_extra in number_surfaces:
+        doc = _html_source_document(
+            tmp_path,
+            -6.98,
+            text,
+            relative=relative,
+            locator_extra=locator_extra,
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"signed-number-{kind}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"number -6.98 {kind}: {errors}")
+    neighbour = _html_source_document(
+        tmp_path, "Fe", "Fe Fe-rich\n", key="formula"
+    )
+    errors = vle.certify_extract_source_fidelity(
+        neighbour, label="fe-rich-neighbour", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"neutral Fe beside Fe-rich: {errors}")
+    unrelated = _html_source_document(
+        tmp_path, "SiO2", "Fe-rich measured\n", key="formula"
+    )
+    errors = vle.certify_extract_source_fidelity(
+        unrelated, label="fe-rich-unrelated", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    if (
+        "source_blind_pin" not in joined
+        or "charged_species_unsupported" in joined
+    ):
+        failures.append(f"unrelated SiO2 beside Fe-rich: {errors}")
     assert failures == []
 
 
