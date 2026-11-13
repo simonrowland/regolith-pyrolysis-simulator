@@ -590,8 +590,8 @@ class KEMSAdapter:
         self._vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
         self._provider = BuiltinVaporPressureProvider(vapor_pressure_data)
         # Survives evaluate() so a later run can replay the stored disclosure.
-        # The key includes the provider identity: a replaced provider must not
-        # reuse another provider's pressures.
+        # The key holds the provider object. id(provider) is recycled after
+        # collection, and the next provider would replay this row's status.
         self._surface_cache: dict[tuple, dict[str, Any]] = {}
 
     def _molar_mass_kg_mol(self, species: str) -> float | None:
@@ -613,7 +613,7 @@ class KEMSAdapter:
         temperature_K: float,
     ) -> tuple:
         return (
-            id(self._provider),
+            self._provider,
             str(case["oxide"]["formula"]),
             float(case["provider_inputs"]["pO2_bar"]),
             float(case["exterior_chamber_pressure"]["value_pa"]),

@@ -463,6 +463,71 @@ def test_non_ok_provider_status_cannot_match_numeric_observation(
     assert run.runtime_rows[0]["vapor_pressures_Pa"]["Ca"] == 1.0
 
 
+def test_recycled_provider_id_cannot_replay_another_provider_status(
+    observations: dict,
+    adapter: KEMSAdapter,
+) -> None:
+    """A collected provider's id must not replay that provider's status.
+
+    The surface cache is shared across copy.copy of the module-scoped
+    adapter. Keying it on id(provider) let CPython hand the next provider
+    the previous row: the gate's unavailable case came back not_converged.
+    """
+
+    class NonOkProvider:
+        name = "recycled-id-provider"
+
+        def __init__(self, status: str) -> None:
+            self._status = status
+
+        def dispatch(self, request):
+            return SimpleNamespace(
+                status=self._status,
+                diagnostic={"vapor_pressures_Pa": {"Ca": 1.0}},
+                warnings=(f"synthetic {self._status}",),
+            )
+
+    case = load_kems_case(KEMS_PRESETS / "halwax_2024_cao.yaml")
+    case["provider_inputs"]["status"] = "reported"
+    changed = copy.deepcopy(observations)
+    point = changed["cases"]["halwax_2024_cao"]["points"][0]
+    point["partial_pressure_pa"] = 1.0
+    point["status"] = "reported"
+    point["uncertainty"] = {"kind": "absolute", "value": 0.01}
+
+    isolated = copy.copy(adapter)
+    isolated._surface_cache = {}
+    first_provider = NonOkProvider("not_converged")
+    isolated._provider = first_provider
+    first = isolated.evaluate(case, changed)
+    assert first.runtime_rows[0]["provider_status"] == "not_converged"
+
+    # The failure the gate hit: the stored identity slot is the integer id,
+    # and the next provider is allocated at that same id.
+    second_provider = NonOkProvider("unavailable")
+    planted: dict = {}
+    collided = False
+    for key, row in isolated._surface_cache.items():
+        rewritten = tuple(
+            id(second_provider) if part == id(first_provider) else part
+            for part in key
+        )
+        collided = collided or rewritten != key
+        planted[rewritten] = row
+    isolated._surface_cache.clear()
+    isolated._surface_cache.update(planted)
+    isolated._provider = second_provider
+    second = isolated.evaluate(case, changed)
+
+    assert second.runtime_rows[0]["provider_status"] == "unavailable"
+    assert any(
+        part is second_provider
+        for key in isolated._surface_cache
+        for part in key
+    )
+    assert not collided
+
+
 def test_unknown_provider_status_is_rejected(
     observations: dict,
     adapter: KEMSAdapter,
