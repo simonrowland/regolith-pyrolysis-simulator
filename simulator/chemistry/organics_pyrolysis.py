@@ -35,11 +35,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from engines.builtin.cco_redox_buffer import CCO_SOURCE
-from simulator.chemistry.graphite_c_co import (
-    carbon_delta_g_co_kj_per_mol_o2,
-    cco_log10_fO2_bar,
-)
+from simulator.chemistry.graphite_c_co import carbon_delta_g_co_kj_per_mol_o2
+from simulator.oxygen_buffers import CCO_SOURCE, cco_log10_fO2_bar
 from simulator.silent_zero import (
     CATEGORY_MARK,
     CATEGORY_PROVEN_ZERO,
@@ -47,10 +44,12 @@ from simulator.silent_zero import (
     ZeroBecause,
     make_note,
 )
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET as CELSIUS_TO_KELVIN,
+    GAS_CONSTANT_6SIG as GAS_CONSTANT_J_PER_MOL_K,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
-GAS_CONSTANT_J_PER_MOL_K = 8.31446
-CELSIUS_TO_KELVIN = 273.15
 _PARAMS_PATH = (
     Path(__file__).resolve().parents[2] / "data" / "organics_pyrolysis.yaml"
 )

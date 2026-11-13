@@ -11,6 +11,23 @@ import yaml
 
 OXIDE_BY_TABLE = {"I": "Li2O", "II": "Na2O", "III": "K2O"}
 QUANTITIES = {"activity", "activity_coefficient", "partial_molar_enthalpy"}
+LIQUIDUS_PROVENANCE = {
+    "I": {
+        "method_class": "quoted_unattributed",
+        "reason": "The text calls these liquidus values but does not identify which work supplied Table I's X1 inputs.",
+    },
+    "II": {
+        "method_class": "quoted_attributed",
+        "attribution": "F. C. Kracek, “System Sodium Oxide-Silica” (1930), reference [23]",
+    },
+    "III": {
+        "method_class": "quoted_attributed",
+        "attribution": (
+            "F. C. Kracek, N. L. Bowen, and G. W. Morey, “Equilibrium Relations and Factors "
+            "Influencing Their Determination in the System K2SiO3-SiO2” (1937), reference [30]"
+        ),
+    },
+}
 
 
 def _composition_id(table: str, temperature: str) -> str:
@@ -118,12 +135,8 @@ def _composition_observation(
                 "The source prints X1 for the binary liquidus; SiO2 is 1 - X1, "
                 "calculated at full Decimal precision by the committed audit script."
             ),
-            "method_class": "quoted_attributed",
             "admission_status": "admitted",
-            "attribution": (
-                f"Charles (1967), Table {table}; the source identifies this column "
-                f"as liquidus composition from the {oxide}-SiO2 phase diagram."
-            ),
+            **LIQUIDUS_PROVENANCE[table],
         },
     }
 

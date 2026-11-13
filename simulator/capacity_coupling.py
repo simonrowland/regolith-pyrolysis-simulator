@@ -12,7 +12,7 @@ from engines.builtin.overhead_bleed import (
     compressible_pressure_capacity_fraction,
     controlled_flow_capacity,
 )
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 
 
@@ -203,7 +203,7 @@ def solve_capacity_shadow(
         "dt_hr": dt_hr,
         "bleed_conductance_kg_s": bleed_conductance_kg_s,
         "p_total_bar": 0.0,
-        "p_downstream_bar": downstream_pressure_Pa / 100000.0,
+        "p_downstream_bar": downstream_pressure_Pa / PA_PER_BAR,
     }
     if not isinstance(accumulator_enabled, bool):
         return CapacityShadowRefusal(
@@ -345,7 +345,7 @@ def solve_capacity_shadow(
             else sum(partials.values())
         )
         bleed_controls = dict(controls)
-        bleed_controls["p_total_bar"] = total_pressure_Pa / 100000.0
+        bleed_controls["p_total_bar"] = total_pressure_Pa / PA_PER_BAR
         bleed_controls["bleed_conductance_kg_s"] = bleed_conductance_kg_s
         if controlled_flow:
             positive_source_kg_hr = sum(
@@ -359,7 +359,7 @@ def solve_capacity_shadow(
                 evolved_flux_kg_hr=positive_source_kg_hr,
                 retained_holdup_kg=retained_holdup_kg,
                 dt_hr=dt_hr,
-                upstream_pressure_bar=total_pressure_Pa / 100000.0,
+                upstream_pressure_bar=total_pressure_Pa / PA_PER_BAR,
             )
             bleed_controls["effective_transport_capacity"] = (
                 final_flow_capacity
@@ -483,8 +483,8 @@ def solve_capacity_shadow(
         pipe_capacity_kg_hr = (
             bleed_conductance_kg_s
             * compressible_pressure_capacity_fraction(
-                total_pressure_Pa / 100000.0,
-                downstream_pressure_Pa / 100000.0,
+                total_pressure_Pa / PA_PER_BAR,
+                downstream_pressure_Pa / PA_PER_BAR,
             )
             * 3600.0
         )

@@ -1,0 +1,91 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.34657/17394
+  citation: Kassis, N., and Frischat, G. H. (1981), Dampfdrucke von Glasschmelzen des Mischalkalisystems Na2O-Rb2O-SiO2, Glastechnische
+    Berichte, 54(4), 89-98.
+  source_ids:
+  - kassis-frischat-1981-mixed-alkali-vapor-pressures
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:kassis-frischat-1981-mixed-alkali-vapor-pressures
+      role: pdf
+      path: raw/kassis-frischat-1981-mixed-alkali-vapor-pressures/kassis-frischat-1981-mixed-alkali-vapor-pressures.pdf
+      sha256:
+        tag: value
+        value: fe10e00552a543945d3108c9cca8a5721a69a374441675c2203e799e9e10a00b
+    - asset_id: pdftotext:kassis-frischat-1981-mixed-alkali-vapor-pressures
+      role: pdftotext
+      path: text/kassis-frischat-1981-mixed-alkali-vapor-pressures
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kassis-frischat-1981-mixed-alkali-vapor-pressures
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.34657/17394
+experiments:
+- experiment_id: 10.34657/17394::experiment::mixed_alkali_pressure_ratio_series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00066'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 90
+        section: 1.2.2
+        note: Printed chamber operating vacuum 6,6 · 10^-4 Pa; this is the outside-cell background, not an in-cell vapor total
+          pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: No sweep-gas composition is reported.
+      locator:
+        page: 2
+        published_page: 90
+        section: 1.2.2
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not report a flow-regime classification.
+  work_id: 10.34657/17394
+  locator:
+    page: 2
+    published_page: 90
+    section: 1.2.2
+    note: Shared chamber condition for the compared melt series.
+  bench_id: 10.34657/17394::bench::knudsen-effusion-apparatus
+benches:
+- id: 10.34657/17394::bench::knudsen-effusion-apparatus
+  work_id: 10.34657/17394
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen cell, thermobalance, and high-temperature high-vacuum furnace
+    locator:
+      page: 2
+      published_page: 90
+      section: 1.2.2
+  other_facts: []

@@ -194,6 +194,27 @@ def _scored(
         }:
             backend_name = backend_name or spec_backend
             evidence_class = evidence_class or "melts"
+    trace_payload = dict(
+        trace
+        or {"hours": [{"hour": 1, "oxygen_kg": oxygen, "backend_status": "ok"}]}
+    )
+    if (
+        feasible
+        and backend_authoritative is True
+        and backend_status in (None, "ok")
+        and evidence_class in {"melts", "magemin"}
+        and isinstance(backend_name, str)
+        and backend_name
+        and trace_payload.get("backend_name") in (None, backend_name)
+    ):
+        diagnostics = trace_payload.get("diagnostics")
+        if not isinstance(diagnostics, dict):
+            diagnostics = {}
+        diagnostics.setdefault("backend_name", backend_name)
+        diagnostics.setdefault("engine_version", "petthermotools 1.2.3")
+        trace_payload["diagnostics"] = diagnostics
+        trace_payload.setdefault("backend_name", backend_name)
+        trace_payload.setdefault("engine_version", "petthermotools 1.2.3")
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -211,8 +232,7 @@ def _scored(
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
-            trace=trace
-            or {"hours": [{"hour": 1, "oxygen_kg": oxygen, "backend_status": "ok"}]},
+            trace=trace_payload,
             product_summary=_product_summary_with_mass_proof(
                 product_summary,
                 oxygen=oxygen,

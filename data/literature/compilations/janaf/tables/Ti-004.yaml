@@ -43,6 +43,17 @@ table:
     state: l
   title_as_published: Titanium (Ti)  |  Ti1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  fusion_transition:
+    temperature:
+      value: 1936
+      uncertainty: 10
+      unit: K
+      locator: "JANAF 4th ed. p. 1910 (PDF p. 1921), T_fus = 1936 ± 10 K"
+    enthalpy:
+      value: 14.146
+      uncertainty: 5.0
+      unit: kJ mol^-1
+      locator: "JANAF 4th ed. p. 1910 (PDF p. 1921), Δ_fusH° = 14.146 ± 5.0 kJ mol^-1"
   units_as_published:
     temperature: K
     heat_capacity: J K^-1 mol^-1

@@ -120,10 +120,10 @@ from simulator.battery.records import (
     phase_token,
 )
 from simulator.physical_constants import (
+    ATM_PA_DECIMAL,
+    BAR_PA_DECIMAL,
     CELSIUS_TO_KELVIN_OFFSET,
-    GAS_CONSTANT,
-    PA_PER_BAR,
-    STANDARD_ATMOSPHERE_PA,
+    GAS_CONSTANT_DECIMAL,
 )
 from simulator.reference_data.janaf import formula_composition
 
@@ -151,12 +151,12 @@ THERMOCHEMICAL_CALORIE_J = Decimal("4.184")
 # A 1 atm vs 1 bar slip in ΔfG is Δn_g RT ln(1.01325) ≈ 0.033 kJ/mol at
 # 298 K per mol of gas — inside the 1 kJ/mol independent band, noted, not
 # silently corrected by identity_equal.
-PA_PER_BAR_DEC = Decimal(str(int(PA_PER_BAR))) if PA_PER_BAR == 1e5 else Decimal(str(PA_PER_BAR))
-PA_PER_ATM_DEC = Decimal(str(int(STANDARD_ATMOSPHERE_PA)))
+PA_PER_BAR_DEC = BAR_PA_DECIMAL
+PA_PER_ATM_DEC = ATM_PA_DECIMAL
 CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 
 # R as used for ΔfG ↔ log10 Kf in *cross-source* identity. CODATA / SI 2019
-# R = N_A k_B = 8.314462618… J/(mol·K) from physical_constants.GAS_CONSTANT.
+# R = N_A k_B from physical_constants.GAS_CONSTANT_DECIMAL.
 # Source-era transcription constants (JANAF 8.31441, B1544 8.3143,
 # B1259 1.98717 cal/(mol·K)) stay on their generators; see this
 # module's Gas-constant policy docstring.
@@ -167,7 +167,7 @@ CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 # Unit check: kJ/mol divided by [kJ/(mol·K)]·K is dimensionless (dex).
 # B1544's ±1.320 kJ/mol at 298.15 K gives 1.320/(R·T·ln 10) = 0.231 dex.
 LN10 = Decimal(str(math.log(10.0)))
-R_J_PER_MOL_K = Decimal(str(GAS_CONSTANT))
+R_J_PER_MOL_K = GAS_CONSTANT_DECIMAL
 R_KJ_PER_MOL_K = R_J_PER_MOL_K / Decimal("1000")
 
 # Fixed-valence domain for condensed oxide-activity comparison. Roy &
@@ -275,6 +275,11 @@ def ideal_gas_entropy_pressure_shift_J_per_mol_K(
     """
 
     return -R_J_PER_MOL_K * _ideal_gas_ln_pressure_ratio(p_from_Pa, p_to_Pa)
+
+
+_STANDARD_PRESSURE_AMBIGUITY_RELATION = (
+    "standard-pressure ambiguity: |RT ln(p_atm/p_bar)|"
+)
 
 
 def standard_pressure_delta_g_kJ_per_mol(
@@ -1125,6 +1130,26 @@ def profile_for(identity: Identity) -> QuantityProfile:
             # flux per area may omit area from equality only after recorded
             # normalization; sample mass still required for extensive rates.
             pass
+    elif q is Quantity.WALL_DEPOSIT_AREAL_RATE:
+        req(
+            "temperature_K",
+            "per",
+            "composition",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "wall",
+        )
+        na(
+            "subtype",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "fO2_Pa",
+            "exposure",
+            "sample_mass_kg",
+        )
     elif q is Quantity.TRANSITION_TEMPERATURE:
         req("subtype", "total_pressure_Pa")
         # no duplicate T coordinate
@@ -1811,6 +1836,8 @@ def _values_compare(
         if left.component_basis != right.component_basis:
             return _mismatch(name)
         if left.reference_pressure_bar != right.reference_pressure_bar:
+            return _mismatch(name)
+        if left.iron_saturation_composition != right.iron_saturation_composition:
             return _mismatch(name)
         nested = _species_equal(
             left.endmember,

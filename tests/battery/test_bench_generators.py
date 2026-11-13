@@ -659,13 +659,20 @@ def test_kems_refuses_reduced_charge_when_print_names_dropped_species():
     experiment = replace(experiment, sample=replace(experiment.sample,
         printed_composition=f.located({"MgO": Decimal("97"), "Unobtainium2O": Decimal("3")})))
     inputs = collect_consumer_inputs(experiment, bench, observation)
-    assert list(inputs.charges) == ["MgO"]
+    assert not inputs.charges
+    assert inputs.charges.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert inputs.charges.absence.missing == (
+        "experiment.sample.printed_composition.Unobtainium2O",
+    )
     assert inputs.charges.dropped == ("Unobtainium2O",)
     result = kems_case(inputs)
     assert result.payload is None
     assert result.readiness.status is ReadinessStatus.GAP
-    assert any(gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
-               and "Unobtainium2O" in gap.waypoint for gap in result.readiness.gaps)
+    assert any(
+        gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        and any("Unobtainium2O" in path for path in gap.missing)
+        for gap in result.readiness.gaps
+    )
 
 
 @pytest.mark.parametrize("name", REQUIREMENTS["kems"])

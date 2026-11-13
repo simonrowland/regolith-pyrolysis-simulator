@@ -62,6 +62,7 @@ from simulator.optimize.result_trust import (
     ResultTrustCarriers,
     carrier_backend_status as _extract_backend_status,
     collect_result_trust_carriers,
+    real_engine_producer_stamp_rejections,
     result_trust_carriers as _admission_carriers,
 )
 
@@ -978,18 +979,31 @@ def _artifact_authority_rejections(
     # rule; it also makes DISAGREEING carriers deny, which they should, since
     # carriers that do not agree have not established certification either.
     #
-    # ★★ FEASIBILITY IN THIS CACHE IS NOT A TRUST SIGNAL, and tightening this
-    # gate does not make it one. The only backend the project ships is in
-    # CERTIFICATION_DENYLIST, so an honest run cannot satisfy this predicate at
-    # all; what survives here is provenance that CLAIMS a backend the shipped
-    # configuration does not run. This guard removes the rows that got in by
-    # omitting a field, not the ones that assert a consistent claim. Do not read
-    # a cached feasible row as having passed a real check while that remains
-    # true -- a stricter gate makes its own output look more trustworthy, which
-    # is the inference this comment exists to block.
+    # ★★ FEASIBILITY IN THIS CACHE IS NOT A TRUST SIGNAL. certification_allowed
+    # is the class-and-status verdict from the fidelity vocabulary. For a
+    # certifying real-engine class (melts, magemin) that verdict is not enough:
+    # the row must also carry the engine_version the adapter wrote on the same
+    # mapping as the backend name it wrote. A consistent alphamelts/melts/ok
+    # claim with no such stamp is refused. The stamp is not a signature. An
+    # omitted certification field stays certification_forbidden and does not
+    # reach the stamp check. Do not read a cached feasible row as signed.
     certification_allowed = _agreed_carrier_value(trust.certification_allowances)
     if certification_allowed is not True:
         reasons.append("certification_forbidden")
+    else:
+        agreed_evidence = _agreed_carrier_value(trust.evidence_classes)
+        agreed_backend = _agreed_carrier_value(trust.backend_names)
+        reasons.extend(
+            real_engine_producer_stamp_rejections(
+                trust,
+                evidence_class=(
+                    agreed_evidence if isinstance(agreed_evidence, str) else None
+                ),
+                claimed_backend=(
+                    agreed_backend if isinstance(agreed_backend, str) else None
+                ),
+            )
+        )
     requires_inherited_evidence_class = any(trust.inherited_evidence_requirements)
     evidence_candidates: tuple[str | None, ...] = (
         distinct_evidence if distinct_evidence else (None,)

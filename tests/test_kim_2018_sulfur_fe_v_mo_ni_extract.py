@@ -56,6 +56,21 @@ def _assert_render_grid_matches_extract(doc: dict, grid: list[dict[str, str]]) -
         assert ratio_values['alloy_composition_mass_percent_as_printed'] == source['metal_composition_mass_percent']
         assert _decimal(ratio_values['distribution_ratio']) == _decimal(source['LS'])
 
+        expected_slag_composition = {
+            '40%CaO-60%Al2O3': {'CaO': '40', 'Al2O3': '60'},
+            '50%CaO-50%Al2O3': {'CaO': '50', 'Al2O3': '50'},
+        }[source['slag_composition']]
+        for row in (ratio, slag_s):
+            composition_values = row['values']
+            assert composition_values.get('composition_wt_pct') == expected_slag_composition
+            assert composition_values['composition_wt_pct_basis'] == 'wt_percent'
+            assert composition_values['composition_wt_pct_semantics'] == 'nominal_as_printed'
+            composition_locator = composition_values['composition_locator']
+            assert composition_locator['page'] == row['locator']['page']
+            assert composition_locator['table'] == row['locator']['table']
+            assert composition_locator['row_label'] == row['locator']['row_label']
+            assert 'nominal starting slag matrix' in composition_locator['note']
+
         assert slag_values['quantity'] == 'equilibrium_phase_composition'
         assert slag_values['formula'] == 'S'
         assert slag_values['phase_label'] == 'slag'
@@ -79,6 +94,12 @@ def _assert_render_grid_matches_extract(doc: dict, grid: list[dict[str, str]]) -
             assert values['phase_label'] == 'metal'
             assert values['sample_id'] == sample
             assert _decimal(values['component_amount']) == _decimal(published)
+            unknown_composition = values['composition']
+            assert unknown_composition['state']['tag'] == 'unknown'
+            assert 'No per-run starting metal composition is printed' in unknown_composition['state']['reason']
+            assert unknown_composition['locator']['page'] == component['locator']['page']
+            assert unknown_composition['locator']['table'] == component['locator']['table']
+            assert unknown_composition['locator']['row_label'] == component['locator']['row_label']
 
         assert ratio['derived_from'] == [slag_s['observation_id'], f'{prefix}_metal_S']
         assert ratio['locator']['page'] == (3 if source['table'] == '1' else 4 if source['table'] == '2' else 5)
@@ -112,6 +133,15 @@ def test_tables_1_to_3_are_independently_bound_to_the_600_dpi_render_grid() -> N
     changed_extract['species']['S']['observations'][0]['values']['component_amount'] = '999'
     with pytest.raises(AssertionError):
         _assert_render_grid_matches_extract(changed_extract, grid)
+
+    changed_composition = deepcopy(doc)
+    changed_slag_row = next(
+        row for row in changed_composition['species']['S']['observations']
+        if row['observation_id'] == 'kim2018_p003_t01_r03_slag_S'
+    )
+    del changed_slag_row['values']['composition_wt_pct']
+    with pytest.raises(AssertionError):
+        _assert_render_grid_matches_extract(changed_composition, grid)
 
 
 def test_all_typed_values_migrate_as_points_with_species_temperature_and_conditions(tmp_path: Path) -> None:
@@ -167,6 +197,41 @@ def test_all_typed_values_migrate_as_points_with_species_temperature_and_conditi
             assert condition.state.value == row.identity.temperature_K.value
             assert condition.locator.page == 6
             assert condition.locator.pdf_page_index == 5
+
+
+def test_named_table_compositions_migrate_without_reusing_metal_analyses(tmp_path: Path) -> None:
+    from simulator.battery.migrate import wt_pct_to_mole_fraction
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(tmp_path, EXTRACT.name)
+    assert result.validation is not None
+    assert result.validation.hard_issues == (), result.validation.hard_issues
+    rows = {
+        row.observation_id.split('::', 1)[-1]: row
+        for row in result.observations.values()
+        if row.source_id == 'kim-2018-sulfur-fe-v-mo-ni'
+    }
+
+    expected_40_60 = wt_pct_to_mole_fraction(
+        {'CaO': Decimal('40'), 'Al2O3': Decimal('60')}
+    )
+    expected_50_50 = wt_pct_to_mole_fraction(
+        {'CaO': Decimal('50'), 'Al2O3': Decimal('50')}
+    )
+    # t-1617 / d-323: the located nominal slag matrices are printed starting
+    # bulks, while the unprinted metal starts below remain unknown.
+    for observation_id, expected in (
+        ('kim2018_p003_t01_r03_slag_S', expected_40_60),
+        ('kim2018_p004_t02_r03_L_S', expected_40_60),
+        ('kim2018_p003_t01_r06_slag_S', expected_50_50),
+    ):
+        composition = rows[observation_id].identity.composition.value
+        assert composition.components == expected.components
+        assert composition.input_provenance == 'printed_starting_bulk'
+
+    metal_composition = rows['kim2018_p004_t02_r03_metal_S'].identity.composition
+    assert metal_composition.is_unknown
+    assert 'No per-run starting metal composition is printed' in metal_composition.reason
 
 
 def _not_dash(value: str) -> bool:

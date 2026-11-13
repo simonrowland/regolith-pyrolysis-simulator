@@ -35,9 +35,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), calculation from Eq. (1)
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -138,6 +137,23 @@ observations:
               section: III.2 Effect of Na2CO3 in Flux
         output_unit: K
         references: []
+  derivation:
+    relation: The authors calculated carbon generated during the first 6 min for Flux E from reaction Eq. (1).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 126
+        pdf_page_index: 5
+        section: III.2 Effect of Na2CO3 in Flux
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_increment_flux_E
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -171,9 +187,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), calculation from Eq. (1)
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -274,6 +289,24 @@ observations:
               section: III.2 Effect of Na2CO3 in Flux
         output_unit: K
         references: []
+  derivation:
+    relation: The authors reduced the calculated generated-carbon amount to the expected concentration increment by assuming
+      all generated carbon dissolved in the 250 g liquid-iron charge.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 126
+        pdf_page_index: 5
+        section: III.2 Effect of Na2CO3 in Flux
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_measured_range
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -400,6 +433,8 @@ observations:
               section: III.2 Effect of Na2CO3 in Flux
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_1
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -502,6 +537,8 @@ observations:
         published_page: 123
         pdf_page_index: 2
         note: Text says final Na2O decreased from 31% as T.Fe increased from 9%.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_2
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -604,6 +641,8 @@ observations:
         published_page: 123
         pdf_page_index: 2
         note: Text says final Na2O decreased to 20% as T.Fe increased to 31%.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_carbon_bound
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -718,6 +757,8 @@ observations:
               section: III.2 Effect of Na2CO3 in Flux
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_flux_C2
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -751,9 +792,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), prose discussion of Figure 7
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -845,6 +885,25 @@ observations:
               section: III.2 Effect of Na2CO3 in Flux
         output_unit: K
         references: []
+  derivation:
+    relation: The comparison rate is the authors' reduction of measured phosphorus change during the first minute per slag-metal
+      interface area; the plotted source curve is in Figure 7.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 125
+        pdf_page_index: 4
+        figure: '7'
+        section: III.2 Effect of Na2CO3 in Flux
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_fluxes_E_to_I
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -878,9 +937,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), prose discussion of Figure 7
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: source status=typed_refusal
@@ -972,6 +1030,25 @@ observations:
               section: III.2 Effect of Na2CO3 in Flux
         output_unit: K
         references: []
+  derivation:
+    relation: The initial dephosphorization rates are reductions of the authors' measured phosphorus changes during the first
+      minute per slag-metal interface area; the plotted source curves are in Figure 7.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 125
+        pdf_page_index: 4
+        figure: '7'
+        section: III.2 Effect of Na2CO3 in Flux
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_A
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -1021,7 +1098,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1044,9 +1121,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), reported Na2O-loss calculation
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1109,6 +1185,24 @@ observations:
         published_page: 123
         pdf_page_index: 2
         section: III.1 Effect of Fe2O3 in Flux
+  derivation:
+    relation: Na2O loss is the authors' calculated difference for the reported flux run; its numerical calculation inputs
+      are not separately itemized.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 123
+        pdf_page_index: 2
+        section: III.1 Effect of Fe2O3 in Flux
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_B
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -1158,7 +1252,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1181,9 +1275,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), reported Na2O-loss calculation
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1246,6 +1339,24 @@ observations:
         published_page: 123
         pdf_page_index: 2
         section: III.1 Effect of Fe2O3 in Flux
+  derivation:
+    relation: Na2O loss is the authors' calculated difference for the reported flux run; its numerical calculation inputs
+      are not separately itemized.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 123
+        pdf_page_index: 2
+        section: III.1 Effect of Fe2O3 in Flux
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_C
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -1295,7 +1406,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1318,9 +1429,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), reported Na2O-loss calculation
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1383,6 +1493,24 @@ observations:
         published_page: 123
         pdf_page_index: 2
         section: III.1 Effect of Fe2O3 in Flux
+  derivation:
+    relation: Na2O loss is the authors' calculated difference for the reported flux run; its numerical calculation inputs
+      are not separately itemized.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 123
+        pdf_page_index: 2
+        section: III.1 Effect of Fe2O3 in Flux
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_D
   experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
   identity:
@@ -1432,7 +1560,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1455,9 +1583,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), reported Na2O-loss calculation
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1520,6 +1647,24 @@ observations:
         published_page: 123
         pdf_page_index: 2
         section: III.1 Effect of Fe2O3 in Flux
+  derivation:
+    relation: Na2O loss is the authors' calculated difference for the reported flux run; its numerical calculation inputs
+      are not separately itemized.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 123
+        pdf_page_index: 2
+        section: III.1 Effect of Fe2O3 in Flux
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
   identity:
@@ -1639,6 +1784,8 @@ observations:
               note: row_label=A-2; column=[%P]i; table_row_number=3; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
   identity:
@@ -1689,7 +1836,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -1826,6 +1973,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 3).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
   identity:
@@ -1945,6 +2094,8 @@ observations:
               note: row_label=A-2; column=[%O]f; table_row_number=3; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
   identity:
@@ -1995,7 +2146,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2132,6 +2283,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 3).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
   identity:
@@ -2182,7 +2335,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2319,6 +2472,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 3).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
   identity:
@@ -2369,7 +2524,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2506,6 +2661,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 3).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
   identity:
@@ -2556,7 +2713,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2693,6 +2850,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 3).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
   identity:
@@ -2743,7 +2902,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -2880,6 +3039,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 3).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
   identity:
@@ -2999,6 +3160,8 @@ observations:
               note: row_label=A-2; column=[%P]i; table_row_number=4; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
   identity:
@@ -3049,7 +3212,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3186,6 +3349,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 4).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
   identity:
@@ -3305,6 +3470,8 @@ observations:
               note: row_label=A-2; column=[%O]f; table_row_number=4; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
   identity:
@@ -3355,7 +3522,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3492,6 +3659,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 4).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
   identity:
@@ -3542,7 +3711,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3679,6 +3848,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 4).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
   identity:
@@ -3729,7 +3900,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -3866,6 +4037,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 4).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
   identity:
@@ -3916,7 +4089,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4053,6 +4226,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 4).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
   identity:
@@ -4103,7 +4278,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4240,6 +4415,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 4).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
   identity:
@@ -4359,6 +4536,8 @@ observations:
               note: row_label=A-2; column=[%P]i; table_row_number=5; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
   identity:
@@ -4409,7 +4588,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4546,6 +4725,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 5).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
   identity:
@@ -4665,6 +4846,8 @@ observations:
               note: row_label=A-2; column=[%O]f; table_row_number=5; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
   identity:
@@ -4715,7 +4898,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -4852,6 +5035,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 5).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
   identity:
@@ -4902,7 +5087,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5039,6 +5224,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 5).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
   identity:
@@ -5089,7 +5276,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5226,6 +5413,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 5).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
   identity:
@@ -5276,7 +5465,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5413,6 +5602,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 5).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
   identity:
@@ -5463,7 +5654,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5600,6 +5791,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-2 (table row 5).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
   identity:
@@ -5719,6 +5912,8 @@ observations:
               note: row_label=A-3; column=[%P]i; table_row_number=6; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
   identity:
@@ -5769,7 +5964,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -5906,6 +6101,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-3 (table row 6).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
   identity:
@@ -6025,6 +6222,8 @@ observations:
               note: row_label=A-3; column=[%O]f; table_row_number=6; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
   identity:
@@ -6075,7 +6274,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6212,6 +6411,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-3 (table row 6).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
   identity:
@@ -6262,7 +6463,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6399,6 +6600,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-3 (table row 6).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
   identity:
@@ -6449,7 +6652,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6586,6 +6789,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-3 (table row 6).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
   identity:
@@ -6636,7 +6841,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6773,6 +6978,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-3 (table row 6).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
   identity:
@@ -6823,7 +7030,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -6960,6 +7167,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-3 (table row 6).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
   identity:
@@ -7079,6 +7288,8 @@ observations:
               note: row_label=A-4; column=[%P]i; table_row_number=7; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
   identity:
@@ -7129,7 +7340,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -7266,6 +7477,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-4 (table row 7).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
   identity:
@@ -7385,6 +7598,8 @@ observations:
               note: row_label=A-4; column=[%O]f; table_row_number=7; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
   identity:
@@ -7435,7 +7650,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -7572,6 +7787,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-4 (table row 7).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
   identity:
@@ -7622,7 +7839,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -7759,6 +7976,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-4 (table row 7).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
   identity:
@@ -7809,7 +8028,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -7946,6 +8165,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-4 (table row 7).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
   identity:
@@ -7996,7 +8217,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -8133,6 +8354,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-4 (table row 7).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
   identity:
@@ -8183,7 +8406,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -8320,6 +8543,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row A-4 (table row 7).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
   identity:
@@ -8439,6 +8664,8 @@ observations:
               note: row_label=B-2; column=[%P]i; table_row_number=8; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
   identity:
@@ -8489,7 +8716,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -8626,6 +8853,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 8).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
   identity:
@@ -8745,6 +8974,8 @@ observations:
               note: row_label=B-2; column=[%O]f; table_row_number=8; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
   identity:
@@ -8795,7 +9026,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -8932,6 +9163,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 8).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
   identity:
@@ -8982,7 +9215,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9119,6 +9352,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 8).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
   identity:
@@ -9169,7 +9404,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9306,6 +9541,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 8).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
   identity:
@@ -9356,7 +9593,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9493,6 +9730,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 8).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
   identity:
@@ -9543,7 +9782,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9680,6 +9919,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 8).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
   identity:
@@ -9799,6 +10040,8 @@ observations:
               note: row_label=B-2; column=[%P]i; table_row_number=9; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
   identity:
@@ -9849,7 +10092,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -9986,6 +10229,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 9).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
   identity:
@@ -10105,6 +10350,8 @@ observations:
               note: row_label=B-2; column=[%O]f; table_row_number=9; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
   identity:
@@ -10155,7 +10402,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -10292,6 +10539,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 9).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
   identity:
@@ -10342,7 +10591,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -10479,6 +10728,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 9).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
   identity:
@@ -10529,7 +10780,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -10666,6 +10917,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 9).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
   identity:
@@ -10716,7 +10969,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -10853,6 +11106,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 9).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
   identity:
@@ -10903,7 +11158,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -11040,6 +11295,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 9).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
   identity:
@@ -11159,6 +11416,8 @@ observations:
               note: row_label=B-2; column=[%P]i; table_row_number=10; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
   identity:
@@ -11209,7 +11468,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -11346,6 +11605,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 10).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
   identity:
@@ -11465,6 +11726,8 @@ observations:
               note: row_label=B-2; column=[%O]f; table_row_number=10; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
   identity:
@@ -11515,7 +11778,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -11652,6 +11915,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 10).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
   identity:
@@ -11702,7 +11967,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -11839,6 +12104,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 10).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
   identity:
@@ -11889,7 +12156,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -12026,6 +12293,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 10).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
   identity:
@@ -12076,7 +12345,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -12213,6 +12482,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 10).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
   identity:
@@ -12263,7 +12534,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -12400,6 +12671,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-2 (table row 10).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
   identity:
@@ -12519,6 +12792,8 @@ observations:
               note: row_label=B-3; column=[%P]i; table_row_number=11; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
   identity:
@@ -12569,7 +12844,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -12706,6 +12981,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-3 (table row 11).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
   identity:
@@ -12825,6 +13102,8 @@ observations:
               note: row_label=B-3; column=[%O]f; table_row_number=11; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
   identity:
@@ -12875,7 +13154,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13012,6 +13291,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-3 (table row 11).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
   identity:
@@ -13062,7 +13343,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13199,6 +13480,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-3 (table row 11).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
   identity:
@@ -13249,7 +13532,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13386,6 +13669,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-3 (table row 11).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
   identity:
@@ -13436,7 +13721,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13573,6 +13858,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-3 (table row 11).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
   identity:
@@ -13623,7 +13910,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -13760,6 +14047,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-3 (table row 11).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
   identity:
@@ -13879,6 +14168,8 @@ observations:
               note: row_label=B-4; column=[%P]i; table_row_number=12; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
   identity:
@@ -13929,7 +14220,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14066,6 +14357,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-4 (table row 12).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
   identity:
@@ -14185,6 +14478,8 @@ observations:
               note: row_label=B-4; column=[%O]f; table_row_number=12; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
   identity:
@@ -14235,7 +14530,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14372,6 +14667,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-4 (table row 12).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
   identity:
@@ -14422,7 +14719,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14559,6 +14856,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-4 (table row 12).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
   identity:
@@ -14609,7 +14908,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14746,6 +15045,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-4 (table row 12).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
   identity:
@@ -14796,7 +15097,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -14933,6 +15234,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-4 (table row 12).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
   identity:
@@ -14983,7 +15286,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -15120,6 +15423,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row B-4 (table row 12).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
   identity:
@@ -15239,6 +15544,8 @@ observations:
               note: row_label=C-0; column=[%P]i; table_row_number=13; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
   identity:
@@ -15289,7 +15596,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -15426,6 +15733,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-0 (table row 13).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
   identity:
@@ -15545,6 +15854,8 @@ observations:
               note: row_label=C-0; column=[%O]f; table_row_number=13; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
   identity:
@@ -15595,7 +15906,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -15732,6 +16043,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-0 (table row 13).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
   identity:
@@ -15782,7 +16095,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -15919,6 +16232,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-0 (table row 13).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
   identity:
@@ -15969,7 +16284,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -16106,6 +16421,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-0 (table row 13).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
   identity:
@@ -16156,7 +16473,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -16293,6 +16610,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-0 (table row 13).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
   identity:
@@ -16343,7 +16662,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -16480,6 +16799,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-0 (table row 13).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
   identity:
@@ -16599,6 +16920,8 @@ observations:
               note: row_label=C-1; column=[%P]i; table_row_number=14; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
   identity:
@@ -16649,7 +16972,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -16786,6 +17109,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 14).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
   identity:
@@ -16905,6 +17230,8 @@ observations:
               note: row_label=C-1; column=[%O]f; table_row_number=14; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
   identity:
@@ -16955,7 +17282,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17092,6 +17419,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 14).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
   identity:
@@ -17142,7 +17471,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17279,6 +17608,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 14).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
   identity:
@@ -17329,7 +17660,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17466,6 +17797,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 14).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
   identity:
@@ -17516,7 +17849,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17653,6 +17986,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 14).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
   identity:
@@ -17703,7 +18038,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -17840,6 +18175,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 14).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
   identity:
@@ -17959,6 +18296,8 @@ observations:
               note: row_label=C-1; column=[%P]i; table_row_number=15; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
   identity:
@@ -18009,7 +18348,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -18146,6 +18485,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 15).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
   identity:
@@ -18265,6 +18606,8 @@ observations:
               note: row_label=C-1; column=[%O]f; table_row_number=15; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
   identity:
@@ -18315,7 +18658,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -18452,6 +18795,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 15).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
   identity:
@@ -18502,7 +18847,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -18639,6 +18984,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 15).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
   identity:
@@ -18689,7 +19036,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -18826,6 +19173,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 15).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
   identity:
@@ -18876,7 +19225,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19013,6 +19362,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 15).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
   identity:
@@ -19063,7 +19414,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19200,6 +19551,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 15).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
   identity:
@@ -19319,6 +19672,8 @@ observations:
               note: row_label=C-1; column=[%P]i; table_row_number=16; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
   identity:
@@ -19369,7 +19724,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19506,6 +19861,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 16).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
   identity:
@@ -19625,6 +19982,8 @@ observations:
               note: row_label=C-1; column=[%O]f; table_row_number=16; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
   identity:
@@ -19675,7 +20034,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19812,6 +20171,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 16).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
   identity:
@@ -19862,7 +20223,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -19999,6 +20360,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 16).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
   identity:
@@ -20049,7 +20412,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -20186,6 +20549,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 16).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
   identity:
@@ -20236,7 +20601,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -20373,6 +20738,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 16).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
   identity:
@@ -20423,7 +20790,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -20560,6 +20927,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-1 (table row 16).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
   identity:
@@ -20679,6 +21048,8 @@ observations:
               note: row_label=C-2; column=[%P]i; table_row_number=17; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
   identity:
@@ -20729,7 +21100,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -20866,6 +21237,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 17).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
   identity:
@@ -20985,6 +21358,8 @@ observations:
               note: row_label=C-2; column=[%O]f; table_row_number=17; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
   identity:
@@ -21035,7 +21410,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21172,6 +21547,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 17).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
   identity:
@@ -21222,7 +21599,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21359,6 +21736,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 17).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
   identity:
@@ -21409,7 +21788,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21546,6 +21925,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 17).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
   identity:
@@ -21596,7 +21977,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21733,6 +22114,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 17).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
   identity:
@@ -21783,7 +22166,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -21920,6 +22303,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 17).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
   identity:
@@ -22039,6 +22424,8 @@ observations:
               note: row_label=C-2; column=[%P]i; table_row_number=18; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
   identity:
@@ -22089,7 +22476,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -22226,6 +22613,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 18).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
   identity:
@@ -22345,6 +22734,8 @@ observations:
               note: row_label=C-2; column=[%O]f; table_row_number=18; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
   identity:
@@ -22395,7 +22786,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -22532,6 +22923,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 18).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
   identity:
@@ -22582,7 +22975,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -22719,6 +23112,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 18).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
   identity:
@@ -22769,7 +23164,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -22906,6 +23301,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 18).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
   identity:
@@ -22956,7 +23353,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -23093,6 +23490,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 18).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
   identity:
@@ -23143,7 +23542,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -23280,6 +23679,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 18).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
   identity:
@@ -23399,6 +23800,8 @@ observations:
               note: row_label=C-2; column=[%P]i; table_row_number=19; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
   identity:
@@ -23449,7 +23852,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -23586,6 +23989,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 19).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
   identity:
@@ -23705,6 +24110,8 @@ observations:
               note: row_label=C-2; column=[%O]f; table_row_number=19; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
   identity:
@@ -23755,7 +24162,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -23892,6 +24299,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 19).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
   identity:
@@ -23942,7 +24351,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24079,6 +24488,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 19).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
   identity:
@@ -24129,7 +24540,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24266,6 +24677,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 19).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
   identity:
@@ -24316,7 +24729,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24453,6 +24866,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 19).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
   identity:
@@ -24503,7 +24918,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24640,6 +25055,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 19).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
   identity:
@@ -24759,6 +25176,8 @@ observations:
               note: row_label=C-2; column=[%P]i; table_row_number=20; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
   identity:
@@ -24809,7 +25228,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -24946,6 +25365,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 20).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
   identity:
@@ -25065,6 +25486,8 @@ observations:
               note: row_label=C-2; column=[%O]f; table_row_number=20; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
   identity:
@@ -25115,7 +25538,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25252,6 +25675,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 20).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
   identity:
@@ -25302,7 +25727,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25439,6 +25864,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 20).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
   identity:
@@ -25489,7 +25916,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25626,6 +26053,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 20).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
   identity:
@@ -25676,7 +26105,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -25813,6 +26242,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 20).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
   identity:
@@ -25863,7 +26294,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -26000,6 +26431,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 20).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
   identity:
@@ -26119,6 +26552,8 @@ observations:
               note: row_label=C-2; column=[%P]i; table_row_number=21; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
   identity:
@@ -26169,7 +26604,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -26306,6 +26741,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 21).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
   identity:
@@ -26425,6 +26862,8 @@ observations:
               note: row_label=C-2; column=[%O]f; table_row_number=21; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
   identity:
@@ -26475,7 +26914,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -26612,6 +27051,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 21).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
   identity:
@@ -26662,7 +27103,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -26799,6 +27240,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 21).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
   identity:
@@ -26849,7 +27292,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -26986,6 +27429,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 21).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
   identity:
@@ -27036,7 +27481,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -27173,6 +27618,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 21).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
   identity:
@@ -27223,7 +27670,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -27360,6 +27807,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-2 (table row 21).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
   identity:
@@ -27479,6 +27928,8 @@ observations:
               note: row_label=C-3; column=[%P]i; table_row_number=22; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
   identity:
@@ -27529,7 +27980,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -27666,6 +28117,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 22).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
   identity:
@@ -27785,6 +28238,8 @@ observations:
               note: row_label=C-3; column=[%O]f; table_row_number=22; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
   identity:
@@ -27835,7 +28290,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -27972,6 +28427,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 22).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
   identity:
@@ -28022,7 +28479,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -28159,6 +28616,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 22).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
   identity:
@@ -28209,7 +28668,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -28346,6 +28805,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 22).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
   identity:
@@ -28396,7 +28857,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -28533,6 +28994,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 22).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
   identity:
@@ -28583,7 +29046,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -28720,6 +29183,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 22).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
   identity:
@@ -28839,6 +29304,8 @@ observations:
               note: row_label=C-3; column=[%P]i; table_row_number=23; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
   identity:
@@ -28889,7 +29356,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -29026,6 +29493,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 23).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
   identity:
@@ -29145,6 +29614,8 @@ observations:
               note: row_label=C-3; column=[%O]f; table_row_number=23; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
   identity:
@@ -29195,7 +29666,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -29332,6 +29803,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 23).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
   identity:
@@ -29382,7 +29855,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -29519,6 +29992,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 23).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
   identity:
@@ -29569,7 +30044,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -29706,6 +30181,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 23).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
   identity:
@@ -29756,7 +30233,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -29893,6 +30370,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 23).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
   identity:
@@ -29943,7 +30422,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -30080,6 +30559,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 23).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
   identity:
@@ -30199,6 +30680,8 @@ observations:
               note: row_label=C-3; column=[%P]i; table_row_number=24; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
   identity:
@@ -30249,7 +30732,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -30386,6 +30869,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 24).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
   identity:
@@ -30505,6 +30990,8 @@ observations:
               note: row_label=C-3; column=[%O]f; table_row_number=24; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
   identity:
@@ -30555,7 +31042,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -30692,6 +31179,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 24).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
   identity:
@@ -30742,7 +31231,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -30879,6 +31368,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 24).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
   identity:
@@ -30929,7 +31420,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -31066,6 +31557,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 24).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
   identity:
@@ -31116,7 +31609,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -31253,6 +31746,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 24).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
   identity:
@@ -31303,7 +31798,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -31440,6 +31935,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-3 (table row 24).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
   identity:
@@ -31559,6 +32056,8 @@ observations:
               note: row_label=C-4; column=[%P]i; table_row_number=25; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
   identity:
@@ -31609,7 +32108,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -31746,6 +32245,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-4 (table row 25).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
   identity:
@@ -31865,6 +32366,8 @@ observations:
               note: row_label=C-4; column=[%O]f; table_row_number=25; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
   identity:
@@ -31915,7 +32418,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -32052,6 +32555,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-4 (table row 25).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
   identity:
@@ -32102,7 +32607,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -32239,6 +32744,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-4 (table row 25).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
   identity:
@@ -32289,7 +32796,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -32426,6 +32933,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-4 (table row 25).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
   identity:
@@ -32476,7 +32985,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -32613,6 +33122,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-4 (table row 25).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
   identity:
@@ -32663,7 +33174,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -32800,6 +33311,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row C-4 (table row 25).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
   identity:
@@ -32919,6 +33432,8 @@ observations:
               note: row_label=D-1; column=[%P]i; table_row_number=26; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
   identity:
@@ -32969,7 +33484,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -33106,6 +33621,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-1 (table row 26).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
   identity:
@@ -33225,6 +33742,8 @@ observations:
               note: row_label=D-1; column=[%O]f; table_row_number=26; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
   identity:
@@ -33275,7 +33794,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -33412,6 +33931,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-1 (table row 26).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
   identity:
@@ -33462,7 +33983,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -33599,6 +34120,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-1 (table row 26).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
   identity:
@@ -33649,7 +34172,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -33786,6 +34309,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-1 (table row 26).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
   identity:
@@ -33836,7 +34361,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -33973,6 +34498,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-1 (table row 26).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
   identity:
@@ -34023,7 +34550,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -34160,6 +34687,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-1 (table row 26).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
   identity:
@@ -34279,6 +34808,8 @@ observations:
               note: row_label=D-2; column=[%P]i; table_row_number=27; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
   identity:
@@ -34329,7 +34860,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -34466,6 +34997,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 27).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
   identity:
@@ -34585,6 +35118,8 @@ observations:
               note: row_label=D-2; column=[%O]f; table_row_number=27; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
   identity:
@@ -34635,7 +35170,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -34772,6 +35307,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 27).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
   identity:
@@ -34822,7 +35359,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -34959,6 +35496,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 27).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
   identity:
@@ -35009,7 +35548,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -35146,6 +35685,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 27).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
   identity:
@@ -35196,7 +35737,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -35333,6 +35874,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 27).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
   identity:
@@ -35383,7 +35926,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -35520,6 +36063,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 27).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
   identity:
@@ -35639,6 +36184,8 @@ observations:
               note: row_label=D-2; column=[%P]i; table_row_number=28; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
   identity:
@@ -35689,7 +36236,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -35826,6 +36373,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 28).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
   identity:
@@ -35945,6 +36494,8 @@ observations:
               note: row_label=D-2; column=[%O]f; table_row_number=28; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
   identity:
@@ -35995,7 +36546,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -36132,6 +36683,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 28).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
   identity:
@@ -36182,7 +36735,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -36319,6 +36872,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 28).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
   identity:
@@ -36369,7 +36924,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -36506,6 +37061,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 28).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
   identity:
@@ -36556,7 +37113,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -36693,6 +37250,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 28).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
   identity:
@@ -36743,7 +37302,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -36880,6 +37439,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 28).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c03
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
   identity:
@@ -36999,6 +37560,8 @@ observations:
               note: row_label=D-2; column=[%P]i; table_row_number=29; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c04
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
   identity:
@@ -37049,7 +37612,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -37186,6 +37749,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 29).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c05
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
   identity:
@@ -37305,6 +37870,8 @@ observations:
               note: row_label=D-2; column=[%O]f; table_row_number=29; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c06
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
   identity:
@@ -37355,7 +37922,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -37492,6 +38059,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 29).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c07
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
   identity:
@@ -37542,7 +38111,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -37679,6 +38248,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 29).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c08
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
   identity:
@@ -37729,7 +38300,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -37866,6 +38437,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 29).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c09
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
   identity:
@@ -37916,7 +38489,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -38053,6 +38626,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 29).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c10
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
   identity:
@@ -38103,7 +38678,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -38240,6 +38815,8 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: Printed composition for Table 1(I) row D-2 (table row 29).
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_equilibrium_MgO_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -38291,7 +38868,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -38438,6 +39015,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_equilibrium_Na2O_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -38489,7 +39068,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -38636,6 +39215,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_equilibrium_P2O5_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -38687,7 +39268,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -38834,6 +39415,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_equilibrium_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -38885,7 +39468,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -39032,6 +39615,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_equilibrium_SiO2_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -39083,7 +39668,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -39230,6 +39815,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_equilibrium_total_Fe_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -39281,7 +39868,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -39428,6 +40015,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_final_O_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -39556,6 +40145,8 @@ observations:
               note: row_label=E; column=[%O]f; table_row_number=1; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_initial_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -39684,6 +40275,8 @@ observations:
               note: row_label=E; column=[%P]i; table_row_number=1; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_equilibrium_MgO_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -39734,7 +40327,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -39880,6 +40473,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_equilibrium_Na2O_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -39930,7 +40525,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -40076,6 +40671,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_equilibrium_P2O5_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -40126,7 +40723,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -40272,6 +40869,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_equilibrium_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -40322,7 +40921,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -40468,6 +41067,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_equilibrium_SiO2_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -40518,7 +41119,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -40664,6 +41265,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_equilibrium_total_Fe_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -40714,7 +41317,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -40860,6 +41463,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_final_O_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -40988,6 +41593,8 @@ observations:
               note: row_label=F; column=[%O]f; table_row_number=2; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_initial_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -41116,6 +41723,8 @@ observations:
               note: row_label=F; column=[%P]i; table_row_number=2; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_equilibrium_MgO_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -41166,7 +41775,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -41312,6 +41921,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_equilibrium_Na2O_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -41362,7 +41973,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -41508,6 +42119,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_equilibrium_P2O5_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -41558,7 +42171,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -41704,6 +42317,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_equilibrium_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -41754,7 +42369,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -41900,6 +42515,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_equilibrium_SiO2_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -41950,7 +42567,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -42096,6 +42713,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_equilibrium_total_Fe_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -42146,7 +42765,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -42292,6 +42911,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_final_O_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -42420,6 +43041,8 @@ observations:
               note: row_label=G; column=[%O]f; table_row_number=3; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_initial_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -42548,6 +43171,8 @@ observations:
               note: row_label=G; column=[%P]i; table_row_number=3; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_equilibrium_MgO_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -42599,7 +43224,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -42746,6 +43371,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_equilibrium_Na2O_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -42797,7 +43424,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -42944,6 +43571,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_equilibrium_P2O5_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -42995,7 +43624,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -43142,6 +43771,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_equilibrium_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -43193,7 +43824,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -43340,6 +43971,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_equilibrium_SiO2_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -43391,7 +44024,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -43538,6 +44171,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_equilibrium_total_Fe_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -43589,7 +44224,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -43736,6 +44371,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_final_O_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -43864,6 +44501,8 @@ observations:
               note: row_label=H; column=[%O]f; table_row_number=4; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_initial_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -43992,6 +44631,8 @@ observations:
               note: row_label=H; column=[%P]i; table_row_number=4; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_equilibrium_MgO_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -44049,12 +44690,13 @@ observations:
         - - P2O5
           - '4.94'
         amount_basis: mass_percent
+        input_provenance: scored_phase_analysis
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -44320,6 +44962,8 @@ observations:
               note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
         output_unit: mole_fraction
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_equilibrium_Na2O_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -44377,12 +45021,13 @@ observations:
         - - P2O5
           - '4.94'
         amount_basis: mass_percent
+        input_provenance: scored_phase_analysis
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -44648,6 +45293,8 @@ observations:
               note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
         output_unit: mole_fraction
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_equilibrium_P2O5_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -44705,12 +45352,13 @@ observations:
         - - P2O5
           - '4.94'
         amount_basis: mass_percent
+        input_provenance: scored_phase_analysis
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -44976,6 +45624,8 @@ observations:
               note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
         output_unit: mole_fraction
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_equilibrium_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -45033,12 +45683,13 @@ observations:
         - - P2O5
           - '4.94'
         amount_basis: mass_percent
+        input_provenance: scored_phase_analysis
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -45304,6 +45955,8 @@ observations:
               note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
         output_unit: mole_fraction
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_equilibrium_SiO2_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -45361,12 +46014,13 @@ observations:
         - - P2O5
           - '4.94'
         amount_basis: mass_percent
+        input_provenance: scored_phase_analysis
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -45632,6 +46286,8 @@ observations:
               note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
         output_unit: mole_fraction
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_equilibrium_total_Fe_in_slag
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -45689,12 +46345,13 @@ observations:
         - - P2O5
           - '4.94'
         amount_basis: mass_percent
+        input_provenance: scored_phase_analysis
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -45960,6 +46617,8 @@ observations:
               note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
         output_unit: mole_fraction
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_final_O_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -46088,6 +46747,8 @@ observations:
               note: row_label=I; column=[%O]f; table_row_number=5; table_column_number=5
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_initial_P_in_liquid_iron
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -46216,6 +46877,8 @@ observations:
               note: row_label=I; column=[%P]i; table_row_number=5; table_column_number=3
         output_unit: K
         references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_e_calculated_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -46267,7 +46930,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -46295,9 +46958,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -46415,6 +47077,24 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  derivation:
+    relation: The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs
+      are not all stored in the extract.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 126
+        pdf_page_index: 5
+        table: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_e_experimental_total_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
   identity:
@@ -46466,7 +47146,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -46614,6 +47294,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_f_calculated_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -46664,7 +47346,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -46692,9 +47374,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -46811,6 +47492,24 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  derivation:
+    relation: The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs
+      are not all stored in the extract.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 126
+        pdf_page_index: 5
+        table: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_f_experimental_total_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
   identity:
@@ -46861,7 +47560,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -47008,6 +47707,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_g_calculated_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -47058,7 +47759,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -47086,9 +47787,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -47205,6 +47905,24 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  derivation:
+    relation: The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs
+      are not all stored in the extract.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 126
+        pdf_page_index: 5
+        table: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_g_experimental_total_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
   identity:
@@ -47255,7 +47973,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -47402,6 +48120,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_h_calculated_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -47453,7 +48173,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -47481,9 +48201,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -47601,6 +48320,24 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  derivation:
+    relation: The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs
+      are not all stored in the extract.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 126
+        pdf_page_index: 5
+        table: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_h_experimental_total_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
   identity:
@@ -47652,7 +48389,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -47800,6 +48537,8 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_i_calculated_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -47857,12 +48596,13 @@ observations:
         - - P2O5
           - '4.94'
         amount_basis: mass_percent
+        input_provenance: scored_phase_analysis
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -47890,9 +48630,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Kunisada and Iwai (1986), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -48129,6 +48868,24 @@ observations:
               note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
         output_unit: mole_fraction
         references: []
+  derivation:
+    relation: The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs
+      are not all stored in the extract.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 126
+        pdf_page_index: 5
+        table: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_table2_flux_i_experimental_total_FeO_content
   experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
   identity:
@@ -48186,12 +48943,13 @@ observations:
         - - P2O5
           - '4.94'
         amount_basis: mass_percent
+        input_provenance: scored_phase_analysis
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile equilibrium_phase_composition does not use sweep_gas
@@ -48458,3 +49216,5 @@ observations:
               note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
         output_unit: mole_fraction
         references: []
+  provenance:
+    printed_phase: l

@@ -1,0 +1,418 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/yu-hewins-1997-lpsc28-1613.yaml
+observations:
+- observation_id: yu-hewins-1997-lpsc28-1613::yu_hewins_1997_k_evaporation_rate_1atm
+  experiment_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::experiment::yu_hewins_1997_one_atm_runs
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped evaporation rate unit 'cm/min as printed; temperature °C and pressure atm as printed'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is reported for the calculated rate.
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: calculated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-hewins-1997-lpsc28-1613
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experimental results
+    note: The authors compare the 1 atm K rate with the 10^-5 atm example and refer to Figure 1.
+  read_from: pdf:yu-hewins-1997-lpsc28-1613
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental results
+        note: The authors compare the 1 atm K rate with the 10^-5 atm example and refer to Figure 1.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:yu-hewins-1997-lpsc28-1613
+    parameters: []
+    output_unit: Pa
+    references: []
+  provenance:
+    printed_phase: silicate_melt
+- observation_id: yu-hewins-1997-lpsc28-1613::yu_hewins_1997_k_evaporation_rate_1e-5_atm
+  experiment_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::experiment::yu_hewins_1997_vacuum_runs
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_rate
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.799934'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped evaporation rate unit 'cm/min as printed; temperature °C and pressure atm as printed'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is reported for the calculated rate.
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: calculated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yu-hewins-1997-lpsc28-1613
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experimental results
+    note: The authors give the 10^-5 atm K rate as a calculated example and refer to Figure 1.
+  read_from: pdf:yu-hewins-1997-lpsc28-1613
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experimental results
+        note: The authors give the 10^-5 atm K rate as a calculated example and refer to Figure 1.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:yu-hewins-1997-lpsc28-1613
+    parameters: []
+    output_unit: Pa
+    references: []
+  provenance:
+    printed_phase: silicate_melt
+- observation_id: yu-hewins-1997-lpsc28-1613::yu_hewins_1997_k_flash_mass_loss
+  experiment_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::experiment::yu_hewins_1997_flash_heating_simulation
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.799934'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.0025'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is reported for the elemental mass loss.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: yu-hewins-1997-lpsc28-1613::yu_hewins_1997_k_flash_mass_loss
+  source_id: yu-hewins-1997-lpsc28-1613
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results
+    note: The flash-heating charge is reported to lose 25% potassium.
+  read_from: pdf:yu-hewins-1997-lpsc28-1613
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:yu-hewins-1997-lpsc28-1613
+    parameters: []
+    output_unit: Pa
+    references: []
+  provenance:
+    printed_phase: silicate_melt
+- observation_id: yu-hewins-1997-lpsc28-1613::yu_hewins_1997_na_flash_mass_loss
+  experiment_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::experiment::yu_hewins_1997_flash_heating_simulation
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '0.799934'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.004'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is reported for the elemental mass loss.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: yu-hewins-1997-lpsc28-1613::yu_hewins_1997_na_flash_mass_loss
+  source_id: yu-hewins-1997-lpsc28-1613
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results
+    note: The flash-heating charge is reported to lose 40% sodium.
+  read_from: pdf:yu-hewins-1997-lpsc28-1613
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:yu-hewins-1997-lpsc28-1613
+    parameters: []
+    output_unit: Pa
+    references: []
+  provenance:
+    printed_phase: silicate_melt

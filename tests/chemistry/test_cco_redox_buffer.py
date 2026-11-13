@@ -1,4 +1,4 @@
-"""Pure-function tests for engines.builtin.cco_redox_buffer (chunk CCO-0)."""
+"""Pure-function tests for the shared oxygen-buffer owner (chunk CCO-0)."""
 
 from __future__ import annotations
 
@@ -8,24 +8,20 @@ from pathlib import Path
 
 import pytest
 
-from engines.builtin.cco_redox_buffer import (
+from simulator.oxygen_buffers import (
     CCO_FORMULATION,
     RedoxBufferInterval,
     RedoxBufferPoint,
     cco_buffered_fO2,
     cco_log10_fO2_bar,
     cco_log10_fO2_interval_for_pressure_range,
+    log10_fo2_c_co_bar,
     qfm_log10_fO2_bar,
     stagno_frost_emog_emod_log10_fO2_interval,
 )
-from simulator.chemistry.graphite_c_co import (
-    cco_log10_fO2_bar as chemistry_cco_log10_fO2_bar,
-    log10_fo2_c_co_bar,
-)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-MODULE_PATH = REPO_ROOT / "engines" / "builtin" / "cco_redox_buffer.py"
-QFM_OWNER_PATH = REPO_ROOT / "simulator" / "chemistry" / "qfm_oneill.py"
+MODULE_PATH = REPO_ROOT / "simulator" / "oxygen_buffers.py"
 
 
 def _imported_modules(path: Path) -> set[str]:
@@ -112,7 +108,7 @@ def test_cco_log10_fO2_increases_with_temperature() -> None:
     assert low_t < mid_t < high_t
 
 
-def test_cco_and_graphite_outputs_are_bit_pinned_on_temperature_grid() -> None:
+def test_cco_outputs_are_bit_pinned_on_temperature_grid() -> None:
     output_grid = (
         (
             1273.15,
@@ -146,10 +142,6 @@ def test_cco_and_graphite_outputs_are_bit_pinned_on_temperature_grid() -> None:
         expected_one_atm,
         expected_tenth_atm,
     ) in output_grid:
-        assert (
-            chemistry_cco_log10_fO2_bar(temperature_K, 1.0).hex()
-            == expected_one_bar
-        )
         assert cco_log10_fO2_bar(temperature_K, 1.0).hex() == expected_one_bar
         assert (
             log10_fo2_c_co_bar(temperature_K, 1.01325).hex()
@@ -183,16 +175,20 @@ def test_purity_no_ledger_provider_or_melt_imports() -> None:
         "__future__.annotations",
         "dataclasses",
         "dataclasses.dataclass",
+        "decimal",
+        "decimal.Decimal",
         "math",
-        "simulator.chemistry.graphite_c_co",
-        "simulator.chemistry.graphite_c_co._require_finite_positive",
-        "simulator.chemistry.graphite_c_co.cco_log10_fO2_bar",
-        "simulator.chemistry.qfm_oneill",
-        "simulator.chemistry.qfm_oneill.oneill_qfm_log10_fO2_bar",
+        "simulator.environment",
+        "simulator.environment.DEFAULT_VACUUM_FLOOR_BAR",
+        # The dependency-free constants owner (t-1748): stdlib-only, so it
+        # cannot pull ledger, provider, inventory or melt code into the buffer.
+        "simulator.physical_constants",
+        "simulator.physical_constants.GAS_CONSTANT",
         "simulator.scalar_boundary",
         "simulator.scalar_boundary.is_declared_real_scalar",
     }
-    assert _imported_modules(QFM_OWNER_PATH) == set()
+    assert not (REPO_ROOT / "simulator" / "chemistry" / "qfm_oneill.py").exists()
+    assert not (REPO_ROOT / "engines" / "builtin" / "cco_redox_buffer.py").exists()
     assert all("melt_backend" not in module for module in modules)
     assert all("inventory" not in module for module in modules)
     assert all("ledger" not in module for module in modules)

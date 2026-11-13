@@ -55,6 +55,24 @@ def _figure_point_counts(document):
     }
 
 
+def test_non_tabulated_pressure_context_stays_unchanged() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    row = next(
+        row
+        for row in _rows(document)
+        if row.get("observation_id") == "shornikov_2000_partial_pressures_not_tabulated"
+    )
+    assert row["type"] == "thermodynamic_example"
+    assert row["values"]["method_class"] == "quoted_attributed"
+    assert row["values"]["admission_status"] == "refused"
+    assert "partial evaporation coefficients" in row["values"]["reason"]
+    assert "references [14] and [15]" in row["values"]["reason"]
+    assert "No numerical pressure or evaporation coefficient is printed." in row[
+        "values"
+    ]["reason"]
+    assert "attribution" not in row["values"]
+
+
 def test_shornikov_2000_reconciled_figure_points_and_migration() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert validate_extract_document(document, path=EXTRACT) == []

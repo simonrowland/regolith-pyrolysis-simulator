@@ -43,7 +43,7 @@ from typing import Any, Dict
 
 import pytest
 
-from engines.builtin.cco_redox_buffer import qfm_log10_fO2_bar
+from simulator.oxygen_buffers import qfm_log10_fO2_bar
 import simulator.melt_backend.sulfsat as sulfsat_module
 from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91

@@ -57,24 +57,32 @@ species:
           note: The abstract says about 10^-13; no numeric uncertainty or confidence level is stated.
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: measured_reduced
+          evidence_class: measured_reduced
           admission_status: admitted
           activity: '1e-13'
           activity_as_printed: about 10^-13
           attribution: Present work; abstract summary of the authors' EMF measurements.
-          measurement_method_as_printed: EMF method with sodium beta-alumina solid electrolyte and reference melt.
-          reduction_note: >-
-            The authors derive activity from the measured EMF using the Nernst
-            relation and a reference melt. The underlying EMF points are plotted
-            only; they are not transcribed here. The abstract's approximate
-            activity is retained as reported because those point inputs are not
-            stored.
-          reduction_locator:
-            page: 2
-            published_page: 44
-            equation: '1'
-            note: Nernst relation for the cell EMF.
+          derivation:
+            relation: The Na2O activity is reduced from the measured EMF using the Nernst relation and reference melt.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                page: 3
+                published_page: 45
+                pdf_page_index: 2
+                figure: '2'
+                note: EMF measurements are plotted, but the numeric EMF inputs for this activity are not transcribed.
+            method:
+              state:
+                tag: value
+                value: EMF measurement with sodium beta-alumina solid electrolyte; activity determined by the Nernst relation.
+              locator:
+                page: 2
+                published_page: 44
+                pdf_page_index: 1
+                section: EMF method
+                equation: '1'
           T_K: '1573'
           composition_mol:
             Na2O: '0.5'
@@ -87,8 +95,8 @@ species:
               composition_mol:
                 Na2O: '0.5'
                 P2O5: '0.5'
-              method_class: quoted_attributed
-              evidence_class: quoted_attributed
+              method_class: measured_reduced
+              evidence_class: measured_reduced
               point_conditions:
                 temperature_K:
                   state: {tag: value, value: '1573'}

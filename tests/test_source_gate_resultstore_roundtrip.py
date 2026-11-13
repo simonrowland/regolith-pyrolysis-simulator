@@ -96,6 +96,12 @@ def test_strip_heavy_result_preserves_vapor_source_report_for_store_gate(
         "vapor_pressure_provider_id": "builtin-vapor-pressure",
         "allow_fallback_vapor": False,
         "force_builtin_vapor_pressure": False,
+        "backend_name": "alphamelts",
+        "engine_version": "petthermotools 1.2.3",
+        "diagnostics": {
+            "backend_name": "alphamelts",
+            "engine_version": "petthermotools 1.2.3",
+        },
         "warnings": [
             "WARNING: SiO vapor pressure uses a backsolved VapoRock "
             "fallback (curve-fit), NOT first-principles"
@@ -156,6 +162,12 @@ def test_reference_trace_fallback_preserves_vapor_source_report_for_store_gate(
         "vapor_pressure_provider_id": "builtin-vapor-pressure",
         "allow_fallback_vapor": False,
         "force_builtin_vapor_pressure": False,
+        "backend_name": "alphamelts",
+        "engine_version": "petthermotools 1.2.3",
+        "diagnostics": {
+            "backend_name": "alphamelts",
+            "engine_version": "petthermotools 1.2.3",
+        },
         "non_jsonable": object(),
     }
     scored = ScoredResult(

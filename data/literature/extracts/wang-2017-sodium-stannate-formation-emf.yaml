@@ -62,8 +62,16 @@ species:
         units: equation coefficients and uncertainty as printed; the HTML gives no unit label
         values:
           quantity: delta_fG
-          method_class: quoted_attributed
-          attribution: Wang et al. (2017), Equation (12), as printed
+          method_class: measured_reduced
+          derivation:
+            relation: The authors derived the sodium-stannate formation Gibbs-energy function from their measured cell EMF fit using the cell relation in Eq. (10) and formation relation in Eq. (11).
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                equation: '12'
+                figure: '5'
+                section: Results of sodium stannate’s formation free energy
+                note: The measured EMF points used for the fit appear in Fig. 5 and are not digitized.
           delta_fG_function_as_printed: '−1040.83 + 0.2221T ± 7.54'
           delta_fG_intercept_as_printed: '−1040.83'
           delta_fG_slope_as_printed: '0.2221'
@@ -75,10 +83,10 @@ species:
           cell_scheme: 'Pt|SnO2, Na2SnO3|β-β″-Al2O3|NaCrO2, Cr2O3|Pt'
           reference_electrode: NaCrO2 + Cr2O3 mixed in a 1:1 mole ratio
           standard_state: standard formation free energy of Na2SnO3
-          method_class_reason: The paper fits its measured EMF series and derives formation Gibbs energy from that series, but the numeric EMF inputs are plotted only in Fig. 5 and are not digitized; the fitted line is therefore quoted_attributed under d-110.
+          method_class_reason: The paper fits its measured EMF series and derives formation Gibbs energy from that series; the numeric EMF inputs are plotted only in Fig. 5 and are not digitized.
           printed_uncertainty_note: confidence level not stated
           status: typed_refused_schema_gap
-          schema_gap: The extract-to-battery schema cannot evaluate this printed linear Gibbs function as a point or series, and no EMF input rows are stored. The printed fit remains attributed evidence.
+          schema_gap: The extract-to-battery schema cannot evaluate this printed linear Gibbs function as a point or series, and no EMF input rows are stored. The printed fit remains a typed refusal.
   Electromotive_force:
     observations: []
     context:
@@ -92,7 +100,16 @@ species:
         values:
           quantity: electromotive_force
           status: typed_refused_schema_gap
-          method_class: quoted_attributed
+          method_class: measured_reduced
+          derivation:
+            relation: The authors fitted their measured reference-cell EMF data to the printed linear relation in Eq. (4).
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                equation: '4'
+                figure: '5'
+                section: Results of sodium stannate’s formation free energy
+                note: The measured reference-cell EMF points appear in Fig. 5 and are not digitized.
           fit_as_printed: '153.24 + 0.1078T ± 2.32'
           T_range_K_as_printed: '773–1273 K'
           correlation_coefficient: '0.982'
@@ -108,7 +125,16 @@ species:
         values:
           quantity: electromotive_force
           status: typed_refused_schema_gap
-          method_class: quoted_attributed
+          method_class: measured_reduced
+          derivation:
+            relation: The authors fitted their measured sodium-stannate-cell EMF data to the printed linear relation in Eq. (8).
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                equation: '8'
+                figure: '5'
+                section: Results of sodium stannate’s formation free energy
+                note: The measured test-cell EMF points appear in Fig. 5 and are not digitized.
           fit_as_printed: '589.94 − 0.2660T ± 13.143'
           T_range_K_as_printed: '773–1273 K'
           correlation_coefficient: '0.958'

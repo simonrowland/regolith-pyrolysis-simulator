@@ -299,12 +299,10 @@ def test_unverified_anchor_would_be_disclosed():
     assert not any("ANCHOR PROVENANCE" in n for n in clean.notes)
 
 
-def test_qfm_coefficients_match_their_other_home():
-    """QFM must stay identical to the PySulfSat-derived values already used by
-    simulator/melt_backend/sulfsat.py. Note this is DUPLICATION, not
-    independent verification — both descend from Frost."""
+def test_qfm_published_row_matches_the_frost_piecewise_calibration():
+    """The registry's beta-quartz row agrees with the Frost piecewise line."""
 
-    from simulator.melt_backend.sulfsat import _qfm_logfo2_frost
+    from simulator.oxygen_buffers import _qfm_logfo2_frost
 
     qfm = PUBLISHED_BUFFERS["QFM"]
     for T_K in (1000.0, 1200.0, 1400.0):

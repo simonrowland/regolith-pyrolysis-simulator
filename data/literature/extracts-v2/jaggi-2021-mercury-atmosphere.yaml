@@ -156,6 +156,8 @@ observations:
           record: LV row; H2 pressure column
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_h2_partial_pressure::T=2000:row=sv:h=a9364a9943c4
   experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
   identity:
@@ -310,6 +312,8 @@ observations:
           record: SV row; H2 pressure column
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=ln3:h=3f7010acaf9c
   experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
   identity:
@@ -464,6 +468,8 @@ observations:
           record: LN3 row; SiO pressure column
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=ln5:h=621b1346e428
   experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
   identity:
@@ -618,6 +624,8 @@ observations:
           record: LN5 row; SiO pressure column
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=sn3:h=87cb8d50abe0
   experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
   identity:
@@ -772,6 +780,8 @@ observations:
           record: SN3 row; SiO pressure column
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=sn5:h=3d462b42da42
   experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
   identity:
@@ -926,6 +936,8 @@ observations:
           record: SN5 row; SiO pressure column
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
   experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
   identity:
@@ -1012,3 +1024,5 @@ observations:
     section: 2.4 Magma ocean composition
     note: Typed parent records the printed composition-input set; complete oxide rows remain in context below.
   read_from: pdf:jaggi-2021-mercury-atmosphere
+  provenance:
+    printed_phase: condensed_liquid

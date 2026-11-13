@@ -58,6 +58,8 @@ observations:
         pdf_page_index: 7
         table: '1'
         note: Table 1 Silver, solid; just below mp 1234 plus or minus 3 K; Wessel [1951]
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_b_mp_alpha_burns
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -164,6 +166,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Boron, solid; liquid (also repeated as Table 2 first row)
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_be_solid_alpha_holden
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -259,6 +263,8 @@ observations:
     table: '1'
     note: Table 1 Beryllium, solid; Holden et al. [1948]
   read_from: pdf:kems-003-pound-1972
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_c_graphite_alpha_marshall_norton
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -354,6 +360,8 @@ observations:
     table: '1'
     note: Table 1 Carbon; Acheson graphite; Marshall and Norton [1950]
   read_from: pdf:kems-003-pound-1972
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_clausing_method_discussion
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -394,6 +402,8 @@ observations:
     line_range: 23-91
     source_path: text/kems-003-pound-1972/mineru/kems-003-pound-1972.md
   read_from: pdftotext:kems-003-pound-1972
+  provenance:
+    printed_phase: method_review
 - observation_id: kems-003-pound-1972::pound_1972_completeness_ledger
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -446,6 +456,8 @@ observations:
     note: Tables 1-3 occupy printed pp. 141-146 (PDF pp. 7-12). No numbered figures in the 12-page article. No supplement
       identified (Crossref/Unpaywall/HAL/NIST).
   read_from: pdf:kems-003-pound-1972
+  provenance:
+    printed_phase: method_review
 - observation_id: kems-003-pound-1972::pound_1972_cr_parent_row_complements
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -498,6 +510,8 @@ observations:
     table: '1'
     note: Complements for parent Cr rows; not a rewrite of those objects.
   read_from: pdf:kems-003-pound-1972
+  provenance:
+    printed_phase: method_review
 - observation_id: kems-003-pound-1972::pound_1972_cr_solid_alpha_mccabe
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -592,6 +606,8 @@ observations:
     note: Table 1 Chromium, solid; McCabe et al. [1956]; OCR verified
     source_path: text/kems-003-pound-1972/mineru/kems-003-pound-1972.md
   read_from: pdftotext:kems-003-pound-1972
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_cr_solid_class_b1
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -680,6 +696,8 @@ observations:
     paragraph: Langmuir-Knudsen flux ratio compilation
     source_path: text/kems-003-pound-1972/mineru/kems-003-pound-1972.md
   read_from: pdftotext:kems-003-pound-1972
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_fe_1600_1800_not_a_printed_band
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -735,6 +753,8 @@ observations:
     table: '1'
     note: Full Table 1 Fe rows on printed p. 141; no 1600-1800 K cell
   read_from: pdf:kems-003-pound-1972
+  provenance:
+    printed_phase: method_review
 - observation_id: kems-003-pound-1972::pound_1972_fe_parent_row_complements
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -787,6 +807,8 @@ observations:
     table: '1'
     note: Complements for parent Fe rows; not a rewrite of those objects. Clausing locators from printed pp. 135 and 137.
   read_from: pdf:kems-003-pound-1972
+  provenance:
+    printed_phase: method_review
 - observation_id: kems-003-pound-1972::pound_1972_fe_solid_alpha_mccabe
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -882,6 +904,8 @@ observations:
     paragraph: Iron, solid; McCabe et al. [1956]
     source_path: raw/kems-003-pound-1972/kems-003-pound-1972.pdf
   read_from: pdf:kems-003-pound-1972
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_fe_solid_alpha_wessel
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -976,6 +1000,8 @@ observations:
     note: Table 1 selected α_v for solid Fe (OCR 'Ircn'); Wessel 1951
     source_path: text/kems-003-pound-1972/mineru/kems-003-pound-1972.md
   read_from: pdftotext:kems-003-pound-1972
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_fe_solid_class_b1
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -1064,6 +1090,8 @@ observations:
     paragraph: Langmuir-Knudsen flux ratio compilation
     source_path: text/kems-003-pound-1972/mineru/kems-003-pound-1972.md
   read_from: pdftotext:kems-003-pound-1972
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_k_liquid_alpha_neumann
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -1159,6 +1187,8 @@ observations:
     table: '2'
     note: Table 2 Potassium, liquid; Neumann [1954]
   read_from: pdf:kems-003-pound-1972
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_pt_condensation_alpha_chupka_1500k
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -1215,6 +1245,8 @@ observations:
         pdf_page_index: 10
         table: '3'
         note: Table 3 Platinum condensation; Chupka et al. [1963]; substrate 1500 plus or minus 20 K
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_rh_condensation_alpha_chupka_1500k
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -1271,6 +1303,8 @@ observations:
         pdf_page_index: 10
         table: '3'
         note: Table 3 Rhodium condensation; Chupka et al. [1963]; substrate 1500 plus or minus 20 K
+  provenance:
+    printed_phase: gas
 - observation_id: kems-003-pound-1972::pound_1972_w_condensation_alpha_chupka_2200k
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -1331,3 +1365,5 @@ observations:
         pdf_page_index: 11
         table: '3'
         note: Table 3 Tungsten condensation; Chupka et al. [1963]; substrate 2200 plus or minus 20 K
+  provenance:
+    printed_phase: gas

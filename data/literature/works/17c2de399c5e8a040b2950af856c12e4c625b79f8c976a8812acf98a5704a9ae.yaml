@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:kress-carmichael-1988-iron-oxidation-stoichiometry
       role: pdf
@@ -76,11 +76,19 @@ experiments:
     published_page: 1267-1269
     section: Abstract and Experimental Technique
     note: pdf_page_index=0-2
+  ambient_pressure_evidence:
+    evidence_class: gas_mixing
+    quote: Oxygen fugacity was imposed by a furnace atmosphere consisting of a CO-CO₂ gas mixture (Deines et al., 1974).
+    locator:
+      published_page: 1269
+      pdf_page_index: 2
+      section: Experimental Technique
   fO2_control:
     channel:
       tag: value
       value: gas_mix
   bench_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae::bench::vertical-quench-furnace
+  equipment_context_id: kress-carmichael-1988-iron-oxidation-stoichiometry::context::kress_1988_experimental_apparatus_and_protocol
   thermal_schedule:
     cooling_or_quench:
       state:
@@ -216,6 +224,36 @@ context:
     interpretation_note: The authors caution that FeO1.464 may not represent a discrete species; they interpret it as a probable
       stoichiometry from a distribution of configurations involving other melt cations.
   context_id: kress-carmichael-1988-iron-oxidation-stoichiometry::context::kress_1988_adopted_reaction_and_regression_model
+  work_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae
+  source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
+  species: Fe
+- observation_id: kress_1988_experimental_apparatus_and_protocol
+  type: apparatus
+  experiment: kress_1988_table1_equilibration_series
+  locator:
+    published_page: 1268-1269
+    pdf_page_index: 1-2
+    section: Experimental Technique
+  units: as printed
+  values:
+    quantity: experimental apparatus and protocol
+    method_class: method_only
+    apparatus: Vertical quench furnace; 4-mm loops of 0.117-mm Pt-Rh wire carrying 1-g fused-rock fragments.
+    notes: 'Starting material and holder: “groundrock powders that were first fused at 1400°C in air, then broken into 1-g
+      fragments”; the fragments were welded onto “4-mm loops of 0.117-mm Pt-Rh wire.” Ten loops comprising five duplicate
+      pairs were suspended in the furnace hot spot. Wire diameter was 0.117 mm; the paper describes them as “4-mm loops” without
+      calling that dimension a diameter. Sample mass was 1 g per fragment. Protocol details from physical PDF page 3 (published
+      p. 1269, Experimental Technique): the paper reports “duplicate runs of between 2 and 12 h duration”; durations between
+      5 and 8 h were “considered an optimal compromise.” For experiments at higher oxygen fugacities, “no effort was made
+      to presaturate the loops in iron”; iron loss in “these runs” was “often found to be quite significant (20–30% of the
+      amount present).” For experiments at very low fO2 and with low initial total iron content, loops had “been previously
+      saturated in an iron-rich melt and cleaned in 50% HF solution.” These statements apply to the groups described in the
+      paper; no per-run presaturation or iron-loss assignment is made. Post-run bulk analysis: major and minor elements were
+      measured on an eight-channel ARL-SEM electron microprobe, with 22-24 points analyzed per glass sample. Ferrous iron
+      was determined using wet-chemical techniques; ferric iron was calculated from total iron and FeO. Scanning or defocused-beam
+      analyses showed no detectable difference in alkali content but decreased analytical precision, so those techniques were
+      not used. Pickup of Pt or Rh was not stated.'
+  context_id: kress-carmichael-1988-iron-oxidation-stoichiometry::context::kress_1988_experimental_apparatus_and_protocol
   work_id: 17c2de399c5e8a040b2950af856c12e4c625b79f8c976a8812acf98a5704a9ae
   source_id: kress-carmichael-1988-iron-oxidation-stoichiometry
   species: Fe

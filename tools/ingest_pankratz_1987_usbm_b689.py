@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import re
 from pathlib import Path
 
@@ -13,6 +12,7 @@ import yaml
 
 from tools.harvest_atct_compilation import feedstock_coverage
 from tools.ingest_pankratz_1984_usbm_b677 import TableParser, parse_note_block, sha256
+from simulator.corpus_paths import regolith_corpus_root
 
 
 SOURCE_ID = "pankratz-1987-usbm-b689"
@@ -399,10 +399,14 @@ def build_b696(corpus):
     return {str(path.relative_to(ROOT)): content for path, content in artifacts.items()}
 
 
-if __name__ == "__main__":
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--corpus", type=Path, default=Path(os.environ.get("REGOLITH_CORPUS_ROOT", Path.home() / "Repos/regolith-corpus")))
+    parser.add_argument("--corpus", type=Path, default=regolith_corpus_root())
     parser.add_argument("--edition", choices=("b689", "b696"), default="b689")
-    args = parser.parse_args()
+    return parser.parse_args(argv)
+
+
+if __name__ == "__main__":
+    args = _parse_args()
     build_function = build if args.edition == "b689" else build_b696
     print(json.dumps(build_function(args.corpus), ensure_ascii=False))

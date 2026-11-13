@@ -63,7 +63,7 @@ from simulator.battery.waypoints import (
     oxygen_condition,
 )
 from simulator.chemistry.graphite_c_co import carbon_delta_g_co_kj_per_mol_o2
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 from simulator.state import MOLAR_MASS
 
 _TIER1_DIRECT_ROUTES = frozenset({
@@ -301,7 +301,7 @@ def resolve_row_fo2(
             and p_na_bar is not None
         ):
             try:
-                total_pressure_bar = float(total_pressure.value) / 1.0e5
+                total_pressure_bar = float(total_pressure.value) / PA_PER_BAR
             except (TypeError, ValueError, ArithmeticError):
                 total_pressure_bar = math.nan
             p_co_bar = total_pressure_bar - p_na_bar
@@ -557,7 +557,7 @@ def _printed_identity_bar(
     if state is None or not state.is_value or state.value is None:
         return None
     try:
-        bar = float(state.value) / 1.0e5
+        bar = float(state.value) / PA_PER_BAR
     except (TypeError, ValueError, ArithmeticError):
         return None
     if not math.isfinite(bar) or bar <= 0.0:
@@ -761,7 +761,7 @@ def _kress_pressure_bar(
             except (TypeError, ValueError):
                 pascal = -1.0
             if math.isfinite(pascal) and pascal > 0.0:
-                return pascal / 1.0e5, "identity.total_pressure_Pa"
+                return pascal / PA_PER_BAR, "identity.total_pressure_Pa"
     if experiment is not None and bench is not None:
         from simulator.battery.waypoints import (
             _prediction_pressure_waypoint,
@@ -785,7 +785,7 @@ def _pascal_point_to_bar(value: object) -> float | None:
     if value.point is None or value.point <= 0:
         return None
     try:
-        bar = float(value.point) / 1.0e5
+        bar = float(value.point) / PA_PER_BAR
     except (TypeError, ValueError, ArithmeticError):
         return None
     if not math.isfinite(bar) or bar <= 0.0:

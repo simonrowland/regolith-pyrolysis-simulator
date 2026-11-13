@@ -1,0 +1,4254 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  citation: Jacobson, N. S. (1989). Thermodynamic Properties of Some Metal Oxide-Zirconia Systems. NASA TM-102351.
+  source_ids:
+  - jacobson-1989-metal-oxide-zirconia
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:jacobson-1989-metal-oxide-zirconia
+      role: pdf
+      path: raw/jacobson-1989-metal-oxide-zirconia/jacobson-1989-metal-oxide-zirconia.pdf
+      sha256:
+        tag: value
+        value: 43d28133aae1f488b81413d039e48a53de26bfa19b0853d98a29bc365adf0d23
+    - asset_id: pdftotext:jacobson-1989-metal-oxide-zirconia
+      role: pdftotext
+      path: text/jacobson-1989-metal-oxide-zirconia
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:jacobson-1989-metal-oxide-zirconia
+      role: table_csv
+      path: tables/jacobson-1989-metal-oxide-zirconia
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:jacobson-1989-metal-oxide-zirconia
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: jacobson_1989_activity_standard_states
+  type: activity_standard_state_context
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 16
+    pdf_page_index: 17
+    section: Rare Earth Oxide-Zirconia Systems
+    note: Jacobson's general relations, Equations 15-16 (printed pp.16-17). Belov's attributed MO+ ion route (Eqs. 17-18)
+      is carried separately in jacobson_1989_belov_mo_ion_activity_route; the Sc2O3 near-ideal route in jacobson_1989_sc2o3_zro2_activity_route;
+      CaO and MgO standards in jacobson_1989_cao_zro2_emf_activity and jacobson_1989_mgo_activity_upper_limit.
+  values:
+    method_class: quoted_unattributed
+    general_component_activity: a(i) = P(i)/P°(i); P(i) is component vapor pressure in solution and P°(i) is vapor pressure
+      of pure component.
+    general_component_activity_equation:
+      equation_number: '15'
+      relation_as_printed: a(i) = P(i)/P°(i)
+      quote: 'Typically the activity of a component in solution is given by: ... Here P(i) is the vapor pressure of the component
+        in solution and P°(i) is the vapor pressure of the pure component.'
+      locator:
+        published_page: 16
+        pdf_page_index: 17
+        section: Rare Earth Oxide-Zirconia Systems
+        note: Definition sentence continues on printed p.17.
+    rare_earth_zirconia_activity: a(ZrO2) = P(ZrO2)/P°(ZrO2) (Eq. 16). Where the ZrO2+ intensity is hard to determine, Belov's
+      attributed MO+ ion route is used; see jacobson_1989_belov_mo_ion_activity_route.
+    zirconia_activity_equation:
+      equation_number: '16'
+      relation_as_printed: a(ZrO2) = P(ZrO2)/P°(ZrO2)
+      quote: 'In the case of a rare-earth oxide-zirconia system, the activity of zirconia can be calculated as:'
+      locator:
+        published_page: 17
+        pdf_page_index: 18
+        section: Rare Earth Oxide-Zirconia Systems
+    congruent_stage_statement:
+      quote: The activities of the two oxide components can be determined from the congruent vaporization stage.
+      locator:
+        published_page: 16
+        pdf_page_index: 17
+        section: Rare Earth Oxide-Zirconia Systems
+    standard_state: Pure component oxide as the reference state; the specific solid polymorph is not specified in this discussion.
+    defining_ion_context: However the mass spectrometer intensity of the ZrO2+ ion may not always be easy to determine as
+      a function of composition. Therefore it is desirable to use the other ions to determine activities of the components.
+      (printed p.17)
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_activity_standard_states
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_appendix_data_sources_and_estimates
+  type: thermodynamic_example
+  units: Cp in cal/K mol and S(298) in cal/K mol, ΔHf(298) in kcal/mol, as printed in Table A-I headers.
+  locator:
+    published_page: 47
+    pdf_page_index: 48
+    section: Appendix. Thermodynamic Data
+    note: Appendix text, printed pp.47-48 (PDF pages 49-50).
+  values:
+    method_class: quoted_unattributed
+    cp_equation:
+      equation_number: 1 (appendix)
+      relation_as_printed: Cp = A + B x 10^-3T + C x 10^5/T^2 + D x 10^-6T^2
+      quote: 'The data for the zirconium-oxygen and alkaline earth metal-oxygen systems was taken from the JANAF tables.1
+        Heat capacities were fitted to an equation of the form:'
+      coefficient_scaling:
+        A: 1
+        B: '0.001'
+        C: '100000'
+        D: '0.000001'
+      note: Table A-I Cp columns A, B, C, D carry the printed coefficients; B multiplies 10^-3 T, C multiplies 10^5/T^2, D
+        multiplies 10^-6 T^2.
+    reference_temperature_K: 298
+    data_availability: Thermodynamic data for the more common oxides is quite plentiful; for the less common oxides it is
+      sparse. Where possible, the best thermodynamic data was used. The most desirable information for each system is the
+      ΔHf(298), S(298), heat capacity and heat of any phase changes. This data is listed in Table AI.
+    measured_vs_estimated:
+      quote: The data for the alkaline earth zirconate systems were taken from other sources and is listed in Table AII. This
+        includes both estimated and measured data. Where possible measured data were used in the final calculations, as shown
+        in Table AI.
+      locator:
+        published_page: 47
+        pdf_page_index: 48
+        section: Appendix. Thermodynamic Data
+    electrochemical_vs_calorimetric:
+      quote: As mentioned in the text, the CaO-ZrO2 system forms a solid solution. The electrochemical data17,18 is for the
+        reaction of the saturated solid solution with CaO to form CaZrO3. For this reason the electrochemical data cannot
+        be directly compared to the calorimetric data. However in the case of SrZrO3 and BaZrO3, the two types of measurements
+        can be directly compared and show good agreement, as indicated in the Table AII.
+      locator:
+        published_page: 47
+        pdf_page_index: 48
+        section: Appendix. Thermodynamic Data
+        note: Continues onto printed p.48.
+    rare_earth_sources:
+      quote: Thermodynamic data for the rare earth-oxygen systems was more difficult to locate. Most of the data for the rare
+        earth metals and condensed phase oxides was taken from the tables by Pankratz.9 Most of these oxides vaporize to the
+        monoxide. Data for some of the rare earth monoxides of Y and Sc was taken from the tables of Ruzinov.10 Data for the
+        volatile oxides of the other rare earth monoxide was available as the free energy of formation from the original sources.14,16
+        The heats of formation of the solid oxide solutions of the composition M2O3·2(ZrO2) were taken from the calorimetric
+        data of Korneev et. al.11
+      locator:
+        published_page: 48
+        pdf_page_index: 49
+        section: Appendix. Thermodynamic Data
+    zirconate_entropy_estimate:
+      method_class: author_estimate
+      quote: Entropies were estimated to be 47.8 cal/mole-°K, after Barin and Knacke13
+      S_298_cal_K_mol: '47.8'
+      applies_to: M2O3·2(ZrO2) solid solutions; Table A-I rows Y2Zr2O7 (56), La2Zr2O7 (70), Ce2Zr2O7+x (78), Sm2Zr2O7 (88),
+        Gd2Zr2O7 (97) carry S(298) = 47.8.
+      locator:
+        published_page: 48
+        pdf_page_index: 49
+        section: Appendix. Thermodynamic Data
+    zirconate_heat_capacity_estimate:
+      method_class: author_estimate
+      quote: and heat capacities were estimated by summing the contribution from M2O3 and 2(ZrO2)20.
+      locator:
+        published_page: 48
+        pdf_page_index: 49
+        section: Appendix. Thermodynamic Data
+    free_energy_form:
+      equation_number: 2 (appendix)
+      relation_as_printed: G = AG/T + BG + CG*T + DG*T^-2 + EG*T^3 + FG*T*LOG(T)
+      quote: 'For each of the systems, the data was combined to obtain free energy of formation from the elements in their
+        standard states. The free energy was obtained in the following form:'
+      temperature_exponents_as_printed:
+      - -1
+      - 0
+      - 1
+      - -2
+      - 3
+      note: Exponents listed for the AG, BG, CG, DG and EG terms; the FG term is T*LOG(T) as printed.
+      locator:
+        published_page: 48
+        pdf_page_index: 49
+        section: Appendix. Thermodynamic Data
+    calculation_use: This free energy was then put into the SOLGASMIX-PV computer program to calculate the vapor pressures
+      for each system.
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_appendix_data_sources_and_estimates
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_belov_mo_ion_activity_route
+  type: activity_standard_state_context
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 17
+    pdf_page_index: 18
+    section: Rare Earth Oxide-Zirconia Systems
+    note: Belov's MO+ ion reduction route, printed pp.17-18 (PDF pages 19-20).
+  values:
+    method_class: quoted_attributed
+    attribution: Belov [32] (Russ. J. Phys. Chem. 59, 1985), as described by Jacobson on printed pp.17-18.
+    attributed_statement: Belov32 points out that use of the other ions is more complex because they are dissociation products.
+      He proposes a calculation method based on the intensity of the MO+ ion from M2O3, as a function of composition.
+    defining_ion: MO+ ion intensity from M2O3, as a function of composition
+    vaporization_routes:
+      quote: The two primary vaporization routes for ZrO2 and M2O3 are given by equations (3) and (13).
+      equation_3: ZrO2(s) = ZrO(g) + O(g)
+      equation_13: M2O3(s) = 2 MO(g) + O(g)
+    relations:
+    - equation_number: '17'
+      relation_as_printed: a(ZrO2) = P(ZrO) P(O-tot) / P°(ZrO) P°(O-tot)
+      locator:
+        published_page: 17
+        pdf_page_index: 18
+        section: Rare Earth Oxide-Zirconia Systems
+    - equation_number: '18'
+      relation_as_printed: a(M2O3) = P(MO)^2 P(O-tot) / P°(MO)^2 P°(O-tot)
+      MO_pressure_exponent: 2
+      locator:
+        published_page: 17
+        pdf_page_index: 18
+        section: Rare Earth Oxide-Zirconia Systems
+        note: P(MO) and P°(MO) are squared as printed.
+    total_oxygen_definition: Note that P(O-tot) is the amount of O from both ZrO2 decomposition, P(O-ZrO2), and M2O3 decomposition,
+      P(O-M2O3).
+    initialization:
+      quote: The actual calculation is iterative. The first step involves setting P(ZrO) = O and taking P(O-tot) = P(O-M2O3).
+      locator:
+        published_page: 17
+        pdf_page_index: 18
+        section: Rare Earth Oxide-Zirconia Systems
+        note: Sentence runs onto printed p.18 (PDF page 20). The value printed after 'P(ZrO) =' has the round shape of the
+          letter O in this typewriter face (compare the narrower zero in '2580' on p.20); as an initial ZrO pressure before
+          any ZrO2 contribution it reads as zero.
+      first_iteration_P_ZrO: 0
+      first_iteration_P_O_tot: P(O-M2O3)
+    iteration:
+      quote: This is in equation (18) to calculate the value of a(M2O3). Then the Gibbs-Duhem equation is used to calculate
+        a(ZrO2). This value is put into equation (17) to calculate P(ZrO) and P(O-ZrO2). The new P(O-tot) becomes P(O-M2O3)
+        + P(O-ZrO2) and the second iteration begins. This continues until the iterations converge.
+      update_relation: P(O-tot) = P(O-M2O3) + P(O-ZrO2)
+      locator:
+        published_page: 18
+        pdf_page_index: 19
+        section: Rare Earth Oxide-Zirconia Systems
+    inputs: MO+ ion intensity (giving P(MO)) versus composition; total oxygen pressure P(O-tot); pure-component pressures
+      P°(ZrO), P°(MO), P°(O-tot); Gibbs-Duhem integration for a(ZrO2).
+    standard_state: P° are pure-component values (pure ZrO2 and pure M2O3), per the general definition on p.17; no polymorph
+      is stated.
+    evaluation: This is an important and useful technique for obtaining activities in these complex oxide systems. (Jacobson,
+      printed p.18)
+    application_y2o3: Figure 17 is an activity-composition diagram determined by mass spectrometry30 for this system. This
+      data was obtained by the two calculation methods described in the preceeding discussion. (printed pp.18-19)
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_belov_mo_ion_activity_route
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_calculated_vapor_pressure_statements
+  type: numeric_and_directional_context
+  units: As printed per statement (atm, K, orders of magnitude).
+  locator:
+    published_page: 5
+    pdf_page_index: 6
+    note: Jacobson's own SOLGASMIX free-energy-minimization results and calculation conditions; per-statement locators. Model
+      results, not cited experiments.
+  values:
+    method_class: model_derived
+    attribution: Jacobson SOLGASMIX/SOLGASMIX-PV calculations using the appendix data.
+    statements:
+    - id: N01
+      quote: These four equations can be solved simultaneously or a free energy minimization program such as SOLGASMIX9 can
+        be used. It should be noted that in order to obtain equilibrium vapor pressures from SOLGASMIX, one atomosphere of
+        argon was put in as a reactant.
+      locator:
+        published_page: 5
+        pdf_page_index: 6
+        section: ZrO2 vapor-pressure calculations
+        note: '''atomosphere'' as printed.'
+      argon_reactant_atm: 1
+    - id: Fig2-oxygen
+      quote: Figure 2 shows the dramatic effect of one atmosphere of oxygen on suppressing the amount of ZrO(g) and Zr(g).
+        However for reaction (2) where no oxygen is released, the oxygen atmosphere has no effect.
+      locator:
+        published_page: 5
+        pdf_page_index: 6
+        section: ZrO2 vapor-pressure calculations
+      oxygen_atm: 1
+    - id: second-oxide
+      quote: In many cases, the second oxide may have a much higher vapor pressure than ZrO2. This vapor pressure can be calculated
+        using the SOLGASMIX program, with the mass balance now including both metal atoms.
+      locator:
+        published_page: 6
+        pdf_page_index: 7
+    - id: binary-vapor-limitation
+      quote: It has been pointed out that in some situations the vaporization of binary oxides is complicated by the presence
+        of binary oxides in the vapor, such as LiBO2(v) over Li2O·B2O3.10 In a case like this, the binary oxide cannot be
+        treated as a pseudo-binary system. ... There is no evidence of this occuring in the various zirconia-metal oxide systems
+        discussed here, but one must be aware of this possibility.
+      locator:
+        published_page: 6
+        pdf_page_index: 7
+      attribution: LiBO2 example from reference 10
+    - id: demixing
+      quote: In many applications, such as coatings, the oxide may be under an oxygen potential gradient. Under these conditions,
+        the faster moving metal ion is likely to move to the region of lower oxygen potential. This composition change in
+        the ceramic may lead to a degradation in high temperature properties.
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+      attribution: references 11, 12
+    - id: CaO-vapor
+      quote: For CaO, as with MgO, the primary vapor products are the metal atom and oxygen.
+      locator:
+        published_page: 11
+        pdf_page_index: 12
+        section: CaO-ZrO2 System
+    - id: N14
+      quote: These figures indicate the compound lowers the vapor pressure of Ca by about two orders of magnitude. This is
+        consistant with the solid solution data in Figure 7, for the solid solution in equilibrium with the compound.
+      locator:
+        published_page: 11
+        pdf_page_index: 12
+        section: CaO-ZrO2 System
+        note: 'Figures 8 (CaO) and 9 (CaZrO3). Direction as printed: lowers.'
+      orders_of_magnitude_Ca_pressure_lowering: 2
+    - id: N15
+      quote: As with the other systems discussed, the alkaline earth oxide vaporizes preferentially to the metal atom and
+        atomic and molecular oxygen, with the metal oxide vapor roughly an order of magnitude lower.
+      locator:
+        published_page: 12
+        pdf_page_index: 13
+        section: SrO-ZrO2
+        note: Figures 11 (SrO) and 12 (SrZrO3).
+      orders_of_magnitude_SrO_below_metal_and_oxygen: 1
+    - id: BaO-dominance
+      quote: Note that the major vapor specie is BaO(g), not the metal atoms and oxygen as in the other systems discussed.
+        This is important, since an oxygen overpressure will not suppress vaporization in this case.
+      locator:
+        published_page: 13
+        pdf_page_index: 14
+        section: BaO-ZrO2
+        note: Figures 13 (BaO) and 14 (BaZrO3).
+    - id: alkaline-summary
+      quote: In general the alkaline-stabilized zirconia cubic solutions compounds have some severe limitations for applications
+        above 1900 K. The major problem is likely to be preferential volatilization of the alkaline earth oxides. Other difficulties
+        include phase changes and possible oxide demixing. The materials with the least limitations are SrZrO3 and CaZrO3.
+      locator:
+        published_page: 15
+        pdf_page_index: 16
+    - id: N21
+      quote: Figure 19 shows the calculated vapor pressures above Y2O3·2(ZrO2). Note that the vapor pressures of YO(g) and
+        Y(g) are lowered by less then an order of magnitude, which is consistant with Figure 17.
+      locator:
+        published_page: 19
+        pdf_page_index: 20
+        section: Y2O3-ZrO2
+      orders_of_magnitude_YO_Y_lowering_upper_bound: 1
+      note: '''less then an order of magnitude'' as printed.'
+    - id: Y2O3-interactions
+      quote: Note the negative deviations from Raoult's Law, indicating attractive interactions. However interactions are
+        stronger in the CaO-ZrO2 system (Figure 7), in which compound formation is eventually observed.
+      locator:
+        published_page: 19
+        pdf_page_index: 20
+        section: Y2O3-ZrO2
+    - id: La2O3-lowering
+      quote: La2O3 has one of the higher vapor pressures of the rare earth oxides (Table I), which would be a limitation of
+        applications of this system. Consistent with the other systems, relatively little vapor pressure lowering is expected
+        in the solid solution (Figure 25).
+      locator:
+        published_page: 21
+        pdf_page_index: 22
+        section: La2O3-ZrO2
+    - id: N25
+      quote: Note that in Figure 28, the vapor pressure of ZrO and Zr is actually higher than their vapor pressure above pure
+        ZrO2. ... There is no suppression of the vaporization/ decomposition processes (i.e. reactions (3) and (4)) and the
+        vapor pressures of ZrO and Zr go up. These vapor pressures are not simply related to the activity of ZrO2, which must
+        remain one or less in solution.
+      locator:
+        published_page: 22
+        pdf_page_index: 23
+        section: CeO2-ZrO2
+      a_ZrO2_upper_bound: 1
+      note: 'Mechanism as printed: vaporization of Ce2O3 as CeO2(g) and CeO(g) generates very little O(g); some oxygen must
+        come from ZrO2. Direction as printed: ZrO and Zr pressures higher than over pure ZrO2.'
+    - id: N26
+      quote: The heat of formation of the solid solution Sm2O3·2(ZrO2) has been measured42. However, when put into the free
+        energy minimization program, it was found that the solid solution decomposed to the constituent oxides at about 1500
+        K. This indicates either an inconsistency in the data or the phase diagram.
+      locator:
+        published_page: 23
+        pdf_page_index: 24
+        section: Sm2O3-ZrO2 and Gd2O3-ZrO2
+      decomposition_temperature_K_approx: 1500
+    - id: Gd-minimization
+      quote: The same situation for the free energy minimization as in Sm2O3·2(ZrO2) was found, also indicating an inconsistency
+        in the data or the phase diagram.
+      locator:
+        published_page: 23
+        pdf_page_index: 24
+        section: Sm2O3-ZrO2 and Gd2O3-ZrO2
+        note: No separate decomposition temperature is printed for Gd2O3·2(ZrO2).
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_calculated_vapor_pressure_statements
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_cao_zro2_emf_activity
+  type: activity_standard_state_context
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 10
+    pdf_page_index: 11
+    section: CaO-ZrO2 System
+  values:
+    method_class: quoted_attributed
+    attribution: References 19 (Pizzini and Morlotti 1972) and 20 (Levitskii et al. 1977), as described by Jacobson on printed
+      pp.10-11.
+    method: emf_cell
+    quote: 'The CaO-ZrO2 system is quite suitable for electrochemical measurements and there is some information on the activity
+      of CaO in solid ZrO2 solution.19,20 These measurements use a cell of the form:'
+    cell:
+      equation_number: '7'
+      relation_as_printed: O2,Pt|CaO,CaF2|CaF2|ZrO2-CaO,CaF2|Pt,O2
+      note: Separators printed as broken vertical bars.
+    cell_reaction:
+      equation_number: '8'
+      relation_as_printed: CaO(a=1) = CaO(solid solution)
+    emf_relation:
+      equation_number: '9'
+      relation_as_printed: ΔG = -2EF = -RT ln a(CaO-ss)
+      symbols: Here ΔG is the Gibbs free energy of formation, E is the measured EMF, F is the Faraday constant, and R is the
+        gas constant.
+    standard_state: Pure CaO, CaO(a=1), in the CaO,CaF2 reference electrode of Eq.(7).
+    temperature_range_K:
+    - 1200
+    - 1550
+    temperature_quote: Measurements are carried out between 1200 and 1550 K and the results are shown in Figure 7.
+    qualification: These temperatures are somewhat lower than those of interest to us, but nonetheless, the measurements give
+      an indication of the strong negative deviations from Raoult's Law, as shown in the diagram.
+    activity_comparisons:
+      quote: Note the CaO activity is about an order of magnitude lower than that predicated for Raoult's law behavior or
+        in total about two orders of magnitude lower than for pure CaO.
+      orders_of_magnitude_below_raoult: 1
+      orders_of_magnitude_below_pure_CaO: 2
+      locator:
+        published_page: 10
+        pdf_page_index: 11
+        section: CaO-ZrO2 System
+        note: 'Sentence continues onto printed p.11 (PDF page 13). Directions as printed: lower.'
+    solubility_disagreement_qualification:
+      quote: These differences are very likely due to the slow phase changes at these temperatures.
+      locator:
+        published_page: 11
+        pdf_page_index: 12
+        section: CaO-ZrO2 System
+        note: Qualifies the 17 m/o (1200-1500 K) versus about 7 m/o below 1413 K / about 17 m/o at 1413 K and above solubility
+          limits carried in jacobson_1989_numeric_and_directional_statements.
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_cao_zro2_emf_activity
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_cited_phase_and_vaporization_facts
+  type: numeric_and_directional_context
+  units: As printed per statement (K, °C, mol/o or m/o, fractions).
+  locator:
+    published_page: 8
+    pdf_page_index: 9
+    note: Printed numeric statements attributed to cited studies; per-statement locators.
+  values:
+    method_class: quoted_attributed
+    attribution: Cited studies named per statement (Jacobson's literature survey).
+    statements:
+    - id: N02-N04
+      quote: This phase has a eutectoid at 1679°K (1406°C) and 13.5 mol/o MgO.
+      locator:
+        published_page: 8
+        pdf_page_index: 9
+        section: MgO-ZrO2 System
+      attribution: Figure 3 phase diagram, reference 13
+      system: ZrO2-MgO cubic phase
+      eutectoid_temperature_K: 1679
+      eutectoid_temperature_C: 1406
+      MgO_mol_percent: '13.5'
+    - id: eq6
+      quote: Eutectoid decomposition of the cubic phase is a feature of both MgO and CaO stabilized ZrO2. ... c(ss) → t(ss)
+        + MgO (6). This phase transformation has been studied in detail14 and is fairly slow. It is also further slowed by
+        the addition of SrO.14
+      locator:
+        published_page: 8
+        pdf_page_index: 9
+        section: MgO-ZrO2 System
+      attribution: reference 14
+    - id: N05-N06
+      quote: The liquidus diagram for ZrO2-MgO is shown in Figure 4.15 There is a eutectic with the 1:1 mixture at 2100°C,
+        which is agreed on by several investigators.13,14
+      locator:
+        published_page: 8
+        pdf_page_index: 9
+        section: MgO-ZrO2 System
+      attribution: references 13, 14 (Figure 4, reference 15)
+      eutectic_composition: 1:1 mixture
+      eutectic_temperature_C: 2100
+    - id: N07-N08
+      quote: Several investigators have reported metastable ordered compounds of composition 2 MgO·5 ZrO2 and MgO·6 ZrO2.13
+      locator:
+        published_page: 8
+        pdf_page_index: 9
+        section: MgO-ZrO2 System
+        note: Sentence continues onto printed p.9.
+      attribution: reference 13
+      compounds:
+      - 2 MgO·5 ZrO2
+      - MgO·6 ZrO2
+    - id: SrO-compounds
+      quote: There are several high melting intermediate phases, including SrZrO3, Sr4Zr3O10, and Sr2ZrO4. The first of these
+        has a low coefficient of thermal expansion, suggesting good resistance to thermal shock.1
+      locator:
+        published_page: 12
+        pdf_page_index: 13
+        section: SrO-ZrO2
+      attribution: phase diagram reference 21 (Figure 10); thermal-shock remark reference 1
+    - id: SrZrO3-demixing
+      quote: It has been reported that this material is quite susceptible to oxide demixing, with a strong separation appearing
+        between the SrO and ZrO2 oxides under the influence of an oxygen potential.22
+      locator:
+        published_page: 13
+        pdf_page_index: 14
+        section: SrO-ZrO2
+      attribution: reference 22
+    - id: N16-N18
+      quote: 'Although not shown on the phase diagram, it has also been reported that SrZrO3 undergoes the following phase
+        transformations23: orthorhombic → tetragonal 1 → tetragonal 2 → cubic (10)'
+      locator:
+        published_page: 13
+        pdf_page_index: 14
+        section: SrO-ZrO2
+        note: 923 K, 1003 K and 1443 K are printed above the three successive arrows of Eq.(10).
+      attribution: reference 23
+      transition_temperatures_K:
+      - 923
+      - 1003
+      - 1443
+      transitions:
+      - orthorhombic → tetragonal 1
+      - tetragonal 1 → tetragonal 2
+      - tetragonal 2 → cubic
+    - id: incongruent-congruent
+      quote: Belov and Semenov have examined a range of rare earth oxide-zirconia stabilized systems and found the following
+        general behavior. These systems first undergo a period of incongruent vaporization, during which the oxides loose
+        oxygen and go from ZrO2(M2O3) to ZrO2-x(M2O3-y). The oxygen pressure created tends to suppress decomposition vaporization
+        reactions, such as 3, 4, 13 and 14. After this a period of congruent vaporization begins.
+      locator:
+        published_page: 16
+        pdf_page_index: 17
+        section: Rare Earth Oxide-Zirconia Systems
+      attribution: Belov and Semenov [28-32]
+    - id: Y2O3-eutectoid
+      quote: Note that the cubic phase field does not extend to lower temperatures, but undergoes a eutectoid decomposition,
+        similar to that of the MgO and CaO stabilized zirconia. This phase change is slow and has only been recently detected.
+      locator:
+        published_page: 18
+        pdf_page_index: 19
+        section: Y2O3-ZrO2
+      attribution: phase diagram reference 33 (Figure 16)
+    - id: Y2O3-YO-data
+      quote: Figures 18 shows the calculated vapor pressures above pure Y2O3 as well as some data points for the vapor pressure
+        of YO(g)34 above Y2O3. These show good agreement with the calculated values.
+      locator:
+        published_page: 19
+        pdf_page_index: 20
+        section: Y2O3-ZrO2
+      attribution: reference 34 (Walsh, Goldstein and White)
+    - id: Y2O3-water
+      quote: Some recent evidence35 indicates that the Y2O3 in this material reacts with water. This is an important point
+        which merits further investigation for structural applications of this material.
+      locator:
+        published_page: 19
+        pdf_page_index: 20
+        section: Y2O3-ZrO2
+      attribution: reference 35
+    - id: Sc2O3-liquidus
+      quote: There are some low temperature phase changes and the location of the liquidus is still in question. However there
+        is a large cubic phase field.
+      locator:
+        published_page: 19
+        pdf_page_index: 20
+        section: Sc2O3-ZrO2
+      attribution: phase diagram reference 36 (Figure 20)
+    - id: N22
+      quote: It should be noted that the vapor pressure in the solid solution is sufficiently high that Belov et. al.38 observe
+        after 100 minutes at 2580°K, all the Sc2O3 has vaporized from their sample of 50 m/o Sc2O3 - 50 m/o ZrO2.
+      locator:
+        published_page: 20
+        pdf_page_index: 21
+        section: Sc2O3-ZrO2
+      attribution: Belov et al. [38]
+      sample_composition_mol_percent:
+        Sc2O3: 50
+        ZrO2: 50
+      duration_min: 100
+      temperature_K: 2580
+      outcome: complete Sc2O3 loss
+    - id: N23
+      quote: While the cubic phase undergoes a eutectoid decomposition at about 2248 K, there is a pyrochlore phase which
+        seems to be stable over a wide range of temperatures.
+      locator:
+        published_page: 21
+        pdf_page_index: 22
+        section: La2O3-ZrO2
+      attribution: phase diagram reference 40 (Figure 23)
+      eutectoid_temperature_K_approx: 2248
+    - id: La2O3-hygroscopic
+      quote: It is well known that La2O3 is quite hygroscopic. This may be also be a limitation in the application of the
+        solid solution.
+      locator:
+        published_page: 21
+        pdf_page_index: 22
+        section: La2O3-ZrO2
+      attribution: general statement (no reference printed)
+    - id: CeO2-partial
+      quote: There is currently interest in the partially stabilized zirconia of this system.41 However, as shown in the phase
+        diagram (Figure 26), there is not a fully stabilized composition down to low temperatures for this system.
+      locator:
+        published_page: 21
+        pdf_page_index: 22
+        section: CeO2-ZrO2
+      attribution: reference 41; phase diagram references 2, 41 (Figure 26)
+    - id: N24
+      quote: The phase diagram for the Sm2O3-ZrO2 system42 is shown in Figure 29. There is a large cubic phase field and also
+        a miscibility gap and temperatures less than 2000 K.
+      locator:
+        published_page: 22
+        pdf_page_index: 23
+        section: Sm2O3-ZrO2 and Gd2O3-ZrO2
+      attribution: reference 42
+      miscibility_gap_temperature_bound_K: 2000
+      note: '''and temperatures less than 2000 K'' as printed (bound read as ''below 2000 K'').'
+    - id: N27-N28
+      quote: These systems all show similar phase diagrams, which exhibit large cubic phase fields and liquidus maxima. These
+        diagrams45-48 are shown in Figures 33, 35, 37, and 39. Note that in each case the liquidus maxima is at a composition
+        of 0.15 to 0.20 M2O3-ZrO2 and a temperature near 2800 K. The phase diagrams are very likely all somewhat tentative,
+        but they do show a lack of phase changes for these compositions.
+      locator:
+        published_page: 23
+        pdf_page_index: 24
+        section: Yb2O3-ZrO2, Dy2O3-ZrO2, Ho2O3-ZrO2, and Er2O3-ZrO2
+        note: Sentence continues onto printed p.24 (PDF page 26).
+      attribution: references 45-48
+      systems:
+      - Yb2O3-ZrO2
+      - Dy2O3-ZrO2
+      - Ho2O3-ZrO2
+      - Er2O3-ZrO2
+      liquidus_maximum_M2O3_fraction_range:
+      - '0.15'
+      - '0.2'
+      liquidus_maximum_temperature_K_approx: 2800
+    - id: N41
+      quote: Although Gd2O3 is one of the lower vapor pressure rare earth oxides, Belov and Semenov28 have found that on heating
+        in the range 2773-2823 K, Gd2O3 completely vaporizes from a solid solution with ZrO2.
+      locator:
+        published_page: 23
+        pdf_page_index: 24
+        section: Sm2O3-ZrO2 and Gd2O3-ZrO2
+      attribution: Belov and Semenov [28]
+      system: Gd2O3-ZrO2 solid solution
+      temperature_range_K:
+      - 2773
+      - 2823
+      outcome: Gd2O3 completely vaporizes
+    - id: N42
+      quote: Data for the solid oxide solution was not available. Belov and Semenov28 have noted that in the temperature range
+        2773 K to 2823 K, Yb2O3 tends to completely vaporize from the solid solution.
+      locator:
+        published_page: 24
+        pdf_page_index: 25
+        section: Yb2O3-ZrO2, Dy2O3-ZrO2, Ho2O3-ZrO2, and Er2O3-ZrO2
+      attribution: Belov and Semenov [28]
+      system: Yb2O3-ZrO2 solid solution
+      temperature_range_K:
+      - 2773
+      - 2823
+      outcome: Yb2O3 tends to completely vaporize
+    - id: N29-N32-N43
+      quote: Belov and Semenov28 have shown that each of these systems at 2, 3, 10, and 50 m/o do not decompose at temperatures
+        of 2773-2823 K.
+      locator:
+        published_page: 24
+        pdf_page_index: 25
+        section: Yb2O3-ZrO2, Dy2O3-ZrO2, Ho2O3-ZrO2, and Er2O3-ZrO2
+        note: '''These systems'' are Dy2O3, Ho2O3 and Er2O3 with ZrO2 (preceding sentences). The sentence does not name the
+          component the m/o refers to.'
+      attribution: Belov and Semenov [28]
+      systems:
+      - Dy2O3-ZrO2
+      - Ho2O3-ZrO2
+      - Er2O3-ZrO2
+      compositions_m_o_as_printed:
+      - 2
+      - 3
+      - 10
+      - 50
+      temperature_range_K:
+      - 2773
+      - 2823
+      outcome: do not decompose
+    - id: DyHoEr-qualification
+      quote: Solid solution data was not available. However systems which exhibit liquidus maxima show significant interactions49
+        and hence these systems should show a corresponding vapor pressure lowering.
+      locator:
+        published_page: 24
+        pdf_page_index: 25
+        section: Yb2O3-ZrO2, Dy2O3-ZrO2, Ho2O3-ZrO2, and Er2O3-ZrO2
+      attribution: reference 49 (Swalin)
+    - id: Lu2O3
+      quote: They have have also suggested the Lu2O3-ZrO2 system, since Lu2O3 has the lowest vapor pressure of the rare earth
+        oxides, as shown in Table I. However a phase diagram could not be located for the Lu2O3-ZrO2 system. Clearly more
+        work is needed on these important systems.
+      locator:
+        published_page: 24
+        pdf_page_index: 25
+        section: Yb2O3-ZrO2, Dy2O3-ZrO2, Ho2O3-ZrO2, and Er2O3-ZrO2
+      attribution: Belov and Semenov [28]
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_cited_phase_and_vaporization_facts
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_fig15_cited_experiment_facts
+  type: cited_experiment_context
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 14
+    pdf_page_index: 15
+    figure: '15'
+    section: BaO-ZrO2
+    note: Methods for the plotted comparative measurements are described in the discussion (quoted apparatus prose; the Figure
+      15 curves themselves remain figure_only in jacobson_1989_figure_15_figure_only).
+  values:
+    method_class: quoted_attributed
+    attribution: Odoj and Hilpert [24-26]; Berkowitz-Mattuck [10]; Glenn et al. [27]; apparatus facts as described by Jacobson
+      on printed p.14.
+    source_quote: The Odoj and Hilpert24-26 data was taken with a Knudsen Cell Mass Spectrometer using a molybdenum cell.
+      There was no evidence of reaction with the cell. The data of Berkowitz-Mattuck10 was taken with a Knudsen Cell Mass
+      Spectrometer and a rhenium cell. The rhenium cell is expected to be more inert than the molybdenum cell. The data of
+      Glenn et. al.27 is an not equilibrium measurement--it was simply the recession rate of an exposed surface.
+    calculated_vs_measured_qualification:
+      quote: Note the calculated vapor pressures from the thermdynamic data in the appendix is somewhat lower than the measured
+        P(BaO). It may be that the measured BaZrO3 compounds are a little BaO rich or there may be some inconsistancies in
+        the thermodynamic data.
+      locator:
+        published_page: 14
+        pdf_page_index: 15
+        section: BaO-ZrO2
+      note: 'Direction as printed: calculated P(BaO) lower than measured. ''A little BaO rich'' is offered as a possible explanation,
+        not a measured composition.'
+    sample_preparation_and_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 14
+        pdf_page_index: 15
+        section: BaO-ZrO2
+        note: No sample preparation, purity, or composition as prepared or after runs is stated for any of the three cited
+          data sets.
+    evidence_sets:
+    - cited_as: Odoj and Hilpert [24-26]
+      method: knudsen_effusion
+      cell_material: molybdenum
+      cell_reaction: The source says there was no evidence of reaction with the cell.
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: Not stated for this cited run.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: Not stated for this cited run.
+      calibration_and_ionization:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: No pressure calibration substance or ionization details stated here.
+    - cited_as: Berkowitz-Mattuck [10]
+      method: knudsen_effusion
+      cell_material: rhenium
+      cell_reactivity_note: Jacobson expected the Re cell to be more inert than Mo.
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: Not stated for this cited run.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: Not stated for this cited run.
+      calibration_and_ionization:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: No pressure calibration substance or ionization details stated here.
+    - cited_as: Glenn et al. [27]
+      method: langmuir_free_evaporation
+      cell_material:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: Not stated for this cited run.
+      equilibrium_status: The source says this was not an equilibrium measurement; it was recession rate of an exposed surface.
+      pressure_conversion: Hertz-Knudsen-Langmuir equation.
+      pressure_conversion_relation:
+        equation_number: '11'
+        relation_as_printed: J=P/(2πMRT)^1/2
+        symbols: Here J is the flux leaving the surface, P is the vapor pressure, M is the molecular weight of the vapor leaving
+          the surface, R is the gas constant, and T is the temperature.
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+      pressure_conversion_working_form:
+        equation_number: '12'
+        relation_as_printed: P(atm)=(2.26x10^-2)J(mole/cm^2-sec)(M(gm/mole))^1/2(T(°K))^1/2
+        conversion_coefficient: '0.0226'
+        conversion_coefficient_units: atm per [J(mole/cm^2-sec) (M(gm/mole))^1/2 (T(°K))^1/2], as printed
+        quote: 'When the appropriate conversion factors are added, this equation becomes:'
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+      agreement_statement:
+        quote: Despite the fact that this is a non-equilibrium measurement, the pressures measured are quite close to the
+          calculated equilibrium values.
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: Sentence continues onto printed p.15 (PDF page 17).
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: Free-surface Langmuir method.
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: Free-surface Langmuir method.
+      calibration_and_ionization:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 14
+          pdf_page_index: 15
+          section: BaO-ZrO2
+          note: No ionization or calibration details stated here.
+    temperature_measurement:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 14
+        pdf_page_index: 15
+        section: BaO-ZrO2
+        note: Temperature instrumentation and uncertainty not stated in this discussion.
+    pressure_environment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 14
+        pdf_page_index: 15
+        section: BaO-ZrO2
+        note: Chamber background pressure not stated in this discussion.
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_fig15_cited_experiment_facts
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_10_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 39
+    pdf_page_index: 40
+    figure: '10'
+    note: ZrO2-SrO phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-SrO phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Phase diagram for ZrO2-SrO'' reference 21; reprinted by permission of the American Ceramic Society
+      (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_10_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_11_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 39
+    pdf_page_index: 40
+    figure: '11'
+    note: vapor-pressure curves over SrO. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over SrO. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_11_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_12_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 39
+    pdf_page_index: 40
+    figure: '12'
+    note: vapor-pressure curves over SrZrO3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over SrZrO3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_12_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_13_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 40
+    pdf_page_index: 41
+    figure: '13'
+    note: vapor-pressure curves over BaO. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over BaO. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_13_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_14_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 40
+    pdf_page_index: 41
+    figure: '14'
+    note: vapor-pressure curves over BaZrO3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over BaZrO3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_14_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_15_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 40
+    pdf_page_index: 41
+    figure: '15'
+    note: measured BaO pressure over BaZrO3, values attributed to other workers. Curve or diagram retained as figure-only
+      context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: measured BaO pressure over BaZrO3, values attributed to other workers. The publication provides no numerical table
+      for this figure.
+    attribution: 'Jacobson figure based on sources 10, 24-27. Legend: CALCULATED (Jacobson); BERKOWITZ-MATTUCK (KCMS); ODOJ
+      AND HILPERT (KCMS); GLENN et. al. (LANGMUIR). Measured points are cited data and were not digitized.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_15_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_16_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 40
+    pdf_page_index: 41
+    figure: '16'
+    note: ZrO2-Y2O3 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-Y2O3 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Phase diagram for ZrO2-Y2O3'' reference 33; reprinted by permission of the American Ceramic Society
+      (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_16_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_17_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 41
+    pdf_page_index: 42
+    figure: '17'
+    note: activity-composition diagram for ZrO2-Y2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: activity-composition diagram for ZrO2-Y2O3. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Activity-composition diagram for ZrO2-Y2O3.'' reference 30; reprinted by permission of the British
+      Library. Caption: ''Line 1 shows the experimental data for a(ZrO2). Line 2 shows the a(Y2O3) values from the Gibbs-Duhem
+      integration. Line 3 shows the a(Y2O3)obtained by comparing the values for the solid solution to the pure compound and
+      applying the appropriate equilibrium equation.'''
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_17_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_18_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 41
+    pdf_page_index: 42
+    figure: '18'
+    note: vapor pressures over Y2O3 with comparison data. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor pressures over Y2O3 with comparison data. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Vapor pressures above Y2O3. Calculated and data of Walsh et. al.'' reference 34 (legend: P(YO)
+      - Walsh, Goldstein, and White). Calculated curves are Jacobson SOLGASMIX-PV results; the plotted points are cited data
+      and were not digitized.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_18_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_19_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 41
+    pdf_page_index: 42
+    figure: '19'
+    note: vapor pressures over Y2O3-2(ZrO2). Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor pressures over Y2O3-2(ZrO2). The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_19_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_1_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 37
+    pdf_page_index: 38
+    figure: '1'
+    note: vapor-pressure curves over ZrO2. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over ZrO2. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); text p.5 says
+      the results for pure ZrO2 are shown in Figure 1; the caption cites no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_1_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_20_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 41
+    pdf_page_index: 42
+    figure: '20'
+    note: ZrO2-Sc2O3 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-Sc2O3 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Phase diagram for ZrO2-Sc2O3.'' reference 36; reprinted by permission of the American Ceramic
+      Society (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_20_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_21_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 42
+    pdf_page_index: 43
+    figure: '21'
+    note: activity-composition diagram for ZrO2-Sc2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: activity-composition diagram for ZrO2-Sc2O3. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Activity-composition diagram for ZrO2-Sc2O3.'' reference 38; reprinted by permission of the British
+      Library. Caption: ''Lines 1 and 2 were calculated by the approximation method 32. Point 3 is a(ZrO2) measured by comparing
+      the solid solution to the pure compound.'''
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_21_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_22_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 42
+    pdf_page_index: 43
+    figure: '22'
+    note: vapor pressures over Sc2O3 with comparison data. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor pressures over Sc2O3 with comparison data. The publication provides no numerical table for this figure.
+    attribution: Calculated curves are Jacobson SOLGASMIX-PV results; legend 'DATA OF SEMENOV 37' (reference 37) marks cited
+      points, not digitized.
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_22_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_23_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 42
+    pdf_page_index: 43
+    figure: '23'
+    note: ZrO2-La2O3 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-La2O3 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Phase diagram for ZrO2-La2O3'' reference 40; reprinted by permission of the American Ceramic
+      Society (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_23_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_24_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 42
+    pdf_page_index: 43
+    figure: '24'
+    note: vapor-pressure curves over La2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over La2O3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_24_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_25_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 43
+    pdf_page_index: 44
+    figure: '25'
+    note: vapor pressures over La2O3-2(ZrO2). Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor pressures over La2O3-2(ZrO2). The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_25_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_26_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 43
+    pdf_page_index: 44
+    figure: '26'
+    note: ZrO2-CeO2 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-CeO2 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Phase diagram for ZrO2-CeO2.'' references 2 and 41; reprinted by permission of the American Ceramic
+      Society (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_26_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_27_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 43
+    pdf_page_index: 44
+    figure: '27'
+    note: vapor-pressure curves over Ce2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over Ce2O3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_27_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_28_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 43
+    pdf_page_index: 44
+    figure: '28'
+    note: vapor-pressure curves over Ce2O3-2(ZrO2). Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over Ce2O3-2(ZrO2). The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_28_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_29_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 44
+    pdf_page_index: 45
+    figure: '29'
+    note: ZrO2-Sm2O3 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-Sm2O3 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Phase diagram for ZrO2-Sm2O3'' reference 42; reprinted by permission of the American Ceramic
+      Society (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_29_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_2_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 37
+    pdf_page_index: 38
+    figure: '2'
+    note: vapor-pressure curves over ZrO2 plus 1 atm oxygen. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over ZrO2 plus 1 atm oxygen. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX calculation with one atmosphere of oxygen (text p.5: ''Figure 2 shows the dramatic effect
+      of one atmosphere of oxygen on suppressing the amount of ZrO(g) and Zr(g).''); the caption cites no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_2_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_30_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 44
+    pdf_page_index: 45
+    figure: '30'
+    note: vapor-pressure curves over Sm2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over Sm2O3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_30_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_31_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 44
+    pdf_page_index: 45
+    figure: '31'
+    note: ZrO2-Gd2O3 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-Gd2O3 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Phase diagram for ZrO2-Gd2O3'' reference 44; reprinted by permission of the American Ceramic
+      Society (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_31_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_32_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 44
+    pdf_page_index: 45
+    figure: '32'
+    note: vapor-pressure curves over Gd2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over Gd2O3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_32_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_33_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 45
+    pdf_page_index: 46
+    figure: '33'
+    note: ZrO2-Yb2O3 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-Yb2O3 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Phase diagram for ZrO2-Yb2O3.'' reference 45; reprinted by permission of the American Ceramic
+      Society (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_33_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_34_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 45
+    pdf_page_index: 46
+    figure: '34'
+    note: vapor-pressure curves over Yb2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over Yb2O3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_34_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_35_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 45
+    pdf_page_index: 46
+    figure: '35'
+    note: ZrO2-Dy2O3 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-Dy2O3 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Phase diagram for ZrO2-Dy2O3.'' reference 46; reprinted by permission of the American Ceramic
+      Society (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_35_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_36_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 45
+    pdf_page_index: 46
+    figure: '36'
+    note: vapor-pressure curves over Dy2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over Dy2O3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_36_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_37_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 46
+    pdf_page_index: 47
+    figure: '37'
+    note: ZrO2-Ho2O3 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-Ho2O3 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''ZrO2-Ho2O3 phase diagram.'' reference 47; reprinted by permission of the American Ceramic Society
+      (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_37_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_38_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 46
+    pdf_page_index: 47
+    figure: '38'
+    note: vapor-pressure curves over Ho2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over Ho2O3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_38_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_39_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 46
+    pdf_page_index: 47
+    figure: '39'
+    note: ZrO2-Er2O3 phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-Er2O3 phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''ZrO2-Er2O3 phase diagram.'' reference 48; reprinted by permission of the American Ceramic Society
+      (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_39_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_3_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 37
+    pdf_page_index: 38
+    figure: '3'
+    note: ZrO2-MgO phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-MgO phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''ZrO2-MgO phase diagram.'' reference 13; reprinted by permission of the American Ceramic Society
+      (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_3_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_40_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 46
+    pdf_page_index: 47
+    figure: '40'
+    note: vapor-pressure curves over Er2O3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over Er2O3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_40_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_4_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 37
+    pdf_page_index: 38
+    figure: '4'
+    note: ZrO2-MgO liquidus diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-MgO liquidus diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''ZrO2-MgO liquidus curve.'' references 15 and 36; reprinted by permission of the American Ceramic
+      Society (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_4_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_5_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 38
+    pdf_page_index: 39
+    figure: '5'
+    note: vapor-pressure curves over MgO. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over MgO. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); a(MgO) taken as
+      essentially unity (text p.9); the caption cites no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_5_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_6_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 38
+    pdf_page_index: 39
+    figure: '6'
+    note: ZrO2-CaO phase diagram. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: ZrO2-CaO phase diagram. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''ZrO2-CaO phase diagram.'' reference 18; reprinted by permission of the American Ceramic Society
+      (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_6_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_7_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 38
+    pdf_page_index: 39
+    figure: '7'
+    note: CaO activity-composition diagram in ZrO2-CaO. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: CaO activity-composition diagram in ZrO2-CaO. The publication provides no numerical table for this figure.
+    attribution: 'Caption: ''Activity-Composition diagram for ZrO2-CaO.'' reference 19; reprinted by permission of the Royal
+      Society of Chemistry (caption).'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_7_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_8_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 38
+    pdf_page_index: 39
+    figure: '8'
+    note: vapor-pressure curves over CaO. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over CaO. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_8_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_figure_9_figure_only
+  type: calculated_vapor_pressure_figure
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 39
+    pdf_page_index: 40
+    figure: '9'
+    note: vapor-pressure curves over CaZrO3. Curve or diagram retained as figure-only context; no values digitized.
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    reason: vapor-pressure curves over CaZrO3. The publication provides no numerical table for this figure.
+    attribution: 'Jacobson SOLGASMIX-PV vapor-pressure calculation from the appendix data (text p.48: ''This free energy was
+      then put into the SOLGASMIX-PV computer program to calculate the vapor pressures for each system.''); the caption cites
+      no other source.'
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_figure_9_figure_only
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_mgo_activity_upper_limit
+  type: activity_standard_state_context
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 9
+    pdf_page_index: 10
+    section: MgO-ZrO2 System
+  values:
+    method_class: author_estimate
+    quote: We were unable to find data on how activity of MgO changes in solution. In order to estimate an upper limit, we
+      shall use the value of a(MgO) along the MgO-rich cubic phase boundary. Since this is in equilibrium with essentially
+      pure MgO, the activity of MgO is essentially unity. Based on this, the vapor pressure for MgO is shown in Figure 5.
+    a_MgO_assumed: 1
+    standard_state: pure MgO
+    note: Jacobson's assumption for an upper-limit estimate at the MgO-rich cubic phase boundary; not a measured activity.
+    vaporization_products: Vaporization studies of MgO indicate that the primary decomposition products are Mg(g) and O(g),
+      with only a very small amount of MgO(g).17
+    preferential_vaporization: One of the major obstacles to the use of this material is the high vapor pressure of MgO--it
+      will preferentially vaporize.13,16
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_mgo_activity_upper_limit
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_numeric_and_directional_statements
+  type: numeric_and_directional_context
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    section: Introduction
+    note: Numeric and comparative prose was checked against the page renders; additional locators are stated per fact.
+  values:
+    method_class: quoted_unattributed
+    statements:
+    - quote: 3000 F (1900 K)
+      locator:
+        published_page: 2
+        pdf_page_index: 3
+        section: Introduction
+    - quote: melting point of 2973 K
+      locator:
+        published_page: 2
+        pdf_page_index: 3
+        section: Introduction
+    - quote: 1443 K; 2643 K; 1223 K
+      locator:
+        published_page: 2
+        pdf_page_index: 3
+        section: Introduction
+        note: Phase-transition temperatures printed around the monoclinic/tetragonal/cubic schematic.
+    - quote: temperatures greater than 1900 K
+      locator:
+        published_page: 4
+        pdf_page_index: 5
+        section: Introduction
+    - quote: It should be noted that in order to obtain equilibrium vapor pressures from SOLGASMIX, one atomosphere of argon
+        was put in as a reactant.
+      locator:
+        published_page: 5
+        pdf_page_index: 6
+        section: ZrO2 vapor-pressure calculations
+        note: As printed, including the misspelling 'atomosphere'. Argon (1 atm) is a SOLGASMIX calculation reactant, not
+          an experimental atmosphere.
+      argon_reactant_atm: 1
+    - quote: For reactions (3) and (4), where oxygen is released, an overpressure of oxygen will suppress the vaporization
+        process. Figure 2 shows the dramatic effect of one atmosphere of oxygen on suppressing the amount of ZrO(g) and Zr(g).
+        However for reaction (2) where no oxygen is released, the oxygen atmosphere has no effect.
+      locator:
+        published_page: 5
+        pdf_page_index: 6
+        section: ZrO2 vapor-pressure calculations
+        note: Separate calculated comparison (Figure 2, ZrO2 + 1 atm O2); distinct from the argon reactant above.
+      oxygen_overpressure_atm: 1
+    - quote: They studied the volatilization of each of these and the Lu2O3-ZrO2 system in the temperature range 2773-2823
+        K. Only the Yb2O3-ZrO2 and Gd2O3-ZrO2 systems decompose, preferentially losing the stabilizing oxide.
+      locator:
+        published_page: 16
+        pdf_page_index: 17
+        section: Rare Earth Oxide-Zirconia Systems
+      attribution: Belov and Semenov [28] (cited survey)
+      systems: ZrO2 with Gd2O3, Dy2O3, Yb2O3, Ho2O3, Er2O3, Y2O3 (liquidus-maximum systems) and Lu2O3
+      temperature_range_K:
+      - 2773
+      - 2823
+      outcome: Only Yb2O3-ZrO2 and Gd2O3-ZrO2 decompose, preferentially losing the stabilizing oxide.
+    - quote: It should be noted that the vapor pressure in the solid solution is sufficiently high that Belov et. al.38 observe
+        after 100 minutes at 2580°K, all the Sc2O3 has vaporized from their sample of 50 m/o Sc2O3 - 50 m/o ZrO2.
+      locator:
+        published_page: 20
+        pdf_page_index: 21
+        section: Sc2O3-ZrO2
+      attribution: Belov et al. [38] (cited experiment)
+      duration_min: 100
+      temperature_K: 2580
+      sample_composition_mol_percent:
+        Sc2O3: 50
+        ZrO2: 50
+      outcome: all the Sc2O3 has vaporized (complete Sc2O3 loss)
+    - quote: At lower temperatures, there is a compound CaO·4(ZrO2). There is also a compound CaO·ZrO2, which is stable to
+        its melting point of 2252 K.
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        section: CaO-ZrO2 System
+        note: Follows the introduction of the Figure 6 phase diagram (reference 18).
+      melting_point_K: 2252
+      compound: CaO·ZrO2 (CaZrO3)
+    - quote: 17 m/o CaO in ZrO2 over the temperature range 1200-1500 K
+      locator:
+        published_page: 11
+        pdf_page_index: 12
+        section: CaO-ZrO2
+    - quote: about 7 m/o CaO below 1413 K
+      locator:
+        published_page: 11
+        pdf_page_index: 12
+        section: CaO-ZrO2
+    - quote: about 17 m/o CaO at 1413 K and above
+      locator:
+        published_page: 11
+        pdf_page_index: 12
+        section: CaO-ZrO2
+    amendments_proposed:
+    - No scored numeric observation type in literature_extract.v1 represents an author's complete multicomponent thermodynamic
+      coefficient table without interpreting it as experimental observation; Tables A-I and A-II are therefore located table
+      context.
+    - The paper's SOLGASMIX-PV vapor-pressure curves and figure-only activity/phase diagrams remain non-numeric context because
+      curve digitization is prohibited.
+    - Jacobson's discussion reports apparatus facts about three prior BaO/BaZrO3 data sets, but not the orifice, channel,
+      ionization, calibration, sample, or full thermal facts; these remain typed absences.
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_numeric_and_directional_statements
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_printed_equations
+  type: numeric_and_directional_context
+  units: Equations as printed; symbols and units per the source.
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    note: Inventory of every printed equation with its locator. Equation numbers are reused in the source (main-text (1) and
+      (15), appendix (1)); the page keeps them distinct.
+  values:
+    method_class: quoted_unattributed
+    equations:
+    - number: 1 (main text)
+      relation_as_printed: Monoclinic = Tetragonal = Cubic
+      locator:
+        published_page: 2
+        pdf_page_index: 3
+        section: Introduction
+        note: 1443 K is printed above the first '=' (Monoclinic = Tetragonal) and 1223 K below it; 2643 K is printed above
+          the second '=' (Tetragonal = Cubic). 'phase changes' carries reference 2.
+    - number: '2'
+      relation_as_printed: ZrO2(s) = ZrO2(g)
+      locator:
+        published_page: 5
+        pdf_page_index: 6
+    - number: '3'
+      relation_as_printed: ZrO2(s) = ZrO(g) + O(g)
+      locator:
+        published_page: 5
+        pdf_page_index: 6
+    - number: '4'
+      relation_as_printed: ZrO2(s) = Zr(g) + O2(g)
+      locator:
+        published_page: 5
+        pdf_page_index: 6
+    - number: '5'
+      relation_as_printed: 2 Σ Zr containing species in the vapor = Σ O containing species in the vapor
+      locator:
+        published_page: 5
+        pdf_page_index: 6
+        note: Introduced as 'Subject to the mass balance constraint in a closed system:'
+    - number: '6'
+      relation_as_printed: c(ss) → t(ss) + MgO
+      locator:
+        published_page: 8
+        pdf_page_index: 9
+        section: MgO-ZrO2 System
+    - number: '7'
+      relation_as_printed: O2,Pt|CaO,CaF2|CaF2|ZrO2-CaO,CaF2|Pt,O2
+      locator:
+        published_page: 10
+        pdf_page_index: 11
+        section: CaO-ZrO2 System
+      attribution: emf cell of references 19, 20
+    - number: '8'
+      relation_as_printed: CaO(a=1) = CaO(solid solution)
+      locator:
+        published_page: 10
+        pdf_page_index: 11
+        section: CaO-ZrO2 System
+    - number: '9'
+      relation_as_printed: ΔG = -2EF = -RT ln a(CaO-ss)
+      locator:
+        published_page: 10
+        pdf_page_index: 11
+        section: CaO-ZrO2 System
+    - number: '10'
+      relation_as_printed: orthorhombic → tetragonal 1 → tetragonal 2 → cubic (923 K, 1003 K, 1443 K printed above the arrows)
+      locator:
+        published_page: 13
+        pdf_page_index: 14
+        section: SrO-ZrO2
+      attribution: reference 23
+    - number: '11'
+      relation_as_printed: J=P/(2πMRT)^1/2
+      locator:
+        published_page: 14
+        pdf_page_index: 15
+        section: BaO-ZrO2
+    - number: '12'
+      relation_as_printed: P(atm)=(2.26x10^-2)J(mole/cm^2-sec)(M(gm/mole))^1/2(T(°K))^1/2
+      locator:
+        published_page: 14
+        pdf_page_index: 15
+        section: BaO-ZrO2
+    - number: '13'
+      relation_as_printed: M2O3(s) = 2 MO(g) + O(g)
+      locator:
+        published_page: 15
+        pdf_page_index: 16
+        section: Rare Earth Oxide-Zirconia Systems
+    - number: '14'
+      relation_as_printed: Yb2O3(s) = 2 Yb(g) + 3 O(g)
+      locator:
+        published_page: 15
+        pdf_page_index: 16
+        section: Rare Earth Oxide-Zirconia Systems
+        note: '''This is with the exception of Yb, which decomposes as:'''
+    - number: '15'
+      relation_as_printed: a(i) = P(i)/P°(i)
+      locator:
+        published_page: 16
+        pdf_page_index: 17
+        section: Rare Earth Oxide-Zirconia Systems
+    - number: '16'
+      relation_as_printed: a(ZrO2) = P(ZrO2)/P°(ZrO2)
+      locator:
+        published_page: 17
+        pdf_page_index: 18
+        section: Rare Earth Oxide-Zirconia Systems
+    - number: '17'
+      relation_as_printed: a(ZrO2) = P(ZrO) P(O-tot) / P°(ZrO) P°(O-tot)
+      locator:
+        published_page: 17
+        pdf_page_index: 18
+        section: Rare Earth Oxide-Zirconia Systems
+      attribution: Belov [32]
+    - number: '18'
+      relation_as_printed: a(M2O3) = P(MO)^2 P(O-tot) / P°(MO)^2 P°(O-tot)
+      locator:
+        published_page: 17
+        pdf_page_index: 18
+        section: Rare Earth Oxide-Zirconia Systems
+      attribution: Belov [32]
+    - number: unnumbered
+      relation_as_printed: P(ZrO) = O; P(O-tot) = P(O-M2O3); then P(O-tot) = P(O-M2O3) + P(O-ZrO2)
+      locator:
+        published_page: 18
+        pdf_page_index: 19
+        section: Rare Earth Oxide-Zirconia Systems
+        note: Initialization and update of Belov's iteration; see jacobson_1989_belov_mo_ion_activity_route for the zero reading.
+      attribution: Belov [32]
+    - number: 15 (reused, p.20)
+      relation_as_printed: P(ScO-sol)=P°(ScO)[x(Sc2O3)]
+      locator:
+        published_page: 20
+        pdf_page_index: 21
+        section: Sc2O3-ZrO2
+      attribution: Semenov [37]; Belov et al. [38-39]
+    - number: 1 (appendix)
+      relation_as_printed: Cp = A + B x 10^-3T + C x 10^5/T^2 + D x 10^-6T^2
+      locator:
+        published_page: 47
+        pdf_page_index: 48
+        section: Appendix. Thermodynamic Data
+    - number: 2 (appendix)
+      relation_as_printed: G = AG/T + BG + CG*T + DG*T^-2 + EG*T^3 + FG*T*LOG(T)
+      locator:
+        published_page: 48
+        pdf_page_index: 49
+        section: Appendix. Thermodynamic Data
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_printed_equations
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_sc2o3_zro2_activity_route
+  type: activity_standard_state_context
+  units: Not applicable to located qualitative context.
+  locator:
+    published_page: 20
+    pdf_page_index: 21
+    section: Sc2O3-ZrO2
+  values:
+    method_class: quoted_attributed
+    attribution: Semenov [37] and Belov et al. [38-39], as described by Jacobson on printed p.20.
+    quote: 'Semenov37 and Belov et. al.38-39 have investigated the vaporization behavior of pure Sc2O3 and Sc2O3-ZrO2 solid
+      solutions. For the solid solutions, they observe the following near ideal behavior:'
+    relation:
+      equation_number: 15 (reused number)
+      relation_as_printed: P(ScO-sol)=P°(ScO)[x(Sc2O3)]
+      note: Printed as equation (15) on p.20; distinct from the general Eq.(15) a(i)=P(i)/P°(i) on p.16. This is a pressure
+        relation for ScO over the solution, not a(M2O3)=x(M2O3).
+    derivation: From this relation and the iterative calculation method described above, they calculate an activity-composition
+      diagram is shown in Figure 21. (sic)
+    comparison: Figure 22 is a plot of the calculated vapor pressures above pure Sc2O3 and the experimental data of Semenov37,
+      which is in good agreement.
+    expectation: In the Sc2O3-ZrO2 solution, one would expect limited vapor pressure lowering consistent with Figure 21 and
+      similar to the Y2O3·2(ZrO2) case.
+    sc2o3_loss_experiment:
+      attribution: Belov et al. [38]
+      duration_min: 100
+      temperature_K: 2580
+      sample_composition_mol_percent:
+        Sc2O3: 50
+        ZrO2: 50
+      outcome: all the Sc2O3 has vaporized
+      locator:
+        published_page: 20
+        pdf_page_index: 21
+        section: Sc2O3-ZrO2
+        note: Same printed sentence as the 100 min / 2580 K statement in jacobson_1989_numeric_and_directional_statements.
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_sc2o3_zro2_activity_route
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_table_ai_thermodynamic_data
+  type: thermodynamic_example
+  locator:
+    published_page: 53
+    pdf_page_index: 54
+    table: A-I
+    note: Thermodynamic data compiled from cited sources; each row retains Table A-I's Source number. Complete raw values
+      are in tables/jacobson-1989-metal-oxide-zirconia/t2.csv.
+  units: See printed column headers; source values retained without conversion.
+  values:
+    quantity: thermodynamic_data_table_ai
+    method_class: quoted_attributed
+    attribution: Thermodynamic data compiled from cited sources; each row retains Table A-I's Source number.
+    provenance_qualification: 'Compiled values mix measured, estimated and derived data (appendix pp.47-48): ''This includes
+      both estimated and measured data. Where possible measured data were used in the final calculations, as shown in Table
+      AI.'' The rare-earth zirconate S(298) = 47.8 cal/K mol entries (rows 56, 70, 78, 88, 97) are estimates after Barin and
+      Knacke, and the zirconate heat capacities were estimated by summing the M2O3 and 2(ZrO2) contributions. Not every value
+      is a direct measurement. See jacobson_1989_appendix_data_sources_and_estimates.'
+    cp_equation: Cp = A + B x 10^-3T + C x 10^5/T^2 + D x 10^-6T^2 (appendix equation 1, printed p.47); columns Cp_A..Cp_D
+      hold the printed coefficients A, B, C, D before these powers of ten are applied.
+    table_csv: tables/jacobson-1989-metal-oxide-zirconia/t2.csv
+    columns:
+    - compound
+    - delta_Hf_298_kcal_mol
+    - S_298_cal_K_mol
+    - Cp_A
+    - Cp_B
+    - Cp_C
+    - Cp_D
+    - T_low_K
+    - T_high_K
+    - comments
+    - source_as_printed
+    - published_page
+    - pdf_page_index
+    row_count: 124
+    numeric_cell_count: 786
+    rows:
+    - row_number: 1
+      cells:
+      - Zr(alpha)
+      - 0
+      - '9.29'
+      - '6.016'
+      - '-0.106'
+      - '-0.124'
+      - '1.32'
+      - 298
+      - 1135
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 2
+      cells:
+      - Zr(beta)
+      - null
+      - null
+      - '7.783'
+      - '-2.334'
+      - '-0.153'
+      - '1.28'
+      - 1135
+      - 2125
+      - Delta(alpha-beta)=0.960
+      - 1
+      - 53
+      - 54
+    - row_number: 3
+      cells:
+      - Zr(L)
+      - null
+      - null
+      - '10'
+      - null
+      - null
+      - null
+      - null
+      - null
+      - Delta(beta-L)=5.000
+      - 1
+      - 53
+      - 54
+    - row_number: 4
+      cells:
+      - Zr(g)
+      - '145.8'
+      - '43.745'
+      - '4.522'
+      - '1.637'
+      - '0.896'
+      - '-0.129'
+      - 298
+      - 2500
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 5
+      cells:
+      - ZrO2(alpha)
+      - '-262.3'
+      - '12.036'
+      - '16.64'
+      - '1.8'
+      - '-3.36'
+      - null
+      - 298
+      - 1478
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 6
+      cells:
+      - ZrO2(beta)
+      - null
+      - null
+      - '17.8'
+      - null
+      - null
+      - null
+      - 1478
+      - 2950
+      - Delta(alpha-beta)=1.42
+      - 1
+      - 53
+      - 54
+    - row_number: 7
+      cells:
+      - ZrO2(L)
+      - null
+      - null
+      - '20.8'
+      - null
+      - null
+      - null
+      - 2950
+      - 3300
+      - Delta(beta-L)=20.8
+      - 1
+      - 53
+      - 54
+    - row_number: 8
+      cells:
+      - ZrO2(g)
+      - '-68.4'
+      - '65.402'
+      - '12.601'
+      - '1.288'
+      - '-1.783'
+      - '-0.328'
+      - 298
+      - 2400
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 9
+      cells:
+      - ZrO(g)
+      - '14'
+      - '54.33'
+      - '6.28'
+      - '3.56'
+      - null
+      - null
+      - 298
+      - 2000
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 10
+      cells:
+      - ZrO(g)
+      - null
+      - null
+      - '14.12'
+      - '-0.839'
+      - null
+      - null
+      - 2000
+      - 2500
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 11
+      cells:
+      - O(g)
+      - '59.554'
+      - '38.494'
+      - '5.019'
+      - '-0.055'
+      - '0.208'
+      - '158.7'
+      - 298
+      - 2500
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 12
+      cells:
+      - O2(g)
+      - 0
+      - '49.031'
+      - '6.922'
+      - '1.676'
+      - '-0.362'
+      - '-0.3'
+      - 298
+      - 2500
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 13
+      cells:
+      - Mg(s)
+      - 0
+      - '7.809'
+      - '6.252'
+      - '-0.209'
+      - '-0.375'
+      - '1.983'
+      - 298
+      - 923
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 14
+      cells:
+      - Mg(L)
+      - null
+      - null
+      - '8.2'
+      - null
+      - null
+      - null
+      - 923
+      - 2000
+      - Delta(S-L)=2.026
+      - 1
+      - 53
+      - 54
+    - row_number: 15
+      cells:
+      - Mg(g)
+      - '35.158'
+      - '35.528'
+      - '4.968'
+      - null
+      - null
+      - null
+      - 298
+      - 1700
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 16
+      cells:
+      - Mg(g)
+      - null
+      - null
+      - '5.347'
+      - '-0.286'
+      - '-1.936'
+      - '0.06056'
+      - 1700
+      - 2700
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 17
+      cells:
+      - Mg2(g)
+      - '68.744'
+      - '57.406'
+      - '4.986'
+      - '-0.03714'
+      - '0.738'
+      - '0.018'
+      - 298
+      - 1700
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 18
+      cells:
+      - Mg2(g)
+      - null
+      - null
+      - '20.338'
+      - '-11.49'
+      - '-81.813'
+      - '2.431'
+      - 1700
+      - 2500
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 19
+      cells:
+      - MgO(s)
+      - '-143.7'
+      - '6.435'
+      - '11.36'
+      - '1.215'
+      - '-2.54'
+      - '-0.103'
+      - 298
+      - 2500
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 20
+      cells:
+      - MgO(g)
+      - '13.9'
+      - '50.973'
+      - '-4.093'
+      - '31.071'
+      - '3.402'
+      - '-14.188'
+      - 298
+      - 1000
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 21
+      cells:
+      - MgO(g)
+      - null
+      - null
+      - '26.184'
+      - '-11.98'
+      - '-34.208'
+      - '2.331'
+      - 1000
+      - 2400
+      - null
+      - 1
+      - 53
+      - 54
+    - row_number: 22
+      cells:
+      - Ca(alpha)
+      - 0
+      - '9.94'
+      - '3.925'
+      - '5.241'
+      - '0.63'
+      - '0.04685'
+      - 298
+      - 716
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 23
+      cells:
+      - Ca(beta)
+      - null
+      - null
+      - '1.307'
+      - '8.035'
+      - '2.734'
+      - '-0.124'
+      - 716
+      - 1115
+      - Delta(alpha-beta)=0.222
+      - 1
+      - 54
+      - 55
+    - row_number: 24
+      cells:
+      - Ca(L)
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - 1115
+      - 2500
+      - Delta(beta-L)=2.041
+      - 1
+      - 54
+      - 55
+    - row_number: 25
+      cells:
+      - Ca(g)
+      - '42.495'
+      - '37.019'
+      - '4.968'
+      - null
+      - null
+      - null
+      - 300
+      - 1200
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 26
+      cells:
+      - Ca(g)
+      - null
+      - null
+      - '7.708'
+      - '-2.374'
+      - '-10.675'
+      - '0.579'
+      - 1200
+      - 2500
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 27
+      cells:
+      - CaO(s)
+      - '-151.79'
+      - '9.133'
+      - '11.978'
+      - '1.088'
+      - '-1.988'
+      - '-0.03156'
+      - 300
+      - 2500
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 28
+      cells:
+      - CaO(g)
+      - '10.5'
+      - '52.514'
+      - '9.884'
+      - '-2.648'
+      - '-1.338'
+      - '1.737'
+      - 300
+      - 2500
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 29
+      cells:
+      - CaZrO3(s)
+      - '-422.3'
+      - '23.9'
+      - '30.15'
+      - '1.54'
+      - '-6.05'
+      - null
+      - 298
+      - 2000
+      - null
+      - 2,4,7
+      - 54
+      - 55
+    - row_number: 30
+      cells:
+      - Sr(alpha)
+      - 0
+      - '13.311'
+      - '5.634'
+      - '2.424'
+      - '0.0359'
+      - '0.07881'
+      - 300
+      - 820
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 31
+      cells:
+      - Sr(beta)
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - 820
+      - 1050
+      - Delta(alpha-beta)=0.200
+      - 1
+      - 54
+      - 55
+    - row_number: 32
+      cells:
+      - Sr(L)
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - 1050
+      - 2000
+      - Delta(beta-L)=1.776
+      - 1
+      - 54
+      - 55
+    - row_number: 33
+      cells:
+      - Sr(g)
+      - '39.197'
+      - '39.293'
+      - '4.968'
+      - null
+      - null
+      - null
+      - 298
+      - 1300
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 34
+      cells:
+      - Sr(g)
+      - null
+      - null
+      - '8.952'
+      - '-3.459'
+      - '-15.517'
+      - '0.846'
+      - 1300
+      - 2500
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 35
+      cells:
+      - SrO(s)
+      - '-141.5'
+      - '13.27'
+      - '11.665'
+      - '1.934'
+      - '-1.235'
+      - '-0.094'
+      - 298
+      - 2500
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 36
+      cells:
+      - SrO(g)
+      - '-3.2'
+      - '54.985'
+      - '10.282'
+      - '-3.134'
+      - '-1.446'
+      - '1.83'
+      - 298
+      - 2500
+      - null
+      - 1
+      - 54
+      - 55
+    - row_number: 37
+      cells:
+      - SrZrO3(s)
+      - '-425.2'
+      - '27.5'
+      - '29.79'
+      - '1.4'
+      - '-4.89'
+      - null
+      - 298
+      - 1620
+      - null
+      - 3,7,8
+      - 54
+      - 55
+    - row_number: 38
+      cells:
+      - Ba(alpha)
+      - 0
+      - '14.932'
+      - '9.584'
+      - '-24.742'
+      - '-0.183'
+      - '52.831'
+      - 100
+      - 583
+      - null
+      - 1
+      - 55
+      - 56
+    - row_number: 39
+      cells:
+      - Ba(beta)
+      - null
+      - null
+      - '-1.059'
+      - '14.402'
+      - '-2.181'
+      - '3.158'
+      - 583
+      - 768
+      - Delta(alpha-beta)=0
+      - 1
+      - 55
+      - 56
+    - row_number: 40
+      cells:
+      - Ba(gamma)
+      - null
+      - null
+      - '9.337'
+      - null
+      - null
+      - null
+      - 768
+      - 1000
+      - Delta(beta-gamma)=0
+      - 1
+      - 55
+      - 56
+    - row_number: 41
+      cells:
+      - Ba(L)
+      - null
+      - null
+      - '15.979'
+      - '-8.183'
+      - '0.901'
+      - '2.464'
+      - 1000
+      - 2100
+      - Delta(beta-L)=1.915
+      - 1
+      - 55
+      - 56
+    - row_number: 42
+      cells:
+      - Ba(g)
+      - '42.8'
+      - '40.69'
+      - '4.968'
+      - null
+      - null
+      - null
+      - 300
+      - 900
+      - null
+      - 1
+      - 55
+      - 56
+    - row_number: 43
+      cells:
+      - Ba(g)
+      - null
+      - null
+      - '8.196'
+      - '-5.379'
+      - '-2.247'
+      - '2.36'
+      - 900
+      - 2500
+      - null
+      - 1
+      - 55
+      - 56
+    - row_number: 44
+      cells:
+      - BaO(s)
+      - '-131'
+      - '17.225'
+      - '11.809'
+      - '2.076'
+      - '-1.002'
+      - '-0.142'
+      - 298
+      - 2200
+      - null
+      - 1
+      - 55
+      - 56
+    - row_number: 45
+      cells:
+      - BaO(g)
+      - '-29.6'
+      - '56.28'
+      - '8.979'
+      - '-0.223'
+      - '-0.965'
+      - '0.156'
+      - 298
+      - 2500
+      - null
+      - 1
+      - 55
+      - 56
+    - row_number: 46
+      cells:
+      - BaZrO3(alpha)
+      - '-426.73'
+      - '29.8'
+      - '25.63'
+      - '6.24'
+      - '-2.82'
+      - null
+      - 298
+      - 758
+      - null
+      - 3,7,8
+      - 55
+      - 56
+    - row_number: 47
+      cells:
+      - BaZrO3(beta)
+      - null
+      - null
+      - '27.77'
+      - '-0.18'
+      - null
+      - null
+      - 758
+      - 1175
+      - null
+      - 3,7,8
+      - 55
+      - 56
+    - row_number: 48
+      cells:
+      - BaZrO3(gamma)
+      - null
+      - null
+      - '24.75'
+      - '4.42'
+      - null
+      - null
+      - 1175
+      - 1606
+      - Delta(beta-gamma)=0.33
+      - 3,7,8
+      - 55
+      - 56
+    - row_number: 49
+      cells:
+      - Y(alpha)
+      - 0
+      - '10.62'
+      - '5.718'
+      - '1.81'
+      - '0.073'
+      - null
+      - 298
+      - 1752
+      - null
+      - 9
+      - 55
+      - 56
+    - row_number: 50
+      cells:
+      - Y(beta)
+      - null
+      - null
+      - '8.36'
+      - null
+      - null
+      - null
+      - 1752
+      - 1799
+      - Delta(alpha-beta)=1.193
+      - 9
+      - 55
+      - 56
+    - row_number: 51
+      cells:
+      - Y(L)
+      - null
+      - null
+      - '10.3'
+      - null
+      - null
+      - null
+      - 1799
+      - 2500
+      - Delta(beta-L)=2.724
+      - 9
+      - 55
+      - 56
+    - row_number: 52
+      cells:
+      - Y(g)
+      - '100.7'
+      - '42.869'
+      - '5.51'
+      - '-0.178'
+      - '0.644'
+      - null
+      - 298
+      - 2500
+      - null
+      - 9
+      - 55
+      - 56
+    - row_number: 53
+      cells:
+      - YO(g)
+      - '-9.3'
+      - '55.88'
+      - '8.41'
+      - '0.32'
+      - '-0.84'
+      - null
+      - 298
+      - 2000
+      - null
+      - 10
+      - 55
+      - 56
+    - row_number: 54
+      cells:
+      - Y2O3(alpha)
+      - '-455.38'
+      - '23.69'
+      - '29.421'
+      - '1.414'
+      - '-4.749'
+      - null
+      - 298
+      - 1330
+      - null
+      - 9
+      - 55
+      - 56
+    - row_number: 55
+      cells:
+      - Y2O3(beta)
+      - null
+      - null
+      - '31.5'
+      - null
+      - null
+      - null
+      - 1330
+      - 2000
+      - Delta(alpha-beta)=0.310
+      - 9
+      - 55
+      - 56
+    - row_number: 56
+      cells:
+      - Y2Zr2O7(s)
+      - '-985.18'
+      - '47.8'
+      - '62.9'
+      - '4.8'
+      - '-11.5'
+      - null
+      - 298
+      - 1500
+      - null
+      - 11,13
+      - 55
+      - 56
+    - row_number: 57
+      cells:
+      - Sc(alpha)
+      - 0
+      - '8.28'
+      - '4.884'
+      - '2.678'
+      - '0.371'
+      - null
+      - 298
+      - 1608
+      - null
+      - 9
+      - 56
+      - 57
+    - row_number: 58
+      cells:
+      - Sc(beta)
+      - null
+      - null
+      - '10.57'
+      - null
+      - null
+      - null
+      - 1608
+      - 1812
+      - Delta(alpha-beta)=0.958
+      - 9
+      - 56
+      - 57
+    - row_number: 59
+      cells:
+      - Sc(L)
+      - null
+      - null
+      - '10.57'
+      - null
+      - null
+      - null
+      - 1812
+      - 3000
+      - Delta(beta-L)=3.369
+      - 9
+      - 56
+      - 57
+    - row_number: 60
+      cells:
+      - Sc(g)
+      - '90.3'
+      - '41.749'
+      - '4.887'
+      - '0.1'
+      - '0.335'
+      - null
+      - 298
+      - 2500
+      - null
+      - 9
+      - 56
+      - 57
+    - row_number: 61
+      cells:
+      - ScO(g)
+      - '-13.68'
+      - '53.5'
+      - '8.22'
+      - '0.44'
+      - '-0.87'
+      - null
+      - 298
+      - 2000
+      - null
+      - 10
+      - 56
+      - 57
+    - row_number: 62
+      cells:
+      - Sc2O3(s)
+      - '-456.22'
+      - '18.4'
+      - '27.709'
+      - '2.78'
+      - '-5.351'
+      - null
+      - 298
+      - 2762
+      - null
+      - 9
+      - 56
+      - 57
+    - row_number: 63
+      cells:
+      - La(alpha)
+      - 0
+      - '6.48'
+      - '6.585'
+      - '0.1'
+      - '-0.12'
+      - null
+      - 298
+      - 550
+      - null
+      - 9
+      - 56
+      - 57
+    - row_number: 64
+      cells:
+      - La(beta)
+      - null
+      - null
+      - '4.319'
+      - '3.504'
+      - '0.768'
+      - null
+      - 550
+      - 1134
+      - Delta(alpha-beta)=0.087
+      - 9
+      - 56
+      - 57
+    - row_number: 65
+      cells:
+      - La(gamma)
+      - null
+      - null
+      - '9.475'
+      - null
+      - null
+      - null
+      - 1134
+      - 1193
+      - Delta(alpha-gamma)=0.746
+      - 9
+      - 56
+      - 57
+    - row_number: 66
+      cells:
+      - La(L)
+      - null
+      - null
+      - '8.2'
+      - null
+      - null
+      - null
+      - 1193
+      - 2000
+      - Delta(gamma-L)=1.481
+      - 9
+      - 56
+      - 57
+    - row_number: 67
+      cells:
+      - La(g)
+      - '103'
+      - '43.564'
+      - '6'
+      - '1.162'
+      - '-0.808'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 56
+      - 57
+    - row_number: 68
+      cells:
+      - LaO(g)
+      - '-26'
+      - '58.3'
+      - '8.46'
+      - '0.3'
+      - '-0.84'
+      - null
+      - 298
+      - 2000
+      - null
+      - 10
+      - 56
+      - 57
+    - row_number: 69
+      cells:
+      - La2O3(s)
+      - '-428.7'
+      - '30.43'
+      - '28.617'
+      - '3.4'
+      - '-3.228'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 56
+      - 57
+    - row_number: 70
+      cells:
+      - La2Zr2O7(s)
+      - '-975.6'
+      - '47.8'
+      - '61.9'
+      - '7'
+      - '-9.95'
+      - null
+      - 298
+      - 1478
+      - null
+      - 11
+      - 56
+      - 57
+    - row_number: 71
+      cells:
+      - La2Zr2O7(s)
+      - null
+      - null
+      - '64.22'
+      - '3.4'
+      - '-3.23'
+      - null
+      - 1478
+      - 2000
+      - null
+      - 11
+      - 56
+      - 57
+    - row_number: 72
+      cells:
+      - Ce(gamma)
+      - 0
+      - '17.2'
+      - '5.085'
+      - '3.894'
+      - '0.172'
+      - null
+      - 298
+      - 999
+      - null
+      - 9
+      - 57
+      - 58
+    - row_number: 73
+      cells:
+      - Ce(delta)
+      - null
+      - null
+      - '8.99'
+      - null
+      - null
+      - null
+      - 999
+      - 1071
+      - Delta(gamma-delta)=0.175
+      - 9
+      - 57
+      - 58
+    - row_number: 74
+      cells:
+      - Ce(L)
+      - null
+      - null
+      - '9.01'
+      - null
+      - null
+      - null
+      - 1071
+      - 2000
+      - Delta(delta-L)=1.305
+      - 9
+      - 57
+      - 58
+    - row_number: 75
+      cells:
+      - Ce(g)
+      - '101'
+      - '45.807'
+      - '6.169'
+      - '2.154'
+      - '-1.153'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 57
+      - 58
+    - row_number: 76
+      cells:
+      - CeO2(s)
+      - '-260.2'
+      - '14.89'
+      - '16.761'
+      - '2.216'
+      - '-2.392'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 57
+      - 58
+    - row_number: 77
+      cells:
+      - Ce2O3(s)
+      - '-429.3'
+      - '35.4'
+      - '31.358'
+      - '4.664'
+      - '-4.142'
+      - null
+      - 298
+      - 1000
+      - null
+      - 9
+      - 57
+      - 58
+    - row_number: 78
+      cells:
+      - Ce2Zr2O7+x(s)
+      - '-997.9'
+      - '47.8'
+      - '64.64'
+      - '8.26'
+      - '-10.86'
+      - null
+      - 298
+      - 1478
+      - null
+      - 11
+      - 57
+      - 58
+    - row_number: 79
+      cells:
+      - Ce2Zr2O7+x(s)
+      - null
+      - null
+      - '66.96'
+      - null
+      - null
+      - null
+      - 1478
+      - 2950
+      - null
+      - 11
+      - 57
+      - 58
+    - row_number: 80
+      cells:
+      - CeO(g)
+      - null
+      - null
+      - DeltaG=-37360-10.8T
+      - null
+      - null
+      - null
+      - 1600
+      - 2000
+      - null
+      - 14
+      - 57
+      - 58
+    - row_number: 81
+      cells:
+      - CeO2(g)
+      - null
+      - null
+      - DeltaG=-131350+7.0T
+      - null
+      - null
+      - null
+      - 1600
+      - 2000
+      - null
+      - 14
+      - 57
+      - 58
+    - row_number: 82
+      cells:
+      - Sm(alpha)
+      - 0
+      - '16.63'
+      - '8.2'
+      - '2.97'
+      - '-1.8'
+      - null
+      - 298
+      - 1190
+      - null
+      - 9
+      - 57
+      - 58
+    - row_number: 83
+      cells:
+      - Sm(beta)
+      - null
+      - null
+      - '11.22'
+      - null
+      - null
+      - null
+      - 1190
+      - 1345
+      - Delta(alpha-beta)=0.744
+      - 9
+      - 57
+      - 58
+    - row_number: 84
+      cells:
+      - Sm(L)
+      - null
+      - null
+      - '12'
+      - null
+      - null
+      - null
+      - 1345
+      - 2000
+      - Delta(beta-L)=2.060
+      - 9
+      - 57
+      - 58
+    - row_number: 85
+      cells:
+      - Sm(g)
+      - '49.4'
+      - '43.722'
+      - '7.895'
+      - '-0.67'
+      - '-0.391'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 57
+      - 58
+    - row_number: 86
+      cells:
+      - Sm2O3(s)
+      - '-435.86'
+      - '36.1'
+      - '30.484'
+      - '4.888'
+      - '-4.064'
+      - null
+      - 298
+      - 1195
+      - Monoclinic
+      - 9
+      - 57
+      - 58
+    - row_number: 87
+      cells:
+      - Sm2O3(s)
+      - null
+      - null
+      - '36.9'
+      - null
+      - null
+      - null
+      - 1195
+      - 2000
+      - Delta(alpha-beta)=0.250
+      - 9
+      - 57
+      - 58
+    - row_number: 88
+      cells:
+      - Sm2Zr2O7(s)
+      - '-978.9'
+      - '47.8'
+      - '63.76'
+      - '8.49'
+      - '-10.78'
+      - null
+      - 298
+      - 1195
+      - null
+      - 11
+      - 57
+      - 58
+    - row_number: 89
+      cells:
+      - Sm2Zr2O7(s)
+      - null
+      - null
+      - '70.18'
+      - '3.6'
+      - '-6.72'
+      - null
+      - 1195
+      - 1478
+      - null
+      - 11
+      - 57
+      - 58
+    - row_number: 90
+      cells:
+      - Sm2Zr2O7(s)
+      - null
+      - null
+      - '72.5'
+      - null
+      - null
+      - null
+      - 1478
+      - 2000
+      - null
+      - 11
+      - 57
+      - 58
+    - row_number: 91
+      cells:
+      - SmO(g)
+      - null
+      - null
+      - DeltaG=-5.953T-47688
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - 16
+      - 57
+      - 58
+    - row_number: 92
+      cells:
+      - Gd(alpha)
+      - 0
+      - '16.24'
+      - '2.786'
+      - '4.406'
+      - '4.231'
+      - null
+      - 298
+      - 1533
+      - null
+      - 9
+      - 58
+      - 59
+    - row_number: 93
+      cells:
+      - Gd(beta)
+      - null
+      - null
+      - '6.827'
+      - null
+      - null
+      - null
+      - 1533
+      - 1585
+      - Delta(alpha-beta)=0.935
+      - 9
+      - 58
+      - 59
+    - row_number: 94
+      cells:
+      - Gd(L)
+      - null
+      - null
+      - '8.88'
+      - null
+      - null
+      - null
+      - 1585
+      - 2000
+      - Delta(beta-L)=2.403
+      - 9
+      - 58
+      - 59
+    - row_number: 95
+      cells:
+      - Gd(g)
+      - '95'
+      - '46.416'
+      - '6.273'
+      - '-0.252'
+      - '-0.343'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 58
+      - 59
+    - row_number: 96
+      cells:
+      - Gd2O3(m)
+      - '-434.9'
+      - '37.5'
+      - '27.365'
+      - '3.458'
+      - '-2.588'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 58
+      - 59
+    - row_number: 97
+      cells:
+      - Gd2Zr2O7(s)
+      - '-972'
+      - '47.8'
+      - '60.65'
+      - '7.06'
+      - '-9.31'
+      - null
+      - 298
+      - 1478
+      - null
+      - 13
+      - 58
+      - 59
+    - row_number: 98
+      cells:
+      - Gd2Zr2O7(s)
+      - null
+      - null
+      - '62.97'
+      - '3.46'
+      - '-2.59'
+      - null
+      - 1478
+      - 2950
+      - null
+      - 13
+      - 58
+      - 59
+    - row_number: 99
+      cells:
+      - GdO(g)
+      - null
+      - null
+      - DeltaG=-11.675T-28781
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - 16
+      - 58
+      - 59
+    - row_number: 100
+      cells:
+      - Yb(s)
+      - 0
+      - '14.3'
+      - '1.024'
+      - '11.404'
+      - '1.747'
+      - null
+      - 298
+      - 553
+      - null
+      - 9
+      - 58
+      - 59
+    - row_number: 101
+      cells:
+      - Yb(alpha)
+      - null
+      - null
+      - '6.228'
+      - '1.388'
+      - '0.227'
+      - null
+      - 553
+      - 1033
+      - Delta(s-alpha)=0
+      - 9
+      - 58
+      - 59
+    - row_number: 102
+      cells:
+      - Yb(beta)
+      - null
+      - null
+      - '8.64'
+      - null
+      - null
+      - null
+      - 1033
+      - 1097
+      - Delta(alpha-beta)=0.418
+      - 9
+      - 58
+      - 59
+    - row_number: 103
+      cells:
+      - Yb(L)
+      - null
+      - null
+      - '8.786'
+      - null
+      - null
+      - null
+      - 1097
+      - 1467
+      - Delta(beta-L)=1.830
+      - 9
+      - 58
+      - 59
+    - row_number: 104
+      cells:
+      - Yb(g)
+      - '36.35'
+      - '41.352'
+      - '4.968'
+      - null
+      - null
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 58
+      - 59
+    - row_number: 105
+      cells:
+      - Yb2O3(alpha)
+      - '-433.68'
+      - '31.8'
+      - '31.817'
+      - '0.062'
+      - '-3.792'
+      - null
+      - 298
+      - 1365
+      - null
+      - 9
+      - 58
+      - 59
+    - row_number: 106
+      cells:
+      - Yb2O3(beta)
+      - null
+      - null
+      - '32.15'
+      - null
+      - null
+      - null
+      - 1365
+      - 2000
+      - Delta(alpha-beta)=0.150
+      - 9
+      - 58
+      - 59
+    - row_number: 107
+      cells:
+      - Dy(alpha)
+      - 0
+      - '17.9'
+      - '3.49'
+      - '4.45'
+      - '1.692'
+      - null
+      - 298
+      - 1657
+      - null
+      - 9
+      - 59
+      - 60
+    - row_number: 108
+      cells:
+      - Dy(beta)
+      - null
+      - null
+      - '6.7'
+      - null
+      - null
+      - null
+      - 1657
+      - 1682
+      - Delta(alpha-beta)=0.995
+      - 9
+      - 59
+      - 60
+    - row_number: 109
+      cells:
+      - Dy(L)
+      - null
+      - null
+      - '11.93'
+      - null
+      - null
+      - null
+      - 1682
+      - 2000
+      - Delta(beta-L)=2.643
+      - 9
+      - 59
+      - 60
+    - row_number: 110
+      cells:
+      - Dy(g)
+      - '69.4'
+      - '46.794'
+      - '4.444'
+      - '0.726'
+      - '0.274'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 59
+      - 60
+    - row_number: 111
+      cells:
+      - Dy2O3(alpha)
+      - '-445.32'
+      - '35.8'
+      - '29.826'
+      - '2.774'
+      - '-2.545'
+      - null
+      - 298
+      - 1590
+      - null
+      - 9
+      - 59
+      - 60
+    - row_number: 112
+      cells:
+      - Dy2O3(beta)
+      - null
+      - null
+      - '34.4'
+      - null
+      - null
+      - null
+      - 1590
+      - 2000
+      - Delta(alpha-beta)=0.220
+      - 9
+      - 59
+      - 60
+    - row_number: 113
+      cells:
+      - DyO(g)
+      - null
+      - null
+      - DeltaG=-6.723T-35621
+      - null
+      - null
+      - null
+      - 1800
+      - 2000
+      - null
+      - 16
+      - 59
+      - 60
+    - row_number: 114
+      cells:
+      - Ho(alpha)
+      - 0
+      - '17.43'
+      - '3.341'
+      - '4.65'
+      - '1.567'
+      - null
+      - 298
+      - 1701
+      - null
+      - 9
+      - 59
+      - 60
+    - row_number: 115
+      cells:
+      - Ho(beta)
+      - null
+      - null
+      - '6.7'
+      - null
+      - null
+      - null
+      - 1701
+      - 1743
+      - Delta(alpha-beta)=1.121
+      - 9
+      - 59
+      - 60
+    - row_number: 116
+      cells:
+      - Ho(L)
+      - null
+      - null
+      - '10.5'
+      - null
+      - null
+      - null
+      - 1743
+      - 2000
+      - Delta(beta-L)=2.911
+      - 9
+      - 59
+      - 60
+    - row_number: 117
+      cells:
+      - Ho(g)
+      - '71.9'
+      - '46.718'
+      - '4.705'
+      - '0.358'
+      - '0.139'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 59
+      - 60
+    - row_number: 118
+      cells:
+      - Ho2O3(s)
+      - '-449.55'
+      - '37.8'
+      - '30.364'
+      - '1.332'
+      - '-2.917'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 59
+      - 60
+    - row_number: 119
+      cells:
+      - HoO(g)
+      - null
+      - null
+      - DeltaG=-6.333T-35789
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - 16
+      - 59
+      - 60
+    - row_number: 120
+      cells:
+      - Er(s)
+      - 0
+      - '17.49'
+      - '5.28'
+      - '2.518'
+      - '0.603'
+      - null
+      - 298
+      - 1795
+      - null
+      - 9
+      - 59
+      - 60
+    - row_number: 121
+      cells:
+      - Er(L)
+      - null
+      - null
+      - '9.25'
+      - null
+      - null
+      - null
+      - 1795
+      - 2000
+      - Delta(s-L)=4.757
+      - 9
+      - 59
+      - 60
+    - row_number: 122
+      cells:
+      - Er(g)
+      - '75.8'
+      - '46.347'
+      - '4.114'
+      - '1.046'
+      - '0.482'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 59
+      - 60
+    - row_number: 123
+      cells:
+      - Er2O3(s)
+      - '-453.59'
+      - '37.2'
+      - '28.864'
+      - '2.542'
+      - '-3.282'
+      - null
+      - 298
+      - 2000
+      - null
+      - 9
+      - 59
+      - 60
+    - row_number: 124
+      cells:
+      - ErO(g)
+      - null
+      - null
+      - DeltaG=-7.090T-29596
+      - null
+      - null
+      - null
+      - 1800
+      - 2000
+      - null
+      - 16
+      - 59
+      - 60
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_table_ai_thermodynamic_data
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_table_aii_zirconate_data
+  type: thermodynamic_example
+  locator:
+    published_page: 60
+    pdf_page_index: 61
+    table: A-II
+    note: Thermodynamic data attributed to the literature sources named in Table A-II. Complete raw values are in tables/jacobson-1989-metal-oxide-zirconia/t3.csv.
+  units: See printed column headers; source values retained without conversion.
+  values:
+    quantity: thermodynamic_data_table_aii
+    method_class: quoted_attributed
+    attribution: Thermodynamic data attributed to the literature sources named in Table A-II.
+    table_csv: tables/jacobson-1989-metal-oxide-zirconia/t3.csv
+    columns:
+    - system
+    - source_as_printed
+    - delta_Hf_298_kcal_mol
+    - S_298_cal_K_mol
+    - Cp_as_printed
+    - comment_as_printed
+    - published_page
+    - pdf_page_index
+    row_count: 24
+    numeric_cell_count: 18
+    rows:
+    - row_number: 1
+      cells:
+      - CaZrO3
+      - Brown and Bennington (2)
+      - -424.58 +/- 0.47
+      - null
+      - null
+      - HF solution calorimetry
+      - 60
+      - 61
+    - row_number: 2
+      cells:
+      - CaZrO3
+      - L'vova and Feodose'v (6)
+      - '-418.7'
+      - null
+      - null
+      - Bomb calorimetry
+      - 60
+      - 61
+    - row_number: 3
+      cells:
+      - CaZrO3
+      - Parker (3)
+      - '-422.3'
+      - '23.92'
+      - null
+      - Value of L'vova and Feodose'v corrected with recent delta Hf(ZrO2)
+      - 60
+      - 61
+    - row_number: 4
+      cells:
+      - CaZrO3
+      - Kubachewski (15)
+      - null
+      - '22.4'
+      - null
+      - Estimated
+      - 60
+      - 61
+    - row_number: 5
+      cells:
+      - CaZrO3
+      - King and Weller (7)
+      - null
+      - 23.9 +/- 0.2
+      - null
+      - Calorimetry
+      - 60
+      - 61
+    - row_number: 6
+      cells:
+      - CaZrO3
+      - Gvelesiani et al. (4)
+      - null
+      - null
+      - 30.15 + 1.54 x 10^-3 T - 6.05 x 10^5/T^2
+      - Calorimetry
+      - 60
+      - 61
+    - row_number: 7
+      cells:
+      - CaZrO3
+      - Mezaki et al. (5)
+      - null
+      - null
+      - 30.41 + 5.19 x 10^-3 T - 3.46 x 10^5/T^2
+      - Calorimetry
+      - 60
+      - 61
+    - row_number: 8
+      cells:
+      - CaZrO3
+      - Barin and Knacke (12)
+      - '-421.9'
+      - '22.4'
+      - 28.5 + 2.88 x 10^-3 T - 5.02 x 10^5/T^2
+      - null
+      - 60
+      - 61
+    - row_number: 9
+      cells:
+      - SrZrO3
+      - L'vova and Feodose'v (6)
+      - '-418.3'
+      - null
+      - null
+      - Bomb calorimetry
+      - 60
+      - 61
+    - row_number: 10
+      cells:
+      - SrZrO3
+      - Parker (3)
+      - '-422.4'
+      - '27.5'
+      - null
+      - See CaZrO3-Parker comment
+      - 60
+      - 61
+    - row_number: 11
+      cells:
+      - SrZrO3
+      - Levitskii et al. (8)
+      - null
+      - null
+      - 29.79 + 1.4 x 10^-3 T - 4.89 x 10^5/T^2
+      - null
+      - 60
+      - 61
+    - row_number: 12
+      cells:
+      - SrZrO3
+      - King and Weller (7)
+      - null
+      - 27.5 +/- 0.2
+      - null
+      - Calorimetry
+      - 60
+      - 61
+    - row_number: 13
+      cells:
+      - SrZrO3
+      - Levitskii (17)
+      - '-425.2'
+      - null
+      - null
+      - Electrochemical cell
+      - 60
+      - 61
+    - row_number: 14
+      cells:
+      - SrZrO3
+      - Barin and Knacke (12)
+      - '-425'
+      - '26'
+      - 28.98 + 2.92 x 10^-3 T - 5.166 x 10^5/T^2
+      - null
+      - 60
+      - 61
+    - row_number: 15
+      cells:
+      - SrZrO3
+      - Kubachewski (15)
+      - '-418.3'
+      - 26.0 +/- 2.0
+      - null
+      - S-estimated
+      - 60
+      - 61
+    - row_number: 16
+      cells:
+      - BaZrO3
+      - L'vova and Feodose'v (6)
+      - '-421.1'
+      - null
+      - null
+      - Bomb calorimetry
+      - 61
+      - 62
+    - row_number: 17
+      cells:
+      - BaZrO3
+      - Parker (3)
+      - '-425.3'
+      - '29.8'
+      - null
+      - See CaZrO3-Parker comment
+      - 61
+      - 62
+    - row_number: 18
+      cells:
+      - BaZrO3
+      - Levitskii et al. (8), alpha phase
+      - null
+      - null
+      - 25.63 + 6.24 x 10^-3 T - 2.82 x 10^5/T^2
+      - null
+      - 61
+      - 62
+    - row_number: 19
+      cells:
+      - BaZrO3
+      - Levitskii et al. (8), beta phase
+      - null
+      - null
+      - 27.77 - 0.18 x 10^-3 T
+      - null
+      - 61
+      - 62
+    - row_number: 20
+      cells:
+      - BaZrO3
+      - Levitskii et al. (8), gamma phase
+      - null
+      - null
+      - 24.75 + 4.42 x 10^-3 T
+      - null
+      - 61
+      - 62
+    - row_number: 21
+      cells:
+      - BaZrO3
+      - King and Weller (7)
+      - null
+      - 29.8 +/- 0.3
+      - null
+      - Calorimetry
+      - 61
+      - 62
+    - row_number: 22
+      cells:
+      - BaZrO3
+      - Levitskii (17)
+      - -426.73 +/- 0.58
+      - null
+      - null
+      - Electrochemical cell
+      - 61
+      - 62
+    - row_number: 23
+      cells:
+      - BaZrO3
+      - Barin and Knacke (12)
+      - '-423.2'
+      - '26.5'
+      - 29.35 + 2.1 x 10^-3 T - 5.25 x 10^5/T^2
+      - null
+      - 61
+      - 62
+    - row_number: 24
+      cells:
+      - BaZrO3
+      - Kubachewski (15)
+      - null
+      - 26.5 +/- 2.0
+      - null
+      - S-estimated
+      - 61
+      - 62
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_table_aii_zirconate_data
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2
+- observation_id: jacobson_1989_table_i_relative_rates
+  type: thermodynamic_example
+  locator:
+    published_page: 27
+    pdf_page_index: 28
+    table: I
+    note: Relative evaporation rates attributed to Belov and Semenov [28].
+  units: dimensionless W(M2O3)/W(Lu2O3) at 2500 K
+  values:
+    quantity: relative_evaporation_rates_of_rare_earth_oxides
+    method_class: quoted_attributed
+    attribution: Belov and Semenov (reference 28), as cited by Jacobson
+    table_csv: tables/jacobson-1989-metal-oxide-zirconia/t1.csv
+    columns:
+    - oxide
+    - evaporation_rate_relative_to_Lu2O3_at_2500K
+    - source_as_printed
+    - published_page
+    - pdf_page_index
+    row_count: 11
+    numeric_cell_count: 11
+    rows:
+    - row_number: 1
+      cells:
+      - La2O3
+      - 130
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 2
+      cells:
+      - Nd2O3
+      - 70
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 3
+      cells:
+      - Sm2O3
+      - 40
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 4
+      cells:
+      - Gd2O3
+      - 15
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 5
+      cells:
+      - Dy2O3
+      - 10
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 6
+      cells:
+      - Yb2O3
+      - 10
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 7
+      cells:
+      - Tm2O3
+      - 6
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 8
+      cells:
+      - Ho2O3
+      - 4
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 9
+      cells:
+      - Er2O3
+      - 4
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 10
+      cells:
+      - Y2O3
+      - 2
+      - Belov and Semenov [28]
+      - 27
+      - 28
+    - row_number: 11
+      cells:
+      - Lu2O3
+      - 1
+      - Belov and Semenov [28]
+      - 27
+      - 28
+  context_id: jacobson-1989-metal-oxide-zirconia::context::jacobson_1989_table_i_relative_rates
+  work_id: 6f685aafd441f7e638a0673c7fcaa298df4422ac3f3f9bfc215509a9f2ce8941
+  source_id: jacobson-1989-metal-oxide-zirconia
+  species: ZrO2

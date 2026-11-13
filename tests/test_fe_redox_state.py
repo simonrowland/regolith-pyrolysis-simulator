@@ -10,9 +10,9 @@ from simulator.fe_redox import (
     REDOX_STATE_REFERENCE_T_K,
     RedoxState,
     RedoxStateInputError,
-    feo_iw_log10_fO2_bar,
     normalize_redox_state,
 )
+from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 
 
 def test_redox_state_equality_and_hash_use_normalized_values() -> None:

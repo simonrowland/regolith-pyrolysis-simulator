@@ -1,0 +1,3652 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/carrillo-sanchez-2020-phosphorus-ablation.yaml
+observations:
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_allende_po_ablation_peak_temperature_radius_gt19um::points:h=de42251433e5
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'PO_ablation_peak_temperature'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: temperature value is not numeric
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: The reported temperature is the peak of a measured PO LIF ablation profile, not a thermodynamic transition; no
+      exact battery quantity represents an ablation-signal peak temperature.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 9
+        pdf_page_index: 8
+        section: 3.2.1
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 9
+    pdf_page_index: 8
+    section: 3.2.1
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '2100'
+          interval_high: '2200'
+          approximate: false
+      locator:
+        page: 9
+        section: 3.2.1
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '15'
+          approximate: true
+      locator:
+        page: 3
+        section: '2.1'
+        note: Printed as about 15 Pa (in N2); approximate pressure retained.
+    atmosphere:
+      state:
+        tag: value
+        value: N2
+      locator:
+        page: 3
+        section: '2.1'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: No numeric fO2 or gas ratio is stated for the N2 MASI experiments.
+      locator:
+        page: 3
+        section: '2.1'
+    heating_rate_K_s:
+      state:
+        tag: unknown
+        reason: The ramp is linear but no numeric slope is stated.
+      locator:
+        page: 7
+        figure: '3'
+        note: The caption prints T = c1 + c2 t without a numeric c2.
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_p_mass_influx::points:row=earth-p:h=1f83344a00c7
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_p_mass_influx::points:row=earth-p:h=87df62c07ebd
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_p_mass_influx::points:row=earth-p:h=d50d3389e914
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_p_mass_influx::points:row=earth-p:h=e140287f6500
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_po2_mass_influx::points:row=earth-po2:h=2194ad13bfdc
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_po2_mass_influx::points:row=earth-po2:h=2dcd4fadd18e
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_po2_mass_influx::points:row=earth-po2:h=87df4bb99d1e
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_po2_mass_influx::points:row=earth-po2:h=ef7d919682ab
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_po_mass_influx::points:row=earth-po:h=545154711364
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_po_mass_influx::points:row=earth-po:h=77860479a205
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_po_mass_influx::points:row=earth-po:h=aca8c37e322d
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_po_mass_influx::points:row=earth-po:h=f908d7297ec8
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_total_p_mass_influx::points:row=earth-total:h=4648e7cc571e
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_total_p_mass_influx::points:row=earth-total:h=4761fb06c471
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_total_p_mass_influx::points:row=earth-total:h=d86462c4a04a
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_earth_total_p_mass_influx::points:row=earth-total:h=ec33ce836516
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Earth Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Earth Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_p_mass_influx::points:row=mars-p:h=166c432af773
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_p_mass_influx::points:row=mars-p:h=67c9292c67d6
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_p_mass_influx::points:row=mars-p:h=7b9eb9aeef7a
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_p_mass_influx::points:row=mars-p:h=f8387e912e6f
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_po2_mass_influx::points:row=mars-po2:h=022ae9eee3a0
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_po2_mass_influx::points:row=mars-po2:h=049b74f9c41c
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_po2_mass_influx::points:row=mars-po2:h=32b722505a2d
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_po2_mass_influx::points:row=mars-po2:h=78e3ef7576fd
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_po_mass_influx::points:row=mars-po:h=2d4b3017295c
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_po_mass_influx::points:row=mars-po:h=82e2d4fb4e3e
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_po_mass_influx::points:row=mars-po:h=8c07a444c114
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_po_mass_influx::points:row=mars-po:h=f0608da38b5d
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_total_p_mass_influx::points:row=mars-total:h=6a5523eefe52
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_total_p_mass_influx::points:row=mars-total:h=860359aa5eb9
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_total_p_mass_influx::points:row=mars-total:h=d24cae3118fd
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_mars_total_p_mass_influx::points:row=mars-total:h=e9cae3fcc98b
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Mars Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Mars Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_p_mass_influx::points:row=venus-p:h=0015ece9ad05
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_p_mass_influx::points:row=venus-p:h=37a2d030154d
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_p_mass_influx::points:row=venus-p:h=71bb9ff45a87
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_p_mass_influx::points:row=venus-p:h=cfb97152eb92
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus P
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus P
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_po2_mass_influx::points:row=venus-po2:h=6b240b7eeb52
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_po2_mass_influx::points:row=venus-po2:h=76dfba9281b1
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_po2_mass_influx::points:row=venus-po2:h=852db56a5672
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_po2_mass_influx::points:row=venus-po2:h=c1da578969d5
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus PO2
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus PO2
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_po_mass_influx::points:row=venus-po:h=0f66e8404c95
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_po_mass_influx::points:row=venus-po:h=b4b10c315b58
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_po_mass_influx::points:row=venus-po:h=bfb923514d86
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_po_mass_influx::points:row=venus-po:h=fd78846ff14f
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus PO
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus PO
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_total_p_mass_influx::points:row=venus-total:h=1fec37eb4e7f
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_total_p_mass_influx::points:row=venus-total:h=5d28c7972de5
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_total_p_mass_influx::points:row=venus-total:h=a0ec30a11b82
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas
+- observation_id: carrillo-sanchez-2020-phosphorus-ablation::carrillo_sanchez_2020_table3_venus_total_p_mass_influx::points:row=venus-total:h=c316afe7cf73
+  experiment_id: 10.1016/j.pss.2020.104926::carrillo-sanchez-2020-phosphorus-ablation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'planetary_phosphorus_mass_influx_rate'
+    species:
+      formula: P
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: unknown
+      reason: No numeric dust composition is printed in this table row.
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
+  admission:
+    status: rejected
+    reason: The table reports an integrated planet-wide mass influx rate; the battery has no exact quantity token for this
+      result.
+    decided_by:
+      worker: w1103cw3-cs20
+      date: '2026-11-03'
+      evidence:
+        page: 13
+        table: '3'
+        note: row=Venus Total
+  notices: []
+  source_id: carrillo-sanchez-2020-phosphorus-ablation
+  locator:
+    page: 13
+    table: '3'
+    note: row=Venus Total
+  read_from: pdf:carrillo-sanchez-2020-phosphorus-ablation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No experimental temperature is printed for this integrated planetary model output.
+      locator:
+        page: 13
+        table: '3'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: No numeric fO2 is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: No numeric dust composition is printed in this table row.
+      locator:
+        page: 13
+        table: '3'
+  provenance:
+    printed_phase: gas

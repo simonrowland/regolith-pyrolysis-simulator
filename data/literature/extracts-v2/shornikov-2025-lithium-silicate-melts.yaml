@@ -101,6 +101,8 @@ observations:
     note: 'Caption series 5, Li pressure over Li2SiO3, calculated in the present study. 600 dpi render: continuous stroke,
       no marker centre. Series 1, 2 and 3 are cited measurements and are not stored.; panel=A'
   read_from: pdf:shornikov-2025-lithium-silicate-melts
+  provenance:
+    printed_phase: gas
 - observation_id: shornikov-2025-lithium-silicate-melts::shornikov_2025_li2o_sio2_fig2b_series8
   experiment_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780::experiment::shornikov_2025_li2o_sio2_model
   identity:
@@ -200,6 +202,8 @@ observations:
     note: Caption series 8, Li pressure over Li4SiO4, calculated in the present study. Continuous stroke, no marker centre.
       Series 4, 6 and 7 are cited measurements and are not stored.; panel=B
   read_from: pdf:shornikov-2025-lithium-silicate-melts
+  provenance:
+    printed_phase: gas
 - observation_id: shornikov-2025-lithium-silicate-melts::shornikov_2025_li2o_sio2_fig3a_series6
   experiment_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780::experiment::shornikov_2025_li2o_sio2_model
   identity:
@@ -328,6 +332,8 @@ observations:
           (1) and 1673 (2–8) K" and does not mention series 9. The body says the Li2O activities of this study (Fig. 3A) are
           at 1673 K. Series 6 is inside the closing clause''s 2–8 group. No temperature was chosen in order to digitize a
           point.; panel=A'
+  provenance:
+    printed_phase: condensed
 - observation_id: shornikov-2025-lithium-silicate-melts::shornikov_2025_li2o_sio2_fig3b_series9
   experiment_id: 5b91c71f94d2f876b22491ea50486d9d24153ba392ff5aea15ff9ad4601df780::experiment::shornikov_2025_li2o_sio2_model
   identity:
@@ -434,3 +440,5 @@ observations:
       caption''s closing temperature clause stops at series 8 ("1673 (2–8) K") and does not assign a temperature to series
       9. The body discusses Fig. 3B without a separate temperature. No T_range_K is stored.; panel=B'
   read_from: pdf:shornikov-2025-lithium-silicate-melts
+  provenance:
+    printed_phase: condensed

@@ -243,24 +243,13 @@ def _install_fixed_mre_provider(sim, **kwargs) -> None:
     """Replace the authoritative ELECTROLYSIS_STEP provider in-place.
 
     The kernel registry is rebuilt per ``load_batch`` but the
-    underlying ``ProviderRegistry`` persists.  Overwriting the
-    authoritative entry directly is the test-time path the kernel
-    contract does NOT offer publicly (``register_idempotent`` rejects a
-    different-provider-id swap by design).  Test-only -- production
-    code never goes through this seam.
+    underlying ``ProviderRegistry`` persists.  This test configures the
+    private slot directly because the production registry intentionally
+    does not expose provider replacement.
     """
 
     provider = _FixedElectrolysisStepProvider(**kwargs)
-    # ``register_idempotent`` rejects a provider_id swap, so this test
-    # uses the dedicated ``replace_for_test`` seam on ProviderRegistry
-    # (0.5.4.1 B3 / M1 closure: replaces the prior direct
-    # ``_chem_registry._authoritative[...] = provider`` private-dict
-    # mutation, which would break silently if the registry internals
-    # were renamed). Method name carries ``_for_test`` so a future
-    # code-review can flag any production caller.
-    sim._chem_registry.replace_for_test(
-        ChemistryIntent.ELECTROLYSIS_STEP, provider
-    )
+    sim._chem_registry._authoritative[ChemistryIntent.ELECTROLYSIS_STEP] = provider
 
 
 def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:

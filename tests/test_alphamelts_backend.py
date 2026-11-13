@@ -2475,6 +2475,283 @@ def test_builtin_subprocess_vapor_projection_refuses_silent_empty_or_unsourced(
     )
 
 
+# Captured on green 16c8dabfa, lunar_mare_low_ti C2A, alphamelts subprocess.
+# Stored hours 1-4 are 40/55/70/85 C. The 85 C call is a quadratic
+# convergence failure and does not project vapour. The next setpoint, 100 C,
+# returns this superliquidus-guess assemblage (melt fraction 0.999756) and
+# the builtin provider's below-400 K empty map. That empty map must be the
+# typed builtin outcome, not vapor_projection_empty.
+_HOUR4_ABORT_LIQUID_WT_PCT = {
+    'SiO2': 44.9571,
+    'TiO2': 1.51336,
+    'Al2O3': 13.6364,
+    'Fe2O3': 18.5245,
+    'Cr2O3': 0.353699,
+    'FeO': 2.10658e-11,
+    'MnO': 0.202128,
+    'MgO': 9.09428,
+    'CaO': 11.1132,
+    'Na2O': 0.40325,
+    'K2O': 0.101015,
+    'P2O5': 0.101015,
+}
+_HOUR4_ABORT_LIQUID_FRACTION = 0.9997563764893724
+_HOUR4_ABORT_TEMPERATURE_C = 100.0
+
+
+def _hour4_abort_equilibrium() -> EquilibriumResult:
+    return EquilibriumResult(
+        temperature_C=_HOUR4_ABORT_TEMPERATURE_C,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        requested_fO2_log=-9.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 0.101866151},
+        liquid_fraction=_HOUR4_ABORT_LIQUID_FRACTION,
+        liquid_composition_wt_pct=dict(_HOUR4_ABORT_LIQUID_WT_PCT),
+        status='ok',
+    )
+
+
+def test_hour4_positive_liquid_below_400k_empty_vapor_map_is_typed():
+    """Kill mutation: raise_on_builtin_below_400k_empty_vapor_map."""
+    from engines.builtin.vapor_pressure import (
+        BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
+        BUILTIN_VAPOR_BELOW_400K_ZERO_REASON,
+    )
+
+    backend = AlphaMELTSBackend()
+    pressures, sources, diagnostic = (
+        backend._builtin_vapor_projection_for_subprocess(
+            _hour4_abort_equilibrium()
+        )
+    )
+
+    assert pressures == {}
+    assert sources == {}
+    # Evaporation accepts this token and no other empty-map reason.
+    assert BUILTIN_VAPOR_BELOW_400K_ZERO_REASON == (
+        'internal_analytical_below_400K'
+    )
+    assert diagnostic['vapor_pressure_zero_reason'] == (
+        'internal_analytical_below_400K'
+    )
+    notice = diagnostic['vapor_pressure_authority_notice']
+    assert notice['reason'] == 'internal_analytical_below_400K'
+    assert notice['authority'] == 'builtin-vapor-pressure'
+    assert notice['band']['temperature_K'] == [
+        0.0,
+        BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
+    ]
+    assert BUILTIN_VAPOR_BELOW_400K_LIMIT_K == 400.0
+
+
+def test_hour4_typed_vapor_outcome_is_visible_on_equilibrium_diagnostics(
+    monkeypatch,
+):
+    """Kill mutation: nest_below_400k_reason_where_evaporation_cannot_read_it."""
+    from engines.builtin.vapor_pressure import (
+        BUILTIN_VAPOR_BELOW_400K_ZERO_REASON,
+    )
+
+    backend = AlphaMELTSBackend()
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    backend._mode = 'subprocess'
+
+    def fake_run(*args, **kwargs):
+        if args and args[0] and str(args[0][-1]) == '--version':
+            return types.SimpleNamespace(
+                returncode=0, stdout='alphaMELTS fake\n', stderr=''
+            )
+        return types.SimpleNamespace(returncode=0, stdout='', stderr='')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+    monkeypatch.setattr(
+        backend,
+        '_parse_single_point_stdout',
+        lambda *args, **kwargs: _hour4_abort_equilibrium(),
+    )
+
+    result = backend._equilibrate_subprocess(
+        _HOUR4_ABORT_TEMPERATURE_C,
+        dict(_HOUR4_ABORT_LIQUID_WT_PCT),
+        -9.0,
+        1.0,
+        total_input_kg=1.0,
+        run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+    )
+
+    assert result.status == 'ok'
+    assert result.vapor_pressures_Pa == {}
+    assert result.diagnostics['vapor_pressure_zero_reason'] == (
+        BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+    )
+    notice = result.diagnostics['vapor_pressure_authority_notice']
+    assert notice['reason'] == BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+    assert notice['authority'] == 'builtin-vapor-pressure'
+    assert 'temperature_K' in notice['band']
+    nested = result.diagnostics['subprocess_vapor_projection']
+    assert nested['vapor_pressure_zero_reason'] == (
+        BUILTIN_VAPOR_BELOW_400K_ZERO_REASON
+    )
+
+
+# Captured at 160 C on the same lunar C2A superliquidus path. The assemblage
+# is stable and fO2, mass, V, and Cp are finite. H and S are the token nan.
+_NONFINITE_SYSTEM_ROW = (
+    "Title:regolith_pyrolysis_simulator\n"
+    "\n"
+    "System Thermodynamic Data:\n"
+    "index Pressure Temperature mass F phi H S V Cp dVdP*10^6 "
+    "dVdT*10^6 fO2(absolute) fO2-9.0) rhol rhos viscosity aH2O chisqr\n"
+    "1 1.00 160.00 101.890973 0.9996783730972626 0.999699 nan nan "
+    "33.862292 145.986649 -297.163069 2848.404292 -9.000 0.000 "
+    "3.008919 3.211769 15.942 n/a n/a\n"
+)
+
+
+def test_nonfinite_system_enthalpy_is_omitted_and_flagged():
+    """Kill mutation: abort_run_on_nonfinite_system_enthalpy."""
+    backend = AlphaMELTSBackend()
+    # Stdout liquid is 101.858164 g and the trace solid is 0.032809 g.
+    # Those sum to the system-table mass, and the printed melt fraction
+    # matches liquid mass / phase mass. A liquid-only row at the system
+    # mass would fail liquid_fraction_mismatch before the enthalpy check.
+    output = (
+        "<> Stable liquid solid assemblage achieved.\n"
+        "Initial alphaMELTS calculation at: P 1.000000 (bars), "
+        "T 160.000000 (C)\n"
+        "liquid: SiO2\n"
+        "101.858164 g 44.9571\n"
+        "clinopyroxene1: 0.032809 g\n"
+        "Melt fraction = 0.999678\n"
+    )
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=160.0,
+        total_input_kg=0.101890973,
+        system_output=_NONFINITE_SYSTEM_ROW,
+    )
+
+    assert result.status == 'ok'
+    assert result.system_enthalpy is None
+    assert result.system_entropy is None
+    assert result.system_volume == pytest.approx(33.862292e-6)
+    assert result.system_heat_capacity_Cp == pytest.approx(145.986649)
+    notice = result.diagnostics['alphamelts_system_property_notice']
+    assert notice['reason'] == 'non_finite_system_property'
+    assert notice['authority'] == 'alphamelts'
+    assert notice['band']['columns'] == ['H', 'S']
+    assert any('non-finite columns: H, S' in warning for warning in result.warnings)
+
+
+def test_nonfinite_system_fo2_still_refuses():
+    """A nan fO2 echo is not the optional-thermo omission."""
+    backend = AlphaMELTSBackend()
+    system = _NONFINITE_SYSTEM_ROW.replace('-9.000', 'nan', 1)
+    output = (
+        "<> Stable liquid solid assemblage achieved.\n"
+        "Initial alphaMELTS calculation at: P 1.000000 (bars), "
+        "T 160.000000 (C)\n"
+        "liquid: SiO2\n"
+        "101.890973 g 44.9571\n"
+        "Melt fraction = 0.999678\n"
+    )
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='absolute engine fO2',
+    ):
+        _parse_subprocess_fixture(
+            backend,
+            output,
+            temperature_C=160.0,
+            total_input_kg=0.101890973,
+            system_output=system,
+        )
+
+
+def _assert_no_nonfinite(value: object, path: str = 'result') -> None:
+    if isinstance(value, float):
+        assert math.isfinite(value), path
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            _assert_no_nonfinite(item, f'{path}.{key}')
+        return
+    if isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            _assert_no_nonfinite(item, f'{path}[{index}]')
+        return
+    if hasattr(value, '__dict__'):
+        for key, item in vars(value).items():
+            _assert_no_nonfinite(item, f'{path}.{key}')
+
+
+def test_nonfinite_phase_enthalpy_is_omitted_and_flagged():
+    """Kill mutation: publish_nan_phase_enthalpy."""
+    backend = AlphaMELTSBackend()
+    # Same 160 C system row as the system-enthalpy fixture. Liquid H and S
+    # are nan. One clinopyroxene instance is nan and one is finite, so the
+    # phase sum must keep the finite enthalpy and must not become 0.
+    output = (
+        "<> Stable liquid solid assemblage achieved.\n"
+        "Initial alphaMELTS calculation at: P 1.000000 (bars), "
+        "T 160.000000 (C)\n"
+        "liquid: SiO2\n"
+        "101.858164 g 44.9571\n"
+        "clinopyroxene1: 0.032809 g\n"
+        "Melt fraction = 0.999678\n"
+    )
+    phase = (
+        "index 1 Pressure 1.00 Temperature 160.00 SiO2\n"
+        "liquid1 101.858164 nan nan 33.852089 145.956791 15.942 44.9571\n"
+        "clinopyroxene1 0.016000 nan 0.010000 0.005000 0.004000 CaSiO3 50.0\n"
+        "clinopyroxene2 0.016809 -40.0 0.020000 0.005000 0.004000 CaSiO3 50.0\n"
+    )
+    composition = (
+        "index Pressure Temperature mass SiO2\n"
+        "1 1.00 160.00 101.890973 44.9571\n"
+    )
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=160.0,
+        total_input_kg=0.101890973,
+        system_output=_NONFINITE_SYSTEM_ROW,
+        table_outputs={
+            'System_main_tbl.txt': _NONFINITE_SYSTEM_ROW,
+            'Phase_main_tbl.txt': phase,
+            'Solid_comp_tbl.txt': composition,
+            'Bulk_comp_tbl.txt': composition,
+            'Liquid_comp_tbl.txt': composition,
+        },
+    )
+
+    assert result.status == 'ok'
+    liquid = result.phase_thermo['liquid']
+    clinopyroxene = result.phase_thermo['clinopyroxene']
+    assert liquid['enthalpy_J'] is None
+    assert liquid['entropy_J_K'] is None
+    assert liquid['volume_m3'] == pytest.approx(33.852089e-6)
+    assert liquid['heat_capacity_J_K'] == pytest.approx(145.956791)
+    assert clinopyroxene['enthalpy_J'] == pytest.approx(-40.0)
+    assert clinopyroxene['entropy_J_K'] == pytest.approx(0.03)
+    notice = result.diagnostics['alphamelts_system_property_notice']
+    assert notice['reason'] == 'non_finite_system_property'
+    assert notice['authority'] == 'alphamelts'
+    columns = notice['band']['columns']
+    assert columns[:2] == ['H', 'S']
+    assert 'liquid.enthalpy_J' in columns
+    assert 'liquid.entropy_J_K' in columns
+    assert 'clinopyroxene.enthalpy_J' in columns
+    assert 'clinopyroxene.entropy_J_K' not in columns
+    _assert_no_nonfinite(result)
+
+
 @pytest.mark.parametrize(
     'composition, provider_status, reason_fragment',
     [
@@ -5927,11 +6204,15 @@ def test_thermoengine_transport_pipe_close_failure_still_joins_worker(monkeypatc
 
 
 @pytest.mark.parametrize(
-    ('solved_fO2_log', 'expected_ok'),
-    [(-9.0, True), (-8.0, False)],
+    ('solved_fO2_log', 'expected_ok', 'echo_tolerance'),
+    [
+        (-9.0, True, 1.0e-3),
+        (-8.0, False, 1.0e-3),
+        (-9.002, True, 2.5e-3),
+    ],
 )
 def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
-    monkeypatch, solved_fO2_log, expected_ok,
+    monkeypatch, solved_fO2_log, expected_ok, echo_tolerance,
 ):
     class FakeTransport:
         def __init__(self, **_kwargs):
@@ -5947,7 +6228,10 @@ def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
                 solved_fO2_log=solved_fO2_log,
             )
 
+    executed_scripts = []
+
     def fake_run(args, **kwargs):
+        executed_scripts.append(args[-1])
         stdout = io.StringIO()
         try:
             with contextlib.redirect_stdout(stdout):
@@ -5967,6 +6251,9 @@ def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
         thermoengine_module, 'ThermoEngineTransport', FakeTransport,
     )
     monkeypatch.setattr(
+        thermoengine_module, '_FO2_ECHO_TOLERANCE', echo_tolerance,
+    )
+    monkeypatch.setattr(
         'engines.alphamelts.thermoengine.subprocess.run',
         fake_run,
     )
@@ -5978,6 +6265,12 @@ def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
     ok, reason = transport.health_check(timeout_s=1.0)
 
     assert ok is expected_ok
+    guard = next(
+        line.strip()
+        for line in executed_scripts[0].splitlines()
+        if 'payload.solved_fO2_log' in line and '>=' in line
+    )
+    assert guard.endswith(f'>= {echo_tolerance!r}')
     if expected_ok:
         assert reason == 'ThermoEngine smoke equilibrium completed'
     else:
@@ -6060,6 +6353,42 @@ def test_normalize_measured_split_reads_both_iron_oxides_through_owner():
     assert normalized["Fe2O3"] == pytest.approx(5.0)
 
 
+def test_normalize_literal_feot_under_qfm_counts_total_iron_once():
+    """A literal FeOt key under QFM is total iron once, then scaled to 100%.
+
+    SiO2 80 and FeOt 10 have no other iron spelling. The single iron mass is
+    10, the oxide sum is 90, and the MELTS basis is 100 * those masses / 90.
+    Counting FeOt again would leave FeO at 20 and SiO2 at 80.
+    """
+
+    backend = AlphaMELTSBackend()
+    backend._redox_buffer = "QFM"
+
+    comp = backend._normalize_composition_to_melts_basis({
+        "SiO2": 80.0,
+        "FeOt": 10.0,
+    })
+
+    assert comp["FeO"] == pytest.approx(100.0 * 10.0 / 90.0)
+    assert comp["SiO2"] == pytest.approx(100.0 * 80.0 / 90.0)
+    assert comp["Fe2O3"] == pytest.approx(0.0)
+    assert sum(comp.values()) == pytest.approx(100.0)
+    assert any(
+        "FeO_total treated as FeOt with QFM" in warning
+        for warning in backend._last_normalization_warnings
+    )
+
+
+def test_normalize_literal_feot_without_policy_still_refuses():
+    backend = AlphaMELTSBackend()
+
+    with pytest.raises(ValueError, match="FeO_total requires explicit redox policy"):
+        backend._normalize_composition_to_melts_basis({
+            "SiO2": 80.0,
+            "FeOt": 10.0,
+        })
+
+
 def test_normalize_composition_refuses_feo_total_without_policy():
     backend = AlphaMELTSBackend()
 
@@ -6083,6 +6412,40 @@ def test_normalize_composition_splits_feo_total_with_explicit_ratio():
 
     assert pytest.approx(sum(comp.values())) == 100.0
     assert comp['FeO'] > comp['Fe2O3'] > 0.0
+
+
+@pytest.mark.parametrize("alias", ("FeO_T", "FeOT", "FeOt", "FeO*"))
+def test_normalize_total_iron_aliases_split_with_explicit_ratio(alias):
+    backend = AlphaMELTSBackend()
+    backend._fe3fet_ratio = 0.2
+
+    normalized = backend._normalize_composition_to_melts_basis({
+        "SiO2": 50.0,
+        alias: 10.0,
+    })
+    canonical = backend._normalize_composition_to_melts_basis({
+        "SiO2": 50.0,
+        "FeO_total": 10.0,
+    })
+
+    assert normalized == pytest.approx(canonical)
+    assert normalized["Fe2O3"] > 0.0
+    assert backend._last_normalization_warnings == []
+
+
+def test_total_iron_alias_consumers_share_feedstock_owner_tuple():
+    from simulator import feedstock_composition, fe_redox
+    from simulator.battery import input_provenance
+    from simulator.melt_backend import alphamelts
+
+    owner = feedstock_composition._TOTAL_IRON_AS_FEO_KEYS
+    assert input_provenance._TOTAL_IRON_AS_FEO_KEYS is owner
+    assert fe_redox._TOTAL_IRON_AS_FEO_KEYS is owner
+    assert alphamelts._TOTAL_IRON_AS_FEO_KEYS is owner
+    assert all(
+        alphamelts.MELTS_OXIDE_ALIASES[alias.lower()] == "FeO_total"
+        for alias in owner
+    )
 
 
 
@@ -10025,7 +10388,7 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed(capsys):
     # ratio retains the full step's serialization diagnostic, including time
     # spent waiting for that shadow and host scheduling.
     #
-    # Measured premise: six xdist-off runs on Mac-Studio-256-2 produced CPU /
+    # Measured premise: six xdist-off runs on the test host produced CPU /
     # wall seconds of 18.18/34.00, 18.23/34.99, 19.13/32.27, 19.23/32.12,
     # 19.09/30.77, and 18.76/31.20 (wall/CPU 1.61-1.92x). CPU median=18.93 s;
     # min=18.18 s, max=19.23 s, spread=max-min=1.05 s. Allow five observed

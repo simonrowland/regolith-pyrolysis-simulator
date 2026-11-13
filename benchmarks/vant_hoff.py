@@ -30,6 +30,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
 from benchmarks.gibbs_duhem import mole_fractions_from_wt
+from simulator.physical_constants import GAS_CONSTANT as GAS_CONSTANT_J_MOL_K
 
 #: |H_ex| below this reads athermal. 1 kJ/mol is 1-2 orders below any real
 #: silicate mixing enthalpy this project would act on, and far above the
@@ -71,8 +72,6 @@ ATHERMAL_H_FLOOR_J_MOL = 1.0e3
 #: nothing caught the drift between the code and the derivation that justifies
 #: it (SC-130 sweep 2026-08-22).
 NONLINEARITY_REL_FLOOR = 0.05
-
-GAS_CONSTANT_J_MOL_K = 8.31446261815324
 
 
 @dataclass(frozen=True)

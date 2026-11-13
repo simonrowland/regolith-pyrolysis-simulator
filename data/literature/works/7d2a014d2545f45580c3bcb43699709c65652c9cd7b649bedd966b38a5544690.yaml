@@ -1,0 +1,486 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 7d2a014d2545f45580c3bcb43699709c65652c9cd7b649bedd966b38a5544690
+  citation: Yakovlev, O. I., and Shornikov, S. I. (2017). The Volatility Inversion of Silicon Oxide and Magnesium Oxide at
+    Evaporation of HASP-Glasses on the Moon. Lunar and Planetary Science XLVIII, abstract 1133.
+  source_ids:
+  - yakovlev-2017-hasp-volatility
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:yakovlev-2017-hasp-volatility
+      role: pdf
+      path: raw/yakovlev-2017-hasp-volatility/yakovlev-2017-hasp-volatility.pdf
+      sha256:
+        tag: value
+        value: 40cc839fb4f5e1028177637da98b821746690fcab2396b763c23b1747f862fd2
+    - asset_id: pdftotext:yakovlev-2017-hasp-volatility
+      role: pdftotext
+      path: text/yakovlev-2017-hasp-volatility
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:yakovlev-2017-hasp-volatility
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: yakovlev_2017_affiliation_and_references
+  type: characterization
+  locator:
+    pdf_page_index: 1
+    section: References
+  units: bibliographic and address metadata as printed
+  values:
+    quantity: printed_source_metadata
+    affiliation:
+      as_printed: Vernadsky Institute of Geochemistry & Analytical Chemistry of RAS, Kosygin st., 19, Moscow, 119991, Russia
+      street_number: 19
+      postal_code: 119991
+      locator:
+        pdf_page_index: 0
+        section: Affiliation
+    references:
+    - label: '1'
+      as_printed: Naney et al. (1976) LPS VII, 155.
+    - label: '2'
+      as_printed: Warren (2008) GCA, 72, 3562–3585.
+    - label: '3'
+      as_printed: Markova et al. (1986) Geochem. Int., 19, 1559–1569.
+    - label: '4'
+      as_printed: Yakovlev et al. (2011) Geochem. Int., 49, 227–238.
+    - label: '5'
+      as_printed: Yakovlev et al. (1984) Meteoritica, 43, 125–133 (in Russian).
+    - label: '6'
+      as_printed: Yakovlev et al. (1987) Meteoritica, 46, 104–118 (in Russian).
+    - label: '7'
+      as_printed: Korginsky (1959) Dokl. AN SSSR, 128, 383–396.
+    - label: '8'
+      as_printed: Shornikov et al. (2017) LPSC XXXXVIII.
+    - label: '9'
+      as_printed: Grossman et al. (2000), 64, 2879–2894.
+  context_id: yakovlev-2017-hasp-volatility::context::yakovlev_2017_affiliation_and_references
+  work_id: 7d2a014d2545f45580c3bcb43699709c65652c9cd7b649bedd966b38a5544690
+  source_id: yakovlev-2017-hasp-volatility
+  species: MgO
+- observation_id: yakovlev_2017_explicit_numeric_payload
+  type: characterization
+  locator:
+    pdf_page_index: 0
+    section: Introduction and Figure 1
+  units: as printed; context values, not new measurements
+  values:
+    quantity: printed_numeric_context_values
+    method_class: quoted_unattributed
+    facts:
+    - name: HASP glass evaporation mass-loss interval
+      value_low: 20
+      value_high: 50
+      unit: mass percent
+      as_printed: ~20–50 %
+      locator:
+        pdf_page_index: 0
+        section: Figure 1 caption and Introduction
+      attribution: Ref. [3] experiment as summarized by the authors; temperature attribution Ref. [4]
+    - name: evaporation temperature associated with mass-loss interval
+      value_low: 1750
+      value_high: 1900
+      unit: °C
+      as_printed: ~1750–1900 °C
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+      attribution: Ref. [4]
+    - name: HASP glass MgO to SiO2 mass ratio low
+      value_low: '0.01'
+      value_high: '0.1'
+      unit: dimensionless
+      as_printed: 0.01 to 0.1
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+      attribution: HASP-glass composition data Ref. [2]
+    - name: average MgO in HASP glasses
+      value: '0.8'
+      unit: mass percent
+      as_printed: 0.8 mass. %
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+      attribution: HASP-glass composition data Ref. [2]
+    - name: pure anorthite SiO2 to Al2O3 ratio
+      value: '1.18'
+      unit: dimensionless
+      as_printed: '1.18'
+      locator:
+        pdf_page_index: 0
+        figure: '1'
+      attribution: Figure 1 dotted line
+    - name: Figure 1 experimental point mass-loss label
+      value: '0.3'
+      unit: mass percent
+      as_printed: M ~ 0.3 %
+      locator:
+        pdf_page_index: 0
+        figure: '1'
+    - name: Figure 1 HASP mass-loss interval lower label
+      value: 20
+      unit: mass percent
+      as_printed: M ~ 20 %
+      locator:
+        pdf_page_index: 0
+        figure: '1'
+    - name: Figure 1 HASP mass-loss interval upper label
+      value: 50
+      unit: mass percent
+      as_printed: M ~ 50 %
+      locator:
+        pdf_page_index: 0
+        figure: '1'
+    - name: Figure 2 correlation coefficient for chondrite CAIs
+      value: '0.8'
+      unit: dimensionless
+      as_printed: r = 0.8
+      locator:
+        pdf_page_index: 1
+        figure: 2a
+      attribution: CAI analyses Ref. [9]
+    - name: Figure 2 correlation coefficient for HASP glasses
+      value: '0.7'
+      unit: dimensionless
+      as_printed: r = 0.7
+      locator:
+        pdf_page_index: 1
+        figure: 2b
+      attribution: HASP-glass analyses Ref. [2]
+  context_id: yakovlev-2017-hasp-volatility::context::yakovlev_2017_explicit_numeric_payload
+  work_id: 7d2a014d2545f45580c3bcb43699709c65652c9cd7b649bedd966b38a5544690
+  source_id: yakovlev-2017-hasp-volatility
+  species: MgO
+- observation_id: yakovlev_2017_figure1_composition_comparison
+  type: experiment_series
+  locator:
+    pdf_page_index: 0
+    figure: '1'
+    section: Figure 1 caption
+  units: mass percent and ratio as printed; graph not digitized
+  values:
+    quantity: anorthite_troctolite_and_hasp_composition_comparison
+    method_class: figure_only
+    caption_as_printed: Fig. 1. SiO2 / Al2O3 ratio dependence in the rock of anorthosite-norite-troctolite moon series (ANT
+      series) (violet circles) and HASP-glasses (red circles) vs. the total refractory content of melt components of CaO and
+      Al2O3. The experimental evaporation trend of the lunar aluminous basalt is shown by triangles. Melt mass loss at evaporation
+      (M) is indicated for the three experimental points. The majority HASP-glass compositions are between the points (~20–50
+      %).
+    printed_numeric_labels:
+    - name: pure_anorthite_SiO2_to_Al2O3_ratio
+      value: '1.18'
+      unit: dimensionless
+      as_printed: '1.18'
+    - name: evaporation_mass_loss_label
+      value: '0.3'
+      unit: mass %
+      as_printed: M ~ 0.3 %
+    - name: HASP_composition_mass_loss_low
+      value: 20
+      unit: mass %
+      as_printed: M ~ 20 %
+    - name: HASP_composition_mass_loss_high
+      value: 50
+      unit: mass %
+      as_printed: M ~ 50 %
+    reason: Figure has plotted compositions/trends but no numeric table; plotted coordinates were not digitized.
+  context_id: yakovlev-2017-hasp-volatility::context::yakovlev_2017_figure1_composition_comparison
+  work_id: 7d2a014d2545f45580c3bcb43699709c65652c9cd7b649bedd966b38a5544690
+  source_id: yakovlev-2017-hasp-volatility
+  species: MgO
+- observation_id: yakovlev_2017_figure2_prior_composition_correlations
+  type: experiment_series
+  locator:
+    pdf_page_index: 1
+    figure: '2'
+    section: Figure 2 caption
+  units: mass percent; plotted points not digitized
+  values:
+    quantity: mgo_to_sio2_ratio_against_cao_in_cai_and_hasp_compositions
+    method_class: figure_only
+    caption_as_printed: Fig. 2. The MgO / SiO2 dependence of CAIs in chondrites [9] (a), and HASP-glasses (b) vs. the CaO
+      content. The figures show the regression line and correlation coefficient (r).
+    printed_correlation_coefficients:
+    - series: CAIs in chondrites (a)
+      r: '0.8'
+      as_printed: r = 0.8
+    - series: HASP-glasses (b)
+      r: '0.7'
+      as_printed: r = 0.7
+    reason: Plotted data are comparisons to previous literature; no source table is given and points were not digitized.
+  context_id: yakovlev-2017-hasp-volatility::context::yakovlev_2017_figure2_prior_composition_correlations
+  work_id: 7d2a014d2545f45580c3bcb43699709c65652c9cd7b649bedd966b38a5544690
+  source_id: yakovlev-2017-hasp-volatility
+  species: MgO
+- observation_id: yakovlev_2017_numeric_and_qualifying_statements
+  type: characterization
+  locator:
+    pdf_page_index: 0
+    section: Introduction
+  units: verbatim; values as printed
+  values:
+    quantity: source_claims_and_numeric_context
+    method_class: quoted_unattributed
+    statements:
+    - statement_id: p1_impact_and_selective_evaporation
+      attribution: Yakovlev & Shornikov
+      quote: Acidity-basicity is a universal characteristic of any melt. To test the effectiveness of its application to the
+        volatility of melt components we investigated the impact HASP-glass lunar regolith. HASP-glasses formed on the lunar
+        surface through an impact process involving high-temperature rock melting and deep selective evaporation [1].
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    - statement_id: p1_hasp_composition_and_losses
+      attribution: Yakovlev & Shornikov
+      quote: HASP-glass composition features high Al2O3 and poor SiO2 due to the high temperature selective evaporation of
+        melts with loss of easily and moderately volatile oxides such as Na2O, K2O and FeO, partial loss of SiO2, and accumulation
+        in the residue of CaO and Al2O3.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    - statement_id: p1_anorthite_limit
+      attribution: Yakovlev & Shornikov
+      quote: The rock and HASP-glass compositions fall in an almost linear decreasing relationship of SiO2 / Al2O3 which becomes
+        smaller as calcium and aluminum oxides increase. The dotted line indicates the SiO2 / Al2O3 ratio in pure anorthite
+        (equal to 1.18). For the moon this may be a petrochemical limit below which the generation of igneous anorthositic
+        rocks is impossible. All compositions which are below this limit can be formed only at evaporation differentiation
+        and thus this limit relation is a marker for the HASP-glasses identification.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    - statement_id: p1_evaporation_mass_loss_and_temperature
+      attribution: Yakovlev & Shornikov
+      quote: Fig. 1 also presents selected results of evaporation experiments on lunar aluminous basalt [3]. These show that
+        the compositions of the most HASP-glasses were probably formed in the range of evaporation mass losses of ~20–50 %,
+        corresponding to an evaporation temperature of ~1750–1900 °C [4].
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    - statement_id: p1_previous_experiment_inversion
+      attribution: Yakovlev & Shornikov
+      quote: Our experiments on the evaporation of chondrites and lunar basalt [3, 5, 6] clearly showed that during the evaporation
+        when the SiO2 content in the melt decreases significantly the MgO content increases slightly indicating that the MgO
+        is low volatility compared to SiO2.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    - statement_id: p1_hasp_composition_contrasts_experiment
+      attribution: Yakovlev & Shornikov
+      quote: However, this experimental observation was not reflected in the actual compositions of HASP-glasses as higher
+        content of MgO relative to SiO2 in glasses is not observed. On the contrary, there is a very low ratio of MgO / SiO2
+        (0.01 to 0.1) and very low contents of MgO – an average of 0.8 mass. % [2]. The compositional features of HASP-glasses
+        in the main oxides of K2O, Na2O, FeO, SiO2, CaO and Al2O3 are easily explained by evaporative differentiation of the
+        melt components, the MgO behavior contradicts to the evaporative mechanism of HASP-glasses formation.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    - statement_id: p1_acid_base_theory_basis
+      attribution: Yakovlev & Shornikov
+      quote: To resolve these questions, we applied the Korginsky theory on acid-base interaction components in the melt [7].
+        According to this theory, the basicity index of a melt is determined by the ion oxygen activity that is always present
+        in the melt due to the partial dissociation of the oxide components.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    - statement_id: p1_oxygen_activity_effect
+      attribution: Yakovlev & Shornikov
+      quote: The effect of ion oxygen activity is different for different oxides and may be the opposite for oxides contrasting
+        in their individual acid-base properties. For example, an increase in ion oxygen activity should lead to an increase
+        of the activity of the basic oxide MgO and decrease of the activity of the acidic oxide SiO2 as the silicon oxide
+        in the melt is not the donor of the oxygen ions but the acceptor.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    - statement_id: p1_activity_and_volatility_relation
+      attribution: Yakovlev & Shornikov
+      quote: 'The component activity in the melt determines their component volatility in the vapor according to a generalized
+        Raoult-Henry law:'
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    - statement_id: p1_volatility_parameters
+      attribution: Yakovlev & Shornikov
+      quote: 'Relation (1) shows that the volatility of the oxide above the melt depends on three parameters: 1) the vapor
+        pressure of the pure oxide; 2) the oxide concentration in the melt; 3) the interaction nature of oxide in the melt.
+        The last two parameters determine the activity of the component and its behavior during evaporation from the melt.'
+      locator:
+        pdf_page_index: 1
+        section: Introduction
+    - statement_id: p2_cmas_and_calcium_effect
+      attribution: Yakovlev & Shornikov
+      quote: The properties of HASP-glass compositions may be modeled as the CMAS oxide system. The main oxides of the system
+        on the acid-basic properties are divided into acid – SiO2, amphoteric – Al2O3 and two basic – CaO and MgO. CaO is
+        the major basic oxide and is a major donor of oxygen ions in the melt and therefore its concentration plays a major
+        role in determining cause of the melt basicity. This also implies that the MgO and SiO2 activity depends on the CaO
+        concentration.
+      locator:
+        pdf_page_index: 1
+        section: Discussion
+    - statement_id: p2_high_calcium_melt_volatility
+      attribution: Yakovlev & Shornikov; statement cites [8]
+      quote: According to acid-base interaction in high-calcium melts the MgO will have high volatility and it can be higher
+        than the SiO2 volatility [8].
+      locator:
+        pdf_page_index: 1
+        section: Discussion
+    - statement_id: p2_direction_of_residue_change
+      attribution: Yakovlev & Shornikov
+      quote: It becomes clear why the MgO low content observes in the HASP-glasses. It’s easy to imagine that during the melt
+        evaporation the CaO content increases (and the melt basicity increase too) and so the MgO activity (and volatility)
+        will increase and the SiO2 activity (and volatility) will fall. As a result of the evaporation process the MgO content
+        in the residual melt will decrease and SiO2 content will increase relative to MgO. For HASP-glasses that means as
+        the CaO content will increase, the MgO / SiO2 ratio will decrease. Chemical analyses of the HASP-glasses [2] confirm
+        this trend (Fig. 2b).
+      locator:
+        pdf_page_index: 1
+        section: Discussion
+    - statement_id: p2_cai_comparison_and_genesis
+      attribution: Yakovlev & Shornikov
+      quote: It is interesting to note that the evaporation of some CAIs, which also belong to CMAS system, may be also described
+        in the framework of the melt acid-base theory. Fig. 2a shows the same behavior of oxides on the evaporation of CAI
+        melts [9] in spite of HASP-glasses and CAIs have absolutely different genesis. The HASP-glasses compositions were
+        formed during the impact process whereas the CAIs formed in the course of a complex process including high temperature
+        melt evaporation in the event of unknown nature.
+      locator:
+        pdf_page_index: 1
+        section: Discussion
+    - statement_id: p2_support_statement
+      attribution: Yakovlev & Shornikov
+      quote: 'The present study was supported by RAS Presidium Program #7 (Experimental and theoretical studies of Solar system
+        objects and star planetary systems. Transients in astrophysics).'
+      locator:
+        pdf_page_index: 1
+        section: Discussion
+  context_id: yakovlev-2017-hasp-volatility::context::yakovlev_2017_numeric_and_qualifying_statements
+  work_id: 7d2a014d2545f45580c3bcb43699709c65652c9cd7b649bedd966b38a5544690
+  source_id: yakovlev-2017-hasp-volatility
+  species: MgO
+- observation_id: yakovlev_2017_raoult_henry_relation_and_activity_basis
+  type: thermodynamic_example
+  locator:
+    pdf_page_index: 0
+    equation: '1'
+    section: Introduction
+  units: equation and oxide-component terms as printed
+  values:
+    quantity: author_theoretical_activity_volatility_relation
+    method_class: quoted_unattributed
+    equation_as_printed: p_i = p_i° a_i = p_i° x_i γ_i
+    definitions_as_printed:
+      p_i: partial pressure of component i above melt
+      p_i°: pressure of pure component i
+      a_i: activity of component i in melt
+      x_i: mole fraction of component i in melt
+      γ_i: activity coefficient of component i in melt
+    oxide_activity_standard_states:
+      MgO:
+        state:
+          tag: unknown
+          reason: Equation (1) gives a generic pure-component reference; the MgO reference phase is not specified.
+        locator:
+          pdf_page_index: 0
+          equation: '1'
+      SiO2:
+        state:
+          tag: unknown
+          reason: Equation (1) gives a generic pure-component reference; the SiO2 reference phase is not specified.
+        locator:
+          pdf_page_index: 0
+          equation: '1'
+    note: Equation is a general relation; the abstract provides no numeric p_i, a_i, or γ_i dataset.
+  context_id: yakovlev-2017-hasp-volatility::context::yakovlev_2017_raoult_henry_relation_and_activity_basis
+  work_id: 7d2a014d2545f45580c3bcb43699709c65652c9cd7b649bedd966b38a5544690
+  source_id: yakovlev-2017-hasp-volatility
+  species: MgO
+- observation_id: yakovlev_2017_scope_and_source_specific_experiment_absences
+  type: laboratory_conditions
+  locator:
+    pdf_page_index: 0
+    section: Abstract
+  units: as reported or typed absence
+  values:
+    quantity: source_scope_and_experiment_metadata
+    source_character: Interpretive discussion applying melt acidity-basicity theory to HASP-glass compositions, with comparisons
+      to previously published evaporation experiments and analyses.
+    new_evaporation_run_described:
+      state:
+        tag: unknown
+        reason: The abstract discusses prior experiments [3, 5, 6] and data from cited sources but gives no run description
+          for a new experiment.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    experiment_method:
+      state:
+        tag: unknown
+        reason: No method for a new experiment is specified in this abstract.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    cell_material_and_liner:
+      state:
+        tag: unknown
+        reason: No apparatus or cell is described in this abstract.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    orifice_diameter_and_channel_length:
+      state:
+        tag: unknown
+        reason: No apparatus or orifice geometry is described in this abstract.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    pressure_calibration_and_ionization_details:
+      state:
+        tag: unknown
+        reason: No mass-spectrometric pressure measurements or calibration details are reported in this abstract.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    temperature_measurement_and_calibration:
+      state:
+        tag: unknown
+        reason: No temperature sensor or calibration for an experiment is described. A cited temperature range is discussion
+          context from Ref. [4].
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    background_pressure:
+      state:
+        tag: unknown
+        reason: No chamber/background pressure is stated.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    sample_preparation_and_composition:
+      state:
+        tag: unknown
+        reason: No sample preparation or run composition is described; HASP-glass composition values are cited from Ref. [2].
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+    activity_defining_ions_and_standard_states:
+      state:
+        tag: unknown
+        reason: MgO and SiO2 activities are discussed theoretically; no defining mass-spectral ions or oxide-specific reference
+          phases are reported. Equation (1) gives a generic pure-component reference.
+      locator:
+        pdf_page_index: 0
+        section: Introduction
+  context_id: yakovlev-2017-hasp-volatility::context::yakovlev_2017_scope_and_source_specific_experiment_absences
+  work_id: 7d2a014d2545f45580c3bcb43699709c65652c9cd7b649bedd966b38a5544690
+  source_id: yakovlev-2017-hasp-volatility
+  species: MgO

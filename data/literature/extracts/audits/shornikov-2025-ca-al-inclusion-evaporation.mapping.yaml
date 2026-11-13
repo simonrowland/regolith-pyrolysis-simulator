@@ -1,0 +1,148 @@
+source_id: shornikov-2025-ca-al-inclusion-evaporation
+source_citation: >-
+  Shornikov and Yakovlev (2025), Evaporation Features of the Melts of
+  Ca–Al–Inclusions in Chondrites, Geochemistry International 63(7), 551–561.
+table_mapping:
+  printed_table: '1'
+  pdf_page: 2
+  published_page: 552
+  pdf_page_index: 1
+  row_count: 4
+  source_numeric_cell_count: 32
+  stored_unique_cell_count: 28
+  row_label_column: 1
+  row_label: oxide
+  unit_as_printed: mol %
+  evidence_class: quoted_attributed
+  phase: not_applicable_background_composition
+  destination: species.CaO.context[shornikov_2025_table1_initial_compositions]
+  columns:
+    2:
+      source_column: A Nazarov et al. (1984)
+      destination_field: A_nazarov_1984_mol_pct
+    3:
+      source_column: A Grossman et al. (2000)
+      destination_field: A_grossman_2000_mol_pct_range
+    4:
+      source_column: A Ivanova (2023)
+      destination_field: A_ivanova_2023_mol_pct_range
+    5:
+      source_column: B Nazarov et al. (1984)
+      destination_field: B_nazarov_1984_mol_pct
+    6:
+      source_column: B Grossman et al. (2000)
+      destination_field: B_grossman_2000_mol_pct_range
+    7:
+      source_column: B Ivanova (2023)
+      destination_field: B_ivanova_2023_mol_pct_range
+    8:
+      source_column: M Dyakonova et al. (1979)
+      destination_field: omitted_duplicate
+      reason: >-
+        The four values are already recorded in
+        shornikov-2023-cai-melt-evaporation; this paper's mol % label is noted
+        without duplicating or converting those cells.
+    9:
+      source_column: FUN1 Mendybaev et al. (2013)
+      destination_field: FUN1_mendybaev_2013_mol_pct
+  conditions:
+    temperature: not_applicable_background_table
+    total_pressure: not_assigned_from_source
+    fO2: not_assigned_from_source
+    experimental_charge_composition: not_assigned_from_table_1
+  cell_audit: shornikov-2025-ca-al-inclusion-evaporation.cell-audit.csv
+figure_mappings:
+  - figure: '1'
+    pdf_page: 3
+    published_page: 553
+    quantity: apparatus_schematic
+    evidence_class: not_applicable
+    species: not_applicable
+    phase: apparatus_diagram
+    unit: schematic; no numeric data extracted
+    conditions: Knudsen effusion apparatus schematic
+    numeric_rows: 0
+  - figure: '2'
+    pdf_page: 3
+    published_page: 553
+    quantity: temperature_time_schedule
+    evidence_class: not_digitised
+    species: experimental samples; Murchison comparison
+    phase: not_applicable
+    unit: T, °C and time as printed
+    conditions: 'Temperature regimes of the evaporation experiments with (1) CAIs of type A, (2) CAIs of type B and (3) the Murchison chondrite.'
+    numeric_rows: 0
+  - figure: '3'
+    pdf_page: 4
+    published_page: 554
+    quantity: partial_pressure_and_residue_composition
+    evidence_class: quoted_attributed
+    species: Ca, Mg, Al, SiO; CaO, MgO, Al2O3, SiO2
+    phase: gas_and_residual_melt_as_captioned
+    unit: log p_i in atm; x_i in mol %
+    condition: Murchison chondrite evaporation; prior data attributed to Yakovlev et al. (1987)
+    numeric_rows: 0
+  - figure: '4'
+    pdf_page: 5
+    published_page: 555
+    quantity: partial_pressure
+    evidence_class: measured_reduced
+    species: Ca, Mg, Al, SiO
+    phase: gas
+    unit: log p_i in atm
+    conditions: type A and B CAI residual melts; T axis in °C; no printed total pressure, fO2, or run-specific bulk composition
+    numeric_rows: 0
+  - figure: '5'
+    pdf_page: 5
+    published_page: 555
+    quantity: residue_component_composition
+    evidence_class: model_derived
+    species: CaO, MgO, Al2O3, SiO2
+    phase: residual melt
+    unit: x_i in mol %
+    conditions: type A and B CAI residual melts; T axis in °C; no weight-loss axis
+    numeric_rows: 0
+  - figure: '6'
+    pdf_page: 7
+    published_page: 557
+    quantity: activity
+    evidence_class: model_derived
+    species: gehlenite and anorthite end members
+    phase: type A residual melt
+    unit: log a_i
+    conditions: T axis in °C
+    numeric_rows: 0
+  - figure: '7'
+    pdf_page: 8
+    published_page: 558
+    quantity: calculated_activity_and_activity_ratios
+    evidence_class: model_derived
+    species: spinel, akermanite, and gehlenite end members
+    phase: type B residual melt
+    unit: activities and activity ratios
+    conditions: Al2O3 axis in mol %
+    numeric_rows: 0
+  - figure: '8'
+    pdf_page: 9
+    published_page: 559
+    quantity: partial_pressure_and_oxygen_ratio
+    evidence_class: measured_reduced
+    species: O and O2
+    phase: gas
+    unit: oxygen pressure in atm and O2/O ratio
+    conditions: type A and B CAIs; T axis in °C; Murchison series attributed to Yakovlev et al. (1987)
+    series_attribution:
+      '1': CAI type A; measured_reduced
+      '2': CAI type B; measured_reduced
+      '3': Murchison; quoted_attributed to Yakovlev et al. (1987)
+    numeric_rows: 0
+unplotted_species:
+  - species: Na
+    source_fact: Na+ is listed among ions detected in the mass spectra.
+    pressure_values_in_this_paper: not_printed
+  - species: K
+    source_fact: K+ is listed among ions detected in the mass spectra.
+    pressure_values_in_this_paper: not_printed
+  - species: Fe
+    source_fact: Fe+ is listed among ions detected in the mass spectra.
+    pressure_values_in_this_paper: not_printed

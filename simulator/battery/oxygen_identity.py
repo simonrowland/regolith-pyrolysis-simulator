@@ -15,8 +15,10 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from simulator.physical_constants import BAR_PA_DECIMAL
+
 # 1 bar = 1e5 Pa exactly. An atmosphere frame passes 101325 Pa instead.
-BAR_PA = Decimal("100000")
+BAR_PA = BAR_PA_DECIMAL
 
 
 def log10_fo2_to_pa(

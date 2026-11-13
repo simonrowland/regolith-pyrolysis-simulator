@@ -68,7 +68,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Table 3 does not state total pressure for the activity attributed to Sugawara et al. [27].
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -120,7 +120,7 @@ observations:
       locator:
         page: 4
         table: '3'
-        note: log a(Na2O), T=1473 K, source table row 5; row=Sugawara et al. [27]
+        note: log a(Na2O), T=1473 K, source table row 5
     composition:
       state:
         tag: value
@@ -154,6 +154,7 @@ observations:
         table: '3'
         note: log a(Na2O), T=1473 K, source table row 5
   provenance:
+    printed_phase: l
     printed_value: '-9.14'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_sugawara_27_row_5_1573K
@@ -222,7 +223,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Table 3 does not state total pressure for the activity attributed to Sugawara et al. [27].
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -274,7 +275,7 @@ observations:
       locator:
         page: 4
         table: '3'
-        note: log a(Na2O), T=1573 K, source table row 5; row=Sugawara et al. [27]
+        note: log a(Na2O), T=1573 K, source table row 5
     composition:
       state:
         tag: value
@@ -308,6 +309,7 @@ observations:
         table: '3'
         note: log a(Na2O), T=1573 K, source table row 5
   provenance:
+    printed_phase: l
     printed_value: '-8.60'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_sugawara_27_row_7_1573K
@@ -376,7 +378,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: Table 3 does not state total pressure for the activity attributed to Sugawara et al. [27].
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -428,7 +430,7 @@ observations:
       locator:
         page: 4
         table: '3'
-        note: log a(Na2O), T=1573 K, source table row 7; row=Sugawara et al. [27]
+        note: log a(Na2O), T=1573 K, source table row 7
     composition:
       state:
         tag: value
@@ -462,6 +464,7 @@ observations:
         table: '3'
         note: log a(Na2O), T=1573 K, source table row 7
   provenance:
+    printed_phase: l
     printed_value: '-8.83'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_3_1473K
@@ -530,7 +533,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for this experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -578,7 +581,7 @@ observations:
       locator:
         page: 4
         table: '3'
-        note: log a(Na2O), T=1473 K, source table row 3; row=This study
+        note: log a(Na2O), T=1473 K, source table row 3
     composition:
       state:
         tag: value
@@ -631,6 +634,7 @@ observations:
           published_page: 1392
           section: 3. Thermodynamic formulation of Gibbs energy of mixing
           equation: '14'
+    printed_phase: l
     printed_value: '-9.01'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_3_1573K
@@ -699,7 +703,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for this experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -747,7 +751,7 @@ observations:
       locator:
         page: 4
         table: '3'
-        note: log a(Na2O), T=1573 K, source table row 3; row=This study
+        note: log a(Na2O), T=1573 K, source table row 3
     composition:
       state:
         tag: value
@@ -800,6 +804,7 @@ observations:
           published_page: 1392
           section: 3. Thermodynamic formulation of Gibbs energy of mixing
           equation: '14'
+    printed_phase: l
     printed_value: '-8.46'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_4_1473K
@@ -868,7 +873,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for this experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -916,7 +921,7 @@ observations:
       locator:
         page: 4
         table: '3'
-        note: log a(Na2O), T=1473 K, source table row 4; row=This study
+        note: log a(Na2O), T=1473 K, source table row 4
     composition:
       state:
         tag: value
@@ -969,6 +974,7 @@ observations:
           published_page: 1392
           section: 3. Thermodynamic formulation of Gibbs energy of mixing
           equation: '14'
+    printed_phase: l
     printed_value: '-8.94'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_4_1573K
@@ -1037,7 +1043,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for this experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1085,7 +1091,7 @@ observations:
       locator:
         page: 4
         table: '3'
-        note: log a(Na2O), T=1573 K, source table row 4; row=This study
+        note: log a(Na2O), T=1573 K, source table row 4
     composition:
       state:
         tag: value
@@ -1138,6 +1144,7 @@ observations:
           published_page: 1392
           section: 3. Thermodynamic formulation of Gibbs energy of mixing
           equation: '14'
+    printed_phase: l
     printed_value: '-8.39'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_6_1573K
@@ -1206,7 +1213,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for this experiment.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1254,7 +1261,7 @@ observations:
       locator:
         page: 4
         table: '3'
-        note: log a(Na2O), T=1573 K, source table row 6; row=This study
+        note: log a(Na2O), T=1573 K, source table row 6
     composition:
       state:
         tag: value
@@ -1307,6 +1314,7 @@ observations:
           published_page: 1392
           section: 3. Thermodynamic formulation of Gibbs energy of mixing
           equation: '14'
+    printed_phase: l
     printed_value: '-8.73'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_48_30_22
@@ -1367,7 +1375,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -1481,6 +1489,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_54_30_16
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -1539,7 +1549,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -1653,6 +1663,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_58_30_12
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -1711,7 +1723,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -1813,6 +1825,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_60_30_10
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -1871,7 +1885,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -1985,6 +1999,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_62_16_22
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -2043,7 +2059,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -2141,6 +2157,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_65_30_5
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -2199,7 +2217,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -2313,6 +2331,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_66_12_22
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -2371,7 +2391,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -2473,6 +2493,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_68_16_16
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -2531,7 +2553,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -2633,6 +2655,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_70_30
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -2689,7 +2713,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -2759,6 +2783,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_72_12_16
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -2817,7 +2843,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -2931,6 +2957,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_74_16_10
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -2989,7 +3017,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -3091,6 +3119,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_78_12_10
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -3149,7 +3179,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -3251,6 +3281,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_79_16_5
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -3309,7 +3341,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -3407,6 +3439,8 @@ observations:
     parameters: []
     output_unit: kJ·mol−1 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_84
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -3463,7 +3497,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -3533,6 +3567,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_88
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -3582,7 +3618,7 @@ observations:
       reason: profile partial_molar_enthalpy does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper does not state total pressure for these activity measurements.
     sweep_gas:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use sweep_gas
@@ -3645,6 +3681,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_48_30_22
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -3778,6 +3816,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_54_30_16
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -3911,6 +3951,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_58_30_12
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -4032,6 +4074,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_60_30_10
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -4165,6 +4209,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_62_16_22
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -4282,6 +4328,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_65_30_5
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -4415,6 +4463,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_66_12_22
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -4536,6 +4586,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_68_16_16
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -4657,6 +4709,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_70_30
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -4744,6 +4798,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_72_12_16
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -4877,6 +4933,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_74_16_10
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -4998,6 +5056,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_78_12_10
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -5119,6 +5179,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_79_16_5
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -5236,6 +5298,8 @@ observations:
     parameters: []
     output_unit: J·K−1·mol−1 × 10^3 as printed
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_84
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -5323,6 +5387,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_entropy_fit_88
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -5396,6 +5462,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_36::T=1273:row=run-36:h=9392c3721b4e
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -5497,6 +5565,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_36::T=1373:row=run-36:h=562de2b50d60
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -5598,6 +5668,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_36::T=1423:row=run-36:h=50c637f7a2c8
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -5699,6 +5771,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_36::T=1473:row=run-36:h=72c53c98d862
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -5800,6 +5874,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_36::T=1523:row=run-36:h=3cd6e7be45db
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -5901,6 +5977,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_36::T=1573:row=run-36:h=376513ef1a35
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6002,6 +6080,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_38::T=1273:row=run-38:h=933e7abf6153
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6103,6 +6183,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_38::T=1373:row=run-38:h=8123eebede91
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6204,6 +6286,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_38::T=1423:row=run-38:h=99313e2f65d7
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6305,6 +6389,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_38::T=1473:row=run-38:h=01fc7b952d5a
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6406,6 +6492,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_38::T=1523:row=run-38:h=fa6f50bdf902
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6507,6 +6595,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_38::T=1573:row=run-38:h=bea62816c1c4
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6608,6 +6698,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_39::T=1273:row=run-39:h=ddfe8aae4ad5
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6709,6 +6801,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_39::T=1373:row=run-39:h=6f66e05bb35e
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6810,6 +6904,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_39::T=1423:row=run-39:h=715a2729e9d2
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -6911,6 +7007,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_39::T=1473:row=run-39:h=ebf3ea86b56a
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7012,6 +7110,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_39::T=1523:row=run-39:h=d3e7aa5da3e9
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7113,6 +7213,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_39::T=1573:row=run-39:h=dd1efbaf584b
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7214,6 +7316,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_44::T=1273:row=run-44:h=14096f4bb716
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7315,6 +7419,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_44::T=1373:row=run-44:h=2c1a9d1c9e5b
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7416,6 +7522,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_44::T=1423:row=run-44:h=e8d4c35c8f65
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7517,6 +7625,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_44::T=1473:row=run-44:h=439490ad43ed
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7618,6 +7728,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_44::T=1523:row=run-44:h=6635c31b1df7
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7719,6 +7831,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_44::T=1573:row=run-44:h=6e7e4d5611e1
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7820,6 +7934,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_46::T=1273:row=run-46:h=51fb445783b0
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -7921,6 +8037,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_46::T=1373:row=run-46:h=8d23affb1030
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8022,6 +8140,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_46::T=1423:row=run-46:h=63278d6cfb59
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8123,6 +8243,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_46::T=1473:row=run-46:h=5fe9d780e873
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8224,6 +8346,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_46::T=1523:row=run-46:h=a1237eed453c
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8325,6 +8449,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_46::T=1573:row=run-46:h=241dfae7c065
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8426,6 +8552,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_47::T=1273:row=run-47:h=319f590e1d34
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8527,6 +8655,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_47::T=1373:row=run-47:h=482dad00b15b
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8628,6 +8758,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_47::T=1423:row=run-47:h=1b65a1524c43
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8729,6 +8861,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_47::T=1473:row=run-47:h=f2e77c97e419
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8830,6 +8964,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_47::T=1523:row=run-47:h=080dff2f1f37
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -8931,6 +9067,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_47::T=1573:row=run-47:h=1a0cde88cb90
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9032,6 +9170,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_49::T=1273:row=run-49:h=92f9c648ed9f
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9133,6 +9273,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_49::T=1373:row=run-49:h=eee7c99b6769
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9234,6 +9376,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_49::T=1423:row=run-49:h=40bae562556a
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9335,6 +9479,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_49::T=1473:row=run-49:h=382078e3b353
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9436,6 +9582,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_49::T=1523:row=run-49:h=46103d7b6ecc
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9537,6 +9685,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_49::T=1573:row=run-49:h=e60c8988b5c9
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9638,6 +9788,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_52::T=1273:row=run-52:h=6b328bebd641
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9739,6 +9891,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_52::T=1373:row=run-52:h=005e99d0b0da
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9840,6 +9994,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_52::T=1423:row=run-52:h=68b720293434
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -9941,6 +10097,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_52::T=1473:row=run-52:h=db3ef442dba5
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10042,6 +10200,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_52::T=1523:row=run-52:h=b79f0fec55bc
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10143,6 +10303,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_52::T=1573:row=run-52:h=0c289c164ec7
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10244,6 +10406,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_53::T=1273:row=run-53:h=21c8c59d3f85
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10345,6 +10509,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_53::T=1373:row=run-53:h=ad7c8590d887
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10446,6 +10612,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_53::T=1423:row=run-53:h=b7473a23d983
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10547,6 +10715,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_53::T=1473:row=run-53:h=3f8d0b49a9bd
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10648,6 +10818,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_53::T=1523:row=run-53:h=e563d8ab422c
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10749,6 +10921,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_53::T=1573:row=run-53:h=862dad06e7a6
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10850,6 +11024,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_55::T=1273:row=run-55;-rendered-row-assignment-is-draft-row-19-although-draft-row-label-shows-78:h=d38ad7062cc2
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -10951,6 +11127,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_55::T=1373:row=run-55;-rendered-row-assignment-is-draft-row-19-although-draft-row-label-shows-78:h=bea8a9bd59f9
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11053,6 +11231,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_55::T=1423:row=run-55;-rendered-row-assignment-is-draft-row-19-although-draft-row-label-shows-78:h=ac63df433f06
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11155,6 +11335,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_55::T=1473:row=run-55;-rendered-row-assignment-is-draft-row-19-although-draft-row-label-shows-78:h=9637a8f6a687
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11257,6 +11439,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_55::T=1523:row=run-55;-rendered-row-assignment-is-draft-row-19-although-draft-row-label-shows-78:h=73cb6133f713
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11359,6 +11543,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_55::T=1573:row=run-55;-rendered-row-assignment-is-draft-row-19-although-draft-row-label-shows-78:h=f8e5401ec407
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11460,6 +11646,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_56::T=1273:row=run-56:h=02830368c49d
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11561,6 +11749,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_56::T=1373:row=run-56:h=28fa9d74e19d
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11662,6 +11852,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_56::T=1423:row=run-56:h=4d6086cf5c7d
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11763,6 +11955,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_56::T=1473:row=run-56:h=5fb376401915
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11864,6 +12058,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_56::T=1523:row=run-56:h=270cbce9ab09
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -11965,6 +12161,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_56::T=1573:row=run-56:h=d7514dfee48e
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12066,6 +12264,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_57::T=1273:row=run-57:h=ac421f1a6950
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12167,6 +12367,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_57::T=1373:row=run-57:h=4a9a676ae169
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12268,6 +12470,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_57::T=1423:row=run-57:h=f5e695735526
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12369,6 +12573,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_57::T=1473:row=run-57:h=e6fef4bbdfd0
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12470,6 +12676,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_57::T=1523:row=run-57:h=5c6e57ec1b4d
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12571,6 +12779,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_57::T=1573:row=run-57:h=a069f0315c63
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12672,6 +12882,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_58::T=1273:row=run-58:h=933e50f675e4
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12773,6 +12985,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_58::T=1373:row=run-58:h=444ee4b1a625
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12874,6 +13088,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_58::T=1423:row=run-58:h=e8f053e2e223
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -12975,6 +13191,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_58::T=1473:row=run-58:h=7d59770d68dd
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13076,6 +13294,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_58::T=1523:row=run-58:h=48bb6ce90170
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13177,6 +13397,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_58::T=1573:row=run-58:h=83c387487509
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13278,6 +13500,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_59::T=1273:row=run-59:h=28f51c786e15
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13379,6 +13603,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_59::T=1373:row=run-59:h=b370b215a26c
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13480,6 +13706,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_59::T=1423:row=run-59:h=26b8333cc3ba
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13581,6 +13809,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_59::T=1473:row=run-59:h=86b4bb5bc400
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13682,6 +13912,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_59::T=1523:row=run-59:h=b98cb5516968
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13783,6 +14015,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_59::T=1573:row=run-59:h=e8b5c70a4d4d
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13884,6 +14118,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_60::T=1273:row=run-60:h=9c995c163687
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -13985,6 +14221,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_60::T=1373:row=run-60:h=be09eab58b49
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14086,6 +14324,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_60::T=1423:row=run-60:h=7d274405a778
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14187,6 +14427,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_60::T=1473:row=run-60:h=8daf2acff0dd
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14288,6 +14530,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_60::T=1523:row=run-60:h=a51f85d3f0ad
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14389,6 +14633,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_60::T=1573:row=run-60:h=eef284ae9a49
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14490,6 +14736,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_70::T=1273:row=binary-calibration-row-70;-composition-printed-in-eq.-(2):h=77861877ded4
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14579,6 +14827,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_70::T=1373:row=binary-calibration-row-70;-composition-printed-in-eq.-(2):h=d8428c6af8c8
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14668,6 +14918,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_70::T=1423:row=binary-calibration-row-70;-composition-printed-in-eq.-(2):h=ffc83df2674a
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14757,6 +15009,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_70::T=1473:row=binary-calibration-row-70;-composition-printed-in-eq.-(2):h=9dfe7ea48ad9
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14846,6 +15100,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_70::T=1523:row=binary-calibration-row-70;-composition-printed-in-eq.-(2):h=458628b95019
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -14935,6 +15191,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_70::T=1573:row=binary-calibration-row-70;-composition-printed-in-eq.-(2):h=d1754712364a
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15024,6 +15282,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_78::T=1273:row=run-78;-rendered-row-assignment-is-draft-row-20-whose-run-number-cell-is-blank:h=e8bf937baa5f
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15125,6 +15385,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_78::T=1373:row=run-78;-rendered-row-assignment-is-draft-row-20-whose-run-number-cell-is-blank:h=5d5f43b225e1
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15226,6 +15488,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_78::T=1423:row=run-78;-rendered-row-assignment-is-draft-row-20-whose-run-number-cell-is-blank:h=81410b60a28b
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15327,6 +15591,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_78::T=1473:row=run-78;-rendered-row-assignment-is-draft-row-20-whose-run-number-cell-is-blank:h=0bf68d2a499a
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15428,6 +15694,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_78::T=1523:row=run-78;-rendered-row-assignment-is-draft-row-20-whose-run-number-cell-is-blank:h=a4fdd65fd51c
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15529,6 +15797,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_78::T=1573:row=run-78;-rendered-row-assignment-is-draft-row-20-whose-run-number-cell-is-blank:h=5c39e167f8e1
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15630,6 +15900,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_84::T=1273:row=binary-row-84;-composition-is-also-printed-in-table-3:h=9dff01ec0872
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15720,6 +15992,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_84::T=1373:row=binary-row-84;-composition-is-also-printed-in-table-3:h=93b3769cc6b0
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15810,6 +16084,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_84::T=1423:row=binary-row-84;-composition-is-also-printed-in-table-3:h=7c266cf7fb8b
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15900,6 +16176,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_84::T=1473:row=binary-row-84;-composition-is-also-printed-in-table-3:h=c7c937a0f6c6
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -15990,6 +16268,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_84::T=1523:row=binary-row-84;-composition-is-also-printed-in-table-3:h=cb9b4e29177c
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16080,6 +16360,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_84::T=1573:row=binary-row-84;-composition-is-also-printed-in-table-3:h=39e876230b65
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16170,6 +16452,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_86::T=1273:row=run-86:h=464c782a962f
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16271,6 +16555,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_86::T=1373:row=run-86:h=14f39a4dd4fe
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16372,6 +16658,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_86::T=1423:row=run-86:h=c7c0bb2fe5e5
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16473,6 +16761,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_86::T=1473:row=run-86:h=78b89e6c5dd5
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16574,6 +16864,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_86::T=1523:row=run-86:h=95b55bf6f18f
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16675,6 +16967,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_86::T=1573:row=run-86:h=8f8252031980
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16776,6 +17070,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_88::T=1273:row=binary-row-88;-na2o-blank:h=b2ae66724fb0
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16851,6 +17147,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_88::T=1373:row=binary-row-88;-na2o-blank:h=623a29185ea3
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -16926,6 +17224,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_88::T=1423:row=binary-row-88;-na2o-blank:h=0414546f1cd8
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -17001,6 +17301,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_88::T=1473:row=binary-row-88;-na2o-blank:h=69f2492f847f
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -17076,6 +17378,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_88::T=1523:row=binary-row-88;-na2o-blank:h=dac01c020d22
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -17151,6 +17455,8 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_rtln_run_88::T=1573:row=binary-row-88;-na2o-blank:h=dae125e0b3ea
   experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
   identity:
@@ -17226,3 +17532,5 @@ observations:
       locator:
         page: 2
         section: 2.1. Electromotive force measurement
+  provenance:
+    printed_phase: l

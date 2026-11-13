@@ -1,0 +1,124 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2010.11.028
+  citation: Mathieu, R., Libourel, G., Deloule, E., Tissandier, L., Rapin, C. & Podor, R. (2011). Na2O solubility in CaO–MgO–SiO2
+    melts. Geochimica et Cosmochimica Acta, 75(2), 608–628.
+  source_ids:
+  - mathieu-2011-na2o-cms-solubility
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:mathieu-2011-na2o-cms-solubility
+      role: pdf
+      path: raw/mathieu-2011-na2o-cms-solubility/mathieu-2011-na2o-cms-solubility.pdf
+      sha256:
+        tag: value
+        value: 27c7193e1b18de50118ba88dac4f7e74de6c08faea9f5d139fd0e531cda3c394
+    - asset_id: pdftotext:mathieu-2011-na2o-cms-solubility
+      role: pdftotext
+      path: text/mathieu-2011-na2o-cms-solubility
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:mathieu-2011-na2o-cms-solubility
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2010.11.028
+experiments:
+- experiment_id: 10.1016/j.gca.2010.11.028::experiment::mathieu_2011_cms_ns2_1400
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'CMS glass melt equilibrated in a sealed silica-tube thermochemical reactor with Na2O–2SiO2 source; Na2O
+      activity imposed by the source; final glass analyzed by electron-probe microanalysis.' is not a closed method token
+      (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 10
+        published_page: 617
+        pdf_page_index: 9
+        table: '5'
+        note: Table 5 caption
+    fO2_Pa:
+      state:
+        tag: value
+        value: '0.21379575'
+      locator:
+        page: 14
+        published_page: 621
+        pdf_page_index: 13
+        figure: '9'
+        note: Figure 9(b) caption; conditions for the Na-bearing CMS section
+    fO2_control:
+      state:
+        tag: unknown
+        reason: condition fO2_control is not a scalar numeric value
+      locator:
+        page: 10
+        published_page: 617
+        pdf_page_index: 9
+        table: '5'
+        note: Table 5 caption
+    p_Na_Pa:
+      state:
+        tag: value
+        value: '12.665625'
+      locator:
+        page: 7
+        published_page: 614
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4 calibration row, rendered at 600 dpi
+    a_Na2O:
+      state:
+        tag: value
+        value: '0.00000021'
+      locator:
+        page: 7
+        published_page: 614
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4 calibration row, rendered at 600 dpi
+    quench_state:
+      state:
+        tag: unknown
+        reason: condition quench_state is not a scalar numeric value
+      locator:
+        page: 3
+        published_page: 610
+        pdf_page_index: 2
+        note: 'Section 2.2: silica tube directly quenched into cold water; no glass-preservation claim'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2010.11.028
+  locator:
+    page: 10
+    published_page: 617
+    pdf_page_index: 9
+    table: '5'
+    note: Table 5 caption

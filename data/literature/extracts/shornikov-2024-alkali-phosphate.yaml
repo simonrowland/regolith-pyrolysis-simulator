@@ -133,7 +133,7 @@ species:
         figure: '2'
       values:
         quantity: partial pressure upper bound
-        method_class: quoted_attributed
+        method_class: model_derived
         temperature_K: 1300
         composition: KPO3 melt (2K2O · P4O10), as printed
         species: PO2 and O2
@@ -143,6 +143,29 @@ species:
           in the present study do not exceed 10−6 atm (Fig. 2).
         reference_phase: >-
           A gas partial pressure. Not an oxide activity standard.
+      derivation:
+        relation: >-
+          The authors calculate this upper bound with the semi-empirical model
+          described in Shornikov (2019), using the cited thermochemical reference data.
+        method:
+          state: {tag: value, value: semi-empirical model}
+          locator:
+            page: 3
+            published_page: 71
+            pdf_page_index: 2
+            section: Theoretical calculations of thermodynamic properties of the K2O–P4O10 melts
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 71
+            pdf_page_index: 2
+            section: Theoretical calculations of thermodynamic properties of the K2O–P4O10 melts
+            note: Gibbs-energy inputs are described but not printed per calculated point.
+        references:
+          - Glushko et al. (1978–1982)
+          - Alikhanyan et al. (1975)
+          - Rudny et al. (1986)
     - observation_id: shornikov_2024_k2o_k_pressure_bound
       type: thermodynamic_example
       units: atm
@@ -154,7 +177,7 @@ species:
         figure: '2'
       values:
         quantity: partial pressure upper bound
-        method_class: quoted_attributed
+        method_class: model_derived
         temperature_K: 1175
         composition: potassium metaphosphate
         species: K
@@ -167,6 +190,29 @@ species:
         reference_phase: >-
           A gas partial pressure. The Steblevsky number is not printed; symbol 4
           was not read.
+      derivation:
+        relation: >-
+          The authors calculate this upper bound with the semi-empirical model
+          described in Shornikov (2019), using the cited thermochemical reference data.
+        method:
+          state: {tag: value, value: semi-empirical model}
+          locator:
+            page: 3
+            published_page: 71
+            pdf_page_index: 2
+            section: Theoretical calculations of thermodynamic properties of the K2O–P4O10 melts
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 71
+            pdf_page_index: 2
+            section: Theoretical calculations of thermodynamic properties of the K2O–P4O10 melts
+            note: Gibbs-energy inputs are described but not printed per calculated point.
+        references:
+          - Glushko et al. (1978–1982)
+          - Alikhanyan et al. (1975)
+          - Rudny et al. (1986)
     - observation_id: shornikov_2024_k2o_fig3_mixing_and_na
       type: thermodynamic_example
       units: kJ/mol for the mixing panel; dimensionless activity for the Na2O comparison

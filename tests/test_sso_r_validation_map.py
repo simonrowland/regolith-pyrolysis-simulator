@@ -27,7 +27,7 @@ CONFIGURED_GOLDEN_PATH = Path(
 CONFIGLESS_GOLDEN_PATH = Path(
     "tests/goldens/sso_r_validation_map_lunar_mare_low_ti_configless.json"
 )
-# Confirmed inside pytest on Mac-Studio-256-2 at green pins.
+# Confirmed inside pytest on the test host at green pins.
 CONFIGURED_OWNER_PN2_ANCHORS = {
     "native_fe_pool_mol": 1572.6800886957762,
     "native_fe_tap_mol": 1570.5846976173568,

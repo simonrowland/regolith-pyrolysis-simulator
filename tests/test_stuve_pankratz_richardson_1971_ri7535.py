@@ -59,7 +59,9 @@ def test_nafeo2_table8_value_and_conditions_survive_isolated_migration(
     # 1 cal = 4.1840 J; the source value remains pinned above as -60.1.
     assert observation.value.point == Decimal("-251.4584")
     assert observation.identity.temperature_K.value == Decimal("1000")
-    assert observation.point_conditions["temperature_K"].state.value == Decimal("1000")
+    condition_temperature = observation.point_conditions["temperature_K"].state.value
+    assert condition_temperature.kind is ValueKind.POINT
+    assert condition_temperature.point == Decimal("1000")
     assert observation.point_conditions["temperature_K"].locator.page == 18
     assert observation.point_conditions["temperature_K"].locator.table == "8"
     assert observation.locator.page == 18

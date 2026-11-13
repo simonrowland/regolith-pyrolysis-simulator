@@ -364,7 +364,8 @@ def test_yakovlev_shornikov_2011_about_sio_and_o2_values_keep_provenance():
     assert sio_row.value.point == convert_pressure_to_pa(Decimal("1e-06"), "bar")[0]
     assert sio_row.value.approximate
     assert sio_row.identity.temperature_K.is_unknown
-    _validate_rows(result, observations)
+    all_source_observations = list(result.observations.values())
+    _validate_rows(result, all_source_observations)
     assert all(row.evidence.class_.value is EvidenceClass.MODEL_DERIVED for row in o2_rows)
     for row in o2_rows:
         condition = row.point_conditions["temperature_K"]
@@ -373,6 +374,36 @@ def test_yakovlev_shornikov_2011_about_sio_and_o2_values_keep_provenance():
         assert condition.locator is not None
         assert condition.locator.table == "O2"
         assert row.point_conditions["composition"].state.is_unknown
+
+    figure_rows = [
+        row for row in all_source_observations if "kems_029_fig" in row.observation_id
+    ]
+    for row in figure_rows:
+        assert row.identity.temperature_K.is_value
+        temperature = row.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == row.identity.temperature_K.value
+        assert temperature.locator is not None
+        figure = "1" if "kems_029_fig1_" in row.observation_id else "2"
+        assert temperature.locator.figure == figure
+        reservoir_condition = row.point_conditions["composition"]
+        assert reservoir_condition.state.is_unknown
+        assert reservoir_condition.locator is not None
+        assert reservoir_condition.locator.figure == figure
+
+    for row_fragment in (
+        "kems_029_fig1_SiO_psat_digitized::T=1679.63",
+        "kems_029_fig2_SiO_psat_digitized::T=1854.12",
+        "kems_029_fig1_Al_psat_digitized::T=2089.56",
+    ):
+        row = next(
+            observation
+            for observation in figure_rows
+            if row_fragment in observation.observation_id
+        )
+        assert row.identity.composition.is_unknown
+        assert row.identity.composition.reason
+
     first = next(row for row in o2_rows if "T=2293.15" in row.observation_id)
     last = next(row for row in o2_rows if "T=2621.15" in row.observation_id)
     assert first.value.point == convert_pressure_to_pa(Decimal("1.9e-09"), "bar")[0]

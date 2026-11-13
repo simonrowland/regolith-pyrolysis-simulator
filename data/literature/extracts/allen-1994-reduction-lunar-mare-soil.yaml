@@ -1,0 +1,324 @@
+schema_version: literature_extract.v1
+source_id: allen-1994-reduction-lunar-mare-soil
+source:
+  citation: 'Allen, C. C., Morris, R. V., and McKay, D. S. (1994), “Reduction of Lunar Mare Soil and Pyroclastic Glass,” Lunar and Planetary Science Conference XXV, pp. 23–24.'
+  year: 1994
+  corpus_asset: raw/allen-1994-reduction-lunar-mare-soil/allen-1994-reduction-lunar-mare-soil.pdf
+  corpus_sha256: 2d49c7a0dd8a24b8f8823e32883a6988242b3bb4f86e135e37769dcc3e5b7bdb
+extraction:
+  method: 'Manual transcription checked digit by digit against both rendered PDF pages at 220 dpi. The paper contains no data tables; numerical results appear as aggregate prose ranges. Figures 1–4 are retained as figure-only context and were not digitized.'
+  date: '2026-10-05'
+  worker: x-allen-1994-reduction-lunar-mare-soil
+review_status: draft
+benches:
+- id: vertical-tube-furnace-weight-monitoring
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Vertical tube furnace with continuous weight-change monitoring}
+    locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical}
+  heating_method:
+    state: {tag: value, value: Vertical tube furnace; samples placed into the hot furnace}
+    locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical}
+  cell_material_and_liner:
+    state: {tag: not_applicable, reason: not_applicable}
+    locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: A tube furnace thermogravimetric setup is described; there is no effusion cell or liner.}
+  geometry:
+    orifice_diameter_m:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: No effusion orifice is used in the described tube furnace method.}
+    orifice_channel_length_m:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: No effusion orifice is used in the described tube furnace method.}
+  other_facts:
+  - name: intensity_to_pressure_calibration
+    unit: not_applicable
+    value:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: No mass spectrometry or vapour-pressure measurements are described.}
+  - name: ionization_cross_sections_and_source
+    unit: not_applicable
+    value:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: No mass spectrometry is described.}
+  - name: ionization_energy_eV
+    unit: eV
+    value:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: No mass spectrometry is described.}
+  - name: multiplier_and_isotope_corrections
+    unit: not_applicable
+    value:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: No mass spectrometry is described.}
+  temperature_measurement:
+    furnace_temperature:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Temperature sensor and measurement method are not stated.}
+  temperature_calibration:
+    calibration:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Temperature calibration and uncertainty are not stated.}
+experiments:
+- experiment_id: mare-soil-75061-hydrogen-reduction
+  bench_id: vertical-tube-furnace-weight-monitoring
+  method: tga
+  locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Authors describe a vertical tube furnace and continually monitored weight change; this method token represents the stated thermogravimetric measurement.}
+  sample:
+    form:
+      state: {tag: value, value: Lunar mare soil sample 75061; high-Ti mare soil; used as received}
+      locator: {page: 23, pdf_page_index: 0, section: Lunar Samples and Experimental/Analytical, note: 'Printed as "Sample 75061 is a high-Ti mare soil" and "Lunar mare soil 75061"; this source prints Apollo 17 provenance only for 74220, so none is recorded for 75061.'}
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0002', interval_high: '0.0003'}}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Printed sample mass 200–300 mg; converted to kg.}
+    printed_composition:
+      state: {tag: value, value: 'Sample 75061 is a high-Ti mare soil which contains pyroxene, plagioclase, ilmenite, minor olivine, agglutinates, and a trace of glass (1).'}
+      locator: {page: 23, pdf_page_index: 0, section: Lunar Samples, note: 'Verbatim; the description cites (1) Heiken and McKay, 1974, PLSC5, 843 (p. 24 References).'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: interval, interval_low: '1173.15', interval_high: '1323.15'}}
+      locator: {page: 23, pdf_page_index: 0, section: Results - Mare Soil, note: Three experiments at 900–1050 °C; converted to K.}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Chamber/background pressure not reported.}
+    sweep_gas:
+      state: {tag: value, value: {species: H2, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Flowing hydrogen; gas flow and pressure are not reported.}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '10800'}}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Reduced for three hours; converted to seconds.}
+    method:
+      state: {tag: value, value: Samples placed in the hot furnace and reduced in flowing hydrogen for three hours}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'iron-wüstite buffer; oxygen fugacity was held below this reference, not at the buffer boundary'}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical}
+- experiment_id: pyroclastic-glass-74220-hydrogen-reduction
+  bench_id: vertical-tube-furnace-weight-monitoring
+  method: tga
+  locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Same described apparatus and procedure; glass results reported on p. 24.}
+  sample:
+    form:
+      state: {tag: value, value: Apollo 17 orange soil sample 74220; pyroclastic glass; used as received}
+      locator: {page: 23, pdf_page_index: 0, section: Lunar Samples and Experimental/Analytical}
+    mass_kg:
+      state: {tag: value, value: {kind: interval, interval_low: '0.0002', interval_high: '0.0003'}}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Printed sample mass 200–300 mg; converted to kg.}
+    printed_composition:
+      state: {tag: value, value: 'Sample 74220 is the Apollo 17 "orange soil," an essentially pure pyroclastic glass deposit (1). Orange spheres, which comprise the bulk of this sample, are completely glassy. Black spheres are the same glass partly recrystallized to olivine, ilmenite, and spinel.'}
+      locator: {page: 23, pdf_page_index: 0, section: Lunar Samples, note: 'Verbatim; the description cites (1) Heiken and McKay, 1974, PLSC5, 843 (p. 24 References).'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: {kind: interval, interval_low: '1173.15', interval_high: '1373.15'}}
+      locator: {page: 24, pdf_page_index: 1, section: Results - Pyroclastic Glass, note: Four experiments at 900–1100 °C; converted to K.}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Chamber/background pressure not reported.}
+    sweep_gas:
+      state: {tag: value, value: {species: H2, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Flowing hydrogen; gas flow and pressure are not reported.}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '10800'}}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical, note: Reduced for three hours; converted to seconds.}
+    method:
+      state: {tag: value, value: Samples placed in the hot furnace and reduced in flowing hydrogen for three hours}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'iron-wüstite buffer; oxygen fugacity was held below this reference, not at the buffer boundary'}
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical}
+species:
+  FeO:
+    observations: []
+    context:
+    - observation_id: allen_1994_mare_soil_weight_loss_range
+      type: aggregate_measurement_context
+      locator: {page: 23, pdf_page_index: 0, section: Results - Mare Soil}
+      phase: lunar mare soil 75061
+      experiment: mare-soil-75061-hydrogen-reduction
+      units: wt% of starting sample as printed
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        method_as_printed: Continuous sample weight monitoring during hydrogen reduction
+        experiment_count: 3
+        temperature_C_range: [900, 1050]
+        bulk_mass_loss_wt_pct_range: [2.6, 3.0]
+        mass_loss_direction_as_printed: increased slightly with increasing temperature
+        time_course_as_printed: Sample weights decreased rapidly for the first 20 minutes and then fell more slowly, remaining essentially constant after the first hour.
+    - observation_id: allen_1994_mare_soil_alpha_iron_reduction_range
+      type: aggregate_measurement_context
+      locator: {page: 23, pdf_page_index: 0, section: Results - Mare Soil}
+      phase: lunar mare soil 75061
+      experiment: mare-soil-75061-hydrogen-reduction
+      units: "% of initial Fe2+; oxygen equivalent in wt% of starting sample"
+      values:
+        quantity: yield_fraction
+        method_class: measured_reduced
+        experiment_count: 3
+        Fe2plus_reduced_to_alpha_iron_pct_range: [47, 54]
+        equivalent_starting_sample_oxygen_loss_wt_pct_range: [1.9, 2.2]
+        derivation_relation_as_printed: 'The VSM data indicated that 47-54% of the Fe2+ in the starting sample was reduced to alpha iron metal. This was equivalent to the loss of 1.9-2.2% of the starting sample weight as oxygen.'
+        derivation_inputs_as_printed: VSM alpha-iron abundance relative to the starting-sample Fe2+ (starting Fe2+ content not printed)
+        basis: VSM data; oxygen loss reported as equivalent to the measured alpha-iron abundance
+        derivation_status: Authors' reported equivalence; no numerical derivation or underlying individual-run values printed.
+    - observation_id: allen_1994_pyroclastic_glass_bulk_mass_loss_range
+      type: aggregate_measurement_context
+      locator: {page: 24, pdf_page_index: 1, section: Results - Pyroclastic Glass}
+      phase: Apollo 17 pyroclastic glass 74220
+      experiment: pyroclastic-glass-74220-hydrogen-reduction
+      units: wt% of starting sample as printed
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        method_as_printed: Continuous sample weight monitoring during hydrogen reduction
+        experiment_count: 4
+        temperature_C_range: [900, 1100]
+        bulk_mass_loss_wt_pct_range: [2.2, 5.4]
+        mass_loss_direction_as_printed: increased steadily with temperature
+        time_course_as_printed: Weight loss was rapid for the first 10–20 minutes, and then became more gradual.
+    - observation_id: allen_1994_pyroclastic_glass_alpha_iron_reduction_range
+      type: aggregate_measurement_context
+      locator: {page: 24, pdf_page_index: 1, section: Results - Pyroclastic Glass}
+      phase: Apollo 17 pyroclastic glass 74220
+      experiment: pyroclastic-glass-74220-hydrogen-reduction
+      units: "% of initial Fe2+; oxygen equivalent in wt% of starting sample"
+      values:
+        quantity: yield_fraction
+        method_class: measured_reduced
+        experiment_count: 4
+        Fe2plus_reduced_to_alpha_iron_pct_range: [32, 68]
+        equivalent_starting_sample_oxygen_loss_wt_pct_range: [1.7, 3.3]
+        derivation_relation_as_printed: 'The VSM data indicated that 32-68% of the Fe2+ in the starting sample was reduced to alpha iron, with the percentage increasing with temperature. This was equivalent to the loss of 1.7-3.3% of the starting sample weight as oxygen.'
+        derivation_inputs_as_printed: VSM alpha-iron abundance relative to the starting-sample Fe2+ (starting Fe2+ content not printed)
+        reduction_direction_as_printed: percentage increased with temperature
+        basis: VSM data; oxygen loss reported as equivalent to the measured alpha-iron abundance
+        derivation_status: Authors' reported equivalence; no numerical derivation or underlying individual-run values printed.
+    - observation_id: allen_1994_method_and_characterization_context
+      type: experimental_method
+      locator: {page: 23, pdf_page_index: 0, section: Experimental/Analytical}
+      phase: lunar mare soil and pyroclastic glass samples
+      units: as printed
+      values:
+        quantity: sample_preparation_and_analytical_methods
+        method_class: measured_direct
+        characterization: Bulk samples and thin sections examined by SEM and EDS; minerals identified by XRD; iron Mössbauer spectroscopy indicated oxidation states and relative iron abundances in glass and mineral phases; VSM determined alpha-iron abundances.
+        initial_materials: Samples 75061 and 74220 were lunar samples; no chemical analysis, purity, or preparation beyond “as received” is reported.
+        method_lineage_as_printed: 'The samples were reduced in a vertical tube furnace, with weight change continually monitored, as in previous tests with lunar simulants (2).'
+        method_lineage_attribution: '(2) Allen et al., 1993, Icarus, 104, 291'
+        sample_composition_after_run: {tag: unknown, reason: not_published}
+        activity_ions_and_reference_states: {tag: not_applicable, reason: not_applicable}
+        uncertainty: {tag: unknown, reason: not_published}
+    - observation_id: allen_1994_mare_soil_figure_1
+      type: figure_context
+      locator: {page: 24, pdf_page_index: 1, figure: '1', note: 'FeMS spectrum of mare soil 75061 reduced at 1050 °C.'}
+      phase: lunar mare soil 75061
+      units: figure only; not digitized
+      values: {quantity: iron_mossbauer_spectrum, method_class: figure_only, digitized: false}
+    - observation_id: allen_1994_mare_soil_figure_2
+      type: figure_context
+      locator: {page: 24, pdf_page_index: 1, figure: '2', note: Ilmenite from mare soil 75061 reduced at 1050 °C.}
+      phase: lunar mare soil 75061
+      units: image only; not digitized
+      values: {quantity: ilmenite_micrograph, method_class: figure_only, digitized: false}
+    - observation_id: allen_1994_pyroclastic_glass_figure_3
+      type: figure_context
+      locator: {page: 24, pdf_page_index: 1, figure: '3', note: 'FeMS spectrum of pyroclastic glass 74220 reduced at 1100 °C.'}
+      phase: Apollo 17 pyroclastic glass 74220
+      units: figure only; not digitized
+      values: {quantity: iron_mossbauer_spectrum, method_class: figure_only, digitized: false}
+    - observation_id: allen_1994_pyroclastic_glass_figure_4
+      type: figure_context
+      locator: {page: 24, pdf_page_index: 1, figure: '4', note: Pyroclastic glass 74220 reduced at 1100 °C.}
+      phase: Apollo 17 pyroclastic glass 74220
+      units: image only; not digitized
+      values: {quantity: pyroclastic_glass_micrograph, method_class: figure_only, digitized: false}
+    - observation_id: allen_1994_abstract_result_summary
+      type: result_qualification
+      locator: {page: 23, pdf_page_index: 0, section: Abstract}
+      phase: lunar mare soil and pyroclastic glasses
+      units: as printed
+      values:
+        quantity: abstract_result_summary
+        method_class: figure_only
+        verbatim_statements:
+        - 'Mare soil and orange and black pyroclastic glass were reduced in hydrogen gas at temperatures of 900-1100°C.'
+        - 'The experiments support studies of regolith maturation, lunar volcanism, and the production of oxygen on the Moon.'
+        - 'The most reactive component in the high-Ti soil was FeO in ilmenite, which was completely reduced to iron metal at all temperatures.'
+        - 'Vitreous orange glass crystallized and was partially reduced to iron metal, pyroxene, and minor olivine.'
+        - 'Initially devitrified black glass was similarly reduced and converted to iron metal, pyroxene, and minor olivine.'
+        - 'The degree of reaction in both glasses increased with temperature.'
+    - observation_id: allen_1994_cited_comparisons_and_references
+      type: attributed_context
+      locator: {page: 23, pdf_page_index: 0, section: Results - Mare Soil and References}
+      phase: lunar reduction experiments
+      units: bibliographic context
+      values:
+        quantity: source_cited_comparisons
+        method_class: quoted_attributed
+        quoted_from: 'Gibson et al., 1994, submitted JGR (reference (3))'
+        comparison: 'The authors state their results are in close agreement with previous reduction experiments utilizing crushed lunar basalt (3).'
+        cited_references_as_printed:
+        - '(1) Heiken and McKay, 1974, PLSC5, 843'
+        - '(2) Allen et al., 1993, Icarus, 104, 291'
+        - '(3) Gibson et al., 1994, submitted JGR'
+        - '(4) Hawke et al., 1990, PLPSC20, 249'
+  Fe:
+    observations: []
+    context:
+    - observation_id: allen_1994_mare_soil_qualifying_statements
+      type: result_qualification
+      locator: {page: 23, pdf_page_index: 0, section: Results - Mare Soil}
+      phase: lunar mare soil 75061
+      units: as printed
+      values:
+        quantity: results_qualifiers_and_directions
+        method_class: figure_only
+        verbatim_statements:
+        - 'Most of the weight loss was due to reduction of ferrous oxide to iron metal, with concomitant release of oxygen.'
+        - 'This sample contained FeO in several phases, including pyroxene, ilmenite, olivine, and agglutinitic and pyroclastic glass.'
+        - 'The XRD and FeMS spectra (Fig. 1) show that a portion of the remaining Fe2+ was reduced to gamma iron in experiments above the transition temperature of 911°C.'
+        - 'The most reactive phase in this Ti-rich soil was ilmenite.'
+        - 'In our experiments the Fe2+ in ilmenite was completely reduced.'
+        - 'No ilmenite remained in these samples, to the detection limit of FeMS and XRD.'
+        - 'All ilmenite grains examined by SEM showed characteristic phase separation and reduction textures (Fig. 2).'
+        - 'Other FeO-bearing phases showed much less evidence of reduction.'
+        - 'Olivine grains exhibited small-scale reduction textures in SEM images.'
+        - 'Olivine peaks in the FeMS spectra became smaller with increasing temperature.'
+        - 'Agglutinitic glass underwent partial reduction, with increasing concentrations of iron metal particles as reduction temperature increased from 900 to 1050°C.'
+        - 'Minor reduction of pyroxene was documented in the 1050°C experiment by SEM and FeMS.'
+        - 'These results are in close agreement with data from previous reduction experiments utilizing crushed lunar basalt (3).'
+        - 'They also provide an extreme "end member" for studies of reduction as a cause of lunar soil maturation.'
+    - observation_id: allen_1994_pyroclastic_glass_qualifying_statements
+      type: result_qualification
+      locator: {page: 24, pdf_page_index: 1, section: Results - Pyroclastic Glass}
+      phase: Apollo 17 pyroclastic glass 74220
+      units: as printed
+      values:
+        quantity: results_qualifiers_and_directions
+        method_class: figure_only
+        verbatim_statements:
+        - 'The XRD and FeMS spectra of all reduced glass samples were dominated by the peaks of iron metal (Fig. 3).'
+        - 'The metal occurred as micrometer-scale blebs scattered throughout each glass particle (Fig. 4).'
+        - 'A significant portion of the remaining Fe2+ formed gamma iron.'
+        - 'Orange glass underwent devitrification in all of the experiments.'
+        - 'Pyroxene crystals grew steadily with temperature, from less that 1 µm across in the 900°C sample to well over 10 µm at 1100°C.'
+        - 'At this temperature the orange glass was totally devitrified to pyroxene and iron metal, plus minor olivine and titanium oxide (Fig. 4).'
+        - 'Black glass spheres also underwent striking changes.'
+        - 'At higher temperatures ever greater amounts of FeO in the glass and crystals were reduced to metal.'
+        - 'Ilmenite was reduced to iron plus titanium oxide and olivine to iron plus pyroxene.'
+        - 'In the 1100°C sample, spheres which were initially crystalline were almost indistinguishable from those which were initially vitreous.'
+        - 'Reduction and devitrification experiments on orange and black glass provide constraints on conditions during lunar pyroclastic eruptions.'
+        - 'They also support the contention that pyroclastic glass would be an ideal feedstock for lunar oxygen production (4).'

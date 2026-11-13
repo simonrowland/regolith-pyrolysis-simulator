@@ -174,7 +174,7 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
         oid for oid in ratios if any(tag in oid for tag in ("row=aii_-35", "row=lw_-30", "row=aii_-25"))
     }
     rhyolite_parents = {
-        f"{prefix}cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725",
+        f"{prefix}cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=29ea154dd367",
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:0",
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:1",
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:2",
@@ -193,7 +193,7 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
     }
     assert printed_rhyolite_fractions == {
         f"{prefix}cottrell_2009_rhyolite_mossbauer::"
-        "T=1823.15:row=568_2:h=59a4f4d57725": Decimal("0.238"),
+        "T=1823.15:row=568_2:h=29ea154dd367": Decimal("0.238"),
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:0": Decimal("0.569"),
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:1": Decimal("0.315"),
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:2": Decimal("0.596"),

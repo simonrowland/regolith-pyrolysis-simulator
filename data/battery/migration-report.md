@@ -1,26 +1,25 @@
 # Battery v2.1 migration report
 
-rows in: 91208
-records out (observations): 186648
-works: 785
-experiments: 7001
-queue size: 124428
+rows in: 93335
+records out (observations): 191609
+works: 852
+experiments: 8040
+queue size: 125197
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 783
-hard issues: 1685
+index sources: 850
+hard issues: 547
 
 ## Unavailable input work census
 
-unavailable derived values without derivation: 967
+unavailable derived values without derivation: 886
 
 Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | kind | count |
 |---|---:|
-| `unavailable_missing_input:declared quantity is unknown; refusing to pick a number` | 330 |
+| `unavailable_missing_input:declared quantity is unknown; refusing to pick a number` | 309 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'apparent_knudsen_pressure_assumed_mw'; refusing to pick a number` | 117 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, subsample, run, temperature_range_K, A, B, p_Na_at_1273_K_Pa, a_Na2O_at_1273_K` | 61 |
 | `unavailable_missing_input:empty values` | 40 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'tabulated_equilibrium_condensation_model'; refusing to pick a number` | 27 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to pick a number` | 24 |
@@ -45,8 +44,6 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'clausius_clapeyron_averaged_log10_P_kPa'; refusing to pick a number` | 4 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing to pick a number` | 4 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed'; refusing to pick a number` | 4 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, selected_subsamples, temperature_range_K, A, B, p_K_at_1273_K_Pa, a_K2O_at_1273_K` | 4 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, selected_subsamples, temperature_range_K, A, B, p_Na_at_1273_K_Pa, a_Na2O_at_1273_K` | 4 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'published_second_law_fit'; refusing to pick a number` | 3 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'reduced_partition_function_ratio_prefactor'; refusing to pick a number` | 3 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'thermodynamic_functions'; refusing to pick a number` | 3 |
@@ -60,6 +57,8 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'oxide_in_model'; refusing to pick a number` | 2 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'partial_molar_enthalpy_of_mixing'; refusing to pick a number` | 2 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'pure_vapor_pressure_fit'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'scss_model_coefficients'; refusing to pick a number` | 2 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'sublimation_enthalpy'; refusing to pick a number` | 2 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'third_law_reaction_enthalpy_298K'; refusing to pick a number` | 2 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'water_vapor_solubility_deltaG'; refusing to pick a number` | 2 |
 | `unavailable_missing_input:figure_not_digitized` | 2 |
@@ -93,9 +92,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [973, 1078] is a temperature domain, not the observable` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [974, 1071] is a temperature domain, not the observable` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; source does not state a closed quantity; refusing to pick a number` | 1 |
-| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Boudouard_equilibrium_constant_fit'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Brownian_motion_validation_setup'; refusing to pick a number` | 1 |
-| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'CO2_density_and_relative_abundance'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Ca_perchlorate_decomposition_peak_temperature_shift'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'Delta53Cr_mineral_melt'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'K2O_liquid_dissociation_Kp'; refusing to pick a number` | 1 |
@@ -170,15 +167,14 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'standard_enthalpy_of_reaction_at_298_15_K'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'standard_gibbs_energy_change'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'starting_magma_composition_and_model_scope'; refusing to pick a number` | 1 |
-| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'sublimation_enthalpy'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'surface_energy'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'ternary_peritectic_temperature_and_phase_compositions'; refusing to pick a number` | 1 |
-| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'thermal_and_pressure_program'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'three_layer_inverse_model_parameter'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'total_flux_relative_drop'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'total_mass_loss_apparent_initial_flux'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'validation_case_parameters_and_runtime'; refusing to pick a number` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'vapor_to_saturation_pressure_ratio'; refusing to pick a number` | 1 |
+| `unavailable_missing_input:no mapped activity field selected; source fields: quantity, label, method_as_published, method_class, method_locator, references_as_published, reason, admission_status, value_cells_printed` | 1 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status, caption, axes_as_printed, temperature_as_printed, source_data_attribution_as_printed, note` | 1 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, generator, evidence_class, composition, ln_gamma_NaO05, ln_gamma_KO05, gamma_KO05_over_gamma_NaO05, model_comparison` | 1 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, generator, evidence_class, illite, SRM_621, model_comparison` | 1 |
@@ -192,26 +188,34 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:no mapped p_sat field selected; source fields: method_class, generator, quantity, pressure_expression, concentration_expression, P_boil_Pa, T_boil_K, DeltaH_options_J_per_mol, DeltaH_used_J_per_mol, reference_pressure_as_printed, DeltaH_from_reference_point_J_per_mol, reference_point_semantics, R_gas_J_per_mol_K` | 1 |
 | `unavailable_missing_input:no mapped transition_temperature field selected; source fields: method_class, generator, quantity, coalescence_lower_limit_K, upper_limit_semantics, semantics` | 1 |
 | `unavailable_missing_input:no mapped transition_temperature field selected; source fields: method_class, generator, quantity, melting_temperature_as_printed, semantics, disagreement` | 1 |
+| `unavailable_missing_input:printed field p_K_at_1273_K_Pa is not numeric: '(1.40±0.24)·10-3'` | 1 |
+| `unavailable_missing_input:printed field p_K_at_1273_K_Pa is not numeric: '(2.57±0.88)·10-3'` | 1 |
+| `unavailable_missing_input:printed field p_K_at_1273_K_Pa is not numeric: '(2.6±1.1)·10-2'` | 1 |
+| `unavailable_missing_input:printed field p_K_at_1273_K_Pa is not numeric: '(7.5±4.8)·10-5'` | 1 |
+| `unavailable_missing_input:printed field p_Na_at_1273_K_Pa is not numeric: '(1.83±0.65)·10-1'` | 1 |
+| `unavailable_missing_input:printed field p_Na_at_1273_K_Pa is not numeric: '(5.42±0.42)·10-3'` | 1 |
+| `unavailable_missing_input:printed field p_Na_at_1273_K_Pa is not numeric: '(5.45±0.61)·10-2'` | 1 |
+| `unavailable_missing_input:printed field p_Na_at_1273_K_Pa is not numeric: '(5.71±0.81)·10-4'` | 1 |
 
 ## Spec vs measured
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 782 (mismatch) |
-| doi_works | 56 | 424 (mismatch) |
-| no_doi_works | 91 | 361 (mismatch) |
-| admission_statuses | 374 | 31443 (mismatch) |
-| supersedes | 422 | 636 (mismatch) |
-| series | 60 | 1719 (mismatch) |
+| citations | 147 | 849 (mismatch) |
+| doi_works | 56 | 455 (mismatch) |
+| no_doi_works | 91 | 397 (mismatch) |
+| admission_statuses | 374 | 32634 (mismatch) |
+| supersedes | 422 | 654 (mismatch) |
+| series | 60 | 1718 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1921 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 639 (mismatch) |
-| formulas | 1625 | 22268 (mismatch) |
+| formulas | 1625 | 23102 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 16639 (mismatch) |
-| absent_classes | 2174 | 2129 (mismatch) |
-| range_only_T | 3125 | 3013 (mismatch) |
-| system_like_phases | 1065 | 3811 (mismatch) |
+| absent_admissions | 3511 | 17547 (mismatch) |
+| absent_classes | 2174 | 2097 (mismatch) |
+| range_only_T | 3125 | 3048 (mismatch) |
+| system_like_phases | 1065 | 2875 (mismatch) |
 | missing_phases | 237 | 1356 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -219,8 +223,9 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | source method_class | count |
 |---|---:|
-| `absent` | 466 |
+| `absent` | 434 |
 | `method_only` | 34 |
+| `typed_refusal` | 14 |
 | `third_law_kems` | 10 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `authors_reduced_from_ion_intensities` | 6 |
@@ -246,7 +251,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 ## Unrecognised polymorph tokens
 
-degradations: 180
+degradations: 270
 
 Unrecognised printed spellings become State.unknown with the original spelling in the reason; they are never dropped and never invented. Each degradation is queued on species.polymorph.
 
@@ -254,10 +259,16 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 |---|---:|
 | `SOL-B` | 69 |
 | `Cristobalite` | 33 |
+| `CaAl12O19` | 25 |
 | `2MgO·SiO2` | 21 |
+| `SiO2` | 20 |
 | `TiO2` | 18 |
+| `Al2O3` | 15 |
+| `CaO` | 15 |
 | `MgO·2TiO2` | 15 |
 | `MgO·SiO2` | 15 |
+| `MgAl2O4` | 10 |
+| `MgAl 2O4` | 5 |
 | `hexagonal` | 4 |
 | `nepheline` | 3 |
 | `enstatite` | 2 |
@@ -10692,9 +10703,9 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0048.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0049.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0050.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0051.json` | 1 | 3 | 5 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0051.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0052.json` | 1 | 5 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0053.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0053.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0054.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0055.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0056.json` | 1 | 4 | 2 |
@@ -10766,13 +10777,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0122.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0123.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0124.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0125.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0125.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0126.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0127.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0128.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0129.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0130.json` | 1 | 5 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0131.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0131.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0132.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0133.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0134.json` | 1 | 4 | 2 |
@@ -10786,13 +10797,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0142.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0143.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0144.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0145.json` | 1 | 5 | 7 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0145.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0146.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0147.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0148.json` | 1 | 3 | 5 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0149.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0150.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0151.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0151.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0152.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0153.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0154.json` | 1 | 4 | 2 |
@@ -10887,7 +10898,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0243.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0244.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0245.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0246.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0246.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0247.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0248.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0249.json` | 1 | 5 | 2 |
@@ -10905,7 +10916,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0261.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0262.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0263.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0264.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0264.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0265.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0266.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0267.json` | 1 | 5 | 2 |
@@ -10947,7 +10958,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0303.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0304.json` | 1 | 3 | 5 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0305.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0306.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0306.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0307.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0308.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0309.json` | 1 | 4 | 2 |
@@ -11089,7 +11100,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0445.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0446.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0447.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0448.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0448.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0449.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0450.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0451.json` | 1 | 4 | 2 |
@@ -11104,25 +11115,25 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0460.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0461.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0462.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0463.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0463.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0464.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0465.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0466.json` | 1 | 4 | 6 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0467.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0466.json` | 1 | 4 | 2 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0467.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0468.json` | 1 | 4 | 6 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0469.json` | 1 | 4 | 6 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0470.json` | 1 | 4 | 6 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0471.json` | 1 | 3 | 5 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0472.json` | 1 | 3 | 5 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0473.json` | 1 | 5 | 7 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0473.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0474.json` | 1 | 5 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0475.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0475.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0476.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0477.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0478.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0479.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0480.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0481.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0481.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0482.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0483.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0484.json` | 1 | 4 | 2 |
@@ -11138,12 +11149,12 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0494.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0495.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0496.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0497.json` | 1 | 4 | 6 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0498.json` | 1 | 4 | 6 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0499.json` | 1 | 4 | 6 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0500.json` | 1 | 4 | 6 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0501.json` | 1 | 4 | 6 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0502.json` | 1 | 3 | 5 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0497.json` | 1 | 4 | 2 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0498.json` | 1 | 4 | 2 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0499.json` | 1 | 4 | 2 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0500.json` | 1 | 4 | 2 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0501.json` | 1 | 4 | 2 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0502.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0503.json` | 1 | 3 | 5 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0504.json` | 1 | 3 | 5 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0505.json` | 1 | 3 | 5 |
@@ -11366,7 +11377,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0722.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0723.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0724.json` | 1 | 3 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0725.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0725.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0726.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0727.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0728.json` | 1 | 3 | 5 |
@@ -11398,7 +11409,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0754.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0755.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0756.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0757.json` | 1 | 3 | 5 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0757.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0758.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0759.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0760.json` | 1 | 4 | 2 |
@@ -11411,7 +11422,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0767.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0768.json` | 1 | 3 | 5 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0769.json` | 1 | 3 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0770.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0770.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0771.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0772.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0773.json` | 1 | 4 | 2 |
@@ -11474,11 +11485,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0830.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0831.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0832.json` | 1 | 3 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0833.json` | 1 | 5 | 7 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0833.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0834.json` | 1 | 3 | 5 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0835.json` | 1 | 1 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0836.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0837.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0837.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0838.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0839.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-0840.json` | 1 | 3 | 2 |
@@ -11645,7 +11656,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1001.json` | 1 | 4 | 6 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1002.json` | 1 | 4 | 6 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1003.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1004.json` | 1 | 5 | 7 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1004.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1005.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1006.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1007.json` | 1 | 4 | 2 |
@@ -11728,7 +11739,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1084.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1085.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1086.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1087.json` | 1 | 4 | 6 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1087.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1088.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1089.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1090.json` | 1 | 4 | 2 |
@@ -11783,7 +11794,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1139.json` | 1 | 1 | 3 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1140.json` | 1 | 1 | 3 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1141.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1142.json` | 1 | 3 | 5 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1142.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1143.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1144.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1145.json` | 1 | 4 | 2 |
@@ -11831,7 +11842,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1187.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1188.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1189.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1190.json` | 1 | 5 | 7 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1190.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1191.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1192.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1193.json` | 1 | 4 | 2 |
@@ -11857,7 +11868,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1213.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1214.json` | 1 | 4 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1215.json` | 1 | 4 | 2 |
-| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1216.json` | 1 | 5 | 7 |
+| `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1216.json` | 1 | 5 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1217.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1218.json` | 1 | 3 | 2 |
 | `data/literature/compilations/kelley-king-1961-usbm-b592/records/table-006-1219.json` | 1 | 3 | 2 |
@@ -15728,7 +15739,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/pankratz-1987-usbm-b689/manifest.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0003.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0004.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0005.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0005.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0006.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0007.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0008.json` | 1 | 7 | 2 |
@@ -15738,8 +15749,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0012.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0013.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0014.json` | 1 | 1 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0015.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0016.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0015.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0016.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0017.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0018.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0019.json` | 1 | 7 | 9 |
@@ -15762,23 +15773,23 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0036.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0037.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0038.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0039.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0039.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0040.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0041.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0042.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0043.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0044.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0043.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0044.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0045.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0046.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0047.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0048.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0047.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0048.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0049.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0050.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0051.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0052.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0053.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0054.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0055.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0055.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0056.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0057.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0058.json` | 1 | 7 | 2 |
@@ -15788,73 +15799,73 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0062.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0063.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0064.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0065.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0066.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0065.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0066.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0067.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0068.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0069.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0070.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0069.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0070.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0071.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0072.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0073.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0074.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0073.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0074.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0075.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0076.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0077.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0078.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0079.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0080.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0081.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0082.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0083.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0084.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0085.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0086.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0087.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0088.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0089.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0077.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0078.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0079.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0080.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0081.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0082.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0083.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0084.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0085.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0086.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0087.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0088.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0089.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0090.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0091.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0092.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0093.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0094.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0095.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0096.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0097.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0098.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0099.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0100.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0101.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0091.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0092.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0093.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0094.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0095.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0096.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0097.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0098.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0099.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0100.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0101.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0102.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0103.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0104.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0105.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0106.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0107.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0108.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0107.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0108.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0109.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0110.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0111.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0112.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0113.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0111.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0112.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0113.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0114.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0115.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0116.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0117.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0118.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0119.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0120.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0121.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0122.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0123.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0124.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0117.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0118.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0119.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0120.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0121.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0122.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0123.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0124.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0125.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0126.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0127.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0127.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0128.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0129.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0130.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0131.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0131.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0132.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0133.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0134.json` | 1 | 7 | 2 |
@@ -15882,78 +15893,78 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0156.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0157.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0158.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0159.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0160.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0159.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0160.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0161.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0162.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0163.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0164.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0165.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0166.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0167.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0167.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0168.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0169.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0170.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0171.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0172.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0173.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0174.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0175.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0176.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0171.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0172.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0173.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0174.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0175.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0176.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0177.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0178.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0179.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0179.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0180.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0181.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0182.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0183.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0184.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0185.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0186.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0185.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0186.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0187.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0188.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0189.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0190.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0189.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0190.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0191.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0192.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0193.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0194.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0193.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0194.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0195.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0196.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0197.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0197.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0198.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0199.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0200.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0201.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0202.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0203.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0204.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0205.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0201.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0202.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0203.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0204.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0205.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0206.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0207.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0208.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0209.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0209.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0210.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0211.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0212.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0213.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0214.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0213.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0214.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0215.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0216.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0217.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0218.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0219.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0217.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0218.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0219.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0220.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0221.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0222.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0223.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0223.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0224.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0225.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0225.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0226.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0227.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0228.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0229.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0230.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0227.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0228.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0229.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0230.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0231.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0232.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0233.json` | 1 | 7 | 9 |
@@ -15962,32 +15973,32 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0236.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0237.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0238.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0239.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0239.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0240.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0241.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0242.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0243.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0244.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0245.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0246.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0243.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0244.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0245.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0246.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0247.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0248.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0249.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0250.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0251.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0252.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0253.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0254.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0255.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0256.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0257.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0258.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0259.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0260.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0261.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0262.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0263.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0264.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0249.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0250.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0251.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0252.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0253.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0254.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0255.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0256.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0257.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0258.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0259.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0260.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0261.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0262.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0263.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0264.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0265.json` | 1 | 4 | 7 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0266.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0267.json` | 1 | 7 | 2 |
@@ -16057,7 +16068,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0331.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0332.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0333.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0334.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0334.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0335.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0336.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0337.json` | 1 | 7 | 2 |
@@ -16069,72 +16080,72 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0343.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0344.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0345.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0346.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0346.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0347.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0348.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0349.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0350.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0350.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0351.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0352.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0353.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0354.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0355.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0356.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0356.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0357.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0358.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0359.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0360.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0361.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0362.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0363.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0364.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0365.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0360.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0361.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0362.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0363.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0364.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0365.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0366.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0367.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0368.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0369.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0368.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0369.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0370.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0371.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0372.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0373.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0372.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0373.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0374.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0375.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0376.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0377.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0378.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0379.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0376.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0377.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0378.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0379.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0380.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0381.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0382.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0383.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0382.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0383.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0384.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0385.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0386.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0387.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0386.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0387.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0388.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0389.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0390.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0391.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0392.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0393.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0392.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0393.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0394.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0395.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0396.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0397.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0398.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0399.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0398.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0399.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0400.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0401.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0402.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0403.json` | 1 | 7 | 9 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0404.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0405.json` | 1 | 7 | 2 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0406.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0407.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0408.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0409.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0410.json` | 1 | 7 | 9 |
-| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0411.json` | 1 | 7 | 9 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0406.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0407.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0408.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0409.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0410.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0411.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0412.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0413.json` | 1 | 7 | 2 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/records/page-0414.json` | 1 | 7 | 2 |
@@ -16285,336 +16296,336 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/auxiliary/symbols-constants.json` | 1 | 1 | 4 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/census.json` | 0 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/manifest.yaml` | 0 | 0 | 0 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p067.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p068.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p069.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p070.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p071.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p072.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p073.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p074.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p075.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p076.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p077.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p078.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p079.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p080.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p081.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p082.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p083.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p084.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p085.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p086.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p087.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p088.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p089.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p090.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p091.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p092.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p093.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p094.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p095.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p096.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p097.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p098.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p099.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p100.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p101.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p102.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p103.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p104.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p105.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p106.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p107.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p108.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p109.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p110.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p111.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p112.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p113.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p114.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p115.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p116.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p117.json` | 1 | 1 | 2 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p118.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p119.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p120.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p121.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p122.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p123.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p124.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p125.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p126.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p127.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p128.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p129.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p130.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p131.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p132.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p133.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p134.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p135.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p136.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p137.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p138.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p139.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p140.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p141.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p142.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p143.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p144.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p145.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p146.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p147.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p148.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p149.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p150.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p151.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p152.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p153.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p154.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p155.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p156.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p157.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p158.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p159.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p160.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p161.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p162.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p163.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p164.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p165.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p166.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p167.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p168.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p169.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p170.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p171.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p172.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p173.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p174.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p175.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p176.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p177.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p178.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p179.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p180.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p181.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p182.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p183.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p184.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p185.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p186.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p187.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p188.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p189.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p190.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p191.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p192.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p193.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p194.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p195.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p196.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p197.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p198.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p199.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p200.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p201.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p202.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p203.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p204.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p205.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p206.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p207.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p208.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p209.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p210.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p211.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p212.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p213.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p214.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p215.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p216.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p217.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p218.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p219.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p220.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p221.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p222.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p223.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p224.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p225.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p226.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p227.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p228.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p229.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p230.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p231.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p232.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p233.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p234.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p235.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p236.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p237.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p238.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p239.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p240.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p241.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p242.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p243.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p244.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p245.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p246.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p247.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p248.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p249.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p250.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p251.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p252.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p253.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p254.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p255.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p256.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p257.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p258.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p259.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p260.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p261.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p262.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p263.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p264.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p265.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p266.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p267.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p268.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p269.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p270.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p271.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p272.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p273.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p274.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p275.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p276.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p277.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p278.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p279.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p280.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p281.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p282.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p283.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p284.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p285.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p286.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p287.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p288.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p289.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p290.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p291.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p292.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p293.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p294.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p295.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p296.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p297.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p298.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p299.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p300.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p301.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p302.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p303.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p304.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p305.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p306.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p307.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p308.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p309.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p310.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p311.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p312.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p313.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p314.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p315.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p316.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p317.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p318.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p319.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p320.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p321.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p322.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p323.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p324.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p325.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p326.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p327.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p328.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p329.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p330.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p331.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p332.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p333.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p334.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p335.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p336.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p337.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p338.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p339.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p340.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p341.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p342.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p343.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p344.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p345.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p346.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p347.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p348.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p349.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p350.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p351.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p352.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p353.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p354.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p355.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p356.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p357.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p358.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p359.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p360.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p361.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p362.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p363.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p364.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p365.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p366.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p367.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p368.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p369.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p370.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p371.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p372.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p373.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p374.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p375.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p376.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p377.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p378.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p379.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p380.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p381.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p382.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p383.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p384.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p385.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p386.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p387.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p388.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p389.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p390.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p391.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p392.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p393.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p394.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p395.json` | 1 | 2 | 5 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p396.json` | 1 | 2 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p067.json` | 1 | 9 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p068.json` | 1 | 6 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p069.json` | 1 | 8 | 2 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p070.json` | 1 | 8 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p071.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p072.json` | 1 | 12 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p073.json` | 1 | 11 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p074.json` | 1 | 9 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p075.json` | 1 | 8 | 2 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p076.json` | 1 | 4 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p077.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p078.json` | 1 | 16 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p079.json` | 1 | 7 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p080.json` | 1 | 8 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p081.json` | 1 | 4 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p082.json` | 1 | 8 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p083.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p084.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p085.json` | 1 | 7 | 2 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p086.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p087.json` | 1 | 12 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p088.json` | 1 | 9 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p089.json` | 1 | 7 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p090.json` | 1 | 6 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p091.json` | 1 | 11 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p092.json` | 1 | 13 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p093.json` | 1 | 12 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p094.json` | 1 | 14 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p095.json` | 1 | 14 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p096.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p097.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p098.json` | 1 | 12 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p099.json` | 1 | 9 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p100.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p101.json` | 1 | 11 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p102.json` | 1 | 7 | 2 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p103.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p104.json` | 1 | 14 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p105.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p106.json` | 1 | 9 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p107.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p108.json` | 1 | 8 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p109.json` | 1 | 9 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p110.json` | 1 | 12 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p111.json` | 1 | 8 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p112.json` | 1 | 8 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p113.json` | 1 | 8 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p114.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p115.json` | 1 | 4 | 1 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p116.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p117.json` | 1 | 12 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p118.json` | 1 | 9 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p119.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p120.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p121.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p122.json` | 1 | 15 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p123.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p124.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p125.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p126.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p127.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p128.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p129.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p130.json` | 1 | 20 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p131.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p132.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p133.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p134.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p135.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p136.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p137.json` | 1 | 15 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p138.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p139.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p140.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p141.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p142.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p143.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p144.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p145.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p146.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p147.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p148.json` | 1 | 15 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p149.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p150.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p151.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p152.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p153.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p154.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p155.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p156.json` | 1 | 20 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p157.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p158.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p159.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p160.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p161.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p162.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p163.json` | 1 | 15 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p164.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p165.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p166.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p167.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p168.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p169.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p170.json` | 1 | 5 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p171.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p172.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p173.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p174.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p175.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p176.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p177.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p178.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p179.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p180.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p181.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p182.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p183.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p184.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p185.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p186.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p187.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p188.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p189.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p190.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p191.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p192.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p193.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p194.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p195.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p196.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p197.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p198.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p199.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p200.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p201.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p202.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p203.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p204.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p205.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p206.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p207.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p208.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p209.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p210.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p211.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p212.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p213.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p214.json` | 1 | 10 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p215.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p216.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p217.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p218.json` | 1 | 5 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p219.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p220.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p221.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p222.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p223.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p224.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p225.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p226.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p227.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p228.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p229.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p230.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p231.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p232.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p233.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p234.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p235.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p236.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p237.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p238.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p239.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p240.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p241.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p242.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p243.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p244.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p245.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p246.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p247.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p248.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p249.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p250.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p251.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p252.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p253.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p254.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p255.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p256.json` | 1 | 5 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p257.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p258.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p259.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p260.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p261.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p262.json` | 1 | 20 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p263.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p264.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p265.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p266.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p267.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p268.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p269.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p270.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p271.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p272.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p273.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p274.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p275.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p276.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p277.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p278.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p279.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p280.json` | 1 | 5 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p281.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p282.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p283.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p284.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p285.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p286.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p287.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p288.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p289.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p290.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p291.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p292.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p293.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p294.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p295.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p296.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p297.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p298.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p299.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p300.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p301.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p302.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p303.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p304.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p305.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p306.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p307.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p308.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p309.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p310.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p311.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p312.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p313.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p314.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p315.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p316.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p317.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p318.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p319.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p320.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p321.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p322.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p323.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p324.json` | 1 | 15 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p325.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p326.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p327.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p328.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p329.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p330.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p331.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p332.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p333.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p334.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p335.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p336.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p337.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p338.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p339.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p340.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p341.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p342.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p343.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p344.json` | 1 | 5 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p345.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p346.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p347.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p348.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p349.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p350.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p351.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p352.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p353.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p354.json` | 1 | 5 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p355.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p356.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p357.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p358.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p359.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p360.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p361.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p362.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p363.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p364.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p365.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p366.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p367.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p368.json` | 1 | 5 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p369.json` | 1 | 10 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p370.json` | 1 | 10 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p371.json` | 1 | 10 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p372.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p373.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p374.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p375.json` | 1 | 5 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p376.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p377.json` | 1 | 15 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p378.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p379.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p380.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p381.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p382.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p383.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p384.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p385.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p386.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p387.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p388.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p389.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p390.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p391.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p392.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p393.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p394.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p395.json` | 1 | 5 | 0 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/records/high-temperature-p396.json` | 1 | 2 | 4 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/source/sidecar.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/cp-p041-01.json` | 1 | 1 | 4 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/cp-p041-02.json` | 1 | 1 | 4 |
@@ -16974,148 +16985,148 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/cp-p066-02.json` | 1 | 1 | 4 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/cp-p066-03.json` | 1 | 1 | 4 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/index.json` | 0 | 0 | 0 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-16.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-03.json` | 1 | 3 | 6 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-05.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-11.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-13.json` | 1 | 1 | 2 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p005-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-04.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-05.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-06.json` | 1 | 3 | 6 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-10.json` | 1 | 3 | 6 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p006-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-13.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p007-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-06.json` | 1 | 3 | 6 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-09.json` | 1 | 3 | 6 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-11.json` | 1 | 3 | 6 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-15.json` | 1 | 3 | 6 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p008-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-14.json` | 1 | 3 | 6 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-15.json` | 1 | 3 | 6 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p009-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-05.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-06.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p010-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-01.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-03.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-04.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-07.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-08.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-10.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-15.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p011-16.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-08.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-02.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-08.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-04.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p012-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-01.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-02.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-03.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-04.json` | 1 | 4 | 10 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-05.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-16.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-08.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-11.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-12.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-13.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-14.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-15.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p013-16.json` | 1 | 4 | 10 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-01.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-02.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-03.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-07.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-07.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-08.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-09.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-10.json` | 1 | 1 | 3 |
@@ -17123,351 +17134,351 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-12.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-13.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p014-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p020-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p020-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p020-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p020-04.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-02.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-03.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-07.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-08.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-09.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-10.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-11.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-13.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-14.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-15.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p015-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p016-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-14.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p017-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-09.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-11.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-12.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-13.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-14.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-15.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p018-16.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p019-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p020-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p020-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p020-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p020-04.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-09.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-02.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-05.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-06.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-07.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-09.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p022-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p022-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p022-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-03.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-12.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-14.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-15.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p021-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p022-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p022-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p022-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-08.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p023-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p024-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-04.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p025-16.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-03.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-04.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-07.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-07.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p027-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p027-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-08.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p026-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p027-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p027-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-07.json` | 1 | 2 | 4 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-08.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-10.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p028-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-12.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p029-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-01.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p030-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-10.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-15.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-15.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p031-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-01.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-14.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p032-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-01.json` | 1 | 4 | 10 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-02.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-04.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-04.json` | 1 | 4 | 10 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-08.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-06.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-07.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-08.json` | 1 | 4 | 10 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-09.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-04.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-11.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-12.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-13.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-14.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p033-15.json` | 1 | 4 | 10 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-02.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-03.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-04.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-05.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-07.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-07.json` | 1 | 4 | 9 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-02.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-15.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p034-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-02.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-06.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-06.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-11.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-10.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-11.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-15.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p035-15.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-02.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-02.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-06.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-06.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-09.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-08.json` | 1 | 2 | 5 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-09.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-13.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-13.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-14.json` | 1 | 1 | 3 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-02.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p036-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-04.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-05.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p037-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-02.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-04.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-03.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-04.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-04.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-05.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-06.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-07.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-08.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-09.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-10.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-11.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p038-12.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-01.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-02.json` | 1 | 4 | 9 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-03.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-04.json` | 1 | 4 | 9 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-05.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-06.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-07.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-08.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-09.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-10.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-11.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-12.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-13.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-14.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-15.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-16.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p040-01.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p040-02.json` | 1 | 1 | 3 |
-| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p040-03.json` | 1 | 1 | 3 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-06.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-07.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-08.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-09.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-10.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-11.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-12.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-13.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-14.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-15.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p039-16.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p040-01.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p040-02.json` | 1 | 4 | 8 |
+| `data/literature/compilations/robie-hemingway-1995-usgs-b2131/summary/reference-p040-03.json` | 1 | 4 | 8 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/manifest.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0001.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0002.json` | 1 | 0 | 0 |
@@ -19038,6 +19049,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml` | 28 | 28 | 64 |
 | `data/literature/extracts/albertsson-2013-cr-slag-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/alexander-2001-maps.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/allen-1994-reduction-lunar-mare-soil.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/ames-walsh-white-1967.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/ammin-73-470-oneill-1988.yaml` | 9 | 9 | 43 |
 | `data/literature/extracts/ammin-75-781-hemingway-1990.yaml` | 12 | 12 | 48 |
@@ -19050,13 +19062,15 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/arxiv-1602-00658-fegley-rock-steam-solubility.yaml` | 5 | 5 | 28 |
 | `data/literature/extracts/arxiv-1902-05005.yaml` | 2 | 41 | 58 |
 | `data/literature/extracts/arxiv-2509-sio-flame-nucleation.yaml` | 11 | 11 | 57 |
-| `data/literature/extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml` | 32 | 32 | 128 |
+| `data/literature/extracts/asai-yokokawa-1982-nasoborosilicate-activity.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml` | 32 | 32 | 96 |
 | `data/literature/extracts/avarmaa-2022-cr-don-smelting.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/babaian-2024-fe-mg-si-air-equilibria.yaml` | 165 | 165 | 165 |
 | `data/literature/extracts/babaian-2026-fe-mg-si-reassessment.yaml` | 213 | 213 | 213 |
 | `data/literature/extracts/baborak-2023-alkali-silicate-levitation-evaporation.yaml` | 11 | 11 | 11 |
 | `data/literature/extracts/badjukov-petrova-1993-shock-vaporization.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems.yaml` | 83 | 83 | 145 |
+| `data/literature/extracts/balasubramaniam-2009-carbothermal-kinetic-constants.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/baldwin-2001-metal-oxide-mitigation-sodium.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/banchor-matsui-naito-1986.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/banya-2004-sulphide-capacity-cao-al2o3.yaml` | 2 | 2 | 1 |
@@ -19072,10 +19086,10 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/beerkens-2003-sulfate-decomposition-na2o-activity.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/behrens-rosenblatt-1972.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/bencze-yazhenskikh-2016.yaml` | 4 | 70 | 210 |
+| `data/literature/extracts/bencze-yazhenskikh-2016.yaml` | 4 | 70 | 88 |
 | `data/literature/extracts/bennington-brown-1982-synthetic-acmite-ri8621.yaml` | 43 | 308 | 264 |
 | `data/literature/extracts/bennington-brown-beyer-1984-aegirine-ri8912.yaml` | 54 | 616 | 357 |
-| `data/literature/extracts/bennour-1996-ternary-cs-na-silicate.yaml` | 8 | 27 | 35 |
+| `data/literature/extracts/bennour-1996-ternary-cs-na-silicate.yaml` | 6 | 49 | 25 |
 | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` | 1 | 2 | 2 |
 | `data/literature/extracts/berman-1988-internally-consistent-mineral-thermodynamic-data.yaml` | 219 | 219 | 0 |
 | `data/literature/extracts/berry-2003-in-situ-cr-xanes-furnace.yaml` | 1 | 1 | 1 |
@@ -19084,6 +19098,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml` | 145 | 145 | 155 |
 | `data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml` | 75 | 545 | 99 |
 | `data/literature/extracts/beyer-brown-ferrante-1980-kalo2-thermodynamics.yaml` | 8 | 308 | 191 |
+| `data/literature/extracts/bielefeldt-2013-factsage-slag.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/bissbort-2026-depolymerized-silicate-glass-transition-viscosity.yaml` | 53 | 53 | 0 |
 | `data/literature/extracts/bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite.yaml` | 98 | 98 | 14 |
 | `data/literature/extracts/bonnell-hastie-1990-htsci-26-313.yaml` | 0 | 0 | 1 |
@@ -19111,17 +19126,21 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/busemann-2024-noble-gases-ryugu-bennu.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer-supplement.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer.yaml` | 682 | 682 | 682 |
-| `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 33 |
+| `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 37 |
+| `data/literature/extracts/carrillo-sanchez-2020-phosphorus-ablation.yaml` | 13 | 49 | 75 |
 | `data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml` | 8 | 8 | 31 |
 | `data/literature/extracts/charles-1967-alkali-silicate-activities.yaml` | 120 | 120 | 120 |
 | `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml` | 26 | 26 | 62 |
 | `data/literature/extracts/chaudary-1997-v-redox-binary-silicate.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml` | 33 | 760 | 33 |
+| `data/literature/extracts/chen-2020-ce2o3-cmas-activity-phase-equilibria.yaml` | 259 | 259 | 349 |
 | `data/literature/extracts/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml` | 198 | 198 | 311 |
-| `data/literature/extracts/cheng-2021-fe-ca-si-o-phase-equilibria.yaml` | 990 | 990 | 1983 |
+| `data/literature/extracts/chen-2022-sio2-mno-slag-activities.yaml` | 222 | 222 | 222 |
+| `data/literature/extracts/cheng-2021-fe-ca-si-o-phase-equilibria.yaml` | 990 | 990 | 1065 |
 | `data/literature/extracts/cho-suito-1994-cas-slag-activities.yaml` | 48 | 48 | 53 |
 | `data/literature/extracts/christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal.yaml` | 19 | 92 | 38 |
+| `data/literature/extracts/christopoulou-2019-jace102-508-aam.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/colson-colson-1995-chromium-dimer-lpsc.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/colson-floden-1998-lpsc-co-nickel-activity.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/colson-floden-haugen-2005-nio-feo-o2-activities.yaml` | 15 | 15 | 45 |
@@ -19135,6 +19154,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/costa-jacobson-2015.yaml` | 1 | 1 | 2 |
 | `data/literature/extracts/cottrell-2009-iron-xanes.yaml` | 4 | 41 | 15 |
 | `data/literature/extracts/dachs-geiger-2006-pyrope-grossular.yaml` | 23 | 23 | 29 |
+| `data/literature/extracts/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry.yaml` | 67 | 67 | 206 |
 | `data/literature/extracts/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.yaml` | 167 | 167 | 167 |
 | `data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml` | 92 | 92 | 92 |
 | `data/literature/extracts/datz-1961-na2cl2.yaml` | 1 | 1 | 6 |
@@ -19150,13 +19170,14 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/di-donato-granati-2000.yaml` | 95 | 95 | 95 |
 | `data/literature/extracts/dikov-2009-luna16-condensate-iron.yaml` | 13 | 21 | 19 |
 | `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` | 24 | 24 | 24 |
+| `data/literature/extracts/dohmen-1998-olivine-fe-gas.yaml` | 5 | 5 | 16 |
 | `data/literature/extracts/dohmen-2003-coupled-kinetics.yaml` | 2 | 2 | 0 |
 | `data/literature/extracts/dong-2009-cr-v-slag-activities.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/doyle-1988-feo-activity-multicomponent-magma.yaml` | 130 | 130 | 259 |
 | `data/literature/extracts/doyle-1989-tio2-feo-activity-magma.yaml` | 167 | 167 | 334 |
 | `data/literature/extracts/drowart-1960-al2o3-kems.yaml` | 10 | 141 | 0 |
 | `data/literature/extracts/ehrt-2008-sn-redox-aluminosilicate.yaml` | 8 | 13 | 8 |
-| `data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml` | 17 | 17 | 46 |
+| `data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml` | 17 | 17 | 43 |
 | `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 6 |
 | `data/literature/extracts/evans-2009-sulfur-mn-ni-w-xanes.yaml` | 24 | 381 | 24 |
 | `data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml` | 1 | 43 | 1 |
@@ -19172,17 +19193,22 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ferguson-nuth-2012-sio-vapor-pressure-mixture.yaml` | 21 | 109 | 117 |
 | `data/literature/extracts/ferkl-2026-waste-glass-thermal-redox.yaml` | 2 | 12 | 2 |
 | `data/literature/extracts/filiberto-lpsc2011-2064-volatiles.yaml` | 3 | 6 | 15 |
+| `data/literature/extracts/filsinger-1990-silica-silicon-carbothermic-kinetics.yaml` | 19 | 19 | 65 |
+| `data/literature/extracts/fincham-1954-proc-roy-soc-a.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/florin-2025-cu-silicate-evaporation.yaml` | 4 | 99 | 1 |
 | `data/literature/extracts/folstad-2024-metals-cao-dissolution-cas.yaml` | 3 | 3 | 6 |
 | `data/literature/extracts/forsberg-2002-ca-fe-o-incongruent-melting.yaml` | 5 | 5 | 17 |
+| `data/literature/extracts/fortin-2014-sulfur-saturation-natural-melts-thesis.yaml` | 688 | 688 | 53 |
 | `data/literature/extracts/fray-schmitt-2009-ch4-1.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/fray-schmitt-2009-co-1.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/fredrickson-chasanov-1973-na2o-enthalpy-1300k.yaml` | 14 | 151 | 92 |
+| `data/literature/extracts/fredriksson-2003-feo-slag-activities-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/frischat-oel-1966-sodium-calcium-silicate-transport.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/fujisawa-1990-cao-al2o3-activities.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml` | 20 | 20 | 43 |
 | `data/literature/extracts/fuyuki-2007-sio-recombination.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/gail-2013-sio-nucleation-silicate-dust.yaml` | 9 | 9 | 23 |
 | `data/literature/extracts/gaillard-2003-hydrogen-iron-redox-rate.yaml` | 52 | 52 | 65 |
 | `data/literature/extracts/gaillard-2003-hydrous-silicic-melt-activity.yaml` | 32 | 260 | 232 |
 | `data/literature/extracts/gca-366-210-berry-2024.yaml` | 7 | 50 | 2 |
@@ -19195,13 +19221,16 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/gorojovsky-wood-2026-sulfur-crustal.yaml` | 983 | 983 | 993 |
 | `data/literature/extracts/gran-sichen-2012-molten12-ladle-slag-liquidus.yaml` | 219 | 876 | 219 |
 | `data/literature/extracts/green-1971-apollo12-basalt-petrology.yaml` | 6 | 6 | 12 |
-| `data/literature/extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml` | 3 | 3 | 6 |
+| `data/literature/extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml` | 7 | 7 | 0 |
+| `data/literature/extracts/greig-1927-immiscibility-part2.yaml` | 11 | 11 | 0 |
+| `data/literature/extracts/greig-barth-1938-nepheline-albite.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/gribchenkova-2017-al2o3-mgo.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/gronvold-sveen-1974-magnetite-high-temperature-cp.yaml` | 15 | 282 | 126 |
 | `data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml` | 1 | 8 | 1 |
 | `data/literature/extracts/habermann-daane-1964.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/hamuyuni-2016-copper-oxide-solubility-thesis-summary.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/hanson-jones-1998-am-cr-partitioning-olivine-liquid.yaml` | 98 | 400 | 18 |
+| `data/literature/extracts/hashimoto-1990-forsterite-evaporation-kinetics.yaml` | 16 | 16 | 16 |
 | `data/literature/extracts/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml` | 7 | 7 | 30 |
 | `data/literature/extracts/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report.yaml` | 38 | 38 | 38 |
 | `data/literature/extracts/hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry.yaml` | 57 | 85 | 75 |
@@ -19229,11 +19258,17 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/itoh-hino-banya-1998-spinel.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/itoh-yokokawa-1984-sodium-activity-nas.yaml` | 2 | 2 | 3 |
 | `data/literature/extracts/iupac-o2-solid-psat.yaml` | 1 | 1 | 5 |
+| `data/literature/extracts/ivanov-1975-lunar-vaporization.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/ivanova-2016-pristine-cai-evaporation-model.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/ivanova-2017-aoa-cai-model.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/ivanova-2018-hibonite-cai-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/ivanova-2018-spinel-rich-cai-evaporation.yaml` | 1 | 32 | 1 |
 | `data/literature/extracts/ivtan-cro2-g.yaml` | 4 | 64 | 70 |
 | `data/literature/extracts/ivtan-mno-coo-thermo.yaml` | 2 | 2 | 2 |
+| `data/literature/extracts/iwahashi-2021-cr-oxide-solid-activities.yaml` | 52 | 52 | 29 |
 | `data/literature/extracts/jackson-2005-ferrous-glass-multispectroscopy.yaml` | 6 | 6 | 0 |
-| `data/literature/extracts/jacquet-2026-alkali-recondensation.yaml` | 10 | 32 | 55 |
+| `data/literature/extracts/jacobson-1989-metal-oxide-zirconia.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/jacquet-2026-alkali-recondensation.yaml` | 10 | 32 | 56 |
 | `data/literature/extracts/jaggi-2021-mercury-atmosphere.yaml` | 3 | 7 | 4 |
 | `data/literature/extracts/jakobsson-tangstad-2015-ca-mg-activities.yaml` | 68 | 68 | 0 |
 | `data/literature/extracts/janaf-4th.yaml` | 51 | 98 | 219 |
@@ -19252,12 +19287,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml` | 8 | 8 | 24 |
 | `data/literature/extracts/kambayashi-kato-1984-mgo-sio2-1973k.yaml` | 77 | 77 | 15 |
 | `data/literature/extracts/kang-2007-sio2-activity-cas-low-silica.yaml` | 66 | 66 | 110 |
+| `data/literature/extracts/kassis-frischat-1981-mixed-alkali-vapor-pressures.yaml` | 4 | 4 | 12 |
 | `data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml` | 4 | 16 | 10 |
 | `data/literature/extracts/kawashima-1984-soda-flux-chemical-sensors.yaml` | 3 | 12 | 2 |
 | `data/literature/extracts/kayahara-1981-liquid-cu-o.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml` | 55 | 507 | 141 |
 | `data/literature/extracts/kemori-1980-oxygen-liquid-copper.yaml` | 31 | 51 | 46 |
-| `data/literature/extracts/kems-001-homma-1966.yaml` | 32 | 72 | 204 |
+| `data/literature/extracts/kems-001-homma-1966.yaml` | 32 | 72 | 172 |
 | `data/literature/extracts/kems-002-ohno-1967.yaml` | 12 | 25 | 60 |
 | `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 46 |
 | `data/literature/extracts/kems-005-fedkin-2006.yaml` | 2 | 2 | 0 |
@@ -19271,7 +19307,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 17 | 37 |
 | `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 152 | 666 | 66 |
 | `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 39 |
+| `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 44 |
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 |
 | `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 42 | 112 | 318 |
@@ -19287,7 +19323,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-031-halwax-2024.yaml` | 28 | 30 | 110 |
 | `data/literature/extracts/kems-032-copland-jacobson-2010.yaml` | 5 | 13 | 28 |
 | `data/literature/extracts/kems-033-shornikov-2010.yaml` | 5 | 5 | 25 |
-| `data/literature/extracts/kems-035-sauerborn-2005.yaml` | 62 | 74 | 274 |
+| `data/literature/extracts/kems-035-sauerborn-2005.yaml` | 62 | 74 | 272 |
 | `data/literature/extracts/kems-036-sesko-2024.yaml` | 8 | 8 | 33 |
 | `data/literature/extracts/kems-037-richter-2002.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kems-038-matchett-2006.yaml` | 3 | 16 | 24 |
@@ -19295,13 +19331,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-040-stolyarova-2015.yaml` | 2 | 2 | 7 |
 | `data/literature/extracts/kems-041-sossi-fegley-2018.yaml` | 77 | 90 | 248 |
 | `data/literature/extracts/kems-042-plante-1979.yaml` | 383 | 383 | 0 |
-| `data/literature/extracts/kems-044-robinot-2026.yaml` | 19 | 20 | 60 |
+| `data/literature/extracts/kems-044-robinot-2026.yaml` | 19 | 20 | 57 |
 | `data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml` | 25 | 57 | 154 |
 | `data/literature/extracts/kems-046-van-limpt-2007.yaml` | 12 | 24 | 84 |
 | `data/literature/extracts/kems-047-turkdogan-1984-isij.yaml` | 6 | 14 | 27 |
 | `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` | 18 | 18 | 107 |
 | `data/literature/extracts/kems-049-kato-1993-ms-review.yaml` | 26 | 26 | 58 |
-| `data/literature/extracts/kems-050-gorokhov-1977.yaml` | 3 | 3 | 10 |
+| `data/literature/extracts/kems-050-gorokhov-1977.yaml` | 3 | 3 | 11 |
 | `data/literature/extracts/kems-051-allibert-1981.yaml` | 9 | 99 | 56 |
 | `data/literature/extracts/kems-053-stolyarova-1991.yaml` | 17 | 144 | 15 |
 | `data/literature/extracts/kems-055-kambayashi-1983.yaml` | 50 | 50 | 10 |
@@ -19328,8 +19364,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-132-nakajima-2016.yaml` | 11 | 23 | 87 |
 | `data/literature/extracts/kems-133-costa-2017.yaml` | 21 | 21 | 87 |
 | `data/literature/extracts/kems-137-bischof-2023.yaml` | 20 | 164 | 462 |
-| `data/literature/extracts/kems-138-bischof-2023.yaml` | 34 | 36 | 117 |
-| `data/literature/extracts/kems-139-jacobson-2024.yaml` | 8 | 35 | 59 |
+| `data/literature/extracts/kems-138-bischof-2023.yaml` | 34 | 36 | 113 |
+| `data/literature/extracts/kems-139-jacobson-2024.yaml` | 8 | 35 | 36 |
 | `data/literature/extracts/kems-140-heck-2025.yaml` | 53 | 148 | 441 |
 | `data/literature/extracts/kems-169-nakazawa-1976.yaml` | 5 | 5 | 21 |
 | `data/literature/extracts/kems-184-behrens-1979.yaml` | 33 | 49 | 189 |
@@ -19339,15 +19375,21 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-198-ichise-ueshima-1989.yaml` | 14 | 23 | 75 |
 | `data/literature/extracts/kems-200-ueshima-1983.yaml` | 21 | 32 | 107 |
 | `data/literature/extracts/kems-201-ichise-1986.yaml` | 11 | 27 | 65 |
+| `data/literature/extracts/kems-209-copland-2001.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/kems-210-hoseinpur-2022.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/kems-211-naughton-1971.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kems-212-schneider-1980-nbsir-80-2059.yaml` | 1 | 3 | 1 |
 | `data/literature/extracts/kems-213-schneider-1980-nbsir-80-2139.yaml` | 15 | 15 | 16 |
 | `data/literature/extracts/kems-214-hastie-1980-nbsir-80-2178.yaml` | 4 | 43 | 0 |
+| `data/literature/extracts/kems-215-schneider-1980-nbsir-80-2183.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/kems-216-schneider-1981-nbsir-81-2252.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/kems-217-hastie-plante-1981-nbsir-81-2293.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kems-218-schneider-1981-nbsir-81-2306.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 140 | 235 |
-| `data/literature/extracts/khedim-2008-chromia-solubility-thesis.yaml` | 25 | 25 | 0 |
+| `data/literature/extracts/khedim-2008-chromia-solubility-thesis.yaml` | 25 | 25 | 25 |
 | `data/literature/extracts/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility.yaml` | 80 | 80 | 0 |
+| `data/literature/extracts/khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility.yaml` | 80 | 80 | 80 |
 | `data/literature/extracts/kido-2004-mn-cr-high-temperature-glass-spectra.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kim-2004-na2o-float-glass-emf.yaml` | 21 | 21 | 42 |
 | `data/literature/extracts/kim-2014-carbon-fe-v-mo-ni.yaml` | 233 | 233 | 0 |
@@ -19397,6 +19439,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/lh87-sno-g.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/li-2005-na-al-phosphate-fe-activities.yaml` | 324 | 370 | 644 |
 | `data/literature/extracts/li-kato-kobayashi-2021-cr-solubility.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/liao-zhao-2023-metals-cmas-phase-eq-review.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/liu-2023-chromium-oxide-activity.yaml` | 38 | 72 | 39 |
 | `data/literature/extracts/liu-2024-cao-al2o3-vox-phase.yaml` | 72 | 72 | 5 |
 | `data/literature/extracts/liu-li-2025-se-te-sulfide-silicate.yaml` | 18 | 18 | 0 |
@@ -19406,6 +19449,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/lopatin-2023-na-barium-borate-kems.yaml` | 10 | 186 | 14 |
 | `data/literature/extracts/lopatin-balabanova-2026-ionization-crosssections.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/lopatin-shugurov-tyurnina-2022-sro-al2o3-kems.yaml` | 13 | 213 | 0 |
+| `data/literature/extracts/lpi-compendium-14163.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/lpi-compendium-14240.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/lpi-compendium-15013.yaml` | 3 | 3 | 12 |
 | `data/literature/extracts/lpi-compendium-62231.yaml` | 1 | 1 | 4 |
@@ -19422,7 +19466,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/majzlan-2021-magnesium-silicate-glass-cp.yaml` | 23 | 23 | 28 |
 | `data/literature/extracts/mamiya-2000-sio-disproportionation.yaml` | 2 | 2 | 0 |
 | `data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml` | 13 | 13 | 26 |
-| `data/literature/extracts/mathieu-2009-sodium-solubility-thesis.yaml` | 421 | 421 | 209 |
+| `data/literature/extracts/mathieu-2009-sodium-solubility-thesis.yaml` | 421 | 421 | 0 |
+| `data/literature/extracts/mathieu-2011-na2o-cms-solubility.yaml` | 48 | 48 | 24 |
 | `data/literature/extracts/matousek-1998-silicate-vaporization-reactions.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/matsumaru-1999-plasma-arc-silicate-evaporation.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/matsuzaki-1997-feo-tio2-sio2-activities.yaml` | 25 | 25 | 25 |
@@ -19434,14 +19479,16 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/mendybaev-2013-fun-cai-evaporation.yaml` | 2 | 96 | 4 |
 | `data/literature/extracts/mendybaev-2017-fun-cai-lab-evaporation.yaml` | 12 | 12 | 18 |
 | `data/literature/extracts/mendybaev-2018-cmas-evaporation.yaml` | 1 | 4 | 5 |
+| `data/literature/extracts/mendybaev-2019-cai-evaporation-kinetics.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/mendybaev-2021-cai-low-pressure-h2-evap.yaml` | 6 | 22 | 47 |
 | `data/literature/extracts/metsoc-2019-6005.yaml` | 33 | 33 | 106 |
 | `data/literature/extracts/metsoc-2024-6131.yaml` | 3 | 3 | 12 |
 | `data/literature/extracts/metsoc-2024-6224.yaml` | 5 | 5 | 20 |
+| `data/literature/extracts/meurisse-2022-lunar-regolith-molten-salt-reduction.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/miao-li-yan-2023-fe-v-spinel-gibbs.yaml` | 39 | 39 | 3 |
 | `data/literature/extracts/miki-1999-si-alloy-thermodynamics.yaml` | 111 | 111 | 186 |
 | `data/literature/extracts/moeller-2007-silicon-oxide-evaporation-condensation.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/mogul-2023-pioneer-venus-co2-icarus.yaml` | 3 | 6 | 27 |
+| `data/literature/extracts/mogul-2023-pioneer-venus-co2-icarus.yaml` | 3 | 6 | 15 |
 | `data/literature/extracts/moosavi-khoonsari-2015-na-fe-cmas-thesis.yaml` | 72 | 72 | 0 |
 | `data/literature/extracts/morey-1964-usgs-pp440l-phase-equilibria.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/morishita-2004-sio2-partial-enthalpy.yaml` | 7 | 61 | 7 |
@@ -19452,7 +19499,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/morris-2006-meridiani-mossbauer.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/muan-1959-manganese-silica-air.yaml` | 57 | 57 | 7 |
 | `data/literature/extracts/mueller-2004-alkali-oxide-activity-coal-ash.yaml` | 4 | 4 | 0 |
-| `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 115 | 81 |
+| `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 115 | 79 |
 | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 42 | 83 |
 | `data/literature/extracts/myers-jacobson-2015-volatile-metal-hydroxides-presentation.yaml` | 4 | 4 | 4 |
 | `data/literature/extracts/mysen-1984-alkaline-earth-redox.yaml` | 34 | 34 | 34 |
@@ -19460,8 +19507,9 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/mysen-virgo-1989-nas-redox.yaml` | 53 | 53 | 53 |
 | `data/literature/extracts/naess-2014-liquid-silicon-oxidation-fume-flux.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml` | 10 | 14 | 48 |
+| `data/literature/extracts/nagahara-1993-sio2-evaporation-equilibrium-vacuum.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/nagahara-2000-metsoc63-5166.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml` | 191 | 191 | 483 |
+| `data/literature/extracts/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml` | 191 | 191 | 479 |
 | `data/literature/extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml` | 5 | 16 | 9 |
 | `data/literature/extracts/nagata-1989-emf-calcium-aluminates.yaml` | 1 | 4 | 2 |
 | `data/literature/extracts/nakamura-2022-science-ryugu-thermal.yaml` | 3 | 18 | 29 |
@@ -19471,18 +19519,21 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/nasa-tm-2024-simulant-guide.yaml` | 11 | 113 | 146 |
 | `data/literature/extracts/nazarov-2015-dhofar-silicides.yaml` | 8 | 34 | 2 |
 | `data/literature/extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml` | 51 | 51 | 14 |
+| `data/literature/extracts/nekhoroshev-2019-phd-polymtl.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization.yaml` | 45 | 45 | 25 |
 | `data/literature/extracts/neubert-2025-vanadium-slag-evaporation.yaml` | 148 | 148 | 148 |
-| `data/literature/extracts/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml` | 29 | 29 | 60 |
+| `data/literature/extracts/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml` | 29 | 29 | 55 |
 | `data/literature/extracts/neuman-2026-levitation-k-isotopes.yaml` | 80 | 2307 | 80 |
 | `data/literature/extracts/niggli-1913-silica-alkali-carbonate-equilibria.yaml` | 10 | 10 | 10 |
 | `data/literature/extracts/nist-srd69-p4.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/nist-webbook.yaml` | 46 | 46 | 181 |
 | `data/literature/extracts/no27-fegley-cameron-1987-epsl.yaml` | 8 | 97 | 112 |
+| `data/literature/extracts/norris-2016-trace-volatility-thesis.yaml` | 64 | 64 | 192 |
 | `data/literature/extracts/norris-2017-earth-volatiles-nature.yaml` | 9 | 9 | 37 |
 | `data/literature/extracts/ntrs-19650014783.yaml` | 8 | 52 | 27 |
 | `data/literature/extracts/ntrs-19730008085.yaml` | 2 | 30 | 66 |
 | `data/literature/extracts/ntrs-20250004626.yaml` | 5 | 15 | 36 |
+| `data/literature/extracts/nussinov-1975-lunar-vacuum-volatilization.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/oeltjen-1999-coal-slag-thermochemistry.yaml` | 39 | 39 | 0 |
 | `data/literature/extracts/ohare-1972-na2o-formation-enthalpy.yaml` | 18 | 18 | 49 |
 | `data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml` | 140 | 140 | 17 |
@@ -19493,7 +19544,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/oneill-2005-alkali-oxide-activities.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/ostrovski-2000-cao-tio2-sio2.yaml` | 40 | 40 | 66 |
 | `data/literature/extracts/ottonello-2000-polymeric-cao-feo-silica.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/ozawa-2012-forsterite-vacuum-evaporation.yaml` | 5 | 134 | 42 |
+| `data/literature/extracts/ozawa-2012-forsterite-vacuum-evaporation.yaml` | 90 | 134 | 42 |
 | `data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml` | 8 | 51 | 16 |
 | `data/literature/extracts/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml` | 46 | 46 | 160 |
 | `data/literature/extracts/panda-2019-ten-oxide-thermodynamics.yaml` | 2 | 2 | 2 |
@@ -19520,6 +19571,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/qi-1987-fe-c-v-interaction.yaml` | 71 | 71 | 19 |
 | `data/literature/extracts/raberg-2007-salt-stability-na2s-thermochemistry-thesis.yaml` | 4 | 4 | 10 |
 | `data/literature/extracts/ramteke-2026-alkali-vapor-corrosion-spinels.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/rankin-wright-1915-ajs-cao-al2o3-sio2.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/rau-1974-se-vp.yaml` | 1 | 1 | 7 |
 | `data/literature/extracts/rb86-capobianco-navrotsky-1982.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/rb86-neuvonen-1952.yaml` | 0 | 0 | 1 |
@@ -19543,7 +19595,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/rego-1985-na2o-sio2-transpiration.yaml` | 93 | 93 | 93 |
 | `data/literature/extracts/rego-1988-silicate-na2o-activities.yaml` | 85 | 85 | 0 |
 | `data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml` | 10 | 10 | 51 |
-| `data/literature/extracts/related-beerkens-1986-deposits-condensation-thesis.yaml` | 17 | 66 | 75 |
+| `data/literature/extracts/related-beerkens-1986-deposits-condensation-thesis.yaml` | 17 | 66 | 59 |
 | `data/literature/extracts/renggli-2022-te-evaporation.yaml` | 1 | 36 | 1 |
 | `data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml` | 24 | 24 | 24 |
 | `data/literature/extracts/richter-2008-cai-like-liquids-lpsc-abstract.yaml` | 0 | 0 | 1 |
@@ -19555,7 +19607,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/romero-serrano-1999-binary-ternary-silicates.yaml` | 4 | 4 | 8 |
 | `data/literature/extracts/rusiecka-2026-chlorine-data.yaml` | 1911 | 1911 | 3822 |
 | `data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml` | 11 | 13 | 46 |
-| `data/literature/extracts/rys-2007-alkali-oxide-thermodynamics.yaml` | 56 | 1002 | 62 |
+| `data/literature/extracts/rys-2007-alkali-oxide-thermodynamics.yaml` | 56 | 1004 | 62 |
 | `data/literature/extracts/rzehak-2021-ti-isotope-redox-lunar-melts.yaml` | 3 | 18 | 0 |
 | `data/literature/extracts/sack-2021-melilite-thermochemistry.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sack-ghiorso-2017-fassaite-thermodynamics.yaml` | 0 | 0 | 1 |
@@ -19564,12 +19616,14 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/saito-2025-transition-metal-oxide-criteria.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sakao-sano-1962-oxygen-ni-cr-co-cr.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml` | 31 | 31 | 42 |
+| `data/literature/extracts/sargeant-2019-h2-isru-demo.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/saridikmen-2009-phosphide-sulphide.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sato-1976-lunar-fo2-apollo-17.yaml` | 21 | 115 | 39 |
 | `data/literature/extracts/sato-hickling-mclane-1973-lunar-fo2.yaml` | 15 | 75 | 15 |
-| `data/literature/extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml` | 15 | 15 | 78 |
+| `data/literature/extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml` | 15 | 15 | 76 |
 | `data/literature/extracts/schaefer-fegley-2009-silicate-atmospheres.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/schaefer-fegley-2011-vaporization-earth.yaml` | 40 | 321 | 403 |
+| `data/literature/extracts/schairer-bowen-1956-nas-phase-equilibria.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu.yaml` | 8 | 8 | 8 |
 | `data/literature/extracts/schreiber-1977-tetravalent-cr-diopside.yaml` | 3 | 3 | 0 |
 | `data/literature/extracts/schreiber-1979-lpsc-fe-redox-abstract.yaml` | 0 | 0 | 1 |
@@ -19580,6 +19634,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/schreiber-1996-fe-mn-cr-redox-interactions.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/schreiber-haskin-1976-plsc7-chromium-in-basalts.yaml` | 8 | 8 | 0 |
 | `data/literature/extracts/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml` | 52 | 500 | 52 |
+| `data/literature/extracts/seetharaman-2013-cr-thin-film-volatilization.yaml` | 7 | 7 | 14 |
 | `data/literature/extracts/seki-2011-ca-o-solubility-fe-cao-al2o3.yaml` | 1 | 10 | 2 |
 | `data/literature/extracts/semkow-haskin-1984-redox-diopsidic-melt.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/senior-1991-solar-heating-jbis.yaml` | 0 | 0 | 1 |
@@ -19591,6 +19646,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics.yaml` | 9 | 33 | 52 |
 | `data/literature/extracts/shaw-2023-vacuum-thermal-sublimation-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shi-2024-cr-activity-slag-polymerisation.yaml` | 36 | 36 | 0 |
+| `data/literature/extracts/shi-2025-mno-activity-eaf-spinel.yaml` | 42 | 14 | 36 |
 | `data/literature/extracts/shilov-1998-sno-zno-p2o5-vaporization.yaml` | 23 | 92 | 97 |
 | `data/literature/extracts/shilov-2025-sro-al2o3-sio2-kems-supplement.yaml` | 42 | 42 | 0 |
 | `data/literature/extracts/shilov-2026-sro-la2o3-kems.yaml` | 9 | 29 | 9 |
@@ -19599,7 +19655,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-1994-mullite-kems.yaml` | 41 | 41 | 8 |
 | `data/literature/extracts/shornikov-1997-cao-al2o3.yaml` | 37 | 37 | 87 |
 | `data/literature/extracts/shornikov-1997-cao-alumina-vapor.yaml` | 17 | 74 | 28 |
-| `data/literature/extracts/shornikov-1997-diopside-vaporization.yaml` | 25 | 81 | 51 |
+| `data/literature/extracts/shornikov-1997-diopside-vaporization.yaml` | 33 | 91 | 67 |
 | `data/literature/extracts/shornikov-1998-silica-vaporization.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-1999-alumina-silica-vaporization.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-1999-silica-partial-vaporization-coefficients.yaml` | 15 | 15 | 75 |
@@ -19615,15 +19671,15 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2002-mullite-thermodynamics.yaml` | 29 | 29 | 66 |
 | `data/literature/extracts/shornikov-2002-spinel-mgal2o4.yaml` | 1 | 1 | 3 |
 | `data/literature/extracts/shornikov-2003-aluminosilicate-solids.yaml` | 7 | 47 | 2 |
-| `data/literature/extracts/shornikov-2003-mullite-thermodynamics.yaml` | 94 | 94 | 201 |
+| `data/literature/extracts/shornikov-2003-mullite-thermodynamics.yaml` | 94 | 94 | 203 |
 | `data/literature/extracts/shornikov-2003-silica-catitanoate-melts.yaml` | 36 | 36 | 72 |
-| `data/literature/extracts/shornikov-2005-potassium-germanate.yaml` | 46 | 46 | 76 |
+| `data/literature/extracts/shornikov-2005-potassium-germanate.yaml` | 46 | 46 | 67 |
 | `data/literature/extracts/shornikov-2007-ca-aluminosilicate-activities.yaml` | 8 | 8 | 19 |
 | `data/literature/extracts/shornikov-2007-cao-aluminosilicate-melts.yaml` | 6 | 34 | 18 |
-| `data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml` | 70 | 70 | 74 |
+| `data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml` | 70 | 70 | 88 |
 | `data/literature/extracts/shornikov-2008-redox-oxide-evaporation.yaml` | 29 | 46 | 5 |
 | `data/literature/extracts/shornikov-2008-zinc-phosphate-melts.yaml` | 34 | 34 | 102 |
-| `data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml` | 60 | 60 | 93 |
+| `data/literature/extracts/shornikov-2011-cao-mgo-alumina-melts.yaml` | 60 | 60 | 94 |
 | `data/literature/extracts/shornikov-2011-titania-melt-evaporation.yaml` | 51 | 114 | 69 |
 | `data/literature/extracts/shornikov-2012-vestnik-cmafs.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2013-cai-genesis-thermodynamics.yaml` | 0 | 0 | 1 |
@@ -19634,15 +19690,17 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2014-sodium-silicate-model.yaml` | 17 | 17 | 34 |
 | `data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics-metsoc.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics.yaml` | 27 | 27 | 42 |
-| `data/literature/extracts/shornikov-2015-cai-vaporization-coefficients.yaml` | 53 | 53 | 110 |
+| `data/literature/extracts/shornikov-2015-cai-vaporization-coefficients.yaml` | 53 | 53 | 105 |
 | `data/literature/extracts/shornikov-2015-complex-oxide-vapor.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2016-ca-al-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2016-cao-mgo-silicate.yaml` | 50 | 85 | 68 |
+| `data/literature/extracts/shornikov-2016-spinel-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2017-cai-mgo-sio-fugacity.yaml` | 4 | 4 | 12 |
 | `data/literature/extracts/shornikov-2017-spinel-evaporation.yaml` | 25 | 144 | 25 |
 | `data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml` | 18 | 30 | 35 |
 | `data/literature/extracts/shornikov-2018-cai-complex-gas-species.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2018-cai-double-inversion.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/shornikov-2018-spinel-solid-solutions-eg.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2018-spinel-solid-solutions.yaml` | 14 | 168 | 0 |
 | `data/literature/extracts/shornikov-2018-thermodynamic-evaporation-model.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2019-ca-feo-vapor.yaml` | 34 | 68 | 49 |
@@ -19652,11 +19710,14 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2019-perovskite-evaporation-thermodynamics.yaml` | 263 | 263 | 317 |
 | `data/literature/extracts/shornikov-2019-perovskite-evaporation.yaml` | 7 | 76 | 0 |
 | `data/literature/extracts/shornikov-2019-spinel-evaporation-abstract.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/shornikov-2020-cao-mgo-thermodynamics.yaml` | 77 | 77 | 116 |
+| `data/literature/extracts/shornikov-2020-cao-mgo-thermodynamics.yaml` | 77 | 77 | 120 |
 | `data/literature/extracts/shornikov-2020-cao-tio2-melts.yaml` | 302 | 302 | 0 |
 | `data/literature/extracts/shornikov-2020-mgo-feo-melts.yaml` | 146 | 146 | 291 |
+| `data/literature/extracts/shornikov-2020-perovskite-abstract.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2020-perovskite-chemical-fractionation.yaml` | 5 | 5 | 5 |
 | `data/literature/extracts/shornikov-2021-mgo-feo-silicate.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/shornikov-2021-perovskite-chapter.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/shornikov-2021-saratov-chondrule-alkali-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2022-k2o-al2o3-melts.yaml` | 1 | 1 | 2 |
 | `data/literature/extracts/shornikov-2022-meteorite-redox-evaporation.yaml` | 3 | 3 | 6 |
 | `data/literature/extracts/shornikov-2022-na2o-al2o3-melts.yaml` | 3 | 3 | 6 |
@@ -19670,6 +19731,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2024-iron-phosphate-melts.yaml` | 17 | 17 | 51 |
 | `data/literature/extracts/shornikov-2024-sodium-phosphate-melts.yaml` | 13 | 13 | 43 |
 | `data/literature/extracts/shornikov-2024-wollastonite-evaporation.yaml` | 19 | 19 | 67 |
+| `data/literature/extracts/shornikov-2025-ca-al-inclusion-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2025-ca-al-inclusion-kems.yaml` | 8 | 95 | 8 |
 | `data/literature/extracts/shornikov-2025-ca-al-inclusion-thermodynamics.yaml` | 29 | 29 | 58 |
 | `data/literature/extracts/shornikov-2025-calcium-oxide-evaporation.yaml` | 14 | 210 | 14 |
@@ -19696,11 +19758,12 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml` | 29 | 29 | 60 |
 | `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 75 | 101 | 220 |
 | `data/literature/extracts/sossi-2020-magma-ocean-redox.yaml` | 12 | 12 | 12 |
+| `data/literature/extracts/spaargaren-2025-disk-element-volatility.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 30 | 30 | 105 |
 | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 9 | 29 | 85 |
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 39 |
-| `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 30 |
+| `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 28 |
 | `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 88 | 589 | 87 |
 | `data/literature/extracts/stolyarova-2021-ti-al-kems-ru.yaml` | 205 | 205 | 26 |
 | `data/literature/extracts/stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement.yaml` | 190 | 1037 | 6 |
@@ -19732,9 +19795,10 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/tachibana-takigawa-2014-forsterite-condensation.yaml` | 19 | 19 | 52 |
 | `data/literature/extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml` | 6 | 6 | 23 |
 | `data/literature/extracts/takeda-1986-liquid-copper-soda-slag.yaml` | 1 | 1 | 2 |
-| `data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml` | 13 | 13 | 26 |
+| `data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml` | 15 | 15 | 30 |
 | `data/literature/extracts/taniguchi-1997-feo-cas.yaml` | 141 | 141 | 282 |
 | `data/literature/extracts/tatsumi-2004-iron-condensation.yaml` | 2 | 2 | 6 |
+| `data/literature/extracts/tenkate-2010-vapor-instrument.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/terashima-2026-sro-slag-activity-preprint.yaml` | 119 | 119 | 37 |
 | `data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml` | 3 | 87 | 93 |
 | `data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml` | 11 | 111 | 134 |
@@ -19766,48 +19830,62 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/vickerfalt-2024-al-si-v-phase-diagram.yaml` | 39 | 39 | 0 |
 | `data/literature/extracts/vickerfalt-2024-autogenous-slag-thesis.yaml` | 150 | 150 | 0 |
 | `data/literature/extracts/vienna-2004-sulfur-loading-law-glass.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/visscher-fegley-2013-debris-disks.yaml` | 12 | 12 | 40 |
+| `data/literature/extracts/visscher-fegley-2013-debris-disks.yaml` | 12 | 12 | 35 |
 | `data/literature/extracts/volovetskii-2012-iron-redox.yaml` | 3 | 30 | 3 |
 | `data/literature/extracts/volovetsky-2010-granitoid-iron-redox.yaml` | 22 | 22 | 0 |
 | `data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml` | 1 | 2 | 4 |
+| `data/literature/extracts/wang-1993-rare-earth-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/wang-2001-solar-melt-evaporation-residues.yaml` | 38 | 538 | 0 |
 | `data/literature/extracts/wang-2009-cr-slag-kems-original.yaml` | 80 | 100 | 200 |
 | `data/literature/extracts/wang-2017-cao-sio2-vox-tables-s1-s32.yaml` | 516 | 516 | 516 |
 | `data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/wang-seetharaman-2010-cr-oxidation-original.yaml` | 39 | 39 | 19 |
+| `data/literature/extracts/watne-1977-potassium-vapor-pressure-furnace.yaml` | 96 | 96 | 288 |
+| `data/literature/extracts/wetzel-2012-heidelberg-thesis.yaml` | 4 | 4 | 9 |
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 59 |
 | `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 64 |
-| `data/literature/extracts/willenborg-2006-alkali-removal-thermodynamics.yaml` | 2 | 2 | 2 |
+| `data/literature/extracts/willenborg-2006-alkali-removal-thermodynamics.yaml` | 2 | 2 | 4 |
 | `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 66 |
-| `data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml` | 7 | 7 | 13 |
+| `data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml` | 7 | 7 | 15 |
 | `data/literature/extracts/woermann-1969-mg-fe-ti-oxides.yaml` | 17 | 17 | 3 |
-| `data/literature/extracts/wood-wade-2013-trace-activities.yaml` | 3 | 3 | 3 |
+| `data/literature/extracts/wood-wade-2013-trace-activities.yaml` | 325 | 325 | 325 |
 | `data/literature/extracts/wright-okamura-1977-makaopuhi-cooling.yaml` | 40 | 40 | 40 |
 | `data/literature/extracts/xiao-2002-chromium-oxide-activities.yaml` | 261 | 261 | 0 |
 | `data/literature/extracts/xiao-holappa-1993-isij-crox-slag-activities.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/xiao-reuter-holappa-2000-chromium-slag-oxidation-review.yaml` | 84 | 84 | 0 |
 | `data/literature/extracts/xu-2026-excess-oxygen-magma.yaml` | 1462 | 1462 | 1462 |
 | `data/literature/extracts/yakovlev-2017-cai-acidity.yaml` | 97 | 166 | 20 |
+| `data/literature/extracts/yakovlev-2017-hasp-volatility.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/yakovlev-2017-olivine-vaporization.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/yakovlev-2018-cai-isotope-fractionation.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/yakovlev-2018-hasp-mg-si-volatility.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/yakovlev-2018-meteoritic-kems.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yakovlev-2021-chondrule-alkali.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yakovlev-2024-cai-vaporization.yaml` | 11 | 167 | 11 |
+| `data/literature/extracts/yakovleva-2019-mg-si-isotope-fractionation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yakovleva-2022-alkali-chondrule-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yam1983.yaml` | 3 | 16 | 33 |
 | `data/literature/extracts/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml` | 1 | 1 | 0 |
 | `data/literature/extracts/yamaguchi-kaneko-iguchi-1987-na2o-fe2o3-activity.yaml` | 12 | 12 | 32 |
 | `data/literature/extracts/yan-2009-cr-ti-nb-v-slag-thermodynamics-review.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.yaml` | 230 | 230 | 250 |
+| `data/literature/extracts/yang-2025-na2o-cao-silica-thermodynamics.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yang-teng-seetharaman-2012-vanadium-evaporation.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/yokokawa-1984-alumina-carbon-volatilization.yaml` | 16 | 16 | 16 |
 | `data/literature/extracts/yu-2003-k-na-evaporation-chondrule-melts.yaml` | 1 | 32 | 1 |
+| `data/literature/extracts/yu-hewins-1997-lpsc28-1613.yaml` | 4 | 4 | 8 |
 | `data/literature/extracts/zagrtdenov-2020-chromite-magnesiochromite-solubility.yaml` | 132 | 132 | 29 |
 | `data/literature/extracts/zagrtdenov-2025-chromite-magnesiochromite-dataset.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/zaitsev-1997-cas-caf2-melts.yaml` | 4 | 42 | 4 |
 | `data/literature/extracts/zaitsev-1999-na2o-sio2-pccp.yaml` | 11 | 116 | 8 |
 | `data/literature/extracts/zaitsev-2000-ms2000-045.yaml` | 4 | 32 | 0 |
 | `data/literature/extracts/zaitsev-2000-sodium-silicate-thermodynamics.yaml` | 7 | 110 | 4 |
+| `data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml` | 25 | 25 | 35 |
 | `data/literature/extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml` | 9 | 9 | 18 |
 | `data/literature/extracts/zhang-2021-acsesc-si.yaml` | 25 | 25 | 39 |
 | `data/literature/extracts/zhang-2024-alkali-evaporation-ti-thesis.yaml` | 23 | 257 | 23 |
+| `data/literature/extracts/zhao-2019-ce2o3-ternary-thermodynamics.yaml` | 14 | 14 | 14 |
 | `data/literature/extracts/zhinkina-2024-ce-gd-kems-poster.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/zigo-1987-gehlenite-fusion.yaml` | 13 | 37 | 64 |
 | `data/literature/gibbs_battery_residual_ledger.yaml` | 58 | 58 | 63 |
@@ -19820,39 +19898,20 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 1685
+hard issues: 547
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 1203 |
-| `conditional_field:derivation` | 249 |
-| `conditional_field:inputs` | 229 |
+| `conditional_field:derived_from` | 388 |
+| `conditional_field:derivation` | 135 |
+| `conditional_field:inputs` | 20 |
 | `invalid_source:initial_composition` | 4 |
 
 ## Hard issues (first 50)
 
-- `observation[ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_third_law_enthalpy].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_cp_fits].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_thermodynamic_table2].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_magnetite_thermodynamic_table4].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_hematite_thermodynamic_table6].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-75-781-hemingway-1990::hemingway_1990_qfm_and_mh_fitted_relations].derived_from` conditional_field: derived observation requires derived_from
-- `observation[ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_4_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_5_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_6_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nucleation_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_surface_energy_temperature_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_saturation_pressure_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_transition_thresholds].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_melting_threshold_result].derived_from` conditional_field: derived observation requires derived_from
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_particle_density].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nonreactive_validation_setup].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_brownian_validation].derived_from` conditional_field: derived observation requires derived_from
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=db6e6e110926].derived_from` conditional_field: derived observation requires derived_from
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=7e9de54a50ed].derived_from` conditional_field: derived observation requires derived_from
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=33b18f04a864].derived_from` conditional_field: derived observation requires derived_from
@@ -19883,11 +19942,99 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=4ea65fd64a8f].derived_from` conditional_field: derived observation requires derived_from
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=77b788f66cb5].derived_from` conditional_field: derived observation requires derived_from
 - `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=916696065c2a].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=a0df516d6063].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=378a03db38fb].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=162fce19b04f].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=3dbaf619600f].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=a2d4880ceca9].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=67de5ab6fdcd].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=d3c9b12e0077].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=6184f0b6544f].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=78b80ccbc28a].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=951548218e39].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=6d9fa3b3c27d].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=4:h=1dc665f53e77].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=f6a205bf0aa6].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=15d0c3b43cef].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=20d5638dd31a].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=3:h=6f65fd86ee72].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=selected:h=917f50314d5e].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=1:h=ac59545ad09c].derived_from` conditional_field: derived observation requires derived_from
+- `observation[bencze-yazhenskikh-2016::bencze_2016_table_s1_na_all_subsamples::rows:row=2:h=f2395eea28a2].derived_from` conditional_field: derived observation requires derived_from
 
 ## Advisory issue census
 
-advisory issues: 317594
+advisory issues: 322275
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 317594 |
+| `identity_incomplete` | 322275 |
+
+## Notices
+
+| code | source | count |
+|---|---|---:|
+| `model_derived_provenance_unrecorded` | `bencze-yazhenskikh-2016` | 61 |
+| `model_derived_provenance_unrecorded` | `bennour-1996-ternary-cs-na-silicate` | 26 |
+| `model_derived_provenance_unrecorded` | `berry-2018-morb-iron-redox` | 13 |
+| `model_derived_provenance_unrecorded` | `beyer-1980-potassium-metasilicate-disilicate-ri8410` | 382 |
+| `model_derived_provenance_unrecorded` | `charles-1967-alkali-silicate-activities` | 90 |
+| `model_derived_provenance_unrecorded` | `eliezer-howald-1978-potassium-silicate-vapor-pressure` | 2 |
+| `model_derived_provenance_unrecorded` | `fredrickson-chasanov-1973-na2o-enthalpy-1300k` | 50 |
+| `model_derived_provenance_unrecorded` | `gibbons-1963-thesis-cas-slags-cas` | 4 |
+| `model_derived_provenance_unrecorded` | `hastie-bonnell-1980-nbsir-80-2169-molecular-chemistry` | 2 |
+| `model_derived_provenance_unrecorded` | `hayashi-2025-ca-fe-silicate-redox-activities` | 44 |
+| `model_derived_provenance_unrecorded` | `holzheid-lodders-2001-copper-solubility` | 12 |
+| `model_derived_provenance_unrecorded` | `huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram` | 4 |
+| `model_derived_provenance_unrecorded` | `jaggi-2021-mercury-atmosphere` | 6 |
+| `model_derived_provenance_unrecorded` | `kemori-1980-oxygen-liquid-copper` | 12 |
+| `model_derived_provenance_unrecorded` | `kems-012-sossi-2019` | 77 |
+| `model_derived_provenance_unrecorded` | `kems-027-plante-hastie-1983` | 4 |
+| `model_derived_provenance_unrecorded` | `kems-028-yakovlev-1984` | 11 |
+| `model_derived_provenance_unrecorded` | `kems-029-yakovlev-shornikov-2011` | 11 |
+| `model_derived_provenance_unrecorded` | `kems-051-allibert-1981` | 55 |
+| `model_derived_provenance_unrecorded` | `kems-053-stolyarova-1991` | 26 |
+| `model_derived_provenance_unrecorded` | `kems-111-ichise-1982` | 36 |
+| `model_derived_provenance_unrecorded` | `kems-184-behrens-1979` | 2 |
+| `model_derived_provenance_unrecorded` | `kems-ms2000-044` | 24 |
+| `model_derived_provenance_unrecorded` | `kim-2014-carbon-fe-v-mo-ni` | 3 |
+| `model_derived_provenance_unrecorded` | `kim-2018-sulfur-fe-v-mo-ni` | 3 |
+| `model_derived_provenance_unrecorded` | `liu-2023-chromium-oxide-activity` | 24 |
+| `model_derived_provenance_unrecorded` | `majzlan-2021-magnesium-silicate-glass-cp` | 3 |
+| `model_derived_provenance_unrecorded` | `mccready-1948-sodium-silicate` | 3 |
+| `model_derived_provenance_unrecorded` | `metsoc-2019-6005` | 30 |
+| `model_derived_provenance_unrecorded` | `miki-1999-si-alloy-thermodynamics` | 14 |
+| `model_derived_provenance_unrecorded` | `nagabayashi-hino-banya-1989-phosphorus` | 3 |
+| `model_derived_provenance_unrecorded` | `ohta-1996-cao-mgo-al2o3-activities` | 6 |
+| `model_derived_provenance_unrecorded` | `pankratz-1968-ri7201-sodium-calcium-silicates` | 47 |
+| `model_derived_provenance_unrecorded` | `richet-bottinga-1986-silicate-thermochemistry` | 4 |
+| `model_derived_provenance_unrecorded` | `sanders-1977-water-vapour-na-vaporization` | 2 |
+| `model_derived_provenance_unrecorded` | `sato-1976-lunar-fo2-apollo-17` | 54 |
+| `model_derived_provenance_unrecorded` | `seki-2011-ca-o-solubility-fe-cao-al2o3` | 10 |
+| `model_derived_provenance_unrecorded` | `sf04-magma-companion-workbook` | 56 |
+| `model_derived_provenance_unrecorded` | `shilov-2026-sro-la2o3-kems` | 3 |
+| `model_derived_provenance_unrecorded` | `shornikov-1994-mullite-kems` | 16 |
+| `model_derived_provenance_unrecorded` | `shornikov-1997-cao-al2o3` | 17 |
+| `model_derived_provenance_unrecorded` | `shornikov-2005-potassium-germanate` | 5 |
+| `model_derived_provenance_unrecorded` | `shornikov-2008-redox-oxide-evaporation` | 17 |
+| `model_derived_provenance_unrecorded` | `shornikov-2008-zinc-phosphate-melts` | 30 |
+| `model_derived_provenance_unrecorded` | `shornikov-2013-potassium-silicate-thermodynamics` | 26 |
+| `model_derived_provenance_unrecorded` | `shornikov-2014-sodium-germanate-melts` | 25 |
+| `model_derived_provenance_unrecorded` | `shornikov-2018-spinel-solid-solutions` | 12 |
+| `model_derived_provenance_unrecorded` | `shornikov-2020-cao-tio2-melts` | 75 |
+| `model_derived_provenance_unrecorded` | `shornikov-2024-wollastonite-evaporation` | 1 |
+| `model_derived_provenance_unrecorded` | `shornikov-2025-calcium-oxide-evaporation` | 75 |
+| `model_derived_provenance_unrecorded` | `shornikova-2019-perovskite-thermodynamics` | 3 |
+| `model_derived_provenance_unrecorded` | `shults-1994-mullite-evaporation` | 8 |
+| `model_derived_provenance_unrecorded` | `stebbins-carmichael-weill-1983` | 9 |
+| `model_derived_provenance_unrecorded` | `steurer-1985-vapor-phase-pyrolysis` | 9 |
+| `model_derived_provenance_unrecorded` | `sublimation-kinetics-2023-minerals` | 1 |
+| `model_derived_provenance_unrecorded` | `sugawara-2013-soda-lime-melt-na2o-activity` | 12 |
+| `model_derived_provenance_unrecorded` | `ta-shirai-2000-lpsc` | 6 |
+| `model_derived_provenance_unrecorded` | `ueshima-1982-fe-mo-thermal` | 58 |
+| `model_derived_provenance_unrecorded` | `wimpenny-2019-zn-isotope-evaporation-extreme-t` | 1 |
+| `model_derived_provenance_unrecorded` | `wood-wade-2013-trace-activities` | 311 |
+| `model_derived_provenance_unrecorded` | `yakovlev-2024-cai-vaporization` | 48 |
+| `model_derived_provenance_unrecorded` | `zaitsev-1999-na2o-sio2-pccp` | 3 |
+| `model_derived_provenance_unrecorded` | `zaitsev-2000-sodium-silicate-thermodynamics` | 3 |
+| `model_derived_provenance_unrecorded` | `zigo-1987-gehlenite-fusion` | 10 |

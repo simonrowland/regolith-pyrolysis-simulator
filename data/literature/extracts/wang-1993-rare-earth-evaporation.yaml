@@ -1,0 +1,231 @@
+schema_version: literature_extract.v1
+source_id: wang-1993-rare-earth-evaporation
+source:
+  citation: 'Wang, J., Davis, A. M. & Clayton, R. N. (1993). Rare earth element fractionation during evaporation of chondritic material. Meteoritics 28, 454 (abstract)'
+  year: 1993
+  corpus_asset: raw/wang-1993-rare-earth-evaporation/wang-1993-rare-earth-evaporation.pdf
+  corpus_sha256: 546ac05a8754eaaa1b0182c131ff6557fc56a3e46a344415ac55b475918ec460
+extraction:
+  method: Manual transcription checked against a 300 dpi render of the supplied one-page abstract. Only p. 454 is supplied; any continuation and the referenced figure's page are unverified. No results table is present. The referenced Wang Figure 1 is not included in the supplied page and is not digitized.
+  date: '2026-10-05'
+  worker: codex
+review_status: draft
+benches:
+- id: vacuum-furnace-reference-4
+  identity:
+    basis: cited_by_author
+    ref:
+      work_id: null
+      cited_as: reference [4]
+      for_parameters:
+      - apparatus_family
+      locator:
+        published_page: 454
+        pdf_page_index: 0
+        paragraph: Abstract
+        note: 'Vacuum furnace is attributed to reference [4]; that source is not supplied here.'
+  apparatus_family:
+    state: {tag: value, value: vacuum furnace}
+    locator: &wang_abstract
+      published_page: 454
+      pdf_page_index: 0
+      paragraph: Abstract
+      note: 'The authors say samples were evaporated in a vacuum furnace [4].'
+  cell_material_and_liner:
+    state: {tag: not_applicable, reason: not_applicable}
+    locator:
+      published_page: 454
+      pdf_page_index: 0
+      paragraph: Abstract
+      note: No effusion cell is described; the source says vacuum furnace.
+  geometry:
+    orifice_diameter_m:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *wang_abstract
+    orifice_channel_length_m:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *wang_abstract
+  heating_method:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 454
+      pdf_page_index: 0
+      paragraph: Abstract
+      note: The heating mechanism of the vacuum furnace is not given.
+  temperature_measurement:
+    sensor:
+      state: {tag: unknown, reason: not_published}
+      locator: *wang_abstract
+  temperature_calibration:
+    calibration:
+      state: {tag: unknown, reason: not_published}
+      locator: *wang_abstract
+  ionization:
+    energy_eV:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *wang_abstract
+    cross_sections:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *wang_abstract
+experiments:
+- experiment_id: wang_1993_chondritic_material_vacuum_furnace
+  bench_id: vacuum-furnace-reference-4
+  method: {tag: unknown, reason: Vacuum-furnace evaporation is reported; an exact supported method token is unavailable.}
+  locator:
+    published_page: 454
+    pdf_page_index: 0
+    paragraph: Abstract, experimental paragraph
+    note: Vacuum-furnace evaporation is reported; an exact supported method token is unavailable. No pyrolysis, Knudsen effusion or Langmuir geometry is asserted.
+  sample:
+    pretreatment:
+      state:
+        tag: value
+        value: Synthetic starting material was prepared and doped with rare earth elements.
+      locator: *wang_abstract
+    characterization:
+      state:
+        tag: value
+        value: CI chondritic relative proportions of MgO, Al2O3, SiO2, CaO, TiO2, and FeO, doped with 100 ppm of each rare earth element.
+      locator: *wang_abstract
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value: {kind: categorical, categorical: '2073.15 or 2273.15 K; source reports 1800 or 2000 °C and does not state run assignment'}
+        locator: *wang_abstract
+    total_duration_s:
+      state: {tag: unknown, reason: not_numeric}
+      locator:
+        published_page: 454
+        pdf_page_index: 0
+        paragraph: Abstract
+        note: Printed duration is “a few seconds to 5 hr”; the lower endpoint is not numeric.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: {kind: point, point: '1.3332236842105263e-4'}
+      locator:
+        published_page: 454
+        pdf_page_index: 0
+        paragraph: Abstract
+        note: Printed 10^-6 torr, converted to Pa; the abstract does not state pressure uncertainty.
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: *wang_abstract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+species:
+  Ce:
+    observations: []
+    context:
+      - observation_id: wang_1993_abstract_numerical_experimental_context
+        type: experiment_series
+        experiment: wang_1993_chondritic_material_vacuum_furnace
+        locator: *wang_abstract
+        units: as printed unless stated
+        values:
+          quantity: abstract_experimental_conditions_and_summary_numbers
+          provenance: Reported experimental conditions and aggregate results in the Wang abstract; no pointwise run assignments are printed.
+          starting_ree_dopant_ppm_each: 100
+          temperature_C_as_printed: [1800, 2000]
+          pressure_torr_as_printed: 0.000001
+          exposure_duration_as_printed: a few seconds to 5 hr
+          exposure_duration_upper_h: 5
+          evaporated_mass_fraction_range_pct: [7.6, 95.4]
+          no_significant_evaporation_mass_loss_upper_pct: 95
+          cerium_anomaly_mass_loss_interval_pct: [60, 70]
+          cerium_anomaly_value_at_mass_loss_pct_95: 0.0005
+          cerium_anomaly_value_as_printed: 5 × 10^-4
+          numeric_limits: The abstract does not assign the alternative furnace temperatures to individual runs or residues and gives no uncertainty.
+      - observation_id: wang_1993_abstract_qualifications_and_directional_claims
+        type: experiment_series
+        experiment: wang_1993_chondritic_material_vacuum_furnace
+        locator: *wang_abstract
+        units: as reported
+        values:
+          quantity: verbatim_abstract_claims_and_data_qualifications
+          provenance: Introduction explicitly attributes modeling to references [2,3]; the remaining statements report the authors' experiment and residue analysis.
+          introduction_claims:
+          - 'Evaporation experiments suggest that enrichments in the heavy isotopes of O, Mg, and Si in some CAIs are caused by kinetic effects during evaporation [1].'
+          - 'Volatility-fractionated REE patterns found in some CAIs have been modeled with some success using equilibrium thermodynamics [2,3], but little is known about kinetic effects on REE patterns.'
+          - 'We have begun an investigation of REE fractionation under conditions where large isotope effects are produced by the kinetic isotope effect.'
+          results_and_qualifications:
+          - 'The mass fraction evaporated ranged from 7.6–95.4%.'
+          - 'Most residues consist of olivine and glass.'
+          - 'Chemical compositions of the residues were determined by electron and ion microprobe.'
+          - 'Results for selected elements are shown in Fig. 1.'
+          - 'There is no significant evaporation of Ca, Al, and Ti up to 95% mass loss; the evaporation behavior of Mg, Si, and Fe is similar to that found by Hashimoto [5].'
+          - 'There is no significant evaporation of most of the REE up to 95% mass loss.'
+          - 'Cerium is much more volatile than the other REE under these conditions.'
+          - 'A tenfold negative Ce anomaly developed between 60% and 70% mass loss and the anomaly reached 5 × 10^-4 at 95% mass loss.'
+          uncertainty: No numeric analytical or experimental uncertainty is stated in the supplied abstract.
+          figure_status: Wang Figure 1 is referenced but is not present in the supplied one-page PDF; it is not digitized. The visible Figure 1 at the top left of page 454 belongs to the preceding abstract, as its surrounding text and caption show.
+      - observation_id: wang_1993_abstract_scope_and_missing_measurement_details
+        type: apparatus
+        experiment: wang_1993_chondritic_material_vacuum_furnace
+        locator: *wang_abstract
+        units: as reported
+        values:
+          quantity: methods_and_abstract_scope
+          provenance: Apparatus, analysis and scope statements reported in the supplied Wang abstract.
+          printed_method: evaporation in a vacuum furnace [4]
+          method_token_note: Experiment method is unknown because an exact supported vacuum-furnace evaporation token is unavailable; the source does not report pyrolysis or effusion geometry.
+          residue_analysis_method: electron and ion microprobe
+          pressure_conversion_method: not stated
+          pressure_calibration:
+            state: {tag: unknown, reason: not_published}
+            locator:
+              published_page: 454
+              pdf_page_index: 0
+              paragraph: Abstract, experimental paragraph
+              note: Furnace pressure is printed as 10^-6 torr; its gauge and calibration are not described.
+          ion_intensity_to_partial_pressure_conversion:
+            state: {tag: not_applicable, reason: not_applicable}
+            locator:
+              published_page: 454
+              pdf_page_index: 0
+              paragraph: Abstract, experimental paragraph
+              note: This describes vapor/KEMS ion-current conversion; residue ion-microprobe analysis is a separate method.
+          numeric_residue_composition:
+            state: {tag: unknown, reason: not_published}
+            locator:
+              published_page: 454
+              pdf_page_index: 0
+              paragraph: Abstract, experimental paragraph
+              note: Residue compositions were measured by electron and ion microprobe but no numeric analyses are included on this page; most residues consist of olivine and glass.
+          sample_purity: not stated
+          temperature_sensor_and_calibration: not stated
+          apparatus_limitations: No furnace model, cell or crucible material, orifice, channel geometry, pressure calibration, or run-specific assignments of temperature and exposure time are given in the supplied abstract.
+          data_table_status: No data table is present in the supplied one-page abstract.
+          source_scope: Only p. 454 supplied; any continuation and the figure's page are unverified. The supplied text ends after a complete Pr-anomaly sentence; only statements on p. 454 are extracted.
+          reference_numbers_as_printed: '[1], [2,3], [4], [5]'
+  Pr:
+    observations: []
+    context:
+    - observation_id: wang_1993_praseodymium_abstract_context
+      type: experiment_series
+      experiment: wang_1993_chondritic_material_vacuum_furnace
+      locator: *wang_abstract
+      units: as reported
+      values:
+        quantity: praseodymium_anomaly_in_high_mass_loss_residue
+        provenance: Reported experimental residue result in the Wang abstract.
+        praseodymium_loss_pct_at_reported_anomaly: 50
+        statement: 'A small Pr anomaly (50% Pr loss) also appeared in the highest-mass-loss residue.'
+    - observation_id: wang_1993_author_affiliations
+      type: source_metadata
+      locator: {published_page: 454, pdf_page_index: 0, paragraph: Wang author-affiliation block}
+      units: bibliographic metadata as printed
+      values:
+        authors_and_affiliation_labels: 'J. Wang [1], A. M. Davis [2], and R. N. Clayton [1,2,3]'
+        affiliations:
+          '1': Department of the Geophysical Sciences, University of Chicago, Chicago IL 60637, USA
+          '2': Enrico Fermi Institute, University of Chicago, Chicago IL 60637, USA
+          '3': Department of Chemistry, University of Chicago, Chicago IL 60637, USA
+        postal_code: 60637

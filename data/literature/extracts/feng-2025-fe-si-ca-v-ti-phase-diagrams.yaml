@@ -30,6 +30,31 @@ experiments:
         pdf_page_index: 4
         published_page: 1854
         table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: 'not_printed: the experimental procedure does not state the total furnace pressure.'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1852
+        section: Experimental Procedure
+        note: The procedure reports pO2 and the CO2/CO volume ratio but not total furnace pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: 'not_printed: the paper does not identify a separate carrier or sweep gas.'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1852
+        section: Experimental Procedure
+        note: The reported CO/CO2 atmosphere controls pO2; no separate carrier or sweep gas is identified.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_printed
 - experiment_id: feng-t4-equilibration
   method: quench_equilibration
   locator:
@@ -49,6 +74,31 @@ experiments:
         pdf_page_index: 6
         published_page: 1856
         table: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: 'not_printed: the experimental procedure does not state the total furnace pressure.'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1852
+        section: Experimental Procedure
+        note: The procedure reports pO2 and the CO2/CO volume ratio but not total furnace pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: 'not_printed: the paper does not identify a separate carrier or sweep gas.'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1852
+        section: Experimental Procedure
+        note: The reported CO/CO2 atmosphere controls pO2; no separate carrier or sweep gas is identified.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_printed
 - experiment_id: feng-v-series-equilibration
   method: quench_equilibration
   locator:
@@ -68,6 +118,31 @@ experiments:
         pdf_page_index: 8
         published_page: 1858
         table: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: 'not_printed: the experimental procedure does not state the total furnace pressure.'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1852
+        section: Experimental Procedure
+        note: The procedure reports pO2 and the CO2/CO volume ratio but not total furnace pressure.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: 'not_printed: the paper does not identify a separate carrier or sweep gas.'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1852
+        section: Experimental Procedure
+        note: The reported CO/CO2 atmosphere controls pO2; no separate carrier or sweep gas is identified.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_printed
 fidelity_samples:
 - path: species.CaO.observations[feng2025_t3_s01_liquid_feo].values.component_amount
   value: '6.9'

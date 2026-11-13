@@ -1329,6 +1329,25 @@ def test_gate_curve_memo_is_receipt_free_and_still_records_notice_once(
     assert notice["notices"][0]["reason"] == "receipt missing"
 
 
+def test_gate_curve_memo_malformed_configuration_raises_typed_error() -> None:
+    class MalformedCurve(dict):
+        def get(self, *_args, **_kwargs):
+            raise ValueError("malformed gate-curve source")
+
+    origin = {"producer_pid": os.getpid()}
+
+    with pytest.raises(ValueError, match="malformed gate-curve configuration") as exc:
+        admission.gate_curve_memo_origin_matches(
+            SimpleNamespace(),
+            MalformedCurve(source="gate_liquid_fraction:authoritative:test"),
+            origin,
+            fresh_evidence=False,
+        )
+
+    assert type(exc.value).__name__ == "_GateCurveConfigurationError"
+    assert exc.value != False
+
+
 @pytest.mark.parametrize("failure", ["failed", "stale", "transport-mismatched"])
 def test_live_cache_gate_refuses_failed_stale_and_wrong_transport_receipts(
     tmp_path: Path,

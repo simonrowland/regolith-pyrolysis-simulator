@@ -964,6 +964,59 @@ def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
     }
 
 
+def test_printed_mineral_mole_fraction_is_not_filtered_as_an_oxide() -> None:
+    """Mg2SiO4 is a charge formula, not an oxide-table reject."""
+
+    result = normalized_composition(
+        replace(factories.kems_experiment(), sample=_charge(single=False)),
+        _bench(),
+    )
+    assert result.selected is not None
+    assert set(result.selected.value) == {"Mg2SiO4", "SiO2"}
+    assert result.selected.notice is None
+
+
+def test_oxide_wt_derivation_names_components_the_charge_cannot_use() -> None:
+    """Closure volatiles stay out of oxides but remain visible to the engine charge."""
+
+    # The mass-percent gate admits at most 0.5 wt% of dropped components.
+    converted = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("99.5"), "H2O": Decimal("0.25"), "Ag2O": Decimal("0.25")}
+    )
+    stored = dict(converted.components)
+    sample = Sample(
+        initial_composition=Located(
+            factories.State.of(converted),
+            factories.loc(),
+            Derivation(
+                "wt_pct_to_mole_fraction", ("wt_pct",), (), "mole_fraction"
+            ),
+        ),
+        printed_composition=factories.located(
+            {
+                "basis": "printed_oxides",
+                "amount_basis": "mass_percent",
+                "components": [
+                    ["SiO2", "99.5"],
+                    ["H2O", "0.25"],
+                    ["Ag2O", "0.25"],
+                ],
+            }
+        ),
+    )
+    assert "H2O" not in stored
+    assert "Ag2O" in stored
+    result = normalized_composition(
+        replace(factories.kems_experiment(), sample=sample), _bench()
+    )
+    assert result.selected is not None
+    assert set(result.selected.value) == {"SiO2"}
+    assert result.selected.value["SiO2"] == Decimal(1)
+    notice = result.selected.notice or ""
+    assert "omitted non-oxide H2O 0.25 wt%, Ag2O 0.25 wt%" in notice
+    assert "omitted total 0.5 wt% <= 1.0 wt%" in notice
+
+
 def test_b704_waypoint_guard_uses_row_closure_and_preserves_independent_routes() -> None:
     experiment = factories.kems_experiment()
     bench = _bench()
@@ -1239,7 +1292,7 @@ def test_nonfinite_print_refuses_unparameterized_derived_initial() -> None:
     assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 
-def test_blank_printed_major_refuses_unparameterized_derived_initial_but_keeps_charge() -> None:
+def test_blank_printed_major_refuses_unparameterized_derived_initial_and_charge() -> None:
     from simulator.battery.records import Derivation
 
     base = factories.kems_experiment()
@@ -1269,7 +1322,9 @@ def test_blank_printed_major_refuses_unparameterized_derived_initial_but_keeps_c
     assert waypoint.selected is None
     assert waypoint.absence is not None
     assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-    assert set(charge) == {"MgO"}
+    # The source composition is a refused partial analysis, so no component
+    # from that same composition can route into a charge waypoint.
+    assert not charge
 
 
 def test_inferred_molar_inventory_never_printed_and_loses_to_printed_wt() -> None:

@@ -50,8 +50,15 @@ def test_measured_values_are_linked_context_and_not_double_scored() -> None:
     assert belite["values"]["printed_table_range_K"] == [972.86, 1471.05]
     assert belite["values"]["printed_prose_range_K"] == [972.86, 1471.65]
 
-    transitions = context["abdul_thesis_table5_2_transition_context"]["values"]["rows"]
+    transition_context = context["abdul_thesis_table5_2_transition_context"]
+    assert transition_context["type"] == "thermodynamic_transition_table_context"
+    assert transition_context["values"]["method_class"] == "quoted_attributed"
+    assert transition_context["values"]["linked_source_id"] == (
+        "abdul-2023-cao-sio2-calphad"
+    )
+    transitions = transition_context["values"]["rows"]
     assert len(transitions) == 19
+    assert all("reference" in row for row in transitions)
     assert transitions[5]["transition_heat_kJ_mol_as_printed"] == "7.757–15.460"
     assert "temperature_C" not in transitions[6]
     assert "temperature_C" not in transitions[9]

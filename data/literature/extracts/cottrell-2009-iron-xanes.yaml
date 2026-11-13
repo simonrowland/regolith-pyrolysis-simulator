@@ -420,17 +420,17 @@ source_material_compositions:
 conditions_source_locators:
   basalt_pressure: &basalt_pressure_locator
     page: 2
-    published_page: '169'
+    published_page: '168'
     section: '2.2 High temperature experiments'
     note: Basalts equilibrated at 1 atm.
   basalt_gases: &basalt_gas_locator
     page: 2
-    published_page: '169'
+    published_page: '168'
     section: '2.2 High temperature experiments'
     note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
   568_temperature: &568_temperature_locator
     page: 2
-    published_page: '169'
+    published_page: '168'
     section: '2.2 High temperature experiments'
     note: VG568 chip held at 1550 °C for 72 h.
   rhyolite_conditions: &rhyolite_conditions_locator
@@ -562,7 +562,7 @@ species:
         type: concentration_series
         locator:
           page: 3
-          published_page: '170'
+          published_page: '169'
           section: '3.1 Mössbauer spectroscopy'
           note: Fe3+/SumFe is the fitted ferric doublet area divided by the full resonant absorption envelope; no recoil-free-fraction correction is applied.
         phase: quenched silicate glass
@@ -578,7 +578,7 @@ species:
               value: not_printed
             locator:
               page: 3
-              published_page: '170'
+              published_page: '169'
               section: '3.1 Mössbauer spectroscopy'
               note: Fitted spectrum areas are not tabulated as numeric cells.
         values:
@@ -1833,7 +1833,7 @@ species:
         type: concentration_series
         locator:
           page: 3
-          published_page: '170'
+          published_page: '169'
           section: '3.1 Mössbauer spectroscopy'
           note: Mössbauer measurements for VG568_2, DT_46, and DT_39.
         phase: quenched silicate glass
@@ -1849,7 +1849,7 @@ species:
               value: not_printed
             locator:
               page: 3
-              published_page: '170'
+              published_page: '169'
               section: '3.1 Mössbauer spectroscopy'
               note: Fitted spectrum areas are not tabulated as numeric cells.
         values:
@@ -2271,35 +2271,35 @@ species:
             average_1sigma_Fe3_sumFe_times_100_as_published: '0.45'
             equation_as_published: 'Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2'
         derived_from:
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
-          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=33babca2189e
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=6ca174562d72
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=e10a222478c6
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=55cddad480b7
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=3014aad11186
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=6112bbb1efe0
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=689af16e60b4
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=bdb3b360ef15
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=14e411c76e2c
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=45671d7935b5
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=7cd41a3320bc
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=a546a2eb0f86
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=0ba289e53f3a
         derivation:
           relation: Least-squares SVD second-order fit of the stored Mössbauer Fe3+/SumFe fractions against the stored cross-session centroid energies.
           inputs:
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
-            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=33babca2189e
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=6ca174562d72
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=e10a222478c6
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=55cddad480b7
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=3014aad11186
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=6112bbb1efe0
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=689af16e60b4
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=bdb3b360ef15
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=14e411c76e2c
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=45671d7935b5
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=7cd41a3320bc
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=a546a2eb0f86
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=0ba289e53f3a
           output_unit: as_published
       - observation_id: cottrell_2009_rhyolite_centroid_calibration
         type: recalculation_table
@@ -2360,7 +2360,7 @@ species:
             average_1sigma_Fe3_sumFe_times_100_as_published: '1.89'
             equation_as_published: 'Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2'
         derived_from:
-          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=29ea154dd367
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
           - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
@@ -2370,7 +2370,7 @@ species:
         derivation:
           relation: Weighted least-squares second-order fit of the seven Table 2 rhyolite glasses; y is footnote-f wet chemistry for the six Moore glasses and the Mössbauer Fe3_over_FeT value for 568_2.
           inputs:
-            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=29ea154dd367
             - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
             - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
             - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2

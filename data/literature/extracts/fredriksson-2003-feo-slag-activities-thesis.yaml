@@ -1,0 +1,2495 @@
+schema_version: literature_extract.v1
+source_id: fredriksson-2003-feo-slag-activities-thesis
+source:
+  citation: Fredriksson, P. (2003), Thermodynamic Studies of the Fe-Pt System and FeO-Containing Slags for Application
+    Towards Ladle Refining, Doctoral Dissertation, Royal Institute of Technology (KTH), Stockholm. ISBN 91-7283-592-3.
+  year: 2003
+extraction:
+  method: Manual transcription checked against 220 dpi page images; Table I and the numeric grid embedded in Figure
+    9 were transcribed before encoding. All 44 pages were rendered and inspected.
+  date: '2026-10-05'
+  worker: codex-resume-32275-1791224887
+  provenance_path: tables/fredriksson-2003-feo-slag-activities-thesis/
+review_status: draft
+fidelity_samples:
+- species: CoO
+  observation_id: fredriksson_2003_coo_gibbs_fit
+  field: equation
+  value: Δ°G_CoO^I = −233996 + 69.28 T
+  locator:
+    page: 28
+    published_page: 19
+    equation: '20'
+    note: Equation and stated uncertainty checked against the page image.
+- species: Al2O3
+  observation_id: fredriksson_2003_materials_table_i
+  field: row_count
+  value: 46
+  locator:
+    page: 14
+    published_page: 5
+    table: I
+    note: First material row, checked against image.
+- species: Al2O3
+  observation_id: fredriksson_2003_fig9_model_activity_table
+  field: row_count
+  value: 6
+  locator:
+    page: 26
+    published_page: 17
+    figure: '9'
+    note: First numeric model row, checked against image.
+species:
+  CoO:
+    observations: []
+    context:
+    - observation_id: fredriksson_2003_coo_gibbs_fit
+      type: thermodynamic_example
+      locator:
+        page: 28
+        published_page: 19
+        equation: '20'
+        section: 5.1 Supplement 1
+      units: J mol-1
+      values:
+        quantity: standard_gibbs_energy_of_formation
+        method_class: author_estimate
+        equation: Δ°G_CoO^I = −233996 + 69.28 T
+        intercept_J_mol: -233996
+        slope_J_mol_K: 69.28
+        temperature_range_K:
+        - 1052
+        - 1488
+        uncertainty_J_mol: 450
+        reaction: Co(s) + 0.5 O2(g) = CoO(s)
+        standard_state: CoO(s); Co(s); O2(g) as printed in the reaction.
+        derivation_note: Obtained by the authors from the galvanic-cell study using reference-electrode thermodynamic
+          information from references 39–40; underlying cell-potential values are not tabulated in this thesis.
+        cell_designation: Printed superscript I designates cell I (Y2O3-stabilised zirconia); cell II uses CaO.
+        comparison: The results are in good agreement with earlier investigations of the cobalt-oxygen system.
+        comparison_locator:
+          page: 39
+          published_page: 30
+          section: 7 Summary and conclusions
+    - observation_id: fredriksson_2003_coo_galvanic_method
+      type: method
+      locator:
+        page: 28
+        published_page: 19
+        section: 5.1 Supplement 1
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: galvanic_cell_validation_method
+        method: emf_cell
+        cell_as_printed: (-) Pt, Fe(s), “FeO”(s) // ZrO2 (partially stabilised with Y2O3 in cell I or CaO in cell II)
+          // CoO(s), Co(s), Pt (+)
+        temperature_range_K:
+        - 1052
+        - 1488
+        reference_state: CoO(s) formation from Co(s) and 0.5 O2(g).
+    - observation_id: fredriksson_2003_co_dissolved_oxygen_relation
+      type: thermodynamic_example
+      locator:
+        page: 29
+        published_page: 20
+        equation: 21–22
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: Gibbs energy for Eq. 21 evaluated using Chen et al. [46] assessment introduced at PDF 28 / print 19.
+        reaction: Co(s) + O̲(Co, fcc) = CoO(s)
+        dissolved_O_notation: O is underlined in the print, denoting dissolved oxygen in fcc Co.
+        equation: Δ°G_21 = −29385 + 5.756 T J/mol (1050–1450 K)
+        intercept_J_mol: -29385
+        slope_J_mol_K: 5.756
+        temperature_range_K:
+        - 1050
+        - 1450
+  Al2O3:
+    observations: []
+    context:
+    - observation_id: fredriksson_2003_materials_table_i
+      type: characterization
+      locator:
+        page: 14
+        published_page: 5
+        table: I
+      units: as printed
+      values:
+        quantity: complete_material_purity_supplier_inventory
+        method_class: quoted_unattributed
+        table_csv: tables/fredriksson-2003-feo-slag-activities-thesis/t1.csv
+        row_count: 46
+        blank_purity_means_not_listed: true
+        example_row:
+          material: Air
+          purity: plus-grade
+          supplier: AGA, Sweden
+        rows:
+        - row_number: 1
+          material: Air
+          purity: plus-grade
+          supplier: AGA, Sweden
+        - row_number: 2
+          material: α-alumina, single crystal
+          purity: 99.99%
+          supplier: NETZSCH, Germany
+        - row_number: 3
+          material: Alumina cement
+          purity:
+            state:
+              tag: unknown
+              reason: not_published
+          supplier: Haldewanger, Germany
+        - row_number: 4
+          material: Alumina crucible
+          purity: 99.7%
+          supplier: Haldewanger, Germany
+        - row_number: 5
+          material: Alumina crucibles and caps
+          purity: 99.5%
+          supplier: Setaram, France
+        - row_number: 6
+          material: Alumina lining,
+          purity: 99.7%
+          supplier: NETZSCH, Germany
+        - row_number: 7
+          material: Aluminium Oxide
+          purity: anhydrous
+          supplier: E. Merck, Germany
+        - row_number: 8
+          material: Alumina tubes
+          purity: 99.7%
+          supplier: Haldenwanger, Germany
+        - row_number: 9
+          material: Ascarite II
+          purity:
+            state:
+              tag: unknown
+              reason: not_published
+          supplier: Thomas Scientific, USA
+        - row_number: 10
+          material: Argon
+          purity: plus-grade
+          supplier: AGA Gas, Sweden
+        - row_number: 11
+          material: Argon-2% Hydrogen
+          purity: plus-grade
+          supplier: AGA Gas, Sweden
+        - row_number: 12
+          material: Calcia stabilised zirconia
+          purity:
+            state:
+              tag: unknown
+              reason: not_published
+          supplier: Yamari Industries, Japan
+        - row_number: 13
+          material: Calcium Oxide
+          purity:
+            state:
+              tag: unknown
+              reason: not_published
+          supplier: Fischer Scientific, USA
+        - row_number: 14
+          material: Carbon Monoxide
+          purity: plus-grade
+          supplier: AGA Gas, Sweden
+        - row_number: 15
+          material: Carbon Dioxide
+          purity: plus-grade
+          supplier: AGA Gas, Sweden
+        - row_number: 16
+          material: Carbonyl iron powder
+          purity: pro analysi
+          supplier: E. Merck, Germany
+        - row_number: 17
+          material: Cobalt powder
+          purity: 99.8%
+          supplier: Johnson Matthey Inc., UK
+        - row_number: 18
+          material: Cobalt(II) nitrate hexahydrate
+          purity: 98%
+          supplier: Aldrich, USA
+        - row_number: 19
+          material: Copper, turnings
+          purity: 99%
+          supplier: Johnson Matthey Inc., UK
+        - row_number: 20
+          material: Gold
+          purity: 99.999%
+          supplier: NETZSCH, Germany
+        - row_number: 21
+          material: Helium
+          purity: plus-grade
+          supplier: AGA Gas, Sweden
+        - row_number: 22
+          material: Hematite powder
+          purity: anhydrous
+          supplier: Fisher Scientific, USA
+        - row_number: 23
+          material: Hydrogen
+          purity: plus-grade
+          supplier: AGA Gas, Sweden
+        - row_number: 24
+          material: Indium
+          purity: 99.999%
+          supplier: NETZSCH, Germany
+        - row_number: 25
+          material: Iron crucible
+          purity: 99.9%
+          supplier: Armco Iron, USA
+        - row_number: 26
+          material: Iron foil
+          purity: 99.5%
+          supplier: Goodfellow, UK
+        - row_number: 27
+          material: Magnesium, turnings
+          purity: '> 99 %'
+          supplier: E. Merck, Germany
+        - row_number: 28
+          material: Magnesium Oxide
+          purity: pro analysi
+          supplier: E. Merck, Germany
+        - row_number: 29
+          material: Magnesium perchlorate (dehydrite)
+          purity: anhydrous
+          supplier: GFS Chemicals, USA
+        - row_number: 30
+          material: Magnetite
+          purity: 96.7%
+          supplier: LKAB, Sweden
+        - row_number: 31
+          material: Nickel foil
+          purity: 99.4%
+          supplier: INCO Alloys, Canada
+        - row_number: 32
+          material: Nitrogen
+          purity: plus-grade
+          supplier: AGA Gas, Sweden
+        - row_number: 33
+          material: di-Phosphorous penta oxide
+          purity: extra pure
+          supplier: E. Merck, Germany
+        - row_number: 34
+          material: Platinum crucibles and caps
+          purity: 99.99%
+          supplier: NETZSCH, Germany
+        - row_number: 35
+          material: Platinum powder
+          purity: 99.9%
+          supplier: Chempur, Germany
+        - row_number: 36
+          material: Platinum wire
+          purity: 99.9%
+          supplier: Johnson Matthey Inc., UK
+        - row_number: 37
+          material: Platinum/Rhodium wire
+          purity: 99.99%
+          supplier: Johnson Matthey Inc., UK
+        - row_number: 38
+          material: Platinum sheet
+          purity: 99.998%
+          supplier: Johnson Matthey Inc., UK
+        - row_number: 39
+          material: Silica gel
+          purity:
+            state:
+              tag: unknown
+              reason: not_published
+          supplier: E. Merck, Germany
+        - row_number: 40
+          material: Silicon Oxide
+          purity: pro analysi
+          supplier: E. Merck, Germany
+        - row_number: 41
+          material: Silver
+          purity: 99.99%
+          supplier: NETZSCH, Germany
+        - row_number: 42
+          material: Tin
+          purity: 99.99%
+          supplier: NETZSCH, Germany
+        - row_number: 43
+          material: Titanium foil
+          purity: 99.7%
+          supplier: Aldrich, USA
+        - row_number: 44
+          material: Yttria stabilised zirconia
+          purity:
+            state:
+              tag: unknown
+              reason: not_published
+          supplier: Friatech, Germany
+        - row_number: 45
+          material: Yttria stabilised zirconia
+          purity:
+            state:
+              tag: unknown
+              reason: not_published
+          supplier: K-Style Adv. Cer., China
+        - row_number: 46
+          material: Zinc
+          purity: 99.999%
+          supplier: NETZSCH, Germany
+    - observation_id: fredriksson_2003_fig9_model_activity_table
+      type: thermodynamic_example
+      locator:
+        page: 26
+        published_page: 17
+        figure: '9'
+        note: Complete numeric grid shown in the THERMOSLAG software screenshot.
+      units: dimensionless activities; mole fractions
+      values:
+        quantity: Calculated activities in the Al2O3-CaO-MgO-SiO2 system
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        attribution: Calculated by the KTH/THERMOSLAG slag model and displayed as point activity calculations in
+          Figure 9.
+        reference_state: pure solid
+        composition_basis: mole fraction
+        csv: tables/fredriksson-2003-feo-slag-activities-thesis/f9.csv
+        row_count: 6
+        numeric_cell_count: 54
+        rows:
+        - row_number: 1
+          temperature_K: 1823
+          composition_mole_fraction:
+            Al2O3: 0.25
+            CaO: 0.6
+            MgO: 0.05
+          activities:
+            Al2O3: 0.0781
+            CaO: 0.207
+            MgO: 0.109
+            SiO2: 0.000252
+          method_class: model_derived
+          attribution: Calculated by the KTH/THERMOSLAG slag model and displayed as point activity calculations
+            in Figure 9.
+        - row_number: 2
+          temperature_K: 1843
+          composition_mole_fraction:
+            Al2O3: 0.25
+            CaO: 0.6
+            MgO: 0.05
+          activities:
+            Al2O3: 0.0739
+            CaO: 0.203
+            MgO: 0.104
+            SiO2: 0.000255
+          method_class: model_derived
+          attribution: Calculated by the KTH/THERMOSLAG slag model and displayed as point activity calculations
+            in Figure 9.
+        - row_number: 3
+          temperature_K: 1863
+          composition_mole_fraction:
+            Al2O3: 0.25
+            CaO: 0.6
+            MgO: 0.05
+          activities:
+            Al2O3: 0.07
+            CaO: 0.199
+            MgO: 0.0994
+            SiO2: 0.000258
+          method_class: model_derived
+          attribution: Calculated by the KTH/THERMOSLAG slag model and displayed as point activity calculations
+            in Figure 9.
+        - row_number: 4
+          temperature_K: 1883
+          composition_mole_fraction:
+            Al2O3: 0.25
+            CaO: 0.6
+            MgO: 0.05
+          activities:
+            Al2O3: 0.0664
+            CaO: 0.195
+            MgO: 0.0951
+            SiO2: 0.00026
+          method_class: model_derived
+          attribution: Calculated by the KTH/THERMOSLAG slag model and displayed as point activity calculations
+            in Figure 9.
+        - row_number: 5
+          temperature_K: 1903
+          composition_mole_fraction:
+            Al2O3: 0.25
+            CaO: 0.6
+            MgO: 0.05
+          activities:
+            Al2O3: 0.0631
+            CaO: 0.191
+            MgO: 0.0911
+            SiO2: 0.000263
+          method_class: model_derived
+          attribution: Calculated by the KTH/THERMOSLAG slag model and displayed as point activity calculations
+            in Figure 9.
+        - row_number: 6
+          temperature_K: 1923
+          composition_mole_fraction:
+            Al2O3: 0.25
+            CaO: 0.6
+            MgO: 0.05
+          activities:
+            Al2O3: 0.06
+            CaO: 0.187
+            MgO: 0.0874
+            SiO2: 0.000266
+          method_class: model_derived
+          attribution: Calculated by the KTH/THERMOSLAG slag model and displayed as point activity calculations
+            in Figure 9.
+  FeO:
+    observations: []
+    context:
+    - observation_id: fredriksson_2003_activity_experiment_and_standard_state
+      type: method
+      locator:
+        page: 19
+        published_page: 10
+        section: 3.4.1 Principle
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: slag_iron_oxide_activity_definition
+        reaction: Fe(Pt) + 0.5 O2(g) = “FeO”(slag)
+        activity_relation: a_FeO = a_Fe(Pt) * pO2^(1/2) * C2
+        inputs: iron activity in Pt, oxygen partial pressure, and equilibrium constant C2.
+        iron_reference_state: pure solid Fe at 298 K and 1 atm.
+        FeO_activity_standard_state:
+          state: unknown
+          reason: not_explicitly_stated_for_the_FeO_activity_plots
+        result_description: Conclusion calls the reported activities activities of liquid “FeO”.
+        gibbs_energy_input: Standard Gibbs energy for reaction (2) taken from JANAF [23].
+    - observation_id: fredriksson_2003_figure10_coo_comparison
+      type: figure_only
+      locator:
+        page: 28
+        published_page: 19
+        figure: '10'
+      units: as plotted
+      values:
+        method_class: figure_only
+        quantity: Gibbs energy of formation for cobaltous oxide compared with earlier studies.
+        note: No curve points digitized.
+    - observation_id: fredriksson_2003_figure11_fept_enthalpy
+      type: figure_only
+      locator:
+        page: 29
+        published_page: 20
+        figure: '11'
+      units: as plotted
+      values:
+        method_class: figure_only
+        quantity: Enthalpies of mixing for Fe-Pt alloys at 1123 K.
+        note: No graph points or error bars digitized.
+    - observation_id: fredriksson_2003_figure12_fept_dta
+      type: figure_only
+      locator:
+        page: 30
+        published_page: 21
+        figure: '12'
+      units: as plotted
+      values:
+        method_class: figure_only
+        quantity: Fe-Pt phase diagram compared with current DTA measurements and prior work.
+        temperature_transitions_K:
+        - 1420
+        - 1610
+        note: Phase-diagram curves and plotted transition points were not digitized.
+    - observation_id: fredriksson_2003_figures14_16_binary_feo_activities
+      type: figure_only
+      locator:
+        page: 32
+        published_page: 23
+        figure: '14'
+        note: 'Figure 14: PDF 32 / print 23; Figures 15–16: PDF 33 / print 24.'
+      units: as plotted
+      values:
+        method_class: figure_only
+        quantity: Experimental and calculated “FeO” activity comparison in FeO-SiO2; Al2O3-FeO; and CaO-FeO systems.
+        present_study_temperature_ranges_K:
+          FeO-SiO2:
+          - 1823
+          - 1873
+          Al2O3-FeO:
+          - 1823
+          - 1873
+          CaO-FeO:
+          - 1823
+          - 1873
+        note: No plotted activity points digitized. Figure 16 prints discrete present-study temperatures 1823 and 1873
+          K, whereas Figures 14–15 print 1823–1873 K.
+    - observation_id: fredriksson_2003_figures17_19_ternary_feo_activities
+      type: figure_only
+      locator:
+        page: 34
+        published_page: 25
+        figure: '17'
+        note: 'Figure 17: PDF 34 / print 25; Figures 18–19: PDF 35 / print 26.'
+      units: as plotted
+      values:
+        method_class: figure_only
+        quantity: Experimental and calculated “FeO” iso-activity contours in Al2O3-FeO-SiO2, CaO-FeO-SiO2, and FeO-MgO-SiO2.
+        temperature_K: 1873
+        standard_state: not stated in the figure captions.
+        note: No plotted activity points or contour values digitized.
+    - observation_id: fredriksson_2003_figure20_multicomponent_model
+      type: figure_only
+      locator:
+        page: 36
+        published_page: 27
+        figure: '20'
+      units: as plotted
+      values:
+        method_class: figure_only
+        quantity: Calculated Al2O3 activity versus Al2O3 weight percent in BF, EAF, and LF six-component slag examples
+          at 1873 K.
+        BF_composition_ratio_as_printed: CaO:“FeO”:MgO:MnO:SiO2 = 32:2:17:2:34
+        EAF_composition_ratio_as_printed: CaO:“FeO”:MgO:MnO:SiO2 = 40:15:9:5:21
+        LF_composition_ratio_as_printed: CaO:“FeO”:MgO:MnO:SiO2 = 53.5:0.6:6:0.4:6.0
+        note: Curves were not digitized.
+    - observation_id: fredriksson_2003_figure21_plant_oxygen
+      type: figure_only
+      locator:
+        page: 37
+        published_page: 28
+        figure: '21'
+      units: as plotted
+      values:
+        method_class: figure_only
+        quantity: Oxygen in liquid steel from THERMOSLAG calculations and total oxygen in finished product across
+          heats 1–24.
+        note: Graph values were not digitized.
+    - observation_id: fredriksson_2003_result_qualifiers
+      type: characterization
+      locator:
+        page: 21
+        published_page: 12
+        section: 3.4.4 Procedure
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: qualifiers_and_assumptions_on_slag_activity_results
+        equilibrium_assumption: Assuming that the dissolution of Fe in Pt had reached equilibrium under the experimental
+          duration
+        equilibrium_duration_h: 8
+        repeat_durations_h:
+        - 15
+        - 24
+        repeats_result: similar_results
+        crucible_concentration_gradient: not_found_across_thickness
+        dissolved_Al_Ca_Mg_wt_percent_upper_bound: 0.1
+        dissolved_Al_Ca_Mg_use_in_calculations: excluded
+        dissolved_Si_wt_percent_max: 0.12
+        sample_holder_contamination: negligible_in_blank_run
+        iron_oxidation_states_analysis: redox_titration
+        slag_analysis: X-ray fluorescence; some checks by Mössbauer analysis
+        activity_uncertainty_percent:
+        - 3
+        - 5
+        activity_uncertainty_basis: percent of calculated activity
+        crucible_gradient_method: SEM–EDS of Pt-crucible cross sections
+        crucible_assay_method: Atomic absorption spectroscopy for dissolved Fe and, where appropriate, Al, Ca, Mg and
+          Si.
+    - observation_id: fredriksson_2003_summary_claims
+      type: thermodynamic_example
+      locator:
+        page: 39
+        published_page: 30
+        section: 7 Summary and conclusions
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: printed_numeric_summary_and_data_qualifiers
+        slag_activity_temperature_range_K_in_summary:
+        - 1823
+        - 1923
+        FePt_galvanic_cell_temperature_range_K:
+        - 1073
+        - 1273
+        FePt_calorimetry_temperature_range_K:
+        - 300
+        - 1988
+        FePt_order_disorder_transition_range_K:
+        - 1420
+        - 1610
+        liquidus_maximum_composition_at_percent_Pt: 50
+        temperature_coefficient_of_FeO_activity: stated negligible
+        trivalent_iron_effect_on_FeO_activity: stated not significant in CaO-“FeO” and “FeO”-MgO-SiO2 by model estimates
+        FeO_activity_comparison: stated in general agreement with earlier investigations
+        note: Abstract and supplement descriptions also print other temperature ranges; see the internal-range-variation
+          context record.
+    - observation_id: fredriksson_2003_numeric_ranges_and_claims
+      type: thermodynamic_example
+      locator:
+        page: 3
+        published_page: iii
+        section: Abstract
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: printed_numeric_summary_and_qualifiers
+        FePt_galvanic_cell_temperature_range_K:
+        - 1073
+        - 1273
+        FePt_calorimetry_temperature_range_K:
+        - 300
+        - 1988
+        statements:
+        - A part of the iron reduced from the “FeO” in the slag phase was dissolved into the Pt crucible.
+        - A correlation between the activity of a metallic oxide in a ternary slag system and the sulphide capacity
+          of the slag was investigated.
+        - The estimated values of the activities were found to be in good agreement with the measured values.
+        - oxygen estimations in the metal from the “FeO” analyses of slags, obtained by conventional sampling and analysis
+          method were less reliable.
+    - observation_id: fredriksson_2003_range_variation
+      type: characterization
+      locator:
+        page: 39
+        published_page: 30
+        section: 7 Summary and conclusions
+        note: Compare abstract, methods, supplement summaries, and conclusions.
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: internally_varying_temperature_ranges_for_slag_activity_work
+        binary_activity_range_K:
+        - 1823
+        - 1873
+        ternary_activity_range_K:
+        - 1823
+        - 1923
+        methods_procedure_range_K:
+        - 1823
+        - 1973
+        supplement_6_range_K:
+        - 1823
+        - 1923
+        conclusion_range_K:
+        - 1823
+        - 1923
+        note: These ranges refer to differently scoped system summaries; the text does not assign each individual plotted
+          point to a range beyond the binary/ternary figure descriptions.
+        introduction_range_K:
+        - 1823
+        - 1873
+        range_locators:
+          introduction:
+            page: 10
+            published_page: 1
+          binary_activity:
+            page: 31
+            published_page: 22
+          ternary_activity:
+            page: 34
+            published_page: 25
+          methods_procedure:
+            page: 21
+            published_page: 12
+          supplement_6:
+            page: 34
+            published_page: 25
+          conclusion:
+            page: 39
+            published_page: 30
+    - observation_id: fredriksson_2003_material_preparation_and_inventory
+      type: characterization
+      locator:
+        page: 13
+        published_page: 4
+        section: 3.2.1 Preparation of materials
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: source_materials_and_preparation
+        inventory_csv: tables/fredriksson-2003-feo-slag-activities-thesis/t1.csv
+        FeO_starting_materials: electrolytic iron powder and Fe2O3 dried at approximately 400 K in air
+        FeO_target_condition: composition in equilibrium with iron at 1273 K
+        FeO_sintering: sealed iron crucible in argon at 1273 K for 12 hours then quenched
+        FeO_characterization: X-ray diffraction found no metallic iron or magnetite
+        FeO_lattice_parameter_A: 4.3
+        literature_lattice_parameter_A: 4.3088
+        CoO_preparation: Co(NO3)2·6H2O decomposed in a platinum dish under nitrogen at 1073 K for 6 hours
+        CoO_characterization: purity confirmed by X-ray diffraction
+        FePt_alloy_preparation: pure metal powders mixed and sintered in situ in galvanic cell for over 12 hours at
+          1473 K; some alloys were premelted under highly purified argon
+        FePt_alloy_characterization: post-experiment X-ray diffraction patterns corresponded to the alloys
+    - observation_id: fredriksson_2003_other_reported_experimental_qualifiers
+      type: characterization
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+        note: Oxygen bound and repeat controls continue on PDF 19 / print 10; H2/He comparison is PDF 30 / print 21.
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: experimental_controls_and_qualifiers
+        outgoing_O2_partial_pressure_atm_upper_bound: 1.0e-15
+        pO2_monitor_temperature_K: 973
+        calorimeter_repeats: selected_experiments_repeated_to_confirm_reproducibility
+        Setaram_constancy_controls: Sample size and weight, crucible and cap weights, and gas flow were kept as constant
+          as possible throughout the measurement series.
+        Setaram_constancy_controls_locator:
+          page: 19
+          published_page: 10
+          section: 3.3.2.2 The Setaram calorimeter
+        H2_vs_He_measurement_effect: insignificant
+        source_internal_consistency_note: The main DTA summary reports measurements under Ar and H2 and says He was
+          used to check H2 effect; calorimetry method text separately gives H2 or He measurement gas.
+    - observation_id: fredriksson_2003_ionic_slag_model_formula
+      type: thermodynamic_example
+      locator:
+        page: 26
+        published_page: 17
+        equation: '15'
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: Ionic model representation
+        equation: (C1^ν1, C2^ν2, …, Ci^νi, …, Cm^νm)_p (O^2−)_q
+        definitions: m oxides; p and q stoichiometric numbers; Ci cations; νi electrical charge.
+    - observation_id: fredriksson_2003_ionic_slag_model_equations_and_standard_state
+      type: thermodynamic_example
+      locator:
+        page: 27
+        published_page: 18
+        equation: 16–19
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: Slag model definitions and reference conventions
+        equations:
+          '16': y_Ci = N_Ci / Σ_(j=1 to m) N_Cj
+          '17': G_m = Σ_i x_(Ci_ci O_ai) °G_(Ci_ci O_ai) + RT p Σ_i y_ci ln(y_ci) + ^E G
+          '18': ^E G = f(T,y_Si4+) + Σ_(i=1 to m−1) (Σ_(j=i+1 to m) y_Ci y_Cj Ω^CiCj(O))
+          '19': Ω^Ci,Cj(O) = Ω_1^Ci,Cj(O) + Ω_2^Ci,Cj(O) T + (y_Ci−y_Cj)(Ω_3^Ci,Cj(O)+Ω_4^Ci,Cj(O) T) + (y_Ci−y_Cj)^2(Ω_5^Ci,Cj(O)+Ω_6^Ci,Cj(O)
+            T) + …
+        definitions: N_Ci moles of cation Ci; sum over all cations; x oxide mole fraction and °G oxide Gibbs energy
+          of formation; R gas constant, T in Kelvin, p stoichiometric number; Temkin ideal mixing entropy.
+        assumptions: Silicate network completely dissociated into Si4+ and O2−, aluminate into Al3+ and O2−; next-nearest
+          cation interactions in presence of oxygen. f(T,y_Si4+) compensates hypothetical silica standard state because
+          excess Gibbs energy is nonzero near pure silica; FeO assumed stoichiometric. This model convention is distinct
+          from Figure 9 pure-solid display standard.
+    - observation_id: fredriksson_2003_multicomponent_model_capability
+      type: thermodynamic_example
+      locator:
+        page: 34
+        published_page: 25
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: Demonstrated model activity prediction in four, five and six component steelmaking slags
+        component_counts:
+        - 4
+        - 5
+        - 6
+        example: Six-component example Figure 20 at PDF 36 / print 27.
+  Fe:
+    observations: []
+    context:
+    - observation_id: fredriksson_2003_fept_galvanic_qualifiers
+      type: characterization
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.3 Procedure
+        note: 'Procedure: PDF 16 / print 7; Eq. 1 and electrolyte: PDF 13 / print 4; range, six alloys and result claims:
+          PDF 29 / print 20.'
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: galvanic_cell_conditions_and_qualifiers
+        temperature_range_K:
+        - 1073
+        - 1273
+        initial_hold_temperature_K: 1473
+        minimum_initial_hold_h: 6
+        minimum_stable_emf_duration_h: 1
+        stable_emf_tolerance_mV: 0.5
+        temperature_cycle_reversibility_mV: 0.4
+        electrolyte: ZrO2 with 11 mol pct CaO
+        Fe_analysis: redox_titration
+        Pt_analysis: atomic_absorption_spectroscopy
+        special_high_Pt_run_oxide: Fe3O4
+        activity_relation: E = -(RT/2F) ln a_Fe(Pt)
+        result_claims:
+        - The EMF values from the Fe-Pt investigation were found to be linear functions of composition.
+        - the activities showed a strong negative deviation from Raoult’s law.
+        - The activity coefficients from the present results showed general agreement with earlier measurements.
+        outgoing_O2_partial_pressure_atm_upper_bound: 1.0e-13
+        emf_input_impedance_Gohm: 1
+        alloys_studied: 6
+        recording: KEITHLY 199 System DMM/Scanner; EASY VIEW PC software; repeated cell polarisation returned EMF to
+          its original value.
+    - observation_id: fredriksson_2003_fept_calorimetry_qualifiers
+      type: characterization
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2 Apparatus and procedure
+        note: 'NETZSCH protocol: PDF 17–18 / print 8–9; Setaram calibration and probe: PDF 18 / print 9, oxygen bound
+          PDF 19 / print 10; explicit 300–1988 K summary and H2/He comparison: PDF 30 / print 21.'
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: FePt_calorimetry_schedule_and_qualifiers
+        NETZSCH_temperature_range_K:
+        - 300
+        - 1673
+        NETZSCH_heating_rate_K_min: 10
+        heating_cooling_cycles: 2
+        NETZSCH_stabilizing_temperature_K: 313
+        NETZSCH_crucible_controls: Both crucibles were weighed before and after each experiment and placed in exactly
+          the same position throughout the measurement series.
+        gas_purity_species: H2_or_He
+        temperature_calibrants:
+        - In
+        - Sn
+        - Zn
+        - Ag
+        - Au
+        alpha_alumina_reference: true
+        Setaram_temperature_range_K:
+        - 300
+        - 1988
+        Setaram_gold_melting_point_K: 1337.3
+        Setaram_O2_upper_bound_atm: 1.0e-15
+        Setaram_O2_probe_temperature_K: 973
+        result_claims:
+        - Fusion temperatures and heats of fusion were in agreement with literature and the recommended values from
+          NETZSCH Instruments.
+        - Use of He instead of H2 in some of the trials showed that the impact of hydrogen on the measurements was insignificant.
+        outlet_gas_start_criterion_as_printed: H2 or He fraction greater than ~99.6%; approximate outlet-gas start criterion,
+          not supplier purity.
+        NETZSCH_recording_time_step_s: 1.5
+        Balzer_Quadstar_422_time_step_s: 6.0
+        recording_evaluation: NETZSCH thermal measurement software and Balzer Quadstar 422 record at 1.5 and 6.0 s respectively;
+          α-alumina reference; NETZSCH Proteus thermal analysis software and numerical integration with Origin graphical
+          software respectively.
+    - observation_id: fredriksson_2003_fept_dta_summary
+      type: thermodynamic_example
+      locator:
+        page: 30
+        published_page: 21
+        section: 5.3 Supplement 3
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: FePt_DTA_temperature_and_atmosphere_summary
+        NETZSCH_alloys: 12
+        NETZSCH_temperature_range_K:
+        - 300
+        - 1673
+        Setaram_alloys: 3
+        Setaram_temperature_range_K:
+        - 300
+        - 1988
+        atmospheres:
+        - Ar
+        - H2
+        H2_effect_checked_with: He
+        transition_temperature_range_K:
+        - 1420
+        - 1610
+        statements:
+        - The results obtained show a good agreement with previous investigations.
+        - Use of He instead of H2 in some of the trials showed that the impact of hydrogen on the measurements was insignificant.
+    - observation_id: fredriksson_2003_fept_activity_standard_states
+      type: characterization
+      locator:
+        page: 23
+        published_page: 14
+        section: 4.1.1 The pure elements
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: FePt_thermodynamic_reference_state
+        reference_state: 'Gibbs-energy reference: pure solid elements Fe and Pt in stable states at 298.15 K (SER);
+          not an independently stated activity standard for every measured alloy activity.'
+        input_attribution: 'Stable and metastable pure Fe and Pt Gibbs energies from SGTE databank [26]. Separate slag-reaction
+          Fe reference, pure solid Fe at 298 K and 1 atm: PDF 19 / print 10.'
+    - observation_id: fredriksson_2003_slag_methods_summary
+      type: method
+      locator:
+        page: 21
+        published_page: 12
+        section: 3.4.4 Procedure
+        note: 'Preparation and Pt spiral: PDF 19 / print 10; apparatus and start of eight-hour procedure: PDF 20 / print
+          11; duration, run range and analyses: PDF 21 / print 12; gas flow: PDF 12 / print 3; probe: PDF 13 / print
+          4.'
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: slag_gas_equilibration_protocol
+        method: quench_equilibration
+        temperature_range_K:
+        - 1823
+        - 1973
+        atmosphere: CO-CO2-Ar mixture after constant argon flow
+        total_gas_flow_dm3_min: 0.2
+        oxygen_partial_pressure: defined_by_mixed_gas_and_monitored_at_973_K; numerical setpoints not tabulated
+        starting_oxides_pretreatment: heated at 1273 K for 12 hours then transferred at 373 K to P2O5 desiccator
+        crucible_material: Pt sheet 0.12 mm thick
+        equilibration_duration_h: 8
+        sample_count_per_holder: 4 crucibles
+        samples: molten oxide slags of differing composition; individual printed compositions are only shown graphically
+        quench: withdraw holder rapidly to the cold furnace zone
+        cross_contamination_control: Pt spiral inside each crucible prevents foaming-induced contamination between slag
+          samples; crucible shaping prevents sample creeping.
+    - observation_id: fredriksson_2003_activity_trend_qualifiers
+      type: thermodynamic_example
+      locator:
+        page: 39
+        published_page: 30
+        section: 7 Summary and conclusions
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: activity_trend_and_comparison_claims
+        statements:
+        - the activities showed a strong negative deviation from Raoult’s law.
+        - The activity coefficients from the present results showed general agreement with earlier measurements.
+        - The obtained phase equilibria and activities of iron and platinum agree reasonably well with the literature
+          data.
+        - The results obtained from the gas equilibration investigations show that activities of liquid “FeO” are in
+          general agreement with previous investigations performed in the different systems.
+        - the temperature coefficient was negligible for the activities of “FeO”.
+        - the agreement between the model calculation and most of the experimental results is satisfactory.
+        - The presence of trivalent iron in the systems CaO-“FeO” and “FeO”-MgO-SiO2 respectively does not seem to affect
+          the activity of “FeO” significantly as seen from the point of the model estimations.
+        - A general agreement between the various models was also observed.
+    - observation_id: fredriksson_2003_sulphide_capacity_qualifiers
+      type: thermodynamic_example
+      locator:
+        page: 36
+        published_page: 27
+        section: 5.7 Supplement 7
+        note: Continues at PDF 37 / print 28; CaS activity-coefficient input is printed separately at PDF 40 / print
+          31.
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: sulphide_capacity_activity_correlation_qualifiers
+        prior_binary_system_statement: Sulphide capacities are described as linear functions of activities of the basic
+          oxides in binary oxide systems, citing Nilsson et al. [65].
+        higher_order_system_need: Similar correlations are said to be desirable for higher-order systems.
+        limitation: The authors state that development is difficult because sulphide activities in complex slags do
+          not adhere to Henry’s law and the relative effects of metal oxides on sulphur affinity are uncertain.
+        estimated_oxide_activity: CaO activities for some Al2O3-CaO-SiO2 intermediate compounds were estimated using
+          sulphur solubility in CaO-SiO2 and Al2O3-CaO binaries plus the sulphide capacity of Al2O3-CaO-SiO2.
+        comparison: Estimated activities are stated to be in good agreement with measured values.
+        CaS_input: CaO activities evaluated from sulphide-capacity data and activity coefficient of CaS in CaO-SiO2
+          and CaO-Al2O3 binaries (PDF 40 / print 31).
+    - observation_id: fredriksson_2003_gas_purification_numeric_context
+      type: method
+      locator:
+        page: 12
+        published_page: 3
+        section: 3.1 The gas cleaning system
+        note: 'Gas cleaning, impurity bound and total flow: PDF 12 / print 3; 973 K probe and agreement sentence continue
+          at PDF 13 / print 4.'
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: gas_purity_and_oxygen_probe_context
+        argon_oxygen_impurity_atm_upper_bound: 1.0e-18
+        oxygen_probe_temperature_K: 973
+        oxygen_probe_comparison: The data from the oxygen probe was found to be in agreement with the calculated data.
+        Cu_Mg_column_temperature_K: 773
+        purification_sequence: 'Figure 2: Ar → silica gel → Cu at 773 K → ascarite → Mg(ClO4)2 → Mg at 773 K → magnetic
+          flow meter → mixer; CO follows the same train without Mg, with oxygen reacting over Cu and CO2 absorbed by
+          ascarite; CO2 → silica gel → Mg(ClO4)2 → flow meter → mixer.'
+        mixing: Bronkhorst High-Tech B.V. Serie E-7000 flow control; gases mixed at room temperature; component partial
+          pressures calculated with Thermo-Calc. Ar cleaning train without flow meter/mixer also applies to calorimetry
+          and galvanic work.
+    - observation_id: fredriksson_2003_calorimetry_material_preparation
+      type: thermodynamic_example
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.3.1 Preparation of materials
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: Fe–Pt calorimetry preparation
+        tablet_pressure_MPa: 500
+        sintering_days: 14
+        sintering_temperature_K: 1273
+        sintering_atmosphere: Ar–2% H2
+        final_hydrogen_release_temperature_K: 773
+        final_hydrogen_release_duration_h: 24
+        induction_melted_alternative_alloys: 3
+        preparation: Fe and dried Pt mixed in agate mortar; pressed tablet in alumina boat wrapped in Ti foil as internal
+          oxygen getter; Enslund horizontal furnace; final cooling to room temperature. Alternative induction melting
+          under highly purified Ar.
+        characterization: Al dissolution negligible and confirmed; no sample oxidation; XRD for phase identification
+          and electron microprobe analysis for composition.
+    - observation_id: fredriksson_2003_author_contributions
+      type: thermodynamic_example
+      locator:
+        page: 7
+        published_page: vii
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: Author contribution percentages; administrative source context, not thermodynamic observations
+        percentages_by_supplement:
+          '1':
+            experimental: 100
+            survey: 100
+            writing: 85
+          '2':
+            experimental: 100
+            survey: 100
+            writing: 55
+          '3':
+            experimental: 100
+            survey: 100
+            writing: 100
+          '4':
+            experimental: 100
+            survey: 100
+            modelling: 65
+            writing: 90
+          '5':
+            experimental: 100
+            survey: 100
+            modelling: 100
+            writing: 75
+          '6':
+            experimental: 100
+            survey: 100
+            modelling: 100
+            writing: 85
+          '7':
+            survey: 20
+            writing: 40
+          '8':
+            survey: 100
+            modelling: 100
+            writing: 70
+    - observation_id: fredriksson_2003_substitutional_and_fcc_model_equations
+      type: thermodynamic_example
+      locator:
+        page: 23
+        published_page: 14
+        equation: 4–7
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: Fe–Pt model equations 4–7
+        equations:
+          '4': G_m = Σ_i x_i °G_i + RT Σ_i x_i ln(x_i) + ^E G_m
+          '5': ^E G_m = x_Fe x_Pt L_FePt
+          '6': L_FePt = Σ_(ν=0,...) (x_Fe − x_Pt)^ν ^νL_FePt
+          '7': (A,B)_0.25 (A,B)_0.25 (A,B)_0.25 (A,B)_0.25
+        sublattices: 4
+        sites_each: 0.25
+        moles_atoms: 1
+        ordering: 'All four equivalent fractions: disordered A1; three identical and one distinct: L12; two identical
+          pairs with distinct pair fractions: L10 (continuation PDF 24 / print 15). CEF supports two or more sublattices.'
+    - observation_id: fredriksson_2003_ordered_fcc_model_equations
+      type: thermodynamic_example
+      locator:
+        page: 24
+        published_page: 15
+        equation: 8–13
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: Fe–Pt ordered-model equations 8–13
+        equations:
+          '8': G_m = G_m^dis(x_i) + ΔG_m^ord(y_i)
+          '9': x_i = 0.25 Σ_(s=1 to 4) y_i^(s)
+          '10': ΔG_m^ord = G_m^4sl(y_i) − G_m^4sl(x_i)
+          '11': G_m^4sl = Σ_i Σ_j Σ_k Σ_l y_i^(1) y_j^(2) y_k^(3) y_l^(4) °G_(i:j:k:l) + 0.25 RT Σ_s Σ_i y_i^(s) ln(y_i^(s))
+            + ^E G_m
+          '12': °G_FeFeFePt = °G_FeFePtFe = … = G_Fe3Pt; °G_FeFePtPt = °G_FePtFePt = … = G_FePt; °G_FePtPtPt = °G_PtFePtPt
+            = … = G_FePt3
+          '13': ^E G_m = Σ_i1 Σ_(i2>i1) Σ_j Σ_k Σ_l y_i1^(r) y_i2^(r) y_j^(s) y_k^(t) y_l^(u) L_(i1,i2:j:k:l) + … +
+            Σ_i1 Σ_(i2>i1) Σ_j1 Σ_(j2>j1) Σ_k Σ_l y_i1^(r) y_i2^(r) y_j1^(s) y_j2^(s) y_k^(t) y_l^(u) L_(i1,i2:j1,j2:k:l)
+            + …
+        definitions: Colon separates sublattices, comma constituents on the same sublattice. First two CEF interactions
+          included, random mixing within each sublattice, cyclic permutations; disordered site fractions equal mole
+          fractions so ordering term is zero.
+    - observation_id: fredriksson_2003_simplified_excess_gibbs_equation
+      type: thermodynamic_example
+      locator:
+        page: 25
+        published_page: 16
+        equation: '14'
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: Regular and reciprocal interactions
+        equation: ^E G_m = Σ_i1 Σ_i2 y_i1^(s) y_i2^(s) L_(i1,i2:*:*:*) + Σ_i1 Σ_i2 Σ_j1 Σ_j2 y_i1^(s) y_i2^(s) y_j1^(t)
+          y_j2^(t) L_(i1,i2:j1,j2:*:*)
+        assumption: Ignore constituent on sublattice without interaction; interacting sublattices permuted cyclically.
+          Reciprocal term needed for correct ordered-fcc topology and first approximation to short-range order.
+  Pt:
+    observations: []
+    context:
+    - observation_id: fredriksson_2003_calorimetry_and_oxygen_context
+      type: thermodynamic_example
+      locator:
+        page: 39
+        published_page: 30
+        section: 7 Summary and conclusions
+      units: as printed
+      values:
+        method_class: quoted_unattributed
+        quantity: numeric_conclusion_context
+        FePt_liquidus_maximum_at_percent_Pt: 50
+        galvanic_temperature_range_K:
+        - 1073
+        - 1273
+        calorimetry_temperature_range_K:
+        - 300
+        - 1988
+        order_disorder_transition_range_K:
+        - 1420
+        - 1610
+        phase_transition_systems:
+        - FePt
+        - FePt3
+        oxygen_estimates_from_conventional_FeO_slag_analysis: less_reliable_as_stated_in_abstract_and_conclusion
+        oxygen_prediction_method: sulphur partition between slag and metal using THERMOSLAG
+        oxygen_claims_locator:
+          page: 40
+          published_page: 31
+          section: 7 Summary and conclusions
+          note: Applies to oxygen_estimates_from_conventional_FeO_slag_analysis and oxygen_prediction_method.
+benches:
+- id: fredriksson_2003_gas_equilibration_furnace
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Horizontal resistance furnace with alumina reaction tube for gas equilibration of molten slag.
+    locator:
+      page: 20
+      published_page: 11
+      section: 3.4.3 Apparatus
+  method:
+    state:
+      tag: value
+      value: CO-CO2-Ar gas equilibration followed by quenching and chemical analysis.
+    locator:
+      page: 21
+      published_page: 12
+      section: 3.4.4 Procedure
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Alumina reaction tube and holder; platinum slag crucibles; silica stoppers; alumina gas inlet tube
+        and radiation shields.
+    locator:
+      page: 20
+      published_page: 11
+      section: 3.4.3 Apparatus
+      note: Text says silica stoppers; Figure 6 caption prints Silicon rubber stopper. Source wording differs.
+  cell_materials:
+  - state:
+      tag: value
+      value: Al2O3
+    locator:
+      page: 20
+      published_page: 11
+      section: 3.4.3 Apparatus
+  - state:
+      tag: value
+      value: Pt
+    locator:
+      page: 20
+      published_page: 11
+      section: 3.4.3 Apparatus
+  - state:
+      tag: value
+      value: SiO2
+    locator:
+      page: 20
+      published_page: 11
+      section: 3.4.3 Apparatus
+  geometry:
+    chamber_dimensions:
+      reaction_tube_outer_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.060'
+        locator:
+          page: 20
+          published_page: 11
+          section: 3.4.3 Apparatus
+          note: Printed 60 mm o.d.; converted to metres.
+      reaction_tube_inner_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.050'
+        locator:
+          page: 20
+          published_page: 11
+          section: 3.4.3 Apparatus
+          note: Printed 50 mm i.d.; converted to metres.
+    orifice_diameter_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.3 Apparatus
+    orifice_channel_length_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.3 Apparatus
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Type B thermocouple, Pt-30 pct Rh/Pt-6 pct Rh.
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.3 Apparatus
+    temperature_control:
+      state:
+        tag: value
+        value: Eurotherm 2408 P4 programmable regulator; uniform hot zone stated as 40 mm.
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.3 Apparatus
+  temperature_calibration:
+    prior_calibration:
+      state:
+        tag: value
+        value: Thermocouple calibrated prior to experiments; calibration reference points are not stated.
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.3 Apparatus
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 21
+        published_page: 12
+        section: 3.4 Procedure
+  other_facts:
+  - name: platinum_crucible_sheet_thickness
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.12'
+      locator:
+        page: 19
+        published_page: 10
+        section: 3.4.2 Preparation of materials
+  - name: total_gas_flow
+    unit: dm3/min
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.2'
+      locator:
+        page: 12
+        published_page: 3
+        section: 3.1 The gas cleaning system
+  - name: gas_inlet_inner_diameter
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.3 Apparatus
+  - name: furnace_maximum_working_temperature
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1973'
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.3 Apparatus
+  - name: constant_temperature_zone_length
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '40'
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.3 Apparatus
+  - name: temperature_accuracy
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3'
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.3 Apparatus
+        note: Stated accuracy is ±3 K.
+  - name: background_pressure
+    unit: Pa
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 21
+        published_page: 12
+        section: 3.4.4 Procedure
+        note: Gas-equilibration furnace chamber pressure is not reported as a total/background pressure.
+  - name: outgoing_gas_oxygen_monitor
+    unit: instrument
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: ZrO2-CaO galvanic cell at 973 K; measured outgoing oxygen partial pressure agreed with calculated
+            gas data.
+      locator:
+        page: 13
+        published_page: 4
+        section: 3.1 The gas cleaning system
+        note: Probe description begins at PDF 12 / print 3.
+- id: fredriksson_2003_fept_galvanic_cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Solid-state galvanic cell in a vertical tube furnace.
+    locator:
+      page: 15
+      published_page: 6
+      section: 3.2.2 Apparatus
+  method:
+    state:
+      tag: value
+      value: Solid electrolyte galvanic cell; EMF related to iron activity in Fe-Pt by the Nernst equation.
+    locator:
+      page: 13
+      published_page: 4
+      section: 3.2 Galvanic cell measurements
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: ZrO2 electrolyte with 11 mol pct CaO; Pt leads and wire; reference electrode housed in alumina crucible;
+        Fe/“FeO” reference mixture and Fe-Pt working alloy. Assembly also uses a silica stopper and iron and nickel
+        foils (Figure 3, PDF 15 / print 6).
+    locator:
+      page: 13
+      published_page: 4
+      section: 3.2 Galvanic cell measurements
+      note: 'Cell definition: PDF 13 / print 4; alumina reference crucible and assembly: PDF 15 / print 6.'
+  cell_materials:
+  - state:
+      tag: value
+      value: Pt
+    locator:
+      page: 13
+      published_page: 4
+      section: 3.2 Galvanic cell measurements
+  - state:
+      tag: value
+      value: ZrO2
+    locator:
+      page: 13
+      published_page: 4
+      section: 3.2 Galvanic cell measurements
+  - state:
+      tag: value
+      value: Al2O3
+    locator:
+      page: 15
+      published_page: 6
+      section: 3.2.2 Apparatus
+  - state:
+      tag: value
+      value: Fe
+    locator:
+      page: 13
+      published_page: 4
+      section: 3.2 Galvanic cell measurements
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        published_page: 6
+        section: 3.2.2 Apparatus
+    orifice_channel_length_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 15
+        published_page: 6
+        section: 3.2.2 Apparatus
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Type S Pt-10 pct Rh/Pt thermocouple in furnace; separate thermocouple in contact with the cell arrangement
+          at the bottom.
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.2 Apparatus
+  temperature_calibration:
+    calibration_points:
+      state:
+        tag: value
+        value: Thermocouple wires calibrated against melting points of pure gold and palladium.
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.2 Apparatus
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.3 Procedure
+  other_facts:
+  - name: temperature_stability
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator:
+        page: 15
+        published_page: 6
+        section: 3.2.2 Apparatus
+        note: Constant-temperature zone stated as ±1 K.
+  - name: background_pressure
+    unit: Pa
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.3 Procedure
+        note: Tube was evacuated and backfilled repeatedly with argon; total/background pressure not stated.
+- id: fredriksson_2003_coo_galvanic_cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Solid-electrolyte galvanic cell described in Supplement 1.
+    locator:
+      page: 28
+      published_page: 19
+      section: 5.1 Supplement 1
+  method:
+    state:
+      tag: value
+      value: Galvanic-cell EMF measurement used to estimate CoO standard Gibbs energy.
+    locator:
+      page: 28
+      published_page: 19
+      section: 5.1 Supplement 1
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Pt electrodes; zirconia electrolyte partially stabilised with Y2O3 in cell I or CaO in cell II; Fe/“FeO”
+        and CoO/Co electrodes.
+    locator:
+      page: 28
+      published_page: 19
+      section: 5.1 Supplement 1
+  cell_materials:
+  - state:
+      tag: value
+      value: Pt
+    locator:
+      page: 28
+      published_page: 19
+      section: 5.1 Supplement 1
+  - state:
+      tag: value
+      value: ZrO2
+    locator:
+      page: 28
+      published_page: 19
+      section: 5.1 Supplement 1
+  - state:
+      tag: value
+      value: Y2O3
+    locator:
+      page: 28
+      published_page: 19
+      section: 5.1 Supplement 1
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 28
+        published_page: 19
+        section: 5.1 Supplement 1
+    orifice_channel_length_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 28
+        published_page: 19
+        section: 5.1 Supplement 1
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Type S Pt-10 pct Rh/Pt thermocouple in furnace; separate thermocouple in contact with the cell arrangement
+          at the bottom.
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.2 Apparatus
+        note: Common apparatus applies to Co–CoO validation by working-electrode replacement (PDF 13 / print 4).
+  temperature_calibration:
+    calibration:
+      state:
+        tag: value
+        value: Thermocouple wires calibrated against melting points of pure gold and palladium.
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.2 Apparatus
+        note: Common apparatus applies to Co–CoO validation by working-electrode replacement (PDF 13 / print 4).
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 28
+        published_page: 19
+        section: 5.1 Supplement 1
+  other_facts:
+  - name: background_pressure
+    unit: Pa
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 28
+        published_page: 19
+        section: 5.1 Supplement 1
+- id: fredriksson_2003_netzsch_calorimeter
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: NETZSCH STA 449C Jupiter calorimeter.
+    locator:
+      page: 17
+      published_page: 8
+      section: 3.3.2.1 The NETZSCH calorimeter
+  method:
+    state:
+      tag: value
+      value: Differential thermal analysis/calorimetry of Fe-Pt alloy samples.
+    locator:
+      page: 17
+      published_page: 8
+      section: 3.3.2.1 The NETZSCH calorimeter
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Platinum crucible with Al2O3 lining and Pt lid; platinum reference crucible on platinum sample holder.
+    locator:
+      page: 17
+      published_page: 8
+      section: 3.3.2.1 The NETZSCH calorimeter
+  cell_materials:
+  - state:
+      tag: value
+      value: Pt
+    locator:
+      page: 17
+      published_page: 8
+      section: 3.3.2.1 The NETZSCH calorimeter
+  - state:
+      tag: value
+      value: Al2O3
+    locator:
+      page: 17
+      published_page: 8
+      section: 3.3.2.1 The NETZSCH calorimeter
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+    orifice_channel_length_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Previously calibrated Type S Pt-10 pct Rh/Pt thermocouple on platinum sample holder.
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+  temperature_calibration:
+    calibrants:
+      state:
+        tag: value
+        value: In; Sn; Zn; Ag; Au; α-alumina reference used for measurements.
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+        note: 'In/Sn/Zn/Ag/Au: PDF 17 / print 8; α-alumina reference: PDF 18 / print 9.'
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+        note: QMS was used to monitor H2/He fraction; ionization energy is not given.
+  other_facts:
+  - name: gas_monitor
+    unit: instrument
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Balzer Thermo Star Quadrupole Gas Mass Spectrometer Model QMS 200 monitored outgoing gas
+            composition.
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+  - name: starting_gas_fraction
+    unit: percent
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: H2 or He fraction greater than ~99.6% before starting; approximate outlet-gas criterion.
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+  - name: background_pressure
+    unit: Pa
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+        note: Chamber evacuated/flushed; total/background pressure is not reported.
+- id: fredriksson_2003_setaram_calorimeter
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Setaram high-temperature calorimeter HTC 1800 K-DSC 2000 K.
+    locator:
+      page: 18
+      published_page: 9
+      section: 3.3.2.2 The Setaram calorimeter
+  method:
+    state:
+      tag: value
+      value: High-temperature differential thermal analysis of Fe-Pt alloys.
+    locator:
+      page: 18
+      published_page: 9
+      section: 3.3.2.2 The Setaram calorimeter
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Alumina sample crucible and empty reference crucible with alumina caps in alumina reaction chamber.
+    locator:
+      page: 18
+      published_page: 9
+      section: 3.3.2.2 The Setaram calorimeter
+  cell_materials:
+  - state:
+      tag: value
+      value: Al2O3
+    locator:
+      page: 18
+      published_page: 9
+      section: 3.3.2.2 The Setaram calorimeter
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+    orifice_channel_length_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Type B Pt-30 pct Rh/Pt-6 pct Rh thermocouple on sample holder.
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+  temperature_calibration:
+    thermocouple_calibration:
+      state:
+        tag: value
+        value: Thermocouple calibrated prior to use; procedure not stated.
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+    calorimeter_standard:
+      state:
+        tag: value
+        value: Calibrated with Au; stated melting point 1337.3 K agreed with literature.
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+  other_facts:
+  - name: outgoing_oxygen_partial_pressure
+    unit: atm
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1.0E-15'
+      locator:
+        page: 19
+        published_page: 10
+        section: 3.3.2.2 The Setaram calorimeter
+  - name: oxygen_probe_temperature
+    unit: K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '973'
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+  - name: background_pressure
+    unit: Pa
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+        note: System was evacuated and flushed; total/background pressure is not stated.
+experiments:
+- experiment_id: fredriksson_2003_slag_gas_equilibration_binary
+  bench_id: fredriksson_2003_gas_equilibration_furnace
+  method: quench_equilibration
+  method_as_printed: Gas equilibration of molten slags with an Ar-CO-CO2 mixture followed by quenching and chemical
+    analysis.
+  locator:
+    page: 19
+    published_page: 10
+    section: 3.4 Gas equilibration measurements
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 19
+        published_page: 10
+        section: 3.4.2 Preparation of materials
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 32
+        published_page: 23
+        figure: '14'
+        note: Binary activity systems shown in Figures 14–16; no point compositions transcribed from plots.
+    form:
+      state:
+        tag: value
+        value: Molten oxide slag held in platinum crucible.
+      locator:
+        page: 19
+        published_page: 10
+        section: 3.4.1 Principle
+    pretreatment:
+      state:
+        tag: value
+        value: Oxides of Al, Ca, Mg and Si heated to 1273 K for 12 h; transferred at 373 K to a P2O5 desiccator;
+          oxides mixed in an agate mortar and stored in a desiccator.
+      locator:
+        page: 19
+        published_page: 10
+        section: 3.4.2 Preparation of materials
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1823'
+          interval_high: '1873'
+      locator:
+        page: 32
+        published_page: 23
+        figure: '14'
+        note: Binary activity system range stated with present study in figures.
+    oxygen_partial_pressure_atm:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 19
+        published_page: 10
+        section: 3.4.1 Principle
+        note: Individual setpoints are not tabulated.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 20
+          published_page: 11
+          section: 3.4.3 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 20
+          published_page: 11
+          section: 3.4.3 Apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '28800'
+      locator:
+        page: 21
+        published_page: 12
+        section: 3.4.4 Procedure
+        note: Printed 8 h converted to seconds.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 21
+        published_page: 12
+        section: 3.4.4 Procedure
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          components:
+          - species: CO
+            mole_fraction:
+              tag: unknown
+              reason: not_published
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          - species: CO2
+            mole_fraction:
+              tag: unknown
+              reason: not_published
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          - species: Ar
+            mole_fraction:
+              tag: unknown
+              reason: not_published
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 21
+        published_page: 12
+        section: 3.4.4 Procedure
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+- experiment_id: fredriksson_2003_slag_gas_equilibration_ternary
+  bench_id: fredriksson_2003_gas_equilibration_furnace
+  method: quench_equilibration
+  method_as_printed: Gas equilibration of ternary slags with CO-CO2-Ar mixtures at different temperatures followed
+    by quenching and chemical analysis.
+  locator:
+    page: 34
+    published_page: 25
+    section: 5.6 Supplement 6
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 20
+        published_page: 11
+        section: 3.4.4 Procedure
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 34
+        published_page: 25
+        figure: '17'
+    form:
+      state:
+        tag: value
+        value: Molten ternary oxide slags in platinum crucibles; samples quenched after equilibration.
+      locator:
+        page: 34
+        published_page: 25
+        section: 5.6 Supplement 6
+    pretreatment:
+      state:
+        tag: value
+        value: Oxides of Al, Ca, Mg and Si heated to 1273 K for 12 h; transferred at 373 K to a P2O5 desiccator;
+          mixed in an agate mortar.
+      locator:
+        page: 19
+        published_page: 10
+        section: 3.4.2 Preparation of materials
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1823'
+          interval_high: '1923'
+      locator:
+        page: 34
+        published_page: 25
+        section: 5.6 Supplement 6
+    oxygen_partial_pressure_atm:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 34
+        published_page: 25
+        section: 5.6 Supplement 6
+        note: Individual setpoints are not tabulated.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 20
+          published_page: 11
+          section: 3.4.3 Apparatus
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 20
+          published_page: 11
+          section: 3.4.3 Apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '28800'
+      locator:
+        page: 21
+        published_page: 12
+        section: 3.4.4 Procedure
+        note: Printed 8 h converted to seconds.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 21
+        published_page: 12
+        section: 3.4.4 Procedure
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          components:
+          - species: CO
+            mole_fraction:
+              tag: unknown
+              reason: not_published
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          - species: CO2
+            mole_fraction:
+              tag: unknown
+              reason: not_published
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          - species: Ar
+            mole_fraction:
+              tag: unknown
+              reason: not_published
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 34
+        published_page: 25
+        section: 5.6 Supplement 6
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+- experiment_id: fredriksson_2003_fept_galvanic_series
+  bench_id: fredriksson_2003_fept_galvanic_cell
+  method: emf_cell
+  method_as_printed: Solid-state galvanic cell EMF measurement of Fe activity in Fe-Pt alloys.
+  locator:
+    page: 13
+    published_page: 4
+    section: 3.2 Galvanic cell measurements
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 13
+        published_page: 4
+        section: 3.2.1 Preparation of materials
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 29
+        published_page: 20
+        figure: '11'
+    form:
+      state:
+        tag: value
+        value: Fe-Pt alloy powder mixture sintered in situ or induction-premelted.
+      locator:
+        page: 13
+        published_page: 4
+        section: 3.2.1 Preparation of materials
+    pretreatment:
+      state:
+        tag: value
+        value: Pure Fe and Pt powders mixed and sintered in situ in the galvanic cell for over 12 h at 1473 K; some
+          alloys premelted under highly purified Ar.
+      locator:
+        page: 13
+        published_page: 4
+        section: 3.2.1 Preparation of materials
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1073'
+          interval_high: '1273'
+      locator:
+        page: 39
+        published_page: 30
+        section: 7 Summary and conclusions
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.3 Procedure
+        note: Run-cycle duration is not stated.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.3 Procedure
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.3 Procedure
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+- experiment_id: fredriksson_2003_coo_galvanic_estimate
+  bench_id: fredriksson_2003_coo_galvanic_cell
+  method: emf_cell
+  method_as_printed: Galvanic cell described for deriving the CoO formation-energy estimate in Equation 20.
+  locator:
+    page: 28
+    published_page: 19
+    section: 5.1 Supplement 1
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1052'
+          interval_high: '1488'
+      locator:
+        page: 28
+        published_page: 19
+        section: 5.1 Supplement 1
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 28
+        published_page: 19
+        section: 5.1 Supplement 1
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 16
+        published_page: 7
+        section: 3.2.3 Procedure
+        note: Common cell arrangement validated with Co–CoO at PDF 13 / print 4.
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+- experiment_id: fredriksson_2003_fept_netzsch_calorimetry
+  bench_id: fredriksson_2003_netzsch_calorimeter
+  method: dta_dsc
+  method_as_printed: NETZSCH STA 449C Jupiter calorimetry and DTA of Fe-Pt alloys in H2 or He.
+  locator:
+    page: 17
+    published_page: 8
+    section: 3.3.2.1 The NETZSCH calorimeter
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 30
+        published_page: 21
+        figure: '12'
+        note: Alloy compositions are plotted, not tabulated or digitized.
+    form:
+      state:
+        tag: value
+        value: Polished Fe-Pt alloy piece in Pt crucible with Al2O3 lining and Pt lid; reference crucible used.
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1673'
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          alternatives:
+          - species: H2
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          - species: He
+            flow_sccm:
+              tag: unknown
+              reason: not_published
+            partial_pressure_Pa:
+              tag: unknown
+              reason: not_published
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 17
+        published_page: 8
+        section: 3.3.2.1 The NETZSCH calorimeter
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable
+- experiment_id: fredriksson_2003_fept_setaram_dta
+  bench_id: fredriksson_2003_setaram_calorimeter
+  method: dta_dsc
+  method_as_printed: Setaram high-temperature calorimeter differential thermal analysis of Fe-Pt alloys.
+  locator:
+    page: 18
+    published_page: 9
+    section: 3.3.2.2 The Setaram calorimeter
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 30
+        published_page: 21
+        figure: '12'
+        note: Alloy compositions are plotted, not tabulated or digitized.
+    form:
+      state:
+        tag: value
+        value: Fe-Pt alloy in Al2O3 sample crucible with empty reference crucible and Al2O3 caps.
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '1988'
+      locator:
+        page: 30
+        published_page: 21
+        section: 5.3 Supplement 3
+        note: Method at PDF 18 / print 9 says room temperature to 1988 K; this summary explicitly prints 300–1988
+          K.
+    oxygen_partial_pressure_atm:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '1.0E-15'
+      locator:
+        page: 19
+        published_page: 10
+        section: 3.3.2.2 The Setaram calorimeter
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 18
+        published_page: 9
+        section: 3.3.2.2 The Setaram calorimeter
+    regime:
+      regime_class:
+        tag: not_applicable
+        reason: not_applicable

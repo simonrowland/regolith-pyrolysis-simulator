@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:doyle-1989-tio2-feo-activity-magma
       role: pdf
@@ -30,17 +30,17 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b::doyle-1989-tio2-feo-activity-magma
+- experiment_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b::experiment::doyle_1989_feo_activity_measurement
   kind: literature
   method:
-    tag: unknown
-    reason: source does not state method
+    tag: value
+    value: quench_equilibration
   sample: {}
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -59,11 +59,10 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
   locator:
-    page: 4
-    published_page: 2634
-    pdf_page_index: 3
-    table: 1A
-    note: row=1; panel=4A
+    page: 3
+    published_page: 2633
+    pdf_page_index: 2
+    section: Furnace arrangement
 context:
 - observation_id: doyle_1989_equation_8_and_standard_state
   type: equation_record

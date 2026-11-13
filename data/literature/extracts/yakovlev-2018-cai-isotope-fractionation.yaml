@@ -1,0 +1,331 @@
+schema_version: literature_extract.v1
+source_id: yakovlev-2018-cai-isotope-fractionation
+source:
+  citation: 'Yakovlev, O. I., and Shornikov, S. I. (2018). "Mg and Si isotope fractionation in dependence on acidity-basicity of CAIs melts." Experiment in Geosciences, 24(1), 58–60.'
+  doi: null
+  year: 2018
+extraction:
+  method: Manual transcription checked against 250 dpi page images; no tables; curves not digitized.
+  date: '2026-10-05'
+  worker: codex-resume-12258-1791237519
+  provenance_path: raw/yakovlev-2018-cai-isotope-fractionation/yakovlev-2018-cai-isotope-fractionation.pdf
+review_status: draft
+evidence_policy:
+  classification: model_calculation_and_literature_discussion
+  measurement_claim: This article presents an acidity-basicity interpretation and figure-based comparisons; the cited 1900 °C evaporation composition is attributed to Mendybaev et al. (2013), not reported as a new experiment here.
+  numeric_encoding: No tables are printed. Numeric prose and figure axes are preserved as located context; both figures remain undigitized.
+  apparatus_status: The article reports no current-study physical apparatus, sample, or measured pressure run. Apparatus details for cited earlier work are not supplied here.
+fidelity_samples:
+- species: SiO2
+  observation_id: yakovlev_2018_figure1_model_activity_curves
+  field: temperature_C
+  value: 1600
+  locator: {page: 59, pdf_page_index: 1, figure: '1', note: Figure caption temperature}
+species:
+  MgO:
+    observations: []
+    context:
+    - observation_id: yakovlev_2018_current_study_apparatus_absence
+      type: apparatus
+      locator: {page: 58, pdf_page_index: 0, section: title and abstract}
+      units: typed states with source locators
+      values:
+        quantity: current_study_experiment_and_apparatus_status
+        method_class: quoted_unattributed
+        apparatus_facts:
+          experiment_method:
+            state: {tag: not_applicable, reason: not_applicable}
+            locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: 'The article presents a thermodynamic interpretation and isotope-fractionation discussion, not a new physical experiment.'}
+          cell_material_and_liner: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study physical cell or liner is described.}}
+          orifice_diameter_m: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study effusion apparatus is described.}}
+          orifice_channel_length_m: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study effusion apparatus is described.}}
+          pressure_conversion_calibration: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study ion-current or pressure measurements are described.}}
+          ionisation_cross_sections_and_source: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study mass-spectrometric measurements are described.}}
+          ionisation_energy_eV: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study mass-spectrometric measurements are described.}}
+          multiplier_and_isotope_corrections: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study ion-current measurements are described.}}
+          temperature_measurement: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study temperature measurement is described.}}
+          temperature_calibration: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study temperature measurement is described.}}
+          chamber_background_pressure_Pa: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study vacuum chamber or physical run is described.}}
+          sample_preparation_and_starting_materials: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study physical charge is described.}}
+          sample_purity: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study physical charge is described.}}
+          composition_as_prepared: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study prepared charge is described.}}
+          composition_after_runs: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 58, pdf_page_index: 0, section: title and abstract, note: No current-study experimental runs are described.}}
+    - observation_id: yakovlev_2018_prior_mg_si_loss_richter
+      type: located_numeric_context
+      locator: {page: 58, pdf_page_index: 0, section: Introduction}
+      units: percent of initial element inventory
+      values:
+        quantity: cited_CAIs_element_loss
+        method_class: quoted_attributed
+        attribution: Richter et al. (2002), as cited by Yakovlev and Shornikov (2018)
+        quote_as_printed: CAIs lost up to 50% of Mg and 25% of Si.
+        Mg_loss_percent: 50
+        Si_loss_percent: 25
+    - observation_id: yakovlev_2018_cai_age_and_isotope_background
+      type: located_numeric_context
+      locator: {page: 58, pdf_page_index: 0, section: Introduction}
+      units: years and isotope notation as printed
+      values:
+        quantity: CAI_age_and_isotope_context
+        method_class: quoted_unattributed
+        quote_as_printed: >-
+          CAIs represent the oldest objects in the Solar system with an age of 4.567 billion years. They have high content of 16O and daughter products of a number of short-lived isotopes in the CAIs composition. There are clear signs of mass-dependent isotope fractionation Mg, Si, O.
+        age_years: 4567000000
+        oxygen_isotope_as_printed: 16O
+    - observation_id: yakovlev_2018_prior_mg_si_isotope_data_williams
+      type: located_numeric_context
+      locator: {page: 58, pdf_page_index: 0, section: Introduction}
+      units: percent loss and per mil
+      values:
+        quantity: cited_individual_CAIs_element_loss_and_isotope_composition
+        method_class: quoted_attributed
+        attribution: Williams et al. (2017), as cited by Yakovlev and Shornikov (2018)
+        quote_as_printed: Individual CAIs lost ~80% Si and ~85% Mg; δ25Mg to 39‰ and δ29Si to 17‰.
+        Si_loss_percent_approx: 80
+        Mg_loss_percent_approx: 85
+        delta25Mg_permil: 39
+        delta29Si_permil: 17
+    - observation_id: yakovlev_2018_model_activity_relation
+      type: located_theoretical_context
+      locator: {page: 59, pdf_page_index: 1, section: Discussion}
+      units: pressure, activity, mole fraction, activity coefficient as printed
+      values:
+        quantity: oxide_vapor_pressure_activity_relation
+        method_class: quoted_unattributed
+        equation_as_printed: P_i = P_i° a_i = P_i° x_i γ_i
+        variables_as_printed: P_i is partial pressure; P_i° is pure oxide vapor pressure; a_i is oxide activity; x_i is oxide mole fraction; γ_i is activity coefficient.
+        standard_state_as_printed: The article does not identify whether the pure oxide reference is solid or liquid.
+    - observation_id: yakovlev_2018_hertz_knudsen_relation
+      type: located_theoretical_context
+      locator: {page: 59, pdf_page_index: 1, section: Discussion}
+      units: flux equation as printed
+      values:
+        quantity: hertz_knudsen_evaporation_flux_relation
+        method_class: quoted_unattributed
+        equation_as_printed: J_i = φ_i P_i / (2πRTm_i)^(1/2)
+        equation_number_as_printed: '2'
+        variable_definitions_context: yakovlev_2018_evaporation_variable_definitions
+    - observation_id: yakovlev_2018_evaporation_variable_definitions
+      type: located_theoretical_context
+      locator: {page: 60, pdf_page_index: 2, section: Discussion, note: Definitions for Eq. (2) on the preceding page.}
+      units: as printed, including anomalous flux-unit typography
+      values:
+        quantity: hertz_knudsen_variable_definitions
+        method_class: quoted_unattributed
+        variables_as_printed:
+          J_i: Evaporation rate or flow of the ith substance when evaporating from the surface of the condensed phase.
+          J_i_unit_as_printed: "mol/cm²ˢsec"
+          J_i_unit_typography: "The characters 2s are together superscript after cm; sec is baseline. Linear rendering mol/cm^(2s)sec. Retained literally without repairing to a conventional flux unit."
+          phi_i: Evaporation coefficient of the ith substance.
+          P_i: Saturated vapor pressure of the ith substance.
+          P_i_unit_as_printed: "dyn/cm²"
+          m_i: Molecular weight of the ith substance.
+          m_i_unit_as_printed: g/mol
+          R: Gas constant.
+          R_unit_as_printed: erg/grad mol
+          T: Absolute temperature.
+    - observation_id: yakovlev_2018_substituted_hertz_knudsen_relation
+      type: located_theoretical_context
+      locator: {page: 60, pdf_page_index: 2, section: Discussion, equation: '3'}
+      units: flux equation as printed
+      values:
+        quantity: activity_substituted_hertz_knudsen_evaporation_flux_relation
+        method_class: quoted_attributed
+        attribution: Yakovlev et al. (1972, 1973), as cited by Yakovlev and Shornikov (2018)
+        equation_number_as_printed: '3'
+        equation_as_printed: J_i = φ_i(P_i° a_i)/(2πRTm_i)^(1/2) = φ_i(P_i° x_i γ_i)/(2πRTm_i)^(1/2)
+        variable_definitions_context: yakovlev_2018_evaporation_variable_definitions
+    - observation_id: yakovlev_2018_abstract_directional_claims
+      type: located_directional_context
+      locator: {page: 58, pdf_page_index: 0, section: Abstract}
+      units: qualitative volatility, activity, and isotope-fractionation comparisons
+      values:
+        quantity: abstract_claims_about_cao_enrichment
+        method_class: quoted_unattributed
+        quote_as_printed: >-
+          When CAIs melts evaporate at high temperatures, the SiO2 and MgO volatilities are inverted: SiO2, which is more volatile than MgO, becomes less volatile when melts are enriched in refractory CaO. This volatility inversion can be explained within the framework of the theory of acid–base interaction between components in silicate melts. According to this theory an increase in CaO concentration in the melt increases its basicity, and this, in turn, increases the activity (and hence, also volatility) of MgO and decreases those of SiO2.
+        second_quote_as_printed: >-
+          This acidity-basicity factor has a strong effect on the rate of magnesium and silicon evaporation that in turn has a strong effect on isotope fractionation which as the melt evaporates increases the efficiency of isotopic fractionation in magnesium compared to silicon isotopes.
+    - observation_id: yakovlev_2018_intro_qualifiers_and_scope
+      type: located_directional_context
+      locator: {page: 58, pdf_page_index: 0, section: Introduction}
+      units: qualitative experimental and physical-conditions context
+      values:
+        quantity: introductory_claims_and_open_conditions
+        method_class: quoted_unattributed
+        quote_as_printed: >-
+          The CAIs have clear features of mass-dependent isotopic fractionation Mg and Si, which, according to experimental data, are formed at high mass losses of evaporating melt.
+        second_quote_as_printed: >-
+          Most researchers are of the opinion that CAIs formed by condensation of gas of Solar composition at the earliest stage of evolution of the Sun. Some researchers develop an alternative hypothesis according to CAIs are objects formed outside the Solar system.
+        third_quote_as_printed: >-
+          To date, the CAIs origin and the particularities of their isotopic characteristics with respect to Mg and Si are clear and do not give rise to disputes. However, there are questions, and there are a lot of them, to the physico-chemical conditions of the evaporation process, namely, temperature, melt cooling rate, pressure and composition of the surrounding gas, the composition of the CAIs initial condensate.
+        fourth_quote_as_printed: >-
+          It is the acid-base melt factor, which, among other factors, determines the evaporation sequence of MgO and SiO2 oxides from CAIs melt, as well as the isotopic composition of magnesium and silicon in the residual melt.
+        fourth_quote_locator: {page: 59, pdf_page_index: 1, section: Discussion, note: First left-column paragraph; other three passages remain on p. 58.}
+    - observation_id: yakovlev_2018_prior_acid_base_and_oxide_classification
+      type: located_directional_context
+      locator: {page: 59, pdf_page_index: 1, section: Discussion}
+      units: qualitative oxide classification and activity trends
+      values:
+        quantity: cited_acid_base_interpretation
+        method_class: quoted_attributed
+        attribution: Korzhinskii (1959) and Yakovlev et al. (2017), as cited by Yakovlev and Shornikov (2018)
+        quote_as_printed: >-
+          In our paper (Yakovlev et al., 2017) we showed that D. S. Korzhinskii's theory on acid-base interaction of components in silicate melts (Korzhinskii, 1959) explains well the behavior of moderately volatile and different acid-base properties of MgO and SiO2 oxides at evaporation from CAIs melts.
+        second_quote_as_printed: >-
+          CAIs compositions can be described within the framework of the quadric oxide system CaO–MgO–Al2O3–SiO2. According to the acid-base properties of oxides of these system are divided into acid (SiO2), amphoteric (Al2O3) and basic (CaO and MgO).
+    - observation_id: yakovlev_2018_raoult_henry_qualifiers
+      type: located_theoretical_context
+      locator: {page: 59, pdf_page_index: 1, section: Discussion}
+      units: qualitative pressure-dependence statement
+      values:
+        quantity: pure_oxide_vapor_pressure_and_melt_interaction_factors
+        method_class: quoted_unattributed
+        quote_as_printed: >-
+          The expression of the Raoult-Henry law shows that the volatility or, more correctly, the pressure of the ith oxide over the melt depends on three parameters: 1) the vapor pressure of the pure oxide, that is, its individual properties; 2) the oxide concentration in the multicomponent melt; 3) the interaction nature of this component in the melt.
+    - observation_id: yakovlev_2018_discussion_directional_claims
+      type: located_directional_context
+      locator: {page: 59, pdf_page_index: 1, section: Discussion}
+      units: qualitative activity and melt-basicity comparisons
+      values:
+        quantity: discussion_claims_about_basicity_and_oxide_activities
+        method_class: quoted_unattributed
+        quote_as_printed: >-
+          It was shown that with the increase in the melt basicity, the parameter of which is the activity of oxygen ions, the activity of MgO, which has the base properties in the melt, should increase, and the activity of SiO2, which has the acid properties in the melt, decrease.
+        second_quote_as_printed: >-
+          Moreover, CaO has more basic properties and, accordingly, greater dissociation degree than MgO, and therefore CaO produces more oxygen ions during dissociation. For this reason, calcium oxide is the main donor of oxygen ions in the melt, and therefore its concentration plays a major role in determining the melt basicity parameter.
+        third_quote_as_printed: >-
+          It is logical to assume then that the MgO and SiO2 activity depend and mainly determined by the CaO concentration in the melt, and thus, if the higher CaO content in the melt, than the higher the MgO activity values and lower the SiO2 activity values.
+        fourth_quote_as_printed: >-
+          The dependences presented in the Fig. 1 clearly illustrate the strong and opposite effect of CaO concentration on the MgO and SiO2 activity. It is in full compliance with the Korzhinskii's theory of acid-base interaction of the melt components.
+        fifth_quote_as_printed: >-
+          As shown above, the MgO and SiO2 activities in melts depends on the CaO concentration, which plays a major role in the formation melt basicity. In accordance with this relationship, in the CAIs evaporating melt at the CaO content increasing, the magnesium oxide activity will increase (and accordingly the MgO volatility will increase too) and, on the contrary, the silicon oxide activity will decrease (and the SiO2 will become less volatile).
+    - observation_id: yakovlev_2018_mendybaev_prior_experiment_condition
+      type: located_numeric_context
+      locator: {page: 60, pdf_page_index: 2, section: Discussion}
+      units: wt% and °C
+      values:
+        quantity: cited_prior_evaporation_mixture_composition_and_temperature
+        method_class: quoted_attributed
+        attribution: Mendybaev et al. (2013), as cited by Yakovlev and Shornikov (2018)
+        quote_as_printed: The data were obtained at evaporation of the mixture (41.3 wt. % SiO2; 3.0 wt. % Al2O3; 53.4 wt. % MgO; 2.4 wt. % CaO) at 1900 °C.
+        composition_wt_percent: {SiO2: 41.3, Al2O3: 3.0, MgO: 53.4, CaO: 2.4}
+        temperature_C: 1900
+        experimental_method_as_reported_here: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: This article attributes the data to Mendybaev et al. (2013) but gives no experimental method in this passage.}}
+    - observation_id: yakovlev_2018_mendybaev_prior_experiment_apparatus_absence
+      type: apparatus
+      locator: {page: 58, pdf_page_index: 0, section: Introduction}
+      units: typed states with source locators
+      values:
+        quantity: cited_Mendybaev_2013_experiment_apparatus_status
+        method_class: quoted_attributed
+        attribution: Mendybaev et al. (2013), as cited by Yakovlev and Shornikov (2018)
+        apparatus_facts:
+          experiment_method:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 58, pdf_page_index: 0, section: Introduction, note: Authors call these "vacuum experiments" but do not identify an accepted method token.}
+          cell_material_and_liner: {state: {tag: unknown, reason: not_published}, locator: {page: 58, pdf_page_index: 0, section: Introduction, note: The cited apparatus material is not specified here.}}
+          orifice_diameter_m: {state: {tag: unknown, reason: not_published}, locator: {page: 58, pdf_page_index: 0, section: Introduction, note: The cited apparatus geometry is not specified here.}}
+          orifice_channel_length_m: {state: {tag: unknown, reason: not_published}, locator: {page: 58, pdf_page_index: 0, section: Introduction, note: The cited apparatus geometry is not specified here.}}
+          pressure_conversion_calibration: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: Pressure calibration is not described here.}}
+          ionisation_cross_sections_and_source: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: Ionisation cross sections are not described here.}}
+          ionisation_energy_eV: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: Ionisation energy is not described here.}}
+          multiplier_and_isotope_corrections: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: Instrument corrections are not described here.}}
+          temperature_measurement: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: Measurement method is not described here; the cited data temperature is 1900 °C.}}
+          temperature_calibration: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: Temperature calibration and uncertainty are not described here.}}
+          chamber_background_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 58, pdf_page_index: 0, section: Introduction, note: Vacuum experiments are mentioned but no background pressure is stated.}}
+          sample_preparation_and_starting_materials: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: Preparation details are not described here.}}
+          sample_purity: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: Purity is not described here.}}
+          composition_as_prepared:
+            state:
+              tag: value
+              value: "Published composition in yakovlev_2018_mendybaev_prior_experiment_condition.values.composition_wt_percent (wt%); refer to that source-local attributed row. Preparation procedure remains unpublished."
+            locator: {page: 60, pdf_page_index: 2, section: Discussion, note: "Printed mixture sums to 100.1 wt%; not normalized."}
+          composition_after_runs: {state: {tag: unknown, reason: not_published}, locator: {page: 60, pdf_page_index: 2, section: Discussion, note: The residual melt is discussed but its post-run composition is not given here.}}
+          experimental_environment_as_reported: vacuum experiments
+    - observation_id: yakovlev_2018_isotope_ratio_figure_claim
+      type: located_directional_context
+      locator: {page: 60, pdf_page_index: 2, section: Discussion}
+      units: isotope-ratio comparison and qualitative trend
+      values:
+        quantity: magnesium_silicon_isotope_fractionation_efficiency
+        method_class: quoted_attributed
+        attribution: Data attributed to Mendybaev et al. (2013), as discussed by Yakovlev and Shornikov (2018)
+        quote_as_printed: >-
+          The Fig. 2 shows the dependence of the δ26Mg / δ30Si ratio on the calcium oxide content in the melt. The cross symbol shows the CaO initial content before evaporation. The data demonstrate more efficient mass fractionation of magnesium isotopes compared to mass fractionation of silicon isotopes as calcium oxide accumulates in the melt.
+        numeric_axis_ticks_as_printed: {delta26Mg_over_delta30Si: [1.4, 1.6, 1.8, 2.0], CaO_wt_percent: [0, 5, 10, 15, 20]}
+        data_digitized: false
+    - observation_id: yakovlev_2018_evaporation_and_isotope_conclusions
+      type: located_directional_context
+      locator: {page: 60, pdf_page_index: 2, section: Discussion and Conclusion}
+      units: qualitative evaporation-rate and isotope-fractionation comparisons
+      values:
+        quantity: activity_controlled_evaporation_and_isotope_fractionation
+        method_class: quoted_unattributed
+        quote_as_printed: >-
+          Under these conditions, the acid-base factor has a strong influence on the MgO and SiO2 evaporation rates. It leads to the fact that the evaporative weight loss of magnesium are becoming higher relative to the weight loss of silicon.
+        second_quote_as_printed: >-
+          In turn, the Mg and Si evaporation rates determine the efficiency of isotope fractionation, which increases in the basic acidity of magnesium oxide and decreases in acidic silicon oxide as the melt evaporates.
+        third_quote_as_printed: >-
+          Thus, the accelerated weight loss of magnesium is determined by its increasing activity in the melt (as a consequence of the increase in the basicity of the melt during evaporation). In turn, it determine its effective mass fractionation of magnesium isotopes in comparison with the mass fractionation of silicon isotopes.
+        fourth_quote_as_printed: >-
+          The obtained equation shows that at evaporation of multicomponent melt, the component evaporation rate is determined not only by the pure component vapor pressure, but also their concentration in the melt and the activity coefficient, taking into account the nature of the interaction of this component in the melt. The equation clearly shows the dependence of evaporation on the composition of the system.
+    - observation_id: yakovlev_2018_bibliographic_numeric_context
+      type: located_numeric_context
+      locator: {page: 60, pdf_page_index: 2, section: References}
+      units: bibliography years, volumes, issues, pages and title numerals
+      values:
+        quantity: references_as_printed
+        method_class: quoted_unattributed
+        references:
+        - "Korzhinskii D. S. (1959) Acid-base interaction of components in silicate melts and the direction of cotectic lines. DAN SSSR, vol. 128, no. 2, pp. 383–386."
+        - "Mendybaev R. A., Richter F. M., Georg R. B., Janney P. E., Spicuzza M. J., Davis A. M., Valley J. W. (2013) Experimental evaporation of Mg- and Si-rich melts: Implications for the origin and evolution of FUN CAIs. Geochim. Cosmochim. Acta, vol. 123, pp. 368–384."
+        - "Rein R. H., Chipman J. (1965) Activities in the liquid solution SiO2–CaO–MgO–Al2O3 at 1600 °C. Trans. Met. Soc. AIME, vol. 233, no. 2, pp. 415–425."
+        - "Richter F. M., Davis A. M., Ebel D. S., Hashimoto A. (2002) Elemental and isotopic fractionation of Type B calcium-, aluminum-rich inclusions: Experiments, theoretical considerations, and constraints on their thermal evolution. Geochim. Cosmochim. Acta, vol. 66, no. 3, pp. 521–540."
+        - "Shornikov S. I. (2016) Thermodynamic properties of the CaO–MgO–SiO2 melts. Experiment in Geosciences, vol. 22, no. 1, pp. 40–42."
+        - "Williams C. D., Ushikubo T., Bullock E. S., Janney P. E., Hines R. R., Kita N. T., Hervig R. L., MacPherson G. J., Mendybaev R. A., Richter F. M., Wadhwa M. (2017) Thermal and chemical evolution in the early solar system as recorded by FUN CAIs: Part I – Petrology, mineral chemistry, and isotopic composition of Allende FUN CAI CMS–1. Geochim. Cosmochim. Acta, vol. 201, pp. 25–48."
+        - "Yakovlev O. I., Kosolapov A. I., Kuznetsov A. V., Nusinov M. D. (1972) The results of the study of the fractional evaporation of basaltic melt in the vacuum. DAN SSSR, vol. 206, no. 4, pp. 970–973."
+        - "Yakovlev O. I., Kosolapov A. I., Kuznetsov A. V., Nusinov M. D. (1973) Features of K and Na vaporization from the melts in a vacuum. Moscow Univ. Geol. Bull., vol. 28, no. 5, pp. 85–88."
+        - "Yakovlev O. I., Ryazantsev K. M., Shornikov S. I. (2017) The role of acidity-basicity in evaporating refractory inclusions in chondrites. Geochem. Int., vol. 55, no. 3, pp. 251–256."
+  SiO2:
+    observations: []
+    context:
+    - observation_id: yakovlev_2018_figure1_model_activity_curves
+      type: thermodynamic_example
+      locator: {page: 59, pdf_page_index: 1, figure: '1'}
+      units: activities as plotted; composition in mol%; temperature in °C
+      values:
+        quantity: oxide_activity_curves
+        method_class: figure_only
+        quote_as_printed: 'Fig. 1. Dependencies of SiO2 (1, 2) and MgO (3, 4) activities in the CaO–MgO–SiO2 melt vs. CaO content at temperature of 1600 °C and at constant mole ratio of MgO / SiO2 = 2 : 3, calculated by: 1, 3 – (Rein and Chipman, 1965) and 2, 4 – (Shornikov, 2016).'
+        data_digitized: false
+        activity_species: [SiO2, MgO]
+        temperature_C: 1600
+        MgO_to_SiO2_mole_ratio: '2:3'
+        composition_axes_as_plotted: {component: CaO, units: mol%, tick_values: [0, 5, 10, 15, 20, 25, 30]}
+        activity_axis_tick_values: [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+        calculation_sources: 'Curves 1 and 3: Rein and Chipman (1965); curves 2 and 4: Shornikov (2016).'
+        standard_state_as_printed: not stated
+    - observation_id: yakovlev_2018_activity_standard_state_status
+      type: located_theoretical_context
+      locator: {page: 59, pdf_page_index: 1, section: Discussion and Fig. 1}
+      units: activity reference state
+      values:
+        quantity: MgO_and_SiO2_activity_standard_state
+        method_class: quoted_unattributed
+        activities_discussed: [MgO, SiO2]
+        standard_state_as_printed: not stated; equation uses pure oxide vapor pressure P_i° but does not specify solid or liquid reference phase.
+    - observation_id: yakovlev_2018_figure2_isotope_fractionation_curve
+      type: thermodynamic_example
+      locator: {page: 60, pdf_page_index: 2, figure: '2'}
+      units: isotope-fractionation efficiency ratio as plotted; CaO in wt%
+      values:
+        quantity: Mg_to_Si_isotope_fractionation_efficiency_curve
+        method_class: figure_only
+        quote_as_printed: 'Fig. 2. Efficiency of fractionation of magnesium and silicon isotopes vs. the calcium oxide content. The CaO content in the initial composition is indicated by cross symbol.'
+        data_digitized: false
+        composition_axes_as_plotted: {component: CaO, units: wt%, tick_values: [0, 5, 10, 15, 20]}
+        ratio_axis_as_plotted: delta26Mg_over_delta30Si
+        ratio_axis_tick_values: [1.4, 1.6, 1.8, 2.0]
+        initial_CaO_marker: cross
+        standard_state_as_printed: not applicable

@@ -74,6 +74,24 @@ def test_internal_analytical_implementation_has_no_legacy_stub_symbols():
     assert not violations, "\n".join(violations)
 
 
+def test_production_source_does_not_sniff_the_test_runner():
+    repo = Path(__file__).parent.parent
+    forbidden = "PYTEST_" + "CURRENT_TEST"
+    violations = []
+    for root_name in ("simulator", "engines", "tools", "scripts"):
+        for path in (repo / root_name).rglob("*"):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            try:
+                source = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
+            if forbidden in source:
+                violations.append(path.relative_to(repo).as_posix())
+
+    assert not violations, "test-runner environment sniffing: " + ", ".join(violations)
+
+
 def test_simulator_has_no_forbidden_internal_kg_mutations():
     repo = Path(__file__).parent.parent
     violations = _forbidden_internal_kg_mutation_hits(repo / "simulator")

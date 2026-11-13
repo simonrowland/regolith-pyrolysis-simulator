@@ -74,9 +74,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise inputs are
@@ -195,6 +194,24 @@ observations:
               section: II. Activity of NaO0.5(l)
         output_unit: Pa
         references: []
+  derivation:
+    relation: NaO0.5 activity was determined by the authors’ EMF method using equations (1)–(5); Table 2 reports group means
+      of those determinations.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Individual EMF readings used to calculate the reported group summaries are not printed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_2_log_a_NaO05::points:h=b068d26ca4eb
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -267,9 +284,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise inputs are
@@ -388,6 +404,24 @@ observations:
               section: II. Activity of NaO0.5(l)
         output_unit: Pa
         references: []
+  derivation:
+    relation: NaO0.5 activity was determined by the authors’ EMF method using equations (1)–(5); Table 2 reports group means
+      of those determinations.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Individual EMF readings used to calculate the reported group summaries are not printed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_3_log_a_NaO05::points:h=84e70d18cd50
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -460,9 +494,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise inputs are
@@ -581,6 +614,24 @@ observations:
               section: II. Activity of NaO0.5(l)
         output_unit: Pa
         references: []
+  derivation:
+    relation: NaO0.5 activity was determined by the authors’ EMF method using equations (1)–(5); Table 2 reports group means
+      of those determinations.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Individual EMF readings used to calculate the reported group summaries are not printed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r1::points:h=b93108d8b925
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -666,9 +717,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -728,6 +778,24 @@ observations:
         page: 5
         published_page: 418
         table: '2'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r2::points:h=f70d59a198fe
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -813,9 +881,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -875,6 +942,24 @@ observations:
         page: 5
         published_page: 418
         table: '2'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r3::points:h=02e581f1afe7
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -960,9 +1045,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -1022,6 +1106,24 @@ observations:
         page: 5
         published_page: 418
         table: '2'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r4::points:h=a9dd167aef10
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -1107,9 +1209,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -1169,6 +1270,24 @@ observations:
         page: 5
         published_page: 418
         table: '2'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r5::points:h=72e1e66e50e8
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -1254,9 +1373,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -1316,6 +1434,24 @@ observations:
         page: 5
         published_page: 418
         table: '2'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r6::points:h=810fd3185f4d
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -1401,9 +1537,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -1463,6 +1598,24 @@ observations:
         page: 5
         published_page: 418
         table: '2'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r7::points:h=2feae6b87aca
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -1548,9 +1701,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -1610,6 +1762,24 @@ observations:
         page: 5
         published_page: 418
         table: '2'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r8::points:h=8928185c97c3
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   identity:
@@ -1695,9 +1865,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 2
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -1757,6 +1926,24 @@ observations:
         page: 5
         published_page: 418
         table: '2'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r1::points:h=7e320eee27ce
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
   identity:
@@ -1842,9 +2029,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 3
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -1904,6 +2090,24 @@ observations:
         page: 6
         published_page: 419
         table: '3'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r2::points:h=5e7a03a219f7
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
   identity:
@@ -1989,9 +2193,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 3
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -2051,6 +2254,24 @@ observations:
         page: 6
         published_page: 419
         table: '3'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r3::points:h=2c2bfa838dae
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
   identity:
@@ -2136,9 +2357,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 3
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -2198,6 +2418,24 @@ observations:
         page: 6
         published_page: 419
         table: '3'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r4::points:h=9889f0a7c034
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
   identity:
@@ -2283,9 +2521,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 3
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -2345,6 +2582,24 @@ observations:
         page: 6
         published_page: 419
         table: '3'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r5::points:h=f3b94142f7e9
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
   identity:
@@ -2430,9 +2685,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 3
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -2492,6 +2746,24 @@ observations:
         page: 6
         published_page: 419
         table: '3'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r6::points:h=a64dc0935bf9
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
   identity:
@@ -2577,9 +2849,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 3
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -2639,6 +2910,24 @@ observations:
         page: 6
         published_page: 419
         table: '3'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r7::points:h=4f40f56ff8d8
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
   identity:
@@ -2724,9 +3013,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 3
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -2786,6 +3074,24 @@ observations:
         page: 6
         published_page: 419
         table: '3'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r8::points:h=7874f6b3b504
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
   identity:
@@ -2871,9 +3177,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 3
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -2933,6 +3238,24 @@ observations:
         page: 6
         published_page: 419
         table: '3'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r9::points:h=d7e5f128dbab
   experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
   identity:
@@ -3018,9 +3341,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Fujisawa et al. (1994), Table 3
+      value: measured_reduced
+    original_method_class: measured_reduced
   admission:
     status: rejected
     reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not independently
@@ -3080,3 +3402,21 @@ observations:
         page: 6
         published_page: 419
         table: '3'
+  derivation:
+    relation: SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: The underlying distribution measurements are reported as row values, but the raw instrument readings used in
+          the reduction are not listed as separate observations.
+    references: []
+  provenance:
+    printed_phase: l

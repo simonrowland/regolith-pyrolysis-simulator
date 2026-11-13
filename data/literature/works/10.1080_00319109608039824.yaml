@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:bennour-1996-ternary-cs-na-silicate
       role: pdf
@@ -66,6 +66,190 @@ experiments:
     table: I
     note: Section (a), row order as printed
 context:
+- observation_id: bennour_1996_binary_formation_enthalpies
+  type: thermodynamic_example
+  locator:
+    page: 245
+    published_page: 245
+    pdf_page_index: 17
+    table: unnumbered
+    row: as listed
+  units: as printed
+  values:
+    quantity: Binary formation enthalpies used for mixing enthalpies
+    method_class: mixed_source_data
+    method: manual
+    source_status_note: Literature values plus parenthesized model [12] estimates, as labelled in the source.
+    rows:
+    - section: Binary_formation_enthalpy
+      row: Na2O-SiO2
+      quantity: reference
+      values_as_published: '5'
+      units: reference number
+      method: manual
+    - section: Binary_formation_enthalpy
+      row: Na2O-SiO2
+      quantity: XSiO2=0.667
+      values_as_published: '-80.27'
+      units: kJ mol-1
+      method: manual
+    - section: Binary_formation_enthalpy
+      row: Na2O-SiO2
+      quantity: XSiO2=0.75
+      values_as_published: (-53.57)
+      units: kJ mol-1 model [12]
+      method: manual
+    - section: Binary_formation_enthalpy
+      row: Na2O-SiO2
+      quantity: XSiO2=0.85
+      values_as_published: (-32.16)
+      units: kJ mol-1 model [12]
+      method: manual
+    - section: Binary_formation_enthalpy
+      row: Cs2O-SiO2
+      quantity: reference
+      values_as_published: '11'
+      units: reference number
+      method: manual
+    - section: Binary_formation_enthalpy
+      row: Cs2O-SiO2
+      quantity: XSiO2=0.667
+      values_as_published: '-83.62'
+      units: kJ mol-1
+      method: manual
+    - section: Binary_formation_enthalpy
+      row: Cs2O-SiO2
+      quantity: XSiO2=0.75
+      values_as_published: (-58.08)
+      units: kJ mol-1 model [12]
+      method: manual
+    - section: Binary_formation_enthalpy
+      row: Cs2O-SiO2
+      quantity: XSiO2=0.85
+      values_as_published: (-34.85)
+      units: kJ mol-1 model [12]
+      method: manual
+  context_id: bennour-1996-ternary-cs-na-silicate::context::bennour_1996_binary_formation_enthalpies
+  work_id: 10.1080/00319109608039824
+  source_id: bennour-1996-ternary-cs-na-silicate
+  species: Cs2O
+- observation_id: bennour_1996_binary_gibbs_energies
+  type: thermodynamic_example
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 15
+    table: unnumbered
+    row: as listed
+  units: as printed
+  values:
+    quantity: Binary Gibbs energies used for ternary excess values
+    method_class: mixed_source_data
+    method: manual
+    source_status_note: Source values and model estimates [12], as parenthesized and identified in the paper.
+    rows:
+    - section: Gibbs_binary
+      row: Na2O-SiO2
+      quantity: reference
+      values_as_published: 5;9;10
+      units: reference numbers
+      method: manual
+    - section: Gibbs_binary
+      row: Na2O-SiO2
+      quantity: XSiO2=0.5
+      values_as_published: (-101.5)
+      units: kJ mol-1 (model [12])
+      method: model [12]
+    - section: Gibbs_binary
+      row: Na2O-SiO2
+      quantity: XSiO2=0.667
+      values_as_published: '-75.47'
+      units: kJ mol-1
+      method: manual
+    - section: Gibbs_binary
+      row: Na2O-SiO2
+      quantity: XSiO2=0.75
+      values_as_published: '-58'
+      units: kJ mol-1
+      method: manual
+    - section: Gibbs_binary
+      row: Na2O-SiO2
+      quantity: XSiO2=0.85
+      values_as_published: (-33.3)
+      units: ' kJ mol-1 (model [12])'
+      method: manual
+    - section: Gibbs_binary
+      row: Cs2O-SiO2
+      quantity: reference
+      values_as_published: '11'
+      units: reference number
+      method: manual
+    - section: Gibbs_binary
+      row: Cs2O-SiO2
+      quantity: XSiO2=0.5
+      values_as_published: '-118.08'
+      units: kJ mol-1
+      method: manual
+    - section: Gibbs_binary
+      row: Cs2O-SiO2
+      quantity: XSiO2=0.667
+      values_as_published: '-76.57'
+      units: kJ mol-1
+      method: manual
+    - section: Gibbs_binary
+      row: Cs2O-SiO2
+      quantity: XSiO2=0.75
+      values_as_published: (-59.6)
+      units: kJ mol-1 (model [12])
+      method: manual
+    - section: Gibbs_binary
+      row: Cs2O-SiO2
+      quantity: XSiO2=0.85
+      values_as_published: (-36)
+      units: kJ mol-1 (model [12])
+      method: manual
+  context_id: bennour-1996-ternary-cs-na-silicate::context::bennour_1996_binary_gibbs_energies
+  work_id: 10.1080/00319109608039824
+  source_id: bennour-1996-ternary-cs-na-silicate
+  species: Cs2O
+- observation_id: bennour_1996_enthalpy_slope_fit
+  type: thermodynamic_example
+  locator:
+    page: 244
+    published_page: 244
+    pdf_page_index: 16
+    table: unnumbered
+    row: as listed
+  units: as printed
+  values:
+    quantity: A/B coefficients for measured temperature-slope curves
+    method_class: model_derived
+    method: manual
+    source_status_note: Linear fit coefficients for slopes derived from measured ion-current-ratio curves; B uncertainties
+      retained.
+    rows:
+    - section: Enthalpy_slope_fit
+      row: '1'
+      quantity: XSiO2=0.667
+      values_as_published: 372.66;3867 ± 400
+      units: A;B
+      method: manual
+    - section: Enthalpy_slope_fit
+      row: '2'
+      quantity: XSiO2=0.75
+      values_as_published: -61.97;2360 ± 750
+      units: A;B
+      method: manual
+    - section: Enthalpy_slope_fit
+      row: '3'
+      quantity: XSiO2=0.85
+      values_as_published: -558.94;4810 ± 1500
+      units: A;B
+      method: manual
+  context_id: bennour-1996-ternary-cs-na-silicate::context::bennour_1996_enthalpy_slope_fit
+  work_id: 10.1080/00319109608039824
+  source_id: bennour-1996-ternary-cs-na-silicate
+  species: Cs2O
 - observation_id: bennour_1996_experimental_apparatus
   type: apparatus
   locator:
@@ -128,6 +312,76 @@ context:
   work_id: 10.1080/00319109608039824
   source_id: bennour-1996-ternary-cs-na-silicate
   species: Cs2O
+- observation_id: bennour_1996_fig7_na2o_x_sio2_0p5
+  type: figure_record
+  locator:
+    figure: '7'
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    note: X_SiO2 = 0.50 curve; printed Figure 7 caption
+  units: activity dimensionless as plotted
+  standard_state: 'Second reference state (dimer hypothesis): Na2Si_nO_(2n+1) silicate end member for XSiO2 = 0.50; a=1 at
+    the Na end (x_path = 0; x(Cs2O) = 0). Our results on the mixing of {(1 − X₂ − X₃) SiO₂, X₂Cs₂O, X₃Na₂O} are calculated
+    by assuming the second reference state that means that the oxide activities are related to the square of the ionic intensities.'
+  T_K: 1573
+  phase: l
+  regime: kems_effusion
+  values:
+    quantity_as_published: Na2O activity curve in Figure 7
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    note: Not digitised; smooth, unmarked curve. Qualitative activity variation only.
+    caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole
+      fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+    section_as_published: '- - - X = 0.5'
+    axes_as_published:
+      x: mole fraction xCs2O
+      y: activity of aNa2O; dimensionless
+    component_as_published: aNa2O
+    method_class: figure_only
+    digitisation_status: not digitized
+    reason: The OpenIMCC starting aid and calibration request cover the two Cs2O curves used by the species-calibration lane;
+      no Na2O values were inferred from those Cs2O traces.
+  context_id: bennour-1996-ternary-cs-na-silicate::context::bennour_1996_fig7_na2o_x_sio2_0p5
+  work_id: 10.1080/00319109608039824
+  source_id: bennour-1996-ternary-cs-na-silicate
+  species: Na2O
+- observation_id: bennour_1996_fig7_na2o_x_sio2_0p85
+  type: figure_record
+  locator:
+    figure: '7'
+    page: 14
+    published_page: 241
+    pdf_page_index: 13
+    note: X_SiO2 = 0.85 curve; printed Figure 7 caption
+  units: activity dimensionless as plotted
+  standard_state: 'Second reference state (dimer hypothesis): Na2Si_nO_(2n+1) silicate end member for XSiO2 = 0.85; a=1 at
+    the Na end (x_path = 0; x(Cs2O) = 0). Our results on the mixing of {(1 − X₂ − X₃) SiO₂, X₂Cs₂O, X₃Na₂O} are calculated
+    by assuming the second reference state that means that the oxide activities are related to the square of the ionic intensities.'
+  T_K: 1573
+  phase: l
+  regime: kems_effusion
+  values:
+    quantity_as_published: Na2O activity curve in Figure 7
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    note: Not digitised; smooth, unmarked curve. Qualitative activity variation only.
+    caption: 'FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) [(1 - x)Na2O + xCs2O] vs. the mole
+      fraction xCs2O at 1573 K: ------ X = 0.85; - - - X = 0.5.'
+    section_as_published: '------ X = 0.85'
+    axes_as_published:
+      x: mole fraction xCs2O
+      y: activity of aNa2O; dimensionless
+    component_as_published: aNa2O
+    method_class: figure_only
+    digitisation_status: not digitized
+    reason: The OpenIMCC starting aid and calibration request cover the two Cs2O curves used by the species-calibration lane;
+      no Na2O values were inferred from those Cs2O traces.
+  context_id: bennour-1996-ternary-cs-na-silicate::context::bennour_1996_fig7_na2o_x_sio2_0p85
+  work_id: 10.1080/00319109608039824
+  source_id: bennour-1996-ternary-cs-na-silicate
+  species: Na2O
 - observation_id: bennour_1996_table_ii_x_sio2_0p5_fit
   type: thermodynamic_example
   locator:
@@ -229,6 +483,3065 @@ context:
       - '0.9'
     equation_as_published: ln(I^2_Cs X_Na2O / I^2_Na X_Cs2O) = A + B x_Cs2O
   context_id: bennour-1996-ternary-cs-na-silicate::context::bennour_1996_table_ii_x_sio2_0p85_fit
+  work_id: 10.1080/00319109608039824
+  source_id: bennour-1996-ternary-cs-na-silicate
+  species: Cs2O
+- observation_id: bennour_1996_table_iii
+  type: thermodynamic_table
+  locator:
+    page: 14
+    published_page: 242
+    pdf_page_index: 14
+    table: III
+  units: kJ mol-1 and mole fractions as printed
+  values:
+    quantity: excess molar free enthalpies
+    method_class: model_derived
+    method: manual
+    source_status_note: Calculated thermodynamic values based partly on literature binary data; not direct measurements.
+    rows:
+    - x_Cs2O_as_published: '0'
+      X2_as_published: '0'
+      X3_as_published: '0.50'
+      minus_G_QB_kJ_mol: '0'
+      minus_delta_G_excess_kJ_mol: '0'
+      minus_delta_G_ternary_kJ_mol: '101.54'
+      row: 1
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 1
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0'
+              - - Na2O
+                - '0.50'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 1
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.1'
+      X2_as_published: '0.05'
+      X3_as_published: '0.45'
+      minus_G_QB_kJ_mol: '2.42'
+      minus_delta_G_excess_kJ_mol: '1.21'
+      minus_delta_G_ternary_kJ_mol: '104.40'
+      row: 2
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 2
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.05'
+              - - Na2O
+                - '0.45'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 2
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.2'
+      X2_as_published: '0.10'
+      X3_as_published: '0.40'
+      minus_G_QB_kJ_mol: '4.30'
+      minus_delta_G_excess_kJ_mol: '2.16'
+      minus_delta_G_ternary_kJ_mol: '107.00'
+      row: 3
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 3
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.10'
+              - - Na2O
+                - '0.40'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 3
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.3'
+      X2_as_published: '0.15'
+      X3_as_published: '0.35'
+      minus_G_QB_kJ_mol: '5.66'
+      minus_delta_G_excess_kJ_mol: '2.83'
+      minus_delta_G_ternary_kJ_mol: '109.33'
+      row: 4
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 4
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.15'
+              - - Na2O
+                - '0.35'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 4
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.4'
+      X2_as_published: '0.20'
+      X3_as_published: '0.30'
+      minus_G_QB_kJ_mol: '6.46'
+      minus_delta_G_excess_kJ_mol: '3.23'
+      minus_delta_G_ternary_kJ_mol: '111.39'
+      row: 5
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 5
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.20'
+              - - Na2O
+                - '0.30'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 5
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.5'
+      X2_as_published: '0.25'
+      X3_as_published: '0.25'
+      minus_G_QB_kJ_mol: '6.74'
+      minus_delta_G_excess_kJ_mol: '3.37'
+      minus_delta_G_ternary_kJ_mol: '113.18'
+      row: 6
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 6
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.25'
+              - - Na2O
+                - '0.25'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 6
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.6'
+      X2_as_published: '0.30'
+      X3_as_published: '0.20'
+      minus_G_QB_kJ_mol: '6.46'
+      minus_delta_G_excess_kJ_mol: '3.23'
+      minus_delta_G_ternary_kJ_mol: '114.70'
+      row: 7
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 7
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.30'
+              - - Na2O
+                - '0.20'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 7
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.7'
+      X2_as_published: '0.35'
+      X3_as_published: '0.15'
+      minus_G_QB_kJ_mol: '5.66'
+      minus_delta_G_excess_kJ_mol: '2.83'
+      minus_delta_G_ternary_kJ_mol: '115.95'
+      row: 8
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 8
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.35'
+              - - Na2O
+                - '0.15'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 8
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.8'
+      X2_as_published: '0.40'
+      X3_as_published: '0.10'
+      minus_G_QB_kJ_mol: '4.30'
+      minus_delta_G_excess_kJ_mol: '2.16'
+      minus_delta_G_ternary_kJ_mol: '116.93'
+      row: 9
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 9
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.40'
+              - - Na2O
+                - '0.10'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 9
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.9'
+      X2_as_published: '0.45'
+      X3_as_published: '0.05'
+      minus_G_QB_kJ_mol: '2.42'
+      minus_delta_G_excess_kJ_mol: '1.21'
+      minus_delta_G_ternary_kJ_mol: '117.64'
+      row: 10
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 10
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.45'
+              - - Na2O
+                - '0.05'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 10
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '1.0'
+      X2_as_published: '0.50'
+      X3_as_published: '0'
+      minus_G_QB_kJ_mol: '0'
+      minus_delta_G_excess_kJ_mol: '0'
+      minus_delta_G_ternary_kJ_mol: '118.08'
+      row: 11
+      section: a
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 11
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.50'
+              - - Na2O
+                - '0'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 11
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0'
+      X2_as_published: '0'
+      X3_as_published: '0.333'
+      minus_G_QB_kJ_mol: '0'
+      minus_delta_G_excess_kJ_mol: '0'
+      minus_delta_G_ternary_kJ_mol: '75.47'
+      row: 1
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 1
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0'
+              - - Na2O
+                - '0.333'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 1
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.1'
+      X2_as_published: '0.033'
+      X3_as_published: '0.300'
+      minus_G_QB_kJ_mol: '2.52'
+      minus_delta_G_excess_kJ_mol: '0.84'
+      minus_delta_G_ternary_kJ_mol: '76.42'
+      row: 2
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 2
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.033'
+              - - Na2O
+                - '0.300'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 2
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.2'
+      X2_as_published: '0.067'
+      X3_as_published: '0.266'
+      minus_G_QB_kJ_mol: '4.44'
+      minus_delta_G_excess_kJ_mol: '1.48'
+      minus_delta_G_ternary_kJ_mol: '77.18'
+      row: 3
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 3
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.067'
+              - - Na2O
+                - '0.266'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 3
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.3'
+      X2_as_published: '0.100'
+      X3_as_published: '0.233'
+      minus_G_QB_kJ_mol: '5.85'
+      minus_delta_G_excess_kJ_mol: '1.95'
+      minus_delta_G_ternary_kJ_mol: '77.75'
+      row: 4
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 4
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.100'
+              - - Na2O
+                - '0.233'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 4
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.4'
+      X2_as_published: '0.133'
+      X3_as_published: '0.200'
+      minus_G_QB_kJ_mol: '6.69'
+      minus_delta_G_excess_kJ_mol: '2.23'
+      minus_delta_G_ternary_kJ_mol: '78.14'
+      row: 5
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 5
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.133'
+              - - Na2O
+                - '0.200'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 5
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.5'
+      X2_as_published: '0.166'
+      X3_as_published: '0.166'
+      minus_G_QB_kJ_mol: '6.96'
+      minus_delta_G_excess_kJ_mol: '2.32'
+      minus_delta_G_ternary_kJ_mol: '78.35'
+      row: 6
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 6
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.166'
+              - - Na2O
+                - '0.166'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 6
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.6'
+      X2_as_published: '0.200'
+      X3_as_published: '0.133'
+      minus_G_QB_kJ_mol: '6.69'
+      minus_delta_G_excess_kJ_mol: '2.23'
+      minus_delta_G_ternary_kJ_mol: '78.36'
+      row: 7
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 7
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.200'
+              - - Na2O
+                - '0.133'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 7
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.7'
+      X2_as_published: '0.233'
+      X3_as_published: '0.100'
+      minus_G_QB_kJ_mol: '5.85'
+      minus_delta_G_excess_kJ_mol: '1.95'
+      minus_delta_G_ternary_kJ_mol: '78.20'
+      row: 8
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 8
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.233'
+              - - Na2O
+                - '0.100'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 8
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.8'
+      X2_as_published: '0.266'
+      X3_as_published: '0.067'
+      minus_G_QB_kJ_mol: '4.44'
+      minus_delta_G_excess_kJ_mol: '1.48'
+      minus_delta_G_ternary_kJ_mol: '77.84'
+      row: 9
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 9
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.266'
+              - - Na2O
+                - '0.067'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 9
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.9'
+      X2_as_published: '0.300'
+      X3_as_published: '0.033'
+      minus_G_QB_kJ_mol: '2.52'
+      minus_delta_G_excess_kJ_mol: '0.84'
+      minus_delta_G_ternary_kJ_mol: '77.30'
+      row: 10
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 10
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.300'
+              - - Na2O
+                - '0.033'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 10
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '1.0'
+      X2_as_published: '0.333'
+      X3_as_published: '0'
+      minus_G_QB_kJ_mol: '0'
+      minus_delta_G_excess_kJ_mol: '0'
+      minus_delta_G_ternary_kJ_mol: '76.57'
+      row: 11
+      section: b
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 11
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.333'
+              - - Na2O
+                - '0'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 11
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0'
+      X2_as_published: '0'
+      X3_as_published: '0.25'
+      minus_G_QB_kJ_mol: '0'
+      minus_delta_G_excess_kJ_mol: '0'
+      minus_delta_G_ternary_kJ_mol: '58.00'
+      row: 1
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 1
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0'
+              - - Na2O
+                - '0.25'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 1
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.1'
+      X2_as_published: '0.025'
+      X3_as_published: '0.225'
+      minus_G_QB_kJ_mol: '2.96'
+      minus_delta_G_excess_kJ_mol: '0.74'
+      minus_delta_G_ternary_kJ_mol: '58.91'
+      row: 2
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 2
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.025'
+              - - Na2O
+                - '0.225'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 2
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.2'
+      X2_as_published: '0.050'
+      X3_as_published: '0.200'
+      minus_G_QB_kJ_mol: '5.28'
+      minus_delta_G_excess_kJ_mol: '1.32'
+      minus_delta_G_ternary_kJ_mol: '59.65'
+      row: 3
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 3
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.050'
+              - - Na2O
+                - '0.200'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 3
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.3'
+      X2_as_published: '0.075'
+      X3_as_published: '0.175'
+      minus_G_QB_kJ_mol: '6.92'
+      minus_delta_G_excess_kJ_mol: '1.73'
+      minus_delta_G_ternary_kJ_mol: '60.23'
+      row: 4
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 4
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.075'
+              - - Na2O
+                - '0.175'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 4
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.4'
+      X2_as_published: '0.100'
+      X3_as_published: '0.150'
+      minus_G_QB_kJ_mol: '7.92'
+      minus_delta_G_excess_kJ_mol: '1.98'
+      minus_delta_G_ternary_kJ_mol: '60.64'
+      row: 5
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 5
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.100'
+              - - Na2O
+                - '0.150'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 5
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.5'
+      X2_as_published: '0.125'
+      X3_as_published: '0.125'
+      minus_G_QB_kJ_mol: '8.24'
+      minus_delta_G_excess_kJ_mol: '2.06'
+      minus_delta_G_ternary_kJ_mol: '60.88'
+      row: 6
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 6
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.125'
+              - - Na2O
+                - '0.125'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 6
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.6'
+      X2_as_published: '0.150'
+      X3_as_published: '0.100'
+      minus_G_QB_kJ_mol: '7.92'
+      minus_delta_G_excess_kJ_mol: '1.98'
+      minus_delta_G_ternary_kJ_mol: '60.97'
+      row: 7
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 7
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.150'
+              - - Na2O
+                - '0.100'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 7
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.7'
+      X2_as_published: '0.175'
+      X3_as_published: '0.075'
+      minus_G_QB_kJ_mol: '6.92'
+      minus_delta_G_excess_kJ_mol: '1.73'
+      minus_delta_G_ternary_kJ_mol: '60.88'
+      row: 8
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 8
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.175'
+              - - Na2O
+                - '0.075'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 8
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.8'
+      X2_as_published: '0.200'
+      X3_as_published: '0.050'
+      minus_G_QB_kJ_mol: '5.28'
+      minus_delta_G_excess_kJ_mol: '1.32'
+      minus_delta_G_ternary_kJ_mol: '60.64'
+      row: 9
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 9
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.200'
+              - - Na2O
+                - '0.050'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 9
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.9'
+      X2_as_published: '0.225'
+      X3_as_published: '0.025'
+      minus_G_QB_kJ_mol: '2.96'
+      minus_delta_G_excess_kJ_mol: '0.74'
+      minus_delta_G_ternary_kJ_mol: '60.23'
+      row: 10
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 10
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.225'
+              - - Na2O
+                - '0.025'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 10
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '1.0'
+      X2_as_published: '0.25'
+      X3_as_published: '0'
+      minus_G_QB_kJ_mol: '0'
+      minus_delta_G_excess_kJ_mol: '0'
+      minus_delta_G_ternary_kJ_mol: '59.64'
+      row: 11
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 11
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.25'
+              - - Na2O
+                - '0'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 11
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '1.0'
+      X2_as_published: '0.15'
+      X3_as_published: '0'
+      minus_G_QB_kJ_mol: '0'
+      minus_delta_G_excess_kJ_mol: '0'
+      minus_delta_G_ternary_kJ_mol: '36.00'
+      row: 12
+      section: c
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 12
+        section: c
+      note: Printed trailing row under XSiO2=0.75; the fractions do not close and its 36.00 cell repeats section (d)'s endpoint,
+        so it is not a normal section-(c) endpoint.
+      T_C: '1299.85'
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0'
+      X2_as_published: '0'
+      X3_as_published: '0.15'
+      minus_G_QB_kJ_mol: '0'
+      minus_delta_G_excess_kJ_mol: '0'
+      minus_delta_G_ternary_kJ_mol: '33.30'
+      row: 1
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 1
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0'
+              - - Na2O
+                - '0.15'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 1
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.1'
+      X2_as_published: '0.015'
+      X3_as_published: '0.135'
+      minus_G_QB_kJ_mol: '4.26'
+      minus_delta_G_excess_kJ_mol: '0.64'
+      minus_delta_G_ternary_kJ_mol: '34.20'
+      row: 2
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 2
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.015'
+              - - Na2O
+                - '0.135'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 2
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.2'
+      X2_as_published: '0.030'
+      X3_as_published: '0.120'
+      minus_G_QB_kJ_mol: '6.53'
+      minus_delta_G_excess_kJ_mol: '0.98'
+      minus_delta_G_ternary_kJ_mol: '34.81'
+      row: 3
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 3
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.030'
+              - - Na2O
+                - '0.120'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 3
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.3'
+      X2_as_published: '0.045'
+      X3_as_published: '0.105'
+      minus_G_QB_kJ_mol: '8.00'
+      minus_delta_G_excess_kJ_mol: '1.20'
+      minus_delta_G_ternary_kJ_mol: '35.30'
+      row: 4
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 4
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.045'
+              - - Na2O
+                - '0.105'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 4
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.4'
+      X2_as_published: '0.060'
+      X3_as_published: '0.090'
+      minus_G_QB_kJ_mol: '8.80'
+      minus_delta_G_excess_kJ_mol: '1.32'
+      minus_delta_G_ternary_kJ_mol: '35.69'
+      row: 5
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 5
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.060'
+              - - Na2O
+                - '0.090'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 5
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.5'
+      X2_as_published: '0.075'
+      X3_as_published: '0.075'
+      minus_G_QB_kJ_mol: '9.06'
+      minus_delta_G_excess_kJ_mol: '1.36'
+      minus_delta_G_ternary_kJ_mol: '36.00'
+      row: 6
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 6
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.075'
+              - - Na2O
+                - '0.075'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 6
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.6'
+      X2_as_published: '0.090'
+      X3_as_published: '0.060'
+      minus_G_QB_kJ_mol: '8.80'
+      minus_delta_G_excess_kJ_mol: '1.32'
+      minus_delta_G_ternary_kJ_mol: '36.23'
+      row: 7
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 7
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.090'
+              - - Na2O
+                - '0.060'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 7
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.7'
+      X2_as_published: '0.105'
+      X3_as_published: '0.045'
+      minus_G_QB_kJ_mol: '8.00'
+      minus_delta_G_excess_kJ_mol: '1.20'
+      minus_delta_G_ternary_kJ_mol: '36.38'
+      row: 8
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 8
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.105'
+              - - Na2O
+                - '0.045'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 8
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.8'
+      X2_as_published: '0.120'
+      X3_as_published: '0.030'
+      minus_G_QB_kJ_mol: '6.53'
+      minus_delta_G_excess_kJ_mol: '0.98'
+      minus_delta_G_ternary_kJ_mol: '36.43'
+      row: 9
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 9
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.120'
+              - - Na2O
+                - '0.030'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 9
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.9'
+      X2_as_published: '0.135'
+      X3_as_published: '0.015'
+      minus_G_QB_kJ_mol: '4.26'
+      minus_delta_G_excess_kJ_mol: '0.64'
+      minus_delta_G_ternary_kJ_mol: '36.35'
+      row: 10
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 10
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.135'
+              - - Na2O
+                - '0.015'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 10
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '1.0'
+      X2_as_published: '0.15'
+      X3_as_published: '0'
+      minus_G_QB_kJ_mol: '0'
+      minus_delta_G_excess_kJ_mol: '0'
+      minus_delta_G_ternary_kJ_mol: '36.00'
+      row: 11
+      section: d
+      locator:
+        page: 15
+        published_page: 242
+        pdf_page_index: 14
+        table: III
+        row: 11
+        section: d
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.85'
+              - - Cs2O
+                - '0.15'
+              - - Na2O
+                - '0'
+          locator:
+            page: 15
+            published_page: 242
+            pdf_page_index: 14
+            table: III
+            row: 11
+            section: d
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+  context_id: bennour-1996-ternary-cs-na-silicate::context::bennour_1996_table_iii
+  work_id: 10.1080/00319109608039824
+  source_id: bennour-1996-ternary-cs-na-silicate
+  species: Cs2O
+- observation_id: bennour_1996_table_iv
+  type: thermodynamic_table
+  locator:
+    page: 19
+    published_page: 247
+    pdf_page_index: 19
+    table: IV
+  units: kJ mol-1 and mole fractions as printed
+  values:
+    quantity: molar enthalpies and ternary mixing enthalpies
+    method_class: derived_from_measured
+    method: manual
+    source_status_note: Derived from the measured temperature slopes and integration; not an independent calorimetric measurement.
+    rows:
+    - x_Cs2O_as_published: '0'
+      X2_as_published: '0'
+      X3_as_published: '0.333'
+      minus_H_QB_kJ_mol: '0'
+      minus_delta_H_excess_kJ_mol: '0'
+      minus_delta_H_ternary_kJ_mol: '80.27'
+      row: 1
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 1
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0'
+              - - Na2O
+                - '0.333'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 1
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.1'
+      X2_as_published: '0.033'
+      X3_as_published: '0.300'
+      minus_H_QB_kJ_mol: '2.88'
+      minus_delta_H_excess_kJ_mol: '0.96'
+      minus_delta_H_ternary_kJ_mol: '81.56'
+      row: 2
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 2
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.033'
+              - - Na2O
+                - '0.300'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 2
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.2'
+      X2_as_published: '0.067'
+      X3_as_published: '0.266'
+      minus_H_QB_kJ_mol: '5.13'
+      minus_delta_H_excess_kJ_mol: '1.71'
+      minus_delta_H_ternary_kJ_mol: '82.65'
+      row: 3
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 3
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.067'
+              - - Na2O
+                - '0.266'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 3
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.3'
+      X2_as_published: '0.100'
+      X3_as_published: '0.233'
+      minus_H_QB_kJ_mol: '6.75'
+      minus_delta_H_excess_kJ_mol: '2.25'
+      minus_delta_H_ternary_kJ_mol: '83.52'
+      row: 4
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 4
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.100'
+              - - Na2O
+                - '0.233'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 4
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.4'
+      X2_as_published: '0.133'
+      X3_as_published: '0.200'
+      minus_H_QB_kJ_mol: '7.72'
+      minus_delta_H_excess_kJ_mol: '2.57'
+      minus_delta_H_ternary_kJ_mol: '84.18'
+      row: 5
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 5
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.133'
+              - - Na2O
+                - '0.200'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 5
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.5'
+      X2_as_published: '0.166'
+      X3_as_published: '0.166'
+      minus_H_QB_kJ_mol: '8.02'
+      minus_delta_H_excess_kJ_mol: '2.67'
+      minus_delta_H_ternary_kJ_mol: '84.62'
+      row: 6
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 6
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.166'
+              - - Na2O
+                - '0.166'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 6
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.6'
+      X2_as_published: '0.200'
+      X3_as_published: '0.133'
+      minus_H_QB_kJ_mol: '7.72'
+      minus_delta_H_excess_kJ_mol: '2.57'
+      minus_delta_H_ternary_kJ_mol: '84.84'
+      row: 7
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 7
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.200'
+              - - Na2O
+                - '0.133'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 7
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.7'
+      X2_as_published: '0.233'
+      X3_as_published: '0.100'
+      minus_H_QB_kJ_mol: '6.75'
+      minus_delta_H_excess_kJ_mol: '2.25'
+      minus_delta_H_ternary_kJ_mol: '84.86'
+      row: 8
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 8
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.233'
+              - - Na2O
+                - '0.100'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 8
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.8'
+      X2_as_published: '0.266'
+      X3_as_published: '0.067'
+      minus_H_QB_kJ_mol: '5.13'
+      minus_delta_H_excess_kJ_mol: '1.71'
+      minus_delta_H_ternary_kJ_mol: '84.66'
+      row: 9
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 9
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.266'
+              - - Na2O
+                - '0.067'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 9
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.9'
+      X2_as_published: '0.300'
+      X3_as_published: '0.033'
+      minus_H_QB_kJ_mol: '2.88'
+      minus_delta_H_excess_kJ_mol: '0.96'
+      minus_delta_H_ternary_kJ_mol: '84.25'
+      row: 10
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 10
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.300'
+              - - Na2O
+                - '0.033'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 10
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '1.0'
+      X2_as_published: '0.333'
+      X3_as_published: '0'
+      minus_H_QB_kJ_mol: '0'
+      minus_delta_H_excess_kJ_mol: '0'
+      minus_delta_H_ternary_kJ_mol: '83.62'
+      row: 11
+      section: a
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 11
+        section: a
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.5'
+              - - Cs2O
+                - '0.333'
+              - - Na2O
+                - '0'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 11
+            section: a
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0'
+      X2_as_published: '0'
+      X3_as_published: '0.25'
+      minus_H_QB_kJ_mol: '0'
+      minus_delta_H_excess_kJ_mol: '0'
+      minus_delta_H_ternary_kJ_mol: '53.58'
+      row: 1
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 1
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0'
+              - - Na2O
+                - '0.25'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 1
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.1'
+      X2_as_published: '0.025'
+      X3_as_published: '0.225'
+      minus_H_QB_kJ_mol: '1.76'
+      minus_delta_H_excess_kJ_mol: '0.44'
+      minus_delta_H_ternary_kJ_mol: '54.41'
+      row: 2
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 2
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.025'
+              - - Na2O
+                - '0.225'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 2
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.2'
+      X2_as_published: '0.050'
+      X3_as_published: '0.200'
+      minus_H_QB_kJ_mol: '3.12'
+      minus_delta_H_excess_kJ_mol: '0.78'
+      minus_delta_H_ternary_kJ_mol: '55.26'
+      row: 3
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 3
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.050'
+              - - Na2O
+                - '0.200'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 3
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.3'
+      X2_as_published: '0.075'
+      X3_as_published: '0.175'
+      minus_H_QB_kJ_mol: '4.12'
+      minus_delta_H_excess_kJ_mol: '1.03'
+      minus_delta_H_ternary_kJ_mol: '55.96'
+      row: 4
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 4
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.075'
+              - - Na2O
+                - '0.175'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 4
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.4'
+      X2_as_published: '0.100'
+      X3_as_published: '0.150'
+      minus_H_QB_kJ_mol: '4.72'
+      minus_delta_H_excess_kJ_mol: '1.18'
+      minus_delta_H_ternary_kJ_mol: '56.55'
+      row: 5
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 5
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.100'
+              - - Na2O
+                - '0.150'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 5
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.5'
+      X2_as_published: '0.125'
+      X3_as_published: '0.125'
+      minus_H_QB_kJ_mol: '4.88'
+      minus_delta_H_excess_kJ_mol: '1.22'
+      minus_delta_H_ternary_kJ_mol: '57.06'
+      row: 6
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 6
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.125'
+              - - Na2O
+                - '0.125'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 6
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.6'
+      X2_as_published: '0.150'
+      X3_as_published: '0.100'
+      minus_H_QB_kJ_mol: '4.72'
+      minus_delta_H_excess_kJ_mol: '1.18'
+      minus_delta_H_ternary_kJ_mol: '57.46'
+      row: 7
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 7
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.150'
+              - - Na2O
+                - '0.100'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 7
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.7'
+      X2_as_published: '0.175'
+      X3_as_published: '0.075'
+      minus_H_QB_kJ_mol: '4.12'
+      minus_delta_H_excess_kJ_mol: '1.03'
+      minus_delta_H_ternary_kJ_mol: '57.76'
+      row: 8
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 8
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.175'
+              - - Na2O
+                - '0.075'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 8
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.8'
+      X2_as_published: '0.200'
+      X3_as_published: '0.050'
+      minus_H_QB_kJ_mol: '3.12'
+      minus_delta_H_excess_kJ_mol: '0.78'
+      minus_delta_H_ternary_kJ_mol: '57.96'
+      row: 9
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 9
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.200'
+              - - Na2O
+                - '0.050'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 9
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.9'
+      X2_as_published: '0.225'
+      X3_as_published: '0.025'
+      minus_H_QB_kJ_mol: '1.76'
+      minus_delta_H_excess_kJ_mol: '0.44'
+      minus_delta_H_ternary_kJ_mol: '58.07'
+      row: 10
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 10
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.225'
+              - - Na2O
+                - '0.025'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 10
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '1.0'
+      X2_as_published: '0.25'
+      X3_as_published: '0'
+      minus_H_QB_kJ_mol: '0'
+      minus_delta_H_excess_kJ_mol: '0'
+      minus_delta_H_ternary_kJ_mol: '58.08'
+      row: 11
+      section: b
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 11
+        section: b
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.667'
+              - - Cs2O
+                - '0.25'
+              - - Na2O
+                - '0'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 11
+            section: b
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0'
+      X2_as_published: '0'
+      X3_as_published: '0.15'
+      minus_H_QB_kJ_mol: '0'
+      minus_delta_H_excess_kJ_mol: '0'
+      minus_delta_H_ternary_kJ_mol: '32.16'
+      row: 1
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 1
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0'
+              - - Na2O
+                - '0.15'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 1
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.1'
+      X2_as_published: '0.015'
+      X3_as_published: '0.135'
+      minus_H_QB_kJ_mol: '3.60'
+      minus_delta_H_excess_kJ_mol: '0.54'
+      minus_delta_H_ternary_kJ_mol: '32.97'
+      row: 2
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 2
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.015'
+              - - Na2O
+                - '0.135'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 2
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.2'
+      X2_as_published: '0.030'
+      X3_as_published: '0.120'
+      minus_H_QB_kJ_mol: '6.40'
+      minus_delta_H_excess_kJ_mol: '0.96'
+      minus_delta_H_ternary_kJ_mol: '33.66'
+      row: 3
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 3
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.030'
+              - - Na2O
+                - '0.120'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 3
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.3'
+      X2_as_published: '0.045'
+      X3_as_published: '0.105'
+      minus_H_QB_kJ_mol: '8.40'
+      minus_delta_H_excess_kJ_mol: '1.26'
+      minus_delta_H_ternary_kJ_mol: '34.23'
+      row: 4
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 4
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.045'
+              - - Na2O
+                - '0.105'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 4
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.4'
+      X2_as_published: '0.060'
+      X3_as_published: '0.090'
+      minus_H_QB_kJ_mol: '9.60'
+      minus_delta_H_excess_kJ_mol: '1.44'
+      minus_delta_H_ternary_kJ_mol: '34.68'
+      row: 5
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 5
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.060'
+              - - Na2O
+                - '0.090'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 5
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.5'
+      X2_as_published: '0.075'
+      X3_as_published: '0.075'
+      minus_H_QB_kJ_mol: '10.00'
+      minus_delta_H_excess_kJ_mol: '1.50'
+      minus_delta_H_ternary_kJ_mol: '35.00'
+      row: 6
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 6
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.075'
+              - - Na2O
+                - '0.075'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 6
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.6'
+      X2_as_published: '0.090'
+      X3_as_published: '0.060'
+      minus_H_QB_kJ_mol: '9.60'
+      minus_delta_H_excess_kJ_mol: '1.44'
+      minus_delta_H_ternary_kJ_mol: '35.22'
+      row: 7
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 7
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.090'
+              - - Na2O
+                - '0.060'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 7
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.7'
+      X2_as_published: '0.105'
+      X3_as_published: '0.045'
+      minus_H_QB_kJ_mol: '8.40'
+      minus_delta_H_excess_kJ_mol: '1.26'
+      minus_delta_H_ternary_kJ_mol: '35.30'
+      row: 8
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 8
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.105'
+              - - Na2O
+                - '0.045'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 8
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.8'
+      X2_as_published: '0.120'
+      X3_as_published: '0.030'
+      minus_H_QB_kJ_mol: '6.40'
+      minus_delta_H_excess_kJ_mol: '0.96'
+      minus_delta_H_ternary_kJ_mol: '35.28'
+      row: 9
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 9
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.120'
+              - - Na2O
+                - '0.030'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 9
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '0.9'
+      X2_as_published: '0.135'
+      X3_as_published: '0.015'
+      minus_H_QB_kJ_mol: '3.60'
+      minus_delta_H_excess_kJ_mol: '0.54'
+      minus_delta_H_ternary_kJ_mol: '35.13'
+      row: 10
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 10
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.135'
+              - - Na2O
+                - '0.015'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 10
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+    - x_Cs2O_as_published: '1.0'
+      X2_as_published: '0.15'
+      X3_as_published: '0'
+      minus_H_QB_kJ_mol: '0'
+      minus_delta_H_excess_kJ_mol: '0'
+      minus_delta_H_ternary_kJ_mol: '34.85'
+      row: 11
+      section: c
+      locator:
+        page: 20
+        published_page: 247
+        pdf_page_index: 19
+        table: IV
+        row: 11
+        section: c
+      T_C: '1299.85'
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_quasi_binary
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.75'
+              - - Cs2O
+                - '0.15'
+              - - Na2O
+                - '0'
+          locator:
+            page: 20
+            published_page: 247
+            pdf_page_index: 19
+            table: IV
+            row: 11
+            section: c
+      T_K_as_published: '1573'
+      temperature_conversion_note: T_C = T_K - 273.15; source prints T_K = 1573 K.
+  context_id: bennour-1996-ternary-cs-na-silicate::context::bennour_1996_table_iv
   work_id: 10.1080/00319109608039824
   source_id: bennour-1996-ternary-cs-na-silicate
   species: Cs2O

@@ -1,0 +1,1668 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/hashimoto-1990-forsterite-evaporation-kinetics.yaml
+observations:
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_alpha_1400c_extrapolated
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.04'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_alpha_1400c_extrapolated
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Author extrapolation printed at 1400 °C.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 3
+        published_page: 55
+        pdf_page_index: 2
+        section: Results and discussion
+        note: Author extrapolation printed at 1400 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 55
+              pdf_page_index: 2
+              section: Results and discussion
+              note: Author extrapolation printed at 1400 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 55
+              pdf_page_index: 2
+              section: Results and discussion
+              note: Author extrapolation printed at 1400 °C.
+        output_unit: K
+        references: []
+  derivation:
+    relation: alpha_v = J_v/J_e
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 54
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 rate series and fitted values used for the extrapolation are not printed numerically.
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_alpha_1700c_extrapolated
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: value
+      value: '1973.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_alpha_1700c_extrapolated
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Author extrapolation printed at 1700 °C.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        page: 3
+        published_page: 55
+        pdf_page_index: 2
+        section: Results and discussion
+        note: Author extrapolation printed at 1700 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              page: 3
+              published_page: 55
+              pdf_page_index: 2
+              section: Results and discussion
+              note: Author extrapolation printed at 1700 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 55
+              pdf_page_index: 2
+              section: Results and discussion
+              note: Author extrapolation printed at 1700 °C.
+        output_unit: K
+        references: []
+  derivation:
+    relation: alpha_v = J_v/J_e
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 54
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 rate series and fitted values used for the extrapolation are not printed numerically.
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_liquid_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2163.15, 2323.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.2'
+    interval_high: '0.21'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_liquid_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Alpha above the melting point at the printed 1890–2050 °C range.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  provenance:
+    printed_phase: l
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_liquid_sio2_mg_o2_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2163.15, 2323.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_liquid_sio2_mg_o2_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Alternate-vapour-species calculation using O2(g) for the liquid-forsterite runs.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  derivation:
+    relation: alpha_v = J_v/J_e
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 54
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_liquid_sio2_mg_o_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2163.15, 2323.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_liquid_sio2_mg_o_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Alternate-vapour-species calculation for liquid forsterite, printed over the same temperature range as the primary
+      coefficient.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  derivation:
+    relation: alpha_v = J_v/J_e
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 54
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_residue_glass_sio2::points:row=most_highly_evaporated_residues:h=fa816c40e011
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    composition:
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=65 wt% is
+        below 95 wt%'
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '65'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    note: Approximately 65 wt% SiO2 in the most highly evaporated residues.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  point_conditions:
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 1
+        published_page: 53
+        pdf_page_index: 0
+        note: The source says the residual charge cooled quickly by radiation, but does not state that the glass phase was
+          preserved or altered on quench.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '65'
+      locator:
+        page: 3
+        published_page: 55
+        pdf_page_index: 2
+        note: Approximately 65 wt% SiO2 in the most highly evaporated residues.
+    composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=65 wt% is
+          below 95 wt%'
+      locator:
+        page: 3
+        published_page: 55
+        pdf_page_index: 2
+        note: Approximately 65 wt% SiO2 in the most highly evaporated residues.
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 1
+        published_page: 53
+        pdf_page_index: 0
+        section: Results and discussion
+        note: Alpha for solid MgO at the printed 1600–1900 °C range.
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - pdf:hashimoto-1990-forsterite-evaporation-kinetics
+    parameters: []
+    output_unit: wt%
+    references: []
+  provenance:
+    printed_phase: glass
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_residue_glass_volume_fraction
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'forsterite_residue_glass_volume_fraction'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'forsterite_residue_glass_volume_fraction'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema_gap_phase_volume_fraction
+    decided_by:
+      worker: w1103cw4-hs90
+      date: '2026-11-03'
+      evidence:
+        page: 3
+        published_page: 55
+        pdf_page_index: 2
+        section: Results and discussion
+        note: Approximate glass abundance in the most highly evaporated forsterite residues.
+  notices: []
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Approximate glass abundance in the most highly evaporated forsterite residues.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  point_conditions:
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 1
+        published_page: 53
+        pdf_page_index: 0
+        note: The source says the residual charge cooled quickly by radiation, but does not state that the glass phase was
+          preserved or altered on quench.
+  provenance:
+    printed_phase: glass
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_solid_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 2163.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.09'
+    interval_high: '0.16'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_solid_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Alpha beneath the melting point at the printed 1600–1890 °C range.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  provenance:
+    printed_phase: cr
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_solid_sio2_mg_o2_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 2163.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.3'
+    interval_high: '0.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_solid_sio2_mg_o2_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Alternate-vapour-species calculation using O2(g) for the solid-forsterite runs.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  derivation:
+    relation: alpha_v = J_v/J_e
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 54
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_solid_sio2_mg_o_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 2163.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.4'
+    interval_high: '0.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_solid_sio2_mg_o_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Alternate-vapour-species calculation for solid forsterite, printed over the same temperature range as the primary
+      coefficient.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  derivation:
+    relation: alpha_v = J_v/J_e
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 54
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_mgo_solid_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 2173.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.12'
+    interval_high: '0.22'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_mgo_solid_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 1
+    published_page: 53
+    pdf_page_index: 0
+    section: Results and discussion
+    note: Alpha for solid MgO at the printed 1600–1900 °C range.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  provenance:
+    printed_phase: cr
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_liquid_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2173.15, 2373.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.038'
+    interval_high: '0.048'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_liquid_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 2
+    published_page: 54
+    pdf_page_index: 1
+    section: Results and discussion
+    note: Alpha for liquid SiO2 at the printed 1900–2100 °C range.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  provenance:
+    printed_phase: l
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_liquid_alternate_gas_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: unknown
+      reason: source alpha 1.2 lies outside (0, 1]; not a Langmuir/HKL evaporation coefficient
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2173.15, 2373.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source alpha 1.2 lies outside (0, 1]; not a Langmuir/HKL evaporation
+      coefficient; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: 'Source caveat on page 55: “impossible, according to the definition of alpha_v”; Hashimoto says the over-unity
+      value may reflect underestimation of the experimental surface area.'
+    decided_by:
+      worker: w1103cw4-hs90
+      date: '2026-11-03'
+      evidence:
+        page: 3
+        published_page: 55
+        pdf_page_index: 2
+        section: Results and discussion
+        note: Alternate Je based on pure SiO2(g); same liquid-SiO2 experiment and temperature span as the coefficient reported
+          on published page 54.
+  notices: []
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Alternate Je based on pure SiO2(g); same liquid-SiO2 experiment and temperature span as the coefficient reported
+      on published page 54.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  derivation:
+    relation: alpha_v = J_v/J_e
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 54
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_previous_effusion_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.01'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Firsova, L. P. & Nesmeyanov (1960), and Nagai et al. (1973), references 11 and 12 as cited by Hashimoto.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_previous_effusion_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 2
+    published_page: 54
+    pdf_page_index: 1
+    section: Results and discussion
+    note: Earlier solid-SiO2 effusion-cell coefficient quoted by Hashimoto.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  provenance:
+    printed_phase: cr
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_solid_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1833.15, 1958.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.011'
+    interval_high: '0.015'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_solid_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 2
+    published_page: 54
+    pdf_page_index: 1
+    section: Results and discussion
+    note: Alpha for solid high cristobalite at the printed 1560–1685 °C range.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  provenance:
+    printed_phase: cr
+- observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_solid_alternate_gas_alpha
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: value
+      value: mol_atom
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1833.15, 1958.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.7'
+    interval_high: '0.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_solid_alternate_gas_alpha
+  source_id: hashimoto-1990-forsterite-evaporation-kinetics
+  locator:
+    page: 3
+    published_page: 55
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Alternate Je based on pure SiO2(g); same solid-SiO2 experiment and temperature span as the coefficient reported
+      on published page 54.
+  read_from: pdf:hashimoto-1990-forsterite-evaporation-kinetics
+  derivation:
+    relation: alpha_v = J_v/J_e
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 54
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+    references: []
+  provenance:
+    printed_phase: cr

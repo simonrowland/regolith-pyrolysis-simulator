@@ -100,10 +100,14 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1000'
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
       locator:
         page: 18
         published_page: 11
         pdf_page_index: 17
         table: '8'
-        note: Render confirms the NaFeO₂(c) row and ΔGf° cell.; row=NaFeO₂(c); column_header=ΔGf°, kcal
+  provenance:
+    printed_phase: cr

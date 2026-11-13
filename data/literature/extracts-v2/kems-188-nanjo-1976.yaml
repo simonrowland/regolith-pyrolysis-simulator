@@ -62,6 +62,8 @@ observations:
         pdf_page_index: 5
         figure: '7'
         note: Belton-Fruehan plots and a_Se, a_Te at 714 K
+  provenance:
+    printed_phase: liquid_Se-Te
 - observation_id: kems-188-nanjo-1976::nanjo_1976_gamma_Te_regular_714k
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -119,6 +121,8 @@ observations:
         pdf_page_index: 4
         figure: '7'
         note: log gamma_Te = 0.33 X_Se2^2 from I+_128/I+_160; also 0.32 and 0.27 from other ion pairs
+  provenance:
+    printed_phase: liquid_Se-Te
 - observation_id: kems-188-nanjo-1976::nanjo_1976_kems_geometry_and_calibration
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -165,6 +169,8 @@ observations:
     figure: '1'
     note: NAG-530 mass filter; quartz Knudsen cell; orifice 0.25 mm; 55 V
   read_from: pdf:kems-188-nanjo-1976
+  provenance:
+    printed_phase: liquid_Se-Te
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_literature_deltaHvap
   experiment_id: 10.2320/jinstmet1952.40.9_958::kems-188-nanjo-1976
   identity:
@@ -211,6 +217,8 @@ observations:
     table: '1'
     note: Table 1 literature column
   read_from: pdf:kems-188-nanjo-1976
+  provenance:
+    printed_phase: literature_comparison
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap::rows:h=2a3381e7afab
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -338,6 +346,8 @@ observations:
           note: Table 1 Te-species second-law heats between Te mp 726 K and 850 K
     output_unit: kJ_per_declared_mol_basis
     references: []
+  provenance:
+    printed_phase: pure_Te_and_Se-Te_vapor
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap::rows:h=ab1ab4b28a58
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -465,6 +475,8 @@ observations:
           note: Table 1 Te-species second-law heats between Te mp 726 K and 850 K
     output_unit: kJ_per_declared_mol_basis
     references: []
+  provenance:
+    printed_phase: pure_Te_and_Se-Te_vapor
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap::rows:h=f004e1eeb2e0
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -592,6 +604,8 @@ observations:
           note: Table 1 Te-species second-law heats between Te mp 726 K and 850 K
     output_unit: kJ_per_declared_mol_basis
     references: []
+  provenance:
+    printed_phase: pure_Te_and_Se-Te_vapor
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=8244dd6e0b98
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -719,6 +733,8 @@ observations:
           note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
     output_unit: kJ_per_declared_mol_basis
     references: []
+  provenance:
+    printed_phase: pure_Se_and_Se-Te_vapor
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=b32850994105
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -846,6 +862,8 @@ observations:
           note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
     output_unit: kJ_per_declared_mol_basis
     references: []
+  provenance:
+    printed_phase: pure_Se_and_Se-Te_vapor
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=be65100398c3
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -973,6 +991,8 @@ observations:
           note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
     output_unit: kJ_per_declared_mol_basis
     references: []
+  provenance:
+    printed_phase: pure_Se_and_Se-Te_vapor
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=cebb94f69408
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -1100,6 +1120,8 @@ observations:
           note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
     output_unit: kJ_per_declared_mol_basis
     references: []
+  provenance:
+    printed_phase: pure_Se_and_Se-Te_vapor
 - observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=df0e8eb5f105
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
@@ -1227,3 +1249,5 @@ observations:
           note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
     output_unit: kJ_per_declared_mol_basis
     references: []
+  provenance:
+    printed_phase: pure_Se_and_Se-Te_vapor

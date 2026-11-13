@@ -67,9 +67,6 @@ from simulator.battery.score import (  # noqa: E402
     measured_engine_rail_records,
 )
 
-STUDIO_HOST = "mac-studio-256-1"
-
-
 def _scoring_filter_record(
     *,
     engines,
@@ -336,13 +333,14 @@ def _run_studio(
     engines: list[str],
     extra: list[str],
     *,
+    studio_host: str,
     output_directory: Path,
     remote_output_directory: Path,
 ) -> tuple[str | None, Path | None]:
-    """Dispatch MELTS engines to Studio 1. Prints a progress line every 60 s."""
+    """Dispatch MELTS engines to configured host, reporting progress every 60 s."""
 
     remote_root = "/tmp/battery-score-impl-chunk2"
-    print(f"rsync worktree → {STUDIO_HOST}:{remote_root}", flush=True)
+    print(f"rsync worktree → {studio_host}:{remote_root}", flush=True)
     rsync = subprocess.run(
         [
             "rsync",
@@ -355,7 +353,7 @@ def _run_studio(
             "--exclude",
             "__pycache__",
             f"{ROOT}/",
-            f"{STUDIO_HOST}:{remote_root}/",
+            f"{studio_host}:{remote_root}/",
         ],
         check=False,
     )
@@ -371,9 +369,9 @@ def _run_studio(
         f"{remote_py} scripts/battery_score.py "
         f"--engines {engine_csv} {extra_args}"
     )
-    print(f"ssh {STUDIO_HOST} (detached MELTS arm)", flush=True)
+    print(f"ssh {studio_host} (detached MELTS arm)", flush=True)
     proc = subprocess.Popen(
-        ["ssh", "-o", "BatchMode=yes", STUDIO_HOST, remote],
+        ["ssh", "-o", "BatchMode=yes", studio_host, remote],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
@@ -392,7 +390,7 @@ def _run_studio(
         if proc.poll() is not None:
             break
         elapsed = int(time.monotonic() - start)
-        print(f"studio wait {elapsed}s ssh {STUDIO_HOST}", flush=True)
+        print(f"studio wait {elapsed}s ssh {studio_host}", flush=True)
         time.sleep(60)
     code = proc.wait()
     if code != 0:
@@ -404,7 +402,7 @@ def _run_studio(
         [
             "rsync",
             "-a",
-            f"{STUDIO_HOST}:{remote_output}/residuals.jsonl",
+            f"{studio_host}:{remote_output}/residuals.jsonl",
             str(output_directory / "residuals.jsonl"),
         ],
         check=False,
@@ -413,7 +411,7 @@ def _run_studio(
         [
             "rsync",
             "-a",
-            f"{STUDIO_HOST}:{remote_output}/score-report.md",
+            f"{studio_host}:{remote_output}/score-report.md",
             str(output_directory / "score-report.md"),
         ],
         check=False,
@@ -428,7 +426,7 @@ def _run_studio(
         [
             "rsync",
             "-a",
-            f"{STUDIO_HOST}:{remote_output}/compilation-comparisons.jsonl",
+            f"{studio_host}:{remote_output}/compilation-comparisons.jsonl",
             str(studio_comparisons_path),
         ],
         check=False,
@@ -464,7 +462,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--studio",
         action="store_true",
-        help="dispatch MELTS engines (alphamelts/thermoengine/magemin) to Studio 1",
+        help=(
+            "dispatch MELTS engines (alphamelts/thermoengine/magemin) to "
+            "the configured Studio host"
+        ),
     )
     parser.add_argument(
         "--write-pins",
@@ -488,6 +489,9 @@ def main(argv: list[str] | None = None) -> int:
         help="accept current source-derived decision-band minima into the ratchet file",
     )
     args = parser.parse_args(argv)
+    studio_host = os.environ.get("REGOLITH_STUDIO_HOST")
+    if args.studio and not studio_host:
+        parser.error("--studio requires REGOLITH_STUDIO_HOST to be set")
 
     if args.species is not None and (
         args.update_band_ratchet or args.measured_headline or args.report_only
@@ -612,7 +616,12 @@ def main(argv: list[str] | None = None) -> int:
     studio_comparisons_path = None
     studio_routed = False
     host = socket.gethostname()
-    if args.studio and melts and STUDIO_HOST not in host and "studio" not in host.lower():
+    if (
+        args.studio
+        and melts
+        and studio_host not in host
+        and "studio" not in host.lower()
+    ):
         studio_routed = True
         extra = []
         if rail is not None:
@@ -636,6 +645,7 @@ def main(argv: list[str] | None = None) -> int:
         studio_hostname, studio_comparisons_path = _run_studio(
             melts,
             extra,
+            studio_host=studio_host,
             output_directory=output_directory,
             remote_output_directory=remote_output_directory,
         )

@@ -14,6 +14,8 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
 
+from simulator.physical_constants import GAS_CONSTANT, J_PER_KJ
+
 
 ALPHAMELTS_CROSS_CHECK_STATUS = "inconclusive_no_activities"
 MELT_OXIDE_ACTIVITY_TIER = "UNCERTIFIED"
@@ -66,7 +68,7 @@ def normalize_high_t_melt_activity(value: Any) -> str:
 # 0.99, so the shipped mid-range path is the constant table gamma. Changing
 # the number would move activities for X in the seam; do not retune it here.
 MELT_OXIDE_ENDMEMBER_CONTINUITY_BLEND_START = 0.99
-R_KJ_PER_MOL_K = 8.31446261815324e-3
+R_KJ_PER_MOL_K = GAS_CONSTANT / J_PER_KJ
 
 
 @dataclass(frozen=True)

@@ -88,7 +88,15 @@ def _scored(spec: EvalSpec, *, candidate_id: str = "candidate-certify") -> Score
         failing_gates=(),
         run_reference=RunReference(
             status="ok",
-            trace={"snapshots": [{"mass_balance_error_pct": 0.0}]},
+            trace={
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+                "backend_name": "alphamelts",
+                "engine_version": "petthermotools 1.2.3",
+                "diagnostics": {
+                    "backend_name": "alphamelts",
+                    "engine_version": "petthermotools 1.2.3",
+                },
+            },
             product_summary={"mass_closure": _closed_mass_closure()},
             backend_name="alphamelts",
             backend_status="ok",

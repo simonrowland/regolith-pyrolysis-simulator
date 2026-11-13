@@ -490,13 +490,8 @@ def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> Non
         digest.update(b"\0")
         digest.update(path.read_bytes())
         digest.update(b"\0")
-    # Byte pin of this fixture after the merged migrator. Car 32f8a434f writes
-    # Derivation.references as references: []. Green b-985 adds an empty
-    # "Unavailable input work census" section to migration-report.md. The
-    # checks above are the behaviour; this digest is the merged tree.
-    assert digest.hexdigest() == (
-        "1e71d46b76d3c2f30dd5c0632a7397e412d15f3995e8d43c7d245e6db8e3746a"
-    )
+    # b-985 adds the empty Unavailable input work census section to migration-report.md.
+    assert digest.hexdigest() == "b2bda27a9dd554981702f79a4bbb3c306d3b923791beff9b6811d645c9ad3d60"
 
 
 def test_aliased_work_counts_each_experiment_under_one_canonical_source(tmp_path, monkeypatch) -> None:

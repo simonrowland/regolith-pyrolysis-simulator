@@ -1,0 +1,125 @@
+source_id: iwahashi-2021-cr-oxide-solid-activities
+source:
+  citation: Iwahashi, K., Hashimoto, S., Yamauchi, R., Saito, K. & Hasegawa, M. (2021). Phase Relationship and Activities
+    of Components in CaO–SiO2–Cr2O3 Ternary System. ISIJ International, 61(5), 1404–1411.
+extraction:
+  method: Two independent machine reads (MinerU and pdftotext) transcribed into the extract; table 1/2 row-column
+    assignment checked on PDF page 4, Eq. 24 on page 5, Table 3 on page 7 and Eqs. 26/27 on page 6 renders.
+    Compare output and full cell audit accompany this mapping.
+  date: '2026-11-03'
+  worker: w1103cw3-iw21
+  review_status: draft
+conditions:
+  temperature:
+    as_printed: 1 573 K
+    locator:
+      page: 4
+      published_page: 1407
+  gas_pressure:
+    as_printed: one atmospheric pressure
+    locator:
+      page: 3
+      published_page: 1406
+  phase_relation_gas:
+    pH2_atm: 2.50 × 10^-1
+    pCO2_atm: 1.67 × 10^-3
+    pO2_atm: 1.02 × 10^-15
+    locator:
+      page: 3
+      published_page: 1406
+tables:
+- page: 4
+  published_page: 1407
+  table_index: 1
+  printed_table: '1'
+  printed_rows: 3
+  type: context_record
+  quantity: solid_phase_assemblage_as_reported
+  evidence_class: measured_direct
+  phase: solid assemblage
+  columns:
+    '1': sample number
+    '2': starting phase assemblage
+    '3': CaO bulk mass%
+    '4': SiO2 bulk mass%
+    '5': Cr2O3 bulk mass%
+    '6': equilibrium phase assemblage
+  disposition: typed_refusal because no exact scored observation type/quantity token represents assemblage membership;
+    keep all three rows as context.
+- page: 4
+  published_page: 1407
+  table_index: 2
+  printed_table: '2'
+  printed_rows: 24
+  type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  unit: mole_fraction
+  evidence_class: measured_direct
+  phase: l
+  phase_role: metal
+  columns:
+    '1': sample number
+    '2': initial pH2 (atm)
+    '3': initial pCO2 (atm)
+    '4': log(P_O2/atm)
+    '5': holding time (hours)
+    '6': initial X_Cu header, interpreted as X_Cr by Eq. 15/prose
+    '7': equilibrium X_Cu header, interpreted as X_Cr by Eq. 15/prose
+  draft_rows: 4-27; result column 7
+- page: 7
+  published_page: 1410
+  table_index: 3
+  printed_table: '3'
+  printed_rows: 8
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless, printed log10
+  evidence_class: measured_reduced
+  phase: cr
+  columns:
+    '2': log a_CaO
+    '3': log a_SiO2
+    '4': log a_Cr2O3
+  draft_rows: 2-9; 8 assemblages × 3 component activities = 24 numeric values
+  disposition: Authors' calculated activities; each row declares its cell-specific reaction-energy inputs not printed,
+    with a page 7/Table 3 locator for lineage.
+equations:
+  '14':
+    page: 4
+    value: '+23.94'
+    quantity: log10_K_reaction
+    evidence_class: quoted_attributed
+    attribution: Turkdogan [2] (1980), as cited in the paper.
+  '24':
+    page: 5
+    value: log gamma_Cr = 1.54
+    quantity: activity_coefficient
+    evidence_class: measured_reduced
+    parents:
+    - iwahashi_2021_cr_oxide_solid_activities_p004_t02_r04_c07
+    - iwahashi_2021_cr_oxide_solid_activities_p004_t02_r05_c07
+    - iwahashi_2021_cr_oxide_solid_activities_p004_t02_r06_c07
+    - iwahashi_2021_cr_oxide_solid_activities_p004_t02_r07_c07
+    - iwahashi_2021_cr_oxide_solid_activities_p004_t02_r08_c07
+    - iwahashi_2021_cr_oxide_solid_activities_p004_t02_r09_c07
+    - iwahashi_2021_cr_oxide_solid_activities_p004_t02_r10_c07
+    - iwahashi_2021_cr_oxide_solid_activities_p004_t02_r11_c07
+    - iwahashi_2021_cr_oxide_solid_activities_p004_t02_r13_c07
+    - iwahashi_2021_cr_oxide_solid_activities_eq14_log10_K13
+  '26':
+    page: 6
+    value: log a_Cr2O3 = -1.33 ± 0.09
+    quantity: activity
+    evidence_class: measured_reduced
+  '27':
+    page: 6
+    value: log a_Cr2O3 = -0.35 ± 0.08
+    quantity: activity
+    evidence_class: measured_reduced
+figure_candidates_not_digitized:
+- Fig. 5 XRD patterns
+- Fig. 2 phase diagram
+- Fig. 6 activity vs X_Cr
+- Fig. 7 log X_Cr vs log P_O2
+- Fig. 8(b) derived phase diagram
+- Fig. 9 ΔG°(17) vs temperature; Eq. 49 prints extrapolated a_Cr2O3 = 0.09 at 1 873 K.

@@ -74,11 +74,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -107,6 +105,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=CaO; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -178,11 +211,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -211,6 +242,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=CaO; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -282,11 +348,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -315,6 +379,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=Ca; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -387,11 +486,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -420,6 +517,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$CaSiO_3$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -491,11 +623,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -524,6 +654,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$CaSiO_3$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -595,11 +760,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -628,6 +791,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Ca_2$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -700,11 +898,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -733,6 +929,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Ca_2SiO_4$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -804,11 +1035,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -837,6 +1066,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Ca_2SiO_4$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -908,11 +1172,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -941,6 +1203,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=CaO; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1013,11 +1310,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1046,6 +1341,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Ca_3SiO_5$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1117,11 +1447,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1150,6 +1478,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=Mg; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1222,11 +1585,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1255,6 +1616,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Ca_3Si_2O_7$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1326,11 +1722,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1359,6 +1753,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Mg_2$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1431,11 +1860,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1464,6 +1891,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=MgO; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1535,11 +1997,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1568,6 +2028,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=MgO; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1639,11 +2134,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1672,6 +2165,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=MgO; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1744,11 +2272,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1777,6 +2303,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$MgSiO_3$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1848,11 +2409,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1881,6 +2440,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=Si; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -1953,11 +2547,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -1986,6 +2578,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Mg_2SiO_4$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2057,11 +2684,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2090,6 +2715,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Mg_2SiO_4$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2161,11 +2821,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2194,6 +2852,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Si_2$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2266,11 +2959,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2299,6 +2990,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$CaMgSiO_4$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2370,11 +3096,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2403,6 +3127,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Si_3$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2475,11 +3234,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2508,6 +3265,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$CaMgSi_2O_6$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2579,11 +3371,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2612,6 +3402,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$CaMgSi_2O_6$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2683,11 +3508,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2716,6 +3539,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Si_4$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2788,11 +3646,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2821,6 +3677,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Ca_2MgSi_2O_7$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2892,11 +3783,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -2925,6 +3814,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Ca_2MgSi_2O_7$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -2996,11 +3920,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3029,6 +3951,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=SiO; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -3101,11 +4058,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3134,6 +4089,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Ca_3MgSi_2O_8$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -3205,11 +4195,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3238,6 +4226,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$SiO_2$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -3310,11 +4333,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3343,6 +4364,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$SiO_2$; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: cr
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -3414,11 +4470,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3447,6 +4501,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$SiO_2$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -3518,11 +4607,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3551,6 +4638,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$Si_2O_2$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -3622,11 +4744,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3655,6 +4775,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=O; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -3726,11 +4881,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3759,6 +4912,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$O_2$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -3830,11 +5018,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3863,6 +5049,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$O_3$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -3934,11 +5155,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Table caption: "calculated in present study"; formation from elements at 2000 K. The text cites the model
-      inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov and Yakovlev, 2015) but those parents are not stored
-      in this extract, so the rows are quoted_attributed.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -3967,6 +5186,41 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=$O_4$; column_header=Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+  derivation:
+    relation: Gibbs formation energies were calculated in the present study within ideal associated solutions theory using
+      experimental and theoretical data cited from Glushko et al. (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev
+      (2015).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: The numerical values from the cited reference datasets are not itemized as inputs in the paper; Table 1 reports
+          the calculated Gibbs formation energies.
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+        note: 'Method paragraph: "within framework of the ideal associated solutions theory"; the model parameters use experimental
+          and theoretical data, and the total Gibbs-energy solution uses the Gibbs energy minimization method.'
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: g
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_CaO_activity
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -4038,11 +5292,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Figure 1 caption: symbols 1-3 were obtained in the present study. The text says the activities come from
-      the Gibbs energies in Table 1. Those parents are the table rows already stored; the per-point minimizer inputs are not
-      itemized, so this curve is not given model_derived lineage. No numeric points are stored.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: Symbols 1-3 are calculated oxide activities of the present study. The curve is a model curve, so its markers are
@@ -4079,6 +5331,105 @@ observations:
         note: Figure 1 panel a. Symbol 1 is black open square, the CaO activity. The axis is lg a_i, which is log10(activity).
           The stored activity is 10 raised to the read ordinate. The ordinate is stored with the sign printed on the axis.
           Model curve; numeric samples are not stored.; panel=a; marker=black open square
+  derived_from:
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+  derivation:
+    relation: The present study calculated the CaO–MgO–SiO2 activity curves by Gibbs-energy minimization within ideal associated
+      solutions theory, using the Gibbs formation energies tabulated in Table 1. The model parameters cite Glushko et al.
+      (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev (2015).
+    inputs:
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_CaO_rein1965_activity::T=1873:h=146ffb9b63ba
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -4195,6 +5546,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_CaO_rein1965_activity::T=1873:h=215c3743851f
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -4311,6 +5664,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_CaO_rein1965_activity::T=1873:h=9f0c3b2fb4bd
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -4427,6 +5782,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_CaO_rein1965_activity::T=1873:h=9f7ed531bb41
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -4543,6 +5900,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_CaO_rein1965_activity::T=1873:h=e92e30db1c35
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -4659,6 +6018,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_MgO_activity
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -4730,11 +6091,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Figure 1 caption: symbols 1-3 were obtained in the present study. The text says the activities come from
-      the Gibbs energies in Table 1. Those parents are the table rows already stored; the per-point minimizer inputs are not
-      itemized, so this curve is not given model_derived lineage. No numeric points are stored.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: Symbols 1-3 are calculated oxide activities of the present study. The curve is a model curve, so its markers are
@@ -4771,6 +6130,105 @@ observations:
         note: Figure 1 panel a. Symbol 2 is red open square, the MgO activity. The axis is lg a_i, which is log10(activity).
           The stored activity is 10 raised to the read ordinate. The ordinate is stored with the sign printed on the axis.
           Model curve; numeric samples are not stored.; panel=a; marker=red open square
+  derived_from:
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+  derivation:
+    relation: The present study calculated the CaO–MgO–SiO2 activity curves by Gibbs-energy minimization within ideal associated
+      solutions theory, using the Gibbs formation energies tabulated in Table 1. The model parameters cite Glushko et al.
+      (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev (2015).
+    inputs:
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_MgO_rein1965_activity::T=1873:h=35e8634cd52a
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -4887,6 +6345,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_MgO_rein1965_activity::T=1873:h=37e25c44ebef
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -5003,6 +6463,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_MgO_rein1965_activity::T=1873:h=efed7572976f
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -5119,6 +6581,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_activity
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -5190,11 +6654,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Figure 1 caption: symbols 1-3 were obtained in the present study. The text says the activities come from
-      the Gibbs energies in Table 1. Those parents are the table rows already stored; the per-point minimizer inputs are not
-      itemized, so this curve is not given model_derived lineage. No numeric points are stored.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: Symbols 1-3 are calculated oxide activities of the present study. The curve is a model curve, so its markers are
@@ -5231,6 +6693,105 @@ observations:
         note: Figure 1 panel a. Symbol 3 is blue open square, the SiO2 activity. The axis is lg a_i, which is log10(activity).
           The stored activity is 10 raised to the read ordinate. The ordinate is stored with the sign printed on the axis.
           Model curve; numeric samples are not stored.; panel=a; marker=blue open square
+  derived_from:
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+  derivation:
+    relation: The present study calculated the CaO–MgO–SiO2 activity curves by Gibbs-energy minimization within ideal associated
+      solutions theory, using the Gibbs formation energies tabulated in Table 1. The model parameters cite Glushko et al.
+      (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev (2015).
+    inputs:
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=223435e551ce
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -5347,6 +6908,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=32e6ccb3b4a6
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -5463,6 +7026,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=4d7795b3594d
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -5579,6 +7144,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=59e73aa2bc67
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -5695,6 +7262,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=89a67a83b5a8
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -5811,6 +7380,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=96933a63b65d
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -5927,6 +7498,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=98fda061ce25
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -6043,6 +7616,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=9e55a6530b00
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -6159,6 +7734,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=a6bc7968f933
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -6275,6 +7852,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=b7cde921d000
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -6391,6 +7970,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=cdd45003c61f
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -6507,6 +8088,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=e9d86336675c
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -6623,6 +8206,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1a_SiO2_rein1965_activity::T=1873:h=faf1fbf202e4
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -6739,6 +8324,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_CaO_activity
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -6810,11 +8397,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Figure 1 caption: symbols 1-3 were obtained in the present study. The text says the activities come from
-      the Gibbs energies in Table 1. Those parents are the table rows already stored; the per-point minimizer inputs are not
-      itemized, so this curve is not given model_derived lineage. No numeric points are stored.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: Symbols 1-3 are calculated oxide activities of the present study. The curve is a model curve, so its markers are
@@ -6851,6 +8436,105 @@ observations:
         note: Figure 1 panel b. Symbol 1 is black open square, the CaO activity. The axis is lg a_i, which is log10(activity).
           The stored activity is 10 raised to the read ordinate. The ordinate is stored with the sign printed on the axis.
           Model curve; numeric samples are not stored.; panel=b; marker=black open square
+  derived_from:
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+  derivation:
+    relation: The present study calculated the CaO–MgO–SiO2 activity curves by Gibbs-energy minimization within ideal associated
+      solutions theory, using the Gibbs formation energies tabulated in Table 1. The model parameters cite Glushko et al.
+      (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev (2015).
+    inputs:
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_CaO_rein1965_activity::T=1873:h=0c5b63e4304b
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -6967,6 +8651,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_CaO_rein1965_activity::T=1873:h=108cfe3d0626
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -7083,6 +8769,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_CaO_rein1965_activity::T=1873:h=31660a2bc8bb
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -7199,6 +8887,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_CaO_rein1965_activity::T=1873:h=9ff98bacfe9c
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -7315,6 +9005,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_CaO_rein1965_activity::T=1873:h=ba7befc8698c
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -7431,6 +9123,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_MgO_activity
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -7502,11 +9196,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Figure 1 caption: symbols 1-3 were obtained in the present study. The text says the activities come from
-      the Gibbs energies in Table 1. Those parents are the table rows already stored; the per-point minimizer inputs are not
-      itemized, so this curve is not given model_derived lineage. No numeric points are stored.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: Symbols 1-3 are calculated oxide activities of the present study. The curve is a model curve, so its markers are
@@ -7543,6 +9235,105 @@ observations:
         note: Figure 1 panel b. Symbol 2 is red open square, the MgO activity. The axis is lg a_i, which is log10(activity).
           The stored activity is 10 raised to the read ordinate. The ordinate is stored with the sign printed on the axis.
           Model curve; numeric samples are not stored.; panel=b; marker=red open square
+  derived_from:
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+  derivation:
+    relation: The present study calculated the CaO–MgO–SiO2 activity curves by Gibbs-energy minimization within ideal associated
+      solutions theory, using the Gibbs formation energies tabulated in Table 1. The model parameters cite Glushko et al.
+      (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev (2015).
+    inputs:
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_MgO_rein1965_activity::T=1873:h=70c7fef939e5
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -7659,6 +9450,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_MgO_rein1965_activity::T=1873:h=ad5972de7fae
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -7775,6 +9568,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_MgO_rein1965_activity::T=1873:h=c5d6678ae1e3
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -7891,6 +9686,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_activity
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -7962,11 +9759,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: 'Figure 1 caption: symbols 1-3 were obtained in the present study. The text says the activities come from
-      the Gibbs energies in Table 1. Those parents are the table rows already stored; the per-point minimizer inputs are not
-      itemized, so this curve is not given model_derived lineage. No numeric points are stored.'
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: rejected
     reason: Symbols 1-3 are calculated oxide activities of the present study. The curve is a model curve, so its markers are
@@ -8003,6 +9798,105 @@ observations:
         note: Figure 1 panel b. Symbol 3 is blue open square, the SiO2 activity. The axis is lg a_i, which is log10(activity).
           The stored activity is 10 raised to the read ordinate. The ordinate is stored with the sign printed on the axis.
           Model curve; numeric samples are not stored.; panel=b; marker=blue open square
+  derived_from:
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+  - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+  derivation:
+    relation: The present study calculated the CaO–MgO–SiO2 activity curves by Gibbs-energy minimization within ideal associated
+      solutions theory, using the Gibbs formation energies tabulated in Table 1. The model parameters cite Glushko et al.
+      (1978–1982), Bale et al. (2009), and Shornikov and Yakovlev (2015).
+    inputs:
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06
+    - shornikov-2016-cao-mgo-silicate::shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: ideal associated solutions theory; Gibbs energy minimization method
+      locator:
+        page: 1
+        published_page: 40
+        pdf_page_index: 0
+        section: Thermodynamic properties of minerals and fluids
+    references:
+    - Glushko et al. (1978–1982)
+    - Bale et al. (2009)
+    - Shornikov and Yakovlev (2015)
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=0f4be1bd7060
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -8119,6 +10013,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=1a42d2b7f925
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -8235,6 +10131,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=1ece7a29bbaf
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -8351,6 +10249,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=428b6eb863ed
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -8467,6 +10367,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=5b58f14f25a2
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -8583,6 +10485,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=6090f91210c6
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -8699,6 +10603,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=6247aa91ab59
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -8815,6 +10721,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=727cd36227eb
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -8931,6 +10839,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=7c59bf4dde96
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -9047,6 +10957,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=87e021933718
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -9163,6 +11075,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=c6524d8ac957
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -9279,6 +11193,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: shornikov-2016-cao-mgo-silicate::shornikov_2016_fig1b_SiO2_rein1965_activity::T=1873:h=f859a9af825f
   experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
   identity:
@@ -9395,3 +11311,5 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: l
