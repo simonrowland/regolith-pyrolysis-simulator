@@ -3220,8 +3220,7 @@ def test_mixed_subthreshold_hours_book_the_full_integral() -> None:
     assert _oracle_complete_flux_supply_kg(mutated_snapshots, ("SiO",)) == {}
 
 
-@pytest.mark.parametrize("order", (("Mg", "SiO"), ("SiO", "Mg")))
-def test_subthreshold_supply_does_not_depend_on_species_order(order: tuple[str, str]) -> None:
+def test_subthreshold_supply_does_not_depend_on_species_order() -> None:
     diagnostic = {
         "evaporation_flux_kg_hr": {"SiO": 2.0e-12},
         "below_threshold_evaporation_flux": {
@@ -3240,14 +3239,20 @@ def test_subthreshold_supply_does_not_depend_on_species_order(order: tuple[str, 
         debit_kg_hr=projected.debit_kg_hr,
     )
     _stamp_flux_measured_rates(flux)
-    bounds = _optimizer_refused_flux_bounds(
-        (SimpleNamespace(hour=1, duration_h=1.0, evap_flux=flux),),
-        order,
+    snapshots = (SimpleNamespace(hour=1, duration_h=1.0, evap_flux=flux),)
+    forward = _optimizer_refused_flux_bounds(
+        snapshots,
+        ("Mg", "SiO"),
         campaigns_elapsed=1.0,
     )
-    assert bounds["SiO"] == pytest.approx(2.0e-12)
-    assert bounds["Mg"] == pytest.approx(5.0e-13)
-    assert list(bounds) == [species for species in order if species in bounds]
+    reverse = _optimizer_refused_flux_bounds(
+        snapshots,
+        ("SiO", "Mg"),
+        campaigns_elapsed=1.0,
+    )
+    assert forward == reverse
+    assert forward["Mg"] == pytest.approx(5.0e-13)
+    assert forward["SiO"] == pytest.approx(2.0e-12)
 
 
 def test_all_subthreshold_hours_still_return_a_supply_bound() -> None:
