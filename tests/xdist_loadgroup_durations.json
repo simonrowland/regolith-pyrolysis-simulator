@@ -6,6 +6,7 @@
     "extract-battery-evaluations": 230.0,
     "hashimoto_real_cohort": 1800.0,
     "lunar_c0_shared": 160.0,
+    "migration-series-census": 499.049,
     "magemin_fullrun_a": 12321.211,
     "magemin_fullrun_b": 16709.486,
     "magemin_fullrun_c": 5112.176,
@@ -19,6 +20,7 @@
   "adjustments": [
     "magemin_fullrun_d 1659.277 -> 1999.277 (+340s, 2026-07-28): test_c5_targeted_feo_full_track_reduces_target_after_low_temperature_hours joined this chain AFTER ci-train-tip2.xml was measured, so the measured total undercounts it and --dist loadgroup would start the chain too late. +340s is that test's historical duration cited at its own timeout mark. Supersede with a measured total at the next hint regeneration.",
     "serial 2136.098 -> 4278.223 (+2142.125s, 2026-11-10): nightly b-549 committed-store regeneration joined the chain after ci-train-tip2.xml was measured; +2142.125s is its successful byte-comparison wall duration on Mac-Studio-256-3. Supersede with a measured group total at the next hint regeneration.",
-    "hashimoto_real_cohort 854.0 -> 1800.0 (2026-11-12): provisional lower bound from three whole-file remote runs that reached the 1800 s per-test wall timeout; no completed duration was measured. Three cpu_budget(1) probes produced no receipt within 75 min. Replace after a completed remote run."
+    "hashimoto_real_cohort 854.0 -> 1800.0 (2026-11-12): provisional lower bound from three whole-file remote runs that reached the 1800 s per-test wall timeout; no completed duration was measured. Three cpu_budget(1) probes produced no receipt within 75 min. Replace after a completed remote run.",
+    "migration-series-census 250.0 -> 499.049 (+249.049s, 2026-11-13): the current remote gate cannot emit JUnit XML (the profile refuses --junitxml); interim hand estimate is the sum of the latest measured member process-CPU durations, J01 230.693s and K04 268.356s. Supersede with a measured JUnit group total at the next hint regeneration."
   ]
 }
