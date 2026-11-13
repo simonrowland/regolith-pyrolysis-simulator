@@ -195,6 +195,52 @@ def test_additivity_proof_code_canonicalizes_owned_numeric_constants() -> None:
     assert canonical != proof._canonical(unrelated)
 
 
+def test_additivity_proof_does_not_normalize_class_local_load_name() -> None:
+    proof = _load_t609_proof()
+    shadowed_namespace = {
+        "__name__": __name__,
+        "PA_PER_BAR": PA_PER_BAR,
+        "_CLASS_SHADOW_VALUE": 7.0,
+    }
+    literal_namespace = dict(shadowed_namespace)
+    exec(
+        "def evaluate():\n"
+        "    class C:\n"
+        "        PA_PER_BAR = _CLASS_SHADOW_VALUE\n"
+        "        result = PA_PER_BAR\n"
+        "    return C.result\n",
+        shadowed_namespace,
+    )
+    exec(
+        "def evaluate():\n"
+        "    class C:\n"
+        "        PA_PER_BAR = _CLASS_SHADOW_VALUE\n"
+        "        result = 1.0e5\n"
+        "    return C.result\n",
+        literal_namespace,
+    )
+    assert proof._canonical(shadowed_namespace["evaluate"]) != proof._canonical(
+        literal_namespace["evaluate"]
+    )
+
+
+def test_additivity_proof_does_not_normalize_rebound_global() -> None:
+    proof = _load_t609_proof()
+
+    def rebound_global(value: float) -> float:
+        global PA_PER_BAR
+        PA_PER_BAR = 7.0
+        return value * PA_PER_BAR
+
+    def rebound_literal(value: float) -> float:
+        global PA_PER_BAR
+        PA_PER_BAR = 7.0
+        return value * 1.0e5
+
+    rebound_literal.__qualname__ = rebound_global.__qualname__
+    assert proof._canonical(rebound_global) != proof._canonical(rebound_literal)
+
+
 def _family_species_ids(text: str) -> set[str]:
     payload = yaml.safe_load(text)
     ids: set[str] = set()
