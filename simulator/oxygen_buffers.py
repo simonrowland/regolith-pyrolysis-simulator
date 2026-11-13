@@ -402,14 +402,36 @@ def cco_log10_fO2_interval_for_pressure_range(
     low_p, high_p = sorted((p0, p1))
     low, low_validity = _cco_log10_fO2_and_validity(temperature, low_p)
     high, high_validity = _cco_log10_fO2_and_validity(temperature, high_p)
+    values = [low, high]
+    branches = {
+        "inside_cco_jakobsson_oskarsson_calibration"
+        if validity == "inside_cco_jakobsson_oskarsson_calibration"
+        else "ideal_gas_fallback"
+        for validity in (low_validity, high_validity)
+    }
+    for boundary_pressure in CCO_PRESSURE_RANGE_BAR:
+        if (
+            not low_p < boundary_pressure < high_p
+            or not CCO_TEMPERATURE_RANGE_K[0]
+            <= temperature
+            <= CCO_TEMPERATURE_RANGE_K[1]
+        ):
+            continue
+        fit_value, _ = _cco_log10_fO2_and_validity(temperature, boundary_pressure)
+        values.append(fit_value)
+        values.append(_closed_co_log10_fO2_bar(temperature, boundary_pressure))
+        branches.update(
+            {"inside_cco_jakobsson_oskarsson_calibration", "ideal_gas_fallback"}
+        )
+
     reason = "pressure_range_not_certified_point"
-    if low_validity != "inside_cco_jakobsson_oskarsson_calibration" or (
-        high_validity != "inside_cco_jakobsson_oskarsson_calibration"
-    ):
+    if "ideal_gas_fallback" in branches:
         reason = f"{reason}; {_cco_fit_out_of_band_validity()}"
+    if len(branches) > 1:
+        reason = f"{reason}; mixed branches=[{', '.join(sorted(branches))}]"
     return RedoxBufferInterval(
-        low_log10_fO2_bar=min(low, high),
-        high_log10_fO2_bar=max(low, high),
+        low_log10_fO2_bar=min(values),
+        high_log10_fO2_bar=max(values),
         certified_point=None,
         reason=reason,
         formulation=CCO_FORMULATION,
