@@ -39,7 +39,9 @@ from simulator.vapour_rail.batch import (
 import simulator.optimize.evaluate as evaluate_module
 from simulator.optimize.evaluate import (
     INVENTORY_CAPPED,
+    MISSING_PARENT_OXIDE_INVENTORY,
     SUPPLY_INTERVAL_UPPER_BOUND_USED,
+    SUPPLY_UNAVAILABLE,
     RunReference,
     ScoredResult,
     _WallSupplyInterval,
@@ -4515,6 +4517,674 @@ def test_computed_parent_oxide_is_reserved_before_refused_bounds(
         else:
             for name, mass_kg in oracle.items():
                 assert mutated[name] == _approx_kg(mass_kg)
+
+
+# Invariant. For one parent oxide, the oxide-equivalent of every computed
+# vapour debit (published or withheld) plus every published refused bound
+# is at most the first recorded inventory, unless the computed debit alone
+# already exceeds it. A withheld species keeps its computed debit in that
+# sum. A snapshot that omits its inventory does not publish the kinetic
+# ceiling. A refused bound whose parent was never recorded is absent and
+# named missing_parent_oxide_inventory. The checks below sum the case
+# inputs and the returned map. They do not call the allocator or scale a
+# demand by the remaining budget.
+_OXIDE_CARRIERS = ("K2O_gas", "K2", "Na2O_gas")
+_OXIDE_PARENT = {"K2O_gas": "K2O", "K2": "K2O", "Na2O_gas": "Na2O"}
+_OXIDE_COMPUTED_RATE_KG_HR = 0.25
+_OXIDE_TINY_RATE_KG_HR = 1.0e-15
+_OXIDE_NA_RATE_KG_HR = 0.1
+_OXIDE_CHARGE_KG = {"K2O": 1.0, "Na2O": 10.0}
+_OXIDE_KINDS = (
+    "computed",
+    "computed_tiny",
+    "refused",
+    "unavailable",
+    "physical_zero",
+)
+
+
+def _oxide_inventory_fields(mode: str) -> dict[str, object]:
+    """Snapshot fields for one inventory mode. Kilograms are exact."""
+
+    if mode == "missing":
+        return {}
+    if mode == "empty":
+        return {"inventory": SimpleNamespace(melt_oxide_kg={})}
+    if mode == "recorded":
+        return {
+            "inventory": SimpleNamespace(melt_oxide_kg=dict(_OXIDE_CHARGE_KG))
+        }
+    if mode == "composition":
+        # 50/50 of 22 kg is 11 kg of K2O and 11 kg of Na2O, not the
+        # recorded 1 kg / 10 kg pair. The conservation check uses this
+        # composition's own kilograms. 50 and 22 are exact in binary.
+        return {
+            "melt_mass_kg": 22.0,
+            "composition_wt_pct": {"K2O": 50.0, "Na2O": 50.0},
+        }
+    raise AssertionError(mode)
+
+
+def _oxide_charge_kg(mode: str) -> dict[str, float]:
+    if mode == "recorded":
+        return dict(_OXIDE_CHARGE_KG)
+    if mode == "composition":
+        return {"K2O": 11.0, "Na2O": 11.0}
+    return {}
+
+
+def _oxide_channel(species: str, *, unavailable: bool) -> dict[str, object]:
+    record = _alkali_inventory_channel(
+        species,
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide=_OXIDE_PARENT[species],
+        stoich_oxide_per_vapor=1.0,
+    )
+    if unavailable:
+        record["activity_one_psat_pa"] = None
+    return record
+
+
+def _oxide_conservation_snapshot(
+    hour: int,
+    interval: Mapping[str, object],
+) -> SimpleNamespace:
+    kinds = dict(interval["kinds"])
+    duration_h = float(interval["duration_h"])
+    rates: dict[str, float] = {}
+    channels: dict[str, dict[str, object]] = {}
+    physical = False
+    for name, kind in kinds.items():
+        if kind == "computed":
+            rate = (
+                _OXIDE_NA_RATE_KG_HR
+                if name == "Na2O_gas"
+                else _OXIDE_COMPUTED_RATE_KG_HR
+            )
+            rates[name] = rate
+            channels[name] = _oxide_channel(name, unavailable=False)
+        elif kind == "computed_tiny":
+            rates[name] = _OXIDE_TINY_RATE_KG_HR
+            channels[name] = _oxide_channel(name, unavailable=False)
+        elif kind == "refused":
+            channels[name] = _oxide_channel(name, unavailable=False)
+        elif kind == "unavailable":
+            channels[name] = _oxide_channel(name, unavailable=True)
+        elif kind == "physical_zero":
+            physical = True
+        else:
+            raise AssertionError(kind)
+    flux: dict[str, object] = {
+        "published_species_kg_hr": rates,
+        "species_kg_hr": dict(rates),
+        "melt_surface_area_m2": _ACTIVITY_ONE_AREA_M2,
+        "carrier_authority_by_species": channels,
+    }
+    if physical:
+        flux["wall_supply_interval_physical_zero"] = {
+            "reason": "frozen_melt",
+            "evidence": "authorized_zero",
+        }
+    snapshot = SimpleNamespace(
+        hour=hour,
+        duration_h=duration_h,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        evap_flux=SimpleNamespace(**flux),
+        **_oxide_inventory_fields(str(interval["inventory_mode"])),
+    )
+    return snapshot
+
+
+def _oxide_case_snapshots(
+    case: Mapping[str, object],
+) -> tuple[SimpleNamespace, ...]:
+    return tuple(
+        _oxide_conservation_snapshot(index, interval)
+        for index, interval in enumerate(case["intervals"], start=1)
+    )
+
+
+def _oxide_case_facts(
+    case: Mapping[str, object],
+) -> dict[str, object]:
+    """Charge, computed debit, and interval classes, read off the case."""
+
+    charge: dict[str, float] = {}
+    recorded = False
+    computed = {name: 0.0 for name in _OXIDE_CARRIERS}
+    refused = {name: False for name in _OXIDE_CARRIERS}
+    unavailable = {name: False for name in _OXIDE_CARRIERS}
+    physical = {name: False for name in _OXIDE_CARRIERS}
+    missing_refused = {name: False for name in _OXIDE_CARRIERS}
+    positive_hours = 0
+    for interval in case["intervals"]:
+        mode = str(interval["inventory_mode"])
+        if mode != "missing":
+            recorded = True
+        for oxide, kg in _oxide_charge_kg(mode).items():
+            charge.setdefault(oxide, kg)
+        duration_h = float(interval["duration_h"])
+        if duration_h == 0.0:
+            continue
+        positive_hours += 1
+        for name, kind in interval["kinds"].items():
+            if kind == "computed":
+                rate = (
+                    _OXIDE_NA_RATE_KG_HR
+                    if name == "Na2O_gas"
+                    else _OXIDE_COMPUTED_RATE_KG_HR
+                )
+                computed[name] += rate * duration_h
+            elif kind == "computed_tiny":
+                computed[name] += _OXIDE_TINY_RATE_KG_HR * duration_h
+            elif kind == "refused":
+                refused[name] = True
+                if mode == "missing":
+                    missing_refused[name] = True
+            elif kind == "unavailable":
+                unavailable[name] = True
+            elif kind == "physical_zero":
+                physical[name] = True
+    return {
+        "charge": charge,
+        "recorded": recorded,
+        "computed": computed,
+        "refused": refused,
+        "unavailable": unavailable,
+        "physical": physical,
+        "missing_refused": missing_refused,
+        "positive_hours": positive_hours,
+    }
+
+
+def _accounted_parent_oxide_kg(
+    bounds: Mapping[str, float],
+    computed: Mapping[str, float],
+    parent: str,
+) -> float:
+    """Published oxide plus the computed debit of unpublished carriers."""
+
+    total = 0.0
+    for name, oxide in _OXIDE_PARENT.items():
+        if oxide != parent:
+            continue
+        if name in bounds:
+            total += float(bounds[name])
+        else:
+            total += float(computed[name])
+    return total
+
+
+def _assert_shared_parent_oxide_invariant(
+    bounds: object,
+    case: Mapping[str, object],
+) -> None:
+    facts = _oxide_case_facts(case)
+    charge = facts["charge"]
+    computed = facts["computed"]
+    for parent in set(_OXIDE_PARENT.values()):
+        computed_oxide = sum(
+            float(computed[name])
+            for name, oxide in _OXIDE_PARENT.items()
+            if oxide == parent
+        )
+        accounted = _accounted_parent_oxide_kg(bounds, computed, parent)
+        if parent in charge:
+            limit = max(float(charge[parent]), computed_oxide)
+        elif facts["recorded"]:
+            # A recorded map that omits the oxide is a known zero.
+            limit = computed_oxide
+        else:
+            limit = None
+        if limit is not None:
+            assert accounted <= limit + 1.0e-9
+    for name in _OXIDE_CARRIERS:
+        if facts["unavailable"][name]:
+            assert name not in bounds
+            continue
+        # A recorded map, including an empty one, is a known charge.
+        # Withholding is only a window that never recorded an inventory.
+        withheld_for_inventory = (
+            facts["refused"][name]
+            and facts["missing_refused"][name]
+            and not facts["recorded"]
+        )
+        if withheld_for_inventory:
+            assert name not in bounds
+            assert (
+                bounds.supply_unavailable[name]
+                == MISSING_PARENT_OXIDE_INVENTORY
+            )
+            continue
+        if (
+            facts["computed"][name] > 0.0
+            or facts["refused"][name]
+            or facts["physical"][name]
+        ):
+            assert name in bounds
+        if name in bounds:
+            assert float(bounds[name]) + 1.0e-15 >= float(
+                facts["computed"][name]
+            )
+    na_hours = facts["positive_hours"]
+    # Na2O_gas is computed on every positive hour of these cases.
+    if all(
+        interval["kinds"]["Na2O_gas"] == "computed"
+        for interval in case["intervals"]
+    ):
+        assert bounds["Na2O_gas"] == _approx_kg(
+            _OXIDE_NA_RATE_KG_HR * na_hours
+        )
+
+
+def _oxide_interval(
+    mode: str,
+    kinds: Mapping[str, str],
+    *,
+    duration_h: float = 1.0,
+) -> dict[str, object]:
+    return {
+        "duration_h": duration_h,
+        "inventory_mode": mode,
+        "kinds": dict(kinds),
+    }
+
+
+def _oxide_conservation_cases() -> tuple[dict[str, object], ...]:
+    cases: list[dict[str, object]] = []
+    for mode in ("recorded", "missing", "empty", "composition"):
+        for kind in _OXIDE_KINDS:
+            cases.append(
+                {
+                    "name": f"one-{mode}-{kind}",
+                    "intervals": (
+                        _oxide_interval(
+                            mode,
+                            {
+                                "K2O_gas": kind,
+                                "K2": "refused",
+                                "Na2O_gas": "computed",
+                            },
+                        ),
+                    ),
+                }
+            )
+    for first_mode, second_mode in (
+        ("recorded", "recorded"),
+        ("recorded", "missing"),
+        ("missing", "recorded"),
+        ("composition", "missing"),
+        ("empty", "recorded"),
+        ("empty", "missing"),
+    ):
+        for first_kind in _OXIDE_KINDS:
+            for second_kind in _OXIDE_KINDS:
+                cases.append(
+                    {
+                        "name": (
+                            f"{first_mode}-{first_kind}"
+                            f"__{second_mode}-{second_kind}"
+                        ),
+                        "intervals": (
+                            _oxide_interval(
+                                first_mode,
+                                {
+                                    "K2O_gas": first_kind,
+                                    "K2": "refused",
+                                    "Na2O_gas": "computed",
+                                },
+                            ),
+                            _oxide_interval(
+                                second_mode,
+                                {
+                                    "K2O_gas": second_kind,
+                                    "K2": "refused",
+                                    "Na2O_gas": "computed",
+                                },
+                            ),
+                        ),
+                    }
+                )
+    cases.append(
+        {
+            "name": "zero-duration-missing-hour-is-outside-the-window",
+            "intervals": (
+                _oxide_interval(
+                    "recorded",
+                    {
+                        "K2O_gas": "refused",
+                        "K2": "refused",
+                        "Na2O_gas": "computed",
+                    },
+                ),
+                _oxide_interval(
+                    "missing",
+                    {
+                        "K2O_gas": "refused",
+                        "K2": "refused",
+                        "Na2O_gas": "computed",
+                    },
+                    duration_h=0.0,
+                ),
+            ),
+        }
+    )
+    return tuple(cases)
+
+
+_OXIDE_CONSERVATION_CASES = _oxide_conservation_cases()
+
+
+@pytest.mark.parametrize(
+    "case",
+    _OXIDE_CONSERVATION_CASES,
+    ids=[case["name"] for case in _OXIDE_CONSERVATION_CASES],
+)
+def test_shared_parent_oxide_conservation(
+    case: Mapping[str, object],
+) -> None:
+    """Every carrier of one oxide spends that oxide once.
+
+    Computed, refused, unavailable, physical-zero, and below-threshold
+    hours are included, as are recorded, composition, empty, and missing
+    inventories, in both orders. Sodium does not spend potassium. A
+    zero-duration hour is not a gap and not a debit. Species order does
+    not change the kilograms.
+    """
+
+    assert _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA) > 1.0
+    snapshots = _oxide_case_snapshots(case)
+    orders = (_OXIDE_CARRIERS, tuple(reversed(_OXIDE_CARRIERS)))
+    results = [
+        _optimizer_refused_flux_bounds(snapshots, order) for order in orders
+    ]
+    for bounds in results:
+        _assert_shared_parent_oxide_invariant(bounds, case)
+    assert dict(results[0]) == dict(results[1])
+    assert results[0].inventory_capped == results[1].inventory_capped
+    assert results[0].supply_unavailable == results[1].supply_unavailable
+
+
+def _k2o_channel(
+    species: str,
+    *,
+    stoich: float,
+    unavailable: bool = False,
+) -> dict[str, object]:
+    record = _alkali_inventory_channel(
+        species,
+        pressure_pa=_OXIDE_HK_PRESSURE_PA,
+        parent_oxide="K2O",
+        stoich_oxide_per_vapor=stoich,
+    )
+    if unavailable:
+        record["activity_one_psat_pa"] = None
+    return record
+
+
+def _k2o_budget_snapshot(
+    hour: int,
+    *,
+    rates: Mapping[str, float],
+    channels: Mapping[str, Mapping[str, object]],
+    inventory_kg: float | None,
+) -> SimpleNamespace:
+    snapshot = SimpleNamespace(
+        hour=hour,
+        duration_h=1.0,
+        temperature_C=_ACTIVITY_ONE_T_C,
+        evap_flux=SimpleNamespace(
+            published_species_kg_hr=dict(rates),
+            species_kg_hr=dict(rates),
+            melt_surface_area_m2=_ACTIVITY_ONE_AREA_M2,
+            carrier_authority_by_species={
+                name: dict(record) for name, record in channels.items()
+            },
+        ),
+    )
+    if inventory_kg is not None:
+        snapshot.inventory = SimpleNamespace(
+            melt_oxide_kg={"K2O": inventory_kg}
+        )
+    return snapshot
+
+
+def _withheld_k2o_gas_snapshots() -> tuple[SimpleNamespace, SimpleNamespace]:
+    """0.25 kg computed K2O_gas, then a typed gap. K2 stays refused.
+
+    Stoich of K2 is 2 kg oxide per kg vapour. The 0.25 kg computed
+    draw is 0.25 kg of the 1 kg charge. K2's refused bound has the
+    other 0.75 kg of oxide, which is 0.375 kg of vapour.
+    """
+
+    k2o = _k2o_channel("K2O_gas", stoich=1.0)
+    k2 = _k2o_channel("K2", stoich=2.0)
+    k2o_gap = _k2o_channel("K2O_gas", stoich=1.0, unavailable=True)
+    return (
+        _k2o_budget_snapshot(
+            1,
+            rates={"K2O_gas": 0.25},
+            channels={"K2O_gas": k2o, "K2": k2},
+            inventory_kg=1.0,
+        ),
+        _k2o_budget_snapshot(
+            2,
+            rates={},
+            channels={"K2O_gas": k2o_gap, "K2": k2},
+            inventory_kg=1.0,
+        ),
+    )
+
+
+def test_withheld_computed_debit_stays_in_the_shared_reserve() -> None:
+    """A gap in K2O_gas does not give its measured draw back to K2.
+
+    1 kg of K2O. Hour 1 computes 0.25 kg of K2O_gas and refuses K2.
+    Hour 2 has no flux law for K2O_gas, so K2O_gas is not published.
+    K2's oxide is 0.75 kg, not the whole charge. Both species orders
+    agree. The kinetic ceiling is above that remainder.
+    """
+
+    assert _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA) > 1.0
+    snapshots = _withheld_k2o_gas_snapshots()
+    for order in (("K2O_gas", "K2"), ("K2", "K2O_gas")):
+        bounds = _optimizer_refused_flux_bounds(snapshots, order)
+        assert "K2O_gas" not in bounds
+        assert bounds["K2"] == _approx_kg(0.375)
+        assert bounds["K2"] * 2.0 == _approx_kg(0.75)
+        assert bounds["K2"] * 2.0 + 0.25 == _approx_kg(1.0)
+        assert bounds.inventory_capped == {"K2": True}
+    execution = _refused_supply_execution(
+        snapshots,
+        (("K2O_gas", "hot_wall"), ("K2", "hot_wall")),
+    )
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        {},
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    assert booked["notice_authority"][INVENTORY_CAPPED] == {"K2": True}
+    assert SUPPLY_UNAVAILABLE not in booked["notice_authority"]
+
+
+def test_dropping_a_withheld_computed_debit_respends_the_charge(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The reserve is what stops K2 at 0.75 kg of oxide.
+
+    Replacing the computed-debit reader with an empty map is the defect.
+    K2 then receives the whole 1 kg of oxide (0.5 kg of vapour at stoich
+    2). With the 0.25 kg already computed, the melt would owe 1.25 kg.
+    """
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_computed_parent_oxide_draws",
+        lambda *args, **kwargs: {},
+    )
+    bounds = _optimizer_refused_flux_bounds(
+        _withheld_k2o_gas_snapshots(),
+        ("K2O_gas", "K2"),
+    )
+    assert bounds["K2"] == _approx_kg(0.5)
+    assert bounds["K2"] * 2.0 + 0.25 == _approx_kg(1.25)
+    assert bounds["K2"] * 2.0 + 0.25 > 1.0
+
+
+def _exhausted_then_unrecorded_snapshots(
+    mode: str,
+) -> tuple[SimpleNamespace, ...]:
+    channel = _k2o_channel("K2O_gas", stoich=1.0)
+    first = _k2o_budget_snapshot(
+        1,
+        rates={},
+        channels={"K2O_gas": channel},
+        inventory_kg=None,
+    )
+    if mode == "recorded":
+        first.inventory = SimpleNamespace(melt_oxide_kg={"K2O": 1.0})
+    elif mode == "composition":
+        first.melt_mass_kg = 1.0
+        first.composition_wt_pct = {"K2O": 100.0}
+    elif mode == "empty":
+        first.inventory = SimpleNamespace(melt_oxide_kg={})
+    elif mode == "missing":
+        pass
+    else:
+        raise AssertionError(mode)
+    if mode == "missing":
+        return (first,)
+    second = _k2o_budget_snapshot(
+        2,
+        rates={},
+        channels={"K2O_gas": channel},
+        inventory_kg=None,
+    )
+    return (first, second)
+
+
+@pytest.mark.parametrize("mode", ("recorded", "composition", "empty", "missing"))
+def test_missing_inventory_cannot_publish_the_kinetic_ceiling(mode: str) -> None:
+    """A later hour with no inventory spends only the remaining charge.
+
+    Recorded and composition each establish 1 kg and the refused bound
+    takes it. The next hour has a kinetic ceiling and no inventory, and
+    adds nothing. An empty map is a known zero, so the bound is 0 and
+    flagged. A run that never records the oxide is typed unavailable.
+    """
+
+    kinetic = _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA)
+    assert kinetic > 1.0
+    bounds = _optimizer_refused_flux_bounds(
+        _exhausted_then_unrecorded_snapshots(mode),
+        ("K2O_gas",),
+    )
+    if mode == "missing":
+        assert "K2O_gas" not in bounds
+        assert (
+            bounds.supply_unavailable["K2O_gas"]
+            == MISSING_PARENT_OXIDE_INVENTORY
+        )
+        execution = _refused_supply_execution(
+            _exhausted_then_unrecorded_snapshots(mode),
+            (("K2O_gas", "hot_wall"),),
+        )
+        booked = objective_module._book_wall_deposits_at_vapour_supply(
+            {},
+            execution.trace.wall_deposit_sticking_authority,
+            execution,
+        )
+        assert booked["notice_authority"][SUPPLY_UNAVAILABLE] == {
+            "K2O_gas": MISSING_PARENT_OXIDE_INVENTORY
+        }
+        return
+    if mode == "empty":
+        assert bounds["K2O_gas"] == 0.0
+    else:
+        assert bounds["K2O_gas"] == _approx_kg(1.0)
+    assert bounds["K2O_gas"] < kinetic
+    assert bounds.inventory_capped == {"K2O_gas": True}
+
+
+def test_missing_inventory_keeps_a_partial_computed_draw() -> None:
+    """0.25 kg computed, then a refused hour with no inventory, is 1 kg.
+
+    The second hour's kinetic ceiling is not added beside the charge.
+    The computed draw is published because this species has no typed gap.
+    """
+
+    kinetic = _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA)
+    assert kinetic > 1.0
+    channel = _k2o_channel("K2O_gas", stoich=1.0)
+    snapshots = (
+        _k2o_budget_snapshot(
+            1,
+            rates={"K2O_gas": 0.25},
+            channels={"K2O_gas": channel},
+            inventory_kg=1.0,
+        ),
+        _k2o_budget_snapshot(
+            2,
+            rates={},
+            channels={"K2O_gas": channel},
+            inventory_kg=None,
+        ),
+    )
+    bounds = _optimizer_refused_flux_bounds(snapshots, ("K2O_gas",))
+    assert bounds["K2O_gas"] == _approx_kg(1.0)
+    assert bounds["K2O_gas"] < 0.25 + kinetic
+    assert bounds.inventory_capped == {"K2O_gas": True}
+
+
+def _unrestricted_parent_oxide_allocation(classified_window, catalog):
+    """The defect: every refused hour contributes its kinetic mass."""
+
+    del catalog
+    rows = []
+    for snapshot, classified in classified_window:
+        duration_h = float(getattr(snapshot, "duration_h", 1.0) or 0.0)
+        row = {}
+        for species, contribution in classified:
+            if (
+                contribution.kind == "supply_interval_upper_bound"
+                and contribution.rate_kg_hr is not None
+            ):
+                row[species] = float(contribution.rate_kg_hr) * duration_h
+        rows.append(row)
+    return evaluate_module._ParentOxideAllocation(
+        tuple(rows),
+        frozenset(),
+        frozenset(),
+        {},
+    )
+
+
+@pytest.mark.parametrize("mode", ("recorded", "composition", "empty", "missing"))
+def test_unrestricted_refused_mass_breaks_the_parent_oxide_budget(
+    mode: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Publishing the kinetic ceiling on these hours exceeds the charge.
+
+    The mutation replaces the one allocator. Recorded and composition
+    then book the ceiling twice. An empty melt books the ceiling instead
+    of zero. A run with no inventory publishes a number instead of the
+    typed gap.
+    """
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "_allocate_parent_oxide_supply",
+        _unrestricted_parent_oxide_allocation,
+    )
+    kinetic = _oracle_hk_kg_hr(_OXIDE_HK_PRESSURE_PA)
+    bounds = _optimizer_refused_flux_bounds(
+        _exhausted_then_unrecorded_snapshots(mode),
+        ("K2O_gas",),
+    )
+    assert "K2O_gas" in bounds
+    assert bounds["K2O_gas"] > 1.0 or mode == "empty"
+    assert bounds["K2O_gas"] >= kinetic
 
 
 class _SnapshotParentCatalog:

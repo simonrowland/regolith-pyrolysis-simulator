@@ -4755,12 +4755,17 @@ def _book_wall_deposits_at_vapour_supply(
 
     - The interval invariant lives in ``_classify_wall_supply_interval``,
       which ``_optimizer_refused_flux_bounds`` is the only caller of.
-      Each positive-duration interval is a computed rate, an evidenced
-      physical zero, an activity-1 supply bound, or unavailable. A
-      species absent from the returned map has no finite bound: one
-      interval had no flux law and no saturation pressure, and a partial
-      sum is not booked. A refused interval with a saturation pressure
-      is in the map at that bound and is flagged
+      Refused kilograms are allocated only by
+      ``_allocate_parent_oxide_supply``. Each positive-duration interval
+      is a computed rate, an evidenced physical zero, an activity-1
+      supply bound, or unavailable. A species absent from the returned
+      map has no finite bound. One interval had no flux law and no
+      saturation pressure, or a refused bound whose parent oxide was
+      never recorded (``missing_parent_oxide_inventory``). A partial
+      sum is not booked. The computed debit of that species still
+      reserves the parent oxide for its siblings. A refused interval
+      with a saturation pressure and a known charge is in the map at
+      the allocated bound and is flagged
       ``supply_interval_upper_bound_used``. A sibling that the integral
       did return is still booked.
     - Supply at or below the mass-balance ledger resolution: authorized
@@ -4803,6 +4808,19 @@ def _book_wall_deposits_at_vapour_supply(
         refused,
         snapshots,
     )
+    from simulator.optimize.evaluate import (
+        INVENTORY_CAPPED,
+        SUPPLY_INTERVAL_UPPER_BOUND_USED,
+        SUPPLY_UNAVAILABLE,
+    )
+
+    raw_unavailable = getattr(supply_kg, SUPPLY_UNAVAILABLE, None)
+    if isinstance(raw_unavailable, MappingABC) and raw_unavailable:
+        notice_authority[SUPPLY_UNAVAILABLE] = {
+            str(species): str(reason)
+            for species, reason in raw_unavailable.items()
+            if str(species) not in supply_kg and str(reason)
+        }
     charge_kg = _run_charge_mass_kg(run_execution)
     if charge_kg is None or not supply_kg:
         return {
@@ -4811,10 +4829,6 @@ def _book_wall_deposits_at_vapour_supply(
             "notice_authority": notice_authority,
             "bookings": (),
         }
-    from simulator.optimize.evaluate import (
-        INVENTORY_CAPPED,
-        SUPPLY_INTERVAL_UPPER_BOUND_USED,
-    )
 
     resolution_kg = _mass_balance_ledger_resolution_kg(charge_kg)
     notice_authority[

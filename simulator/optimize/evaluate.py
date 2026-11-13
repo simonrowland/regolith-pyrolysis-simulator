@@ -1901,6 +1901,12 @@ def _trace_with_optimizer_coating_report(
                 str(species): True
                 for species in capped
             }
+        unavailable = getattr(refused_flux_bounds, SUPPLY_UNAVAILABLE, None)
+        if isinstance(unavailable, MappingABC) and unavailable:
+            report[SUPPLY_UNAVAILABLE] = {
+                str(species): str(reason)
+                for species, reason in unavailable.items()
+            }
     if threshold_parametric:
         raw_rate = runner_report.get("wall_deposit_kg_per_campaign", 0.0)
         if raw_rate is None:
@@ -2014,6 +2020,11 @@ _WALL_SUPPLY_UPPER_BOUND = "supply_interval_upper_bound"
 SUPPLY_INTERVAL_UPPER_BOUND_USED = "supply_interval_upper_bound_used"
 # The parent-oxide inventory, not the kinetic ceiling, limited this species.
 INVENTORY_CAPPED = "inventory_capped"
+# A refused bound whose parent oxide was never recorded. Not a kinetic mass
+# and not a zero. The species stays out of the supply map.
+MISSING_PARENT_OXIDE_INVENTORY = "missing_parent_oxide_inventory"
+# Species omitted from the supply map, each with the typed reason.
+SUPPLY_UNAVAILABLE = "supply_unavailable"
 
 
 @dataclass(frozen=True)
@@ -2037,6 +2048,7 @@ class _WallSupplyIntegral(dict):
         masses: Mapping[str, float],
         counts: Mapping[str, int] | None = None,
         inventory_capped: Mapping[str, bool] | None = None,
+        supply_unavailable: Mapping[str, str] | None = None,
     ) -> None:
         super().__init__(masses)
         self.supply_interval_upper_bound_used = {
@@ -2048,6 +2060,13 @@ class _WallSupplyIntegral(dict):
             str(species): True
             for species, flagged in (inventory_capped or {}).items()
             if flagged and str(species) in self
+        }
+        # Reasons for species this integral did not publish. A published
+        # species is not unavailable. Dict equality ignores this attribute.
+        self.supply_unavailable = {
+            str(species): str(reason)
+            for species, reason in (supply_unavailable or {}).items()
+            if str(reason) and str(species) not in self
         }
 
 
@@ -3052,8 +3071,10 @@ def _snapshot_oxide_inventory_kg(snapshot: Any) -> dict[str, float] | None:
 
     ``inventory.melt_oxide_kg`` is that inventory. A composition and a
     melt mass are the same inventory when the kilogram map was not
-    copied. An empty recorded map is an empty melt. No inventory and no
-    composition is a missing operand: the kinetic bound stays unchanged.
+    copied. An empty recorded map is an empty melt, which is a known
+    zero, not a missing operand. No inventory and no composition is an
+    unknown melt. A refused bound that debits a parent oxide cannot
+    replace that operand with the kinetic ceiling.
     """
 
     inventory = getattr(snapshot, "inventory", None)
@@ -3100,17 +3121,17 @@ def _snapshot_oxide_inventory_kg(snapshot: Any) -> dict[str, float] | None:
 def _computed_parent_oxide_draws(
     snapshot: Any,
     catalog: Any | None,
-    *,
-    skip_species: AbstractSet[str] | None = None,
 ) -> dict[str, float]:
     """Oxide kilograms this interval's computed vapour rates consume.
 
     The rate map is the computed draw. A refused carrier is absent from
-    it, so this does not reserve the bound that the cap still has to
-    allocate. ``skip_species`` are withheld: their partial sum is not a
-    supply, and they do not spend the shared inventory. A carrier with
-    no parent-oxide ratio contributes nothing here; it is not given a
-    zero debit.
+    it, so this does not reserve the bound the cap still has to
+    allocate. Every computed rate with a parent-oxide ratio is a debit,
+    including a rate of a species whose supply integral is withheld.
+    Withholding drops the unpublished partial sum. It does not return
+    those atoms to the melt, and a sibling must not spend them again.
+    A carrier with no parent-oxide ratio contributes nothing here; it
+    is not given a zero debit.
     """
 
     rates = _snapshot_refused_flux_rates(snapshot)
@@ -3119,12 +3140,9 @@ def _computed_parent_oxide_draws(
     duration_h = _snapshot_duration_h(snapshot)
     if duration_h == 0.0:
         return {}
-    skipped = skip_species or frozenset()
     draws: dict[str, float] = {}
     for name, raw in rates.items():
         species = str(name)
-        if species in skipped:
-            continue
         rate_kg_hr = _require_vapour_supply_rate(raw, species)
         stoich = _parent_oxide_debit_per_vapour_kg(snapshot, species, catalog)
         if stoich is None:
@@ -3139,13 +3157,13 @@ def _computed_parent_oxide_draws(
 def _window_parent_oxide_budget(
     snapshots: Sequence[Any],
     catalog: Any | None,
-    withheld: AbstractSet[str],
 ) -> tuple[dict[str, float], dict[str, float]]:
-    """First recorded inventory and the window's computed oxide debit.
+    """First recorded inventory and every computed oxide debit.
 
     The charge is the first snapshot that records that oxide. Computed
-    draws anywhere in the window, including a later hour, are one debit
-    against it. See ``_inventory_cap_upper_bounds``.
+    draws anywhere in the window are one debit against it, including a
+    draw by a species the integral will not publish. See
+    ``_allocate_parent_oxide_supply``.
     """
 
     charge: dict[str, float] = {}
@@ -3156,11 +3174,7 @@ def _window_parent_oxide_budget(
             for parent, kg in inventory.items():
                 if parent not in charge:
                     charge[parent] = kg
-        for parent, kg in _computed_parent_oxide_draws(
-            snapshot,
-            catalog,
-            skip_species=withheld,
-        ).items():
+        for parent, kg in _computed_parent_oxide_draws(snapshot, catalog).items():
             computed[parent] = computed.get(parent, 0.0) + kg
     return charge, computed
 
@@ -3172,74 +3186,115 @@ def _inventory_cap_upper_bounds(
     booked_oxide_kg: dict[str, float],
     charge_oxide_kg: Mapping[str, float],
     computed_oxide_kg: Mapping[str, float],
+    *,
+    inventory_map_recorded: bool,
 ) -> tuple[dict[str, float], set[str]]:
-    """Cap refused upper bounds that share one parent-oxide inventory.
+    """Assign every refused upper bound on this snapshot a vapour mass.
 
     The returned map is kilograms of vapour, already multiplied by the
-    interval duration. Computed rates are not rewritten. They are
-    reserved first, across the whole window, including a computed hour
-    that comes later and a computed carrier of the same element.
+    interval duration. It contains every upper bound in ``classified``.
+    Computed rates are not rewritten. They are reserved first, across
+    the whole window, including a computed hour that comes later, a
+    computed carrier of the same element, and a computed carrier whose
+    own supply is withheld.
 
     Invariant. For one parent oxide, the oxide-equivalent of the booked
-    supply — computed vapour plus refused upper bounds, across every
-    carrier of that oxide — does not exceed the first recorded
-    inventory, except when the computed draw alone already exceeds it.
+    supply — every computed vapour debit, published or not, plus every
+    refused upper bound that is published — does not exceed the first
+    recorded inventory, except when the computed draw alone already
+    exceeds it. No upper bound is left out of the returned map. A
+    caller that added the kinetic mass for a missing key would spend
+    the charge twice.
 
     Derivation. A refused hour can still show the undepleted melt. The
     cap used to allocate against that snapshot and then add the computed
     mass, so 1 kg of K2O became 1 kg of refused K2O_gas plus another
     kilogram of computed vapour (d-401 amendment 2). The same hole
     exists when the computed hour is earlier and the inventory map was
-    not debited. Let C be the first recorded inventory, D the
-    oxide-equivalent of every computed rate in the window, S the
-    inventory on this snapshot, and B the refused oxide already
-    allocated:
+    not debited, and when the computed carrier is withheld: its measured
+    debit was skipped, so the sibling received the full charge. Let C
+    be the first recorded inventory, D the oxide-equivalent of every
+    computed rate in the window, S the inventory on this snapshot, and
+    B the refused oxide already allocated. When this snapshot records
+    an inventory:
 
         available = min(S, max(0, C - D)) - B, floored at 0.
 
-    C - D is the charge after the computed reserve. S is a tighter cap
-    when this snapshot already shows a smaller melt. Subtracting D from
-    S as well would count a post-debit drop twice. When the map is not
-    debited, S = C and available = C - D - B. Two carriers split that
-    remainder in proportion to oxide demand. Species order does not
-    change D. A computed debit already folded into a first snapshot
-    that never shows a higher inventory cannot be told apart from an
-    undepleted map; over-booking is the forbidden outcome, so that
-    draw stays inside D.
+    When it records none, S is not infinite. The known charge remains
+    the ceiling:
+
+        available = max(0, C - D) - B, floored at 0.
+
+    A window that recorded no inventory map at all does not reach this
+    function for a parented carrier. ``_allocate_parent_oxide_supply``
+    withholds that species. A recorded map that omits the oxide is a
+    charge of zero, including an empty map; a later snapshot that omits
+    the map does not reopen the kinetic ceiling. C - D is the charge
+    after the computed reserve. S is a tighter cap when this snapshot
+    already shows a smaller melt. Subtracting D from S as well would
+    count a post-debit drop twice. When the map is not debited, S = C
+    and available = C - D - B. Two carriers split that remainder in
+    proportion to oxide demand. Species order does not change D. A
+    carrier with no parent ratio has no shared budget; its mass is the
+    kinetic ceiling.
+
+    Sanity value. 1 kg of K2O, stoich 1. Hour 1 computes 0.25 kg of
+    K2O_gas and refuses K2. Hour 2 has no flux law for K2O_gas, so
+    K2O_gas is not published. D still holds the 0.25 kg. K2 receives
+    0.75 kg, not 1 kg. A second hour that refuses K2O_gas after the
+    1 kg charge is exhausted, and that records no inventory, adds 0
+    rather than the kinetic ceiling.
     """
 
     inventory = _snapshot_oxide_inventory_kg(snapshot)
-    if inventory is None:
-        return {}, set()
     duration_h = _snapshot_duration_h(snapshot)
     grouped: dict[str, list[tuple[str, float, float]]] = {}
+    replacements: dict[str, float] = {}
     for species, contribution in classified:
         if contribution.kind != _WALL_SUPPLY_UPPER_BOUND:
             continue
         if contribution.rate_kg_hr is None:
-            continue
+            raise CoatingFeasibilityReportError(
+                "activity-one supply bound for "
+                f"{species!r} is missing its rate"
+            )
+        kinetic_kg = float(contribution.rate_kg_hr) * duration_h
         stoich = _parent_oxide_debit_per_vapour_kg(snapshot, species, catalog)
         if stoich is None:
+            replacements[species] = kinetic_kg
             continue
         parent, oxide_per_vapour = stoich
         grouped.setdefault(parent, []).append(
-            (
-                species,
-                float(contribution.rate_kg_hr) * duration_h,
-                oxide_per_vapour,
-            )
+            (species, kinetic_kg, oxide_per_vapour)
         )
-    replacements: dict[str, float] = {}
     capped: set[str] = set()
     for parent, rows in grouped.items():
-        snapshot_kg = inventory.get(parent, 0.0)
-        charge = charge_oxide_kg.get(parent, snapshot_kg)
+        # A key in ``charge_oxide_kg`` is the first record of that oxide.
+        # A recorded map that never names it is zero, not an unknown
+        # melt. No recorded map at all is not this branch.
+        charge_known = parent in charge_oxide_kg or inventory_map_recorded
+        if inventory is None and not charge_known:
+            raise CoatingFeasibilityReportError(
+                f"parent oxide {parent!r} has a refused supply and no "
+                "recorded inventory"
+            )
+        if parent in charge_oxide_kg:
+            charge = charge_oxide_kg[parent]
+        else:
+            charge = 0.0
+        if inventory is None:
+            snapshot_kg: float | None = None
+        else:
+            snapshot_kg = inventory.get(parent, 0.0)
         computed = computed_oxide_kg.get(parent, 0.0)
         ceiling = charge - computed
         if ceiling < 0.0:
             ceiling = 0.0
         booked = booked_oxide_kg.get(parent, 0.0)
-        available = min(snapshot_kg, ceiling) - booked
+        if snapshot_kg is None:
+            available = ceiling - booked
+        else:
+            available = min(snapshot_kg, ceiling) - booked
         if available < 0.0:
             available = 0.0
         demands = {
@@ -3248,6 +3303,8 @@ def _inventory_cap_upper_bounds(
         }
         total_demand = sum(demands.values())
         if total_demand <= 0.0:
+            for species, _vapour_kg, _oxide_per_vapour in rows:
+                replacements[species] = 0.0
             continue
         if total_demand <= available or math.isclose(
             total_demand,
@@ -3275,6 +3332,129 @@ def _inventory_cap_upper_bounds(
     return replacements, capped
 
 
+@dataclass(frozen=True)
+class _ParentOxideAllocation:
+    """Refused-bound kilograms from the one parent-oxide allocator.
+
+    ``upper_bound_kg`` is parallel to the classified window. Each dict
+    is vapour kilograms already multiplied by that interval's duration.
+    ``withheld`` species are absent from those dicts. ``unavailable``
+    names why. Computed rates are not in this object; the integral adds
+    them, and their oxide debit is already inside the budget this
+    allocation spent.
+    """
+
+    upper_bound_kg: tuple[Mapping[str, float], ...]
+    inventory_capped: frozenset[str]
+    withheld: frozenset[str]
+    unavailable: Mapping[str, str]
+
+
+def _allocate_parent_oxide_supply(
+    classified_window: Sequence[
+        tuple[Any, Sequence[tuple[str, _WallSupplyInterval]]]
+    ],
+    catalog: Any | None,
+) -> _ParentOxideAllocation:
+    """Allocate every refused bound against the shared parent-oxide charge.
+
+    This is the only function that turns a refused interval into
+    kilograms. The integral adds a computed rate or one value from
+    ``upper_bound_kg``. It does not read the kinetic rate again.
+
+    Invariant, for each parent oxide. Let C be the first recorded
+    inventory of that oxide. A recorded map that never names the oxide,
+    including an empty melt, is C = 0. C is unknown only when the window
+    recorded no inventory map at all. Let D be the oxide-equivalent of
+    every computed vapour rate in the window, including a rate of a
+    species that is not published. A refused bound then receives only
+    what remains of C after D and after refused oxide already allocated.
+    A snapshot that omits its inventory does not make the remainder
+    infinite. A refused bound with C unknown is
+    ``missing_parent_oxide_inventory`` and is not a number. A carrier
+    with no parent ratio keeps the kinetic ceiling. Species order does
+    not change the kilograms.
+    """
+
+    unavailable: dict[str, str] = {}
+    classifier_withheld: set[str] = set()
+    for _snapshot, classified in classified_window:
+        for species, contribution in classified:
+            if contribution.kind != _WALL_SUPPLY_UNAVAILABLE:
+                continue
+            classifier_withheld.add(species)
+    snapshots = tuple(snapshot for snapshot, _classified in classified_window)
+    charge_oxide_kg, computed_oxide_kg = _window_parent_oxide_budget(
+        snapshots,
+        catalog,
+    )
+    # One recorded map anywhere, including an empty melt, makes every
+    # unnamed parent a charge of zero. Withholding is only for a window
+    # that recorded no inventory at all.
+    inventory_map_recorded = any(
+        _snapshot_oxide_inventory_kg(snapshot) is not None
+        for snapshot in snapshots
+    )
+    withheld = set(classifier_withheld)
+    if not inventory_map_recorded:
+        for snapshot, classified in classified_window:
+            for species, contribution in classified:
+                if species in withheld:
+                    continue
+                if contribution.kind != _WALL_SUPPLY_UPPER_BOUND:
+                    continue
+                stoich = _parent_oxide_debit_per_vapour_kg(
+                    snapshot,
+                    species,
+                    catalog,
+                )
+                if stoich is None:
+                    continue
+                parent, _ratio = stoich
+                if parent in charge_oxide_kg:
+                    continue
+                withheld.add(species)
+                unavailable.setdefault(species, MISSING_PARENT_OXIDE_INVENTORY)
+    booked_oxide_kg: dict[str, float] = {}
+    inventory_capped: set[str] = set()
+    upper_rows: list[dict[str, float]] = []
+    for snapshot, classified in classified_window:
+        eligible = tuple(
+            (species, contribution)
+            for species, contribution in classified
+            if species not in withheld
+        )
+        capped_kg, capped_species = _inventory_cap_upper_bounds(
+            snapshot,
+            eligible,
+            catalog,
+            booked_oxide_kg,
+            charge_oxide_kg,
+            computed_oxide_kg,
+            inventory_map_recorded=inventory_map_recorded,
+        )
+        inventory_capped.update(capped_species)
+        row: dict[str, float] = {}
+        for species, contribution in classified:
+            if species in withheld:
+                continue
+            if contribution.kind != _WALL_SUPPLY_UPPER_BOUND:
+                continue
+            if species not in capped_kg:
+                raise CoatingFeasibilityReportError(
+                    "refused supply of "
+                    f"{species!r} was not allocated against its parent oxide"
+                )
+            row[species] = capped_kg[species]
+        upper_rows.append(row)
+    return _ParentOxideAllocation(
+        tuple(upper_rows),
+        frozenset(inventory_capped),
+        frozenset(withheld),
+        unavailable,
+    )
+
+
 def _optimizer_refused_flux_bounds(
     snapshots: Any,
     refused_species: tuple[str, ...],
@@ -3287,22 +3467,26 @@ def _optimizer_refused_flux_bounds(
     Product summary, furnace lifespan, and the tap projection book only
     the map returned here. No other path integrates a wall-supply flux.
     Each positive-duration interval is classified by
-    ``_classify_wall_supply_interval`` and is not re-read here.
+    ``_classify_wall_supply_interval`` and is not re-read here. Refused
+    kilograms come only from ``_allocate_parent_oxide_supply``.
 
-    A returned number sums computed rates and activity-scaled supply
-    bounds. Computed parent-oxide draws in the window are reserved
+    A returned number sums computed rates and the allocator's refused
+    masses. Computed parent-oxide draws in the window are reserved
     before any refused bound is allocated, including a draw on a later
-    hour and a draw by another carrier of that element. The refused
-    bound then receives only what remains of the first recorded
-    inventory (d-401 amendment 2). ``inventory_capped`` names the species
-    for which that limit bound. ``supply_interval_upper_bound_used``
-    counts the
+    hour, a draw by another carrier of that element, and a draw by a
+    species this map does not publish. The refused bound then receives
+    only what remains of the first recorded inventory (d-401 amendment
+    2). A snapshot with no inventory does not bypass that charge.
+    ``inventory_capped`` names the species for which the limit bound.
+    ``supply_unavailable`` names a species omitted from the map and the
+    typed reason. ``supply_interval_upper_bound_used`` counts the
     bounded refused intervals. That count is not divided by
     ``campaigns_elapsed``. An evidenced physical zero adds nothing and
     keeps the species observed. One unavailable interval drops that
-    species: the partial sum of the other intervals is not a supply, and
-    the wall refusal stays. A sibling with a complete integral is still
-    returned. Species order does not change the values.
+    species: the partial sum of the other intervals is not a supply,
+    and the wall refusal stays. Its computed debit still reserves the
+    parent oxide. A sibling with a complete integral is still returned.
+    Species order does not change the values.
 
     A species absent from every contributing interval is not given a
     fabricated zero. Ledger resolution is not applied here. Booking
@@ -3318,9 +3502,7 @@ def _optimizer_refused_flux_bounds(
         )
     totals = {species: 0.0 for species in refused_species}
     observed: set[str] = set()
-    withheld: set[str] = set()
     bound_counts = {species: 0 for species in refused_species}
-    inventory_capped: set[str] = set()
     # One recorded-pO2 set for the window. The classifier chooses the
     # hour's own value, or the extremum that maximises P. This scan
     # does not read a flux map.
@@ -3330,72 +3512,68 @@ def _optimizer_refused_flux_bounds(
         tuple[Any, tuple[tuple[str, _WallSupplyInterval], ...]]
     ] = []
     for snapshot in window:
-        classified = tuple(
+        classified_window.append(
             (
-                species,
-                _classify_wall_supply_interval(
-                    snapshot,
-                    species,
-                    catalog,
-                    recorded_pO2_bar,
+                snapshot,
+                tuple(
+                    (
+                        species,
+                        _classify_wall_supply_interval(
+                            snapshot,
+                            species,
+                            catalog,
+                            recorded_pO2_bar,
+                        ),
+                    )
+                    for species in refused_species
                 ),
             )
-            for species in refused_species
         )
-        for _species, contribution in classified:
-            if contribution.kind == _WALL_SUPPLY_UNAVAILABLE:
-                withheld.add(_species)
-        classified_window.append((snapshot, classified))
-    # Computed draws are reserved once for the window, then refused
-    # bounds spend only the remainder. A withheld species is not part
-    # of that reserve: its partial sum is not a supply.
-    charge_oxide_kg, computed_oxide_kg = _window_parent_oxide_budget(
-        window,
-        catalog,
-        withheld,
-    )
-    booked_oxide_kg: dict[str, float] = {}
-    for snapshot, classified in classified_window:
-        eligible = tuple(
-            (species, contribution)
-            for species, contribution in classified
-            if species not in withheld
-        )
-        capped_kg, capped_species = _inventory_cap_upper_bounds(
-            snapshot,
-            eligible,
-            catalog,
-            booked_oxide_kg,
-            charge_oxide_kg,
-            computed_oxide_kg,
-        )
-        inventory_capped.update(capped_species)
+    allocation = _allocate_parent_oxide_supply(classified_window, catalog)
+    withheld = allocation.withheld
+    for index, (_snapshot, classified) in enumerate(classified_window):
         for species, contribution in classified:
+            if contribution.kind == _WALL_SUPPLY_UNAVAILABLE and (
+                species not in withheld
+            ):
+                raise CoatingFeasibilityReportError(
+                    "unavailable wall supply of "
+                    f"{species!r} was not withheld"
+                )
             if contribution.kind == _WALL_SUPPLY_OUTSIDE:
                 continue
-            if contribution.kind == _WALL_SUPPLY_UNAVAILABLE:
-                continue
-            if species in withheld:
+            if (
+                contribution.kind == _WALL_SUPPLY_UNAVAILABLE
+                or species in withheld
+            ):
                 continue
             if contribution.kind == _WALL_SUPPLY_PHYSICAL_ZERO:
                 observed.add(species)
                 continue
-            if contribution.kind not in (
-                _WALL_SUPPLY_COMPUTED,
-                _WALL_SUPPLY_UPPER_BOUND,
-            ):
+            if contribution.kind == _WALL_SUPPLY_COMPUTED:
+                if contribution.rate_kg_hr is None:
+                    raise CoatingFeasibilityReportError(
+                        "computed wall supply of "
+                        f"{species!r} is missing its rate"
+                    )
+                duration_h = _snapshot_duration_h(_snapshot)
+                totals[species] += float(contribution.rate_kg_hr) * duration_h
+                observed.add(species)
+                continue
+            if contribution.kind != _WALL_SUPPLY_UPPER_BOUND:
                 raise CoatingFeasibilityReportError(
                     "wall-supply interval classifier returned "
                     f"{contribution.kind!r} for {species!r}"
                 )
-            if species in capped_kg:
-                totals[species] += capped_kg[species]
-            else:
-                duration_h = _snapshot_duration_h(snapshot)
-                totals[species] += float(contribution.rate_kg_hr) * duration_h
+            try:
+                totals[species] += allocation.upper_bound_kg[index][species]
+            except KeyError as exc:
+                raise CoatingFeasibilityReportError(
+                    "refused supply of "
+                    f"{species!r} was not allocated against its parent oxide"
+                ) from exc
             observed.add(species)
-            if contribution.kind == _WALL_SUPPLY_UPPER_BOUND:
-                bound_counts[species] += 1
+            bound_counts[species] += 1
     masses = {
         species: float(totals[species] / campaigns_elapsed)
         for species in refused_species
@@ -3404,7 +3582,8 @@ def _optimizer_refused_flux_bounds(
     return _WallSupplyIntegral(
         masses,
         bound_counts,
-        {species: True for species in inventory_capped},
+        {species: True for species in allocation.inventory_capped},
+        allocation.unavailable,
     )
 
 
