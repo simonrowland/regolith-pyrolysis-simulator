@@ -888,16 +888,43 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             for account, products in products_by_account.items()
             if products
         }
+        diagnostic_legs_by_account: dict[str, list[dict[str, Any]]] = {}
+        for leg_index, raw_leg in enumerate(booking.get("reaction_legs") or ()):
+            if not isinstance(raw_leg, Mapping):
+                continue
+            account = str(raw_leg.get("account") or "")
+            if (
+                str(raw_leg.get("surface") or "") != "wall"
+                or account not in products_by_account
+            ):
+                continue
+            diagnostic_legs_by_account.setdefault(account, []).append({
+                "booking_leg_index": leg_index,
+                "reaction_id": raw_leg.get("reaction_id"),
+                "surface": raw_leg.get("surface"),
+                "stage_key": raw_leg.get("stage_key"),
+                "account": raw_leg.get("account"),
+                "vapour_mol": raw_leg.get("vapour_mol"),
+                "notices": tuple(raw_leg.get("notices") or ()),
+            })
+        diagnostics_by_account = {}
+        for account in products_by_account:
+            reaction_legs = tuple(diagnostic_legs_by_account.get(account, ()))
+            notices = tuple(dict.fromkeys(
+                notice
+                for leg in reaction_legs
+                for notice in leg["notices"]
+            ))
+            diagnostics_by_account[account] = {
+                "mechanism": "wall_saturation_winner",
+                "status": "wall_reaction_booking",
+                "notices": notices,
+                "reaction_legs": reaction_legs,
+            }
         return {
             "product_mol_by_account": products_by_account,
             "substrate_debit_mol_by_account": {},
-            "diagnostics_by_account": {
-                account: {
-                    "mechanism": "wall_saturation_winner",
-                    "status": "wall_reaction_booking",
-                }
-                for account in products_by_account
-            },
+            "diagnostics_by_account": diagnostics_by_account,
             "alkali_state_by_account": {},
         }
 
