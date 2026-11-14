@@ -200,10 +200,13 @@ class OffgasFO2:
     #: CH4-bearing and CO-free (organics_pyrolysis emits H2/CH4/H2O/CO2/N2/
     #: H2S/COS with CO forced to zero).
     unmodelled_species_mol: dict[str, float] = field(default_factory=dict)
+    #: Full CEA-vs-JANAF post-WGS log fO2 spread, in dex. None when no second
+    #: equilibrium-constant source was supplied or WGS did not run.
+    uncertainty_band_dex: float | None = None
     notes: tuple[str, ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
-        return {
+        result = {
             "schema": self.schema,
             "status": self.status,
             "coupling": self.coupling,
@@ -220,6 +223,9 @@ class OffgasFO2:
             "unmodelled_species_mol": dict(self.unmodelled_species_mol),
             "notes": list(self.notes),
         }
+        if self.uncertainty_band_dex is not None:
+            result["uncertainty_band_dex"] = self.uncertainty_band_dex
+        return result
 
 
 @dataclass(frozen=True)
@@ -658,6 +664,42 @@ def _couple_log10_fO2(ratio: float, log10_K: float) -> float:
     return 2.0 * (math.log10(ratio) - log10_K)
 
 
+def _log10_K_from_formation_gibbs_J_per_mol(
+    stoichiometry: tuple[tuple[str, float], ...],
+    formation_gibbs_J_per_mol: Mapping[str, float],
+    T_K: float,
+    gas_constant_J_per_mol_K: float,
+) -> float:
+    """Resolve log10(K) from products-positive reaction Gibbs energies."""
+
+    T = _coerce_T_K(T_K)
+    try:
+        gas_constant = float(gas_constant_J_per_mol_K)
+        delta_g = sum(
+            coefficient * float(formation_gibbs_J_per_mol[formula])
+            for formula, coefficient in stoichiometry
+        )
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        raise OffgasFO2Unavailable(
+            "reaction Gibbs energies and gas constant must be available"
+        ) from exc
+    if (
+        not math.isfinite(gas_constant)
+        or gas_constant <= 0.0
+        or not math.isfinite(delta_g)
+    ):
+        raise OffgasFO2Unavailable(
+            "reaction Gibbs energies and gas constant must be finite and positive"
+        )
+
+    # Premise: JANAF provides formation Gibbs energies and stoichiometric
+    # coefficients are positive for products, negative for reactants, so their
+    # sum is reaction ΔG°. Algebra: log10(K) = -ΔG°/(R T ln(10)). ΔG° and RT
+    # are both J/mol; ln(10) is dimensionless, leaving dimensionless log10(K).
+    # Sanity limit: ΔG°=0 gives K=1 and log10(K)=0.
+    return -delta_g / (gas_constant * T * math.log(10.0))
+
+
 def _direct_gas_couple_fo2(
     species_mol: Mapping[str, float],
     relative_precision: Mapping[str, float],
@@ -718,13 +760,15 @@ def _direct_gas_couple_fo2(
     thermo_spread: float | None = None
     if formation_gibbs_J_per_mol is not None and gas_constant_J_per_mol_K:
         if all(name in formation_gibbs_J_per_mol for name in (oxidised, reduced, "O2")):
-            delta_g = (
-                float(formation_gibbs_J_per_mol[oxidised])
-                - float(formation_gibbs_J_per_mol[reduced])
-                - 0.5 * float(formation_gibbs_J_per_mol["O2"])
-            )
-            janaf_log10_K = -delta_g / (
-                float(gas_constant_J_per_mol_K) * T * math.log(10.0)
+            janaf_log10_K = _log10_K_from_formation_gibbs_J_per_mol(
+                (
+                    (oxidised, 1.0),
+                    (reduced, -1.0),
+                    ("O2", -0.5),
+                ),
+                formation_gibbs_J_per_mol,
+                T,
+                gas_constant_J_per_mol_K,
             )
             janaf_log10_fO2 = _couple_log10_fO2(
                 oxidised_mol / reduced_mol, janaf_log10_K
@@ -940,10 +984,55 @@ def shift_extent(
     return min(max(inside[0], lower), upper)
 
 
+def _equilibrated_wgs_prediction(
+    n_CO: float,
+    n_H2O: float,
+    n_CO2: float,
+    n_H2: float,
+    log10_K_co: float,
+    log10_K_h2: float,
+) -> tuple[float, float, dict[str, float], float]:
+    """Return one source's WGS K, extent, equilibrated moles, and fO2."""
+
+    log10_K_wgs = log10_K_co - log10_K_h2
+    extent = shift_extent(
+        n_CO, n_H2O, n_CO2, n_H2, 10.0**log10_K_wgs
+    )
+    equilibrated = {
+        "CO": n_CO - extent,
+        "H2O": n_H2O - extent,
+        "CO2": n_CO2 + extent,
+        "H2": n_H2 + extent,
+    }
+    log10_fO2_h2 = (
+        _couple_log10_fO2(
+            equilibrated["H2O"] / equilibrated["H2"], log10_K_h2
+        )
+        if equilibrated["H2"] > 0.0 and equilibrated["H2O"] > 0.0
+        else None
+    )
+    log10_fO2_co = (
+        _couple_log10_fO2(
+            equilibrated["CO2"] / equilibrated["CO"], log10_K_co
+        )
+        if equilibrated["CO"] > 0.0 and equilibrated["CO2"] > 0.0
+        else None
+    )
+    value = log10_fO2_h2 if log10_fO2_h2 is not None else log10_fO2_co
+    if value is None:
+        raise OffgasFO2Unavailable(
+            "water-gas-shift equilibration left no complete couple; refusing"
+        )
+    return log10_K_wgs, extent, equilibrated, value
+
+
 def imposed_fo2(
     species_mol: Mapping[str, float],
     T_K: float,
     polynomials: Mapping[str, NasaCeaPolynomial] | None = None,
+    *,
+    janaf_formation_gibbs_J_per_mol: Mapping[str, float] | None = None,
+    janaf_gas_constant_J_per_mol_K: float | None = None,
 ) -> OffgasFO2:
     """The single fO2 an offgas imposes at ``T_K``, after shift equilibration.
 
@@ -951,6 +1040,13 @@ def imposed_fo2(
     a gas of pure H2 with no oxidised partner imposes an unboundedly low fO2, and
     there is no honest finite number to return.
     """
+
+    if (janaf_formation_gibbs_J_per_mol is None) != (
+        janaf_gas_constant_J_per_mol_K is None
+    ):
+        raise OffgasFO2Unavailable(
+            "JANAF WGS comparison needs both formation Gibbs energies and gas constant"
+        )
 
     polys = polynomials if polynomials is not None else load_buffer_polynomials()
     # Normalise the temperature ONCE, here, and use this value everywhere below.
@@ -1102,8 +1198,58 @@ def imposed_fo2(
             ),
         )
 
-    log10_K_wgs = log10_K("CO") - log10_K("H2")
-    K_wgs = 10.0 ** log10_K_wgs
+    log10_K_co = log10_K("CO")
+    log10_K_h2 = log10_K("H2")
+    log10_K_wgs, extent, eq, value = _equilibrated_wgs_prediction(
+        n_CO,
+        n_H2O,
+        n_CO2,
+        n_H2,
+        log10_K_co,
+        log10_K_h2,
+    )
+
+    uncertainty_band_dex: float | None = None
+    if janaf_formation_gibbs_J_per_mol is not None:
+        required_species = ("CO", "CO2", "H2", "H2O", "O2")
+        missing_species = tuple(
+            formula
+            for formula in required_species
+            if formula not in janaf_formation_gibbs_J_per_mol
+        )
+        if missing_species:
+            raise OffgasFO2Unavailable(
+                "JANAF WGS comparison lacks formation Gibbs energies for "
+                + ", ".join(missing_species)
+            )
+        assert janaf_gas_constant_J_per_mol_K is not None
+        janaf_log10_K_co = _log10_K_from_formation_gibbs_J_per_mol(
+            (("CO2", 1.0), ("CO", -1.0), ("O2", -0.5)),
+            janaf_formation_gibbs_J_per_mol,
+            T_K,
+            janaf_gas_constant_J_per_mol_K,
+        )
+        janaf_log10_K_h2 = _log10_K_from_formation_gibbs_J_per_mol(
+            (("H2O", 1.0), ("H2", -1.0), ("O2", -0.5)),
+            janaf_formation_gibbs_J_per_mol,
+            T_K,
+            janaf_gas_constant_J_per_mol_K,
+        )
+        _, _, _, janaf_value = _equilibrated_wgs_prediction(
+            n_CO,
+            n_H2O,
+            n_CO2,
+            n_H2,
+            janaf_log10_K_co,
+            janaf_log10_K_h2,
+        )
+        # Premise: CEA remains the central value, while JANAF is a second
+        # equilibrium-constant source with its own WGS extent. Algebra:
+        # δ=|log10(fO2_CEA)-log10(fO2_JANAF)|, so CEA±δ encloses both source
+        # predictions. Both terms are log10(fO2/bar), hence their difference
+        # is a dimensionless dex band. Sanity limit: identical source
+        # predictions give δ=0; this is source spread, not kinetic uncertainty.
+        uncertainty_band_dex = abs(value - janaf_value)
 
     log10_Q_over_K: float | None = None
     disagreement: float | None = None
@@ -1112,24 +1258,6 @@ def imposed_fo2(
         log10_Q_over_K = log10_Q - log10_K_wgs
         if raw_h2 is not None and raw_co is not None:
             disagreement = raw_co - raw_h2
-
-    extent = shift_extent(n_CO, n_H2O, n_CO2, n_H2, K_wgs)
-    eq = {
-        "CO": n_CO - extent,
-        "H2O": n_H2O - extent,
-        "CO2": n_CO2 + extent,
-        "H2": n_H2 + extent,
-    }
-
-    eq_h2 = fo2_h2(eq["H2"], eq["H2O"])
-    eq_co = fo2_co(eq["CO"], eq["CO2"])
-    # Prefer whichever couple is well-conditioned after the shift; they agree by
-    # construction, so this is a numerical choice and not a physical one.
-    value = eq_h2 if eq_h2 is not None else eq_co
-    if value is None:
-        raise OffgasFO2Unavailable(
-            "water-gas-shift equilibration left no complete couple; refusing"
-        )
 
     # Placeholder; computed below once the equilibrated value exists.
     strain: float | None = None
@@ -1191,6 +1319,7 @@ def imposed_fo2(
         log10_fO2_co_couple_raw=raw_co,
         raw_couple_disagreement_dex=disagreement,
         assumption_strain_dex=strain,
+        uncertainty_band_dex=uncertainty_band_dex,
         equilibrium_assumption_verified=False,
         equilibrated_mol=eq,
         unmodelled_species_mol=unmodelled,

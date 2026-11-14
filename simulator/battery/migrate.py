@@ -19941,10 +19941,10 @@ def _row_printed_atmospheres(
     return tuple(experiment_atmospheres)
 
 
-def _printed_direct_gas_couple(
+def _printed_sccm_gas_mixture(
     as_printed: str,
 ) -> tuple[dict[str, Decimal], dict[str, float]] | None:
-    """Parse a two-species SCCM couple and its last-digit relative precision."""
+    """Parse a printed SCCM gas mixture and component last-digit precision."""
 
     normalized = as_printed.replace("₂", "2").replace("₀", "0")
     pieces = normalized.split("+")
@@ -19971,20 +19971,39 @@ def _printed_direct_gas_couple(
             _last_printed_digit(fraction) / fraction
             + _last_printed_digit(flow) / flow
         )
-    if set(species_mol) not in ({"CO2", "CO"}, {"H2O", "H2"}):
+    if len(species_mol) < 2:
         return None
     return species_mol, relative_precision
+
+
+def _janaf_gas_formation_inputs(
+    formulas: Sequence[str], temperature_K: Decimal
+) -> tuple[dict[str, float], float]:
+    """Read the requested JANAF gas records through their existing owner."""
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        _janaf_gas_formation_gibbs_J_per_mol,
+    )
+
+    gibbs = {
+        formula: float(
+            _janaf_gas_formation_gibbs_J_per_mol(formula, temperature_K)
+        )
+        for formula in formulas
+    }
+    return gibbs, float(JANAF_R_J_PER_MOL_K)
 
 
 def _is_wgs_dependent_gas_mix(as_printed: str) -> bool:
     normalized = as_printed.replace("₂", "2").replace("₀", "0").upper()
     compact = re.sub(r"\s+", "", normalized)
     species = set(re.findall(r"CO2|H2O|CO|H2", compact))
+    carries_carbon = bool(species & {"CO", "CO2"})
+    carries_hydrogen = bool(species & {"H2", "H2O"})
     return (
         "WGS" in compact
-        or {"CO2", "H2"}.issubset(species)
-        or {"CO", "H2O"}.issubset(species)
-        or {"CO", "CO2", "H2", "H2O"}.issubset(species)
+        or (carries_carbon and carries_hydrogen)
     )
 
 
@@ -20043,26 +20062,130 @@ def _bare_log_frame_decision(
     tolerance = max(_last_printed_digit(log10_fO2), Decimal("0.01"))
     checked: list[tuple[str, Decimal, Decimal]] = []
     unsupported: list[str] = []
+
+    def checked_gas_mix_decision(
+        atmosphere: str,
+        expected: Decimal,
+        owner_band: Decimal,
+        band_text: str,
+        authority: Authority,
+        notices: tuple[PrintedOxygenNotice, ...] = (),
+    ) -> PrintedOxygenDecision | None:
+        checked.append((atmosphere, expected, owner_band))
+        if abs(log10_fO2 - expected) > tolerance + owner_band:
+            return None
+        reason = (
+            "bare fO2 frame matched printed atmosphere "
+            f"{atmosphere!r}; expected CEA log10(fO2/bar)="
+            f"{_display_fo2_dex(expected)}; {band_text}"
+        )
+        return PrintedOxygenDecision(
+            "log",
+            State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)),
+            notice_reason=reason,
+            notice_kind=NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE,
+            notice_band=band_text,
+            notice_authority=authority,
+            notices=notices,
+        )
+
     for atmosphere in candidates:
         kind = _atmosphere_kind(atmosphere)
         if kind is None:
-            parsed_couple = _printed_direct_gas_couple(atmosphere)
-            if parsed_couple is not None and temperature_K is not None:
-                species_mol, relative_precision = parsed_couple
-                formation_gibbs: dict[str, Decimal] | None = {}
-                thermo_missing_reason = ""
-                try:
-                    from simulator.battery.generators.janaf import (
-                        JANAF_R_J_PER_MOL_K,
-                        _janaf_gas_formation_gibbs_J_per_mol,
-                    )
-
-                    for formula in (*species_mol, "O2"):
-                        formation_gibbs[formula] = (
-                            _janaf_gas_formation_gibbs_J_per_mol(
-                                formula, temperature_K
+            parsed_mix = _printed_sccm_gas_mixture(atmosphere)
+            if parsed_mix is not None and temperature_K is not None:
+                species_mol, relative_precision = parsed_mix
+                if _is_wgs_dependent_gas_mix(atmosphere):
+                    formation_gibbs: dict[str, float] | None = None
+                    thermo_missing_reason = ""
+                    try:
+                        formation_gibbs, janaf_gas_constant = (
+                            _janaf_gas_formation_inputs(
+                                ("CO", "CO2", "H2", "H2O", "O2"),
+                                temperature_K,
                             )
                         )
+                    except (
+                        FileNotFoundError,
+                        OSError,
+                        KeyError,
+                        TypeError,
+                        ValueError,
+                    ) as exc:
+                        thermo_missing_reason = str(exc)
+                    if formation_gibbs is None:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
+                            "JANAF WGS data missing"
+                            + (
+                                f" ({thermo_missing_reason})"
+                                if thermo_missing_reason
+                                else ""
+                            )
+                            + ")"
+                        )
+                        continue
+                    from simulator.chemistry.offgas_fo2 import (
+                        OffgasFO2Unavailable,
+                        imposed_fo2,
+                        load_buffer_polynomials,
+                    )
+                    try:
+                        resolution = imposed_fo2(
+                            {
+                                name: float(amount)
+                                for name, amount in species_mol.items()
+                            },
+                            float(temperature_K),
+                            load_buffer_polynomials(),
+                            janaf_formation_gibbs_J_per_mol=formation_gibbs,
+                            janaf_gas_constant_J_per_mol_K=janaf_gas_constant,
+                        )
+                    except (
+                        ArithmeticError,
+                        OffgasFO2Unavailable,
+                        TypeError,
+                        ValueError,
+                    ) as exc:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: {exc})"
+                        )
+                        continue
+                    if resolution.uncertainty_band_dex is None:
+                        unsupported.append(
+                            f"{atmosphere!r} (gas_mix_fo2_band_unavailable: "
+                            "WGS source spread is unsized)"
+                        )
+                        continue
+                    expected = Decimal(str(resolution.log10_fO2))
+                    wgs_band = Decimal(str(resolution.uncertainty_band_dex))
+                    band_text = (
+                        f"tolerance={_dec_str(tolerance)} dex; "
+                        f"wgs_uncertainty_band={_dec_str(wgs_band)} dex; "
+                        f"combined_allowance={_dec_str(tolerance + wgs_band)} dex"
+                    )
+                    decision = checked_gas_mix_decision(
+                        atmosphere,
+                        expected,
+                        wgs_band,
+                        band_text,
+                        Authority.CERTIFIED,
+                    )
+                    if decision is not None:
+                        return decision
+                    continue
+
+                if set(species_mol) not in ({"CO2", "CO"}, {"H2O", "H2"}):
+                    unsupported.append(atmosphere)
+                    continue
+                formation_gibbs: dict[str, float] | None = None
+                thermo_missing_reason = ""
+                try:
+                    formation_gibbs, janaf_gas_constant = (
+                        _janaf_gas_formation_inputs(
+                            (*species_mol, "O2"), temperature_K
+                        )
+                    )
                 except (
                     FileNotFoundError,
                     OSError,
@@ -20070,7 +20193,6 @@ def _bare_log_frame_decision(
                     TypeError,
                     ValueError,
                 ) as exc:
-                    formation_gibbs = None
                     thermo_missing_reason = str(exc)
                 from simulator.chemistry.offgas_fo2 import (
                     OffgasFO2Unavailable,
@@ -20082,16 +20204,9 @@ def _bare_log_frame_decision(
                         {name: float(amount) for name, amount in species_mol.items()},
                         relative_precision,
                         float(temperature_K),
-                        formation_gibbs_J_per_mol=(
-                            {
-                                name: float(value)
-                                for name, value in formation_gibbs.items()
-                            }
-                            if formation_gibbs is not None
-                            else None
-                        ),
+                        formation_gibbs_J_per_mol=formation_gibbs,
                         gas_constant_J_per_mol_K=(
-                            float(JANAF_R_J_PER_MOL_K)
+                            janaf_gas_constant
                             if formation_gibbs is not None
                             else None
                         ),
@@ -20108,7 +20223,6 @@ def _bare_log_frame_decision(
                     continue
                 expected = Decimal(str(resolution.log10_fO2))
                 gas_band = Decimal(str(resolution.band_dex))
-                checked.append((atmosphere, expected, gas_band))
                 authority = (
                     Authority.EXTRAPOLATED
                     if resolution.authority == "extrapolated"
@@ -20124,42 +20238,37 @@ def _bare_log_frame_decision(
                     f"mix_precision={resolution.mix_precision_band_dex:.4f} dex; "
                     f"thermo_spread={spread}; combined_band={_dec_str(gas_band)} dex"
                 )
-                if abs(log10_fO2 - expected) <= tolerance + gas_band:
-                    reason = (
-                        "bare fO2 frame matched printed atmosphere "
-                        f"{atmosphere!r}; expected CEA log10(fO2/bar)="
-                        f"{_display_fo2_dex(expected)}; {band_text}"
-                    )
-                    notices = (
-                        (
-                            PrintedOxygenNotice(
-                                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                                reason=(
-                                    "gas_couple_thermo_spread_unsized: JANAF "
-                                    "species data are unavailable; using the "
-                                    "printed-flow mix band alone"
-                                    + (
-                                        f" ({thermo_missing_reason})"
-                                        if thermo_missing_reason
-                                        else ""
-                                    )
-                                ),
-                                band=band_text,
-                                authority=authority,
+                notices = (
+                    (
+                        PrintedOxygenNotice(
+                            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                            reason=(
+                                "gas_couple_thermo_spread_unsized: JANAF "
+                                "species data are unavailable; using the "
+                                "printed-flow mix band alone"
+                                + (
+                                    f" ({thermo_missing_reason})"
+                                    if thermo_missing_reason
+                                    else ""
+                                )
                             ),
-                        )
-                        if resolution.thermo_spread_dex is None
-                        else ()
+                            band=band_text,
+                            authority=authority,
+                        ),
                     )
-                    return PrintedOxygenDecision(
-                        "log",
-                        State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)),
-                        notice_reason=reason,
-                        notice_kind=NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE,
-                        notice_band=band_text,
-                        notice_authority=authority,
-                        notices=notices,
-                    )
+                    if resolution.thermo_spread_dex is None
+                    else ()
+                )
+                decision = checked_gas_mix_decision(
+                    atmosphere,
+                    expected,
+                    gas_band,
+                    band_text,
+                    authority,
+                    notices,
+                )
+                if decision is not None:
+                    return decision
                 continue
             if _is_wgs_dependent_gas_mix(atmosphere):
                 unsupported.append(
@@ -27671,6 +27780,7 @@ class Migrator:
         # Residue fO2 is the printed-only promotion above. The generic
         # decision covers every other quantity, including a derived ratio
         # copied from the row point.
+        oxygen_applied = False
         if (
             q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             and oxygen_state is not None
@@ -27678,6 +27788,7 @@ class Migrator:
                 admission, row_point_conditions
             )
         ):
+            oxygen_applied = True
             ident_kwargs["fO2_Pa"] = oxygen_state
         identity_for_profile = (
             Identity(
@@ -29212,7 +29323,6 @@ class Migrator:
             q_token, ident_kwargs.get("subtype")
         )
         coord = None
-        val = None
         trail = "identity"
         extra_unc = None
         extra_unc_k: int | None = None
@@ -29550,7 +29660,6 @@ class Migrator:
                         "duplicate_of_observation_id"
                     ],
                 }
-            val = value_sel.amount
             trail = value_sel.unit_trail
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
@@ -32132,7 +32241,7 @@ class Migrator:
         count = self._count(rel)
         try:
             doc = load_json(path) if path.suffix == ".json" else load_yaml(path)
-        except (OSError, json.JSONDecodeError, yaml.YAMLError) as exc:
+        except (OSError, json.JSONDecodeError, yaml.YAMLError):
             count.metadata_in += 1
             return
         if not isinstance(doc, Mapping):
