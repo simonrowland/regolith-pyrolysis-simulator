@@ -418,9 +418,6 @@ def _register_direct_flagged_continuations(
         for item in delta
         if item.get("law_id")
     }
-    registered_species = {
-        law_id.split(":", 1)[0] for law_id in registered_law_ids
-    }
     executions: list[tuple[Any, Any]] = []
     for class_name, diagnostic_key in PUBLISHED_EXTRAPOLATION_CLASSES:
         records = published_extrapolation_maps[diagnostic_key]
@@ -430,7 +427,7 @@ def _register_direct_flagged_continuations(
                     vapor_pressures=vapor_pressures,
                     vapor_pressure_provenance=vapor_pressure_provenance,
                     temperature_records=records,
-                    registered_species=registered_species,
+                    registered_law_ids=registered_law_ids,
                     executed_compiled_laws=executed_compiled_laws,
                     public_carrier_notices=public_carrier_notices,
                 )
@@ -535,7 +532,7 @@ def _temperature_band_executions(
     vapor_pressures: Mapping[str, float],
     vapor_pressure_provenance: Mapping[str, Mapping[str, Any]],
     temperature_records: Mapping[str, Any],
-    registered_species: set[str],
+    registered_law_ids: set[str],
     executed_compiled_laws: Mapping[str, Any],
     public_carrier_notices,
 ) -> list[tuple[Any, Any]]:
@@ -543,8 +540,19 @@ def _temperature_band_executions(
 
     executions: list[tuple[Any, Any]] = []
     covered: set[str] = set()
+
+    def already_registered(species: str) -> bool:
+        evaluator = executed_compiled_laws.get(species)
+        if evaluator is None:
+            law_id = f"{species}:antoine"
+        else:
+            law_species = str(getattr(evaluator, "species_id", "") or species)
+            family = str(getattr(evaluator, "evaluator_family", "") or "")
+            law_id = f"{law_species}:{family}" if family else law_species
+        return law_id in registered_law_ids
+
     for species in vapor_pressures:
-        if species in registered_species:
+        if already_registered(str(species)):
             continue
         provenance = vapor_pressure_provenance.get(species) or {}
         extrapolated = [
@@ -564,7 +572,7 @@ def _temperature_band_executions(
         )
         covered.add(str(species))
     for species, notice in temperature_records.items():
-        if species not in vapor_pressures or species in registered_species:
+        if species not in vapor_pressures or already_registered(str(species)):
             continue
         if species in covered or not isinstance(notice, Mapping):
             continue

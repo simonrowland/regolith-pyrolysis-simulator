@@ -2508,23 +2508,51 @@ def _probe_session(*, use_fe: bool):
     return session
 
 
-def test_session_registry_reaches_every_publisher(monkeypatch) -> None:
-    """Fe through the bare-float helper shows on every public output.
+def test_disclosure_survives_every_publication_point(
+    monkeypatch, tmp_path: Path
+) -> None:
+    """Exercise every named publisher through its real production entry point.
 
     The law is executed only by ``effective_equilibrium_pressure_Pa``. Each
-    arm calls a real entry point. A session that does not execute the law
-    publishes no disclosure.
+    run-level arm calls a real entry point; the battery arms use the real
+    scoring and catalog prediction paths. A session that does not execute the
+    law publishes no disclosure.
     """
 
     import json
     import sys
     import types
+    from decimal import Decimal
     from types import SimpleNamespace
 
+    from simulator.battery.enums import (
+        Engine,
+        EvidenceClass,
+        MethodToken,
+        Phase,
+        Polymorph,
+        Quantity,
+    )
+    from simulator.battery.records import (
+        Apparatus,
+        ApparatusGeometry,
+        Identity,
+        Species,
+        State,
+    )
+    from simulator.battery.score import (
+        ScoreContext,
+        compile_residual,
+        predict_with_engine,
+        residual_to_plain,
+    )
     from simulator.run_executor import RunExecutor
     from simulator.runner import RunnerError, _runner_failure_result
     from simulator.session import SimSession
     from simulator.session_cli import SessionScriptRunner
+    from tests.battery import factories as F
+
+    publications: dict[str, tuple[dict, ...]] = {}
 
     monkeypatch.setattr(
         SimSession,
@@ -2596,6 +2624,9 @@ def test_session_registry_reaches_every_publisher(monkeypatch) -> None:
         law_id=_FE_ASSOCIATION_LAW_ID,
         count=1,
     )
+    publications["runner report"] = tuple(
+        dict(item) for item in payload["run_metadata"]["law_disclosures"]
+    )
     _assert_fe_disclosure(
         payload["per_hour_summary"][0]["law_disclosures"][0],
         law_id=_FE_ASSOCIATION_LAW_ID,
@@ -2627,6 +2658,9 @@ def test_session_registry_reaches_every_publisher(monkeypatch) -> None:
         dict(ranked.law_disclosures[0]),
         law_id=_FE_ASSOCIATION_LAW_ID,
         count=1,
+    )
+    publications["optimizer ranking"] = tuple(
+        dict(item) for item in ranked.law_disclosures
     )
     _assert_fe_disclosure(
         executor.session.law_disclosures[0],
@@ -2733,6 +2767,146 @@ def test_session_registry_reaches_every_publisher(monkeypatch) -> None:
         law_id=_FE_ASSOCIATION_LAW_ID,
         count=evaluations["n"],
     )
+
+    score_experiment = F.tabulation_experiment(
+        experiment_id="disclosure-probe",
+        work_id="disclosure-score-work",
+        method=MethodToken.LANGMUIR_FREE_EVAPORATION,
+        T_K=Decimal("1800"),
+    )
+    score_experiment = replace(
+        score_experiment,
+        apparatus=Apparatus(
+            geometry=ApparatusGeometry(
+                exposed_area_m2=F.located(Decimal("1e-4"))
+            )
+        ),
+    )
+    score_identity = Identity(
+        quantity=Quantity.MASS_LOSS_FRACTION,
+        species=Species("Fe", Phase.G),
+        temperature_K=State.of(Decimal("1800")),
+    )
+    score_observation = F.observation(
+        "disclosure-score-reference",
+        score_experiment.experiment_id,
+        score_identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="scoring-disclosure-probe",
+    )
+    work = F.work(score_experiment.work_id or "disclosure-score-work")
+    score_context = ScoreContext(
+        works={work.work_id: work},
+        experiments={score_experiment.experiment_id: score_experiment},
+        observations={score_observation.observation_id: score_observation},
+        extract_review={score_observation.source_id: "reviewed"},
+        hostname="test",
+    )
+    before_scoring = evaluations["n"]
+    score_prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        score_observation,
+        experiment=experiment,
+    )
+    scored, scored_candidate = compile_residual(
+        score_observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=score_context,
+        prediction=score_prediction,
+    )
+    assert scored_candidate is not None
+    score_row = residual_to_plain(scored, scored_candidate)
+    score_provenance = score_row["candidate_observation"]["provenance"]
+    score_disclosures = score_provenance["law_disclosures"]
+    scoring_count = evaluations["n"] - before_scoring
+    _assert_fe_disclosure(
+        score_disclosures[0],
+        law_id=_FE_ASSOCIATION_LAW_ID,
+        count=scoring_count,
+    )
+    publications["battery score row"] = tuple(
+        dict(item) for item in score_disclosures
+    )
+
+    catalog_experiment = F.tabulation_experiment(
+        experiment_id="catalog-disclosure-probe",
+        work_id="catalog-disclosure-work",
+        T_K=Decimal("300"),
+    )
+    catalog_identity = F.psat_identity(
+        "H2O", T_K=Decimal("300"), reservoir_phase=Phase.CR
+    )
+    catalog_identity = replace(
+        catalog_identity,
+        reservoir=State.of(Species(
+            "H2O", Phase.CR, polymorph=State.of(Polymorph.I)
+        )),
+    )
+    catalog_observation = F.observation(
+        "catalog-disclosure-reference",
+        catalog_experiment.experiment_id,
+        catalog_identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="catalog-disclosure-probe",
+    )
+    catalog_prediction = predict_with_engine(
+        Engine.CATALOG_EVALUATOR,
+        catalog_observation,
+        experiment=catalog_experiment,
+    )
+    catalog_disclosures = tuple(
+        dict(item) for item in catalog_prediction.law_disclosures
+    )
+    assert len(catalog_disclosures) == 1
+    assert catalog_disclosures[0]["law_id"].startswith("H2O:")
+    assert catalog_disclosures[0]["authority"] == "extrapolated"
+    publications["catalog engine row"] = catalog_disclosures
+
+    cache_spec = _base_spec(campaign="publication-cache-replay")
+    with disclosure_scope(inherit=False):
+        with computation_disclosure() as computation:
+            _fe_pressure("FeO_association_gas")
+            cached_disclosures = computation.snapshot()
+    cache_store = ResultStore(
+        tmp_path / "publication-cache.sqlite",
+        current_code_version=cache_spec.code_version,
+        current_data_digests=cache_spec.data_digests,
+    )
+    cache_store.store(
+        cache_spec,
+        replace(_scored(cache_spec), law_disclosures=cached_disclosures),
+        created_at="2026-11-14T00:00:00Z",
+    )
+    with disclosure_scope(inherit=False) as replay_run:
+        replayed = cache_store.lookup(cache_spec)
+        assert replayed is not None
+        replayed_run = replay_run.snapshot()
+    _assert_fe_disclosure(
+        replayed.law_disclosures[0], law_id=_FE_ASSOCIATION_LAW_ID, count=1
+    )
+    _assert_fe_disclosure(
+        replayed_run[0], law_id=_FE_ASSOCIATION_LAW_ID, count=1
+    )
+    publications["cache replay"] = tuple(
+        dict(item) for item in replayed.law_disclosures
+    )
+
+    expected_publication_points = {
+        "battery score row",
+        "catalog engine row",
+        "runner report",
+        "cache replay",
+        "optimizer ranking",
+    }
+    assert set(publications) == expected_publication_points
+    for point in expected_publication_points - {"catalog engine row"}:
+        rows = publications[point]
+        assert len(rows) == 1, point
+        _assert_fe_disclosure(
+            rows[0], law_id=_FE_ASSOCIATION_LAW_ID, count=rows[0]["evaluation_count"]
+        )
 
 
 def _memo_host(calls: list[str]):
@@ -5711,6 +5885,13 @@ def test_every_published_extrapolation_class_is_disclosed(
     assert any(item["law_id"] == "Fe:nasa_cea_9" for item in snapshot)
     assert any(item["law_id"] == "Fe:ellingham" for item in snapshot)
     law_ids = {item["law_id"] for item in snapshot}
+    fe_association = [
+        item for item in snapshot if item["law_id"] == _FE_ASSOCIATION_LAW_ID
+    ]
+    assert len(fe_association) == 1
+    _assert_fe_disclosure(
+        fe_association[0], law_id=_FE_ASSOCIATION_LAW_ID, count=2
+    )
     assert "Mg:ellingham" in law_ids
     assert "Mg2:nasa_cea_9" in law_ids
     assert "Ca:ellingham" in law_ids

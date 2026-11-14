@@ -587,6 +587,7 @@ class EnginePrediction:
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
     version: str | None = None
+    law_disclosures: tuple[Mapping[str, object], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -11715,6 +11716,15 @@ def _predict_mass_loss_with_residue(
         or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
     ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
+    law_disclosures_raw = result.engine_metadata.get("law_disclosures")
+    law_disclosures: tuple[Mapping[str, object], ...] = ()
+    if law_disclosures_raw is not None:
+        decoded_disclosures = json.loads(law_disclosures_raw)
+        if not isinstance(decoded_disclosures, list) or any(
+            not isinstance(item, Mapping) for item in decoded_disclosures
+        ):
+            raise ValueError("residue engine metadata law_disclosures is malformed")
+        law_disclosures = tuple(dict(item) for item in decoded_disclosures)
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -11729,6 +11739,7 @@ def _predict_mass_loss_with_residue(
         coefficient_sources=(*sources, *json.loads(result.engine_metadata.get("alpha_sources", "[]"))),
         lineage_complete=False,
         identity=identity,
+        law_disclosures=law_disclosures,
         version=(
             "method_class=calculated_residue_integrator; "
             "sourced_alpha; bounded_unsourced_channels_and_preheat; self_similar_printed_area"
@@ -12413,6 +12424,7 @@ def _catalog_prediction(
     certified_band: Mapping[str, tuple[Decimal, Decimal]] | None = None,
     call_evidence: str | None = None,
     version: str | None = None,
+    law_disclosures: tuple[Mapping[str, object], ...] = (),
 ) -> EnginePrediction:
     return EnginePrediction(
         engine=Engine.CATALOG_EVALUATOR,
@@ -12429,6 +12441,7 @@ def _catalog_prediction(
         refusal_detail=dict(detail or {}),
         identity=identity,
         version=version,
+        law_disclosures=law_disclosures,
     )
 
 
@@ -12825,12 +12838,25 @@ def _catalog_evaluated_prediction(
         )
     from simulator.vapour_rail.catalog import CatalogCompileError
 
+    from simulator.vapour_rail.run_disclosure import (
+        active_registry,
+        computation_disclosure,
+        disclosure_scope,
+    )
+
+    evaluation_scope = (
+        computation_disclosure()
+        if active_registry() is not None
+        else disclosure_scope(inherit=False)
+    )
     try:
-        evaluation = evaluator.evaluate(
-            float(temperature),
-            source_activity=source_activity,
-            pO2_bar=pO2_bar,
-        )
+        with evaluation_scope as registry:
+            evaluation = evaluator.evaluate(
+                float(temperature),
+                source_activity=source_activity,
+                pO2_bar=pO2_bar,
+            )
+            law_disclosures = registry.snapshot()
         value = Decimal(str(evaluation.pressure_pa))
     except (CatalogCompileError, InvalidOperation, OverflowError, ValueError) as exc:
         return _catalog_refuse(
@@ -12886,6 +12912,7 @@ def _catalog_evaluated_prediction(
         certified_band=certified_band,
         call_evidence=f"catalog_evaluator:{row.species_id}",
         version=evaluator.evaluator_family or None,
+        law_disclosures=law_disclosures,
     )
 
 
@@ -15260,6 +15287,12 @@ def candidate_observation(
             "physics_rung": selected_oxygen[2],
             "route": selected_oxygen[3],
         }
+    if prediction.law_disclosures:
+        if provenance is None:
+            provenance = {}
+        provenance["law_disclosures"] = [
+            dict(item) for item in prediction.law_disclosures
+        ]
     return Observation(
         observation_id=f"engine:{prediction.engine.value}:{reference.observation_id}",
         experiment_id=reference.experiment_id,
