@@ -1609,7 +1609,7 @@ def test_transport_saturation_uses_full_inlet_when_residual_is_nearly_captured()
     sim.melt.campaign = CampaignPhase.C2A
     sim.melt.campaign_hour = 0.0
     sim.overhead = gas
-    sim.campaign_mgr.get_temp_target = lambda *_args: (1600.0, 100.0)
+    sim.campaign_mgr.get_temp_target = lambda *_args, dt_hr=1.0: (1600.0, 100.0)
     sim._update_temperature()
 
     assert sim._last_actual_ramp == pytest.approx(50.0)

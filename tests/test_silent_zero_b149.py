@@ -477,6 +477,7 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
         }
     }
     sim = SimpleNamespace(
+        _step_dt_hr=1.0,
         melt=SimpleNamespace(
             campaign=CampaignPhase.C7_CA_ALUMINOTHERMIC,
             campaign_hour=0,

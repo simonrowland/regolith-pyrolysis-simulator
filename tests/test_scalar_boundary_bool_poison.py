@@ -356,7 +356,7 @@ def _intent_request(**changes: Any) -> IntentRequest:
 def _dummy_sio_sim() -> SimpleNamespace:
     manager = SimpleNamespace(
         overrides={},
-        get_temp_target=lambda campaign, campaign_hour, melt: (1000.0, 5.0),
+        get_temp_target=lambda campaign, campaign_hour, melt, *, dt_hr=1.0: (1000.0, 5.0),
         _clamp_to_furnace_max=lambda value: value,
     )
     sim = SimpleNamespace(

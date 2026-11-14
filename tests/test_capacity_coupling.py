@@ -1654,6 +1654,7 @@ def test_loop3_renders_live_binding_cause(
         capacity=FiniteCapacity(oxygen_capacity),
     )
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim.melt = SimpleNamespace(
         temperature_C=1500.0,
         campaign=CampaignPhase.C2A,
@@ -1665,7 +1666,7 @@ def test_loop3_renders_live_binding_cause(
         turbine_limited=False,
     )
     sim.campaign_mgr = SimpleNamespace(
-        get_temp_target=lambda *_args: (1600.0, 100.0)
+        get_temp_target=lambda *_args, dt_hr=1.0: (1600.0, 100.0)
     )
 
     sim._update_temperature()

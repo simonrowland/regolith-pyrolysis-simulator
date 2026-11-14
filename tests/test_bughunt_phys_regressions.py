@@ -100,6 +100,7 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
             return self._transitions
 
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -217,6 +218,7 @@ def test_terminal_refusal_restores_incremental_accounting_prefixes() -> None:
         return SimpleNamespace(debits=(debit,), credits=(credit,))
 
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -464,6 +466,7 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     backing = {"nested": [{"value": 1}]}
     proxy = MappingProxyType(backing)
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -570,6 +573,7 @@ def _terminal_refusal_writer_sim() -> PyrolysisSimulator:
             return self._transitions
 
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(
@@ -699,6 +703,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
     registry_before = registry.capability_summary()
 
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -760,6 +765,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_authority(
     assert registry_before == {}
 
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -817,6 +823,7 @@ def test_terminal_refusal_rolls_back_metal_phase_authority() -> None:
     assert registry_before == {}
 
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -866,6 +873,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
     intent = ChemistryIntent.GATE_LIQUID_FRACTION
     registry = ProviderRegistry()
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -973,6 +981,7 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     )
     committed = HistoricalSnapshot()
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -1014,6 +1023,7 @@ def _refusal_step_sim() -> PyrolysisSimulator:
             return self._transitions
 
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -1138,6 +1148,7 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
         composition_wt_pct={"FeO": 80.0, "SiO2": 20.0},
     )
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -1201,6 +1212,7 @@ def _refusal_step_sim() -> PyrolysisSimulator:
             return self._transitions
 
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
@@ -1832,6 +1844,7 @@ def test_authoritative_headspace_pressure_refuses_missing_projection(
 
 def test_c6_acquisition_timeout_ends_as_transport_bound_refusal() -> None:
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim.campaign_mgr = CampaignManager({
         "campaigns": {
             "C6": {
@@ -1933,8 +1946,9 @@ def test_qualified_continuous_negative_margin_is_priced_not_constrained(gate: st
 
 def test_first_snapshot_volatile_throttle_ignores_downstream_partials() -> None:
     sim = object.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim.campaign_mgr = SimpleNamespace(
-        get_temp_target=lambda *_args: (100.0, 10.0)
+        get_temp_target=lambda *_args, dt_hr=1.0: (100.0, 10.0)
     )
     sim.melt = SimpleNamespace(
         campaign=CampaignPhase.C0,

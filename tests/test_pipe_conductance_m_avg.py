@@ -965,12 +965,13 @@ def test_loop3_vacuum_overcapacity_exceeds_100_and_throttles_ramp():
     assert gas.evap_exceeds_transport is True
 
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim.melt = melt
     sim.melt.campaign = CampaignPhase.C2A
     sim.melt.campaign_hour = 0.0
     sim.overhead = gas
     sim.campaign_mgr = SimpleNamespace(
-        get_temp_target=lambda *_args: (1600.0, 100.0)
+        get_temp_target=lambda *_args, dt_hr=1.0: (1600.0, 100.0)
     )
     sim._update_temperature()
 

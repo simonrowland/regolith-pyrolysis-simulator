@@ -10797,6 +10797,7 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
     helper = _vaporock_helper_returning({'SiO': 0.4})
     backend._vaporock_helper = helper
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim.backend = backend
     sim.melt = types.SimpleNamespace(
         body='moon', ambient_pressure_mbar=0.0,

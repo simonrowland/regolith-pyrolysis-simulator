@@ -809,6 +809,7 @@ def test_refused_activity_holds_only_local_certified_gamma(
             / (561.522380 - 106.0723021)
         )
         sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+        sim._step_dt_hr = 1.0
         sim.species_formula_registry = {}
         sim.vapor_pressures = provider._vapor_pressure_data
         parent_mass = (
@@ -2859,6 +2860,7 @@ def test_projection_over_one_percent_refuses_and_provider_solves_projected(
     assert fallback_provenance["SiO"]["projected_composition_solve"] == notice
     assert fallback_provenance["SiO"]["melt_activity_authority"] == "projected_composition_solve"
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._step_dt_hr = 1.0
     sim.melt = SimpleNamespace(hour=1, campaign=CampaignPhase.C2A)
     sim._note_high_t_melt_activity_fallback(high_t, fallback_provenance)
     run_notice = sim.high_t_melt_activity_run_notice()
