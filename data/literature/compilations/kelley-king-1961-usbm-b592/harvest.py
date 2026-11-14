@@ -21,12 +21,14 @@ from simulator.reference_data.kelley_king_1961_usbm_b592_loader import (
     _table6_line_wrap_groups,
 )
 from tools.harvest_atct_compilation import feedstock_coverage
+from simulator.corpus_paths import regolith_corpus_root
 
 
 SOURCE_ID = "kelley-king-1961-usbm-b592"
 ROOT = Path(__file__).resolve().parent
-CORPUS_RAW = Path("/Users/simonrowland/Repos/regolith-corpus/raw") / SOURCE_ID
-MINERU_ROOT = Path("/Users/simonrowland/Repos/regolith-corpus/text") / SOURCE_ID / "mineru"
+CORPUS = regolith_corpus_root()
+CORPUS_RAW = CORPUS / "raw" / SOURCE_ID
+MINERU_ROOT = CORPUS / "text" / SOURCE_ID / "mineru"
 PDF = CORPUS_RAW / f"{SOURCE_ID}.pdf"
 ACCESS_DATE = "2026-09-08"
 EXPECTED_BLOCKS = 25

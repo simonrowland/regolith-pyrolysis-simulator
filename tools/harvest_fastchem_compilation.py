@@ -33,6 +33,7 @@ from tools.compilation_harvest_io import (  # noqa: E402
     sha256_bytes,
     write_json,
 )
+from simulator.corpus_paths import regolith_corpus_root  # noqa: E402
 from simulator.reference_data.fastchem import (  # noqa: E402
     COMPILATION_ROLE,
     COMPILATION_SOURCE,
@@ -62,9 +63,16 @@ from simulator.reference_data.fastchem import (  # noqa: E402
 )
 
 # Seated corpus copy; pass --corpus, or set REGOLITH_CORPUS_RAW to the corpus raw/ directory.
-CORPUS = Path(os.environ.get("REGOLITH_CORPUS_RAW", "~/Repos/regolith-corpus/raw")).expanduser() / (
-    "fastchem-v3-1-3-gas-condensate-coefficients"
-)
+def default_corpus() -> Path:
+    corpus_raw = os.environ.get("REGOLITH_CORPUS_RAW")
+    raw_root = (
+        Path(corpus_raw).expanduser()
+        if corpus_raw is not None
+        else regolith_corpus_root() / "raw"
+    )
+    return raw_root / "fastchem-v3-1-3-gas-condensate-coefficients"
+
+
 SIDE_FILES = (
     "README.TXT",
     "SOURCE.md",
@@ -223,7 +231,7 @@ def main() -> int:
     records_dir = output_root / "records"
     source_dir.mkdir(parents=True, exist_ok=True)
     records_dir.mkdir(parents=True, exist_ok=True)
-    corpus = args.corpus or CORPUS
+    corpus = args.corpus or default_corpus()
 
     gas_src = resolve_existing(
         [path for path in (args.gas, corpus / GAS_SOURCE_NAME, source_dir / GAS_SOURCE_NAME) if path],

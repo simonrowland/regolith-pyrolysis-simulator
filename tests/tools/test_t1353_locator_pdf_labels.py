@@ -125,14 +125,19 @@ def _changed_extract_paths():
     return TOUCHED_EXTRACTS
 
 
-def _pdf_path(source_id, corpus_source_id):
+def _pdf_path(source_id, corpus_source_id, locator=None):
     for sid in dict.fromkeys((source_id, corpus_source_id)):
         if not sid:
             continue
+        filenames = [f"{sid}.pdf"]
+        # Bischof's audit quotes Table S1 from the named supplement.
+        if sid == "kems-137-bischof-2023" and locator and locator.get("table") == "S1":
+            filenames.insert(0, f"{sid}-mmc1.pdf")
         for root in CORPUS_ROOTS:
-            candidate = root / sid / f"{sid}.pdf"
-            if candidate.is_file():
-                return candidate
+            for filename in filenames:
+                candidate = root / sid / filename
+                if candidate.is_file():
+                    return candidate
     return None
 
 
@@ -661,18 +666,19 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
             if not ("page" in locator and "pdf_page_index" in locator):
                 continue
             label = f"{next(k for k in ('table', 'figure') if k in locator)} {locator[next(k for k in ('table', 'figure') if k in locator)]}"
-            if pdf is None:
+            locator_pdf = _pdf_path(current.get("source_id"), current.get("source", {}).get("corpus_source_id"), locator)
+            if locator_pdf is None:
                 skipped += 1
                 continue
             page_number = int(locator["pdf_page_index"]) + 1
-            text = _page_text(str(pdf), page_number)
+            text = _page_text(str(locator_pdf), page_number)
             if not _has_page_text(text):
                 skipped += 1
                 continue
             caption_page = locator.get("table_caption_page")
             if locator.get("table_continued") is True:
                 caption_page = page_number - 1
-            caption_text = _page_text(str(pdf), caption_page) if caption_page is not None else None
+            caption_text = _page_text(str(locator_pdf), caption_page) if caption_page is not None else None
             printed_values = tuple(_observation_values(current, locator_path))
             try:
                 _assert_label_and_data(
@@ -1065,6 +1071,22 @@ def test_zigo_equation_and_prose_locators_bind_to_their_physical_pages():
     assert re.search(r"\(\s*7\s*\)", page9) and "172.1" in page9
     assert re.search(r"\(\s*[8S]\s*\)", page9) and re.search(r"9\s*2\s*4", page9)
     assert "1857" in page10 and "1866" in page10
+    derivation_pins = (
+        ("zigo_1987_fusion_enthalpy_at_1863K", 9, 8, 179, "7"),
+        ("zigo_1987_fusion_entropy_at_1863K", 9, 8, 179, "8"),
+        ("zigo_1987_fusion_temperature_sensitivity", 10, 9, 180, None),
+    )
+    for observation_id, page, index, folio, equation in derivation_pins:
+        locator = observations[observation_id]["values"]["derivation"]["locator"]
+        assert (locator["page"], locator["pdf_page_index"], locator["published_page"]) == (
+            page,
+            index,
+            folio,
+        )
+        if equation is not None:
+            assert locator["equation"] == equation
+    assert re.search(r"\(1987\)\s+179", page9)
+    assert re.search(r"\(1987\)\s+180", page10)
 
 
 def test_figure_caption_regex_handles_spacing_and_japanese_suffix():

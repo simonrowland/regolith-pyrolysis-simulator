@@ -15,7 +15,12 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import QUANTITY_UNITS, Phase, Quantity
+from simulator.battery.enums import (
+    QUANTITY_UNITS,
+    Phase,
+    Quantity,
+    ReferenceStateConvention,
+)
 from simulator.battery.generators import janaf as generator
 from simulator.battery.migrate import iter_observation_store_paths
 from tests.battery import compilation_shard_observation_count
@@ -2108,3 +2113,31 @@ def test_janaf_raw_table_gate_skips_without_private_corpus(tmp_path, monkeypatch
     assert not (mod.RAW_FIXTURES / "Ba-001.txt").is_file()
     with pytest.raises(pytest.skip.Exception):
         mod._require_raw_table("Ba-001")
+
+
+def test_liquid_element_reference_uses_janaf_and_flags_the_cp_tail() -> None:
+    assert (
+        ReferenceStateConvention.CONDENSED_ELEMENT_REFERENCE.value
+        == "condensed_element_reference"
+    )
+    magnesium = generator.janaf_liquid_element_reference_at_temperature(
+        "Mg", Decimal("2000")
+    )
+    assert magnesium.table_id == "Mg-003"
+    assert magnesium.delta_fG_kJ_per_mol == Decimal("57.596")
+    assert magnesium.extrapolation_interval_K is None
+
+    extrapolated = generator.janaf_liquid_element_reference_at_temperature(
+        "Mg", Decimal("2173")
+    )
+    assert extrapolated.extrapolation_interval_K == (
+        Decimal("1900"),
+        Decimal("2000"),
+    )
+    assert abs(extrapolated.delta_fG_kJ_per_mol - Decimal("72.80")) < Decimal("0.01")
+    assert abs(
+        generator.janaf_condensed_element_gas_delta_fG_kJ_per_mol(
+            "Mg", Decimal("2173")
+        )
+        + Decimal("72.80")
+    ) < Decimal("0.01")

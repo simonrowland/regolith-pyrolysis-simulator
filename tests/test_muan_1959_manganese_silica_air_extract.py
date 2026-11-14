@@ -11,6 +11,15 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Phase, PhaseRole, Quantity, ValueKind
+from simulator.battery.identity import Identity
+from simulator.battery.migrate import (
+    _point_condition_from_plain,
+    _point_pressure_for_identity,
+    _pressure_locator_is_unprinted,
+    _printed_source_point_condition_pressure,
+    _without_unprinted_total_pressure,
+)
+from simulator.battery.records import Located, State
 from tests.battery.factories import migrate_one_extract
 
 
@@ -177,8 +186,13 @@ def test_muan_typed_rows_migrate_with_species_phase_temperature_and_conditions()
         assert row.identity.temperature_K.value == Decimal(values["T_C"]) + Decimal("273.15")
         assert row.identity.fO2_Pa.is_value
         assert row.identity.fO2_Pa.value == Decimal("21278.25")
+        assert row.identity.total_pressure_Pa.is_unknown
+        assert "inferred" in row.identity.total_pressure_Pa.reason
         assert row.point_conditions["pO2_Pa"].state.value == Decimal("21278.25")
         assert row.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
+        assert row.point_conditions["total_pressure_Pa"].inference is not None
+        assert row.point_conditions["total_pressure_Pa"].inference.relation == "extract_inference"
+        assert "inferred=true" in row.point_conditions["total_pressure_Pa"].inference.inputs
         assert row.point_conditions["gas_mix"].state.value == "air"
         assert row.point_conditions["temperature_K"].state.value == row.identity.temperature_K.value
         assert row.experiment_id in migrator.result.experiments
@@ -220,3 +234,138 @@ def test_muan_typed_rows_migrate_with_species_phase_temperature_and_conditions()
     }
     assert figure_records["muan1959_fig2_braunite_solid_solution"]["values"]["series"][0]["marker_count"] == 3
     assert figure_records["muan1959_fig1_phase_relations"]["values"]["series"][-1]["marker_count"] == 11
+
+
+def test_unprinted_pressure_guard_uses_source_provenance() -> None:
+    inferred = _point_condition_from_plain(
+        {
+            "state": {"tag": "value", "value": "101325"},
+            "inferred": True,
+            "inference": "air at 1 atm",
+        },
+        key="total_pressure_Pa",
+    )
+    parsed_unlocated = _point_condition_from_plain(
+        {"state": {"tag": "value", "value": "101325"}},
+        key="total_pressure_Pa",
+    )
+    unlocated = Located(State.of(Decimal("101325")))
+
+    assert _without_unprinted_total_pressure({"total_pressure_Pa": inferred}) == {
+        "total_pressure_Pa": inferred
+    }
+    assert _printed_source_point_condition_pressure(inferred) is None
+    assert parsed_unlocated.inference is None
+    assert _printed_source_point_condition_pressure(parsed_unlocated) is None
+    assert _without_unprinted_total_pressure(
+        {"total_pressure_Pa": parsed_unlocated}
+    ) is None
+    assert _printed_source_point_condition_pressure(unlocated) is None
+    assert _without_unprinted_total_pressure({"total_pressure_Pa": unlocated}) is None
+
+
+def test_located_approximate_print_stays_off_identity_and_calibration() -> None:
+    """A located approximate print stays off identity.
+
+    Identity.total_pressure_Pa cannot carry the approximate flag, so the
+    axis is absent. Calibration readers refuse the same print. Inferred,
+    locatorless, and bound pressures stay off identity. Absence is not
+    replaced by a default. An exact located point still maps.
+    """
+
+    approximate = _point_condition_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "point",
+                    "point": "0.0001",
+                    "approximate": True,
+                },
+            },
+            "locator": {"page": 8, "note": "About 10^-6 mbar"},
+        },
+        key="total_pressure_Pa",
+    )
+    identity = Identity(quantity=State.of(Quantity.VISCOSITY), species=None)
+    assert (
+        _point_pressure_for_identity(identity, {"total_pressure_Pa": approximate})
+        is None
+    )
+    assert _printed_source_point_condition_pressure(approximate) is None
+
+    exact = _point_condition_from_plain(
+        {
+            "state": {"tag": "value", "value": "101325"},
+            "locator": {"page": 8, "note": "1 atm"},
+        },
+        key="total_pressure_Pa",
+    )
+    mapped = _point_pressure_for_identity(identity, {"total_pressure_Pa": exact})
+    assert mapped is not None and mapped.is_value
+    assert mapped.value == Decimal("101325")
+
+    inferred = _point_condition_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "point",
+                    "point": "0.0001",
+                    "approximate": True,
+                },
+            },
+            "locator": {"page": 8},
+            "inferred": True,
+            "inference": "assumed vacuum",
+        },
+        key="total_pressure_Pa",
+    )
+    assert (
+        _point_pressure_for_identity(identity, {"total_pressure_Pa": inferred})
+        is None
+    )
+
+    bound = _point_condition_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "bound",
+                    "bound_operator": "<",
+                    "bound_value": "0.0001",
+                },
+            },
+            "locator": {"page": 74},
+        },
+        key="total_pressure_Pa",
+    )
+    assert _point_pressure_for_identity(identity, {"total_pressure_Pa": bound}) is None
+
+    locatorless = _point_condition_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "kind": "point",
+                    "point": "0.0001",
+                    "approximate": True,
+                },
+            },
+        },
+        key="total_pressure_Pa",
+    )
+    assert (
+        _point_pressure_for_identity(identity, {"total_pressure_Pa": locatorless})
+        is None
+    )
+    assert _point_pressure_for_identity(identity, {}) is None
+
+
+def test_pressure_locator_note_negation_is_not_an_inference() -> None:
+    assert not _pressure_locator_is_unprinted(
+        {"note": "not an inferred sample-cell pressure"}
+    )
+    assert _pressure_locator_is_unprinted(
+        {"note": "total pressure was not printed"}
+    )

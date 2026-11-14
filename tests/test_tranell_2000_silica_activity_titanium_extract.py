@@ -401,12 +401,15 @@ def test_rendered_tables_bind_every_cell_and_migrate_conditions() -> None:
         assert row.point_conditions is not None
         conditions = row.point_conditions
         assert conditions["temperature_K"].state.is_value
-        assert conditions["composition"].state.is_unknown
         # The paper gives gas ratios and oxygen potential, not total reaction-gas pressure.
         if row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
-            # This datum type preserves its explicit unknown point condition.
+            # Unknown starting composition is retained in the source extract,
+            # but omitted from each liquid child because composition is the
+            # measured quantity. The isolated migration has 238 such cells.
+            assert "composition" not in conditions
             assert conditions["total_pressure_Pa"].state.is_unknown
         else:
+            assert conditions["composition"].state.is_unknown
             assert "total_pressure_Pa" not in conditions
         assert conditions["fO2_Pa"].state.is_value
         if row.identity.quantity.value in {Quantity.ACTIVITY, Quantity.VALENCE_RATIO}:

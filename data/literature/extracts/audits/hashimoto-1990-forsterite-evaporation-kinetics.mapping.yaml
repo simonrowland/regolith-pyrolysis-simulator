@@ -1,0 +1,28 @@
+source_id: hashimoto-1990-forsterite-evaporation-kinetics
+citation: >-
+  Hashimoto, A. (1990). Evaporation kinetics of forsterite and implications for
+  the early solar nebula. Nature 347, 53–55. doi:10.1038/347053a0
+machine_reads:
+  primary: MinerU markdown and content list for PDF pages 1–3
+  independent_check: Tesseract English OCR, 300 dpi, page segmentation mode 6
+  text_layer: empty
+table_draft:
+  printed_tables: 0
+  mineru_tables: 0
+  qa_digit_agreement: not_applicable
+  qa_flags: 0
+  conversion: no table columns to map
+prose_mapping:
+  - source: p. 53
+    target: MgO solid alpha; Jv/Je definition; printed Celsius interval
+  - source: p. 54
+    target: solid and liquid SiO2 alpha; prior effusion alpha attribution; printed Celsius intervals
+  - source: p. 55
+    target: alternate SiO2 coefficients; forsterite coefficients and extrapolations; residue composition
+figure_mapping:
+  - source: Fig. 1a, p. 54
+    target: SiO2 figure-only series labels; no plotted coordinates extracted
+  - source: Fig. 1b, p. 54
+    target: MgO figure-only series labels; no plotted coordinates extracted
+  - source: Fig. 1c, p. 54
+    target: forsterite figure-only series labels; no plotted coordinates extracted

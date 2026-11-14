@@ -145,6 +145,27 @@ def knudsen_effusion_molar_flux(
     return delta_p / denominator
 
 
+def knudsen_effusion_relative_weight(
+    pressure: float,
+    molar_mass: float,
+    coefficient: float = 1.0,
+) -> float:
+    """Relative effusion weight after ``sqrt(2*pi*R*T)`` cancels.
+
+    Premise: species compared at one temperature share ``sqrt(2*pi*R*T)``,
+    so their Knudsen rates stand in the ratio ``p/sqrt(M)``. A dimensionless
+    stoichiometric count multiplies the pressure before the division.
+    Algebra: ``coefficient * pressure / sqrt(molar_mass)``. The default
+    count is 1, and multiplication by 1 leaves the pressure bits unchanged,
+    so the bare weight is ``pressure / sqrt(molar_mass)``.
+    Unit check: pressure over square-root mass is not a molar flux. The
+    absolute flux remains :func:`knudsen_effusion_molar_flux`.
+    Sanity: ``2.5e-4 / sqrt(0.055845)`` is the hex ``0x1.1552ff5ce3623p-10``.
+    """
+
+    return coefficient * pressure / math.sqrt(molar_mass)
+
+
 def langmuir_molar_flux(
     T_surface_K: float,
     p_eq_pa: float,
@@ -486,6 +507,7 @@ __all__ = (
     "hertz_knudsen_k_kg_s_m2_pa",
     "knudsen_effusion_flux",
     "knudsen_effusion_molar_flux",
+    "knudsen_effusion_relative_weight",
     "langmuir_flux",
     "langmuir_molar_flux",
     "pseudo_antoine_p_eq_pa",

@@ -29,10 +29,6 @@ from simulator.chemistry.kernel import (
     BACKEND_STATUS_PRECEDENCE,
     select_backend_status,
 )
-from simulator.chemistry.graphite_c_co import (
-    _CCO_EQUATION,
-    cco_log10_fO2_bar,
-)
 from simulator.scalar_boundary import finite_float
 
 _OXIDE_SET = frozenset(OXIDE_SPECIES)
@@ -430,7 +426,7 @@ WARN_TIER_ANALYTICAL_MODELS: dict[str, dict[str, Any]] = {
                 "citation": "Brooker et al. 2014; Sephton et al. 2004 DOI 10.1016/j.gca.2003.08.019",
             },
             "cco_buffer": {
-                "equation": _CCO_EQUATION,
+                "equation": "simulator.oxygen_buffers.cco_log10_fO2_bar at 1 bar",
                 "valid_range_K": (1273.15, 1873.15),
                 "error": "CCO reference only; EMOG/EMOD graphite-saturation bounds stay interval-only",
                 "citation": "Jakobsson & Oskarsson 1994 DOI 10.1016/0016-7037(94)90442-1; Stagno & Frost 2010 EPSL 300:72-84",
@@ -779,6 +775,7 @@ def _evaluate_analytical_forms(
     forms: Mapping[str, Any],
     *,
     T_K: float | None,
+    cco_reference_log10_fO2_bar: float | None = None,
 ) -> dict[str, Any]:
     if T_K is None:
         return {}
@@ -842,14 +839,12 @@ def _evaluate_analytical_forms(
         }
 
     cco = forms.get("cco_buffer")
-    if isinstance(cco, Mapping):
-        # Keep this as an explicit diagnostic evaluation of the stored formula;
-        # the stored point is evaluated at its documented 1 bar reference.
-        log10_fO2 = cco_log10_fO2_bar(temperature, 1.0)
+    if isinstance(cco, Mapping) and cco_reference_log10_fO2_bar is not None:
+        # The high-level caller evaluates the shared owner at its 1 bar reference.
         evaluations["cco_buffer"] = {
             "T_K": temperature,
             "pressure_bar": 1.0,
-            "log10_fO2_bar": log10_fO2,
+            "log10_fO2_bar": float(cco_reference_log10_fO2_bar),
             "inside_valid_range": _inside_range(
                 temperature,
                 cco.get("valid_range_K"),
@@ -925,6 +920,7 @@ def _analytical_model_metadata(
     species: str,
     *,
     T_K: float | None = None,
+    cco_reference_log10_fO2_bar: float | None = None,
 ) -> dict[str, Any]:
     model = WARN_TIER_ANALYTICAL_MODELS.get(row_key)
     if model is None:
@@ -942,7 +938,11 @@ def _analytical_model_metadata(
         "speciation": deepcopy(model["speciation"]),
         "forms": selected_forms,
     }
-    evaluations = _evaluate_analytical_forms(selected_forms, T_K=T_K)
+    evaluations = _evaluate_analytical_forms(
+        selected_forms,
+        T_K=T_K,
+        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
+    )
     if evaluations:
         metadata["evaluated_at_T_K"] = evaluations
     return metadata
@@ -952,13 +952,19 @@ def warn_tier_analytical_diagnostic(
     species: str,
     *,
     T_K: float | None = None,
+    cco_reference_log10_fO2_bar: float | None = None,
 ) -> dict[str, Any] | None:
     """Return the internal-analytical WARN-tier model for a residual species."""
     matched = _match_effect_row(species)
     if matched is None:
         return None
     row_key, _row = matched
-    return _analytical_model_metadata(row_key, species, T_K=T_K)
+    return _analytical_model_metadata(
+        row_key,
+        species,
+        T_K=T_K,
+        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
+    )
 
 
 def _engine_coverage_absent_warning(
@@ -1191,6 +1197,7 @@ def _compute_property_perturbation(
     T_in_C: float,
     melts_result: Mapping[str, Any] | Any | None,
     engine: str,
+    cco_reference_log10_fO2_bar: float | None = None,
 ) -> PropertyPerturbation | None:
     mode = str(prop_cfg.get("mode", ""))
     grounded = bool(prop_cfg.get("grounded", False))
@@ -1199,6 +1206,7 @@ def _compute_property_perturbation(
         row_key,
         species,
         T_K=float(T_in_C) + 273.15,
+        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
     )
 
     if mode == "phase_topology_presence":
@@ -1404,6 +1412,7 @@ def melt_effect_adjustment(
     *,
     T_in_C: float,
     cleaned_oxide_wt_pct: Mapping[str, float] | None = None,
+    cco_reference_log10_fO2_bar: float | None = None,
 ) -> MeltEffectAdjustmentResult:
     """Per-residual analytical correction with separate raw vs adjusted fields."""
     perturbations: list[PropertyPerturbation] = []
@@ -1460,6 +1469,7 @@ def melt_effect_adjustment(
                 T_in_C=T_in_C,
                 melts_result=melts_result,
                 engine=engine,
+                cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
             )
             if pert is None:
                 continue
@@ -1720,6 +1730,7 @@ def evaluate_verdict_a_timeline(
     timeline: tuple[Any, ...],
     confounding_threshold_pct: float = 0.01,
     cleaned_oxide_wt_pct: Mapping[str, float] | None = None,
+    cco_reference_log10_fO2_bar: float | None = None,
 ) -> VerdictAResult:
     """Step-resolved WARN-only flags; clears when bakeoff drops residual."""
     hourly = _estimate_hourly_residuals(final_residual_wt_pct, timeline)
@@ -1735,6 +1746,7 @@ def evaluate_verdict_a_timeline(
             engine,
             T_in_C=T_in_C,
             cleaned_oxide_wt_pct=cleaned_oxide_wt_pct,
+            cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
         )
         flags = evaluate_verdict_a(
             adjustment.perturbations,
@@ -1988,6 +2000,7 @@ def build_harness_verdicts(
     engine: str,
     timeline: tuple[Any, ...],
     T_in_C: float,
+    cco_reference_log10_fO2_bar: float | None = None,
 ) -> dict[str, Any]:
     """Assemble verdict (a) + verdict (b) for Stage0HarnessResult."""
     residual_wt = residual_wt_pct_by_species(cleaned_melt_kg)
@@ -2018,6 +2031,7 @@ def build_harness_verdicts(
         engine,
         T_in_C=T_in_C,
         cleaned_oxide_wt_pct=strip_result.oxide_wt_pct,
+        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
     )
     verdict_a = evaluate_verdict_a_timeline(
         residual_wt,
@@ -2026,6 +2040,7 @@ def build_harness_verdicts(
         T_in_C=T_in_C,
         timeline=timeline,
         cleaned_oxide_wt_pct=strip_result.oxide_wt_pct,
+        cco_reference_log10_fO2_bar=cco_reference_log10_fO2_bar,
     )
 
     latest_status = str(

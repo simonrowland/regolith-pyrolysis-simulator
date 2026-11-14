@@ -237,3 +237,201 @@ def strict_bool(value: Any) -> bool:
         if normalized in {"false", "0"}:
             return False
     return False
+
+
+# Certifying evidence classes that name a real engine. internal-datatables is
+# a class-level certificate with no engine adapter, so it is not in this set.
+REAL_ENGINE_EVIDENCE_CLASSES = frozenset({"melts", "magemin"})
+# Versions the adapters write when they did not obtain a producer identity.
+# MeltBackend.get_engine_version returns 'unavailable'; some call sites use
+# 'unknown'. Neither is evidence that the named engine produced the row.
+_PRODUCER_STAMP_SENTINELS = frozenset({"", "unavailable", "unknown"})
+_STAMP_NEST_KEYS = ("diagnostics", "backend_diagnostics")
+_STAMP_HOUR_KEYS = ("per_hour", "hours")
+
+
+def producer_stamp_is_sentinel(version: str) -> bool:
+    return version.strip().lower() in _PRODUCER_STAMP_SENTINELS
+
+
+def real_engine_producer_stamp_rejections(
+    trust: ResultTrustCarriers,
+    *,
+    evidence_class: str | None,
+    claimed_backend: str | None,
+) -> tuple[str, ...]:
+    """Refuse a certifying real-engine claim that is not bound to a producer stamp.
+
+    The stamp is the pair the engine adapter writes on one mapping:
+    ``backend_name`` plus a non-sentinel ``engine_version``. A matching pair
+    of caller-supplied authority fields is not that stamp. This is not a
+    signature; a caller who forges both fields still matches the adapter shape.
+    """
+    if evidence_class not in REAL_ENGINE_EVIDENCE_CLASSES:
+        return ()
+    stamps = _producer_stamp_records_from_carriers(trust.carriers)
+    if not stamps:
+        return ("real_engine_producer_stamp_missing",)
+    non_sentinel = [
+        (backend, version)
+        for backend, version in stamps
+        if not producer_stamp_is_sentinel(version)
+    ]
+    if not non_sentinel:
+        return ("real_engine_producer_stamp_unbound",)
+    claimed = (
+        canonical_backend_name(claimed_backend) if claimed_backend is not None else None
+    )
+    if claimed is None:
+        return ("real_engine_producer_stamp_unbound",)
+    bound: list[str] = []
+    foreign: list[str] = []
+    for backend, version in non_sentinel:
+        if not backend:
+            continue
+        if canonical_backend_name(backend) == claimed:
+            bound.append(version)
+        else:
+            foreign.append(backend)
+    if bound:
+        distinct = tuple(dict.fromkeys(bound))
+        if len(distinct) == 1:
+            return ()
+        return (
+            "real_engine_producer_stamp_disagreement:"
+            + "|".join(sorted(distinct)),
+        )
+    if foreign:
+        return (
+            "real_engine_producer_stamp_disagreement:"
+            + "|".join(sorted(set(foreign))),
+        )
+    return ("real_engine_producer_stamp_unbound",)
+
+
+def real_producer_stamp_pair(carrier: Any) -> dict[str, str] | None:
+    """The first non-sentinel same-mapping stamp on this carrier, if any."""
+    for backend, version in _producer_stamp_records(carrier):
+        if backend and not producer_stamp_is_sentinel(version):
+            return {"backend_name": backend, "engine_version": version}
+    return None
+
+
+def attach_producer_engine_stamp(
+    payload: dict[str, Any],
+    stamp: Mapping[str, str],
+) -> None:
+    """Record an adapter stamp on ``payload`` without binding a foreign engine.
+
+    The diagnostics pair is always merged. The top-level ``engine_version``
+    is set only when the stamp's backend is the payload's backend, so a
+    version from a different engine is not stored beside the claim name.
+    """
+    backend_name = str(stamp["backend_name"])
+    engine_version = str(stamp["engine_version"])
+    current = payload.get("diagnostics")
+    diagnostics = dict(current) if isinstance(current, Mapping) else {}
+    diagnostics.setdefault("backend_name", backend_name)
+    diagnostics.setdefault("engine_version", engine_version)
+    payload["diagnostics"] = diagnostics
+    claimed = payload.get("backend_name")
+    claimed_name = (
+        canonical_backend_name(str(claimed)) if isinstance(claimed, str) else None
+    )
+    stamp_name = canonical_backend_name(backend_name)
+    if claimed_name is None or stamp_name == claimed_name:
+        if claimed_name is None:
+            payload.setdefault("backend_name", backend_name)
+        payload.setdefault("engine_version", engine_version)
+
+
+def producer_engine_stamp_from_execution(run_execution: Any) -> dict[str, str] | None:
+    """The stamp the adapter wrote, else the live backend's own version call.
+
+    A diagnostics mapping that already carries ``engine_version`` is the
+    adapter's answer, including a sentinel. Do not replace that sentinel by
+    calling ``get_engine_version`` again. The fallback exists for adapters
+    that never write the pair (MAGEMin): one call per trace build, using
+    ``backend.name`` when ``backend_name`` is still the base ``unknown``.
+    """
+    simulator = getattr(run_execution, "simulator", None)
+    diagnostics = getattr(simulator, "_last_backend_diagnostics", None)
+    if isinstance(diagnostics, Mapping) and "engine_version" in diagnostics:
+        return real_producer_stamp_pair(diagnostics)
+    backend = getattr(simulator, "backend", None)
+    if backend is None:
+        return None
+    getter = getattr(backend, "get_engine_version", None)
+    if not callable(getter):
+        return None
+    version = getter()
+    if not isinstance(version, str) or producer_stamp_is_sentinel(version.strip()):
+        return None
+    raw_name = getattr(backend, "backend_name", None)
+    name = raw_name.strip() if isinstance(raw_name, str) else ""
+    if name.lower() in {"", "unknown"}:
+        raw_class_name = getattr(backend, "name", None)
+        name = raw_class_name.strip() if isinstance(raw_class_name, str) else ""
+    if not name or name.lower() == "unknown":
+        return None
+    return {"backend_name": name, "engine_version": version.strip()}
+
+
+def _producer_stamp_records_from_carriers(
+    carriers: tuple[Any, ...],
+) -> tuple[tuple[str | None, str], ...]:
+    records: list[tuple[str | None, str]] = []
+    for carrier in carriers:
+        records.extend(_producer_stamp_records(carrier))
+    return tuple(records)
+
+
+def _producer_stamp_records(carrier: Any) -> tuple[tuple[str | None, str], ...]:
+    """Stamps on this carrier, one level into diagnostics and per-hour entries.
+
+    Nested ``trace`` is not walked. The trace is already its own carrier, and
+    walking it again would let a reference and its trace count as two stamps.
+    """
+    if not isinstance(carrier, Mapping):
+        return ()
+    records: list[tuple[str | None, str]] = []
+    own = _stamp_record(carrier)
+    if own is not None:
+        records.append(own)
+    for key in _STAMP_NEST_KEYS:
+        nested = carrier.get(key)
+        if isinstance(nested, Mapping):
+            nested_record = _stamp_record(nested)
+            if nested_record is not None:
+                records.append(nested_record)
+    for key in _STAMP_HOUR_KEYS:
+        entries = carrier.get(key)
+        if not isinstance(entries, Sequence) or isinstance(entries, (str, bytes)):
+            continue
+        for entry in entries:
+            if not isinstance(entry, Mapping):
+                continue
+            entry_record = _stamp_record(entry)
+            if entry_record is not None:
+                records.append(entry_record)
+            for nest_key in _STAMP_NEST_KEYS:
+                nested = entry.get(nest_key)
+                if isinstance(nested, Mapping):
+                    nested_record = _stamp_record(nested)
+                    if nested_record is not None:
+                        records.append(nested_record)
+    return tuple(records)
+
+
+def _stamp_record(mapping: Mapping[Any, Any]) -> tuple[str | None, str] | None:
+    if "engine_version" not in mapping:
+        return None
+    raw_version = mapping.get("engine_version")
+    version = raw_version.strip() if isinstance(raw_version, str) else ""
+    raw_backend = mapping.get("backend_name")
+    backend = (
+        raw_backend.strip()
+        if isinstance(raw_backend, str) and raw_backend.strip()
+        else None
+    )
+    return (backend, version)

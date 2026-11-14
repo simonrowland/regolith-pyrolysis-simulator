@@ -1,0 +1,911 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2475/ajs.s5-13.74.133
+  citation: J. W. Greig, “Immiscibility in Silicate Melts. Part II,” American Journal of Science, 5th series, 13 (74), 133–154
+    (1927).
+  source_ids:
+  - greig-1927-immiscibility-part2
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:greig-1927-immiscibility-part2
+      role: pdf
+      path: raw/greig-1927-immiscibility-part2/greig-1927-immiscibility-part2.pdf
+      sha256:
+        tag: value
+        value: 2042fca9672b285443cf0631cf18f37dcf34a97fb69aee4435c9ee37b652ca3c
+    - asset_id: pdftotext:greig-1927-immiscibility-part2
+      role: pdftotext
+      path: text/greig-1927-immiscibility-part2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:greig-1927-immiscibility-part2
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2475/ajs.s5-13.74.133
+experiments:
+- experiment_id: 10.2475/ajs.s5-13.74.133::greig-1927-immiscibility-part2
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2475/ajs.s5-13.74.133
+  locator:
+    page: 3
+    published_page: 135
+    pdf_page_index: 2
+    table: VIII
+    note: 'row=A: Fe2O3'
+context:
+- observation_id: greig1927_bleininger_teetor_b2o3_sio2_result_quoted
+  type: quoted_literature_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 138
+    note: Paragraph “Boric oxide-silica”; citation 36.
+  units: Composition values as printed; basis not stated in this sentence.
+  values:
+    method_class: quoted_attributed
+    attribution: Bleininger and Teetor, “Thermal study of boric acid-silica mixtures,” Transactions of the American Ceramic
+      Society, 14, 210–217 (1917), cited as reference 36.
+    composition_range_as_published: pure B2O3 to 28B2O3, 72SiO2
+    result_as_published: Opaque but glassy.
+  context_id: greig-1927-immiscibility-part2::context::greig1927_bleininger_teetor_b2o3_sio2_result_quoted
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_cao_calibration_temperature_restatement
+  type: source_statement_context
+  locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: 146
+    note: Prose repeats the CaO-SiO2 cristobalite + two-liquid point as a temperature-scale calibration point.
+  units: °C
+  values:
+    method_class: measured_direct
+    statement_as_published: The temperature at which mixtures of lime and silica melt to two liquids, 1698° ± 5°, is suggested
+      as such a point.
+    temperature_as_published: 1698° ± 5°
+    same_summary_observation_id: greig1927_cao_cristobalite_two_liquids_transition_1698
+    calibration_mix_as_published: 15CaO, 85SiO2
+  context_id: greig-1927-immiscibility-part2::context::greig1927_cao_calibration_temperature_restatement
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_cao_cristobalite_two_liquids_transition_1698
+  type: phase_equilibrium_run_products
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    row: 1, temperature column
+  units: °C
+  uncertainty:
+    value: '5'
+    units: °C
+    confidence_level: not_stated
+    value_as_published: ±5°
+  values:
+    quantity: transition_temperature
+    value: '1698'
+    method_class: measured_tabulated
+    source_relationship: repeated_from_part_i
+    evidence_class_as_published: repeat of a measured Part I transition observation
+    originating_part_i_observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
+    phase_assemblage_as_printed: cristobalite and two liquids
+  context_id: greig-1927-immiscibility-part2::context::greig1927_cao_cristobalite_two_liquids_transition_1698
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_cao_less_siliceous_cao
+  type: author_derived_composition_context
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    note: Unnumbered inline summary; compositions are printed as weight per cent.
+    row: CaO; less_siliceous liquid; CaO
+  units: wt_percent
+  values:
+    quantity: equilibrium_phase_composition
+    formula: CaO
+    component_amount: '27.5'
+    component_amount_as_published: '27.5'
+    composition_as_printed:
+      CaO: '27.5'
+      SiO2: '72.5'
+    method_class: author_derived
+    extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal
+      determined by the quenches of Table III, the composition of the less siliceous of the two liquids which can coexist
+      in equilibrium with cristobalite is found. In each case the extrapolation is short.
+    method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+    method_source_observation_id: greig1927_less_siliceous_liquid_method
+    method_source_locator_as_printed: Part I physical and published p. 16, section "Immiscibility in the binary systems".
+    source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition
+      as found by extrapolating the liquidus curve.
+    phase_assignment_as_published: less-siliceous liquid
+    system_as_printed: CaO-SiO2
+    limb_as_published: less-siliceous
+    T_C_as_assigned: '1698'
+    temperature_assignment_source_observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
+  context_id: greig-1927-immiscibility-part2::context::greig1927_cao_less_siliceous_cao
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: CaO
+- observation_id: greig1927_cao_less_siliceous_sio2
+  type: author_derived_composition_context
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    note: Unnumbered inline summary; compositions are printed as weight per cent.
+    row: CaO; less_siliceous liquid; SiO2
+  units: wt_percent
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    component_amount: '72.5'
+    component_amount_as_published: '72.5'
+    composition_as_printed:
+      CaO: '27.5'
+      SiO2: '72.5'
+    method_class: author_derived
+    extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal
+      determined by the quenches of Table III, the composition of the less siliceous of the two liquids which can coexist
+      in equilibrium with cristobalite is found. In each case the extrapolation is short.
+    method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+    method_source_observation_id: greig1927_less_siliceous_liquid_method
+    method_source_locator_as_printed: Part I physical and published p. 16, section "Immiscibility in the binary systems".
+    source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition
+      as found by extrapolating the liquidus curve.
+    phase_assignment_as_published: less-siliceous liquid
+    system_as_printed: CaO-SiO2
+    limb_as_published: less-siliceous
+    T_C_as_assigned: '1698'
+    temperature_assignment_source_observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
+  context_id: greig-1927-immiscibility-part2::context::greig1927_cao_less_siliceous_sio2
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_cao_silica_rich_cao
+  type: phase_equilibrium_run_products
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    row: 1, columns 1-2
+  units: wt%
+  values:
+    quantity: equilibrium_phase_composition
+    formula: CaO
+    component_amount: '0.6'
+    component_amount_as_published: '0.6'
+    composition_as_printed:
+      CaO: '0.6'
+      SiO2: '99.4'
+    method_class: author_derived
+    source_relationship: Part II repeats a Part I Table V interpolation; this is not a new measurement.
+    evidence_class_as_published: interpolated in Part I Table V and quoted again in Part II.
+    originating_part_i_observation_id: greig1927_t5_cao_siliceous_glass
+    originating_temperature_C: '1710'
+    part_ii_summary_temperature_C: '1698'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_cao_silica_rich_cao
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: CaO
+- observation_id: greig1927_cao_silica_rich_sio2
+  type: phase_equilibrium_run_products
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    row: 1, columns 1-2
+  units: wt%
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    component_amount: '99.4'
+    component_amount_as_published: '99.4'
+    composition_as_printed:
+      CaO: '0.6'
+      SiO2: '99.4'
+    method_class: author_derived
+    source_relationship: Part II repeats a Part I Table V interpolation; this is not a new measurement.
+    evidence_class_as_published: interpolated in Part I Table V and quoted again in Part II.
+    originating_part_i_observation_id: greig1927_t5_cao_siliceous_glass
+    originating_temperature_C: '1710'
+    part_ii_summary_temperature_C: '1698'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_cao_silica_rich_sio2
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_feo_cristobalite_two_liquids_transition_1689
+  type: phase_equilibrium_run_products
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    row: 4, temperature column
+  units: °C
+  uncertainty:
+    value: '15'
+    units: °C
+    confidence_level: not_stated
+    value_as_published: ±15°
+  values:
+    quantity: transition_temperature
+    value: '1689'
+    method_class: measured_reduced
+    source_relationship: Part II summary repeats the p. 4 reduced estimate.
+    originating_context_id: greig1927_feo_text_transition_1689_plusminus10
+    phase_assemblage_as_printed: cristobalite and two liquids
+  context_id: greig-1927-immiscibility-part2::context::greig1927_feo_cristobalite_two_liquids_transition_1689
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_feo_small_charge_immiscibility_limits_context
+  type: phase_equilibrium_run_products
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 134
+    note: Prose describing small ferrous-oxalate/silica charges and approximate FeO-SiO2 immiscibility limits.
+  units: FeO charge per cent as printed; temperature in °C
+  values:
+    method_class: measured_direct_qualitative
+    run_temperature_C: '1700'
+    run_temperature_as_published: 1700°
+    charge_material_as_published: silica and ferrous oxalate
+    quench_as_published: Charges were quickly removed from the furnace and plunged under water.
+    runs:
+    - FeO_charge_as_published: 40 per cent iron oxide as FeO
+      silica_charge: not stated
+      result_as_published: When melted, almost all one liquid with a little of a second highly siliceous liquid.
+    - FeO_charge_as_published: 5 per cent FeO
+      silica_charge: not stated
+      result_as_published: Considerable amount of the less siliceous phase.
+    - composition_as_published: Mixtures richer in silica than the 40 per cent FeO mixture; exact composition not given.
+      result_as_published: Always more of the silica-rich phase.
+    limits_as_published: Approximate limits of immiscibility for the oxidation state of iron in these melts; no definite oxidation
+      state was determined.
+    furnace_atmosphere_as_published: Equilibrium was not attained between the liquid and the furnace atmosphere.
+  context_id: greig-1927-immiscibility-part2::context::greig1927_feo_small_charge_immiscibility_limits_context
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_feo_text_limits_and_fe2o3_effect
+  type: source_statement_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 136
+    note: Prose after the Table VIII C charge discussion; tentative limits and Fe2O3 effect.
+  units: wt% as printed
+  values:
+    method_class: author_estimate
+    tentative_immiscibility_limits_as_published:
+    - FeO: '3'
+      SiO2: '97'
+    - FeO: '40'
+      SiO2: '60'
+    FeO_to_Fe2O3_ratio_as_published: approximately 1:1
+    C_charge_composition_in_prose_as_published:
+      FeO_as_oxalate: '3.7'
+      SiO2: '97'
+    C_charge_run_conditions_as_published:
+      temperature: about 1700°
+      quench: Withdrawn from the furnace and plunged under water.
+    prior_5FeO_charge_as_published:
+      FeO_as_oxalate: '5'
+      SiO2: '95'
+      run_temperature: about 1700°
+      run_outcome: A fair amount of the iron-rich phase was present after similar treatment.
+    Table_VIII_C_charge_composition_as_published:
+      FeO_as_oxalate: '3'
+      SiO2: '97'
+    composition_discrepancy_note: The prose gives 3.7FeO (as oxalate), 97SiO2 for the quenched C charge; Table VIII prints
+      3FeO, 97SiO2. Both are retained as printed.
+    temperature_effect_as_published: Increase in the amount of Fe2O3 appears to lower this temperature somewhat.
+  context_id: greig-1927-immiscibility-part2::context::greig1927_feo_text_limits_and_fe2o3_effect
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_feo_text_transition_1689_plusminus10
+  type: phase_equilibrium_run_products
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 136
+    row: FeO-SiO2 transition prose bracket
+  units: °C
+  uncertainty:
+    value: '10'
+    units: °C
+    confidence_level: not_stated
+    value_as_published: ±10°
+  values:
+    quantity: transition_temperature
+    value: '1689'
+    method_class: measured_reduced
+    derivation_as_published: The FeO-SiO2 temperature is reported from the interval between complete-crystal-disappearance
+      temperatures of the CaO-SiO2 and BaO-SiO2 control mixtures.
+    control_temperature_bracket_as_published:
+    - system: CaO-SiO2
+      composition: 15CaO, 85SiO2
+      temperature_C: '1698'
+    - system: BaO-SiO2
+      composition: 15BaO, 85SiO2
+      temperature_C: '1679'
+    bracket_interpretation: Printed control inputs remain located on physical p. 4; they are not unprinted inputs.
+  context_id: greig-1927-immiscibility-part2::context::greig1927_feo_text_transition_1689_plusminus10
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_mgo_cristobalite_two_liquids_transition_1695
+  type: phase_equilibrium_run_products
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    row: 2, temperature column
+  units: °C
+  uncertainty:
+    value: '5'
+    units: °C
+    confidence_level: not_stated
+    value_as_published: ±5°
+  values:
+    quantity: transition_temperature
+    value: '1695'
+    method_class: measured_tabulated
+    source_relationship: repeated_from_part_i
+    evidence_class_as_published: repeat of a measured Part I transition observation
+    originating_part_i_observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
+    phase_assemblage_as_printed: cristobalite and two liquids
+  context_id: greig-1927-immiscibility-part2::context::greig1927_mgo_cristobalite_two_liquids_transition_1695
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_mgo_less_siliceous_mgo
+  type: author_derived_composition_context
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    note: Unnumbered inline summary; compositions are printed as weight per cent.
+    row: MgO; less_siliceous liquid; MgO
+  units: wt_percent
+  values:
+    quantity: equilibrium_phase_composition
+    formula: MgO
+    component_amount: '31'
+    component_amount_as_published: '31'
+    composition_as_printed:
+      MgO: '31'
+      SiO2: '70'
+    method_class: author_derived
+    extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal
+      determined by the quenches of Table III, the composition of the less siliceous of the two liquids which can coexist
+      in equilibrium with cristobalite is found. In each case the extrapolation is short.
+    method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+    method_source_observation_id: greig1927_less_siliceous_liquid_method
+    method_source_locator_as_printed: Part I physical and published p. 16, section "Immiscibility in the binary systems".
+    source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition
+      as found by extrapolating the liquidus curve.
+    phase_assignment_as_published: less-siliceous liquid
+    system_as_printed: MgO-SiO2
+    limb_as_published: less-siliceous
+    T_C_as_assigned: '1695'
+    temperature_assignment_source_observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
+  context_id: greig-1927-immiscibility-part2::context::greig1927_mgo_less_siliceous_mgo
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: MgO
+- observation_id: greig1927_mgo_less_siliceous_sio2
+  type: author_derived_composition_context
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    note: Unnumbered inline summary; compositions are printed as weight per cent.
+    row: MgO; less_siliceous liquid; SiO2
+  units: wt_percent
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    component_amount: '70'
+    component_amount_as_published: '70'
+    composition_as_printed:
+      MgO: '31'
+      SiO2: '70'
+    method_class: author_derived
+    extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal
+      determined by the quenches of Table III, the composition of the less siliceous of the two liquids which can coexist
+      in equilibrium with cristobalite is found. In each case the extrapolation is short.
+    method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+    method_source_observation_id: greig1927_less_siliceous_liquid_method
+    method_source_locator_as_printed: Part I physical and published p. 16, section "Immiscibility in the binary systems".
+    source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition
+      as found by extrapolating the liquidus curve.
+    phase_assignment_as_published: less-siliceous liquid
+    system_as_printed: MgO-SiO2
+    limb_as_published: less-siliceous
+    T_C_as_assigned: '1695'
+    temperature_assignment_source_observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
+  context_id: greig-1927-immiscibility-part2::context::greig1927_mgo_less_siliceous_sio2
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_mgo_silica_rich_mgo
+  type: phase_equilibrium_run_products
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    row: 2, columns 1-2
+  units: wt%
+  values:
+    quantity: equilibrium_phase_composition
+    formula: MgO
+    component_amount: '0.8'
+    component_amount_as_published: '0.8'
+    composition_as_printed:
+      MgO: '0.8'
+      SiO2: '99.2'
+    method_class: author_derived
+    source_relationship: Part II repeats a Part I Table V interpolation; this is not a new measurement.
+    evidence_class_as_published: interpolated in Part I Table V and quoted again in Part II.
+    originating_part_i_observation_id: greig1927_t5_mgo_siliceous_glass
+    originating_temperature_C: '1710'
+    part_ii_summary_temperature_C: '1695'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_mgo_silica_rich_mgo
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: MgO
+- observation_id: greig1927_mgo_silica_rich_sio2
+  type: phase_equilibrium_run_products
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    row: 2, columns 1-2
+  units: wt%
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    component_amount: '99.2'
+    component_amount_as_published: '99.2'
+    composition_as_printed:
+      MgO: '0.8'
+      SiO2: '99.2'
+    method_class: author_derived
+    source_relationship: Part II repeats a Part I Table V interpolation; this is not a new measurement.
+    evidence_class_as_published: interpolated in Part I Table V and quoted again in Part II.
+    originating_part_i_observation_id: greig1927_t5_mgo_siliceous_glass
+    originating_temperature_C: '1710'
+    part_ii_summary_temperature_C: '1695'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_mgo_silica_rich_sio2
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_p21_interleaved_summary_layout
+  type: source_statement_context
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    note: Unnumbered inline summary; physical column order preserved.
+  units: wt% and °C as printed
+  values:
+    method_class: measured_text
+    printed_rows:
+    - row: '1'
+      CaO_silica_rich: 0.6 CaO, 99.4 SiO2
+      MgO_less_siliceous: 31 MgO, 70 SiO2
+      temperature_as_published: 1698° ± 5°
+    - row: '2'
+      MgO_silica_rich: 0.8 MgO, 99.2 SiO2
+      CaO_less_siliceous: 27.5 CaO, 72.5 SiO2
+      temperature_as_published: 1695° ± 5°
+    - row: '3'
+      SrO_silica_rich: 2.4 SrO, 97.6 SiO2
+      SrO_less_siliceous: 30 SrO, 69 SiO2
+      temperature_as_published: 1693° ± 5°
+    - row: '4'
+      FeO_silica_rich: 3 FeO, 97 SiO2
+      FeO_less_siliceous: 40 FeO, 60 SiO2
+      temperature_as_published: 1689° ± 15°
+    inconsistency_flag: The printed MgO less-siliceous values share row 1 with the CaO temperature; the printed CaO less-siliceous
+      values share row 2 with the MgO temperature.
+    reconciled_pairing_basis:
+      CaO_temperature_observation_id: greig1927_t3_cao_sio2_cristobalite_two_liquids_T
+      MgO_temperature_observation_id: greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
+      note: Composition identities remain as printed; system temperatures use the independent Part I Table III observations.
+  context_id: greig-1927-immiscibility-part2::context::greig1927_p21_interleaved_summary_layout
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_prior_b2o3_sio2_results_quoted
+  type: quoted_literature_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 138
+    note: Paragraph “Boric oxide-silica”; citations 36–38.
+  units: Composition values and per-cent analysis as printed; basis not stated in the quoted sentence unless noted.
+  values:
+    method_class: quoted_attributed
+    attribution: Dimbleby, Hodkin, Parkin, and Turner, J. Soc. Glass Techn., 7, 59 (1923), cited as reference 37; 41.85 per
+      cent analysis cited as reference 38.
+    rows:
+    - composition_as_published: 70SiO2, 30B2O3
+      duration_hours: '7'
+      temperature_C: '1400'
+      result_as_published: Opaque mass.
+    - composition_as_published: 50SiO2, 50B2O3
+      duration_hours: '6'
+      temperature_C: '1400'
+      result_as_published: Semi-opaque mass.
+    - composition_as_published: 50SiO2, 50B2O3
+      duration_hours: '48'
+      temperature_C: not stated for this clause
+      result_as_published: 'Two layers: an upper clear layer and a lower opaque one.'
+    - composition_as_published: 30SiO2, 70B2O3
+      duration_hours: not stated
+      temperature_C: not stated
+      result_as_published: Likewise gave two layers.
+    - composition_as_published: 20SiO2, 80B2O3
+      duration_hours: not stated
+      temperature_C: not stated
+      result_as_published: Likewise gave two layers.
+    - composition_as_published: 5SiO2, 95B2O3
+      duration_hours: not stated
+      temperature_C: not stated
+      result_as_published: Yielded a clear glass.
+    upper_clear_layer_silica_as_published: '41.85'
+    upper_clear_layer_silica_units: '%'
+    upper_clear_layer_silica_composition_basis: not stated in the quoted sentence
+    greig_assessment_as_published: The 41.85 per cent SiO2 analysis itself shows these layers are not due to immiscibility;
+      if they were, the second liquid in the 50:50 mixture would have to be more than 50 per cent SiO2, and the other mixtures
+      would each have two liquids more siliceous than that.
+    greig_assessment_numeric_threshold: '>50 per cent SiO2'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_prior_b2o3_sio2_results_quoted
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_sro_less_siliceous_sio2
+  type: author_derived_composition_context
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    note: Unnumbered inline summary; compositions are printed as weight per cent.
+    row: SrO; less_siliceous liquid; SiO2
+  units: wt_percent
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    component_amount: '69'
+    component_amount_as_published: '69'
+    composition_as_printed:
+      SrO: '30'
+      SiO2: '69'
+    method_class: author_derived
+    extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal
+      determined by the quenches of Table III, the composition of the less siliceous of the two liquids which can coexist
+      in equilibrium with cristobalite is found. In each case the extrapolation is short.
+    method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+    method_source_observation_id: greig1927_less_siliceous_liquid_method
+    method_source_locator_as_printed: Part I physical and published p. 16, section "Immiscibility in the binary systems".
+    source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition
+      as found by extrapolating the liquidus curve.
+    phase_assignment_as_published: less-siliceous liquid
+    system_as_printed: SrO-SiO2
+    limb_as_published: less-siliceous
+    T_C_as_assigned: '1693'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_sro_less_siliceous_sio2
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_sro_less_siliceous_sro
+  type: author_derived_composition_context
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    note: Unnumbered inline summary; compositions are printed as weight per cent.
+    row: SrO; less_siliceous liquid; SrO
+  units: wt_percent
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SrO
+    component_amount: '30'
+    component_amount_as_published: '30'
+    composition_as_printed:
+      SrO: '30'
+      SiO2: '69'
+    method_class: author_derived
+    extrapolation_method_as_published: By extrapolating the liquidus curve so obtained until it intersects the horizontal
+      determined by the quenches of Table III, the composition of the less siliceous of the two liquids which can coexist
+      in equilibrium with cristobalite is found. In each case the extrapolation is short.
+    method_source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+    method_source_observation_id: greig1927_less_siliceous_liquid_method
+    method_source_locator_as_printed: Part I physical and published p. 16, section "Immiscibility in the binary systems".
+    source_relationship: Part II p. 21 summarizes this value; Part I p. 16 describes the less-siliceous liquid composition
+      as found by extrapolating the liquidus curve.
+    phase_assignment_as_published: less-siliceous liquid
+    system_as_printed: SrO-SiO2
+    limb_as_published: less-siliceous
+    T_C_as_assigned: '1693'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_sro_less_siliceous_sro
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SrO
+- observation_id: greig1927_sro_silica_rich_sio2
+  type: phase_equilibrium_run_products
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    row: 3, columns 1-2
+  units: wt%
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SiO2
+    component_amount: '97.6'
+    component_amount_as_published: '97.6'
+    composition_as_printed:
+      SrO: '2.4'
+      SiO2: '97.6'
+    method_class: author_derived
+    source_relationship: Part II repeats a Part I Table V interpolation; this is not a new measurement.
+    evidence_class_as_published: interpolated in Part I Table V and quoted again in Part II.
+    originating_part_i_observation_id: greig1927_t5_sro_siliceous_glass
+    originating_temperature_C: '1710'
+    part_ii_summary_temperature_C: '1693'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_sro_silica_rich_sio2
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_sro_silica_rich_sro
+  type: phase_equilibrium_run_products
+  locator:
+    page: 21
+    pdf_page_index: 20
+    published_page: 153
+    row: 3, columns 1-2
+  units: wt%
+  values:
+    quantity: equilibrium_phase_composition
+    formula: SrO
+    component_amount: '2.4'
+    component_amount_as_published: '2.4'
+    composition_as_printed:
+      SrO: '2.4'
+      SiO2: '97.6'
+    method_class: author_derived
+    source_relationship: Part II repeats a Part I Table V interpolation; this is not a new measurement.
+    evidence_class_as_published: interpolated in Part I Table V and quoted again in Part II.
+    originating_part_i_observation_id: greig1927_t5_sro_siliceous_glass
+    originating_temperature_C: '1710'
+    part_ii_summary_temperature_C: '1693'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_sro_silica_rich_sro
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SrO
+- observation_id: greig1927_table10_b2o3_sio2_runs
+  type: phase_equilibrium_run_products
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 139
+    table: X
+    note: All four body rows; rotated table layout checked against page render.
+  units: wt% as printed; °C; heat-treatment time as printed
+  values:
+    method_class: measured_direct_qualitative
+    table_body_row_count: 4
+    rows:
+    - row: '1'
+      charge_composition_wt_percent:
+        B2O3: '76.2'
+        SiO2: '23.8'
+      heat_treatment_as_published: 3 hrs. at 900°
+      heat_treatment_steps:
+      - duration_hours: '3'
+        temperature_C: '900'
+      result_as_published: Clear glass.
+      microscopic_examination_as_published: A few scattered grains of quartz not yet dissolved. Glass is homogeneous.
+    - row: '2'
+      charge_composition_wt_percent:
+        B2O3: '50'
+        SiO2: '50'
+      heat_treatment_as_published: 72 hrs. at 1100°; 2 hrs. at 1500°
+      heat_treatment_steps:
+      - duration_hours: '72'
+        temperature_C: '1100'
+      - duration_hours: '2'
+        temperature_C: '1500'
+      result_as_published: Clear glass.
+      microscopic_examination_as_published: Quartz dissolved very slowly. There was at no time any sign of two liquids.
+    - row: '3'
+      charge_composition_wt_percent:
+        B2O3: '23'
+        SiO2: '77'
+      heat_treatment_as_published: 3 hrs. at 900°; 1¼ hrs. at 1500°
+      heat_treatment_steps:
+      - duration_hours_as_published: '3'
+        temperature_C: '900'
+      - duration_hours_as_published: 1¼
+        temperature_C: '1500'
+      result_as_published: Clear glass.
+      microscopic_examination_as_published: A few grains of quartz still undissolved. Glass is homogeneous.
+    - row: '4'
+      charge_composition_wt_percent:
+        B2O3: '10.8'
+        SiO2: '89.2'
+      heat_treatment_as_published: 2 hrs. at 1600°; crushed and again 2 hrs. at 1600°
+      heat_treatment_steps:
+      - duration_hours: '2'
+        temperature_C: '1600'
+      - duration_hours: '2'
+        temperature_C: '1600'
+      result_as_published: Glass is not free from bubbles, otherwise clear.
+      microscopic_examination_as_published: Clear homogeneous glass, with a very few quartz fragments.
+    quartz_in_glass_bound_as_published: <0.1 per cent
+    quartz_bound_units: '%'
+    quartz_bound_note: The table note says the amount of quartz in the glass was in no case as much as 0.1 per cent.
+  context_id: greig-1927-immiscibility-part2::context::greig1927_table10_b2o3_sio2_runs
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_table8_charge_and_c_analysis_context
+  type: phase_equilibrium_run_products
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 135
+    table: VIII
+    note: All three Table VIII charge columns; C analysis classified using the prose on physical p. 4.
+  units: wt% as printed; time in min; temperature in °C
+  values:
+    method_class: measured_direct
+    table_body_row_count: 9
+    charges_and_times:
+    - sample: A
+      charge_FeO_as_oxalate_wt_percent: '35'
+      charge_SiO2_wt_percent: '65'
+      time_at_1710_C_min: '10'
+    - sample: B
+      charge_FeO_as_oxalate_wt_percent: '38'
+      charge_SiO2_wt_percent: '62'
+      time_at_1710_C_min: '5'
+    - sample: C
+      charge_FeO_as_oxalate_wt_percent: '3'
+      charge_SiO2_wt_percent: '97'
+      time_at_1710_C_min: '15'
+    C_analysis_wt_percent:
+      FeO: '2.94'
+      Fe2O3: '.13'
+      SiO2_by_difference: '96.9'
+    C_analysis_status: The paper calls the Table VIII C values an analysis of the charge; the quenched charge contained sparse
+      FeO-rich globules and was almost entirely siliceous phase, so these values are not assigned to a single liquid.
+    render_checked_cells:
+    - 'PDF p. 3, Table VIII, row FeO in SiO2-rich phase, column C: 2.94 (not Tesseract 2.04)'
+    - 'PDF p. 3, Table VIII, row Fe2O3 in SiO2-rich phase, column C: .13 (not Tesseract 13)'
+  context_id: greig-1927-immiscibility-part2::context::greig1927_table8_charge_and_c_analysis_context
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2
+- observation_id: greig1927_table9_other_binary_silica_run_products
+  type: phase_equilibrium_run_products
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 137
+    table: IX
+    note: All nine body rows, composition percentages by weight; approximate temperature column and microscopy outcomes.
+  units: wt% as printed; °C; heat-treatment time as printed
+  values:
+    method_class: measured_direct_qualitative
+    table_body_row_count: 9
+    rows:
+    - row: '1'
+      charge_composition_wt_percent:
+        BeO: '5'
+        SiO2: '95'
+      approx_temperature_C: '1715'
+      result_as_published: Single clear glass. No sign of immiscibility.
+    - row: '2'
+      charge_composition_wt_percent:
+        ZnO: '12'
+        SiO2: '88'
+      approx_temperature_C: '1725'
+      result_as_published: Typical structure developed; globules of unquenched material in glass. Two liquids.
+    - row: '3'
+      charge_composition_wt_percent:
+        MnO: '10'
+        SiO2: '90'
+      approx_temperature_C: '1725'
+      result_as_published: Charge pink in color. Typical structure. Two liquids.
+    - row: '4'
+      charge_composition_wt_percent:
+        CoO: '10'
+        SiO2: '90'
+      approx_temperature_C: '1725'
+      result_as_published: Charge blue in color. Typical structure. Two liquids.
+    - row: '5'
+      charge_composition_wt_percent:
+        NiO: '10'
+        SiO2: '90'
+      approx_temperature_C: '1725'
+      result_as_published: Charge brown. Typical structure. Two liquids.
+    - row: '6'
+      charge_composition_wt_percent:
+        SnO2: '10'
+        SiO2: '90'
+      approx_temperature_C: '1715'
+      result_as_published: Single clear glass.
+    - row: '7'
+      charge_composition_wt_percent:
+        SnO2: '20'
+        SiO2: '80'
+      approx_temperature_C: '1725'
+      result_as_published: Temperature apparently not up to that of the liquidus. Top of crucible clear glass; below, glass
+        with crystals which had settled out. No sign of immiscibility.
+    - row: 8-9
+      physical_rows:
+      - '8'
+      - '9'
+      charge_composition_wt_percent:
+        PbO: '11'
+        SiO2: '89'
+      reagent_description_as_published: PbO as glass; PbSiO3¹
+      heat_treatment_as_published: Charge first heated 24 hrs. at 1100°, then at 1710°.
+      heat_treatment_steps:
+      - duration_hours: '24'
+        temperature_C: '1100'
+      - duration_hours: not printed
+        temperature_C: '1710'
+      result_as_published: Single clear glass. 9PbO 91SiO2. No sign of immiscibility.
+      additional_composition_as_published: 9PbO 91SiO2
+      additional_composition_role: Not resolved by the printed table; retained literally.
+    footnote_as_published: 'The following oxides are incompletely miscible with silica in the liquid state: ZnO, MnO, CoO,
+      NiO.'
+    pb_formula_render_check: The superscript footnote marker follows PbSiO3; MinerU fused the 3 and footnote 1 as PbSiO2¹.
+      Render confirms PbSiO3¹.
+  context_id: greig-1927-immiscibility-part2::context::greig1927_table9_other_binary_silica_run_products
+  work_id: 10.2475/ajs.s5-13.74.133
+  source_id: greig-1927-immiscibility-part2
+  species: SiO2

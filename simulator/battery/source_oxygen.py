@@ -14,7 +14,7 @@ from simulator.battery.enums import AdmissionStatus, EvidenceClass, NoticeKind, 
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import Bench, Derivation, Located, Locator, Notice, Observation, Species, State, Uncertainty, Value, _is_source_internally_inconsistent
 from simulator.battery.waypoints import identity_composition_waypoint
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 
 SOURCE_OXYGEN_RELATION = "source_oxygen_condition;"
 CO_MEASURED_CONSISTENCY_ORIGIN = "co-measured oxygen consistency"
@@ -244,7 +244,8 @@ def _printed_partner_is_ineligible(
 ) -> bool:
     """Both formulas are printed and this is not one eligible condition.
 
-    Counted on the printed rows, before eligibility drops a partner.
+    Counted on the printed rows, before eligibility drops a partner,
+    except an unidentified-input molecular reduction beside a cell command.
     Exactly one measured-eligible side is ambiguous. Neither side eligible
     is ambiguous too: an O/O2 pair where either row fails, including both,
     stays AMBIGUOUS. A cell-route O is the base exception, and it still
@@ -253,6 +254,8 @@ def _printed_partner_is_ineligible(
     """
     printed: dict[str, list[Observation]] = {"O": [], "O2": []}
     for row in point.values():
+        if cell_oxygen and _unidentified_molecular_input(row):
+            continue
         if _positive_oxygen_pressure(row):
             printed[row.identity.species.formula].append(row)
     if not printed["O"] or not printed["O2"]:
@@ -269,6 +272,18 @@ def _printed_partner_is_ineligible(
         if cell_ids and all(row.observation_id in cell_ids for row in printed["O"]):
             return False
     return True
+
+
+def _unidentified_molecular_input(row: Observation) -> bool:
+    return (
+        row.identity.species.formula == "O2"
+        and row.identity.reaction is not None
+        and row.identity.reaction.is_value
+        and {term.species.formula for term in row.identity.reaction.value.terms} == {"O", "O2"}
+        and not row.derived_from
+        and row.derivation is not None
+        and row.derivation.declares_unprinted_raw_inputs
+    )
 
 
 def _janaf_atomic_oxygen(temperature_K: Decimal) -> tuple[Decimal, float, Locator]:
@@ -295,7 +310,7 @@ def _po2_pa_from_atomic_oxygen(pressure_pa: Decimal, constant: float) -> Decimal
     # W pO=6.8e-10 atm gives q=3.073062243e-12 bar. Shornikov's
     # 2.65e-9 atm O gives 4.667080363e-11 bar, agreeing within 0.36%
     # with its printed O2=4.59e-11 atm=4.6508175e-11 bar.
-    return Decimal(str((float(pressure_pa) / 100000.0 / constant) ** 2 * 100000.0))
+    return Decimal(str((float(pressure_pa) / PA_PER_BAR / constant) ** 2 * PA_PER_BAR))
 
 
 def _atomic_oxygen_equilibrium_parameters(
@@ -592,7 +607,13 @@ def resolve_source_oxygen(
             continue
         gases, used = ancestry
         if formula == "O" and cell_pair and gases == cell_pair:
-            if row.derived_from or row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED:
+            # Measured >= quoted for the same identified cell reduction:
+            # stronger evidence must never lose the oxygen command.
+            if row.derived_from or row.evidence.class_.value in {
+                EvidenceClass.QUOTED_ATTRIBUTED,
+                EvidenceClass.MEASURED_DIRECT,
+                EvidenceClass.MEASURED_REDUCED,
+            }:
                 cell_oxygen.append((row, used))
         elif (
             row.evidence.class_.is_value
@@ -601,6 +622,11 @@ def resolve_source_oxygen(
             and not row.derived_from
         ):
             measured.append((row, used))
+    if cell_oxygen:
+        # A reduction with an unidentified O input cannot outrank an
+        # identified cell reduction, either as command or as partner veto.
+        measured = [(row, used) for row, used in measured
+                    if not _unidentified_molecular_input(row)]
     candidates = measured or cell_oxygen
     comeasured = _comeasured_oxygen_pair(measured)
     if comeasured is not None:

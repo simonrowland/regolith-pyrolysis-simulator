@@ -9,9 +9,17 @@ import math
 from pathlib import Path
 import re
 import subprocess
+from simulator.corpus_paths import regolith_corpus_ctl_root
+from simulator.physical_constants import GAS_CONSTANT
 
 ROOT = Path(__file__).resolve().parent
-SOURCE = Path('/Users/simonrowland/Repos/regolith-corpus-ctl/raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf')
+
+
+def source_pdf() -> Path:
+    return (
+        regolith_corpus_ctl_root()
+        / "raw/robie-hemingway-1995-usgs-b2131/robie-hemingway-1995-usgs-b2131.pdf"
+    )
 TMP = Path('/private/tmp/b2131-summary-raster')
 NUMBER = re.compile(r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\Z')
 # Mineral names occupying their own OCR line, with the numeric row below.
@@ -92,7 +100,15 @@ def attach_detached_name_headers(lines, header_idx, first_numeric, cp, starts):
 def raster(page):
     stem = TMP / str(page)
     if not stem.with_suffix('.txt').exists() or not stem.with_suffix('.txt').stat().st_size:
-        subprocess.run(['pdftoppm', '-f', str(page), '-l', str(page), '-r', '120', '-singlefile', '-png', str(SOURCE), str(stem)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            [
+                'pdftoppm', '-f', str(page), '-l', str(page), '-r', '120',
+                '-singlefile', '-png', str(source_pdf()), str(stem),
+            ],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         subprocess.run(['tesseract', str(stem.with_suffix('.png')), str(stem), '--psm', '6'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return stem.with_suffix('.txt').read_text()
 
@@ -242,7 +258,7 @@ def harvest(page, raster_text):
             dg=numeric_first.get('formation_gibbs',{})
             logk=numeric_first.get('log_kf',{})
             if dg.get('value') is not None and logk.get('value') is not None:
-                factor=8.31446261815324*temperature_cell['value']*math.log(10)/1000
+                factor=GAS_CONSTANT*temperature_cell['value']*math.log(10)/1000
                 def half_step(raw):
                     return 0.5*10**(-len(raw.split('.')[1])) if '.' in raw else 0.5
                 tolerance=half_step(dg['raw'])+factor*half_step(logk['raw'])+0.01

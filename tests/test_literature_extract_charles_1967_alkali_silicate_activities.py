@@ -125,6 +125,24 @@ def _assert_rendered_table_cells(document: dict) -> None:
             assert composition["values"]["component_amount"] == format(
                 Decimal(x1.strip("()*")), "f"
             )
+            if table == "I":
+                assert composition["values"]["method_class"] == "quoted_unattributed"
+                assert "attribution" not in composition["values"]
+                assert composition["values"]["reason"] == (
+                    "The text calls these liquidus values but does not identify which work "
+                    "supplied Table I's X1 inputs."
+                )
+            else:
+                expected_attribution = {
+                    "II": "F. C. Kracek, “System Sodium Oxide-Silica” (1930), reference [23]",
+                    "III": (
+                        "F. C. Kracek, N. L. Bowen, and G. W. Morey, “Equilibrium Relations "
+                        "and Factors Influencing Their Determination in the System K2SiO3-SiO2” "
+                        "(1937), reference [30]"
+                    ),
+                }[table]
+                assert composition["values"]["method_class"] == "quoted_attributed"
+                assert composition["values"]["attribution"] == expected_attribution
             components = composition["values"]["composition_mol"]
             assert components[specification["oxide"]] == composition["values"]["component_amount"]
             assert Decimal(components["SiO2"]) == Decimal(1) - Decimal(x1.strip("()*"))

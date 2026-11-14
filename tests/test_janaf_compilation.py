@@ -92,6 +92,45 @@ O007_PAGE_READ_SAMPLE = (
 )
 
 
+@pytest.mark.parametrize(
+    ("table_id", "expected_kj_per_mol"),
+    (
+        ("Ca-006", Decimal("0.8")),
+        ("Mg-005", Decimal("0.80")),
+        ("Fe-008", Decimal("1.3")),
+        ("Ti-006", Decimal("16.7")),
+        ("O-001", Decimal("0.10")),
+        ("Ca-001", Decimal(0)),
+        ("Mg-001", Decimal(0)),
+        ("Fe-003", Decimal(0)),
+        ("Ti-001", Decimal(0)),
+        ("O-029", Decimal(0)),
+    ),
+)
+def test_janaf_delta_fh_298_uncertainty_metadata(
+    table_id: str, expected_kj_per_mol: Decimal
+) -> None:
+    table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+
+    assert (
+        janaf_reference.table_delta_fh_298_uncertainty_kj_per_mol(table)
+        == expected_kj_per_mol
+    )
+
+
+def test_janaf_missing_delta_fh_298_uncertainty_is_unavailable() -> None:
+    table = load_table_document(TABLES_DIR / "Ca-004.yaml")["table"]
+
+    assert janaf_reference.table_delta_fh_298_uncertainty_kj_per_mol(table) is None
+
+
+def test_janaf_delta_fh_298_uncertainty_rejects_unknown_unit() -> None:
+    with pytest.raises(janaf_reference.JanafParseError, match="unit"):
+        janaf_reference.table_delta_fh_298_uncertainty_kj_per_mol(
+            {"delta_fH_298_uncertainty": {"value": 0.8, "unit": "J mol^-1"}}
+        )
+
+
 def test_harvester_parses_live_t_k_header() -> None:
     """Null hypothesis: committed parse_table still requires the HTML-era T/K label."""
 

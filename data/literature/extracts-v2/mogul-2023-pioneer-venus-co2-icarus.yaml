@@ -38,11 +38,34 @@ observations:
   notices: []
   source_id: mogul-2023-pioneer-venus-co2-icarus
   locator:
-    published_page: 19
-    pdf_page_index: 19
+    published_page: 18
+    pdf_page_index: 17
     section: '4.3'
     note: preliminary external methane conversion; upper/lower correction outcomes retained
   read_from: pdf:mogul-2023-pioneer-venus-co2-icarus
+  derived_from:
+  - mogul-2023-pioneer-venus-co2-icarus::mogul_2023_co2_density_profile
+  derivation:
+    relation: The authors' preliminary conversion calculated external CH4 mixing ratios against CO2 and N2 abundances and
+      corrected the apparent m/z-dependent getter efficiency.
+    inputs:
+    - mogul-2023-pioneer-venus-co2-icarus::mogul_2023_co2_density_profile
+    parameters: []
+    output_unit: ppm
+    method:
+      state:
+        tag: value
+        value: Preliminary conversion of LNMS CH4 counts to mixing ratios against CO2 and N2 abundances with correction for
+          apparent m/z-dependent getter efficiency.
+      locator:
+        page: 18
+        pdf_page_index: 17
+        section: '4.3'
+        note: The paper names no external input references for this conversion; Donahue and Hodges (1993) and Oyama et al.
+          (1980) are comparison values in this section.
+    references: []
+  provenance:
+    printed_phase: Venus_atmosphere_CH4
 - observation_id: mogul-2023-pioneer-venus-co2-icarus::mogul_2023_ch4_mixing_ratio_model::rows:h=cfd5b32b1706
   experiment_id: 10.1016/j.icarus.2022.115374::mogul-2023-pioneer-venus-co2-icarus
   identity:
@@ -79,11 +102,34 @@ observations:
   notices: []
   source_id: mogul-2023-pioneer-venus-co2-icarus
   locator:
-    published_page: 19
-    pdf_page_index: 19
+    published_page: 18
+    pdf_page_index: 17
     section: '4.3'
     note: preliminary external methane conversion; upper/lower correction outcomes retained
   read_from: pdf:mogul-2023-pioneer-venus-co2-icarus
+  derived_from:
+  - mogul-2023-pioneer-venus-co2-icarus::mogul_2023_co2_density_profile
+  derivation:
+    relation: The authors' preliminary conversion calculated external CH4 mixing ratios against CO2 and N2 abundances and
+      corrected the apparent m/z-dependent getter efficiency.
+    inputs:
+    - mogul-2023-pioneer-venus-co2-icarus::mogul_2023_co2_density_profile
+    parameters: []
+    output_unit: ppm
+    method:
+      state:
+        tag: value
+        value: Preliminary conversion of LNMS CH4 counts to mixing ratios against CO2 and N2 abundances with correction for
+          apparent m/z-dependent getter efficiency.
+      locator:
+        page: 18
+        pdf_page_index: 17
+        section: '4.3'
+        note: The paper names no external input references for this conversion; Donahue and Hodges (1993) and Oyama et al.
+          (1980) are comparison values in this section.
+    references: []
+  provenance:
+    printed_phase: Venus_atmosphere_CH4
 - observation_id: mogul-2023-pioneer-venus-co2-icarus::mogul_2023_ch4_mixing_ratio_model::rows:h=f59b7880e65f
   experiment_id: 10.1016/j.icarus.2022.115374::mogul-2023-pioneer-venus-co2-icarus
   identity:
@@ -120,11 +166,34 @@ observations:
   notices: []
   source_id: mogul-2023-pioneer-venus-co2-icarus
   locator:
-    published_page: 19
-    pdf_page_index: 19
+    published_page: 18
+    pdf_page_index: 17
     section: '4.3'
     note: preliminary external methane conversion; upper/lower correction outcomes retained
   read_from: pdf:mogul-2023-pioneer-venus-co2-icarus
+  derived_from:
+  - mogul-2023-pioneer-venus-co2-icarus::mogul_2023_co2_density_profile
+  derivation:
+    relation: The authors' preliminary conversion calculated external CH4 mixing ratios against CO2 and N2 abundances and
+      corrected the apparent m/z-dependent getter efficiency.
+    inputs:
+    - mogul-2023-pioneer-venus-co2-icarus::mogul_2023_co2_density_profile
+    parameters: []
+    output_unit: ppm
+    method:
+      state:
+        tag: value
+        value: Preliminary conversion of LNMS CH4 counts to mixing ratios against CO2 and N2 abundances with correction for
+          apparent m/z-dependent getter efficiency.
+      locator:
+        page: 18
+        pdf_page_index: 17
+        section: '4.3'
+        note: The paper names no external input references for this conversion; Donahue and Hodges (1993) and Oyama et al.
+          (1980) are comparison values in this section.
+    references: []
+  provenance:
+    printed_phase: Venus_atmosphere_CH4
 - observation_id: mogul-2023-pioneer-venus-co2-icarus::mogul_2023_co2_density_profile
   experiment_id: 10.1016/j.icarus.2022.115374::mogul-2023-pioneer-venus-co2-icarus
   identity:
@@ -168,6 +237,30 @@ observations:
     section: '3.12'
     note: prose prints selected density points and ranges; full 14-point profile is in Figure 9 and was not digitized
   read_from: pdf:mogul-2023-pioneer-venus-co2-icarus
+  derived_from:
+  - mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_quoted_reference_conditions
+  derivation:
+    relation: The authors converted normalized LNMS CO2 counts to density using calibration curves constructed from PVGC composition,
+      atmospheric density and pressure-temperature data, and LNMS CO2 control data.
+    inputs:
+    - mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_quoted_reference_conditions
+    parameters: []
+    output_unit: kg m^-3 and % w/w
+    method:
+      state:
+        tag: value
+        value: CO2 calibration-curve conversion from normalized LNMS counts to density using curves assembled from published
+          data.
+      locator:
+        page: 14
+        figure: '7'
+        section: '3.11'
+    references:
+    - Hoffman et al. (1979a)
+    - Oyama et al. (1980)
+    - Seiff et al. (1985)
+  provenance:
+    printed_phase: Venus_atmosphere_CO2
 - observation_id: mogul-2023-pioneer-venus-co2-icarus::mogul_2023_co2_isotope_ratios::rows:h=c01e7dc90f84
   experiment_id: 10.1016/j.icarus.2022.115374::mogul-2023-pioneer-venus-co2-icarus
   identity:
@@ -203,11 +296,29 @@ observations:
   notices: []
   source_id: mogul-2023-pioneer-venus-co2-icarus
   locator:
-    published_page: 13
+    published_page: 14
     pdf_page_index: 13
     section: '3.9'
     note: ratios derived from fitted LNMS CO2 isotopologue signals across 25 spectra
   read_from: pdf:mogul-2023-pioneer-venus-co2-icarus
+  derivation:
+    relation: The authors derived the carbon and oxygen isotope ratios by tracking CO2 and its isotopologue ion counts across
+      the Venusian atmosphere.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless isotope ratio
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 14
+        pdf_page_index: 13
+        section: '3.9'
+        note: The row-level isotopologue counts used to form the ratios are not printed.
+    references: []
+  provenance:
+    printed_phase: Venus_atmosphere_CO2
 - observation_id: mogul-2023-pioneer-venus-co2-icarus::mogul_2023_co2_isotope_ratios::rows:h=e4f27d62cf1a
   experiment_id: 10.1016/j.icarus.2022.115374::mogul-2023-pioneer-venus-co2-icarus
   identity:
@@ -243,8 +354,26 @@ observations:
   notices: []
   source_id: mogul-2023-pioneer-venus-co2-icarus
   locator:
-    published_page: 13
+    published_page: 14
     pdf_page_index: 13
     section: '3.9'
     note: ratios derived from fitted LNMS CO2 isotopologue signals across 25 spectra
   read_from: pdf:mogul-2023-pioneer-venus-co2-icarus
+  derivation:
+    relation: The authors derived the carbon and oxygen isotope ratios by tracking CO2 and its isotopologue ion counts across
+      the Venusian atmosphere.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless isotope ratio
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 14
+        pdf_page_index: 13
+        section: '3.9'
+        note: The row-level isotopologue counts used to form the ratios are not printed.
+    references: []
+  provenance:
+    printed_phase: Venus_atmosphere_CO2

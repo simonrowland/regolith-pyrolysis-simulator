@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:de-abreu-2024-li2o-sio2-thermochemistry
       role: pdf
@@ -868,7 +868,30 @@ context:
     - series: This work calculated phase boundaries
       marker: continuous line
       marker_count: not_countable_from_render
-      method_class: quoted_attributed
+      method_class: model_derived
+      derivation:
+        relation: The authors calculated the Li2O-SiO2 phase diagram with the thermodynamic parameters optimized in this work.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 11
+            published_page: 313
+            pdf_page_index: 10
+            section: 5.2 Thermodynamic Modeling
+        method:
+          state:
+            tag: value
+            value: Thermo-Calc PARROT module for CALPHAD optimization followed by POLY-3 phase-diagram calculations.
+          locator:
+            page: 11
+            published_page: 313
+            pdf_page_index: 10
+            section: 5.2 Thermodynamic Modeling
+        references:
+        - 'Figure 5 caption input data: [10–12, 28, 35, 41, 54–57].'
+        - Thermo-Calc [43] and the CALPHAD method [44].
     digitisation: deferred to a figure pass
     attribution: Literature datasets as named in the legend; model parameters from this work.
   context_id: de-abreu-2024-li2o-sio2-thermochemistry::context::deabreu2024_figure5_calculated_phase_diagram

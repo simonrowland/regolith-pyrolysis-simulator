@@ -10,11 +10,12 @@ from pathlib import Path
 
 import yaml
 
+from simulator.physical_constants import ATM_PA_DECIMAL
 
 SID = "rego-1985-na2o-sio2-transpiration"
 EXTRACT = Path(__file__).parents[1] / f"{SID}.yaml"
 MOLAR_MASS_NA_G_MOL = Decimal("22.98976928")
-PA_PER_ATM = Decimal("101325")
+PA_PER_ATM = ATM_PA_DECIMAL
 CO_MOL_PER_DISPLAYED_UNIT = Decimal("0.01")
 
 

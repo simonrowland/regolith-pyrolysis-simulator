@@ -59,6 +59,20 @@ species:
     observations:
     - observation_id: berry_2024_AD_table2_fit_quoted
       experiment: berry_2024_re_quenched_cmas_melts
+      derivation: &berry24_table2_lcf_derivation
+        relation: "Table 2 Ti3+/ΣTi values are calculated from the XANES linear-combination proportions using Eq. (2), with parameters optimized by the least-squares objective in Eq. (3)."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 213
+            section: '3. Results'
+            note: 'The XANES spectra and linear-combination proportions are provided in Supplementary Spreadsheet 1, which is not present in the local corpus package.'
+        method:
+          state: {tag: value, value: "Constrained nonlinear least-squares regression of the linear-combination fit proportions using Eqs. (2) and (3)."}
+          locator:
+            page: 213
+            section: '3. Results'
+            equation: '2, 3'
       type: gibbs_table
       locator:
         page: 214
@@ -73,8 +87,7 @@ species:
         note: confidence level not stated
       values:
         quantity: Ti3plus_over_total_Ti
-        method_class: quoted_attributed
-        attribution: Berry et al. (2024), Table 2.
+        method_class: measured_reduced
         admission_status: admitted
         interpretation: Authors' constrained XANES/LCF fit output; not an independent measurement. The
           fixed −1/4 slope is imposed in the fit.
@@ -853,6 +866,7 @@ species:
                 row: 10
     - observation_id: berry_2024_AD_Fo_table2_fit_quoted
       experiment: berry_2024_re_quenched_cmas_melts
+      derivation: *berry24_table2_lcf_derivation
       type: gibbs_table
       locator:
         page: 214
@@ -867,8 +881,7 @@ species:
         note: confidence level not stated
       values:
         quantity: Ti3plus_over_total_Ti
-        method_class: quoted_attributed
-        attribution: Berry et al. (2024), Table 2.
+        method_class: measured_reduced
         admission_status: admitted
         interpretation: Authors' constrained XANES/LCF fit output; not an independent measurement. The
           fixed −1/4 slope is imposed in the fit.
@@ -1647,6 +1660,7 @@ species:
                 row: 10
     - observation_id: berry_2024_AD_Wo_table2_fit_quoted
       experiment: berry_2024_re_quenched_cmas_melts
+      derivation: *berry24_table2_lcf_derivation
       type: gibbs_table
       locator:
         page: 214
@@ -1661,8 +1675,7 @@ species:
         note: confidence level not stated
       values:
         quantity: Ti3plus_over_total_Ti
-        method_class: quoted_attributed
-        attribution: Berry et al. (2024), Table 2.
+        method_class: measured_reduced
         admission_status: admitted
         interpretation: Authors' constrained XANES/LCF fit output; not an independent measurement. The
           fixed −1/4 slope is imposed in the fit.
@@ -2441,6 +2454,7 @@ species:
                 row: 10
     - observation_id: berry_2024_AD_En_table2_fit_quoted
       experiment: berry_2024_re_quenched_cmas_melts
+      derivation: *berry24_table2_lcf_derivation
       type: gibbs_table
       locator:
         page: 214
@@ -2455,8 +2469,7 @@ species:
         note: confidence level not stated
       values:
         quantity: Ti3plus_over_total_Ti
-        method_class: quoted_attributed
-        attribution: Berry et al. (2024), Table 2.
+        method_class: measured_reduced
         admission_status: admitted
         interpretation: Authors' constrained XANES/LCF fit output; not an independent measurement. The
           fixed −1/4 slope is imposed in the fit.
@@ -3158,6 +3171,7 @@ species:
                 row: 10
     - observation_id: berry_2024_AD_Qz_table2_fit_quoted
       experiment: berry_2024_re_quenched_cmas_melts
+      derivation: *berry24_table2_lcf_derivation
       type: gibbs_table
       locator:
         page: 214
@@ -3172,8 +3186,7 @@ species:
         note: confidence level not stated
       values:
         quantity: Ti3plus_over_total_Ti
-        method_class: quoted_attributed
-        attribution: Berry et al. (2024), Table 2.
+        method_class: measured_reduced
         admission_status: admitted
         interpretation: Authors' constrained XANES/LCF fit output; not an independent measurement. The
           fixed −1/4 slope is imposed in the fit.

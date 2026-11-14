@@ -26,6 +26,7 @@ import tempfile
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
+from functools import lru_cache
 from fractions import Fraction
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Sequence
@@ -51,6 +52,8 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
     ValueKind,
+    ProprietaryEngineRefusal,
+    refuse_proprietary_engine_use,
 )
 from simulator.battery.identity import (
     Identity,
@@ -86,6 +89,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_same_phase_extension,
     ellingham_segment_for_temperature,
 )
+from simulator.physical_constants import PA_PER_BAR
 
 # ``-> [coeff ]Formula(token)``. Coeff defaults to 1 (``TiO2(rutile,s)``).
 _PRODUCT_RE = re.compile(
@@ -154,6 +158,15 @@ _ENGINE_THERMO_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.VAPOROCK: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.THERMOENGINE: _ENGINE_PURE_PHASE_QUANTITIES,
     Engine.MAGEMIN: _ENGINE_PURE_PHASE_QUANTITIES,
+    Engine.NASA_CEA_9: frozenset(
+        {
+            Quantity.CP,
+            Quantity.S,
+            Quantity.H_MINUS_H298,
+            Quantity.DELTA_FH,
+            Quantity.DELTA_FG,
+        }
+    ),
 }
 # Engines emit H(T)−H(298.15 K). The Decimal is the subtype anchor; the
 # float is the pure-phase call temperature. They are the same value.
@@ -884,6 +897,499 @@ def _refuse(
         refusal_detail=payload,
         call_evidence=call_evidence,
         coefficient_sources=() if quantity in FUSION_QUANTITIES else None,
+    )
+
+
+@lru_cache(maxsize=1)
+def _nasa_cea_9_record_index():
+    from simulator.reference_data.nasa_glenn import load_all_record_documents
+
+    by_formula: dict[str, list[Mapping[str, object]]] = defaultdict(list)
+    by_id: dict[str, Mapping[str, object]] = {}
+    for record in load_all_record_documents():
+        formula = record.get("formula")
+        record_id = record.get("record_id")
+        if isinstance(formula, str) and isinstance(record_id, str):
+            by_formula[formula].append(record)
+            by_id[record_id] = record
+    return (
+        {formula: tuple(records) for formula, records in by_formula.items()},
+        by_id,
+    )
+
+
+def _nasa_cea_9_record_for_species(
+    species,
+) -> tuple[Mapping[str, object] | None, str]:
+    by_formula, _by_id = _nasa_cea_9_record_index()
+    formula = species.formula
+    records = by_formula.get(formula, ())
+    if not records:
+        return None, "nasa-cea-formula-not-covered"
+    phase = phase_token(species)
+    polymorph = polymorph_token(species)
+    if phase is Phase.G:
+        phase_labels = {"g", "gas"}
+    elif phase is Phase.L:
+        phase_labels = {"l", "liquid"}
+    elif phase is Phase.CR:
+        phase_label = (
+            polymorph.value.casefold()
+            if polymorph is not None and polymorph is not Polymorph.REFERENCE
+            else "cr"
+        )
+        phase_labels = {phase_label}
+    else:
+        return None, "nasa-cea-phase-not-covered"
+    matches = [
+        record
+        for record in records
+        if str(record.get("phase", "")).strip().casefold() in phase_labels
+    ]
+    if not matches:
+        return None, "nasa-cea-phase-not-covered"
+    if len(matches) != 1:
+        return None, "nasa-cea-phase-ambiguous"
+    record = matches[0]
+    if record.get("phase_ordinal") is not None:
+        return None, "nasa-cea-phase-ordinal-unresolved"
+    return record, ""
+
+
+@lru_cache(maxsize=512)
+def _nasa_cea_9_polynomial(record_id: str):
+    from simulator.vapour_rail.catalog import (
+        CatalogCompileError,
+        _polynomial_from_thermo_record,
+    )
+    from simulator.vapour_rail.nasa_cea import NASA9_DEFAULT_EXPONENTS
+
+    _by_formula, by_id = _nasa_cea_9_record_index()
+    record = by_id[record_id]
+    phase = str(record["phase"]).strip().casefold()
+    standard_state = {
+        "g": "gas",
+        "gas": "gas",
+        "l": "condensed_liquid",
+        "liquid": "condensed_liquid",
+    }.get(phase, "condensed_solid")
+    segments: list[dict[str, object]] = []
+    for interval in record["intervals"]:
+        exponents = tuple(
+            float(item["value"]) for item in interval["exponents"][:7]
+        )
+        if exponents != NASA9_DEFAULT_EXPONENTS:
+            raise CatalogCompileError(
+                f"{record_id}: unsupported NASA-9 exponent sequence {exponents!r}"
+            )
+        segments.append(
+            {
+                "T_min_K": interval["T_min_K"]["value"],
+                "T_max_K": interval["T_max_K"]["value"],
+                "a_coefficients": [
+                    item["value"] for item in interval["a_coefficients"]
+                ],
+                "b1": interval["b1"]["value"],
+                "b2": interval["b2"]["value"],
+            }
+        )
+    payload = {
+        "formula": record["formula"],
+        "standard_state": standard_state,
+        "segments": segments,
+        "delta_f_H_298_15_J_per_mol": record["delta_f_H_298_15"]["value"],
+        "citation": record["citation_as_published"],
+        "source_ref_code": record["source_ref_code"],
+        "reference_pressure_Pa": PA_PER_BAR,
+    }
+    polynomial = _polynomial_from_thermo_record(
+        name=record_id,
+        family="nasa_cea_9",
+        record=payload,
+    )
+    return polynomial
+
+
+def _nasa_cea_9_state(polynomial, temperature_K: Decimal):
+    from simulator.vapour_rail.nasa_cea import ThermoState
+
+    temperature = float(temperature_K)
+    outside = not (
+        polynomial.T_min_K <= temperature <= polynomial.T_max_K
+    )
+    if not outside:
+        return polynomial.evaluate(temperature), False
+    segment = (
+        polynomial.segments[0]
+        if temperature < polynomial.T_min_K
+        else polynomial.segments[-1]
+    )
+    return ThermoState(temperature, *segment.evaluate_ratios(temperature)), True
+
+
+def _nasa_cea_9_attempt_success(
+    quantity: Quantity,
+    value: Decimal,
+    *,
+    origin: str,
+    call_evidence: str,
+    polynomials: Sequence[object],
+    extrapolated: bool,
+) -> ThermoAttempt:
+    authority = Authority.EXTRAPOLATED if extrapolated else Authority.BRIDGE
+    notices: tuple[Notice, ...] = ()
+    if extrapolated:
+        band = "; ".join(
+            f"{polynomial.name} [{polynomial.T_min_K}, "
+            f"{polynomial.T_max_K}] K"
+            for polynomial in polynomials
+        )
+        notices = (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason="nasa_cea_9_temperature_extrapolated",
+                origin=origin,
+                band=band,
+                authority=Authority.EXTRAPOLATED,
+            ),
+        )
+    return ThermoAttempt(
+        value=value,
+        unit=QUANTITY_UNITS[quantity],
+        authority=authority,
+        notices=notices,
+        refusal_reason=None,
+        refusal_detail={},
+        call_evidence=call_evidence,
+        coefficient_sources=("nasa-glenn",),
+    )
+
+
+def _nasa_cea_9_attempt(
+    identity: Identity,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    *,
+    origin: str,
+) -> ThermoAttempt:
+    from simulator.vapour_rail.nasa_cea import (
+        R_J_PER_MOL_K,
+        reaction_equilibrium_constant,
+    )
+
+    if identity.species is None:
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "nasa-cea-species-unknown",
+            quantity=quantity,
+            origin=origin,
+        )
+    if quantity is Quantity.P_SAT:
+        from simulator.battery.score import stated_pure_substance_reservoir
+
+        reservoir_basis = stated_pure_substance_reservoir(identity)
+        reservoir = identity.reservoir
+        if (
+            reservoir_basis is None
+            or not isinstance(reservoir, State)
+            or not reservoir.is_value
+            or reservoir.value is None
+        ):
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "nasa-cea-pure-reservoir-not-stated",
+                quantity=quantity,
+                origin=origin,
+            )
+        gas_record, gas_reason = _nasa_cea_9_record_for_species(identity.species)
+        condensed_record, condensed_reason = _nasa_cea_9_record_for_species(
+            reservoir.value
+        )
+        if gas_record is None or condensed_record is None:
+            reason = gas_reason if gas_record is None else condensed_reason
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                reason,
+                quantity=quantity,
+                origin=origin,
+                extra={"formula": identity.species.formula},
+            )
+        try:
+            gas_poly = _nasa_cea_9_polynomial(str(gas_record["record_id"]))
+            condensed_poly = _nasa_cea_9_polynomial(
+                str(condensed_record["record_id"])
+            )
+            gas_state, gas_outside = _nasa_cea_9_state(
+                gas_poly, temperature_K
+            )
+            condensed_state, condensed_outside = _nasa_cea_9_state(
+                condensed_poly, temperature_K
+            )
+            if gas_outside or condensed_outside:
+                pressure_ratio = reaction_equilibrium_constant(
+                    ((1.0, gas_state), (-1.0, condensed_state)),
+                    T_K=float(temperature_K),
+                )
+            else:
+                pressure_ratio = gas_poly.pure_psat_over_Pstd(
+                    condensed_poly, float(temperature_K)
+                )
+            if not math.isfinite(pressure_ratio) or pressure_ratio <= 0:
+                raise ValueError("NASA-9 pure vaporization ratio is outside float range")
+            pressure = as_decimal(str(pressure_ratio)) * as_decimal(
+                str(gas_poly.reference_pressure_Pa)
+            )
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return _refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "nasa-cea-psat-evaluation-unavailable",
+                quantity=quantity,
+                origin=origin,
+                extra={"detail": str(exc)},
+            )
+        return _nasa_cea_9_attempt_success(
+            quantity,
+            pressure,
+            origin=origin,
+            call_evidence=(
+                f"nasa-cea-9:pure-psat:{identity.species.formula}:"
+                f"{gas_record['record_id']}+{condensed_record['record_id']}:"
+                f"T={temperature_K}"
+            ),
+            polynomials=(gas_poly, condensed_poly),
+            extrapolated=gas_outside or condensed_outside,
+        )
+
+    if quantity in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}:
+        per = _per_basis(identity)
+        if per is not PerBasis.MOL_SPECIES:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "nasa-cea-pure-thermo-requires-mol-species",
+                quantity=quantity,
+                origin=origin,
+                extra={"per": None if per is None else per.value},
+            )
+        reference_temperature = temperature_K
+        declared_anchor = ""
+        if quantity is Quantity.H_MINUS_H298:
+            accepted = _accepted_enthalpy_anchor(
+                identity, engine=Engine.NASA_CEA_9, quantity=quantity, origin=origin
+            )
+            if isinstance(accepted, ThermoAttempt):
+                return accepted
+            reference_temperature, declared_anchor = accepted
+        record, reason = _nasa_cea_9_record_for_species(identity.species)
+        if record is None:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                reason,
+                quantity=quantity,
+                origin=origin,
+                extra={"formula": identity.species.formula},
+            )
+        gas_entropy_pressure: Decimal | None = None
+        if quantity is Quantity.S and phase_token(identity.species) is Phase.G:
+            pressure_state = identity.standard_pressure_Pa
+            if pressure_state is None or not pressure_state.is_value:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "nasa-cea-gas-entropy-pressure-missing",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            try:
+                gas_entropy_pressure = as_decimal(pressure_state.value)
+            except (TypeError, ValueError):
+                gas_entropy_pressure = Decimal("NaN")
+            if not gas_entropy_pressure.is_finite() or gas_entropy_pressure <= 0:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "nasa-cea-gas-entropy-pressure-not-positive",
+                    quantity=quantity,
+                    origin=origin,
+                )
+        try:
+            polynomial = _nasa_cea_9_polynomial(str(record["record_id"]))
+            state, outside = _nasa_cea_9_state(polynomial, temperature_K)
+            if quantity is Quantity.CP:
+                value = as_decimal(str(state.cp_J_per_mol_K))
+            elif quantity is Quantity.S:
+                value = as_decimal(str(state.s_J_per_mol_K))
+                if gas_entropy_pressure is not None:
+                    # The NASA gas polynomial gives S(T, p0), p0 = 100000 Pa.
+                    # S(T,p) = S(T,p0) - R ln(p/p0): zero shift at p0 and
+                    # about +95.7 J/mol/K at 1 Pa. Use the identity owner.
+                    value += ideal_gas_entropy_pressure_shift_J_per_mol_K(
+                        PA_PER_BAR_DEC, gas_entropy_pressure
+                    )
+            else:
+                anchor_state, anchor_outside = _nasa_cea_9_state(
+                    polynomial, reference_temperature
+                )
+                value = as_decimal(
+                    str((state.h_J_per_mol - anchor_state.h_J_per_mol) / 1000.0)
+                )
+                outside = outside or anchor_outside
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return _refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "nasa-cea-thermo-evaluation-unavailable",
+                quantity=quantity,
+                origin=origin,
+                extra={"detail": str(exc)},
+            )
+        evidence = (
+            f"nasa-cea-9:{record['record_id']}:{quantity.value}:T={temperature_K}"
+        )
+        if declared_anchor:
+            evidence += f":anchor={declared_anchor}"
+        return _nasa_cea_9_attempt_success(
+            quantity,
+            value,
+            origin=origin,
+            call_evidence=evidence,
+            polynomials=(polynomial,),
+            extrapolated=outside,
+        )
+
+    if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}:
+        reaction = _explicit_reaction(identity)
+        per = _per_basis(identity)
+        if reaction is None:
+            return _refuse(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                "nasa-cea-formation-reaction-unknown",
+                quantity=quantity,
+                origin=origin,
+            )
+        if per not in {PerBasis.MOL_SPECIES, PerBasis.MOL_O2}:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "nasa-cea-formation-per-basis-unsupported",
+                quantity=quantity,
+                origin=origin,
+                extra={"per": None if per is None else per.value},
+            )
+        target_coefficient = sum(
+            (term.coefficient for term in reaction.terms
+             if term.species.formula == identity.species.formula),
+            Fraction(0),
+        )
+        if target_coefficient <= 0 or any(
+            term.coefficient > 0
+            and term.species.formula != identity.species.formula
+            for term in reaction.terms
+        ):
+            return _refuse(
+                RefusalReason.IDENTITY_MISMATCH,
+                "nasa-cea-formation-reaction-target-not-single-product",
+                quantity=quantity,
+                origin=origin,
+            )
+        try:
+            from simulator.battery.identity import (
+                rescale_energy_per_basis,
+            )
+
+            term_states = []
+            polynomials = []
+            extrapolated = False
+            for term in reaction.terms:
+                record, reason = _nasa_cea_9_record_for_species(term.species)
+                if record is None:
+                    return _refuse(
+                        RefusalReason.UNSUPPORTED,
+                        reason,
+                        quantity=quantity,
+                        origin=origin,
+                        extra={"formula": term.species.formula},
+                    )
+                polynomial = _nasa_cea_9_polynomial(str(record["record_id"]))
+                state, outside = _nasa_cea_9_state(polynomial, temperature_K)
+                term_states.append((float(term.coefficient), state))
+                polynomials.append(polynomial)
+                extrapolated = extrapolated or outside
+            if quantity is Quantity.DELTA_FH:
+                energy_J_per_reaction = sum(
+                    coefficient * state.h_J_per_mol
+                    for (coefficient, state) in term_states
+                )
+            else:
+                equilibrium_constant = reaction_equilibrium_constant(
+                    term_states, T_K=float(temperature_K)
+                )
+                if not math.isfinite(equilibrium_constant) or equilibrium_constant <= 0:
+                    raise ValueError("NASA-9 reaction K is outside float range")
+                energy_J_per_reaction = (
+                    -R_J_PER_MOL_K
+                    * float(temperature_K)
+                    * math.log(equilibrium_constant)
+                )
+            per_species = as_decimal(str(energy_J_per_reaction / 1000.0)) / as_decimal(
+                target_coefficient
+            )
+            if quantity is Quantity.DELTA_FG:
+                pressure = identity.standard_pressure_Pa
+                if (
+                    not isinstance(pressure, State)
+                    or not pressure.is_value
+                    or pressure.value is None
+                    or pressure.value <= 0
+                ):
+                    return _refuse(
+                        RefusalReason.IDENTITY_UNKNOWN,
+                        "nasa-cea-standard-pressure-unknown",
+                        quantity=quantity,
+                        origin=origin,
+                    )
+                gas_coefficient = sum(
+                    (
+                        term.coefficient
+                        for term in reaction.terms
+                        if phase_token(term.species) is Phase.G
+                    ),
+                    Fraction(0),
+                ) / target_coefficient
+                per_species += standard_pressure_delta_g_kJ_per_mol(
+                    as_decimal(gas_coefficient),
+                    temperature_K,
+                    PA_PER_BAR_DEC,
+                    as_decimal(pressure.value),
+                )
+            if per is PerBasis.MOL_O2 and identity.species.formula != "O2":
+                per_species = rescale_energy_per_basis(
+                    per_species,
+                    PerBasis.MOL_SPECIES,
+                    PerBasis.MOL_O2,
+                    reaction,
+                )
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            return _refuse(
+                RefusalReason.ATTEMPTED_UNAVAILABLE,
+                "nasa-cea-formation-evaluation-unavailable",
+                quantity=quantity,
+                origin=origin,
+                extra={"detail": str(exc)},
+            )
+        return _nasa_cea_9_attempt_success(
+            quantity,
+            per_species,
+            origin=origin,
+            call_evidence=(
+                f"nasa-cea-9:formation:{quantity.value}:T={temperature_K}"
+            ),
+            polynomials=polynomials,
+            extrapolated=extrapolated,
+        )
+
+    return _refuse(
+        RefusalReason.UNSUPPORTED,
+        "nasa-cea-engine-does-not-emit",
+        quantity=quantity,
+        origin=origin,
+        extra={"engine": Engine.NASA_CEA_9.value},
     )
 
 
@@ -2041,6 +2547,70 @@ def _b1259_element_reference_phase_refusal(
     )
 
 
+_B677_H298_TEMPERATURES = (Decimal("298"), Decimal("298.15"))
+
+
+@lru_cache(maxsize=None)
+def _b677_printed_ideal_gas_h298(source_path: str, formula: str, table_id: str) -> bool:
+    """True when this B677 record prints the ideal-gas enthalpy zero.
+
+    Chapter 1 says a table headed as an ideal gas uses that gas as H298,
+    and those tables print H°−H°298 = 0 at 298 K
+    (pankratz-1984-usbm-b677-p001-p040.md:285-287). The combined K(c,l,g)
+    heading does not say ideal; its 298 K zero is the crystal.
+    ``table_id`` has to be the one JANAF gas table for ``formula``.
+    """
+
+    from simulator.battery.generators.janaf import _janaf_gas_table_ids
+
+    if _janaf_gas_table_ids().get(formula, ()) != (table_id,):
+        return False
+    norm = source_path.replace("\\", "/")
+    if "pankratz-1984-usbm-b677/records/" not in norm or not norm.endswith(".json"):
+        return False
+    from simulator.battery.migrate import (
+        REPO_ROOT,
+        compilation_column_series_from_record,
+    )
+
+    path = Path(norm)
+    if not path.is_file():
+        path = REPO_ROOT / norm.lstrip("/")
+    if not path.is_file():
+        return False
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(loaded, Mapping):
+        return False
+    token = loaded.get("formula_token")
+    if isinstance(token, Mapping) and token.get("value") not in (None, ""):
+        published = str(token["value"])
+    else:
+        published = str(loaded.get("formula_as_published") or "")
+    if published != formula:
+        return False
+    heading = str(loaded.get("name_as_published") or "")
+    if not heading:
+        heading = str(loaded.get("name_heading_raw") or "")
+    if "ideal" not in heading.casefold():
+        return False
+    series = next(
+        (
+            item
+            for item in compilation_column_series_from_record(loaded)
+            if item.quantity is Quantity.H_MINUS_H298
+        ),
+        None,
+    )
+    if series is None or not series.value.series:
+        return False
+    zeros = [
+        value
+        for temperature, value in series.value.series
+        if as_decimal(temperature) in _B677_H298_TEMPERATURES
+    ]
+    return len(zeros) == 1 and zeros[0] == 0
+
+
 def _tabulated_gas_basis_matches(
     observation: Observation, formula: str, table_id: str
 ) -> bool:
@@ -2049,11 +2619,14 @@ def _tabulated_gas_basis_matches(
     A JANAF row matches only its own table id. Mg-001 above the boiling
     point is the gas on the condensed 298.15 K zero; Mg-005 is the ideal-gas
     zero. A non-JANAF row matches only when its source-specific reference
-    owner establishes that the 298.15 K reference is this ideal gas. B677's
-    standalone K(g) table is such a match; its combined K(c,l,g) table is not.
-    A reference-state table that is crystal at 298.15 K does not, including
-    temperatures where the stable phase has become gas. H−H298 is the only
-    quantity that calls this. Cp and S do not.
+    owner establishes that the 298.15 K reference is this ideal gas. B1259
+    matches a record whose phase string is one ideal-gas span over the whole
+    grid and whose 298.15 K H−H298 cell is 0. A B677 row matches when its
+    record heading prints an ideal gas, its 298 K H−H298 cell is 0, and
+    ``formula`` is that one JANAF gas table. Neither predicate admits the
+    combined K(c,l,g) table or a reference-state table that is crystal at
+    298.15 K, including temperatures where the stable phase has become gas.
+    H−H298 is the only quantity that calls this. Cp and S do not.
     """
 
     if _is_janaf_compilation_observation(observation, None):
@@ -2062,6 +2635,7 @@ def _tabulated_gas_basis_matches(
     from simulator.battery.generators.usgs_b1259 import (
         SOURCE_ID as b1259_source,
         reference_enthalpy_zero_is_ideal_gas as b1259_ideal_gas,
+        reference_enthalpy_zero_is_ideal_gas_span as b1259_ideal_gas_span,
     )
     from simulator.battery.generators.usgs_b1452 import (
         SOURCE_ID as b1452_source,
@@ -2069,34 +2643,22 @@ def _tabulated_gas_basis_matches(
     )
 
     if source_id == b1259_source:
-        return b1259_ideal_gas(formula)
+        return b1259_ideal_gas(formula) or b1259_ideal_gas_span(
+            _locator_table_id(observation)
+        )
     if source_id == b1452_source:
         return b1452_ideal_gas(formula)
     if source_id == "pankratz-1984-usbm-b677":
-        # B677 defines H°T−H°298° = ∫298^T Cp°dT, with 298.15 K as the
-        # integration baseline, and says the standard state is "the state of
-        # pure elements and pure compounds in their stable states at 1 atm of
-        # pressure"; H°298° "refers to the pure elements or compounds stable
-        # or assumed to be stable at 298.15 K" (source p001-p040.md:223,255,259).
-        # Its separate table-0096 is headed K(g), "Potassium (ideal
-        # monatomic gas)", and prints H°−H°298 = 0 at 298 K
-        # (source p041-p080.md:873-876), so that row has the K-005 gas zero.
-        # The combined K(c,l,g) table-0095 retains the condensed 298 K zero.
-        # The generic migrator leaves table_index as locator note metadata;
-        # confirm table-0096 from both the parent id and its source record path.
+        # B677 defines H°T−H°298 as the integral of Cp° from 298.15 K, and
+        # says that for a table headed ideal gas, H298 is that gas rather
+        # than the stable condensed phase (p001-p040.md:223,259,285-287).
         locator = observation.locator
         source_path = (
             ""
             if locator is None or locator.source_path is None
-            else str(locator.source_path).replace("\\", "/")
+            else str(locator.source_path)
         )
-        parent_id = parent_observation_id(observation.observation_id)
-        return (
-            formula == "K"
-            and table_id == "K-005"
-            and parent_id.startswith(f"{source_id}:table-0096:")
-            and source_path.endswith("/records/table-0096.json")
-        )
+        return _b677_printed_ideal_gas_h298(source_path, formula, table_id)
     return False
 
 
@@ -2712,6 +3274,16 @@ def predict_thermo_attempt(
     identity = observation.identity
     origin = observation.observation_id
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    try:
+        refuse_proprietary_engine_use(engine, mode="surrogate_fitting")
+    except ProprietaryEngineRefusal as exc:
+        return _refuse(
+            exc.reason,
+            exc.code,
+            quantity=quantity or Quantity.DELTA_FG,
+            origin=origin,
+            extra={"engine": engine.value},
+        )
     if not isinstance(identity, Identity) or quantity is None:
         return _refuse(
             RefusalReason.IDENTITY_UNKNOWN,
@@ -2719,7 +3291,9 @@ def predict_thermo_attempt(
             quantity=Quantity.DELTA_FG,
             origin=origin,
         )
-    if quantity not in _THERMO_QUANTITIES:
+    if quantity not in _THERMO_QUANTITIES and not (
+        engine is Engine.NASA_CEA_9 and quantity is Quantity.P_SAT
+    ):
         return _refuse(
             RefusalReason.UNSUPPORTED,
             "quantity-not-thermochemistry",
@@ -2978,6 +3552,10 @@ def predict_thermo_attempt(
         )
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
+    if engine is Engine.NASA_CEA_9:
+        return _nasa_cea_9_attempt(
+            identity, quantity, temperature_K, origin=origin
+        )
     if engine is Engine.VAPOROCK:
         return _vaporock_gas_attempt(
             observation, identity, quantity, temperature_K, origin=origin

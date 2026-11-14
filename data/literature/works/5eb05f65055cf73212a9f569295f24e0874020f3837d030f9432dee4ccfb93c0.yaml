@@ -1,0 +1,905 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  citation: 'Yu, Y. & Hewins, R. H. (1997), "Evaporation of potassium and sodium under vacuum conditions: did chondrules really
+    form at low pressure?", Lunar and Planetary Science XXVIII, printed identifier 1048.PDF; ADS retrieval identifier 1997LPI....28.1613Y.'
+  source_ids:
+  - yu-hewins-1997-lpsc28-1613
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:yu-hewins-1997-lpsc28-1613
+      role: pdf
+      path: raw/yu-hewins-1997-lpsc28-1613/yu-hewins-1997-lpsc28-1613.pdf
+      sha256:
+        tag: value
+        value: 135e7d3756646474c4f44dc2f89c6a00e9d290df8de7093aa8165cea004d06cb
+    - asset_id: pdftotext:yu-hewins-1997-lpsc28-1613
+      role: pdftotext
+      path: text/yu-hewins-1997-lpsc28-1613
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:yu-hewins-1997-lpsc28-1613
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::experiment::yu_hewins_1997_flash_heating_simulation
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Same synthetic K- and Na-enriched silicate glass described on page 1.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+        note: Maximum flash-heating temperature is not printed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.799934'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+        note: Printed 6 × 10^-3 torr; converted to Pa using 101325 Pa per 760 torr.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.006'
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Results
+              note: Printed 6 × 10^-3 torr; converted to Pa using 101325 Pa per 760 torr.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Results
+              note: Printed 6 × 10^-3 torr; converted to Pa using 101325 Pa per 760 torr.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results
+    note: Flash heating simulation described after the main comparison.
+  bench_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::bench::yu_hewins_1997_deltech_furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Sample heated for 20 seconds then cooled at 5000 °C/hour.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Cooled at 5000 °C/hour.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+- experiment_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::experiment::yu_hewins_1997_one_atm_runs
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthetic silicate glass similar to type IIAB chondrules; 3.3% K2O and 2.8% Na2O.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: About 50 mg pellet supported by platinum wire on the sample holder.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Printed 1450 °C; converted to K.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Printed 1450 °C; converted to K.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Printed 1450 °C; converted to K.
+        output_unit: K
+        references: []
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Printed 1 atm; converted using 1 atm = 101325 Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Printed 1 atm; converted using 1 atm = 101325 Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Printed 1 atm; converted using 1 atm = 101325 Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO/CO2 mixture
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: CO/CO2 component ratio and partial pressures are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experiments
+    note: One-atmosphere run set with CO/CO2 gas mixture.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: iron-wustite buffer; fO2 controlled 0.5 log units below buffer
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Absolute fO2 or oxygen partial pressure is not reported.
+  bench_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::bench::yu_hewins_1997_deltech_furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Furnace flushed with CO/CO2 mixture; other procedure as vacuum runs.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Heating times ranged from 5 minutes to 2 hours across experiments.
+- experiment_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::experiment::yu_hewins_1997_vacuum_h2_runs
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthetic silicate glass similar to type IIAB chondrules; 3.3% K2O and 2.8% Na2O.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: About 50 mg pellet supported by platinum wire on the sample holder.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Printed 1450 °C; converted to K.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Printed 1450 °C; converted to K.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Printed 1450 °C; converted to K.
+        output_unit: K
+        references: []
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '9.332566'
+          approximate: false
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Evacuated to 6 × 10^-3 torr then pure H2 introduced to final 7 × 10^-2 torr; this value is the final total pressure,
+          converted using 101325 Pa per 760 torr. Figure 1 labels the H2 series 10^-4 atm.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Evacuated to 6 × 10^-3 torr then pure H2 introduced to final 7 × 10^-2 torr; this value is the final total
+                pressure, converted using 101325 Pa per 760 torr. Figure 1 labels the H2 series 10^-4 atm.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Evacuated to 6 × 10^-3 torr then pure H2 introduced to final 7 × 10^-2 torr; this value is the final total
+                pressure, converted using 101325 Pa per 760 torr. Figure 1 labels the H2 series 10^-4 atm.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: No H2 partial pressure is stated separately from total pressure.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experiments
+    note: Furnace evacuated, then pure H2 introduced; authors describe the set as vacuum+H2.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Pure H2 is introduced; no fO2 is stated.
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+  bench_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::bench::yu_hewins_1997_deltech_furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Same procedure as vacuum runs after H2 introduction.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Heating times ranged from 5 minutes to 2 hours across experiments.
+- experiment_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::experiment::yu_hewins_1997_vacuum_runs
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthetic silicate glass similar in composition to type IIAB chondrules; enriched to 3.3% K2O and 2.8% Na2O.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: About 50 mg pressed into a pellet and supported by platinum wire on the sample holder.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Printed 1450 °C; 1450 + 273.15 = 1723.15 K.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.799934'
+          approximate: false
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Furnace evacuated to 6 × 10^-3 torr before sample insertion; converted using 1 atm = 101325 Pa and 760 torr
+          = 1 atm. Figure 1 labels the vacuum series 10^-5 atm.
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.006'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Furnace evacuated to 6 × 10^-3 torr before sample insertion; converted using 1 atm = 101325 Pa and 760
+                torr = 1 atm. Figure 1 labels the vacuum series 10^-5 atm.
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              page: 1
+              pdf_page_index: 0
+              section: Experiments
+              note: Furnace evacuated to 6 × 10^-3 torr before sample insertion; converted using 1 atm = 101325 Pa and 760
+                torr = 1 atm. Figure 1 labels the vacuum series 10^-5 atm.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: No gas is introduced in the vacuum-only set; residual gas composition is not reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experiments
+    note: The authors call these vacuum evaporation experiments in a Deltech muffle tube furnace.
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: iron-wustite buffer; fO2 estimated above the buffer
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: fO2 is explicitly unknown; only its estimate relative to the iron-wustite buffer is stated.
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+  bench_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::bench::yu_hewins_1997_deltech_furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Furnace preheated to temperature; sample lowered into hot spot; removed and quenched in vacuum.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Run durations range from 5 minutes to 2 hours; no single duration applies.
+benches:
+- id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0::bench::yu_hewins_1997_deltech_furnace
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Deltech muffle tube furnace with vacuum system and controlled gas species.
+    locator:
+      page: 1
+      pdf_page_index: 0
+      section: Experiments
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 1
+      pdf_page_index: 0
+      section: Experiments
+      note: The charge is described as supported by a platinum wire on the sample holder; no cell or liner material is named.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+        note: Temperature stated as 1450 °C; sensor not identified.
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Experiments
+  other_facts: []
+context:
+- observation_id: yu_hewins_1997_activity_absence
+  type: characterization
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experimental results
+  units: as printed
+  values:
+    quantity: activity_data_status
+    method_class: quoted_unattributed
+    activity_values: none reported
+    defining_ions: not stated
+    reference_standard_state: not stated
+    note: The abstract reports vaporization rates and K/Na retention ratios, not oxide activities.
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_activity_absence
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_apparatus_and_sample_method
+  type: apparatus
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experiments
+  units: as printed
+  values:
+    quantity: furnace_capability_and_sample_preparation
+    method_class: measured_direct
+    apparatus_as_printed: Deltech muffle tube furnace with vacuum system; variable pressure from 1 to 10^-9 atm (10^-6 torr),
+      controlled gas species, instantaneous heating and quenching, and control of heating time, temperature and cooling rate.
+    preliminary_vacuum_range_as_printed: Reported preliminary experiments were run under primary vacuum range (~10^-2–10^-3
+      torr).
+    sample_as_printed: Synthetic silicate glass similar to type IIAB chondrules, enriched to 3.3% K2O and 2.8% Na2O; about
+      50 mg pressed into a pellet and supported by platinum wire.
+    starting_material_purity: not reported.
+    analytical_method_as_printed: Mass loss determined by weighing before and after heating; final charge compositions determined
+      by JEOL-8600 electron microprobe at 15 kV; rastered beam and shorter counting time used to minimize Na and K loss.
+    final_charge_as_printed: Clear glass and roughly oval in shape; numerical final charge compositions are not given.
+    temperature_measurement_uncertainty: not_reported
+    temperature_calibration: not_reported
+    cell_and_liner: not_identified; platinum wire sample support is reported.
+    pressure_calibration: Not reported for furnace pressure; pressure instrument and calibration are not identified. Ion-current
+      conversion is separately inapplicable.
+    orifice: Not applicable to the described muffle-tube furnace method.
+    ionization_energy_cross_sections_and_corrections: Not applicable; no mass spectrometer or ion-current measurements are
+      described.
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_apparatus_and_sample_method
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_discussion_comparisons
+  type: statement
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Discussion
+  units: verbatim prose
+  values:
+    quantity: condensation_evaporation_and_chondrule_comparisons
+    method_class: quoted_unattributed
+    statements_verbatim:
+    - Potassium and sodium have very similar condensation temperatures [1] but this does not necessarily lead to similar evaporation
+      rates.
+    - An analogous situation exists with isotopes of K, which may or may not show mass fractionation during evaporation [7].
+    - This study shows that when heated far above the minimum vaporization temperatures for both elements, sodium is more
+      easily lost from chondrule melts.
+    - Chondrules have various potassium and sodium contents and the two elements are positively correlated [8]. However, the
+      chondrule data are more or less linear on K-Na plot and do not show a curve that convex towards the potassium rich side
+      as shown in Fig. 2. This suggest that chondrules are unlikely to have formed by progressive evaporation from a single
+      original source, unless the conditions that suppress K isotopic fractionation also suppress K/Na fractionation. There
+      are other possibilities such as volatile recondensation [9] or low temperature re-entry [10], but how these processes
+      can affect the K/Na ratio is unknown.
+    - Compared to 1 atm pressure, potassium and sodium evaporate much faster at lower pressure and with the presence of H2,
+      as in a nebular environment.
+    - Detailed potassium isotopic study should unveil the secrets and this will be the next step of our on-going investigation.
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_discussion_comparisons
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_discussion_conclusion
+  type: statement
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results and discussion
+  units: verbatim prose
+  values:
+    quantity: flash_heating_and_low_pressure_conclusion
+    method_class: quoted_unattributed
+    numeric_context_as_printed: Flash heating simulation at 6 × 10^-3 torr; heated for 20 seconds; cooled at 5000°C/hr; charge
+      lost 40% sodium and 25% potassium.
+    statements_verbatim:
+    - More experiments are underway, but it becomes doubtful that flash heating alone will effectively prevent volatile loss
+      under low pressure conditions.
+    uncertainty: No numeric uncertainty for the losses or rates is reported.
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_discussion_conclusion
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_figures
+  type: figure_only
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Figures
+    figure: 1 and 2
+  units: ratios and time axes as printed; curves not digitized
+  values:
+    quantity: potassium_sodium_evaporation_figures
+    method_class: figure_only
+    figure_1: K/K(o) versus time (min); y ticks 1, 0.1, 0.01, 0.001; x ticks 0, 20, 40, 60, 80 min; plotted labels 1 atm,
+      10^-5 atm, and 10^-4 atm (with H2).
+    figure_2: K/K(o) versus Na/Na(o); both axes show 0.0 to 1.0 in 0.2 increments and a dashed 1:1 line; no curve coordinates
+      digitized.
+    digitized: false
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_figures
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_introduction_context
+  type: statement
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Introduction
+  units: verbatim prose
+  values:
+    quantity: prior_study_context_and_motivation
+    method_class: quoted_unattributed
+    statements_verbatim:
+    - Potassium and sodium are both moderately volatile elements [1]. Though many experimental studies have been done to investigate
+      the volatility of sodium and its implications to chondrule formation [e.g., 2,3], most of these experiments were performed
+      at 1 atm pressure. There have been only limited studies on the volatility of potassium [4,5] and it is not clear how
+      the evaporative behavior of potassium compares to that of sodium.
+    - Assuming chondrules formed in a nebular environment with pressures far less than 1 atm [6], a knowledge of the evaporative
+      behavior of the moderately volatile elements at low pressures is important for understanding the chondrule-forming processes.
+    - Moreover, understanding the evaporative behavior of potassium is particularly important because potassium is a lithophile
+      element with more than two isotopes, potentially a better candidate than sodium for studying nebular processes since
+      it allows studies of mass dependent isotopic fractionation [7].
+    quantitative_note: The introduction’s 1 atm and far-below-1-atm statements concern prior studies or the assumed nebular
+      environment, not this experiment’s run values.
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_introduction_context
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_one_atm_flash_conclusion
+  type: statement
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Discussion
+  units: verbatim prose
+  values:
+    quantity: one_atmosphere_flash_heating_conclusion
+    quote: Results obtained from 1 atm experiments are supportive of the flash heating scenario [3].
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_one_atm_flash_conclusion
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_reference_metadata
+  type: method
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: References
+  units: bibliographic identifiers as printed
+  values:
+    quantity: reference_numeric_context
+    description: '[1] Palme et al. (1988), Meteorites and the Early Solar System, 436–461; [2] Tsuchiyama et al. (1981), GCA
+      45, 1357–1367; [3] Yu et al. (1996), Chondrules and the Protoplanetary Disk, 213–219; [4] Gibson and Hubbard (1972),
+      Proc. LSC 3rd, 2003–2014; [5] Shimaoka and Nakamura (1991), Origin and Evolution of Interplanetary Dust, 79–82; [6]
+      Wood and Morfill (1988), Meteorites and the Early Solar System, 329–347; [7] Humayun and Clayton (1995), GCA 59, 2131–2148;
+      [8] Grossman (1996), Chondrules and the Protoplanetary Disk, 243–253; [9] Huang et al. (1994), LPS XXV, 573–574; [10]
+      Grossman (1996), LPS XXVII, 467–468.'
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_reference_metadata
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_results_directional_claims
+  type: statement
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experimental results
+  units: verbatim prose
+  values:
+    quantity: reported_pressure_hydrogen_and_element_rate_comparisons
+    method_class: quoted_unattributed
+    statements_verbatim:
+    - First, pressure has a significant effect on the vaporization rates of both K and Na from silicate melt. The calculated
+      vaporization rate of K at 1450°C, for example, is about an order of magnitude higher at 10^-5 atm than that at 1 atmosphere
+      pressure, e.g., 3.8 × 10^-3 cm/min vs. 1.7 × 10^-4 cm/min (Fig. 1).
+    - Second, the presence of H2 enhances the K and Na loss. Introduction of H2 into the evacuated system caused about an
+      order of magnitude increase in overall system pressure, yet the vaporization rates for both K and Na are slightly increased.
+    - Third, Na has a higher vaporization rate than K. This is observed in all three sets of experiments run under different
+      pressures and gas environment. On the K/Ko vs. Na/Nao diagram (Fig. 2), the data of experimental charges significantly
+      deviate from the 1:1 line and form a curve convex towards the K-rich side. The calculated values of vaporization rates
+      for Na are about 1.3 to 2 factors higher than those for K.
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_results_directional_claims
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_source_identity_context
+  type: method
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Header and affiliation
+  units: metadata as printed
+  values:
+    quantity: source_identity_and_provenance
+    description: Printed header Lunar and Planetary Science XXVIII and 1048.PDF; affiliation Rutgers University, Piscataway,
+      NJ 08855. Source key and ADS retrieval identifier 1997LPI....28.1613Y retained as retrieval metadata; 1613 is not printed
+      as the abstract identifier. No licence statement is printed on either supplied page; licence unverified offline.
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_source_identity_context
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K
+- observation_id: yu_hewins_1997_vacuum_run_conditions
+  type: experiment_series
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Experiments
+  units: as printed
+  values:
+    quantity: three_pressure_and_gas_run_sets
+    method_class: measured_direct
+    common_temperature_C: 1450
+    temperature_above_liquidus_C: about 30
+    heating_time_range: 5 minutes to 2 hours
+    vacuum_set: Preheated furnace evacuated to 6 × 10^-3 torr before sample was lowered into hot spot; fO2 unknown, estimated
+      above iron-wustite buffer by iron foil test; quenched in vacuum.
+    vacuum_hydrogen_set: Preheated and evacuated to 6 × 10^-3 torr; pure H2 introduced until total pressure was 7 × 10^-2
+      torr; remaining procedure similar to vacuum runs.
+    one_atmosphere_set: Furnace flushed with CO/CO2 gas mixture; fO2 controlled at 0.5 log units below iron-wustite buffer.
+    post_run_composition: Final charge compositions analyzed by microprobe, but numerical final compositions are not reported.
+    uncertainty: Temperature sensor, temperature uncertainty, calibration and numeric analytical uncertainty not reported.
+  context_id: yu-hewins-1997-lpsc28-1613::context::yu_hewins_1997_vacuum_run_conditions
+  work_id: 5eb05f65055cf73212a9f569295f24e0874020f3837d030f9432dee4ccfb93c0
+  source_id: yu-hewins-1997-lpsc28-1613
+  species: K

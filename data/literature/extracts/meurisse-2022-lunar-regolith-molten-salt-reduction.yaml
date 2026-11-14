@@ -1,0 +1,2635 @@
+schema_version: literature_extract.v1
+source_id: meurisse-2022-lunar-regolith-molten-salt-reduction
+source:
+  citation: Meurisse, A., Lomax, B., Selmeci, Á., Conti, M., Lindner, R., Makaya, A., Symes, M. D. and Carpenter, J. (2022)
+    Lower temperature electrochemical reduction of lunar regolith simulants in molten salts. Planetary and Space Science,
+    211, 105408.
+  doi: 10.1016/j.pss.2021.105408
+  url: https://doi.org/10.1016/j.pss.2021.105408
+  year: 2022
+  version: Author Accepted Manuscript (University of Glasgow Enlighten, eprints.gla.ac.uk/261964, deposited 10 January 2022);
+    not the version of record
+  corpus_asset: raw/meurisse-2022-lunar-regolith-molten-salt-reduction/meurisse-2022-lunar-regolith-molten-salt-reduction.pdf
+  corpus_sha256: efc4ed7102aed82c441bc12b905db9c620161c96c9cfdf9a4fa2020402d8fec1
+extraction:
+  method: Native PDF text layer (pdftotext -layout) used to locate content; Tables 1-3 transcribed and every cell checked
+    against 110 dpi page renders; key prose numbers checked against the text layer page by page. Figures not digitized. Locators
+    use PDF pages because the AAM has no journal pagination or line numbers.
+  date: '2026-10-05'
+  worker: s37b3-backlog37
+  corpus_tables: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/
+review_status: draft
+fidelity_samples:
+- species: LMS-1
+  observation_id: meurisse_2022_table2_bulk_chemistry
+  field: LMS-1_wt_pct
+  value:
+    SiO2: 42.81
+    MgO: 18.89
+    Al2O3: 14.13
+    FeOT: 7.87
+    CaO: 5.94
+    Na2O: 4.92
+    TiO2: 4.62
+    K2O: 0.57
+    P2O5: 0.44
+    Cr2O3: 0.21
+    MnO: 0.15
+    SO3: 0.11
+    Total: 100.00
+  locator:
+    page: 4
+    table: '2'
+    note: All LMS-1 column cells including Total
+- species: LMS-1
+  observation_id: meurisse_2022_table1_lms1_mineralogy
+  field: mineralogy_wt_pct
+  value:
+    Pyroxene: 32.8
+    Glass-rich basalt: 32.0
+    Anorthosite: 19.8
+    Olivine: 11.1
+    Ilmenite: 4.3
+  locator:
+    page: 4
+    table: '1'
+    note: All Table 1 cells
+- species: LMS-1
+  observation_id: meurisse_2022_run_cacl2_850C
+  field: current_efficiency_pct
+  value:
+    bound: <
+    value: 40
+  locator:
+    page: 13
+    section: CaCl2 electrolyte
+    note: '''the extent of reduction dropped to 50% and the current efficiency to less than 40%'''
+- species: LMS-1
+  observation_id: meurisse_2022_run_licl_785C
+  field: current_efficiency_pct
+  value:
+    value: 6
+  locator:
+    page: 20
+    section: LiCl electrolyte
+    note: '''a reduction level below 20% and a current efficiency of 6%'''
+benches:
+- id: esa-estec-ffc-inconel-cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: 'FFC Cambridge molten-salt electrolysis cell: vertical 2.3 L Inconel 600 cell with removable lid (one gas inlet,
+        one gas outlet, two cathode-basket feedthroughs, one anode feedthrough, one thermocouple feedthrough); two-electrode
+        set-up; potentiostatic operation'
+    locator: &id001
+      page: 6
+      pdf_page_index: 5
+      section: Materials and methods / Electrochemical setup
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Inconel 600 cell body; 0.5 L alumina crucible holding the dry salt and oxide at the bottom of the cell
+    locator: *id001
+  heating_method:
+    state:
+      tag: value
+      value: Bottom of the cell inside a tube furnace; a water heat exchanger cools the top of the cell; process temperature
+        controlled between 660 and 950 °C
+    locator: *id001
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: K-type Inconel 600 thermocouple covered with an alumina sheath and immersed in the salt; temperature logged
+          with a Pico Technology data logger
+      locator:
+        page: 6
+        pdf_page_index: 5
+        section: Materials and methods / Electrochemical setup
+        note: Data logger named on PDF p. 7 (Reduction experiments).
+  temperature_calibration:
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        pdf_page_index: 5
+        section: Materials and methods / Electrochemical setup
+        note: No thermocouple calibration or temperature uncertainty is printed.
+  gauges:
+    pressure_sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No pressure gauge or cell pressure is printed; the cell is swept with argon.
+  detector:
+    state:
+      tag: value
+      value: Pfeiffer Thermostar mass spectrometer, qualitative analysis of the filtered process off-gas; electrolysis by
+        Biologic VMP3 potentiostat with a 20 A booster
+    locator: &id002
+      page: 7
+      pdf_page_index: 6
+      section: Materials and methods / Reduction experiments
+  other_facts:
+  - name: cell_volume
+    unit: L
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2.3'
+      locator: *id001
+  - name: alumina_crucible_volume
+    unit: L
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.5'
+      locator: *id001
+  - name: cathode
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Ø47 mm SS316 basket perforated with Ø2 mm holes, holding the sintered LMS-1 pellet
+      locator: *id001
+  - name: anode
+    unit: mm
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Ø12.7 mm graphite rod, 100 mm long
+      locator: *id001
+  - name: current_collectors
+    unit: none
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Inconel 600 rod
+      locator: *id001
+  - name: cell_voltage
+    unit: V
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3.2'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Constant voltage for 24 h; ramped at 0.25 V/min at the start of each experiment.
+  - name: voltage_ramp_rate
+    unit: V/min
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.25'
+      locator: *id002
+  - name: argon_flow
+    unit: L/min
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'; reference conditions not stated.
+experiments:
+- experiment_id: meurisse-ffc-cacl2-950C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: CaCl2 | 950 | 0.8 wt% CaO
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 | 950 | 0.8 wt% CaO
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1223.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 | 950 | 0.8 wt% CaO
+        note: Electrolysis temperature 950 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 950 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte CaCl2 with 0.8 wt% CaO, 24 g regolith in 800 g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1223.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: CaCl2 | 950 | 0.8 wt% CaO
+          note: 950 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+- experiment_id: meurisse-ffc-cacl2-900C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: CaCl2 | 900 | 0.8 wt% CaO
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 | 900 | 0.8 wt% CaO
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1173.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 | 900 | 0.8 wt% CaO
+        note: Electrolysis temperature 900 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 900 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte CaCl2 with 0.8 wt% CaO, 24 g regolith in 800 g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1173.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: CaCl2 | 900 | 0.8 wt% CaO
+          note: 900 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+- experiment_id: meurisse-ffc-cacl2-850C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: CaCl2 | 850 | 0.8 wt% CaO
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 | 850 | 0.8 wt% CaO
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1123.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 | 850 | 0.8 wt% CaO
+        note: Electrolysis temperature 850 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 850 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte CaCl2 with 0.8 wt% CaO, 24 g regolith in 800 g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1123.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: CaCl2 | 850 | 0.8 wt% CaO
+          note: 850 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+- experiment_id: meurisse-ffc-cacl2-kcl-950C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: CaCl2 (82 wt.%) /KCl (18 wt.%) | 950 | 0.8 wt% CaO
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (82 wt.%) /KCl (18 wt.%) | 950 | 0.8 wt% CaO
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1223.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (82 wt.%) /KCl (18 wt.%) | 950 | 0.8 wt% CaO
+        note: Electrolysis temperature 950 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 950 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte CaCl2 (82 wt.%) /KCl (18 wt.%) with 0.8 wt% CaO, 24 g regolith in 800
+          g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1223.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: CaCl2 (82 wt.%) /KCl (18 wt.%) | 950 | 0.8 wt% CaO
+          note: 950 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+- experiment_id: meurisse-ffc-cacl2-kcl-806C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: CaCl2 (82 wt.%) /KCl (18 wt.%) | 806 | 0.8 wt% CaO
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (82 wt.%) /KCl (18 wt.%) | 806 | 0.8 wt% CaO
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1079.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (82 wt.%) /KCl (18 wt.%) | 806 | 0.8 wt% CaO
+        note: Electrolysis temperature 806 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 806 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte CaCl2 (82 wt.%) /KCl (18 wt.%) with 0.8 wt% CaO, 24 g regolith in 800
+          g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1079.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: CaCl2 (82 wt.%) /KCl (18 wt.%) | 806 | 0.8 wt% CaO
+          note: 806 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+- experiment_id: meurisse-ffc-cacl2-nacl-950C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: CaCl2 (69 wt.%) /NaCl (31 wt.%) | 950 | 0.8 wt% CaO
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (69 wt.%) /NaCl (31 wt.%) | 950 | 0.8 wt% CaO
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1223.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (69 wt.%) /NaCl (31 wt.%) | 950 | 0.8 wt% CaO
+        note: Electrolysis temperature 950 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 950 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte CaCl2 (69 wt.%) /NaCl (31 wt.%) with 0.8 wt% CaO, 24 g regolith in 800
+          g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1223.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: CaCl2 (69 wt.%) /NaCl (31 wt.%) | 950 | 0.8 wt% CaO
+          note: 950 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+- experiment_id: meurisse-ffc-cacl2-nacl-680C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: CaCl2 (69 wt.%) /NaCl (31 wt.%) | 680 | 0.8 wt% CaO
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (69 wt.%) /NaCl (31 wt.%) | 680 | 0.8 wt% CaO
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '953.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (69 wt.%) /NaCl (31 wt.%) | 680 | 0.8 wt% CaO
+        note: Electrolysis temperature 680 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 680 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte CaCl2 (69 wt.%) /NaCl (31 wt.%) with 0.8 wt% CaO, 24 g regolith in 800
+          g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '953.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: CaCl2 (69 wt.%) /NaCl (31 wt.%) | 680 | 0.8 wt% CaO
+          note: 680 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+- experiment_id: meurisse-ffc-cacl2-licl-950C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: CaCl2 (60 wt.%) /LiCl (40 wt.%) | 950 | 0.8 wt% CaO
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (60 wt.%) /LiCl (40 wt.%) | 950 | 0.8 wt% CaO
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1223.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (60 wt.%) /LiCl (40 wt.%) | 950 | 0.8 wt% CaO
+        note: Electrolysis temperature 950 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 950 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte CaCl2 (60 wt.%) /LiCl (40 wt.%) with 0.8 wt% CaO, 24 g regolith in 800
+          g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1223.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: CaCl2 (60 wt.%) /LiCl (40 wt.%) | 950 | 0.8 wt% CaO
+          note: 950 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+- experiment_id: meurisse-ffc-cacl2-licl-660C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: CaCl2 (60 wt.%) /LiCl (40 wt.%) | 660 | 0.8 wt% CaO
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (60 wt.%) /LiCl (40 wt.%) | 660 | 0.8 wt% CaO
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '933.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: CaCl2 (60 wt.%) /LiCl (40 wt.%) | 660 | 0.8 wt% CaO
+        note: Electrolysis temperature 660 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 660 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte CaCl2 (60 wt.%) /LiCl (40 wt.%) with 0.8 wt% CaO, 24 g regolith in 800
+          g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '933.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: CaCl2 (60 wt.%) /LiCl (40 wt.%) | 660 | 0.8 wt% CaO
+          note: 660 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+- experiment_id: meurisse-ffc-licl-785C
+  bench_id: esa-estec-ffc-inconel-cell
+  method:
+    tag: unknown
+    reason: not_published
+  locator:
+    page: 6
+    pdf_page_index: 5
+    table: '3'
+    source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+    row: LiCl | 785 | 0.8 wt% Li2O
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.024'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: LiCl | 785 | 0.8 wt% Li2O
+        note: 'Table 3 caption: ''used a mass of regolith of 24 g''; unit conversion only.'
+    form:
+      state:
+        tag: value
+        value: LMS-1 Lunar Mare Simulant (CLASS Exolith Lab, University of Central Florida), sintered porous pellet approximately
+          46 mm in diameter and 10 mm tall
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+        figure: '2'
+        note: LMS-1 identity on PDF p. 4.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+        note: 'LMS-1 bulk oxide wt% as printed (quoted from ref. [29], supplier data, not measured on these pellets). FeOT:
+          Fe2+ and Fe3+ not distinguished. Total printed 100.00.'
+    pretreatment:
+      state:
+        tag: value
+        value: 24 g LMS-1 sintered in a cylindrical alumina crucible at a furnace temperature of 1135 °C for 2 hours under
+          argon
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1058.15'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+        row: LiCl | 785 | 0.8 wt% Li2O
+        note: Electrolysis temperature 785 °C; unit conversion only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: No cell pressure is printed; argon-swept cell.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Printed 'A constant flow of argon (1 L/min)'. The reference temperature and pressure for the volumetric flow
+          are not stated, so no sccm value is assigned.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Argon-swept cell; no vacuum pumping during electrolysis is described.
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Salt dried under vacuum at 120 °C for 48 h before each experiment; electrolysis at 785 °C, constant 3.2 V for
+          24 h after a 0.25 V/min ramp; electrolyte LiCl with 0.8 wt% Li2O, 24 g regolith in 800 g salt (1:33)
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Salt drying on PDF p. 6; 800 g salt on PDF p. 6 (Salts and oxides).
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Reduction experiments
+        note: Heat-up and cool-down durations are not printed.
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1058.15'
+        locator:
+          page: 6
+          pdf_page_index: 5
+          table: '3'
+          source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+          row: LiCl | 785 | 0.8 wt% Li2O
+          note: 785 °C; unit conversion only.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '86400'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          section: Materials and methods / Reduction experiments
+          note: Constant voltage for 24 hours; unit conversion only. The hold is the electrolysis duration.
+species:
+  LMS-1:
+    observations: []
+    context:
+    - observation_id: meurisse_2022_run_cacl2_950C
+      type: experiment_run_result
+      experiment: meurisse-ffc-cacl2-950C
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: Results & discussions / CaCl2 electrolyte
+        note: 'Run condition row: Table 3, PDF p. 6 (CaCl2 | 950 | 0.8 wt% CaO).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: CaCl2
+        temperature_C: 950
+        added_oxide_as_printed: 0.8 wt% CaO
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        oxygen_removal_pct:
+          approx: 85
+        current_efficiency_pct:
+          approx: 48
+        statements_as_printed:
+        - '''a high level of reduction of LMS-1 can be achieved in CaCl2 at 950 °C (~85 %)'' (PDF p. 9)'
+        - '''the majority (85 %) of the lunar regolith simulant being reduced to a metal powder in 24 hours'' (PDF p. 13)'
+        - '''from approximately 85% and 48%, respectively'' (extent of reduction and current efficiency at 950 °C, PDF p.
+          13)'
+        - '''85% of the oxygen could be removed in the comparative experiment using the baseline conditions of CaCl2 at 950
+          °C'' (Abstract, PDF p. 2)'
+        sem_edx: 'Metal phases identified by EDX (Figure 7, PDF p. 13): Ca/Si/Al and Fe/Ti/Si/Al phases and a wide Si/Mg phase'
+        oxygen_basis: Remaining oxygen by inert gas fusion (Elementar Inductar OHN Cube)
+        figure_basis: Oxygen removal and current efficiency are plotted in Figure 6 (PDF p. 11) only; not digitized.
+    - observation_id: meurisse_2022_run_cacl2_900C
+      type: experiment_run_result
+      experiment: meurisse-ffc-cacl2-900C
+      locator:
+        page: 14
+        pdf_page_index: 13
+        section: Results & discussions / CaCl2 electrolyte
+        note: 'Run condition row: Table 3, PDF p. 6 (CaCl2 | 900 | 0.8 wt% CaO).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: CaCl2
+        temperature_C: 900
+        added_oxide_as_printed: 0.8 wt% CaO
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        total_charge_relative_to_950C: '''~8% less than at 950 °C, under equivalent conditions'' as printed'
+        oxygen_removal_pct: not printed in prose
+        current_efficiency_pct: not printed in prose
+        figure_basis: Oxygen removal and current efficiency are plotted in Figure 6 (PDF p. 11) only; not digitized.
+    - observation_id: meurisse_2022_run_cacl2_850C
+      type: experiment_run_result
+      experiment: meurisse-ffc-cacl2-850C
+      locator:
+        page: 13
+        pdf_page_index: 12
+        section: Results & discussions / CaCl2 electrolyte
+        note: 'Run condition row: Table 3, PDF p. 6 (CaCl2 | 850 | 0.8 wt% CaO).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: CaCl2
+        temperature_C: 850
+        added_oxide_as_printed: 0.8 wt% CaO
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        oxygen_removal_pct:
+          approx: 50
+        current_efficiency_pct:
+          bound: <
+          value: 40
+        statements_as_printed:
+        - '''the extent of reduction dropped to 50% and the current efficiency to less than 40%'' (PDF p. 13)'
+        - '''the total charge was reduced by ~40% at 850 °C'' relative to 950 °C (PDF p. 14)'
+        total_charge_relative_to_950C: ~40% less, as printed
+        text_discrepancy_note: The Conclusion (PDF p. 22) says 'Reducing the temperature of CaCl2 down to 850 °C dropped the
+          current efficiency to below 30%', while the Results (PDF p. 13) say 'less than 40%'. Both kept; not reconciled.
+        figure_basis: Oxygen removal and current efficiency are plotted in Figure 6 (PDF p. 11) only; not digitized.
+    - observation_id: meurisse_2022_run_cacl2_kcl_950C
+      type: experiment_run_result
+      experiment: meurisse-ffc-cacl2-kcl-950C
+      locator:
+        page: 21
+        pdf_page_index: 20
+        figure: '11'
+        note: 'Run condition row: Table 3, PDF p. 6 (CaCl2 (82 wt.%) /KCl (18 wt.%) | 950 | 0.8 wt% CaO).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: CaCl2 (82 wt.%) /KCl (18 wt.%)
+        temperature_C: 950
+        added_oxide_as_printed: 0.8 wt% CaO
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        oxygen_removal_pct: not printed in prose
+        current_efficiency_pct: not printed in prose
+        figure_basis: Oxygen removal and current efficiency at 950 °C are plotted in Figure 11 (PDF p. 21) only; not digitized.
+    - observation_id: meurisse_2022_run_cacl2_kcl_806C
+      type: experiment_run_result
+      experiment: meurisse-ffc-cacl2-kcl-806C
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: Results & discussions / CaCl2 - KCl eutectic electrolyte
+        note: 'Run condition row: Table 3, PDF p. 6 (CaCl2 (82 wt.%) /KCl (18 wt.%) | 806 | 0.8 wt% CaO).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: CaCl2 (82 wt.%) /KCl (18 wt.%)
+        temperature_C: 806
+        added_oxide_as_printed: 0.8 wt% CaO
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        oxygen_removal_pct:
+          approx: 51
+        current_efficiency_pct_series:
+          approx: 45
+          scope_as_printed: '''the current efficiency of the CaCl2-KCl experiments, around 45%, is similar to that of CaCl2
+            at 950 °C'' (PDF p. 15); the sentence compares against the 850 °C CaCl2 run ''which achieved a similar reduction
+            level'', but does not name the run temperature'
+        statements_as_printed:
+        - '''SEM analyses of the samples reduced in CaCl2-KCl at 806 °C ... The reduction (~51%) seemed to have been homogeneously
+          distributed'' (PDF p. 15)'
+        sem_edx: No metallic phases found (Figure 8, PDF p. 16); calcium-rich phases
+        figure_basis: Oxygen removal and current efficiency are plotted in Figure 6 (PDF p. 11) only; not digitized.
+    - observation_id: meurisse_2022_run_cacl2_nacl_950C
+      type: experiment_run_result
+      experiment: meurisse-ffc-cacl2-nacl-950C
+      locator:
+        page: 21
+        pdf_page_index: 20
+        figure: '11'
+        note: 'Run condition row: Table 3, PDF p. 6 (CaCl2 (69 wt.%) /NaCl (31 wt.%) | 950 | 0.8 wt% CaO).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: CaCl2 (69 wt.%) /NaCl (31 wt.%)
+        temperature_C: 950
+        added_oxide_as_printed: 0.8 wt% CaO
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        oxygen_removal_pct: not printed in prose
+        current_efficiency_pct: not printed in prose
+        figure_basis: Oxygen removal and current efficiency at 950 °C are plotted in Figure 11 (PDF p. 21) only; not digitized.
+    - observation_id: meurisse_2022_run_cacl2_nacl_680C
+      type: experiment_run_result
+      experiment: meurisse-ffc-cacl2-nacl-680C
+      locator:
+        page: 17
+        pdf_page_index: 16
+        section: Results & discussions / CaCl2 - NaCl eutectic electrolyte
+        note: 'Run condition row: Table 3, PDF p. 6 (CaCl2 (69 wt.%) /NaCl (31 wt.%) | 680 | 0.8 wt% CaO).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: CaCl2 (69 wt.%) /NaCl (31 wt.%)
+        temperature_C: 680
+        added_oxide_as_printed: 0.8 wt% CaO
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        oxygen_removal_pct:
+          bound: '>'
+          value: 40
+        current_efficiency_pct:
+          bound: '>'
+          value: 60
+        statements_as_printed:
+        - '''more than 40% of the regolith could be reduced at 680 °C, with a current efficiency above 60%. This offers a
+          more efficient use of the current at a temperature 126 °C less than the CaCl2-KCl eutectic'' (PDF p. 17)'
+        sem_edx: No metal-rich phase observed in any particle (Figure 9, PDF p. 18)
+        figure_basis: Oxygen removal and current efficiency are plotted in Figure 6 (PDF p. 11) only; not digitized.
+    - observation_id: meurisse_2022_run_cacl2_licl_950C
+      type: experiment_run_result
+      experiment: meurisse-ffc-cacl2-licl-950C
+      locator:
+        page: 21
+        pdf_page_index: 20
+        figure: '11'
+        note: 'Run condition row: Table 3, PDF p. 6 (CaCl2 (60 wt.%) /LiCl (40 wt.%) | 950 | 0.8 wt% CaO).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: CaCl2 (60 wt.%) /LiCl (40 wt.%)
+        temperature_C: 950
+        added_oxide_as_printed: 0.8 wt% CaO
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        oxygen_removal_pct: not printed in prose
+        current_efficiency_pct: not printed in prose
+        figure_basis: Oxygen removal and current efficiency at 950 °C are plotted in Figure 11 (PDF p. 21) only; not digitized.
+    - observation_id: meurisse_2022_run_cacl2_licl_660C
+      type: experiment_run_result
+      experiment: meurisse-ffc-cacl2-licl-660C
+      locator:
+        page: 18
+        pdf_page_index: 17
+        section: Results & discussions / CaCl2 - LiCl eutectic electrolyte
+        note: 'Run condition row: Table 3, PDF p. 6 (CaCl2 (60 wt.%) /LiCl (40 wt.%) | 660 | 0.8 wt% CaO).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: CaCl2 (60 wt.%) /LiCl (40 wt.%)
+        temperature_C: 660
+        added_oxide_as_printed: 0.8 wt% CaO
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        oxygen_removal_pct:
+          bound: '>'
+          value: 40
+        current_efficiency_pct:
+          approx: 35
+        statements_as_printed:
+        - '''The level of reduction at 660 °C in CaCl2-LiCl eutectic, above 40%, was similar to the CaCl2-NaCl eutectic but
+          the current efficiency dropped to approximately 35%'' (PDF p. 18)'
+        sem_edx: Metallised phases such as Si/Ca and Si/Ti/Fe; a partially reduced olivine (Figure 10, PDF p. 19)
+        figure_basis: Oxygen removal and current efficiency are plotted in Figure 6 (PDF p. 11) only; not digitized.
+    - observation_id: meurisse_2022_run_licl_785C
+      type: experiment_run_result
+      experiment: meurisse-ffc-licl-785C
+      locator:
+        page: 20
+        pdf_page_index: 19
+        section: Results & discussions / LiCl electrolyte
+        note: 'Run condition row: Table 3, PDF p. 6 (LiCl | 785 | 0.8 wt% Li2O).'
+      units: °C; %; wt%; g; h; V as printed
+      values:
+        quantity: ffc_electrolysis_run_result
+        method_class: measured_derived
+        evidence_class: authors_own_experiment
+        electrolyte_as_printed: LiCl
+        temperature_C: 785
+        added_oxide_as_printed: 0.8 wt% Li2O
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        duration_h: 24
+        cell_voltage_V: 3.2
+        oxygen_removal_pct:
+          bound: <
+          value: 20
+        current_efficiency_pct:
+          value: 6
+        statements_as_printed:
+        - '''Results show a reduction level below 20% and a current efficiency of 6%'' (PDF p. 20)'
+        - '''The extent of reduction in LiCl does not exceed 20%, with a current efficiency below 10%'' (PDF p. 9-10)'
+        - Raising the voltage slightly above 3.4 V gave a new release of oxygen by gas analysis, but chlorine formed, so the
+          test ran only a few minutes (PDF p. 20)
+        sem_edx: No SEM performed (reduction too low)
+        figure_basis: Oxygen removal and current efficiency are plotted in Figure 6 (PDF p. 11) only; not digitized.
+    - observation_id: meurisse_2022_table1_lms1_mineralogy
+      type: characterization
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '1'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t1.csv
+      units: wt%
+      values:
+        quantity: feedstock_mineralogy
+        method_class: quoted_attributed
+        attribution: ref. [29] (CLASS Exolith Lab, University of Central Florida)
+        material: LMS-1
+        mineralogy_wt_pct:
+          Pyroxene: 32.8
+          Glass-rich basalt: 32.0
+          Anorthosite: 19.8
+          Olivine: 11.1
+          Ilmenite: 4.3
+    - observation_id: meurisse_2022_table2_bulk_chemistry
+      type: characterization
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t2.csv
+      units: wt%
+      values:
+        quantity: feedstock_bulk_chemistry
+        method_class: quoted_attributed
+        attribution: 'LMS-1: ref. [29]; Apollo 11 sample 10084, 1591: ref. [30]'
+        LMS-1_wt_pct:
+          SiO2: 42.81
+          MgO: 18.89
+          Al2O3: 14.13
+          FeOT: 7.87
+          CaO: 5.94
+          Na2O: 4.92
+          TiO2: 4.62
+          K2O: 0.57
+          P2O5: 0.44
+          Cr2O3: 0.21
+          MnO: 0.15
+          SO3: 0.11
+          Total: 100.00
+        Apollo_11_10084_1591_wt_pct:
+          SiO2: 41.3
+          MgO: 8.0
+          Al2O3: 13.7
+          FeOT: 15.8
+          CaO: 12.5
+          Na2O: 0.41
+          TiO2: 7.5
+          K2O: 0.14
+          P2O5: /
+          Cr2O3: 0.290
+          MnO: 0.213
+          SO3: /
+          Total: 99.85
+        footnote: '*: Fe2+ and Fe3+ are not distinguished (printed at the top of PDF p. 5)'
+        note: '''/'' cells kept as printed; no value.'
+    - observation_id: meurisse_2022_table3_run_matrix
+      type: experiment_series
+      locator:
+        page: 6
+        pdf_page_index: 5
+        table: '3'
+        source_path: tables/meurisse-2022-lunar-regolith-molten-salt-reduction/t3.csv
+      units: °C; wt%; g
+      values:
+        quantity: run_matrix
+        method_class: controlled_laboratory_condition
+        runs: 10
+        regolith_to_salt_ratio_as_printed: '1:33'
+        regolith_mass_g: 24
+        salt_mass_g: 800
+        design_rule: For each CaCl2-X eutectic, one run at 950 °C (the CaCl2 reference temperature) and one at its melting
+          point + 180 °C (the gap between 950 °C and the CaCl2 melting point); CaO mass kept constant. LiCl with 0.8% Li2O
+          run at its melting point + 180 °C.
+        note: Design rule and 800 g salt on PDF p. 5-6 (Salts and oxides).
+    - observation_id: meurisse_2022_sample_and_salt_preparation
+      type: method
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: Materials and methods
+      units: °C; h; g; mm
+      values:
+        quantity: sample_and_electrolyte_preparation
+        method_class: method_only
+        pellet: 24 g LMS-1 in a cylindrical alumina crucible, sintered at a furnace temperature of 1135 °C for 2 h under argon;
+          porous pellets about 46 mm diameter and 10 mm tall
+        salt_drying: Salt dried under vacuum at 120 °C for 48 h before each experiment (PDF p. 6) to limit CaO formation from
+          hydrolysis of absorbed moisture
+    - observation_id: meurisse_2022_post_run_analysis
+      type: method
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Materials and methods / Sample analysis
+      units: °C; h; mg
+      values:
+        quantity: post_run_analysis
+        method_class: method_only
+        washing: Running water; poorly reduced pellets crushed; distilled water; filtered; vacuum dried at 120 °C for 24 h
+        sem_edx: Epoxy-embedded, polished, Pt-Au sputter-coated portions; Carl Zeiss EVO SEM with Oxford Instruments X-Max
+          EDX (metallic-phase identification; EDX not quantitative for oxygen)
+        oxygen: A few mg of each sample by inert gas fusion (Elementar Inductar OHN Cube) for remaining oxygen; reduction
+          percentages come from this method (PDF p. 17)
+        current_efficiency_definition: Fraction of electrons participating in the reduction (Faradaic efficiency), PDF p.
+          9
+    - observation_id: meurisse_2022_aggregate_claims
+      type: experiment_series
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: Results & discussions / Temperature-dependent oxygen extraction efficiency
+      units: '%; °C'
+      values:
+        quantity: aggregate_author_claims
+        method_class: author_summary
+        current_efficiency_range_pct:
+          approx_low: 35
+          approx_high: 60
+        statements_as_printed:
+        - '''The current efficiency also varies considerably between approximately 35 and 60%, depending on the temperature
+          and salt composition'' (PDF p. 9)'
+        - '''more than 40% reduction of the lunar regolith simulant was achieved at 660 and 680 °C in the CaCl2-LiCl and CaCl2-NaCl
+          eutectics, respectively'' (PDF p. 9)'
+        - '''removing at least 40% of the oxygen present in lunar minerals in 24 hours in all eutectics and at temperatures
+          as low as 660 °C'' (Abstract, PDF p. 2)'
+        - CaCl2 850 °C, CaCl2-NaCl and CaCl2-KCl 'all achieve a reduction level within approximately 10% of each other' (PDF
+          p. 10)
+        - '''A trend can be noticed in Figure 10, whereby higher CaCl2 content leads to more complete reduction and better
+          current efficiency'' (PDF p. 21; the 950 °C data are in Figure 11)'
+        figure_reference_note: The text cites 'Figure 5' for the oxygen-removal data on PDF p. 10 and p. 14, and 'Figure 10'
+          for the 950 °C CaCl2-content trend on PDF p. 21; the plotted data are in Figures 6 and 11. Kept as printed.
+    - observation_id: meurisse_2022_decomposition_voltages
+      type: author_model_fit
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: Results & discussions / Theoretical assessment
+        figure: '5'
+      units: V
+      values:
+        quantity: decomposition_voltage
+        method_class: author_calculation
+        basis: Gibbs free energy of decomposition of simple oxides and the electrolyte chlorides versus temperature (Figure
+          5, figure-only)
+        KCl_V: 3.44
+        CaCl2_V: 3.25
+        CaO_V_range: 2.5-2.7 (PDF p. 11, 'as shown in Figure 5')
+        CaO_V_about: 2.8
+        Li2O_V: below 2.5
+        chosen_cell_voltage_V: 3.2
+        text_discrepancy_note: CaO decomposition is given as 'between 2.5 and 2.7 V' on PDF p. 11 and 'about 2.8 V' on PDF
+          p. 20. Both kept.
+        note: KCl and CaCl2 values on PDF p. 14; Li2O and 2.8 V CaO on PDF p. 20. The temperature of these single values is
+          not printed.
+    - observation_id: meurisse_2022_salt_literature_values
+      type: literature_context
+      locator:
+        page: 14
+        pdf_page_index: 13
+        section: Results & discussions
+      units: °C; wt%
+      values:
+        quantity: electrolyte_property_statements
+        method_class: quoted_attributed
+        CaCl2_KCl_first_eutectic_C: 626
+        CaCl2_NaCl_melting_point_as_low_as_C: 504
+        LiCl_melting_point_C: 605
+        CaCO3_decomposition_C:
+          value: 887
+          attribution: Chen et al. [39]
+        CaO_solubility:
+          statement: from 16 wt.% in pure CaCl2 down to 4 wt.% in equimolar CaCl2-KCl mixtures at 950 °C
+          attribution: '[60]'
+        Li2O_solubility_in_LiCl:
+          statement: 8.7 wt% at 650 °C
+          attribution: '[61]'
+        LiCl_volatility: High volatility of LiCl prevented a 950 °C run
+        baseline_literature: FFC with molten CaCl2 and 0.4 wt.% CaO at 950 °C can reduce every oxide mineral in lunar regolith
+          [11] (PDF p. 3)
+        lunar_soil_oxygen_wt_pct: 40 to 45 (PDF p. 3)
+        note: 626 °C on PDF p. 14; 504 °C on PDF p. 16; 605 °C on PDF p. 19; CaO solubility on PDF p. 21; Li2O solubility
+          and LiCl volatility on PDF p. 22.
+    - observation_id: meurisse_2022_background_numeric_context
+      type: literature_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        section: Introduction
+      units: years; °C
+      values:
+        quantity: prior_work_and_temperature_context
+        method_class: quoted_attributed
+        prior_work_duration_as_printed: over the last 20 years
+        lunar_regolith_extraction_temperature_C: '>900'
+        simple_oxide_reduction_temperature_range_C: '550-850'
+        note: Prior-work duration and temperature statements on PDF p. 3.
+    - observation_id: meurisse_2022_lunar_regolith_background_numeric_context
+      type: literature_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: Introduction
+      units: kg; years; %
+      values:
+        quantity: lunar_sampling_and_surface_context
+        method_class: quoted_attributed
+        returned_lunar_regolith_kg: '<400'
+        returned_samples_period_as_printed: early 70s
+        lunar_highlands_surface_coverage_pct: '>84'
+        note: Returned mass, Apollo timing, and highlands area coverage on PDF p. 4.
+    - observation_id: meurisse_2022_reaction_equations
+      type: literature_context
+      locator:
+        page: 11
+        pdf_page_index: 10
+        section: Results & discussions / CaCl2 electrolyte
+      units: reaction equations
+      values:
+        quantity: printed_reduction_and_parasitic_cycle_reactions
+        method_class: literature_context
+        equations:
+          '(1)': 'MₓOᵧ + 2y e⁻ = xM + y O²⁻'
+          '(2)': 'CaO = Ca²⁺ + O²⁻'
+          '(3)': 'Ca²⁺ + 2e⁻ = Ca'
+          '(4)': 'MₓOᵧ + yCa = xM + yCaO'
+          '(5)': '2O²⁻ = O₂ + 4e⁻'
+          '(6)': 'C + 2O²⁻ = CO₂ + 4e⁻'
+          '(7)': 'C + O²⁻ = CO + 2e⁻'
+          '(8)': '2O²⁻ + C = CO₂ + 4e⁻'
+          '(9)': 'CO₂ + O²⁻ = CO₃²⁻'
+          '(10)': 'CO₃²⁻ + 4e⁻ = C + 3O²⁻'
+          '(11)': 'Ca²⁺ + 2e⁻ = Ca'
+          '(12)': 'Ca = Ca²⁺ + 2e⁻'
+          '(13)': 'Li₂O = 2Li⁺ + O²⁻'
+          '(14)': 'Li⁺ + e⁻ = Li'
+          '(15)': 'MₓOᵧ + 2yLi = xM + yLi₂O'
+        locators:
+          reactions_1_to_4: PDF p. 11
+          reactions_5_to_7: PDF p. 12
+          reactions_8_to_10: PDF p. 14
+          reactions_11_to_12: PDF p. 14
+          reaction_1_reference: PDF p. 19
+          reactions_13_to_15: PDF p. 20
+        note: Reaction (1) is stated on PDF p. 11 and referenced in the LiCl discussion on PDF p. 19; reactions (13)-(15) are printed on PDF p. 20.
+    - observation_id: meurisse_2022_licl_alternative_context
+      type: literature_context
+      locator:
+        page: 6
+        pdf_page_index: 5
+        section: Materials and methods / Reduction experiments
+      units: °C
+      values:
+        quantity: LiCl_alternative_temperature_context
+        method_class: quoted_attributed
+        statements_as_printed:
+        - '''LiCl is often presented as an alternative to CaCl₂ for reducing oxides at temperatures as low as 650 °C'' (PDF p. 6)'
+    - observation_id: meurisse_2022_tio2_intermediate_sequence
+      type: literature_context
+      locator:
+        page: 11
+        pdf_page_index: 10
+        section: Results & discussions / CaCl2 electrolyte
+      units: reaction sequence
+      values:
+        quantity: titanium_oxide_reduction_intermediates
+        method_class: literature_context
+        sequence_as_printed: TiO₂ → Ti₃O₅ → Ti₂O₃ → TiO → Ti–O
+        note: Example of intermediate formation during electrochemical reduction (PDF p. 11).
+    - observation_id: meurisse_2022_named_reduction_intermediates
+      type: literature_context
+      locator:
+        page: 15
+        pdf_page_index: 14
+        section: Results & discussions / CaCl2-KCl eutectic electrolyte
+      units: chemical formula
+      values:
+        quantity: named_oxide_reduction_intermediates
+        method_class: literature_context
+        compounds: [Ca₁₂Al₁₄O₃₃, CaTiO₃, MgAl₂O₄, CaSiO₃]
+        context: Reported as intermediates identifiable at the beginning of pyroxene and perovskite reduction; later reduce to sub-oxides with less oxygen.
+        note: PDF p. 15.
+    - observation_id: meurisse_2022_figure1_figure_only
+      type: figure_only
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '1'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: LMS-1 and Apollo particle size distributions [29]
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure2_figure_only
+      type: figure_only
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '2'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Sintered pellet of LMS-1, 46 mm diameter and 10 mm thick
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure3_figure_only
+      type: figure_only
+      locator:
+        page: 7
+        pdf_page_index: 6
+        figure: '3'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Sketch of the electrochemical cell
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure4_figure_only
+      type: figure_only
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: '4'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: LMS-1 reduced in CaCl2 at 950 °C (photograph)
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure5_figure_only
+      type: figure_only
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: '5'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Decomposition voltage of regolith oxides and electrolyte salts versus temperature
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure6_figure_only
+      type: figure_only
+      locator:
+        page: 11
+        pdf_page_index: 10
+        figure: '6'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Oxygen removal and current efficiency versus temperature in different salts
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure7_figure_only
+      type: figure_only
+      locator:
+        page: 13
+        pdf_page_index: 12
+        figure: '7'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: BSE image, LMS-1 reduced in CaCl2 at 950 °C
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure8_figure_only
+      type: figure_only
+      locator:
+        page: 16
+        pdf_page_index: 15
+        figure: '8'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: BSE image, CaCl2-KCl eutectic at 806 °C; no pure metal phases
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure9_figure_only
+      type: figure_only
+      locator:
+        page: 18
+        pdf_page_index: 17
+        figure: '9'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: BSE image, CaCl2-NaCl eutectic at 680 °C; no fully metallic phases
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure10_figure_only
+      type: figure_only
+      locator:
+        page: 19
+        pdf_page_index: 18
+        figure: '10'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: BSE image, CaCl2-LiCl eutectic at 660 °C; metallic phases by EDX
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+    - observation_id: meurisse_2022_figure11_figure_only
+      type: figure_only
+      locator:
+        page: 21
+        pdf_page_index: 20
+        figure: '11'
+      units: as plotted
+      values:
+        quantity: figure_not_digitized
+        method_class: figure_only
+        admission_status: figure_only
+        caption: Oxygen removal and current efficiency at 950 °C versus CaCl2 content
+        note: Figure inspected; not digitized. Prose numbers, where printed, are carried in other rows.
+scope_assessment:
+  observations_scored: 0
+  reason: 'Potentiostatic FFC molten-salt electrolysis of sintered LMS-1: oxygen removal and current efficiency per run, mostly
+    figure-only with approximate or bounded prose values. None fits a closed scored type (no vapour pressure, activity, alpha,
+    mass-loss series of a condensed phase, or thermodynamic table), so all rows are context.'
+  not_extracted:
+  - Figure 6 and Figure 11 per-run oxygen removal and current efficiency (figure-only; not digitized)
+  - Figure 5 decomposition-voltage curves (figure-only)
+  - Current-time or charge data (not printed)

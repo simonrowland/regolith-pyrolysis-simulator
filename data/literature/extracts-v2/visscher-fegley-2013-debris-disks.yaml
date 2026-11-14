@@ -11,12 +11,11 @@ observations:
     species:
       formula: SiO2_melt
       phase:
-        tag: unknown
-        reason: phase string 'BSE_composition_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -75,9 +74,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -88,6 +87,35 @@ observations:
     section: '3.2'
     equation: '6'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  derivation:
+    relation: Fit to the authors' MAGMA-calculated total saturation vapor pressure over the BSE-composition melt.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1. Chemical Model
+    method:
+      state:
+        tag: value
+        value: MAGMA total saturation vapor-pressure fit for BSE-composition melt using Eq. (6).
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        section: '3.2'
+        equation: '6'
+    references:
+    - Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.
+    - Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.
+  provenance:
+    printed_phase: BSE_composition_melt
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_bsm_total_vapor_pressure_fit
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -97,12 +125,11 @@ observations:
     species:
       formula: SiO2_melt
       phase:
-        tag: unknown
-        reason: phase string 'BSM_composition_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -161,9 +188,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -174,6 +201,35 @@ observations:
     section: '3.2'
     equation: '7'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  derivation:
+    relation: Fit to the authors' MAGMA-calculated total saturation vapor pressure over the BSM-composition melt.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1. Chemical Model
+    method:
+      state:
+        tag: value
+        value: MAGMA total saturation vapor-pressure fit for BSM-composition melt using Eq. (7).
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        section: '3.2'
+        equation: '7'
+    references:
+    - Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.
+    - Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.
+  provenance:
+    printed_phase: BSM_composition_melt
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_carbon_dioxide_ratio_constraint
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -203,9 +259,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), MAGMA-derived fO2 equilibrium relation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -216,6 +272,36 @@ observations:
     section: '3.3'
     equation: '12'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  derivation:
+    relation: The printed equilibrium relation predicts CO2/CO from oxygen fugacity determined by the silicate melt-vapor
+      chemistry; CO2 and CO are not included in MAGMA.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1. Chemical Model
+    method:
+      state:
+        tag: value
+        value: Equilibrium relation for CO2/CO as a function of MAGMA-derived oxygen fugacity using Eq. (12).
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        section: '3.3'
+        equation: '12'
+    references:
+    - Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.
+    - Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.
+  provenance:
+    printed_phase: saturated_silicate_vapor
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_figure2_vapor_species_trends
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -256,6 +342,8 @@ observations:
     figure: '2'
     section: '3.1'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  provenance:
+    printed_phase: saturated_silicate_vapor
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_low_temperature_volatile_dominance
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -321,8 +409,8 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, lower_temperature_dominant_species,
-      lower_temperature_regime, transition_temperature_K_as_printed'
+    unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, value_as_printed,
+      transition_statement_as_printed, transition_locator, lower_temperature_dominant_species, lower_temperature_regime, transition_temperature_K_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -330,9 +418,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -342,6 +430,30 @@ observations:
     published_page: 3
     section: '3.1'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  derived_from:
+  - visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions
+  derivation:
+    relation: The MAGMA calculations compare saturated vapor compositions across the printed melt compositions; the paper
+      states that volatile abundance controls the temperature transition.
+    inputs:
+    - visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: We used the MAGMA code (Fegley & Cameron 1987; Schaefer & Fegley 2004) to calculate the temperature-dependent
+          chemical equilibrium composition of silicate melt and coexisting vapor.
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1. Chemical Model
+    references:
+    - Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.
+    - Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.
+  provenance:
+    printed_phase: saturated_silicate_vapor
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_low_temperature_volatile_dominance_zinc
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -407,8 +519,8 @@ observations:
       reason: profile evolved_gas_yield does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, dominant_with_lower_temperature_volatile_species,
-      composition_sensitivity'
+    unavailable_reason: 'no mapped evolved_gas_yield field selected; source fields: quantity, method_class, generator, value_as_printed,
+      value_locator, dominant_with_lower_temperature_volatile_species, composition_sensitivity'
     approximate: false
   uncertainty:
     kind: printed
@@ -416,9 +528,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -428,6 +540,33 @@ observations:
     published_page: 3
     section: '3.1'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  derived_from:
+  - visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions
+  derivation:
+    relation: The MAGMA zinc-bearing vapor calculation depends on the relative abundances of volatile elements in the printed
+      melt compositions.
+    inputs:
+    - visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: We used the MAGMA code (Fegley & Cameron 1987; Schaefer & Fegley 2004) to calculate the temperature-dependent
+          chemical equilibrium composition of silicate melt and coexisting vapor. Zinc thermochemistry was recently added
+          to the code calculations in order to explore the chemical behavior and potential volatile loss of Zn-bearing gases
+          from the protolunar disk atmosphere (e.g., Paniello et al. 2012).
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1. Chemical Model
+    references:
+    - Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.
+    - Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.
+    - Paniello, R. C., Day, J. M. D., & Moynier, F. 2012, Nature, 490, 376.
+  provenance:
+    printed_phase: saturated_silicate_vapor
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_saturated_vapor_oxygen_fugacity
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -437,12 +576,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -502,9 +640,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -515,6 +653,36 @@ observations:
     figure: 3b
     section: '3.3'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  derivation:
+    relation: MAGMA model outputs give oxygen fugacity through the printed Eq. (8) relation; the authors use gamma_O2 approximately
+      1.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1. Chemical Model
+    method:
+      state:
+        tag: value
+        value: MAGMA oxygen fugacity calculated from oxygen mole fraction and total pressure using Eq. (8).
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        section: '3.3'
+        equation: '8'
+    references:
+    - Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.
+    - Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.
+  provenance:
+    printed_phase: saturated_silicate_vapor
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_sio2_pure_melt_vapor_pressure_fit
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -580,7 +748,8 @@ observations:
       reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, generator, expression, coefficients'
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, attribution, method_class, generator, expression,
+      coefficients'
     approximate: false
   uncertainty:
     kind: printed
@@ -590,7 +759,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), quoting Fegley and Schaefer 2012 MAGMA calculation
+    attribution: Fegley and Schaefer (2012), as cited by Visscher and Fegley in Section 3.2.
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -601,6 +770,8 @@ observations:
     section: '3.2'
     equation: '2'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  provenance:
+    printed_phase: pure_molten_SiO2
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_sio_partial_pressure_equilibrium
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -610,12 +781,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'multicomponent_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -675,9 +845,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), MAGMA equilibrium calculation using IMCC activities
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -688,6 +858,36 @@ observations:
     section: '3.2'
     equation: '5'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  derivation:
+    relation: The MAGMA equilibrium calculation determines SiO partial pressure using the printed Eq. (5) relation and model
+      activities.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1. Chemical Model
+    method:
+      state:
+        tag: value
+        value: MAGMA equilibrium relation for SiO partial pressure using melt activity and oxygen fugacity.
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        section: '3.2'
+        equation: '5'
+    references:
+    - Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.
+    - Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.
+  provenance:
+    printed_phase: multicomponent_silicate_melt
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -730,6 +930,8 @@ observations:
     published_page: 2
     table: '1'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  provenance:
+    printed_phase: bulk_silicate_composition_input
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_total_vapor_pressure_sum
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -739,12 +941,11 @@ observations:
     species:
       formula: SiO2_melt
       phase:
-        tag: unknown
-        reason: phase string 'multicomponent_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -802,9 +1003,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), MAGMA equilibrium calculation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -815,6 +1016,36 @@ observations:
     section: '3.2'
     equation: '3'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  derivation:
+    relation: The saturated vapor pressure over the multicomponent melt is the sum of partial pressures of all equilibrium
+      gas species, as printed in Eq. (3).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1. Chemical Model
+    method:
+      state:
+        tag: value
+        value: MAGMA equilibrium vapor pressure from the sum of gas-species partial pressures using Eq. (3).
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        section: '3.2'
+        equation: '3'
+    references:
+    - Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.
+    - Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.
+  provenance:
+    printed_phase: multicomponent_silicate_melt
 - observation_id: visscher-fegley-2013-debris-disks::visscher_2013_water_ratio_constraint
   experiment_id: 10.1088/2041-8205/767/1/l12::visscher-fegley-2013-debris-disks
   identity:
@@ -844,9 +1075,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
-    attribution: Visscher and Fegley (2013), MAGMA-derived fO2 equilibrium relation
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -857,3 +1088,33 @@ observations:
     section: '3.3'
     equation: '10'
   read_from: pdf:visscher-fegley-2013-debris-disks
+  derivation:
+    relation: The printed equilibrium relation predicts H2O/H2 from oxygen fugacity determined by the silicate melt-vapor
+      chemistry; H2O is not included in MAGMA.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: 2.1. Chemical Model
+    method:
+      state:
+        tag: value
+        value: Equilibrium relation for H2O/H2 as a function of MAGMA-derived oxygen fugacity using Eq. (10).
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        section: '3.3'
+        equation: '10'
+    references:
+    - Fegley, B., & Cameron, A. G. W. 1987, Earth and Planetary Science Letters, 82, 207.
+    - Schaefer, L., & Fegley, B. 2004, Icarus, 169, 216.
+  provenance:
+    printed_phase: saturated_silicate_vapor

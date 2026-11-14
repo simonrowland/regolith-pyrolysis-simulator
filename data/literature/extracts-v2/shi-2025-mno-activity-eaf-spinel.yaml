@@ -1,0 +1,2985 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shi-2025-mno-activity-eaf-spinel.yaml
+observations:
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_prose_mn_spinel_precipitation_ratio_80_32::T=1673:row=4:h=3589f0158df4
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::shi-2025-mno-activity-eaf-spinel
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'manganese_spinel_precipitation_ratio_as_printed'
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673'
+    composition:
+      tag: unknown
+      reason: The reported composition is the initial charge; the post-equilibrium bulk composition is not printed.
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 4
+        published_page: 2272
+        pdf_page_index: 3
+        section: 3.2. Effect of Al2O3 Content on the Precipitation of Spinel
+        equation: 7–9
+        note: The text states a maximum MnAl2O4 precipitation ratio of 80.32% at 33.64 mol% Al2O3.
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 4
+    published_page: 2272
+    pdf_page_index: 3
+    section: 3.2. Effect of Al2O3 Content on the Precipitation of Spinel
+    equation: 7–9
+    note: The text states a maximum MnAl2O4 precipitation ratio of 80.32% at 33.64 mol% Al2O3.
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 4
+        published_page: 2272
+        pdf_page_index: 3
+        section: 3.2. Effect of Al2O3 Content on the Precipitation of Spinel
+        equation: 7–9
+        note: The text states a maximum MnAl2O4 precipitation ratio of 80.32% at 33.64 mol% Al2O3.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: unknown
+        reason: The reported composition is the initial charge; the post-equilibrium bulk composition is not printed.
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.0994'
+          - - SiO2
+            - '0.1209'
+          - - Al2O3
+            - '0.3364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Initial slag recipe in Table 1; only a starting-charge composition.
+  derivation:
+    relation: The authors calculate the fraction of total Mn incorporated into MnAl2O4 from EDS elemental balances using Eqs.
+      (7)–(9).
+    inputs: []
+    parameters: []
+    output_unit: '%'
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 2272
+        pdf_page_index: 3
+        section: 3.2. Effect of Al2O3 Content on the Precipitation of Spinel
+        equation: 7–9
+        note: The paper does not publish the intermediate elemental-balance inputs used for the reported maximum.
+    references: []
+  provenance:
+    printed_phase: cr
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table3_row_1_al2o3_activity::T=1673:row=1:h=19c7d53266a9
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::shi-2025-mno-activity-eaf-spinel
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: published_initial_slag_mole_percent
+        components:
+        - - CaO
+          - '0.1897'
+        - - SiO2
+          - '0.2306'
+        - - Al2O3
+          - '0.1364'
+        - - MgO
+          - '0.0742'
+        - - FeO
+          - '0.2824'
+        - - MnO
+          - '0.0867'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.3691'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=1; table_row_number=2; table_column_number=3; phase=liquid
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 3
+    published_page: 2271
+    pdf_page_index: 2
+    table: '3'
+    note: Calculated Al2O3 activity, Table 3.; row=1; table_row_number=2; table_column_number=3; phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=1; table_row_number=2; table_column_number=3; phase=liquid
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1897'
+          - - SiO2
+            - '0.2306'
+          - - Al2O3
+            - '0.1364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+  derivation:
+    relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the
+      precipitation equilibrium relation in Eq. (6).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The thermochemical input values used by the calculation are not tabulated.
+    method:
+      state:
+        tag: value
+        value: FactSage 8.3 equilibrium calculation for Al2O3 activity.
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        equation: '6'
+    references:
+    - FToxid database 8.3
+    - FactPS database 8.3
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table3_row_2_al2o3_activity::T=1673:row=2:h=f1dd5eaf5ad7
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::shi-2025-mno-activity-eaf-spinel
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: published_initial_slag_mole_percent
+        components:
+        - - CaO
+          - '0.1446'
+        - - SiO2
+          - '0.1758'
+        - - Al2O3
+          - '0.2364'
+        - - MgO
+          - '0.0742'
+        - - FeO
+          - '0.2824'
+        - - MnO
+          - '0.0867'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.7203'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=2; table_row_number=3; table_column_number=3; phase=liquid
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 3
+    published_page: 2271
+    pdf_page_index: 2
+    table: '3'
+    note: Calculated Al2O3 activity, Table 3.; row=2; table_row_number=3; table_column_number=3; phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=2; table_row_number=3; table_column_number=3; phase=liquid
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1446'
+          - - SiO2
+            - '0.1758'
+          - - Al2O3
+            - '0.2364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+  derivation:
+    relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the
+      precipitation equilibrium relation in Eq. (6).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The thermochemical input values used by the calculation are not tabulated.
+    method:
+      state:
+        tag: value
+        value: FactSage 8.3 equilibrium calculation for Al2O3 activity.
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        equation: '6'
+    references:
+    - FToxid database 8.3
+    - FactPS database 8.3
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table3_row_3_al2o3_activity::T=1673:row=3:h=90d98db7b347
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::shi-2025-mno-activity-eaf-spinel
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: published_initial_slag_mole_percent
+        components:
+        - - CaO
+          - '0.1221'
+        - - SiO2
+          - '0.1484'
+        - - Al2O3
+          - '0.2864'
+        - - MgO
+          - '0.0742'
+        - - FeO
+          - '0.2824'
+        - - MnO
+          - '0.0867'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.802'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=3; table_row_number=4; table_column_number=3; phase=liquid
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 3
+    published_page: 2271
+    pdf_page_index: 2
+    table: '3'
+    note: Calculated Al2O3 activity, Table 3.; row=3; table_row_number=4; table_column_number=3; phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=3; table_row_number=4; table_column_number=3; phase=liquid
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1221'
+          - - SiO2
+            - '0.1484'
+          - - Al2O3
+            - '0.2864'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+  derivation:
+    relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the
+      precipitation equilibrium relation in Eq. (6).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The thermochemical input values used by the calculation are not tabulated.
+    method:
+      state:
+        tag: value
+        value: FactSage 8.3 equilibrium calculation for Al2O3 activity.
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        equation: '6'
+    references:
+    - FToxid database 8.3
+    - FactPS database 8.3
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table3_row_4_al2o3_activity::T=1673:row=4:h=d485409aa7d0
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::shi-2025-mno-activity-eaf-spinel
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: published_initial_slag_mole_percent
+        components:
+        - - CaO
+          - '0.0994'
+        - - SiO2
+          - '0.1209'
+        - - Al2O3
+          - '0.3364'
+        - - MgO
+          - '0.0742'
+        - - FeO
+          - '0.2824'
+        - - MnO
+          - '0.0867'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.9374'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=4; table_row_number=5; table_column_number=3; phase=liquid
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 3
+    published_page: 2271
+    pdf_page_index: 2
+    table: '3'
+    note: Calculated Al2O3 activity, Table 3.; row=4; table_row_number=5; table_column_number=3; phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=4; table_row_number=5; table_column_number=3; phase=liquid
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.0994'
+          - - SiO2
+            - '0.1209'
+          - - Al2O3
+            - '0.3364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+  derivation:
+    relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the
+      precipitation equilibrium relation in Eq. (6).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The thermochemical input values used by the calculation are not tabulated.
+    method:
+      state:
+        tag: value
+        value: FactSage 8.3 equilibrium calculation for Al2O3 activity.
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        equation: '6'
+    references:
+    - FToxid database 8.3
+    - FactPS database 8.3
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table3_row_5_al2o3_activity::T=1673:row=5:h=757dc701db79
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::shi-2025-mno-activity-eaf-spinel
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: For the 36.56 mol% Al2O3 calculation the paper states only the CaO/SiO2 ratio 0.82, not separate CaO and SiO2
+        amounts.
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=5; table_row_number=6; table_column_number=3; phase=liquid
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 3
+    published_page: 2271
+    pdf_page_index: 2
+    table: '3'
+    note: Calculated Al2O3 activity, Table 3.; row=5; table_row_number=6; table_column_number=3; phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        table: '3'
+        note: Calculated Al2O3 activity, Table 3.; row=5; table_row_number=6; table_column_number=3; phase=liquid
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 3
+              published_page: 2271
+              pdf_page_index: 2
+              section: 3.1. Thermodynamic Equilibrium Calculation
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: unknown
+        reason: For the 36.56 mol% Al2O3 calculation the paper states only the CaO/SiO2 ratio 0.82, not separate CaO and SiO2
+          amounts.
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+  derivation:
+    relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the
+      precipitation equilibrium relation in Eq. (6).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        note: The thermochemical input values used by the calculation are not tabulated.
+    method:
+      state:
+        tag: value
+        value: FactSage 8.3 equilibrium calculation for Al2O3 activity.
+      locator:
+        page: 3
+        published_page: 2271
+        pdf_page_index: 2
+        section: 3.1. Thermodynamic Equilibrium Calculation
+        equation: '6'
+    references:
+    - FToxid database 8.3
+    - FactPS database 8.3
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_1_mno_activity::T=1673:row=1:h=51d26a442ecb
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_1
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.04137'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=1; column=aMnO; table_row_number=2; table_column_number=4;
+          phase=liquid
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_1_mno_activity::T=1673:row=1:h=51d26a442ecb
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 6
+    published_page: 2274
+    pdf_page_index: 5
+    table: '6'
+    note: Table 6 MnO activity from chemical-equilibrium reduction.; row=1; column=aMnO; table_row_number=2; table_column_number=4;
+      phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=1; column=aMnO; table_row_number=2; table_column_number=4;
+          phase=liquid
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1e-13 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm.
+        output_unit: Pa
+        references: []
+    gas_mix:
+      state:
+        tag: value
+        value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+    composition:
+      state:
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
+      locator:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=1; column=aMnO; table_row_number=2; table_column_number=4;
+          phase=liquid
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1897'
+          - - SiO2
+            - '0.2306'
+          - - Al2O3
+            - '0.1364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+  derived_from:
+  - shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_1_x_mn_measurement
+  derivation:
+    relation: MnO activity calculated from the printed oxidation reaction and equilibrium relation, Eq. (13), using the measured
+      XMn and the Ag–Mn gamma relation in Eq. (14).
+    inputs:
+    - shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_1_x_mn_measurement
+    parameters: []
+    output_unit: as_published
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_1_x_mn_measurement
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_1
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00153'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6, XMn in the Ag–Mn alloy.; row=1; column=XMn; table_row_number=2; table_column_number=3; phase=liquid
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 6
+    published_page: 2274
+    pdf_page_index: 5
+    table: '6'
+    note: Table 6, XMn in the Ag–Mn alloy.; row=1; column=XMn; table_row_number=2; table_column_number=3; phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: All chemical-equilibrium experiments were conducted at 1673 K.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+    gas_mix:
+      state:
+        tag: value
+        value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+    composition:
+      state:
+        tag: unknown
+        reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1897'
+          - - SiO2
+            - '0.2306'
+          - - Al2O3
+            - '0.1364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_2_mno_activity::T=1673:row=2:h=a87a2a84b853
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.03164'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=2; column=aMnO; table_row_number=3; table_column_number=4;
+          phase=liquid
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_2_mno_activity::T=1673:row=2:h=a87a2a84b853
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 6
+    published_page: 2274
+    pdf_page_index: 5
+    table: '6'
+    note: Table 6 MnO activity from chemical-equilibrium reduction.; row=2; column=aMnO; table_row_number=3; table_column_number=4;
+      phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=2; column=aMnO; table_row_number=3; table_column_number=4;
+          phase=liquid
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1e-13 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm.
+        output_unit: Pa
+        references: []
+    gas_mix:
+      state:
+        tag: value
+        value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+    composition:
+      state:
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
+      locator:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=2; column=aMnO; table_row_number=3; table_column_number=4;
+          phase=liquid
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1446'
+          - - SiO2
+            - '0.1758'
+          - - Al2O3
+            - '0.2364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+  derived_from:
+  - shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_2_x_mn_measurement
+  derivation:
+    relation: MnO activity calculated from the printed oxidation reaction and equilibrium relation, Eq. (13), using the measured
+      XMn and the Ag–Mn gamma relation in Eq. (14).
+    inputs:
+    - shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_2_x_mn_measurement
+    parameters: []
+    output_unit: as_published
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_2_x_mn_measurement
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_2
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.00117'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6, XMn in the Ag–Mn alloy.; row=2; column=XMn; table_row_number=3; table_column_number=3; phase=liquid
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 6
+    published_page: 2274
+    pdf_page_index: 5
+    table: '6'
+    note: Table 6, XMn in the Ag–Mn alloy.; row=2; column=XMn; table_row_number=3; table_column_number=3; phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: All chemical-equilibrium experiments were conducted at 1673 K.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+    gas_mix:
+      state:
+        tag: value
+        value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+    composition:
+      state:
+        tag: unknown
+        reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1446'
+          - - SiO2
+            - '0.1758'
+          - - Al2O3
+            - '0.2364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_3_mno_activity::T=1673:row=3:h=71fba74d46cd
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_3
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.02845'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=3; column=aMnO; table_row_number=4; table_column_number=4;
+          phase=liquid
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_3_mno_activity::T=1673:row=3:h=71fba74d46cd
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 6
+    published_page: 2274
+    pdf_page_index: 5
+    table: '6'
+    note: Table 6 MnO activity from chemical-equilibrium reduction.; row=3; column=aMnO; table_row_number=4; table_column_number=4;
+      phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=3; column=aMnO; table_row_number=4; table_column_number=4;
+          phase=liquid
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1e-13 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm.
+        output_unit: Pa
+        references: []
+    gas_mix:
+      state:
+        tag: value
+        value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+    composition:
+      state:
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
+      locator:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=3; column=aMnO; table_row_number=4; table_column_number=4;
+          phase=liquid
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1221'
+          - - SiO2
+            - '0.1484'
+          - - Al2O3
+            - '0.2864'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+  derived_from:
+  - shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_3_x_mn_measurement
+  derivation:
+    relation: MnO activity calculated from the printed oxidation reaction and equilibrium relation, Eq. (13), using the measured
+      XMn and the Ag–Mn gamma relation in Eq. (14).
+    inputs:
+    - shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_3_x_mn_measurement
+    parameters: []
+    output_unit: as_published
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_3_x_mn_measurement
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_3
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.001052'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6, XMn in the Ag–Mn alloy.; row=3; column=XMn; table_row_number=4; table_column_number=3; phase=liquid
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 6
+    published_page: 2274
+    pdf_page_index: 5
+    table: '6'
+    note: Table 6, XMn in the Ag–Mn alloy.; row=3; column=XMn; table_row_number=4; table_column_number=3; phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: All chemical-equilibrium experiments were conducted at 1673 K.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+    gas_mix:
+      state:
+        tag: value
+        value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+    composition:
+      state:
+        tag: unknown
+        reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.1221'
+          - - SiO2
+            - '0.1484'
+          - - Al2O3
+            - '0.2864'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_4_mno_activity::T=1673:row=4:h=a26e2a032c08
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_4
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MnO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MnO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: MnO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+        only'
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.02117'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=4; column=aMnO; table_row_number=5; table_column_number=4;
+          phase=liquid
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - activity
+    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_4_mno_activity::T=1673:row=4:h=a26e2a032c08
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 6
+    published_page: 2274
+    pdf_page_index: 5
+    table: '6'
+    note: Table 6 MnO activity from chemical-equilibrium reduction.; row=4; column=aMnO; table_row_number=5; table_column_number=4;
+      phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=4; column=aMnO; table_row_number=5; table_column_number=4;
+          phase=liquid
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1e-13 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: Printed oxygen partial pressure 10^-13 atm.
+        output_unit: Pa
+        references: []
+    gas_mix:
+      state:
+        tag: value
+        value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+    composition:
+      state:
+        tag: unknown
+        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
+          only'
+      locator:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6 MnO activity from chemical-equilibrium reduction.; row=4; column=aMnO; table_row_number=5; table_column_number=4;
+          phase=liquid
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.0994'
+          - - SiO2
+            - '0.1209'
+          - - Al2O3
+            - '0.3364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+  derived_from:
+  - shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_4_x_mn_measurement
+  derivation:
+    relation: MnO activity calculated from the printed oxidation reaction and equilibrium relation, Eq. (13), using the measured
+      XMn and the Ag–Mn gamma relation in Eq. (14).
+    inputs:
+    - shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_4_x_mn_measurement
+    parameters: []
+    output_unit: as_published
+    references: []
+  provenance:
+    printed_phase: l
+- observation_id: shi-2025-mno-activity-eaf-spinel::shi2025_table6_row_4_x_mn_measurement
+  experiment_id: 10.2355/isijinternational.isijint-2025-334::experiment::shi2025_slag_4
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+    fO2_Pa:
+      tag: value
+      value: '0.0000000101325'
+    total_pressure_Pa:
+      tag: unknown
+      reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: metal
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.0007829'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103cw3-sh25
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        published_page: 2274
+        pdf_page_index: 5
+        table: '6'
+        note: Table 6, XMn in the Ag–Mn alloy.; row=4; column=XMn; table_row_number=5; table_column_number=3; phase=liquid
+  notices: []
+  source_id: shi-2025-mno-activity-eaf-spinel
+  locator:
+    page: 6
+    published_page: 2274
+    pdf_page_index: 5
+    table: '6'
+    note: Table 6, XMn in the Ag–Mn alloy.; row=4; column=XMn; table_row_number=5; table_column_number=3; phase=liquid
+  read_from: pdf:shi-2025-mno-activity-eaf-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: All chemical-equilibrium experiments were conducted at 1673 K.
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000000101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000001'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 2270
+              pdf_page_index: 1
+              section: 2.3. Experimental Procedure
+              note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        output_unit: Pa
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+    gas_mix:
+      state:
+        tag: value
+        value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        section: 2.3. Experimental Procedure
+        note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+    composition:
+      state:
+        tag: unknown
+        reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: published_initial_slag_mole_percent
+          components:
+          - - CaO
+            - '0.0994'
+          - - SiO2
+            - '0.1209'
+          - - Al2O3
+            - '0.3364'
+          - - MgO
+            - '0.0742'
+          - - FeO
+            - '0.2824'
+          - - MnO
+            - '0.0867'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 2270
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+  provenance:
+    printed_phase: l

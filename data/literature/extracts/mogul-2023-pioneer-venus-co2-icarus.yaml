@@ -29,7 +29,7 @@ species:
     - observation_id: mogul_2023_co2_isotope_ratios
       type: concentration_series
       locator:
-        published_page: 13
+        published_page: 14
         pdf_page_index: 13
         section: 3.9
         note: ratios derived from fitted LNMS CO2 isotopologue signals across 25 spectra
@@ -39,6 +39,18 @@ species:
       values:
         quantity: isotope_ratios
         method_class: measured_reduced
+        derivation:
+          relation: >-
+            The authors derived the carbon and oxygen isotope ratios by tracking
+            CO2 and its isotopologue ion counts across the Venusian atmosphere.
+          output_unit: dimensionless isotope ratio
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 14
+              pdf_page_index: 13
+              section: '3.9'
+              note: The row-level isotopologue counts used to form the ratios are not printed.
         spectra: 25
         rows:
         - {ratio: 13C/12C, value: '1.260e-2 ± 0.072e-2', relative_error: 5.7%, altitude_range_km: '55.4-0.9'}
@@ -56,10 +68,32 @@ species:
       phase: Venus_atmosphere_CO2
       regime: normalized_LNMS_count_to_density_conversion
       units: kg m^-3 and % w/w as published
+      derived_from: [mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_quoted_reference_conditions]
       values:
         quantity: CO2_density_and_relative_abundance
         method_class: model_derived
         generator: authors' LNMS calibration-curve model; raw CO2+ counts normalized to 136Xe2+, then converted using Hoffman control data, PVGC composition, Seiff pressure-temperature data, equation of state, and power regressions
+        derivation:
+          relation: >-
+            The authors converted normalized LNMS CO2 counts to density using
+            calibration curves constructed from PVGC composition, atmospheric
+            density and pressure-temperature data, and LNMS CO2 control data.
+          inputs: [mogul-2023-pioneer-venus-co2-icarus::context::mogul_2023_quoted_reference_conditions]
+          output_unit: kg m^-3 and % w/w
+          method:
+            state:
+              tag: value
+              value: >-
+                CO2 calibration-curve conversion from normalized LNMS counts
+                to density using curves assembled from published data.
+            locator:
+              page: 14
+              section: '3.11'
+              figure: '7'
+          references:
+          - Hoffman et al. (1979a)
+          - Oyama et al. (1980)
+          - Seiff et al. (1985)
         printed_points:
         - {altitude_km: 58.3, co2_density_kg_m3: '0.38 ± 0.06', atmospheric_density_kg_m3: 0.58, relative_co2_w_w: '66 ± 7%'}
         - {altitude_km: 55.4, co2_density_kg_m3: '0.80 ± 0.12', atmospheric_density_kg_m3: 0.85, relative_co2_w_w: '95 ± 15%'}
@@ -76,17 +110,43 @@ species:
     - observation_id: mogul_2023_ch4_mixing_ratio_model
       type: gas_speciation
       locator:
-        published_page: 19
-        pdf_page_index: 19
+        published_page: 18
+        pdf_page_index: 17
         section: 4.3
         note: preliminary external methane conversion; upper/lower correction outcomes retained
       phase: Venus_atmosphere_CH4
       regime: corrected_LNMS_count_conversion
       units: ppm as published
+      derived_from:
+      - mogul_2023_co2_density_profile
       values:
         quantity: external_CH4_mixing_ratio
         method_class: model_derived
         generator: authors' preliminary LNMS model correcting apparent m/z-dependent getter efficiency and converting counts against CO2/N2
+        derivation:
+          relation: >-
+            The authors' preliminary conversion calculated external CH4 mixing
+            ratios against CO2 and N2 abundances and corrected the apparent
+            m/z-dependent getter efficiency.
+          inputs:
+          - mogul_2023_co2_density_profile
+          output_unit: ppm
+          method:
+            state:
+              tag: value
+              value: >-
+                Preliminary conversion of LNMS CH4 counts to mixing ratios
+                against CO2 and N2 abundances with correction for apparent
+                m/z-dependent getter efficiency.
+            locator:
+              page: 18
+              pdf_page_index: 17
+              section: '4.3'
+              note: >-
+                The paper names no external input references for this
+                conversion; Donahue and Hodges (1993) and Oyama et al. (1980)
+                are comparison values in this section.
+          references: []
         rows:
         - {altitude_km: 51.3, value: '~15 ± 12 ppm'}
         - {altitude_km: 21.6, value: '~130 ± 100 ppm'}

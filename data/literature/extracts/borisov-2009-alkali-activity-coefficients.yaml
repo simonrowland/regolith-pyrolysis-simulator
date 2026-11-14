@@ -101,7 +101,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -158,17 +158,18 @@ species:
             value:
               basis: printed oxide mass percent
               amount_basis: mass_percent
-              components: &id001
-                SiO2: '83.4'
-                Na2O: '3.3'
-                K2O: '4.4'
-                Rb2O: '7.1'
+              components:
+                SiO2: '75.9'
+                Na2O: '5.4'
+                K2O: '6.9'
+                Rb2O: '11.0'
           locator:
             page: 2
             pdf_page_index: 1
             published_page: 580
             table: '2'
-            row: RNK-38
+            note: The starting composition of the sources
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -182,6 +183,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -191,7 +194,7 @@ species:
         value_as_published: '83.4'
         value: '83.4'
         sample_total_wt_pct: '98.1'
-        sample_composition_as_published:
+        sample_composition_as_published: &id001
           SiO2: '83.4'
           Na2O: '3.3'
           K2O: '4.4'
@@ -258,7 +261,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -315,17 +318,18 @@ species:
             value:
               basis: printed oxide mass percent
               amount_basis: mass_percent
-              components: &id002
-                SiO2: '76.7'
-                Na2O: '5.0'
-                K2O: '6.0'
-                Rb2O: '10.0'
+              components:
+                SiO2: '75.9'
+                Na2O: '5.4'
+                K2O: '6.9'
+                Rb2O: '11.0'
           locator:
             page: 2
             pdf_page_index: 1
             published_page: 580
             table: '2'
-            row: RNK-36
+            note: The starting composition of the sources
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -339,6 +343,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -348,7 +354,7 @@ species:
         value_as_published: '76.7'
         value: '76.7'
         sample_total_wt_pct: '97.7'
-        sample_composition_as_published:
+        sample_composition_as_published: &id002
           SiO2: '76.7'
           Na2O: '5.0'
           K2O: '6.0'
@@ -416,7 +422,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -473,17 +479,18 @@ species:
             value:
               basis: printed oxide mass percent
               amount_basis: mass_percent
-              components: &id003
-                SiO2: '81.0'
-                Na2O: '4.0'
-                K2O: '5.1'
-                Rb2O: '8.5'
+              components:
+                SiO2: '75.9'
+                Na2O: '5.4'
+                K2O: '6.9'
+                Rb2O: '11.0'
           locator:
             page: 2
             pdf_page_index: 1
             published_page: 580
             table: '2'
-            row: RNK-39
+            note: The starting composition of the sources
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -497,6 +504,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -506,7 +515,7 @@ species:
         value_as_published: '81.0'
         value: '81.0'
         sample_total_wt_pct: '98.6'
-        sample_composition_as_published:
+        sample_composition_as_published: &id003
           SiO2: '81.0'
           Na2O: '4.0'
           K2O: '5.1'
@@ -574,7 +583,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -631,17 +640,18 @@ species:
             value:
               basis: printed oxide mass percent
               amount_basis: mass_percent
-              components: &id004
-                SiO2: '85.8'
-                Na2O: '3.2'
-                K2O: '4.2'
-                Rb2O: '6.8'
+              components:
+                SiO2: '75.9'
+                Na2O: '5.4'
+                K2O: '6.9'
+                Rb2O: '11.0'
           locator:
             page: 2
             pdf_page_index: 1
             published_page: 580
             table: '2'
-            row: RNK-37
+            note: The starting composition of the sources
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -655,6 +665,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -664,7 +676,7 @@ species:
         value_as_published: '85.8'
         value: '85.8'
         sample_total_wt_pct: '100.1'
-        sample_composition_as_published:
+        sample_composition_as_published: &id004
           SiO2: '85.8'
           Na2O: '3.2'
           K2O: '4.2'
@@ -732,7 +744,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -786,14 +798,15 @@ species:
         composition: &id025
           state:
             tag: unknown
-            reason: Table 3 prints an em dash for MgO in this sample; the melt composition is incomplete and no
-              oxide is reconstructed.
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: CSA6RNK-38
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: CSA6
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -807,6 +820,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -884,7 +899,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -938,14 +953,15 @@ species:
         composition: &id026
           state:
             tag: unknown
-            reason: Table 3 prints an em dash for MgO in this sample; the melt composition is incomplete and no
-              oxide is reconstructed.
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: CSA12RNK-38
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: CSA12
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -959,6 +975,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -1036,7 +1054,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -1090,14 +1108,15 @@ species:
         composition: &id027
           state:
             tag: unknown
-            reason: Table 3 prints an em dash for MgO in this sample; the melt composition is incomplete and no
-              oxide is reconstructed.
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: CSA18RNK-38
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: CSA18
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -1111,6 +1130,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -1188,7 +1209,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -1242,14 +1263,15 @@ species:
         composition: &id028
           state:
             tag: unknown
-            reason: Table 3 prints an em dash for MgO in this sample; the melt composition is incomplete and no
-              oxide is reconstructed.
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: CSA25RNK-38
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: CSA25
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -1263,6 +1285,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -1340,7 +1364,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -1393,24 +1417,16 @@ species:
           units: h
         composition: &id029
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id007
-                SiO2: '47.09'
-                Al2O3: '14.98'
-                CaO: '22.16'
-                Na2O: '2.20'
-                K2O: '1.78'
-                Rb2O: '2.40'
-                MgO: '10.03'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DARNK-36
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DA
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -1424,6 +1440,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -1433,7 +1451,7 @@ species:
         value_as_published: '47.09'
         value: '47.09'
         sample_total_wt_pct: '100.66'
-        sample_composition_as_published:
+        sample_composition_as_published: &id007
           SiO2: '47.09'
           Al2O3: '14.98'
           CaO: '22.16'
@@ -1502,7 +1520,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -1555,24 +1573,16 @@ species:
           units: h
         composition: &id030
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id008
-                SiO2: '58.71'
-                Al2O3: '9.37'
-                CaO: '13.67'
-                Na2O: '3.21'
-                K2O: '3.28'
-                Rb2O: '5.96'
-                MgO: '6.22'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DAS50RNK-36
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DAS50
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -1586,6 +1596,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -1595,7 +1607,7 @@ species:
         value_as_published: '58.71'
         value: '58.71'
         sample_total_wt_pct: '100.45'
-        sample_composition_as_published:
+        sample_composition_as_published: &id008
           SiO2: '58.71'
           Al2O3: '9.37'
           CaO: '13.67'
@@ -1664,7 +1676,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -1717,24 +1729,16 @@ species:
           units: h
         composition: &id031
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id009
-                SiO2: '72.57'
-                Al2O3: '4.87'
-                CaO: '6.05'
-                Na2O: '2.64'
-                K2O: '3.62'
-                Rb2O: '7.26'
-                MgO: '2.91'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DAS200RNK-36
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DAS200
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -1748,6 +1752,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -1757,7 +1763,7 @@ species:
         value_as_published: '72.57'
         value: '72.57'
         sample_total_wt_pct: '99.95'
-        sample_composition_as_published:
+        sample_composition_as_published: &id009
           SiO2: '72.57'
           Al2O3: '4.87'
           CaO: '6.05'
@@ -1826,7 +1832,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -1879,24 +1885,16 @@ species:
           units: h
         composition: &id032
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id010
-                SiO2: '77.37'
-                Al2O3: '2.25'
-                CaO: '5.85'
-                Na2O: '2.27'
-                K2O: '3.36'
-                Rb2O: '6.43'
-                MgO: '1.98'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DAS400RNK-36
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DAS400
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -1910,6 +1908,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -1919,7 +1919,7 @@ species:
         value_as_published: '77.37'
         value: '77.37'
         sample_total_wt_pct: '99.54'
-        sample_composition_as_published:
+        sample_composition_as_published: &id010
           SiO2: '77.37'
           Al2O3: '2.25'
           CaO: '5.85'
@@ -1988,7 +1988,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -2041,24 +2041,16 @@ species:
           units: h
         composition: &id033
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id012
-                SiO2: '47.45'
-                Al2O3: '14.94'
-                CaO: '22.24'
-                Na2O: '1.87'
-                K2O: '1.87'
-                Rb2O: '2.01'
-                MgO: '10.10'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DARNK-37
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DA
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -2072,6 +2064,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -2081,7 +2075,7 @@ species:
         value_as_published: '47.45'
         value: '47.45'
         sample_total_wt_pct: '100.51'
-        sample_composition_as_published:
+        sample_composition_as_published: &id012
           SiO2: '47.45'
           Al2O3: '14.94'
           CaO: '22.24'
@@ -2150,7 +2144,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -2203,24 +2197,16 @@ species:
           units: h
         composition: &id034
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id013
-                SiO2: '58.89'
-                Al2O3: '9.37'
-                CaO: '13.69'
-                Na2O: '2.83'
-                K2O: '4.11'
-                Rb2O: '5.28'
-                MgO: '6.30'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DAS50RNK-37
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DAS50
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -2234,6 +2220,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -2243,7 +2231,7 @@ species:
         value_as_published: '58.89'
         value: '58.89'
         sample_total_wt_pct: '100.51'
-        sample_composition_as_published:
+        sample_composition_as_published: &id013
           SiO2: '58.89'
           Al2O3: '9.37'
           CaO: '13.69'
@@ -2312,7 +2300,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -2365,24 +2353,16 @@ species:
           units: h
         composition: &id035
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id014
-                SiO2: '70.41'
-                Al2O3: '4.69'
-                CaO: '6.92'
-                Na2O: '2.77'
-                K2O: '4.99'
-                Rb2O: '7.14'
-                MgO: '3.17'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DAS200RNK-37
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DAS200
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -2396,6 +2376,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -2405,7 +2387,7 @@ species:
         value_as_published: '70.41'
         value: '70.41'
         sample_total_wt_pct: '100.12'
-        sample_composition_as_published:
+        sample_composition_as_published: &id014
           SiO2: '70.41'
           Al2O3: '4.69'
           CaO: '6.92'
@@ -2474,7 +2456,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -2527,24 +2509,16 @@ species:
           units: h
         composition: &id036
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id015
-                SiO2: '77.51'
-                Al2O3: '3.20'
-                CaO: '3.73'
-                Na2O: '2.35'
-                K2O: '4.59'
-                Rb2O: '6.98'
-                MgO: '1.76'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DAS400RNK-37
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DAS400
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -2558,6 +2532,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -2567,7 +2543,7 @@ species:
         value_as_published: '77.51'
         value: '77.51'
         sample_total_wt_pct: '100.16'
-        sample_composition_as_published:
+        sample_composition_as_published: &id015
           SiO2: '77.51'
           Al2O3: '3.20'
           CaO: '3.73'
@@ -2636,7 +2612,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -2689,24 +2665,16 @@ species:
           units: h
         composition: &id037
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id017
-                SiO2: '46.96'
-                Al2O3: '14.91'
-                CaO: '22.11'
-                Na2O: '2.10'
-                K2O: '2.01'
-                Rb2O: '2.37'
-                MgO: '10.08'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DARNK-39
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DA
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -2720,6 +2688,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -2729,7 +2699,7 @@ species:
         value_as_published: '46.96'
         value: '46.96'
         sample_total_wt_pct: '100.57'
-        sample_composition_as_published:
+        sample_composition_as_published: &id017
           SiO2: '46.96'
           Al2O3: '14.91'
           CaO: '22.11'
@@ -2798,7 +2768,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -2851,24 +2821,16 @@ species:
           units: h
         composition: &id038
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id018
-                SiO2: '57.95'
-                Al2O3: '9.26'
-                CaO: '13.49'
-                Na2O: '3.05'
-                K2O: '4.21'
-                Rb2O: '5.87'
-                MgO: '6.18'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DAS50RNK-39
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DAS50
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -2882,6 +2844,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -2891,7 +2855,7 @@ species:
         value_as_published: '57.95'
         value: '57.95'
         sample_total_wt_pct: '100.03'
-        sample_composition_as_published:
+        sample_composition_as_published: &id018
           SiO2: '57.95'
           Al2O3: '9.26'
           CaO: '13.49'
@@ -2960,7 +2924,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -3013,24 +2977,16 @@ species:
           units: h
         composition: &id039
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id019
-                SiO2: '69.54'
-                Al2O3: '4.50'
-                CaO: '7.01'
-                Na2O: '2.99'
-                K2O: '4.98'
-                Rb2O: '7.89'
-                MgO: '3.17'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DAS200RNK-39
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DAS200
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -3044,6 +3000,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -3053,7 +3011,7 @@ species:
         value_as_published: '69.54'
         value: '69.54'
         sample_total_wt_pct: '100.11'
-        sample_composition_as_published:
+        sample_composition_as_published: &id019
           SiO2: '69.54'
           Al2O3: '4.50'
           CaO: '7.01'
@@ -3122,7 +3080,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -3175,24 +3133,16 @@ species:
           units: h
         composition: &id040
           state:
-            tag: value
-            value:
-              basis: printed oxide mass percent
-              amount_basis: mass_percent
-              components: &id020
-                SiO2: '77.35'
-                Al2O3: '3.31'
-                CaO: '3.22'
-                Na2O: '2.37'
-                K2O: '4.42'
-                Rb2O: '7.63'
-                MgO: '1.77'
+            tag: unknown
+            reason: "Run-specific starting composition is not printed. Table 1 note: \"Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008).\""
           locator:
-            page: 3
-            pdf_page_index: 2
-            published_page: 581
-            table: '3'
-            row: DAS400RNK-39
+            page: 2
+            pdf_page_index: 1
+            published_page: 580
+            table: '1'
+            row: DAS400
+            note: "Compositions obtained by the averaging and recalculating to alkali-free compositions of the results of microprobe analysis of all experimental glasses (number of analyses is given in parentheses), including the data of Borisov (2008)."
+          units: wt% as printed
         quench_state:
           state:
             tag: value
@@ -3206,6 +3156,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -3215,7 +3167,7 @@ species:
         value_as_published: '77.35'
         value: '77.35'
         sample_total_wt_pct: '100.10'
-        sample_composition_as_published:
+        sample_composition_as_published: &id020
           SiO2: '77.35'
           Al2O3: '3.31'
           CaO: '3.22'
@@ -3287,7 +3239,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -3352,6 +3304,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -3427,7 +3381,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -3492,6 +3446,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -3567,7 +3523,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -3632,6 +3588,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -3707,7 +3665,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -3772,6 +3730,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -3847,7 +3807,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -3912,6 +3872,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -3991,7 +3953,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -4056,6 +4018,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -4135,7 +4099,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -4200,6 +4164,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -4279,7 +4245,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -4344,6 +4310,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -4423,7 +4391,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -4488,6 +4456,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -4568,7 +4538,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -4633,6 +4603,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -4713,7 +4685,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -4778,6 +4750,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -4858,7 +4832,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -4923,6 +4897,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -5003,7 +4979,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -5068,6 +5044,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -5148,7 +5126,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -5213,6 +5191,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -5293,7 +5273,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -5358,6 +5338,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -5438,7 +5420,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -5503,6 +5485,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -5583,7 +5567,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -5648,6 +5632,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -5728,7 +5714,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -5793,6 +5779,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -5873,7 +5861,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -5938,6 +5926,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -6018,7 +6008,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -6083,6 +6073,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -9287,7 +9279,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -9352,6 +9344,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -9427,7 +9421,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -9492,6 +9486,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -9567,7 +9563,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -9632,6 +9628,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -9707,7 +9705,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -9772,6 +9770,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -9847,7 +9847,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -9912,6 +9912,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -9991,7 +9993,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -10056,6 +10058,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -10135,7 +10139,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -10200,6 +10204,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -10279,7 +10285,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -10344,6 +10350,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -10423,7 +10431,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -10488,6 +10496,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -10568,7 +10578,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -10633,6 +10643,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -10713,7 +10725,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -10778,6 +10790,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -10858,7 +10872,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -10923,6 +10937,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -11003,7 +11019,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -11068,6 +11084,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -11148,7 +11166,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -11213,6 +11231,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -11293,7 +11313,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -11358,6 +11378,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -11438,7 +11460,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -11503,6 +11525,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -11583,7 +11607,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -11648,6 +11672,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -11728,7 +11754,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -11793,6 +11819,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -11873,7 +11901,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -11938,6 +11966,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -12018,7 +12048,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -12083,6 +12113,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -14323,7 +14355,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -14388,6 +14420,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -14463,7 +14497,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -14528,6 +14562,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -14603,7 +14639,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -14668,6 +14704,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -14743,7 +14781,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -14808,6 +14846,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -14883,7 +14923,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -14948,6 +14988,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -15027,7 +15069,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -15092,6 +15134,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -15171,7 +15215,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -15236,6 +15280,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -15315,7 +15361,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -15380,6 +15426,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -15459,7 +15507,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -15524,6 +15572,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -15604,7 +15654,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -15669,6 +15719,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -15749,7 +15801,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -15814,6 +15866,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -15894,7 +15948,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -15959,6 +16013,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -16039,7 +16095,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -16104,6 +16160,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -16184,7 +16242,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -16249,6 +16307,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -16329,7 +16389,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -16394,6 +16454,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -16474,7 +16536,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -16539,6 +16601,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -16619,7 +16683,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -16684,6 +16748,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -16764,7 +16830,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -16829,6 +16895,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -16909,7 +16977,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -16974,6 +17042,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -17054,7 +17124,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -17119,6 +17189,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -19359,7 +19431,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -19424,6 +19496,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -19501,7 +19575,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -19566,6 +19640,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -19643,7 +19719,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -19708,6 +19784,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -19785,7 +19863,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -19850,6 +19928,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -19927,7 +20007,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -19992,6 +20072,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -20070,7 +20152,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -20135,6 +20217,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -20213,7 +20297,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -20278,6 +20362,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -20356,7 +20442,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -20421,6 +20507,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -20499,7 +20587,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -20564,6 +20652,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -20642,7 +20732,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -20707,6 +20797,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -20785,7 +20877,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -20850,6 +20942,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -20928,7 +21022,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -20993,6 +21087,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -21071,7 +21167,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -21136,6 +21232,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -21214,7 +21312,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -21279,6 +21377,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -21357,7 +21457,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -21422,6 +21522,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -21500,7 +21602,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -21565,6 +21667,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -21646,7 +21750,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -21711,6 +21815,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -21788,7 +21894,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -21853,6 +21959,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -21930,7 +22038,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -21995,6 +22103,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -22072,7 +22182,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -22137,6 +22247,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -22214,7 +22326,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -22279,6 +22391,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -22357,7 +22471,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -22422,6 +22536,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -22500,7 +22616,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -22565,6 +22681,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -22643,7 +22761,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -22708,6 +22826,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -22786,7 +22906,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -22851,6 +22971,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -22929,7 +23051,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -22994,6 +23116,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -23072,7 +23196,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -23137,6 +23261,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -23215,7 +23341,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -23280,6 +23406,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -23358,7 +23486,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -23423,6 +23551,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -23501,7 +23631,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -23566,6 +23696,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -23644,7 +23776,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -23709,6 +23841,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -23787,7 +23921,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -23852,6 +23986,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -23933,7 +24069,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -23998,6 +24134,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -24076,7 +24214,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -24141,6 +24279,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -24219,7 +24359,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -24284,6 +24424,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -24362,7 +24504,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -24427,6 +24569,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1300'
@@ -24505,7 +24649,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -24570,6 +24714,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -24648,7 +24794,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -24713,6 +24859,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -24791,7 +24939,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -24856,6 +25004,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -24934,7 +25084,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -24999,6 +25149,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1470'
@@ -25077,7 +25229,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -25142,6 +25294,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -25220,7 +25374,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -25285,6 +25439,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -25363,7 +25519,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -25428,6 +25584,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'
@@ -25506,7 +25664,7 @@ species:
               −log value is retained as a separate field. The paper identifies CO/CO2 control at the iron–wüstite
               buffer on physical page 1; the source does not name the log reference, so the family bar convention
               is used.
-          units: log10(fO2/bar)
+          units: log10(bar)
           reference: bar
         minus_log_fO2_as_printed:
           state:
@@ -25571,6 +25729,8 @@ species:
               not stated.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         method_class: measured_direct
         basis_as_published: oxide wt%
         T_C: '1400'

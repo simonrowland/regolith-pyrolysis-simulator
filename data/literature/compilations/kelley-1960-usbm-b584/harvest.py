@@ -17,12 +17,14 @@ from typing import Any
 import yaml
 
 from tools.harvest_atct_compilation import feedstock_coverage
+from simulator.corpus_paths import regolith_corpus_root
 
 
 SOURCE_ID = "kelley-1960-usbm-b584"
 ROOT = Path(__file__).resolve().parent
-CORPUS_RAW = Path("/Users/simonrowland/Repos/regolith-corpus/raw") / SOURCE_ID
-MINERU_ROOT = Path("/Users/simonrowland/Repos/regolith-corpus/text") / SOURCE_ID / "mineru"
+CORPUS = regolith_corpus_root()
+CORPUS_RAW = CORPUS / "raw" / SOURCE_ID
+MINERU_ROOT = CORPUS / "text" / SOURCE_ID / "mineru"
 PDF = CORPUS_RAW / f"{SOURCE_ID}.pdf"
 EXPECTED_TABLES = 893
 ACCESS_DATE = "2026-09-07"

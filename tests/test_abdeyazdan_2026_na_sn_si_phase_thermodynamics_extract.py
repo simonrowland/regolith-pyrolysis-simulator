@@ -97,6 +97,21 @@ def test_isolated_migration_preserves_phase_conditions_and_printed_values(tmp_pa
     assert len(result.observations) == 452
     assert not result.validation.hard_issues
 
+    model_context = next(
+        row
+        for species in document["species"].values()
+        for row in species.get("context", [])
+        if row["observation_id"] == "abdeyazdan_2026_factSage_table4_optimized_database"
+    )
+    assert model_context["type"] == "table_context"
+    assert model_context["locator"]["table"] == "4"
+    assert model_context["values"]["method_class"] == "quoted_attributed"
+    assert "optimized in the present study" in model_context["values"]["attribution"]
+    assert all(
+        not observation_id.endswith("::abdeyazdan_2026_factSage_table4_optimized_database")
+        for observation_id in result.observations
+    )
+
     by_id = {key.rsplit("::", 1)[1]: row for key, row in result.observations.items()}
     expected = {
         "abdeyazdan_2026_t1_run01_NaSi9_r_glass_sio2": (

@@ -8,7 +8,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Polymorph, ReferenceStateConvention, ValueKind
+from simulator.battery.enums import (
+    EvidenceClass,
+    Phase,
+    Polymorph,
+    ReferenceStateConvention,
+    ValueKind,
+)
 from simulator.battery.migrate import migrate
 from literature_extract_test_utils import isolated_root
 
@@ -254,20 +260,37 @@ def _assert_extracted_table_cells(document: dict) -> None:
         assert interpolated["quantity"] == "activity"
         assert interpolated["admission_status"] == "typed_refusal"
         assert interpolated["method_class"] == "author_derived"
-        assert (
-            observations[f"{base}_interpolated_log_a_star_na2o"]["method_class"]
-            == "author_derived"
+        interpolated_observation = observations[
+            f"{base}_interpolated_log_a_star_na2o"
+        ]
+        assert interpolated_observation["standard_state_as_printed"] == (
+            "The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure."
         )
+        reference = interpolated_observation["standard_state"]
+        assert reference["state"]["tag"] == "value"
+        assert reference["state"]["value"] == {
+            **NA2O_LIQUID_STANDARD_STATE,
+            "reference_pressure_bar": "1.01325",
+        }
+        assert reference["inferred"] is False
+        assert reference["locator"]["published_page"] == 608
+        assert "Lin and Elliott [24]" in reference["note"]
         assert "evidence_class" not in interpolated
         assert interpolated["column_as_printed"] == "Interpolated (†) as printed in the Table IV footnote"
         assert "activity" not in interpolated
         assert interpolated["table_reference_footnote_as_printed"] == (
             "* Relative to pure solid silica (tridymite)."
         )
+        assert (
+            interpolated_observation["method_class"] == "author_derived"
+        )
         if row[3] is None:
             assert f"{base}_calculated_log_a_star_na2o" not in observations
         else:
-            calculated = observations[f"{base}_calculated_log_a_star_na2o"]["values"]
+            calculated_observation = observations[
+                f"{base}_calculated_log_a_star_na2o"
+            ]
+            calculated = calculated_observation["values"]
             assert (
                 calculated["NNa2O_as_printed"],
                 calculated["NCaO_as_printed"],
@@ -276,14 +299,84 @@ def _assert_extracted_table_cells(document: dict) -> None:
             ) == (*row[:3], row[3])
             assert calculated["quantity"] == "activity"
             assert calculated["admission_status"] == "typed_refusal"
-            assert calculated["method_class"] == "author_derived"
-            assert (
-                observations[f"{base}_calculated_log_a_star_na2o"]["method_class"]
-                == "author_derived"
+            assert calculated["method_class"] == "model_derived"
+            assert calculated_observation["method_class"] == "model_derived"
+            context_id = (
+                "neudorf-elliott-1980-na2o-cao-silicate-activities::context::"
+                "neudorf_elliott_1980_richardson_eq8_model_context"
+            )
+            assert calculated_observation["derived_from"] == [context_id]
+            derivation = calculated_observation["derivation"]
+            assert derivation["inputs"] == [context_id]
+            assert "Richardson ideal-mixing relation" in derivation["relation"]
+            assert derivation["method"]["state"]["value"] == (
+                "By Eq. [8]¹¹ as printed in the Table IV header."
+            )
+            assert derivation["method"]["locator"] == {
+                "page": 7,
+                "pdf_page_index": 6,
+                "published_page": 613,
+                "table": "IV",
+                "equation": "8",
+            }
+            assert any(
+                "Richardson [11]" in reference
+                for reference in derivation["references"]
             )
             assert "evidence_class" not in calculated
             assert calculated["column_as_printed"] == "By Eq. [8]¹¹ as printed in the Table IV header"
             assert "activity" not in calculated
+
+
+def _assert_sc456_relabels(document: dict) -> None:
+    observations = _observations(document)
+    changed_ids = {
+        "neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c",
+        "neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c",
+        *(f"neudorf_elliott_1980_table1_row{i}_log_activity_temperature_fit" for i in range(1, 5)),
+        *(f"neudorf_elliott_1980_table2_na2o_fit_row{i}" for i in range(1, 4)),
+        *(f"neudorf_elliott_1980_table2_sio2_fit_row{i}" for i in range(1, 5)),
+    }
+    for observation_id in changed_ids:
+        values = observations[observation_id]["values"]
+        assert values["method_class"] == "measured_reduced"
+        assert values["evidence_class"] == "measured_reduced"
+
+    assert observations[
+        "neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c"
+    ]["derived_from"] == ["neudorf_elliott_1980_table1_row1_log_activity_temperature_fit"]
+    assert observations[
+        "neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c"
+    ]["derived_from"] == ["neudorf_elliott_1980_table1_row4_log_activity_temperature_fit"]
+    for index in range(1, 5):
+        row = observations[f"neudorf_elliott_1980_table1_row{index}_log_activity_temperature_fit"]
+        raw_inputs = row["derivation"]["raw_inputs"]
+        assert raw_inputs["state"]["value"] == "not_printed"
+        assert raw_inputs["locator"]["figure"] == "3"
+    table1_ids = [
+        f"neudorf_elliott_1980_table1_row{index}_log_activity_temperature_fit"
+        for index in range(1, 5)
+    ]
+    for index in range(1, 4):
+        row = observations[f"neudorf_elliott_1980_table2_na2o_fit_row{index}"]
+        assert row["derivation"]["inputs"] == table1_ids
+    for index in range(1, 5):
+        row = observations[f"neudorf_elliott_1980_table2_sio2_fit_row{index}"]
+        assert row["derivation"]["references"] == [
+            "Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583."
+        ]
+
+
+def test_sc456_evidence_class_and_lineage_are_pinned() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_sc456_relabels(document)
+
+    reverted = copy.deepcopy(document)
+    _observations(reverted)[
+        "neudorf_elliott_1980_table1_row1_log_activity_temperature_fit"
+    ]["values"]["evidence_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_relabels(reverted)
 
 
 def _expected_audit_cells() -> list[tuple[str, str, str, str, str]]:
@@ -333,6 +426,14 @@ def test_complete_table_transcription_counts_and_mutation_guard() -> None:
     _table3_rows(changed)[1]["values"]["partial_HM_Na2O_kJ_per_mol_as_printed"] = "-160.5"
     with pytest.raises(AssertionError):
         _assert_extracted_table_cells(changed)
+    changed_method = copy.deepcopy(document)
+    calculated_row = _observations(changed_method)[
+        "neudorf_elliott_1980_table4_row2_calculated_log_a_star_na2o"
+    ]
+    calculated_row["values"]["method_class"] = "author_derived"
+    calculated_row["method_class"] = "author_derived"
+    with pytest.raises(AssertionError):
+        _assert_extracted_table_cells(changed_method)
 
 
 def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: Path) -> None:
@@ -344,6 +445,8 @@ def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: P
     assert len(migrated) == 29
     assert sum(row.value.kind is ValueKind.POINT for row in migrated.values()) == 3
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 26
+    assert sum(row.admission.status.value == "admitted" for row in migrated.values()) == 3
+    assert sum(row.admission.status.value == "rejected" for row in migrated.values()) == 26
 
     expected_unknown = {
         *(f"neudorf_elliott_1980_table1_row{index}_log_activity_temperature_fit" for index in range(1, 5)),
@@ -471,6 +574,12 @@ def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: P
         interpolated = migrated[interpolated_id]
         assert interpolated.value.kind is ValueKind.UNAVAILABLE
         assert interpolated.evidence.class_.is_unknown
+        assert interpolated.identity.reference_state.is_value
+        reference_state = interpolated.identity.reference_state.value
+        assert reference_state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference_state.endmember.formula == "Na2O"
+        assert reference_state.endmember.phase.value is Phase.L
+        assert reference_state.reference_pressure_bar == Decimal("1.01325")
         _assert_migrated_conditions(
             interpolated,
             temperature_K="1343.15",
@@ -479,7 +588,13 @@ def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: P
         if table_row[3] is not None:
             calculated = migrated[f"neudorf_elliott_1980_table4_row{index}_calculated_log_a_star_na2o"]
             assert calculated.value.kind is ValueKind.UNAVAILABLE
-            assert calculated.evidence.class_.is_unknown
+            assert calculated.evidence.class_.is_value
+            assert calculated.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+            assert calculated.evidence.model == "model_derived"
+            assert calculated.identity.reference_state.is_value
+            assert calculated.identity.reference_state.value.convention is (
+                ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            )
             _assert_migrated_conditions(
                 calculated,
                 temperature_K="1343.15",
@@ -497,7 +612,7 @@ def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: P
     assert refused.identity.total_pressure_Pa is None or refused.identity.total_pressure_Pa.is_unknown
 
     contexts = [context for rows in result.context_by_work.values() for context in rows]
-    assert len(contexts) == 2
+    assert len(contexts) == 3
     reference_context = document["species"]["Na2O"]["context"][0]["values"]
     assert reference_context["reference_melt_equations_attributed_as_printed"] == "Lin and Elliott [24]"
     assert reference_context["reference_melt_GM_conditions_as_printed"] == "1200 K and 0.53 < NWO3 < 0.8"

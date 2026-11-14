@@ -1182,16 +1182,81 @@ def assert_xtoken_points_carry_explicit_composition(
         )
 
 
+def _printed_mole_fraction(
+    point: Mapping[str, Any],
+    compositions: Mapping[str, Any],
+) -> tuple[Mapping[str, Any] | None, str]:
+    """Published X on the point, else on its composition record."""
+    published = point.get("published_mole_fraction")
+    if isinstance(published, Mapping) and published:
+        return published, "point.published_mole_fraction"
+    composition_id = point.get("composition_id")
+    if composition_id is None:
+        return None, ""
+    meta = compositions.get(str(composition_id))
+    if not isinstance(meta, Mapping):
+        return None, ""
+    published = meta.get("published_mole_fraction")
+    if isinstance(published, Mapping) and published:
+        return published, f"compositions[{composition_id}].published_mole_fraction"
+    return None, ""
+
+
+def composition_input_for_point(
+    point: Mapping[str, Any],
+    compositions: Mapping[str, Any],
+) -> tuple[dict[str, float], str]:
+    """Evaluator wt% plus where that composition came from.
+
+    A printed mole fraction is the input. Wt% is used only when the source
+    did not print X. Mass conversion stays in ``project_oxide_composition``;
+    single-cation aliases (AlO1.5) are formula-unit moles first so the
+    evaluator sees Al2O3 rather than a second oxide key with the same mass.
+    """
+    published, printed_at = _printed_mole_fraction(point, compositions)
+    if published is not None:
+        from simulator.accounting.formulas import project_oxide_composition
+        from simulator.chemistry.structural_activity import (
+            normalize_formula_unit_moles,
+        )
+
+        formula_mol, unsupported = normalize_formula_unit_moles(published)
+        if unsupported:
+            raise ValueError(
+                "published mole fraction has species outside the formula-unit "
+                f"oxide map: {', '.join(unsupported)}"
+            )
+        mass_fraction = project_oxide_composition(
+            formula_mol, source_basis="moles"
+        )
+        if not mass_fraction:
+            raise ValueError(
+                "published mole fraction projected to an empty composition"
+            )
+        return (
+            {oxide: 100.0 * amount for oxide, amount in mass_fraction.items()},
+            (
+                f"{printed_at} -> normalize_formula_unit_moles -> "
+                "project_oxide_composition(moles to wt%)"
+            ),
+        )
+    inline = point.get("composition_wt_pct")
+    if isinstance(inline, Mapping) and inline:
+        return _normalize_wt(inline), "point.composition_wt_pct (no published X)"
+    composition_id = str(point["composition_id"])
+    return (
+        _normalize_wt(compositions[composition_id]["composition_wt_pct"]),
+        f"compositions[{composition_id}].composition_wt_pct (no published X)",
+    )
+
+
 def composition_wt_pct_for_point(
     point: Mapping[str, Any],
     compositions: Mapping[str, Any],
 ) -> dict[str, float]:
-    """Prefer the point's explicit wt% vector; never parse the point id."""
-    inline = point.get("composition_wt_pct")
-    if isinstance(inline, Mapping) and inline:
-        return _normalize_wt(inline)
-    composition_id = str(point["composition_id"])
-    return _normalize_wt(compositions[composition_id]["composition_wt_pct"])
+    """Evaluator wt% for a bench point. Never parse the point id."""
+    weight_percent, _provenance = composition_input_for_point(point, compositions)
+    return weight_percent
 
 
 def load_bench_set(path: Path) -> dict[str, Any]:
@@ -1538,7 +1603,9 @@ def run_points(
     rows: list[dict[str, Any]] = []
     for point in fixture["points"]:
         composition_id = str(point["composition_id"])
-        composition = composition_wt_pct_for_point(point, compositions)
+        composition, composition_provenance = composition_input_for_point(
+            point, compositions
+        )
         temperature_K = float(point["temperature_K"])
         measured, conversion_reason = _liquid_standard_measured_activity(point)
         activity_observable = str(point["observable"]) in {
@@ -1606,7 +1673,14 @@ def run_points(
                         measured_activity_basis(point),
                         engine_activity_basis(result.details),
                     ),
-                    "details": json.dumps(result.details, sort_keys=True, default=str),
+                    "details": json.dumps(
+                        {
+                            **result.details,
+                            "composition_input_provenance": composition_provenance,
+                        },
+                        sort_keys=True,
+                        default=str,
+                    ),
                 }
             )
     return rows
@@ -1790,7 +1864,9 @@ def run_composition_probes(
     for probe in fixture.get("composition_probes", []):
         composition_id = str(probe["composition_id"])
         composition_meta = compositions[composition_id]
-        composition = _normalize_wt(composition_meta["composition_wt_pct"])
+        composition, composition_provenance = composition_input_for_point(
+            probe, compositions
+        )
         for engine in engines:
             result = execute_engine(
                 engine,
@@ -1808,7 +1884,14 @@ def run_composition_probes(
                     "engine": engine.name,
                     "status": result.status,
                     "reason": result.reason,
-                    "details": json.dumps(result.details, sort_keys=True, default=str),
+                    "details": json.dumps(
+                        {
+                            **result.details,
+                            "composition_input_provenance": composition_provenance,
+                        },
+                        sort_keys=True,
+                        default=str,
+                    ),
                 }
             )
     return rows

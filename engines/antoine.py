@@ -206,3 +206,52 @@ def _read_antoine_coefficients(
     else:
         C = read("C")
     return A, B, C
+
+
+def antoine_ab_from_enthalpy_entropy(
+    enthalpy: float,
+    entropy: float,
+    *,
+    gas_constant: float,
+    standard_pressure: float,
+) -> tuple[float, float]:
+    """Two-parameter Antoine A and B from a constant ΔH and ΔS.
+
+    Premise: log10(P/P°) = −ΔH/(R T ln 10) + ΔS/(R ln 10), so
+    log10(P) = A − B/(T+C) with C = 0.
+    Algebra: B = ΔH/(R ln 10) and A = log10(P°) + ΔS/(R ln 10).
+    The gas constant and the standard pressure are arguments, so a
+    calorie source keeps its own R and an atmosphere source keeps
+    its own P°.
+    Unit check: ΔH/R is kelvin and B stays kelvin. ΔS/R is
+    dimensionless, so A is a log10 pressure.
+    Sanity: ΔH = 400000, ΔS = 150, R = 8.31446261815324, P° = 1e5
+    gives A hex 0x1.9ab8ac22ada95p+3 and B hex 0x1.4675cacd27747p+14.
+    """
+
+    ln10 = math.log(10.0)
+    antoine_a = math.log10(standard_pressure) + entropy / (gas_constant * ln10)
+    antoine_b = enthalpy / (gas_constant * ln10)
+    return antoine_a, antoine_b
+
+
+def clausius_clapeyron_pressure(
+    prefactor: float,
+    enthalpy: float,
+    temperature: float,
+    *,
+    gas_constant: float,
+) -> float:
+    """Integrated Clausius-Clapeyron pressure at constant enthalpy.
+
+    Premise: a source written P = prefactor * exp[−ΔH/(R T)] is that
+    integral. The gas constant is an argument so the caller can pass
+    the R the source used.
+    Algebra: prefactor * exp(−enthalpy / (gas_constant * temperature)).
+    Unit check: ΔH/R is kelvin, divided by temperature it is
+    dimensionless, and the prefactor carries the pressure unit.
+    Sanity: prefactor 1.23e11, ΔH 400000, T 1800 K and
+    R = 8.31446261815324 is hex 0x1.36fb264ef0908p-2.
+    """
+
+    return prefactor * math.exp(-enthalpy / (gas_constant * temperature))

@@ -5,8 +5,9 @@ structural invariants enforce that:
 
 1. Every test with a process CPU budget above the 300 s global default MUST
    carry exactly one recognized serialized-chain ``xdist_group`` mark —
-   ``magemin_fullrun_<x>`` for heavy native tests, or ``serial`` for the
-   socket/pool-contended web pair — so heavy tests run inside a
+   ``magemin_fullrun_<x>`` for heavy native tests, ``serial`` for the
+   socket/pool-contended web pair, or ``hashimoto_real_cohort`` for the
+   isolated 24-run OpenIMCC correctness pin — so heavy tests run inside a
    duration-hinted serialized chain while the rest of the suite
    parallelizes around them (``--dist loadgroup``).
 2. The heavy roster is SHRINK-ONLY. Membership below is a debt list, not a
@@ -43,7 +44,9 @@ GLOBAL_CPU_BUDGET_CEILING_S = DEFAULT_CPU_BUDGET_SECONDS
 # invariant's purpose (heavy tests live inside a hinted serialized chain).
 # The web pause/resume pair cannot join a magemin chain: they serialize on
 # socket/pool contention, not on the native-engine binary.
-HEAVY_GROUP_PATTERN = re.compile(r"^(magemin_fullrun_[a-z]|serial)$")
+HEAVY_GROUP_PATTERN = re.compile(
+    r"^(magemin_fullrun_[a-z]|serial|hashimoto_real_cohort)$"
+)
 DURATION_HINTS_PATH = Path(__file__).with_name("xdist_loadgroup_durations.json")
 
 # Shrink-only debt roster: (file, test-function name), parameters stripped.
@@ -145,6 +148,11 @@ HEAVY_ROSTER = frozenset({
     # Keep the provenance pin nightly with a 2600 s CPU budget.
     ("tests/battery/test_store_regeneration.py",
      "test_committed_store_is_byte_identical_to_regeneration"),
+    # Owner-ratified w1112hashfx2 follow-up (2026-11-12): keep the required
+    # 24-run OpenIMCC full-tuple digest pin; no lower-call-volume equivalent
+    # is established. Nightly-only while the cohort call volume is reduced.
+    ("tests/battery/test_hashimoto_residue_predictions.py",
+     "test_hashimoto_openimcc_primary_numeric_output_is_pinned"),
 })
 
 # b-586: these campaign-length yield nodes must stay out of the PR tier. They
@@ -219,7 +227,8 @@ def _suite_shape_violations(
                 f"{item.nodeid}: CPU budget {ceiling:g}s > "
                 f"{GLOBAL_CPU_BUDGET_CEILING_S:g}s without exactly one "
                 f"recognized serialized-chain group "
-                f"(magemin_fullrun_<x> or serial; got {groups})"
+                f"(magemin_fullrun_<x>, serial, or hashimoto_real_cohort; "
+                f"got {groups})"
             )
         if _item_key(item) not in roster:
             violations.append(

@@ -33,7 +33,32 @@ species:
         locator: {page: 3, published_page: 1901, pdf_page_index: 2, table: '1'}
         phase: l
         units: dimensionless activity
-        standard_state: pure liquid Na2O
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase:
+                  tag: value
+                  value: l
+              component_basis: Na2O
+          inferred: false
+          note: >-
+            Table 1 caption states the Na2O and SiO2 reference states are
+            liquid (published p.1901); the discussion also names pure liquid
+            Na2O as the activity standard (published p.1903). The paper says
+            IVTANTERMO data [25] convert measured values to the beta-Na2O
+            standard used for partial Gibbs energies (published p.1901), but
+            names no separate Gibbs function or table for the liquid activity
+            standard. Reference [25] is L. V. Gurvitch, Vestnik Akad. Nauk,
+            SSSR, 1983, 54.
+          locator:
+            page: 3
+            published_page: 1901
+            pdf_page_index: 2
+            table: '1'
         composition_basis: printed_mole_fraction
         composition_derivation: 'binary Na2O-SiO2 as declared on p.1901; x_Na2O = 1 - x_SiO2'
         uncertainty:

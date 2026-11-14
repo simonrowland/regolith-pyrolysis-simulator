@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:kress-carmichael-1991-iron-redox-calibration
       role: pdf
@@ -4308,6 +4308,32 @@ context:
   work_id: 10.1007/bf00307328
   source_id: kress-carmichael-1991-iron-redox-calibration
   species: Fe
+- observation_id: kc91_experimental_apparatus_and_protocol
+  type: apparatus
+  locator:
+    page: 2-3
+    pdf_page_index: 1-2
+    published_page: 83-84
+    section: Ultrasonic measurements
+  units: as printed
+  values:
+    quantity: experimental apparatus and protocol
+    method_class: method_only
+    notes: 'The ultrasonic experiment used a Pt-Rh crucible containing 7.1-8.9 g of powdered glass sample. The crucible and
+      acoustic reflector plate were made from 90% Pt-10% Rh alloy; the buffer rod and crucible support structure were high-purity
+      alumina ceramic. Crucible dimensions: not stated. Fe-redox equilibrium was achieved after 5-24 h depending on composition
+      and temperature; a set of acoustic measurements took 3-7 h. The melt was sampled at high temperature with a Pt loop
+      quenched into ice-water before and after each set; loop wire diameter and Fe presaturation were not stated. Sample mass
+      of the loop aliquots was not stated. Initial and final bulk compositions were measured using an eight-channel ARL-EMX
+      microprobe and are listed in Table 3. In NAFS compositions, Na2O loss was sufficiently high that counting time was reduced
+      from 10 to 1 s and averaged points increased from 20 to 200. Reaction with the alumina buffer rod produced 0-8.7 wt%
+      Al2O3 contamination; in most samples this was less than 1 wt%, though Al2O3 varied by 2-6 wt% in the worst cases. The
+      authors state that loss of Fe to Pt was not significant under the oxidizing experimental conditions. Pickup of Pt, Rh,
+      Ir, or Re was not stated.'
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_experimental_apparatus_and_protocol
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: Fe
 - observation_id: kc91_fig1
   type: figure_record
   locator:
@@ -7372,6 +7398,348 @@ context:
       with the printed units. Candidate tokens checked: density, viscosity, cp, and electrical_conductivity; none types these
       quantities.'
   context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t2_count_note
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_0011_0014_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_0011_0014
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 0011_0014; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_0011_0014_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_0021_0025_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_0021_0025
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 0021_0025; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_0021_0025_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_021_023_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_021_023
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 021_023; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_021_023_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_031_036_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_031_036
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 031_036; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_031_036_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_041_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_041
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 041; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_041_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_051_056_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_051_056
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 051_056; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_051_056_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_081_086_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_081_086
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 081_086; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_081_086_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_091_0910_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_091_0910
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 091_0910; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_091_0910_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_101_107_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_101_107
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 101_107; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_101_107_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_111_117_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_111_117
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 111_117; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_111_117_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_121_126_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_121_126
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 121_126; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_121_126_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_131_137_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_131_137
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 131_137; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_131_137_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_141_147_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_141_147
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 141_147; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_141_147_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_151_157_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_151_157
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 151_157; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_151_157_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_161_167_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_161_167
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 161_167; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_161_167_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_171_174_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_171_174
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 171_174; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_171_174_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_181_182_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_181_182
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 181_182; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_181_182_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_201_206_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_201_206
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 201_206; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_201_206_phase_assemblage_evidence
+  work_id: 10.1007/bf00307328
+  source_id: kress-carmichael-1991-iron-redox-calibration
+  species: SiO2
+- observation_id: kc91_t3_211_213_phase_assemblage_evidence
+  type: phase_assemblage_evidence
+  experiment: kc91_t3_211_213
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 83
+    section: Ultrasonic measurements
+    note: Table 3 ultrasonic set 211_213; the general Pt-loop quench-crystal sentence does not identify individual products.
+  units: as printed
+  values:
+    evidence_type: sampled-from-liquid
+    run_products_as_printed: Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition
+      analyses to about 0.7 wt% absolute.
+  context_id: kress-carmichael-1991-iron-redox-calibration::context::kc91_t3_211_213_phase_assemblage_evidence
   work_id: 10.1007/bf00307328
   source_id: kress-carmichael-1991-iron-redox-calibration
   species: SiO2

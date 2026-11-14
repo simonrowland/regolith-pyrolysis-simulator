@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:shornikov-2019-perovskite-evaporation
       role: pdf
@@ -45,13 +45,22 @@ experiments:
   sample:
     initial_composition:
       state:
-        tag: unknown
-        reason: not_published
+        tag: value
+        value:
+          basis: printed_formula_stoichiometry
+          components:
+          - - CaO
+            - '1'
+          - - TiO2
+            - '1'
+          amount_basis: mol_inventory
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        published_page: 257
-        pdf_page_index: 4
-        section: Experimental
-        note: The CaCO3:TiO2 batch ratio and analyzed starting composition are not reported.
+        published_page: 253
+        pdf_page_index: 0
+        section: Introduction
+        note: Calcium titanate CaTiO3 (perovskite) is the starting charge formula.
     printed_composition:
       state:
         tag: value

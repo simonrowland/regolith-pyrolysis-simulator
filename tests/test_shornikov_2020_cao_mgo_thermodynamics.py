@@ -88,6 +88,112 @@ def _observations(document):
     ]
 
 
+SC456_MODEL_DERIVED_IDS = {
+    "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r10_c02",
+    "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r10_c05",
+    "shornikov_2020_tm_cao_r10",
+    "shornikov_2020_tm_mgo_r10",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c02",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c04",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r04_c02",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r04_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c02",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c04",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r06_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r07_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r08_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r09_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r10_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r11_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r12_c06",
+}
+
+SC456_FIGURE_ONLY_IDS = {
+    "shornikov_2020_fig2a_line1_CaO_not_sampled",
+    "shornikov_2020_fig2a_line2_CaO_not_sampled",
+    "shornikov_2020_fig2a_line4_MgO_not_sampled",
+    "shornikov_2020_fig2a_line5_MgO_not_sampled",
+}
+
+
+def _assert_sc456_evidence_classes(document):
+    rows = {row["observation_id"]: row for _formula, row in _observations(document)}
+    assert SC456_MODEL_DERIVED_IDS.isdisjoint(SC456_FIGURE_ONLY_IDS)
+    for observation_id in SC456_MODEL_DERIVED_IDS:
+        row = rows[observation_id]
+        assert row["values"]["method_class"] == "model_derived"
+        method_locator = row["derivation"]["method"]["locator"]
+        assert method_locator["published_page"] == 79
+        assert method_locator["section"] == "Thermodynamic properties of minerals and fluids"
+        assert "equation" not in method_locator
+        method_text = row["derivation"]["method"]["state"]["value"]
+        assert method_text.startswith(("The calculations used", "In the present study"))
+        assert row["derivation"]["references"]
+        if row["values"]["quantity"] == "delta_fG":
+            assert row["values"].get("standard_pressure") == "not_printed"
+
+    for observation_id in SC456_FIGURE_ONLY_IDS:
+        row = rows[observation_id]
+        values = row["values"]
+        assert values["method_class"] == "typed_refusal"
+        assert values["method_class_as_printed"] == "model_derived"
+        assert values["admission_status"] == "typed_refusal"
+        assert values["status"] == "typed_refusal"
+        assert values["unavailable_reason"] == "model_curve_not_sampled"
+        assert "no numeric point" in values["reason"]
+        assert "value" not in values
+        assert "derivation" not in row
+
+    for observation_id in (
+        "shornikov_2020_fig2a_line3_CaO_not_sampled",
+        "shornikov_2020_fig2a_line6_MgO_not_sampled",
+    ):
+        row = rows[observation_id]
+        assert row["values"]["method_class"] == "quoted_attributed"
+        assert "Wu et al. (1993)" in row["values"]["reason"]
+
+
+def test_sc456_model_derived_rows_are_pinned_against_quoted_class_mutation():
+    document = _load()
+    _assert_sc456_evidence_classes(document)
+
+    mutated = _load()
+    rows = {row["observation_id"]: row for _formula, row in _observations(mutated)}
+    rows["shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c02"]["values"][
+        "method_class"
+    ] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_evidence_classes(mutated)
+
+
+def test_sc456_figure_only_rows_are_pinned_against_model_admission_mutation():
+    document = _load()
+    _assert_sc456_evidence_classes(document)
+
+    mutated = _load()
+    rows = {row["observation_id"]: row for _formula, row in _observations(mutated)}
+    rows["shornikov_2020_fig2a_line1_CaO_not_sampled"]["values"][
+        "method_class"
+    ] = "model_derived"
+    with pytest.raises(AssertionError):
+        _assert_sc456_evidence_classes(mutated)
+
+
+def test_sc456_table2_standard_pressure_field_is_pinned():
+    document = _load()
+    _assert_sc456_evidence_classes(document)
+
+    mutated = _load()
+    rows = {row["observation_id"]: row for _formula, row in _observations(mutated)}
+    del rows["shornikov_2020_cao_mgo_thermodynamics_p003_t02_r10_c06"]["values"][
+        "standard_pressure"
+    ]
+    with pytest.raises(AssertionError):
+        _assert_sc456_evidence_classes(mutated)
+
+
 def _figure_markers(document):
     return [
         row
@@ -337,7 +443,8 @@ def test_isolated_migration_reaches_temperature_on_every_printed_row():
     ]
     assert len(migrated) == 77
     assert not result.registry_issues
-    assert not result.validation.hard_issues
+    hard_issues = result.validation.hard_issues
+    assert not hard_issues
 
     def quantity(row):
         return row.identity.quantity.value.value

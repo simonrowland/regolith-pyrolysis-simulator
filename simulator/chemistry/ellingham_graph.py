@@ -31,12 +31,15 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.gas_rail_authority import (
     _gas_rail_block_is_authoritative,
 )
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT_6SIG as GAS_CONSTANT_J_PER_MOL_K,
+    PA_PER_BAR,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
-# Match simulator.state.GAS_CONSTANT without importing simulator.state here.
-GAS_CONSTANT_J_PER_MOL_K = 8.31446
-CELSIUS_TO_KELVIN_OFFSET = 273.15
-ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+# Six-significant-figure R, same object as simulator.state.GAS_CONSTANT.
+ELLINGHAM_STANDARD_PRESSURE_PA = PA_PER_BAR
 logger = logging.getLogger(__name__)
 
 # Same evaporation floor used by BuiltinVaporPressureProvider.
@@ -105,6 +108,25 @@ def dissociation_delta_g(species: str, temperature_K: float) -> float:
         _require_species(species),
         float(temperature_K),
     )
+
+
+def _metallothermic_reductant_for_oxide(
+    species: str,
+    temperature_K: float,
+) -> str | None:
+    """Return the stronger Mg or Ca reductant for the oxide at this temperature."""
+    target_dG = dissociation_delta_g(species, temperature_K)
+    mg_dG = dissociation_delta_g("Mg", temperature_K)
+    ca_dG = dissociation_delta_g("Ca", temperature_K)
+    # Premise: all three formation values share a mol-O2 basis at the same T.
+    # ΔΔG = target dG - reductant-oxide dG; >1 kJ/mol-O2 means the target oxide
+    # is less stable by that margin. Equality (including identical lines) stays
+    # on the less-reducible side, matching the prior strict comparisons.
+    if target_dG > mg_dG + 1.0:
+        return "Mg"
+    if target_dG > ca_dG + 1.0:
+        return "Ca"
+    return None
 
 
 def dissociation_equilibrium_constant(species: str, temperature_K: float) -> float:

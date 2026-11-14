@@ -11,12 +11,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'cristobalite' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -52,7 +51,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state a numeric total_pressure_Pa
+      reason: not stated for the melting-point determination.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -72,8 +71,11 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Printed ± 5° (°C); temperature held constant to better than ± 0.4° during each run (Table II A note).
-      T_C_plus_minus_as_printed: 5
+      value: '5'
+      units: °C
+      confidence_level: not_stated
+      note: Printed ± 5°; confidence level is not stated. Table II A separately says the run temperature was held constant
+        to better than ± 0.4°.
   evidence:
     class:
       tag: value
@@ -96,6 +98,22 @@ observations:
     note: Summary line "Melting point 1713° ± 5°." printed under Table II A (p. 9) and again under Table II B (p. 10)
   read_from: pdf:greig-1927-ajs-immiscibility-silicate-melts-part1
   point_conditions:
+    composition_wt_pct:
+      state:
+        tag: unknown
+        reason: The starting material is cristobalite; no melt composition is printed for this melting-point determination.
+      locator:
+        page: 9
+        published_page: 9
+        table: II A
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not stated for the melting-point determination.
+      locator:
+        page: 9
+        published_page: 9
+        table: II A
     temperature_K:
       state:
         tag: value
@@ -105,6 +123,36 @@ observations:
         published_page: 9
         table: II A
         note: Summary line "Melting point 1713° ± 5°." printed under Table II A (p. 9) and again under Table II B (p. 10)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1713'
+            locator:
+              page: 9
+              published_page: 9
+              table: II A
+              note: Summary line "Melting point 1713° ± 5°." printed under Table II A (p. 9) and again under Table II B (p.
+                10)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 9
+              published_page: 9
+              table: II A
+              note: Summary line "Melting point 1713° ± 5°." printed under Table II A (p. 9) and again under Table II B (p.
+                10)
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: glass
 - observation_id: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t3_cao_sio2_cristobalite_two_liquids_T
   experiment_id: 10.2475/ajs.s5-13.73.1::experiment::cristobalite-two-liquids-t3
   identity:
@@ -114,12 +162,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'cristobalite + two liquids' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -155,7 +202,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state a numeric total_pressure_Pa
+      reason: not stated for these quenching runs.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -173,10 +220,7 @@ observations:
     point: '1971.15'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No ± printed for this temperature in Table III; the working element was compared with the two standard elements
-        after runs 6, 11 and 15.
+    kind: none
   evidence:
     class:
       tag: value
@@ -199,6 +243,23 @@ observations:
     note: Row "Temperature of the equilibrium", CaO-SiO2 column(s) 15CaO, 85SiO2 / 5CaO, 95SiO2; restated in prose p. 30
   read_from: pdf:greig-1927-ajs-immiscibility-silicate-melts-part1
   point_conditions:
+    composition_wt_pct:
+      state:
+        tag: unknown
+        reason: Table III gives multiple charge compositions for one shared invariant temperature; no single composition applies
+          to this row.
+      locator:
+        page: 14
+        published_page: 14
+        table: III
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not stated for these quenching runs.
+      locator:
+        page: 14
+        published_page: 14
+        table: III
     temperature_K:
       state:
         tag: value
@@ -209,6 +270,36 @@ observations:
         table: III
         note: Row "Temperature of the equilibrium", CaO-SiO2 column(s) 15CaO, 85SiO2 / 5CaO, 95SiO2; restated in prose p.
           30
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1698'
+            locator:
+              page: 14
+              published_page: 14
+              table: III
+              note: Row "Temperature of the equilibrium", CaO-SiO2 column(s) 15CaO, 85SiO2 / 5CaO, 95SiO2; restated in prose
+                p. 30
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 14
+              table: III
+              note: Row "Temperature of the equilibrium", CaO-SiO2 column(s) 15CaO, 85SiO2 / 5CaO, 95SiO2; restated in prose
+                p. 30
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: glass
 - observation_id: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
   experiment_id: 10.2475/ajs.s5-13.73.1::experiment::cristobalite-two-liquids-t3
   identity:
@@ -218,12 +309,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'cristobalite + two liquids' is not in the closed automatic map
+        tag: value
+        value: glass
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -259,7 +349,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: source does not state a numeric total_pressure_Pa
+      reason: not stated for these quenching runs.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -277,10 +367,7 @@ observations:
     point: '1968.15'
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: No ± printed for this temperature in Table III; the working element was compared with the two standard elements
-        after runs 6, 11 and 15.
+    kind: none
   evidence:
     class:
       tag: value
@@ -303,6 +390,23 @@ observations:
     note: Row "Temperature of the equilibrium", MgO-SiO2 column(s) 15MgO, 85SiO2; restated in prose p. 30
   read_from: pdf:greig-1927-ajs-immiscibility-silicate-melts-part1
   point_conditions:
+    composition_wt_pct:
+      state:
+        tag: unknown
+        reason: Table III gives multiple charge compositions for one shared invariant temperature; no single composition applies
+          to this row.
+      locator:
+        page: 14
+        published_page: 14
+        table: III
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not stated for these quenching runs.
+      locator:
+        page: 14
+        published_page: 14
+        table: III
     temperature_K:
       state:
         tag: value
@@ -312,3 +416,991 @@ observations:
         published_page: 14
         table: III
         note: Row "Temperature of the equilibrium", MgO-SiO2 column(s) 15MgO, 85SiO2; restated in prose p. 30
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1695'
+            locator:
+              page: 14
+              published_page: 14
+              table: III
+              note: Row "Temperature of the equilibrium", MgO-SiO2 column(s) 15MgO, 85SiO2; restated in prose p. 30
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 14
+              published_page: 14
+              table: III
+              note: Row "Temperature of the equilibrium", MgO-SiO2 column(s) 15MgO, 85SiO2; restated in prose p. 30
+        output_unit: K
+        references: []
+  provenance:
+    printed_phase: glass
+- observation_id: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t5_cao_siliceous_glass
+  experiment_id: 10.2475/ajs.s5-13.73.1::experiment::critical-quenches-binary
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.006425870638110853568968368582'
+        - - SiO2
+          - '0.9935741293618891464310316315'
+        amount_basis: mole_fraction
+        input_provenance: scored_phase_analysis
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Not stated for the Table V glass.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '99.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      range:
+      - '-0.5'
+      - '0.5'
+      units: wt%
+      confidence_level: not_stated
+      value_as_published: better than 0.5 per cent
+      note: Strict bound on composition error; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t5_cao_siliceous_glass
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  read_from: pdf:greig-1927-ajs-immiscibility-silicate-melts-part1
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.006425870638110853568968368582'
+          - - SiO2
+            - '0.9935741293618891464310316315'
+          amount_basis: mole_fraction
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0.6'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '99.4'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Not stated for the Table V glass.
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Not stated for the Table V glass.
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+        note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+              note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+              note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+        output_unit: K
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '0.6'
+          SiO2: '99.4'
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+        note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  derived_from:
+  - greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices
+  derivation:
+    relation: linear interpolation of refractive index with composition
+    inputs:
+    - greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices
+    parameters: []
+    output_unit: wt%
+    references: []
+  provenance:
+    printed_phase: glass
+- observation_id: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t5_cao_siliceous_glass_CaO
+  experiment_id: 10.2475/ajs.s5-13.73.1::experiment::critical-quenches-binary
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.006425870638110853568968368582'
+        - - SiO2
+          - '0.9935741293618891464310316315'
+        amount_basis: mole_fraction
+        input_provenance: scored_phase_analysis
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Not stated for the Table V glass.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      range:
+      - '-0.5'
+      - '0.5'
+      units: wt%
+      confidence_level: not_stated
+      value_as_published: better than 0.5 per cent
+      note: Strict bound on composition error; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t5_cao_siliceous_glass_CaO
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  read_from: pdf:greig-1927-ajs-immiscibility-silicate-melts-part1
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.006425870638110853568968368582'
+          - - SiO2
+            - '0.9935741293618891464310316315'
+          amount_basis: mole_fraction
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '0.6'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '99.4'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Not stated for the Table V glass.
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Not stated for the Table V glass.
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+        note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+              note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+              note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+        output_unit: K
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '0.6'
+          SiO2: '99.4'
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+        note: CaO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  derived_from:
+  - greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices
+  derivation:
+    relation: linear interpolation of refractive index with composition
+    inputs:
+    - greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_cao_siliceous_glass_raw_indices
+    parameters: []
+    output_unit: wt%
+    references: []
+  provenance:
+    printed_phase: glass
+- observation_id: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t5_mgo_siliceous_glass
+  experiment_id: 10.2475/ajs.s5-13.73.1::experiment::critical-quenches-binary
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.01187932489735118912866695045'
+        - - SiO2
+          - '0.9881206751026488108713330495'
+        amount_basis: mole_fraction
+        input_provenance: scored_phase_analysis
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Not stated for the Table V glass.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '99.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      range:
+      - '-0.5'
+      - '0.5'
+      units: wt%
+      confidence_level: not_stated
+      value_as_published: better than 0.5 per cent
+      note: Strict bound on composition error; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t5_mgo_siliceous_glass
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  read_from: pdf:greig-1927-ajs-immiscibility-silicate-melts-part1
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.01187932489735118912866695045'
+          - - SiO2
+            - '0.9881206751026488108713330495'
+          amount_basis: mole_fraction
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0.8'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '99.2'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Not stated for the Table V glass.
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Not stated for the Table V glass.
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+        note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+              note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+              note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+        output_unit: K
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '0.8'
+          SiO2: '99.2'
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+        note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  derived_from:
+  - greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices
+  derivation:
+    relation: linear interpolation of refractive index with composition
+    inputs:
+    - greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices
+    parameters: []
+    output_unit: wt%
+    references: []
+  provenance:
+    printed_phase: glass
+- observation_id: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t5_mgo_siliceous_glass_MgO
+  experiment_id: 10.2475/ajs.s5-13.73.1::experiment::critical-quenches-binary
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1983.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.01187932489735118912866695045'
+        - - SiO2
+          - '0.9881206751026488108713330495'
+        amount_basis: mole_fraction
+        input_provenance: scored_phase_analysis
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: Not stated for the Table V glass.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      range:
+      - '-0.5'
+      - '0.5'
+      units: wt%
+      confidence_level: not_stated
+      value_as_published: better than 0.5 per cent
+      note: Strict bound on composition error; confidence level is not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t5_mgo_siliceous_glass_MgO
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  locator:
+    page: 19
+    published_page: 19
+    table: V
+    note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  read_from: pdf:greig-1927-ajs-immiscibility-silicate-melts-part1
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.01187932489735118912866695045'
+          - - SiO2
+            - '0.9881206751026488108713330495'
+          amount_basis: mole_fraction
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0.8'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '99.2'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+        output_unit: mole_fraction
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Not stated for the Table V glass.
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Not stated for the Table V glass.
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+    temperature_K:
+      state:
+        tag: value
+        value: '1983.15'
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+        note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1710'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+              note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 19
+              published_page: 19
+              table: V
+              note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+        output_unit: K
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          MgO: '0.8'
+          SiO2: '99.2'
+      locator:
+        page: 19
+        published_page: 19
+        table: V
+        note: MgO-SiO2 siliceous-glass composition at 1710° by interpolation.
+  derived_from:
+  - greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices
+  derivation:
+    relation: linear interpolation of refractive index with composition
+    inputs:
+    - greig-1927-ajs-immiscibility-silicate-melts-part1::context::greig1927_t5_mgo_siliceous_glass_raw_indices
+    parameters: []
+    output_unit: wt%
+    references: []
+  provenance:
+    printed_phase: glass

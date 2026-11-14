@@ -21,6 +21,28 @@ def test_mathieu_2009_extract_migrates_and_pins_printed_activity_values(
     }
 
     assert len(rows) == 421
+    from simulator.battery.enums import Phase
+
+    gamma_rows = [
+        row for row_id, row in rows.items() if row_id.endswith("_gamma_na2o")
+    ]
+    assert len(gamma_rows) == 209
+    assert all(row.identity.species.formula == "Na2O" for row in gamma_rows)
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.L
+        for row in gamma_rows
+    )
+    assert all(row.identity.temperature_K.is_value for row in rows.values())
+    assert all(
+        row.point_conditions is not None
+        and row.point_conditions["temperature_K"].state.is_value
+        and row.point_conditions["temperature_K"].locator is not None
+        for row in rows.values()
+    )
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
     # Table IV.1, p. 136: 0.85 × 10^-6 for ACMAS5 / AS1.
     assert rows["mathieu_2009_t38_acmas5_as1_gamma_na2o"].value.point == Decimal(
         "8.5e-7"

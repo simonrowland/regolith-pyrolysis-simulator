@@ -851,11 +851,26 @@ species:
       regime: olette_relative_evaporation_coefficient
       units: dimensionless
       values:
-        method_class: quoted_attributed
+        method_class: model_derived
         olette_alpha_theoretical: 1095
         not_hkl_langmuir_coefficient: true
         note: Author-calculated relative evaporation coefficient. Not an experimental HKL coefficient; retained
           without a measured alpha scalar.
+        calculation_method_as_printed: Olette's evaporation-coefficient equation (8), derived from the Hertz-Langmuir-Knudsen equation
+        equation_as_printed: 'alpha_B = (gamma_B/gamma_Fe) * (P_B^0/P_Fe^0) * sqrt(M_Fe/M_B)'
+        derivation:
+          relation: Homma et al. calculated the theoretical alpha with Olette's equation (8) using the thermodynamic data in Table 6.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 519, section: III.2 Evaporation coefficient measurement and calculation, table: '6'}
+          method:
+            state: {tag: value, value: Olette's evaporation-coefficient equation (8).}
+            locator: {page: '516–517', section: III.2 Evaporation coefficient measurement and calculation, equation: '8'}
+          references:
+            - '[1] M. Olette (1959), source cited for equation (8).'
+            - '[6] J. F. Elliott, M. Gleiser, and V. Ramakrishna, Thermochemistry for Steelmaking (1963), Vol. 2.'
+            - '[7] H. Schenck and W. Spieker, Arch. Eisenhütt. 30 (1959), 641.'
+            - '[8] R. Hultgren, R. L. Orr, P. D. Anderson, and K. K. Kelley, Selected Values of Thermodynamic Properties of Metals and Alloys (1963).'
         admission_status: model_output_not_measurement
       uncertainty:
         note: No numerical uncertainty printed for theoretical coefficient.
@@ -1067,6 +1082,24 @@ species:
         quantity: fitted_first_order_evaporation_constants
         method_class: model_derived
         admission_status: model_output_not_measurement
+        derivation:
+          relation: The authors fitted first-order concentration-loss constants using equations (1)–(4), converted them to surface-area constants with equations (5)–(6), and calculated surface-to-bulk ratios using Ward's equations (14)–(17).
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: '516–518'
+              section: III.1 Measurement of evaporation constants
+              figure: '1–4'
+              table: '1–3'
+          method:
+            state: {tag: value, value: First-order concentration-loss kinetics and Ward's surface-to-bulk concentration relation.}
+            locator:
+              page: '516–520'
+              section: III.1 Measurement of evaporation constants and IV Discussion
+              equation: '1–6, 14–17'
+          references:
+            - '[3] R. G. Ward, J. Iron Steel Inst. 201 (1963), 11.'
+          input_reference_note: Reference (3) supplies Ward's surface-depletion relation; the concentration-time inputs are the authors' own experimental results.
         rows:
         - alloy: Fe-Mn
           melt: 6411-15
@@ -1434,11 +1467,26 @@ species:
       regime: olette_relative_evaporation_coefficient
       units: dimensionless
       values:
-        method_class: quoted_attributed
+        method_class: model_derived
         olette_alpha_theoretical: 143
         not_hkl_langmuir_coefficient: true
         note: Author-calculated relative evaporation coefficient. Not an experimental HKL coefficient; retained
           without a measured alpha scalar.
+        calculation_method_as_printed: Olette's evaporation-coefficient equation (8), derived from the Hertz-Langmuir-Knudsen equation
+        equation_as_printed: 'alpha_B = (gamma_B/gamma_Fe) * (P_B^0/P_Fe^0) * sqrt(M_Fe/M_B)'
+        derivation:
+          relation: Homma et al. calculated the theoretical alpha with Olette's equation (8) using the thermodynamic data in Table 6.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 519, section: III.2 Evaporation coefficient measurement and calculation, table: '6'}
+          method:
+            state: {tag: value, value: Olette's evaporation-coefficient equation (8).}
+            locator: {page: '516–517', section: III.2 Evaporation coefficient measurement and calculation, equation: '8'}
+          references:
+            - '[1] M. Olette (1959), source cited for equation (8).'
+            - '[6] J. F. Elliott, M. Gleiser, and V. Ramakrishna, Thermochemistry for Steelmaking (1963), Vol. 2.'
+            - '[7] H. Schenck and W. Spieker, Arch. Eisenhütt. 30 (1959), 641.'
+            - '[8] R. Hultgren, R. L. Orr, P. D. Anderson, and K. K. Kelley, Selected Values of Thermodynamic Properties of Metals and Alloys (1963).'
         admission_status: model_output_not_measurement
       uncertainty:
         note: No numerical uncertainty printed for theoretical coefficient.
@@ -1702,6 +1750,24 @@ species:
         quantity: fitted_first_order_evaporation_constants
         method_class: model_derived
         admission_status: model_output_not_measurement
+        derivation:
+          relation: The authors fitted first-order concentration-loss constants using equations (1)–(4), converted them to surface-area constants with equations (5)–(6), and calculated surface-to-bulk ratios using Ward's equations (14)–(17).
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: '516–518'
+              section: III.1 Measurement of evaporation constants
+              figure: '1–4'
+              table: '1–3'
+          method:
+            state: {tag: value, value: First-order concentration-loss kinetics and Ward's surface-to-bulk concentration relation.}
+            locator:
+              page: '516–520'
+              section: III.1 Measurement of evaporation constants and IV Discussion
+              equation: '1–6, 14–17'
+          references:
+            - '[3] R. G. Ward, J. Iron Steel Inst. 201 (1963), 11.'
+          input_reference_note: Reference (3) supplies Ward's surface-depletion relation; the concentration-time inputs are the authors' own experimental results.
         rows:
         - alloy: Fe-Cu
           melt: 6503-12
@@ -1959,11 +2025,26 @@ species:
       regime: olette_relative_evaporation_coefficient
       units: dimensionless
       values:
-        method_class: quoted_attributed
+        method_class: model_derived
         olette_alpha_theoretical: 20
         not_hkl_langmuir_coefficient: true
         note: Author-calculated relative evaporation coefficient. Not an experimental HKL coefficient; retained
           without a measured alpha scalar.
+        calculation_method_as_printed: Olette's evaporation-coefficient equation (8), derived from the Hertz-Langmuir-Knudsen equation
+        equation_as_printed: 'alpha_B = (gamma_B/gamma_Fe) * (P_B^0/P_Fe^0) * sqrt(M_Fe/M_B)'
+        derivation:
+          relation: Homma et al. calculated the theoretical alpha with Olette's equation (8) using the thermodynamic data in Table 6.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 519, section: III.2 Evaporation coefficient measurement and calculation, table: '6'}
+          method:
+            state: {tag: value, value: Olette's evaporation-coefficient equation (8).}
+            locator: {page: '516–517', section: III.2 Evaporation coefficient measurement and calculation, equation: '8'}
+          references:
+            - '[1] M. Olette (1959), source cited for equation (8).'
+            - '[6] J. F. Elliott, M. Gleiser, and V. Ramakrishna, Thermochemistry for Steelmaking (1963), Vol. 2.'
+            - '[7] H. Schenck and W. Spieker, Arch. Eisenhütt. 30 (1959), 641.'
+            - '[8] R. Hultgren, R. L. Orr, P. D. Anderson, and K. K. Kelley, Selected Values of Thermodynamic Properties of Metals and Alloys (1963).'
         admission_status: model_output_not_measurement
       uncertainty:
         note: No numerical uncertainty printed for theoretical coefficient.
@@ -2178,6 +2259,24 @@ species:
         quantity: fitted_first_order_evaporation_constants
         method_class: model_derived
         admission_status: model_output_not_measurement
+        derivation:
+          relation: The authors fitted first-order concentration-loss constants using equations (1)–(4), converted them to surface-area constants with equations (5)–(6), and calculated surface-to-bulk ratios using Ward's equations (14)–(17).
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: '516–518'
+              section: III.1 Measurement of evaporation constants
+              figure: '1–4'
+              table: '1–3'
+          method:
+            state: {tag: value, value: First-order concentration-loss kinetics and Ward's surface-to-bulk concentration relation.}
+            locator:
+              page: '516–520'
+              section: III.1 Measurement of evaporation constants and IV Discussion
+              equation: '1–6, 14–17'
+          references:
+            - '[3] R. G. Ward, J. Iron Steel Inst. 201 (1963), 11.'
+          input_reference_note: Reference (3) supplies Ward's surface-depletion relation; the concentration-time inputs are the authors' own experimental results.
         rows:
         - alloy: Fe-Sn
           melt: 6503-15

@@ -35,9 +35,11 @@ SKIP_REASON = "corpus_checkout_not_required_by_this_gate"
 # landed on green after 6badf9e3b; its corpus raw/ is on file). 781 are
 # distinct: bencze-yazhenskikh-2016.yaml and
 # bencze-yazhenskikh-2016-table-s1-k.yaml share one source_id.
-EXPECTED_EXTRACT_COUNT = 782
-EXPECTED_SOURCE_ID_COUNT = 782
-EXPECTED_DISTINCT_SOURCE_IDS = 781
+# b261 landing: the main join adds 67 extracts with 67 new, distinct source ids
+# (782 -> 849 extracts and source_id values; 781 -> 848 distinct).
+EXPECTED_EXTRACT_COUNT = 849
+EXPECTED_SOURCE_ID_COUNT = 849
+EXPECTED_DISTINCT_SOURCE_IDS = 848
 
 # Root source_id in the preamble, YAML or JSON-style. Checked against a full
 # document load of every extract at the census commit.

@@ -27,6 +27,7 @@ from scripts.grid_pregrind_writer import (  # noqa: E402
     table_columns,
     utc_now,
 )
+from simulator.battery.enums import refuse_proprietary_engine_use  # noqa: E402
 
 
 DEFAULT_ACCUMULATOR = (
@@ -521,6 +522,12 @@ def harvest_snapshot(
         if variant != SCHEMA_VARIANT:
             raise ValueError(
                 f"source schema variant mismatch: {variant!r} != {SCHEMA_VARIANT!r}"
+            )
+        for (engine_mode,) in source.execute(
+            f'SELECT DISTINCT engine_mode FROM "{table}"'
+        ):
+            refuse_proprietary_engine_use(
+                str(engine_mode), mode="distilled_grind_archive"
             )
         source_generation = _metadata(source, "database_id")
         if source_generation is None:

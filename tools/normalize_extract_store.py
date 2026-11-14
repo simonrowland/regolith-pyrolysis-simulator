@@ -45,6 +45,11 @@ from typing import Any, Iterable, Mapping, Sequence
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from simulator.physical_constants import ATM_PA, BAR_PA
+
 EXTRACTS_DIR = ROOT / "data" / "literature" / "extracts"
 U0_PATH = ROOT / "data" / "vapour_rail_u0_manifest.yaml"
 VP_PATH = ROOT / "data" / "vapor_pressures.yaml"
@@ -132,9 +137,7 @@ SIMPLE_RANGE_RE = re.compile(
     r"([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s*$"
 )
 
-ATM_PA = 101325.0
-BAR_PA = 1.0e5
-TORR_PA = 101325.0 / 760.0  # 133.32236842105263
+TORR_PA = ATM_PA / 760.0  # 133.32236842105263
 C_TO_K = 273.15
 
 CONVERSIONS = {

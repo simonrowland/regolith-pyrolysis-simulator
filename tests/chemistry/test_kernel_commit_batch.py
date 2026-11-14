@@ -827,7 +827,7 @@ def test_commit_batch_rejects_dispatch_proposal_after_provider_unregistered():
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
     proposal = _dispatch_commit_proposal(kernel)
-    registry.replace_for_test(ChemistryIntent.EVAPORATION_TRANSITION, None)
+    registry._authoritative.pop(ChemistryIntent.EVAPORATION_TRANSITION)
 
     with pytest.raises(ProviderUnavailableError):
         kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, proposal)
@@ -848,9 +848,7 @@ def test_commit_batch_requires_same_provider_object_after_registry_replacement()
     proposal = _dispatch_commit_proposal(kernel)
 
     replacement = _CommitProvider()
-    registry.replace_for_test(
-        ChemistryIntent.EVAPORATION_TRANSITION, replacement
-    )
+    registry._authoritative[ChemistryIntent.EVAPORATION_TRANSITION] = replacement
 
     with pytest.raises(ProviderUnavailableError, match="no longer registered"):
         kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, proposal)

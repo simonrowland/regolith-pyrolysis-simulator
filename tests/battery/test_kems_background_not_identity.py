@@ -399,7 +399,8 @@ def test_langmuir_free_evaporation_keeps_printed_row_pressure(
     } == {"Na": Decimal("0.26"), "K": Decimal("0.13")}
     for row in result.observations.values():
         assert row.identity.total_pressure_Pa is not None
-        assert row.identity.total_pressure_Pa.is_unknown
+        assert row.identity.total_pressure_Pa.is_value
+        assert row.identity.total_pressure_Pa.value == Decimal("1.0")
         point_pressure = row.point_conditions["total_pressure_Pa"]
         assert point_pressure.state.is_value
         assert point_pressure.state.value.point == Decimal("1.0")

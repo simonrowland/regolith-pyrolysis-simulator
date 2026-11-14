@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.migrate import Migrator
@@ -19,6 +20,7 @@ def test_fujisawa_1994_render_pins_and_row_count() -> None:
     t2 = [row for row in sn_rows if row["locator"]["table"] == "2"]
     t3 = [row for row in sn_rows if row["locator"]["table"] == "3"]
     na_rows = doc["species"]["NaO0.5"]["observations"]
+    _assert_sc456_reduced_class(doc)
 
     assert len(t2) == 8  # Table 2 has eight run rows.
     assert len(t3) == 9  # Table 3 has nine run rows.
@@ -68,6 +70,29 @@ def test_fujisawa_1994_render_pins_and_row_count() -> None:
         for row in na_rows
     )
     assert all("activity" not in row["values"] for row in sn_rows)
+
+
+def _assert_sc456_reduced_class(document: dict) -> None:
+    sn_rows = document["species"]["SnO2"]["observations"]
+    na_rows = document["species"]["NaO0.5"]["observations"]
+    changed_rows = [row for row in sn_rows if row["observation_id"].startswith(("fujisawa94_t2_", "fujisawa94_t3_"))] + na_rows
+    assert len(changed_rows) == 20
+    for row in changed_rows:
+        values = row["values"]
+        assert values["method_class"] == "measured_reduced"
+        assert values["evidence_class"] == "measured_reduced"
+        raw_inputs = values["derivation"]["raw_inputs"]
+        assert raw_inputs["state"] == {"tag": "value", "value": "not_printed"}
+        assert raw_inputs["locator"]["page"] == row["locator"]["page"]
+        assert raw_inputs["locator"]["table"] == row["locator"]["table"]
+
+
+def test_fujisawa_sc456_class_pin_rejects_quote_reversion() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    row = document["species"]["SnO2"]["observations"][0]
+    row["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_reduced_class(document)
 
 
 def test_fujisawa_1994_isolated_migration_keeps_conditions_and_locators() -> None:
