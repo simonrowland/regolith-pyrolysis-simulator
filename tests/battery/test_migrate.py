@@ -15,7 +15,7 @@ import unicodedata
 from collections import Counter
 from copy import deepcopy
 from dataclasses import replace
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 import pytest
@@ -8917,6 +8917,11 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
     return None
 
 
+_SU_ZHANG_PROFILE_REFUSAL = (
+    "natural glass radial profile; no evaporation experiment"
+)
+
+
 def _series_census(
     extracts: Path, extracts_v2: Path
 ) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
@@ -8962,6 +8967,14 @@ def _series_census(
                 obs_type = row.get("type") if isinstance(row.get("type"), str) else None
                 units = str(row.get("units") or "")
                 q_token = _census_declared_quantity(obs_type, values, units)
+                if (
+                    q_token is None
+                    and values.get("quantity")
+                    == _SU_ZHANG_PROFILE_REFUSAL
+                    and values.get("typed_refused_schema_gap") is True
+                ):
+                    n_unavailable += len(series)
+                    continue
                 raw_id = str(row.get("observation_id") or "")
                 for index, item in enumerate(series):
                     if not isinstance(item, dict):
@@ -9112,6 +9125,110 @@ def _series_census(
     return census, mismatches, n_numeric, n_unavailable, per_source
 
 
+def test_su_zhang_natural_glass_profiles_are_typed_absence(tmp_path: Path) -> None:
+    source_id = "su-zhang-2023-lunar-orange-glass-na-k-cu-degassing"
+    refusal_reason = _SU_ZHANG_PROFILE_REFUSAL
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    source = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    from simulator.battery.migrate import _residue_component_field_sets
+
+    profile_ids: set[str] = set()
+    source_profile_points = 0
+    numeric_source_cells = 0
+    for body in source["species"].values():
+        if not isinstance(body, dict):
+            continue
+        for row in body.get("observations") or []:
+            raw_id = row.get("observation_id")
+            values = row.get("values")
+            if (
+                not isinstance(raw_id, str)
+                or not raw_id.endswith("_profile")
+                or not isinstance(values, dict)
+            ):
+                continue
+            series = values.get("series")
+            assert isinstance(series, list)
+            source_profile_points += len(series)
+            assert values.get("quantity") == refusal_reason
+            assert values.get("typed_refused_schema_gap") is True
+            profile_ids.add(raw_id)
+            for item in series:
+                if not isinstance(item, dict):
+                    continue
+                fields, _invalid = _residue_component_field_sets(item)
+                for field in ("residue_ppm", *fields):
+                    if field not in item:
+                        continue
+                    try:
+                        amount = Decimal(str(item[field]))
+                    except (InvalidOperation, ValueError, TypeError):
+                        continue
+                    if amount.is_finite():
+                        numeric_source_cells += 1
+
+    assert numeric_source_cells == 3435
+    migrated = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+    prefix = f"{source_id}::"
+    migrated_profiles = {
+        observation.observation_id: observation
+        for observation in migrated.observations.values()
+        if observation.source_id == source_id
+        and observation.observation_id.startswith(prefix)
+        and observation.observation_id[len(prefix) :].split("::", 1)[0]
+        in profile_ids
+    }
+
+    stored_path = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "extracts-v2"
+        / f"{source_id}.yaml"
+    )
+    previous_store = yaml.safe_load(stored_path.read_text(encoding="utf-8"))
+    previous_profiles = {
+        observation["observation_id"]: observation
+        for observation in previous_store["observations"]
+        if observation["observation_id"].startswith(prefix)
+        and observation["observation_id"][len(prefix) :].split("::", 1)[0]
+        in profile_ids
+    }
+
+    assert len(migrated_profiles) == source_profile_points
+    assert len(previous_profiles) == numeric_source_cells
+    assert {
+        observation_id[len(prefix) :].split("::", 1)[0]
+        for observation_id in migrated_profiles
+    } == profile_ids
+    assert {
+        observation_id[len(prefix) :].split("::", 1)[0]
+        for observation_id in previous_profiles
+    } == profile_ids
+    numeric_previous_rows = {
+        observation_id
+        for observation_id, observation in previous_profiles.items()
+        if observation["value"]["kind"] == "point"
+    }
+    assert len(numeric_previous_rows) == numeric_source_cells
+    migrated_locators = Counter(
+        yaml.safe_dump(to_plain(observation.locator), sort_keys=True)
+        for observation in migrated_profiles.values()
+        if observation.locator is not None
+    )
+    previous_locators = Counter(
+        yaml.safe_dump(observation["locator"], sort_keys=True)
+        for observation in previous_profiles.values()
+    )
+    assert not previous_locators - migrated_locators
+    for observation_id, observation in migrated_profiles.items():
+        assert observation.identity.quantity.is_unknown
+        assert observation.identity.quantity.reason == (
+            f"unsupported quantity {refusal_reason!r}"
+        )
+        assert observation.locator is not None
+
+
 def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) -> None:
     extracts = REPO_ROOT / "data" / "literature" / "extracts"
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
@@ -9231,15 +9348,15 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # 4110->4319.
     # Yakovlev 2017 (fc7c11533, merge F20 23a54e9b3) adds 34 printed residue
     # cells: 4319->4353.
-    # Data offers 3+4 add Su & Zhang (2023)'s 2,570 Table S2 + 61 Table S3 +
-    # 804 Table S4 numeric residue cells and Richter et al. (2011)'s 324 numeric
-    # Table 1 oxide cells. Its 325th printed oxide cell is <0.01 Na2O and remains
-    # typed-refused. The count moved because these data became visible, not
-    # because a check was relaxed; mismatches stay 0.
-    assert census.get("residue_component_composition") == 8112
-    assert per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing") == {
-        "residue_component_composition": 3435
-    }
+    # t-1781 retypes Su & Zhang's 3,435 natural-glass profile cells as an
+    # explicit typed absence; the numeric census excludes them from the residue
+    # quantity. Richter et al. (2011) still contributes 324 Table 1 oxide cells.
+    assert census.get("residue_component_composition") == 4677
+    assert (
+        per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing", {})
+        .get("residue_component_composition", 0)
+        == 0
+    )
     assert per_source.get(
         "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
     ) == {"isotope_delta": 21, "residue_component_composition": 324}
@@ -9274,6 +9391,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # components plus 21 isotope deltas), moving n_numeric to 12,505. They also
     # add 60 null Su & Zhang Table S2 cells and Richter's printed <0.01 Na2O
     # cell to the unavailable tally: 949->1,010. These cells are not numeric.
+    # t-1781 adds 3,435 natural-glass profile cells as typed absences, so the
+    # unavailable tally becomes 4,445 without adding them to any quantity rail.
     # The old 8818 total also
     # counted 93 Beyer cells from the Table 6 glass-S and Tables 8/10/12
     # simple-oxide-formation schema-gap rows. SC-475 keeps those rows typed
@@ -9285,7 +9404,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "H_minus_H298": 74,
         "cp": 12,
     }
-    assert n_unavailable == 1010
+    assert n_unavailable == 4445
     assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
         "cp": 123,
         "H_minus_H298": 123,
@@ -9330,7 +9449,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 12505, (n_numeric, census, n_unavailable)
+    # t-1781 removes Su & Zhang's 3,435 natural-glass profile cells from the
+    # residue quantity census: 12,505->9,070 numeric cells.
+    assert n_numeric == 9070, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
