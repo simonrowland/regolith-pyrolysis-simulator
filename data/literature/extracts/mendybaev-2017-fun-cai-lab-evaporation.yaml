@@ -3721,10 +3721,10 @@ species:
         method_class: measured_direct
         phase: silicate_melt_FUNC_forsterite_rich
         series:
-        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: MgO}, MgO_wt_pct: '34.09', sigma: '0.10'}
-        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: Al2O3}, Al2O3_wt_pct: '13.93', sigma: '0.08'}
-        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: SiO2}, SiO2_wt_pct: '42.93', sigma: '0.05'}
-        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: CaO}, CaO_wt_pct: '9.05', sigma: '0.05'}
+        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: MgO}, MgO_wt_pct: '34.09', sigma: '0.10', composition_wt_pct: &func5_residue_wt_pct {MgO: '34.09', Al2O3: '13.93', SiO2: '42.93', CaO: '9.05'}}
+        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: Al2O3}, Al2O3_wt_pct: '13.93', sigma: '0.08', composition_wt_pct: *func5_residue_wt_pct}
+        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: SiO2}, SiO2_wt_pct: '42.93', sigma: '0.05', composition_wt_pct: *func5_residue_wt_pct}
+        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: CaO}, CaO_wt_pct: '9.05', sigma: '0.05', composition_wt_pct: *func5_residue_wt_pct}
     - observation_id: mendybaev_2017_func10_table1_residue_composition
       experiment: func-10
       type: composition_series
@@ -3737,10 +3737,10 @@ species:
         method_class: measured_direct
         phase: silicate_melt_FUNC_forsterite_rich
         series:
-        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: MgO}, MgO_wt_pct: '33.53', sigma: '0.10'}
-        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: Al2O3}, Al2O3_wt_pct: '15.20', sigma: '0.12'}
-        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: SiO2}, SiO2_wt_pct: '40.74', sigma: '0.11'}
-        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: CaO}, CaO_wt_pct: '10.48', sigma: '0.06'}
+        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: MgO}, MgO_wt_pct: '33.53', sigma: '0.10', composition_wt_pct: &func10_residue_wt_pct {MgO: '33.53', Al2O3: '15.20', SiO2: '40.74', CaO: '10.48'}}
+        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: Al2O3}, Al2O3_wt_pct: '15.20', sigma: '0.12', composition_wt_pct: *func10_residue_wt_pct}
+        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: SiO2}, SiO2_wt_pct: '40.74', sigma: '0.11', composition_wt_pct: *func10_residue_wt_pct}
+        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: CaO}, CaO_wt_pct: '10.48', sigma: '0.06', composition_wt_pct: *func10_residue_wt_pct}
     - observation_id: mendybaev_2017_func1_table1_residue_composition
       experiment: func-1
       type: composition_series
@@ -3753,10 +3753,10 @@ species:
         method_class: measured_direct
         phase: silicate_melt_FUNC_forsterite_rich
         series:
-        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: MgO}, MgO_wt_pct: '32.12', sigma: '0.24'}
-        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: Al2O3}, Al2O3_wt_pct: '18.16', sigma: '0.16'}
-        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: SiO2}, SiO2_wt_pct: '37.16', sigma: '0.11'}
-        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: CaO}, CaO_wt_pct: '12.52', sigma: '0.14'}
+        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: MgO}, MgO_wt_pct: '32.12', sigma: '0.24', composition_wt_pct: &func1_residue_wt_pct {MgO: '32.12', Al2O3: '18.16', SiO2: '37.16', CaO: '12.52'}}
+        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: Al2O3}, Al2O3_wt_pct: '18.16', sigma: '0.16', composition_wt_pct: *func1_residue_wt_pct}
+        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: SiO2}, SiO2_wt_pct: '37.16', sigma: '0.11', composition_wt_pct: *func1_residue_wt_pct}
+        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: CaO}, CaO_wt_pct: '12.52', sigma: '0.14', composition_wt_pct: *func1_residue_wt_pct}
     - observation_id: mendybaev_2017_func9_table1_residue_composition
       experiment: func-9
       type: composition_series
@@ -3769,10 +3769,10 @@ species:
         method_class: measured_direct
         phase: silicate_melt_FUNC_forsterite_rich
         series:
-        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: MgO}, MgO_wt_pct: '29.92', sigma: '0.34'}
-        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: Al2O3}, Al2O3_wt_pct: '19.78', sigma: '0.19'}
-        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: SiO2}, SiO2_wt_pct: '35.54', sigma: '0.11'}
-        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: CaO}, CaO_wt_pct: '14.77', sigma: '0.22'}
+        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: MgO}, MgO_wt_pct: '29.92', sigma: '0.34', composition_wt_pct: &func9_residue_wt_pct {MgO: '29.92', Al2O3: '19.78', SiO2: '35.54', CaO: '14.77'}}
+        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: Al2O3}, Al2O3_wt_pct: '19.78', sigma: '0.19', composition_wt_pct: *func9_residue_wt_pct}
+        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: SiO2}, SiO2_wt_pct: '35.54', sigma: '0.11', composition_wt_pct: *func9_residue_wt_pct}
+        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: CaO}, CaO_wt_pct: '14.77', sigma: '0.22', composition_wt_pct: *func9_residue_wt_pct}
     - observation_id: mendybaev_2017_func3_table1_residue_composition
       experiment: func-3
       type: composition_series
@@ -3785,10 +3785,10 @@ species:
         method_class: measured_direct
         phase: silicate_melt_FUNC_forsterite_rich
         series:
-        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: MgO}, MgO_wt_pct: '27.36', sigma: '0.34'}
-        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: Al2O3}, Al2O3_wt_pct: '21.69', sigma: '0.13'}
-        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: SiO2}, SiO2_wt_pct: '34.24', sigma: '0.11'}
-        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: CaO}, CaO_wt_pct: '16.72', sigma: '0.26'}
+        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: MgO}, MgO_wt_pct: '27.36', sigma: '0.34', composition_wt_pct: &func3_residue_wt_pct {MgO: '27.36', Al2O3: '21.69', SiO2: '34.24', CaO: '16.72'}}
+        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: Al2O3}, Al2O3_wt_pct: '21.69', sigma: '0.13', composition_wt_pct: *func3_residue_wt_pct}
+        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: SiO2}, SiO2_wt_pct: '34.24', sigma: '0.11', composition_wt_pct: *func3_residue_wt_pct}
+        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: CaO}, CaO_wt_pct: '16.72', sigma: '0.26', composition_wt_pct: *func3_residue_wt_pct}
     - observation_id: mendybaev_2017_func7_table1_residue_composition
       experiment: func-7
       type: composition_series
@@ -3801,10 +3801,10 @@ species:
         method_class: measured_direct
         phase: silicate_melt_FUNC_forsterite_rich
         series:
-        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: MgO}, MgO_wt_pct: '23.87', sigma: '0.07'}
-        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: Al2O3}, Al2O3_wt_pct: '25.30', sigma: '0.34'}
-        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: SiO2}, SiO2_wt_pct: '31.63', sigma: '0.20'}
-        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: CaO}, CaO_wt_pct: '19.22', sigma: '0.24'}
+        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: MgO}, MgO_wt_pct: '23.87', sigma: '0.07', composition_wt_pct: &func7_residue_wt_pct {MgO: '23.87', Al2O3: '25.30', SiO2: '31.63', CaO: '19.22'}}
+        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: Al2O3}, Al2O3_wt_pct: '25.30', sigma: '0.34', composition_wt_pct: *func7_residue_wt_pct}
+        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: SiO2}, SiO2_wt_pct: '31.63', sigma: '0.20', composition_wt_pct: *func7_residue_wt_pct}
+        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: CaO}, CaO_wt_pct: '19.22', sigma: '0.24', composition_wt_pct: *func7_residue_wt_pct}
     - observation_id: mendybaev_2017_func8_table1_residue_composition
       experiment: func-8
       type: composition_series
@@ -3817,10 +3817,10 @@ species:
         method_class: measured_direct
         phase: silicate_melt_FUNC_forsterite_rich
         series:
-        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: MgO}, MgO_wt_pct: '19.08', sigma: '0.09'}
-        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: Al2O3}, Al2O3_wt_pct: '31.35', sigma: '0.24'}
-        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: SiO2}, SiO2_wt_pct: '28.21', sigma: '0.21'}
-        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: CaO}, CaO_wt_pct: '21.37', sigma: '0.16'}
+        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: MgO}, MgO_wt_pct: '19.08', sigma: '0.09', composition_wt_pct: &func8_residue_wt_pct {MgO: '19.08', Al2O3: '31.35', SiO2: '28.21', CaO: '21.37'}}
+        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: Al2O3}, Al2O3_wt_pct: '31.35', sigma: '0.24', composition_wt_pct: *func8_residue_wt_pct}
+        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: SiO2}, SiO2_wt_pct: '28.21', sigma: '0.21', composition_wt_pct: *func8_residue_wt_pct}
+        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: CaO}, CaO_wt_pct: '21.37', sigma: '0.16', composition_wt_pct: *func8_residue_wt_pct}
     - observation_id: mendybaev_2017_func4_table1_residue_composition
       experiment: func-4
       type: composition_series
@@ -3833,10 +3833,10 @@ species:
         method_class: measured_direct
         phase: silicate_melt_FUNC_forsterite_rich
         series:
-        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: MgO}, MgO_wt_pct: '16.51', sigma: '0.29'}
-        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: Al2O3}, Al2O3_wt_pct: '32.15', sigma: '0.54'}
-        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: SiO2}, SiO2_wt_pct: '27.32', sigma: '0.35'}
-        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: CaO}, CaO_wt_pct: '24.03', sigma: '0.47'}
+        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: MgO}, MgO_wt_pct: '16.51', sigma: '0.29', composition_wt_pct: &func4_residue_wt_pct {MgO: '16.51', Al2O3: '32.15', SiO2: '27.32', CaO: '24.03'}}
+        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: Al2O3}, Al2O3_wt_pct: '32.15', sigma: '0.54', composition_wt_pct: *func4_residue_wt_pct}
+        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: SiO2}, SiO2_wt_pct: '27.32', sigma: '0.35', composition_wt_pct: *func4_residue_wt_pct}
+        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: CaO}, CaO_wt_pct: '24.03', sigma: '0.47', composition_wt_pct: *func4_residue_wt_pct}
     - observation_id: mendybaev_2017_func6_table1_residue_composition
       experiment: func-6
       type: composition_series
@@ -3849,10 +3849,10 @@ species:
         method_class: measured_direct
         phase: silicate_melt_FUNC_forsterite_rich
         series:
-        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: MgO}, MgO_wt_pct: '10.95', sigma: '0.05'}
-        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: Al2O3}, Al2O3_wt_pct: '40.16', sigma: '0.06'}
-        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: SiO2}, SiO2_wt_pct: '22.16', sigma: '0.07'}
-        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: CaO}, CaO_wt_pct: '26.75', sigma: '0.08'}
+        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: MgO}, MgO_wt_pct: '10.95', sigma: '0.05', composition_wt_pct: &func6_residue_wt_pct {MgO: '10.95', Al2O3: '40.16', SiO2: '22.16', CaO: '26.75'}}
+        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: Al2O3}, Al2O3_wt_pct: '40.16', sigma: '0.06', composition_wt_pct: *func6_residue_wt_pct}
+        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: SiO2}, SiO2_wt_pct: '22.16', sigma: '0.07', composition_wt_pct: *func6_residue_wt_pct}
+        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: CaO}, CaO_wt_pct: '26.75', sigma: '0.08', composition_wt_pct: *func6_residue_wt_pct}
   Ca:
     observations:
     - observation_id: mendybaev_2017_ca_non_loss
