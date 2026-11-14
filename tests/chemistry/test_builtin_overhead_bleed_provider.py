@@ -449,6 +449,42 @@ def test_live_headspace_bleed_conductance_uses_headspace_species_m_avg(
     assert sim._headspace_bleed_conductance_kg_s() == pytest.approx(expected)
 
 
+@pytest.mark.parametrize("dt_hr", [0.25, 0.125, 0.0625])
+def test_inert_sweep_prediction_matches_committed_subhour_bleed(
+    dt_hr, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.pO2_mbar = 0.0
+    sim.melt.p_total_mbar = 147.0
+    sim.melt.temperature_C = 1500.0
+    molar_mass = resolve_species_formula(
+        "O2", sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+    sim._overhead_headspace_config.update(
+        enabled=True, downstream_pressure_bar=0.0,
+        # Capacity is .5 mol/h: a quarter-hour leaves .875 of the 1 mol.
+        conductance_kg_s=molar_mass / (2.0 * 3600.0),
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"O2": molar_mass},
+        source="subhour sweep projection", material_origin="feedstock",
+    )
+    sim._step_dt_hr = dt_hr
+    predicted = sim._inert_sweep_transport_pO2_bar(1.0)
+    result = sim._dispatch_overhead_bleed()
+    assert result.status == "ok"
+    residual_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+    assert residual_mol == pytest.approx(1.0 - 0.5 * dt_hr)
+    committed = sim._headspace_equilibrated_pO2_bar(
+        sim._headspace_ledger_pO2_bar_from_o2_mol(residual_mol),
+    )
+    assert predicted == pytest.approx(committed)
+    assert sim.atom_ledger.assert_balanced()
+
+
 @pytest.mark.parametrize(
     "downstream_pressure_bar",
     [
