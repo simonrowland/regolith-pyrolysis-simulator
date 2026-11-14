@@ -13960,9 +13960,13 @@ def _predict_with_engine(
                 certified_band = {
                     "temperature_K": (Decimal(str(low)), Decimal(str(high)))
                 }
-            if activity.authority_status == (
+            temperature_out_of_domain = activity.authority_status == (
                 MELT_OXIDE_GAMMA_TEMPERATURE_OUT_OF_DOMAIN_STATUS
-            ):
+            )
+            composition_out_of_domain = activity.authority_status == (
+                MELT_OXIDE_GAMMA_COMPOSITION_OUT_OF_DOMAIN_STATUS
+            )
+            if temperature_out_of_domain:
                 authority = Authority.EXTRAPOLATED
                 notices.append(
                     Notice(
@@ -13981,9 +13985,7 @@ def _predict_with_engine(
                         authority=Authority.EXTRAPOLATED,
                     )
                 )
-            elif activity.authority_status == (
-                MELT_OXIDE_GAMMA_COMPOSITION_OUT_OF_DOMAIN_STATUS
-            ):
+            elif composition_out_of_domain:
                 authority = Authority.EXTRAPOLATED
                 notices.append(
                     Notice(
@@ -13997,16 +13999,31 @@ def _predict_with_engine(
                         authority=Authority.EXTRAPOLATED,
                     )
                 )
-            elif activity.warning or (
-                activity.valid_range_K is None
+            uncertified_composition_fallback = (
+                composition_out_of_domain
+                and activity.valid_range_K is None
                 and activity.evidence_tier == "UNCERTIFIED"
-            ):
+            )
+            needs_fallback = uncertified_composition_fallback or (
+                not temperature_out_of_domain
+                and not composition_out_of_domain
+                and (
+                    activity.warning
+                    or (
+                        activity.valid_range_K is None
+                        and activity.evidence_tier == "UNCERTIFIED"
+                    )
+                )
+            )
+            if needs_fallback:
                 notices.append(
                     Notice(
                         kind=NoticeKind.FALLBACK,
                         affected_quantities=(Quantity.ACTIVITY,),
                         reason=(
-                            activity.warning
+                            "melt_oxide_activity has no certified evidence tier"
+                            if uncertified_composition_fallback
+                            else activity.warning
                             or "melt_oxide_activity has no certified evidence tier"
                         ),
                         origin=(

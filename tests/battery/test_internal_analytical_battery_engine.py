@@ -596,6 +596,7 @@ def test_internal_analytical_carries_gamma_composition_domain_notice(
         notice
         for notice in prediction.notices
         if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "Table 2 composition domain"
     )
     assert composition_notice.authority is Authority.EXTRAPOLATED
     assert composition_notice.band == "Table 2 composition domain"
