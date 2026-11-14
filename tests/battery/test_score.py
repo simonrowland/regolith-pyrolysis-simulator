@@ -12242,6 +12242,77 @@ def test_openimcc_doi_matching_a_registered_work_is_same_source() -> None:
     ) is SourceRelation.SAME_INPUT
 
 
+def test_registered_doi_work_resolves_its_member_ancestry() -> None:
+    from simulator.battery.validate import _resolve_coefficient_sources
+
+    doi = "10.1098/rspa.1965.0176"
+    upstream_work = F.work("upstream-doi-ancestry")
+    registered_work = replace(
+        F.work("registered-doi-ancestry"), doi=doi
+    )
+    upstream_experiment = F.tabulation_experiment(
+        experiment_id="upstream-doi-ancestry-exp",
+        work_id=upstream_work.work_id,
+    )
+    registered_experiment = F.tabulation_experiment(
+        experiment_id="registered-doi-ancestry-exp",
+        work_id=registered_work.work_id,
+    )
+    identity = F.o2_identity()
+    root = F.observation(
+        "doi-ancestry-root",
+        upstream_experiment.experiment_id,
+        identity,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=upstream_work.work_id,
+    )
+    member = F.observation(
+        "doi-ancestry-member",
+        upstream_experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id=upstream_work.work_id,
+        derived_from=(root.observation_id,),
+    )
+    registered_row = F.observation(
+        "doi-registered-work-row",
+        registered_experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id=registered_work.work_id,
+        derived_from=(member.observation_id,),
+    )
+    works = {
+        upstream_work.work_id: upstream_work,
+        registered_work.work_id: registered_work,
+    }
+    observations = {
+        row.observation_id: row for row in (root, member, registered_row)
+    }
+    experiments = {
+        upstream_experiment.experiment_id: upstream_experiment,
+        registered_experiment.experiment_id: registered_experiment,
+    }
+
+    resolved = _resolve_coefficient_sources(
+        (f"doi:{doi}",), observations, works, experiments
+    )
+
+    assert resolved.complete
+    assert resolved.ids == frozenset(
+        {
+            "nasa-cea-thermo",
+            root.observation_id,
+            member.observation_id,
+            registered_row.observation_id,
+        }
+    )
+    assert f"doi:{doi}" not in resolved.ids
+
+
 @pytest.mark.parametrize(
     "unknown_alias",
     (
