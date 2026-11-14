@@ -15957,20 +15957,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(type(exc), 'terminal_refusal', False)
             )
             if terminal_refusal:
-                wall_refusals = self.condensation_model.last_sticking_alpha_provenance_notice.get(
-                    'wall_saturation_pressure_refusals_by_species'
-                )
+                wall_refusals = {
+                    field: getattr(self.condensation_model, field).get(
+                        'wall_saturation_pressure_refusals_by_species'
+                    )
+                    for field in (
+                        'last_sticking_alpha_provenance_notice',
+                        'execution_sticking_alpha_provenance_notice',
+                    )
+                }
                 _materialize_refusal_snapshot_history(terminal_refusal_state)
                 self._restore_terminal_refusal_hour_state(
                     terminal_refusal_state,
                     terminal_refusal_ledger,
                     terminal_refusal_cost_state,
                 )
-                # Roll back quantities, but retain the reason the wall channel refused.
-                if wall_refusals:
-                    self.condensation_model.last_sticking_alpha_provenance_notice[
-                        'wall_saturation_pressure_refusals_by_species'
-                    ] = wall_refusals
+                # Roll back quantities, retaining the refusal in each scope.
+                for field, refusals in wall_refusals.items():
+                    if refusals:
+                        getattr(self.condensation_model, field)[
+                            'wall_saturation_pressure_refusals_by_species'
+                        ] = refusals
             elif committed_transition_count:
                 # AtomLedger is append-only. Whole-hour rollback would require
                 # compensating transitions and is a separate design change.

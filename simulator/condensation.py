@@ -2264,20 +2264,14 @@ def _accumulate_wall_sticking_authority_notice(
     sticking_notice['vapour_carrier_lineage_by_deposited_species'] = (
         wall_carrier_lineage_by_deposited_species
     )
-    extrapolations = copy.deepcopy(dict(prior_notice.get(
+    extrapolations = prior_notice.get(
         'wall_saturation_pressure_extrapolations_by_species', {}
-    )))
-    extrapolations.update(current_notice.get(
-        'wall_saturation_pressure_extrapolations_by_species', {}
-    ))
+    )
     if extrapolations:
         sticking_notice['wall_saturation_pressure_extrapolations_by_species'] = copy.deepcopy(extrapolations)
-    transport_notices = copy.deepcopy(dict(prior_notice.get(
+    transport_notices = prior_notice.get(
         'evaporation_transport_notices_by_species', {}
-    )))
-    transport_notices.update(current_notice.get(
-        'evaporation_transport_notices_by_species', {}
-    ))
+    )
     if transport_notices:
         sticking_notice['evaporation_transport_notices_by_species'] = copy.deepcopy(transport_notices)
     prior_refusals = prior_notice.get(
@@ -2482,6 +2476,7 @@ class CondensationModel:
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
         self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
         self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
+        self.execution_sticking_alpha_provenance_notice: dict[str, Any] = {}
         self.wall_temperature_input_refusals: dict[str, str] = {}
         self.last_transport_parameter_notice: dict[str, Any] = {}
         self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
@@ -2514,30 +2509,13 @@ class CondensationModel:
     def wall_deposit_accounts(self) -> tuple[str, ...]:
         return tuple(segment.wall_deposit_account for segment in self.pipe_segments)
 
-    def reset_run_sticking_authority(self) -> None:
-        """Reset route-accumulated sticking authority at a run boundary."""
-
-        self.last_sticking_alpha_provenance_notice = {}
-        self.last_condensation_refusals_by_species = {}
-        self.last_condensation_authority_by_species = {}
-
-    def accumulate_run_sticking_authority(
-        self, prior_notice: Mapping[str, Any],
-    ) -> dict[str, Any]:
-        """Return this execution's notice and retain cumulative session flags.
-
-        Rates and lifespan diagnostics use the returned execution-local notice;
-        the session keeps earlier refusals even when their channels no longer
-        engage. Route updates and execution boundaries use the same merge rule.
-        """
-        execution_notice = copy.deepcopy(self.last_sticking_alpha_provenance_notice)
-        if prior_notice:
-            self.last_sticking_alpha_provenance_notice = (
-                _accumulate_wall_sticking_authority_notice(
-                    execution_notice, prior_notice,
-                )
-            )
-        return execution_notice
+    def reset_run_sticking_authority(self, *, preserve_session: bool = False) -> None:
+        """Start local authority while optionally retaining cumulative flags."""
+        self.execution_sticking_alpha_provenance_notice = {}
+        if not preserve_session:
+            self.last_sticking_alpha_provenance_notice = {}
+            self.last_condensation_refusals_by_species = {}
+            self.last_condensation_authority_by_species = {}
 
     def configure_operating_conditions(
         self,
@@ -3800,27 +3778,34 @@ class CondensationModel:
         sticking_notice["vapour_carrier_lineage_by_deposited_species"] = (
             wall_carrier_lineage_by_deposited_species
         )
+        execution_sticking_notice = _accumulate_wall_sticking_authority_notice(
+            sticking_notice,
+            self.execution_sticking_alpha_provenance_notice,
+            pressure_refusals=wall_saturation_pressure_refusals_by_species,
+        )
         sticking_notice = _accumulate_wall_sticking_authority_notice(
             sticking_notice,
             self.last_sticking_alpha_provenance_notice,
             pressure_refusals=wall_saturation_pressure_refusals_by_species,
         )
         geometry_notice = dict(self.stage_area_geometry_provenance_notice)
-        if geometry_notice:
-            sticking_notice = dict(sticking_notice)
-            sticking_notice['surface_geometry_provenance'] = geometry_notice
-            sticking_notice['stage_area_geometry_provenance_notice'] = (
-                geometry_notice)
         alpha_extrapolation_warnings = (
             _alpha_s_extrapolation_warnings_from_provenance(
                 wall_sticking_alpha_provenance_by_species,
             )
         )
-        if sticking_notice and alpha_extrapolation_warnings:
-            sticking_notice = dict(sticking_notice)
-            sticking_notice['alpha_s_extrapolation_warnings'] = (
-                alpha_extrapolation_warnings
-            )
+        for notice in (sticking_notice, execution_sticking_notice):
+            if geometry_notice:
+                notice['surface_geometry_provenance'] = geometry_notice
+                notice['stage_area_geometry_provenance_notice'] = (
+                    geometry_notice)
+            if notice and alpha_extrapolation_warnings:
+                notice['alpha_s_extrapolation_warnings'] = (
+                    alpha_extrapolation_warnings
+                )
+        self.execution_sticking_alpha_provenance_notice = copy.deepcopy(
+            execution_sticking_notice
+        )
         self.last_sticking_alpha_provenance_notice = copy.deepcopy(
             sticking_notice
         )

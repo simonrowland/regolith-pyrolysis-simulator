@@ -267,14 +267,13 @@ class RunExecutor:
     ) -> RunExecution:
         sim = session.simulator
         condensation_model = getattr(sim, "_condensation_model", None)
-        prior_sticking_notice = {}
         execution_sticking_notice = {}
         if condensation_model is not None:
-            if getattr(getattr(sim, "record", None), "snapshots", ()):
-                prior_sticking_notice = deepcopy(
-                    condensation_model.last_sticking_alpha_provenance_notice
-                )
-            condensation_model.reset_run_sticking_authority()
+            condensation_model.reset_run_sticking_authority(
+                preserve_session=bool(getattr(
+                    getattr(sim, "record", None), "snapshots", ()
+                )),
+            )
         per_hour: list[dict[str, Any]] = []
         operator_decisions: list[dict[str, Any]] = []
         status = "ok"
@@ -472,14 +471,12 @@ class RunExecutor:
             error_message = _safe_exception_text(exc)
         finally:
             # A terminal-refusal rollback can replace the model instance.
-            # Project the execution's authority from that restored owner, then
-            # retain earlier flags before building the cumulative trace.
+            # Read that owner, whose local and cumulative notices were updated
+            # together by the same route rule, without clearing session flags.
             condensation_model = getattr(sim, "_condensation_model", None)
             if condensation_model is not None:
-                execution_sticking_notice = (
-                    condensation_model.accumulate_run_sticking_authority(
-                        prior_sticking_notice,
-                    )
+                execution_sticking_notice = deepcopy(
+                    condensation_model.execution_sticking_alpha_provenance_notice
                 )
 
         try:

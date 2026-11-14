@@ -26,18 +26,25 @@ def _record_wall_pressure_notice(
     segment: str,
     record: Mapping[str, Any],
 ) -> None:
-    records = model.last_sticking_alpha_provenance_notice.setdefault(kind, {}).setdefault(species, {})
-    if any(
-        existing == record for key, existing in records.items()
-        if key == segment or key.startswith(f"{segment}#")
+    # Keep the global event keys independent of execution boundaries. The
+    # local accumulator sees only events in this execution, with the same
+    # de-duplication and segment suffix rule.
+    for notice in (
+        model.last_sticking_alpha_provenance_notice,
+        model.execution_sticking_alpha_provenance_notice,
     ):
-        return
-    key = segment
-    suffix = 2
-    while key in records:
-        key = f"{segment}#{suffix}"
-        suffix += 1
-    records[key] = dict(record)
+        records = notice.setdefault(kind, {}).setdefault(species, {})
+        if any(
+            existing == record for key, existing in records.items()
+            if key == segment or key.startswith(f"{segment}#")
+        ):
+            continue
+        key = segment
+        suffix = 2
+        while key in records:
+            key = f"{segment}#{suffix}"
+            suffix += 1
+        records[key] = dict(record)
 
 
 def wall_deposit_candidate_kg(
