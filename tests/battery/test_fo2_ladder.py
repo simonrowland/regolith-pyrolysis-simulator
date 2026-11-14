@@ -15,6 +15,7 @@ from simulator.battery.enums import (
     Authority,
     CellMaterial,
     Engine,
+    EvidenceClass,
     ExecutionState,
     FO2Channel,
     Fo2Mode,
@@ -174,6 +175,10 @@ def test_scoring_modes_keep_distinct_keys_notices_and_store_outputs() -> None:
     observation = replace(
         observation,
         source_id=experiment.work_id,
+        evidence=replace(
+            observation.evidence,
+            class_=State.of(EvidenceClass.MEASURED_DIRECT),
+        ),
         identity=replace(
             observation.identity,
             per=State.of(PerBasis.DIMENSIONLESS),
