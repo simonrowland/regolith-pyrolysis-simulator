@@ -13999,12 +13999,10 @@ def _predict_with_engine(
                         authority=Authority.EXTRAPOLATED,
                     )
                 )
-            uncertified_composition_fallback = (
-                composition_out_of_domain
-                and activity.valid_range_K is None
-                and activity.evidence_tier == "UNCERTIFIED"
+            uncertified_evidence_fallback = (
+                activity.evidence_tier == "UNCERTIFIED"
             )
-            needs_fallback = uncertified_composition_fallback or (
+            needs_fallback = uncertified_evidence_fallback or (
                 not temperature_out_of_domain
                 and not composition_out_of_domain
                 and (
@@ -14022,7 +14020,7 @@ def _predict_with_engine(
                         affected_quantities=(Quantity.ACTIVITY,),
                         reason=(
                             "melt_oxide_activity has no certified evidence tier"
-                            if uncertified_composition_fallback
+                            if uncertified_evidence_fallback
                             else activity.warning
                             or "melt_oxide_activity has no certified evidence tier"
                         ),
