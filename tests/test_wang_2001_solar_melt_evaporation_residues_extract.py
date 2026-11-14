@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
-from simulator.battery.identity import IdentityEqualKind, identity_equal
+from simulator.battery.identity import IdentityEqualKind, identity_equal, profile_for
 from simulator.battery.migrate import Migrator
 from simulator.battery.score import _printed_uncertainty_band
 
@@ -309,10 +309,10 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         for row in sc1_residue_cells
     )
     matching = [identity_equal(row.identity, row.identity) for row in sc1_residue_cells]
+    assert all(outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN for outcome in matching)
     assert all(
-        outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
-        and "total_pressure_Pa" in outcome.fields
-        for outcome in matching
+        "total_pressure_Pa" in profile_for(row.identity).required
+        for row in sc1_residue_cells
     )
 
     expected_by_quantity = {
