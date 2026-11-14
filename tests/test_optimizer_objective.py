@@ -2160,9 +2160,15 @@ def test_product_booking_and_coating_gate_share_run_total_zero_classification() 
         "tap_expected_kg_per_campaign",
     ),
     (
-        ("24/35 campaign", 24.0 / 35.0, (1.0,), 1.4583333333333333, 1.4583333333333333),
-        ("one campaign", 1.0, (1.0,), 1.0, 1.0),
-        ("two campaigns", 2.0, (1.0,), 0.5, 0.5),
+        (
+            "24/35 campaign",
+            24.0 / 35.0,
+            (1.0, 0.25),
+            1.8229166666666667,
+            2.9166666666666665,
+        ),
+        ("one campaign", 1.0, (1.0, 0.25), 1.25, 2.0),
+        ("two campaigns", 2.0, (1.0, 0.25), 0.625, 1.0),
         ("tap after one of two campaigns", 2.0, (1.0, 10.0), 5.5, 1.0),
     ),
 )
@@ -2179,12 +2185,12 @@ def test_publication_paths_use_their_own_wall_supply_window(
 
     Terminal/tap product summaries exercise product booking; the production
     gate and evaluate report exercise the coating classifier. Together these
-    paths cover each caller of the typed window classifier.
-
-    For 1 kg/run, 1 / (24/35) = 1.4583333333333333, 1 / 1 = 1,
-    and 1 / 2 = 0.5 kg/campaign. In the two-campaign tap case, the
-    terminal integral is (1 + 10) / 2 = 5.5, while the tap integral is
-    1 / 1 = 1 kg/campaign.
+    paths cover each caller of the typed window classifier. The first three
+    windows have two hours of supply (1 kg, then 0.25 kg): the terminal
+    summary divides 1.25 kg by all elapsed campaigns, while the hour-1 tap
+    summary divides 1 kg by half the elapsed campaigns. In the final window,
+    the terminal integral is (1 + 10) / 2 = 5.5, while the hour-1 tap integral
+    is 1 / 1 = 1 kg/campaign.
     """
 
     flux_snapshots = tuple(
@@ -2233,11 +2239,11 @@ def test_publication_paths_use_their_own_wall_supply_window(
             assert flux is not None
             flux.carrier_authority_by_species["SiO"]["parent_oxide"] = "SiO2"
             snapshot.evap_flux = flux
-        execution = _tap_run(tap_snapshots, configured_hours=len(tap_snapshots))
-        execution.campaigns_elapsed = campaigns_elapsed
-        execution.trace.wall_deposit_by_segment_species_kg = {}
-        execution.trace.wall_zone_by_segment = {"hot_wall": "Hot"}
-        execution.trace.wall_deposit_sticking_authority = {
+        tap_execution = _tap_run(tap_snapshots, configured_hours=len(tap_snapshots))
+        tap_execution.campaigns_elapsed = campaigns_elapsed
+        tap_execution.trace.wall_deposit_by_segment_species_kg = {}
+        tap_execution.trace.wall_zone_by_segment = {"hot_wall": "Hot"}
+        tap_execution.trace.wall_deposit_sticking_authority = {
             "wall_saturation_pressure_refusals_by_species": {
                 "SiO": {
                     "hot_wall": {
@@ -2257,10 +2263,32 @@ def test_publication_paths_use_their_own_wall_supply_window(
             maturity={"best_tap": {"enabled": True, "tap_grid": [1]}},
         )
         _set_profile_hours(profile, len(tap_snapshots))
-        evidence = compute_objectives(profile, execution).evidence[
+        evidence = compute_objectives(profile, tap_execution).evidence[
             "composition_target:pool-test"
         ]["composition_target"]
+        assert evidence["tap_hour"] == 1
         published = evidence["tap_coating_product_summary"]
+
+        terminal_profile = _composition_score_profile(
+            "residual_rump_at_stop",
+            oxides={
+                "SiO2": {"min": 49.0, "max": 51.0, "weight": 1.0},
+                "CaO": {"min": 49.0, "max": 51.0, "weight": 1.0},
+            },
+            maturity={
+                "best_tap": {
+                    "enabled": True,
+                    "tap_grid": [len(tap_snapshots)],
+                }
+            },
+        )
+        _set_profile_hours(terminal_profile, len(tap_snapshots))
+        terminal_evidence = compute_objectives(terminal_profile, tap_execution).evidence[
+            "composition_target:pool-test"
+        ]["composition_target"]
+        assert terminal_evidence["tap_hour"] == len(tap_snapshots)
+        assert terminal_evidence["tap_provenance"] == "completed_run"
+        assert "tap_coating_product_summary" not in terminal_evidence
     else:
         if publication_path == "evaluate_report":
             spec = EvalSpec(
