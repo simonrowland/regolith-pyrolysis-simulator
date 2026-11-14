@@ -2428,11 +2428,15 @@ def predict_mass_loss_fraction(
     ):
         raise ResidueInventoryRefusal("initial_composition_invalid")
     # Printed oxide wt% are normalized only for source rounding: each m_i is
-    # m0*w_i/Σw. Dividing kg by kg mol^-1 yields mol on the sample-mass basis.
-    initial_inventory_mol = {
+    # m0*w_i/Σw. Preserve this mass for the shared-parent cap; converting m_i to
+    # moles and back can round above the physical sample-mass ceiling.
+    initial_oxide_mass_kg = {
         oxide: sample_mass_kg * (amount / total_wt_pct)
-        / _formula_terms(oxide)[1]
         for oxide, amount in wt_pct.items()
+    }
+    initial_inventory_mol = {
+        oxide: initial_oxide_mass_kg[oxide] / _formula_terms(oxide)[1]
+        for oxide in wt_pct
     }
     try:
         from openimcc import load_gas_datapack
@@ -2707,7 +2711,7 @@ def predict_mass_loss_fraction(
                 if name in capped_channels
             )
             total = finite_total + capped_total
-            ceiling = initial_inventory_mol[parent] * _formula_terms(parent)[1]
+            ceiling = initial_oxide_mass_kg[parent]
             remaining = max(0.0, ceiling - finite_total)
             scale = min(1.0, remaining / capped_total) if capped_total > 0.0 else 1.0
             parent_scales[parent] = scale
