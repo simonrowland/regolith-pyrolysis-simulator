@@ -5420,14 +5420,14 @@ def _reference_lineage_with_work_doi(
         return lineage
     experiment = indexes.experiments.get(reference.experiment_id)
     work = None if experiment is None else indexes.works.get(experiment.work_id)
-    doi_source = (
-        None
-        if work is None or not work.doi
-        else _canonical_doi_source(f"doi:{work.doi}".lower())
-    )
-    if doi_source is None:
+    if work is None:
         return lineage
-    return Ancestry.of(set(lineage.ids) | {work.work_id, doi_source})
+    ids = set(lineage.ids) | {work.work_id}
+    if work.doi:
+        doi_source = _canonical_doi_source(f"doi:{work.doi}".lower())
+        if doi_source is not None:
+            ids.add(doi_source)
+    return Ancestry.of(ids)
 
 
 def _resolve_source_relation_with_indexes(
@@ -5514,13 +5514,9 @@ class _ScoringLineageResolver:
         if not complete or candidate_lineage is None:
             return complete, SourceRelation.UNKNOWN
 
-        reference_lineage = self.indexes.observation_lineages.get(
-            reference.observation_id
+        reference_lineage = _reference_lineage_with_work_doi(
+            reference, self.indexes
         )
-        if reference_lineage is None:
-            reference_lineage = _reference_lineage_with_work_doi(
-                reference, self.indexes
-            )
 
         if (
             not reference_lineage.complete
