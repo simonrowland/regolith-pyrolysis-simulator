@@ -451,7 +451,9 @@ def _assert_rego_table_i_sibling_links(observations: list[dict]) -> dict[str, di
         input_id = f"{base_id}_printed_log_input"
         assert activity_id in by_id
         assert input_id in by_id
-        assert by_id[activity_id]["derived_from"] == [input_id]
+        activity = by_id[activity_id]
+        assert "derived_from" in activity, f"{activity_id} must retain its log sibling link"
+        assert activity["derived_from"] == [input_id]
     return by_id
 
 
