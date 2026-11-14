@@ -1767,7 +1767,10 @@ class PyrolysisRun:
                     existing_by_segment_species_kg=(
                         _nested_species_kg_from_segment_species(existing_before)
                     ),
-                    authority=execution.trace.wall_deposit_sticking_authority,
+                    authority=wall_deposit_sticking_authority_status(
+                        execution_delta,
+                        execution.wall_deposit_execution_notice,
+                    ),
                 )
                 summary = final_summary
                 if not (
@@ -4383,6 +4386,7 @@ def _wall_fouling_lifespan_report(
 
     report = {
         "input_basis": "execution_local_committed_rate_per_campaign",
+        "authority_scope": "execution_local",
         "liner_material": cfg["liner_material"],
         "controlling_segment": controlling_segment,
         "wall_deposit_kg_per_campaign": (

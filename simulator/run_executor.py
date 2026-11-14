@@ -117,6 +117,7 @@ class RunExecution:
     envelope_detail_unavailable: str = ""
     campaigns_elapsed: float = 1.0
     campaigns_elapsed_start: float = 0.0
+    wall_deposit_execution_notice: Mapping[str, Any] = field(default_factory=dict)
     # Terminal exception that stopped the run, when status is "failed"
     # or "refused". evaluate() recovers honest engine answers from this
     # object; dropping it flattens a timeout/OOD into EngineBugAbort.
@@ -266,9 +267,13 @@ class RunExecutor:
     ) -> RunExecution:
         sim = session.simulator
         condensation_model = getattr(sim, "_condensation_model", None)
-        if condensation_model is not None and not getattr(
-            getattr(sim, "record", None), "snapshots", ()
-        ):
+        prior_sticking_notice = {}
+        execution_sticking_notice = {}
+        if condensation_model is not None:
+            if getattr(getattr(sim, "record", None), "snapshots", ()):
+                prior_sticking_notice = deepcopy(
+                    condensation_model.last_sticking_alpha_provenance_notice
+                )
             condensation_model.reset_run_sticking_authority()
         per_hour: list[dict[str, Any]] = []
         operator_decisions: list[dict[str, Any]] = []
@@ -465,6 +470,17 @@ class RunExecutor:
             failure_exc = exc
             status = "failed"
             error_message = _safe_exception_text(exc)
+        finally:
+            # A terminal-refusal rollback can replace the model instance.
+            # Project the execution's authority from that restored owner, then
+            # retain earlier flags before building the cumulative trace.
+            condensation_model = getattr(sim, "_condensation_model", None)
+            if condensation_model is not None:
+                execution_sticking_notice = (
+                    condensation_model.accumulate_run_sticking_authority(
+                        prior_sticking_notice,
+                    )
+                )
 
         try:
             unenriched_failure = (status, reason, error_message)
@@ -532,6 +548,7 @@ class RunExecutor:
                 simulator=sim,
                 snapshots=snapshots,
                 trace=trace,
+                wall_deposit_execution_notice=execution_sticking_notice,
                 per_hour=tuple(per_hour),
                 operator_decisions=tuple(operator_decisions),
                 shadow_trace=tuple(shadow_trace),
