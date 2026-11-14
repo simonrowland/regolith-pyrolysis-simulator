@@ -935,7 +935,7 @@ def test_c0_reforecast_counts_alkali_already_lost_during_this_hold(
     budget_fraction = startup_prediction["alkali_retention_budget_fraction"]
     projected_future_loss_kg = feed_alkali_kg * budget_fraction * 0.2
 
-    def project_fixed_future_loss(_flux, *, dt_hr=1.0):
+    def project_fixed_future_loss(_flux, dt_hr=1.0):
         if dt_hr <= 0.0:
             return EvaporationFlux()
         integrated = EvaporationFlux(
@@ -1035,7 +1035,7 @@ def test_c0_zero_window_projects_no_future_alkali_loss(monkeypatch):
     current_temperature_C = sim.melt.temperature_C
     calls = []
 
-    def record_depletion_call(_flux, *, dt_hr=1.0):
+    def record_depletion_call(_flux, dt_hr=1.0):
         calls.append(dt_hr)
         return EvaporationFlux()
 
@@ -1086,7 +1086,7 @@ def test_c0_unexpected_reforecast_error_records_typed_unavailable_exit(
         CampaignPhase.C0
     )
 
-    def fail_projection(_flux, *, dt_hr=1.0):
+    def fail_projection(_flux, dt_hr=1.0):
         raise RuntimeError("forced C0 forecast failure")
 
     monkeypatch.setattr(
