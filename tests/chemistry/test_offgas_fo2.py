@@ -553,8 +553,17 @@ def test_imposed_fo2_returns_the_ceajanaf_wgs_source_spread(polys):
     # Mutation: clear `uncertainty_band_dex` on the WGS result and these assertions fail.
     assert result.log10_fO2 == pytest.approx(cea.log10_fO2, abs=1e-12)
     assert result.uncertainty_band_dex is not None
-    assert result.uncertainty_band_dex > 0.0
+    # Mutation: halve the full CEA/JANAF post-WGS spread; this pin fails.
+    assert result.uncertainty_band_dex == pytest.approx(0.0004895351, abs=2e-9)
     assert result.as_dict()["uncertainty_band_dex"] == result.uncertainty_band_dex
+
+
+def test_non_wgs_result_omits_the_optional_source_band(polys):
+    result = imposed_fo2({"H2O": 2000.0, "H2": 10.0}, 1682.15, polys)
+
+    # Mutation: serialize a fabricated zero band when no WGS comparison ran.
+    assert result.uncertainty_band_dex is None
+    assert "uncertainty_band_dex" not in result.as_dict()
 
 
 def test_direct_couple_owner_combines_mix_precision_and_janaf_cea_spread(polys):
