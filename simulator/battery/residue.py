@@ -26,17 +26,20 @@ from simulator.battery.oxygen_balance import (
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.battery.residue_cohorts import (
+    HASHIMOTO_GEOMETRIES as _HASHIMOTO_GEOMETRIES,
+    HASHIMOTO_PRIMARY_GEOMETRY as _HASHIMOTO_PRIMARY_GEOMETRY,
+    HASHIMOTO_SOURCE_ID,
+    LangmuirResidueCohortSpec,
+    SPHERE_CONSTANT_GEOMETRY,
+    SPHERE_SHRINKING_GEOMETRY,
+    _LANGMUIR_RESIDUE_COHORTS,
+)
 
 
 _SECONDS_PER_HOUR = 3_600.0
 _OXYGEN_CHANNELS = frozenset({"O", "O2"})
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
-_HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
-_HASHIMOTO_GEOMETRIES = (
-    "sphere_constant",
-    "sphere_shrinking",
-    "disk_4mm_constant",
-)
 _HASHIMOTO_DENSITY_KG_M3 = 2_700.0
 _HASHIMOTO_N_CAP = 256
 _HASHIMOTO_REFINEMENT_TOLERANCE_WT_PCT = 0.05
@@ -419,6 +422,7 @@ class _HashimotoRunSetup:
     alpha_specs: Mapping[str, Any]
     pressure_model: Any
     engine_floor_inversion_diagnostics: dict[str, dict[str, object]]
+    pressure_is_upper_bound: bool
 
 
 @dataclass(frozen=True)
@@ -483,6 +487,13 @@ def _formula_terms(formula_text: str) -> tuple[dict[str, float], float]:
             "residue_formula_invalid", f"formula {formula_text!r} is not finite and positive"
         )
     return atoms, molar_mass
+
+
+def _inventory_mass_kg(inventory_mol: Mapping[str, float]) -> float:
+    return math.fsum(
+        float(amount) * _formula_terms(str(formula))[1]
+        for formula, amount in inventory_mol.items()
+    )
 
 
 def _channel_terms(
@@ -1071,7 +1082,7 @@ def integrate_knudsen_residue_inventory(
     if not inventory or any(not math.isfinite(v) or v < 0.0 for v in inventory.values()):
         raise ResidueInventoryRefusal("initial_composition_invalid")
     initial_atoms = _atom_totals(inventory, {})
-    m0 = math.fsum(n * _formula_terms(k)[1] for k, n in inventory.items())
+    m0 = _inventory_mass_kg(inventory)
     if m0 <= 0.0:
         raise ResidueInventoryRefusal("initial_composition_invalid")
     try:
@@ -1220,6 +1231,48 @@ def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
     if not math.isfinite(numeric):
         raise ResidueInventoryRefusal("hashimoto_printed_input_invalid")
     return numeric
+
+
+def _residue_pressure_point_or_upper_bound(record: object) -> tuple[float | None, bool]:
+    """Resolve a printed pressure point or a documented upper bound."""
+    state = getattr(record, "state", None)
+    if state is None and isinstance(record, Mapping):
+        state = record.get("state")
+    if state is None:
+        return None, False
+    if isinstance(state, Mapping):
+        if state.get("tag") != "value":
+            return None, False
+        value = state.get("value")
+    elif getattr(state, "is_value", False):
+        value = getattr(state, "value", None)
+    else:
+        return None, False
+
+    kind = getattr(value, "kind", None)
+    kind = getattr(kind, "value", kind)
+    if isinstance(value, Mapping):
+        kind = value.get("kind")
+    is_upper_bound = (
+        kind == "bound"
+        and (
+            value.get("bound_operator") if isinstance(value, Mapping)
+            else getattr(value, "bound_operator", None)
+        ) in {"<", "<="}
+    )
+    if kind == "point":
+        raw = value.get("point") if isinstance(value, Mapping) else getattr(value, "point", None)
+    elif is_upper_bound:
+        raw = value.get("bound_value") if isinstance(value, Mapping) else getattr(value, "bound_value", None)
+    else:
+        return None, False
+    try:
+        numeric = float(raw)
+    except (TypeError, ValueError, OverflowError):
+        return None, is_upper_bound
+    if not math.isfinite(numeric) or numeric < 0.0:
+        return None, is_upper_bound
+    return numeric, is_upper_bound
 
 
 def _omission_proof(record: object) -> tuple[float, float] | None:
@@ -1678,6 +1731,10 @@ def _mass_loss_sourced_alphas(
     return fits
 
 
+def _area_mm2_to_m2(area_mm2: object) -> float:
+    return float(area_mm2) * 1.0e-6
+
+
 def _mass_loss_area_inputs(
     experiment: object, observation: object, source: Mapping[str, Any],
 ) -> tuple[float, float, float]:
@@ -1705,8 +1762,8 @@ def _mass_loss_area_inputs(
                     percent = float(uncertainty[
                         "one_mm_percent" if diameter == 1.0 else "larger_samples_percent"
                     ])
-                    initial = float(sample["initial_area_mm2"]) * 1.0e-6
-                    final = float(sample["final_area_mm2"]) * 1.0e-6
+                    initial = _area_mm2_to_m2(sample["initial_area_mm2"])
+                    final = _area_mm2_to_m2(sample["final_area_mm2"])
                     if not all(math.isfinite(x) and x > 0 for x in (
                         initial, final, diameter, percent
                     )) or diameter < 1.0 or not uncertainty.get("locator"):
@@ -2065,7 +2122,7 @@ def predict_knudsen_residue_composition(
                 primary.retained_oxygen_atoms_mol - formula_oxygen_atoms_mol
             ) * _formula_terms("O")[1],
             "atom_closure_mol": dict(primary.atom_closure_mol),
-            "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
+            "escaped_mass_fraction": _inventory_mass_kg(primary.evaporated_mol) / _inventory_mass_kg(initial),
             "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
         }
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
@@ -2128,20 +2185,11 @@ def predict_mass_loss_fraction(
         )
 
     pressure_environment = getattr(experiment, "pressure_environment", None)
-    total_pressure_Pa = _located_point(
+    total_pressure_Pa, pressure_is_bound = _residue_pressure_point_or_upper_bound(
         None
         if pressure_environment is None
         else getattr(pressure_environment, "total_pressure_Pa", None)
     )
-    pressure_value = getattr(getattr(
-        getattr(pressure_environment, "total_pressure_Pa", None), "state", None
-    ), "value", None)
-    pressure_is_bound = (
-        getattr(getattr(pressure_value, "kind", None), "value", None) == "bound"
-        and getattr(pressure_value, "bound_operator", None) in {"<", "<="}
-    )
-    if pressure_is_bound:
-        total_pressure_Pa = float(pressure_value.bound_value)
     if engine == "internal-analytical" and total_pressure_Pa is None:
         raise ResidueInventoryRefusal("total_pressure_not_stated")
 
@@ -2514,7 +2562,7 @@ def _hashimoto_project_oxide_wt_pct(inventory_mol: Mapping[str, float]) -> dict[
         oxide: float(amount) * _formula_terms(oxide)[1]
         for oxide, amount in inventory_mol.items()
     }
-    total_mass_kg = math.fsum(oxide_mass_kg.values())
+    total_mass_kg = _inventory_mass_kg(inventory_mol)
     if not math.isfinite(total_mass_kg) or total_mass_kg <= 0.0:
         raise ResidueInventoryRefusal("hashimoto_residue_mass_invalid")
     # This is the run-end liquid's bulk oxide inventory; the Hashimoto source
@@ -2557,9 +2605,7 @@ def _hashimoto_integrate_geometry(
     inventory = {str(oxide): float(amount) for oxide, amount in initial_inventory_mol.items()}
     sample_total_mol = math.fsum(inventory.values())
     exhaustion_floor_mol = _component_exhaustion_floor_mol(sample_total_mol)
-    initial_mass_kg = math.fsum(
-        amount * _formula_terms(oxide)[1] for oxide, amount in inventory.items()
-    )
+    initial_mass_kg = _inventory_mass_kg(inventory)
     if initial_sample_mass_kg is not None:
         # Thermal segments retain the original printed A0/m0 reference.
         initial_mass_kg = initial_sample_mass_kg
@@ -2599,10 +2645,7 @@ def _hashimoto_integrate_geometry(
     def area_for_current_inventory() -> float:
         if geometry_policy_id != "sphere_shrinking":
             return initial_area_m2
-        remaining_mass_kg = math.fsum(
-            amount * _formula_terms(oxide)[1]
-            for oxide, amount in inventory.items()
-        )
+        remaining_mass_kg = _inventory_mass_kg(inventory)
         return _self_similar_area_m2(
             initial_area_m2, remaining_mass_kg, initial_mass_kg
         )
@@ -2734,6 +2777,10 @@ def _hashimoto_run_setup(
     engine: str,
     engine_metadata: Mapping[str, str],
     reference_printed_wt_pct: Mapping[str, Any],
+    sample_mass_kg_override: float | None = None,
+    geometry_areas_override: Mapping[str, float] | None = None,
+    allow_pressure_upper_bound: bool = False,
+    source_id: str = HASHIMOTO_SOURCE_ID,
 ) -> _HashimotoRunSetup:
     """Build the shared per-run inputs used by cohort and refinement checks."""
     from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
@@ -2746,16 +2793,34 @@ def _hashimoto_run_setup(
     duration_s = _hashimoto_point_value(
         experiment["thermal_schedule"]["total_duration_s"]
     )
-    sample_mass_kg = _hashimoto_point_value(experiment["sample"]["mass_kg"])
-    total_pressure_Pa = _hashimoto_point_value(
-        experiment["pressure_environment"]["total_pressure_Pa"]
+    sample_mass_kg = (
+        _hashimoto_point_value(experiment["sample"]["mass_kg"])
+        if sample_mass_kg_override is None
+        else float(sample_mass_kg_override)
     )
-    if not math.isclose(sample_mass_kg, 1.0e-4, rel_tol=0.0, abs_tol=1.0e-12):
+    if not math.isfinite(sample_mass_kg) or sample_mass_kg <= 0.0:
+        raise ResidueInventoryRefusal("sample_mass_invalid", experiment_id)
+    if sample_mass_kg_override is None and not math.isclose(
+        sample_mass_kg, 1.0e-4, rel_tol=0.0, abs_tol=1.0e-12
+    ):
         raise ResidueInventoryRefusal("hashimoto_printed_mass_changed", experiment_id)
+    pressure_record = experiment["pressure_environment"]["total_pressure_Pa"]
+    if allow_pressure_upper_bound:
+        total_pressure_Pa, pressure_is_upper_bound = (
+            _residue_pressure_point_or_upper_bound(pressure_record)
+        )
+        if total_pressure_Pa is None:
+            raise ResidueInventoryRefusal("total_pressure_not_stated", experiment_id)
+    else:
+        total_pressure_Pa = _hashimoto_point_value(pressure_record)
+        pressure_is_upper_bound = False
     run_wt_pct = experiment["sample"]["printed_composition"]["state"]["value"]
     if dict(run_wt_pct) != dict(reference_printed_wt_pct):
         raise ResidueInventoryRefusal(
-            "hashimoto_printed_composition_changed", experiment_id
+            "hashimoto_printed_composition_changed"
+            if source_id == HASHIMOTO_SOURCE_ID
+            else "langmuir_printed_composition_changed",
+            experiment_id,
         )
     initial_inventory_mol = {
         str(oxide): float(wt_pct) * sample_mass_kg / 100.0
@@ -2773,8 +2838,10 @@ def _hashimoto_run_setup(
         raise ResidueInventoryRefusal("hashimoto_openimcc_channels_missing")
 
     steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
-    geometry_areas = _hashimoto_geometry_areas(
-        sample_mass_kg, preform_dimensions_mm
+    geometry_areas = (
+        _hashimoto_geometry_areas(sample_mass_kg, preform_dimensions_mm)
+        if geometry_areas_override is None
+        else {str(key): float(value) for key, value in geometry_areas_override.items()}
     )
     liquid_rows = _hashimoto_liquid_row_provenance(
         gas_pack, gas_channels, temperature_K
@@ -2884,6 +2951,7 @@ def _hashimoto_run_setup(
         alpha_specs=alpha_specs,
         pressure_model=pressure_model,
         engine_floor_inversion_diagnostics=engine_floor_inversion_diagnostics,
+        pressure_is_upper_bound=pressure_is_upper_bound,
     )
 
 
@@ -2899,28 +2967,150 @@ def _residue_catalog_rows(
     ]
 
 
-def _predict_hashimoto_residue_cohort(
+def _langmuir_area_rows_by_sample(
+    source_document: Mapping[str, Any],
+) -> dict[str, tuple[Mapping[str, Any], ...]]:
+    rows: defaultdict[str, list[Mapping[str, Any]]] = defaultdict(list)
+    species_blocks = source_document.get("species") or {}
+    if not isinstance(species_blocks, Mapping):
+        raise ResidueInventoryRefusal("sample_area_inputs_invalid")
+    for block in species_blocks.values():
+        if not isinstance(block, Mapping):
+            continue
+        observations = block.get("observations") or ()
+        if not isinstance(observations, Sequence) or isinstance(
+            observations, (str, bytes)
+        ):
+            continue
+        for observation in observations:
+            if not isinstance(observation, Mapping):
+                continue
+            equipment = observation.get("equipment") or {}
+            surface_area = (
+                equipment.get("sample_surface_area")
+                if isinstance(equipment, Mapping)
+                else None
+            )
+            values = (
+                surface_area.get("value")
+                if isinstance(surface_area, Mapping)
+                else None
+            )
+            records = values if isinstance(values, list) else (values,)
+            for record in records:
+                if not isinstance(record, Mapping):
+                    continue
+                sample_id = record.get("sample")
+                if isinstance(sample_id, str) and sample_id.strip():
+                    rows[sample_id].append(record)
+    return {sample_id: tuple(records) for sample_id, records in rows.items()}
+
+
+def _langmuir_area_record_value(
+    record: Mapping[str, Any], key: str, *, reason: str
+) -> float | None:
+    raw = record.get(key)
+    if isinstance(raw, Mapping) and "state" in raw:
+        state = raw.get("state")
+        if not isinstance(state, Mapping) or state.get("tag") != "value":
+            raise ResidueInventoryRefusal(reason, key)
+        raw = state.get("value")
+    if raw is None:
+        if reason.endswith("unreported") or reason.endswith("not_stated"):
+            return None
+        raise ResidueInventoryRefusal(reason, key)
+    try:
+        value = float(raw)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ResidueInventoryRefusal(reason, key) from exc
+    if not math.isfinite(value) or value <= 0.0:
+        raise ResidueInventoryRefusal(reason, key)
+    return value
+
+
+def _langmuir_experiment_area_inputs(
+    experiment: Mapping[str, Any],
+    records_by_sample: Mapping[str, Sequence[Mapping[str, Any]]],
+    *,
+    spec: LangmuirResidueCohortSpec,
+) -> tuple[float, float | None, float]:
+    sample = experiment.get("sample") or {}
+    locator = experiment.get("locator") or {}
+    sample_id = (
+        sample.get("sample_id") if isinstance(sample, Mapping) else None
+    ) or (locator.get("row") if isinstance(locator, Mapping) else None)
+    if not isinstance(sample_id, str) or not sample_id:
+        raise ResidueInventoryRefusal(spec.missing_area_reason or "sample_area_not_stated")
+    records = records_by_sample.get(sample_id, ())
+    if not records:
+        raise ResidueInventoryRefusal(spec.missing_area_reason or "sample_area_not_stated")
+
+    resolved: set[tuple[float | None, float | None, float | None]] = set()
+    for record in records:
+        initial_area = _langmuir_area_record_value(
+            record,
+            "initial_area_mm2",
+            reason=spec.missing_area_reason or "initial_area_unreported",
+        )
+        final_area = _langmuir_area_record_value(
+            record, "final_area_mm2", reason="final_area_not_stated"
+        )
+        initial_mass = _langmuir_area_record_value(
+            record,
+            "initial_weight_mg",
+            reason=spec.missing_mass_reason or "initial_mass_not_stated",
+        )
+        resolved.add((initial_area, final_area, initial_mass))
+    if len(resolved) != 1:
+        raise ResidueInventoryRefusal(
+            "sample_area_inputs_ambiguous", sample_id
+        )
+    initial_area, final_area, initial_mass_mg = resolved.pop()
+    if initial_area is None:
+        raise ResidueInventoryRefusal(spec.missing_area_reason or "initial_area_unreported")
+    if initial_mass_mg is None:
+        raise ResidueInventoryRefusal(spec.missing_mass_reason or "initial_mass_not_stated")
+    return (
+        _area_mm2_to_m2(initial_area),
+        None if final_area is None else _area_mm2_to_m2(final_area),
+        initial_mass_mg / 1_000_000.0,
+    )
+
+
+def _predict_langmuir_residue_cohort(
     experiments: Sequence[Mapping[str, Any]],
     runtime_catalog: Mapping[str, Any],
     *,
-    preform_dimensions_mm: Mapping[str, float],
+    cohort_spec: LangmuirResidueCohortSpec,
+    source_id: str,
+    source_document: Mapping[str, Any] | None,
+    preform_dimensions_mm: Mapping[str, float] | None,
     code_revision: str,
     engine: str = "openimcc",
     selected_experiment_ids: frozenset[str] | None = None,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
-    """Produce both alpha arms and geometry bands, without reading residues."""
+    """Produce the declared alpha arms and area geometries for one cohort."""
     if engine not in {"openimcc", "internal-analytical"}:
-        raise ResidueInventoryRefusal("hashimoto_engine_unsupported", engine)
+        raise ResidueInventoryRefusal(
+            "hashimoto_engine_unsupported"
+            if source_id == HASHIMOTO_SOURCE_ID
+            else "langmuir_engine_unsupported",
+            engine,
+        )
     experiment_ids = {
         str(experiment.get("experiment_id", "")) for experiment in experiments
     }
     if (
         not experiments
         or len(experiment_ids) != len(experiments)
-        or len(experiments) != 24
+        or len(experiments) != cohort_spec.experiment_count
     ):
         raise ResidueInventoryRefusal(
-            "hashimoto_cohort_invalid", "R2 requires 24 distinct physical runs"
+            "hashimoto_cohort_invalid"
+            if source_id == HASHIMOTO_SOURCE_ID
+            else "langmuir_cohort_invalid",
+            f"expected {cohort_spec.experiment_count} distinct physical runs; "
+            f"received {len(experiment_ids)}",
         )
     if selected_experiment_ids is not None and (
         not selected_experiment_ids or not selected_experiment_ids <= experiment_ids
@@ -2930,7 +3120,31 @@ def _predict_hashimoto_residue_cohort(
             "selected runs must be a non-empty subset of the validated cohort",
         )
     if not code_revision.strip():
-        raise ResidueInventoryRefusal("hashimoto_code_revision_missing")
+        raise ResidueInventoryRefusal(
+            "hashimoto_code_revision_missing"
+            if source_id == HASHIMOTO_SOURCE_ID
+            else "langmuir_code_revision_missing"
+        )
+    if cohort_spec.missing_mass_reason is not None and (
+        cohort_spec.initial_mass_source == "unreported"
+    ):
+        raise ResidueInventoryRefusal(cohort_spec.missing_mass_reason)
+    area_records_by_sample = (
+        _langmuir_area_rows_by_sample(source_document)
+        if cohort_spec.geometry_source == "per_experiment_printed_area_mm2"
+        and source_document is not None
+        else {}
+    )
+    if (
+        cohort_spec.geometry_source == "per_experiment_printed_area_mm2"
+        and source_document is None
+    ):
+        raise ResidueInventoryRefusal("sample_area_inputs_missing")
+    if (
+        cohort_spec.geometry_source == "hashimoto_metadata_dimensions"
+        and preform_dimensions_mm is None
+    ):
+        raise ResidueInventoryRefusal("hashimoto_preform_geometry_missing")
 
     try:
         import openimcc
@@ -2963,21 +3177,87 @@ def _predict_hashimoto_residue_cohort(
         else None
     )
     melt_pack_identity: dict[str, str] = {}
-    primary_alpha_arm, primary_geometry = _hashimoto_primary_policy()
+    primary_alpha_arm, _hashimoto_geometry = _hashimoto_primary_policy()
+    primary_geometry = cohort_spec.primary_geometry_policy_id
     prediction_rows: list[_HashimotoResiduePrediction] = []
 
     for experiment in experiments:
-        setup = _hashimoto_run_setup(
-            experiment,
-            gas_pack=gas_pack,
-            catalog_rows=catalog_rows,
-            alpha_specs=alpha_specs,
-            preform_dimensions_mm=preform_dimensions_mm,
-            engine=engine,
-            engine_metadata=melt_pack_identity,
-            reference_printed_wt_pct=printed_wt_pct,
-        )
-        experiment_id = setup.experiment_id
+        experiment_id = str(experiment.get("experiment_id") or "")
+        if (
+            source_id != HASHIMOTO_SOURCE_ID
+            and selected_experiment_ids is not None
+            and experiment_id not in selected_experiment_ids
+        ):
+            continue
+        initial_area_m2: float | None = None
+        printed_final_area_m2: float | None = None
+        sample_mass_override_kg: float | None = None
+        geometry_areas_override: dict[str, float] | None = None
+        try:
+            if cohort_spec.geometry_source == "per_experiment_printed_area_mm2":
+                (
+                    initial_area_m2,
+                    printed_final_area_m2,
+                    sample_mass_override_kg,
+                ) = _langmuir_experiment_area_inputs(
+                    experiment,
+                    area_records_by_sample,
+                    spec=cohort_spec,
+                )
+                geometry_areas_override = {
+                    geometry: initial_area_m2
+                    for geometry in cohort_spec.geometry_policy_ids
+                }
+            setup = _hashimoto_run_setup(
+                experiment,
+                gas_pack=gas_pack,
+                catalog_rows=catalog_rows,
+                alpha_specs=alpha_specs,
+                preform_dimensions_mm=preform_dimensions_mm or {},
+                engine=engine,
+                engine_metadata=melt_pack_identity,
+                reference_printed_wt_pct=printed_wt_pct,
+                sample_mass_kg_override=sample_mass_override_kg,
+                geometry_areas_override=geometry_areas_override,
+                allow_pressure_upper_bound=source_id != HASHIMOTO_SOURCE_ID,
+                source_id=source_id,
+            )
+        except ResidueInventoryRefusal as exc:
+            if source_id == HASHIMOTO_SOURCE_ID:
+                raise
+            geometry_refusals = {
+                geometry: {
+                    "reason": exc.reason,
+                    "detail": exc.detail,
+                    "geometry_policy_id": geometry,
+                }
+                for geometry in cohort_spec.geometry_policy_ids
+            }
+            for alpha_arm in (
+                "alpha_common_unity_sensitivity",
+                "alpha_runtime_catalog",
+            ):
+                prediction_rows.append(
+                    _HashimotoResiduePrediction(
+                        experiment_id=experiment_id,
+                        alpha_arm=alpha_arm,
+                        primary_geometry_policy_id=primary_geometry,
+                        primary_oxide_wt_pct={},
+                        geometry_oxide_wt_pct={},
+                        sensitivity_band_wt_pct={},
+                        initial_inventory_mol={},
+                        primary_inventory_mol=None,
+                        provenance={
+                            "source_id": source_id,
+                            "experiment_id": experiment_id,
+                            "geometry_refusal_by_geometry": geometry_refusals,
+                            "run_refusal": geometry_refusals[primary_geometry],
+                            "area_uncertainty": cohort_spec.area_uncertainty,
+                            "prediction_status": "refused",
+                        },
+                    )
+                )
+            continue
         if (
             selected_experiment_ids is not None
             and experiment_id not in selected_experiment_ids
@@ -3105,7 +3385,7 @@ def _predict_hashimoto_residue_cohort(
             refinement_cpu_seconds_by_geometry: dict[str, float] = {}
             refinement_accepted_steps_by_geometry: dict[str, int] = {}
             refinement_notices: list[dict[str, str]] = []
-            for geometry in _HASHIMOTO_GEOMETRIES:
+            for geometry in cohort_spec.geometry_policy_ids:
                 steps = initial_steps
                 tried_steps: list[int] = []
                 level_differences: list[dict[str, float | int]] = []
@@ -3129,6 +3409,11 @@ def _predict_hashimoto_residue_cohort(
                         steps=steps,
                         geometry_policy_id=geometry,
                         initial_area_m2=geometry_areas[geometry],
+                        initial_sample_mass_kg=(
+                            sample_mass_kg
+                            if source_id != HASHIMOTO_SOURCE_ID
+                            else None
+                        ),
                     )
                     (
                         values,
@@ -3209,23 +3494,63 @@ def _predict_hashimoto_residue_cohort(
                 for oxide in run_initial_mol
             }
             primary_area = geometry_areas[primary_geometry]
-            geometry_provenance = {
-                "sphere_constant": {
-                    "area_m2_initial": geometry_areas["sphere_constant"],
-                    "area_evolution": "constant equal-volume sphere area",
-                    "flag": "area_assumed_sphere_constant",
-                },
-                "sphere_shrinking": {
-                    "area_m2_initial": geometry_areas["sphere_shrinking"],
-                    "area_evolution": "A(t)=A0*(remaining_oxide_mass/initial_mass)^(2/3), updated each step",
-                    "flag": "area_assumed_sphere_shrinking",
-                },
-                "disk_4mm_constant": {
-                    "area_m2_initial": geometry_areas["disk_4mm_constant"],
-                    "area_evolution": "constant 4 mm diameter disk; hole not subtracted",
-                    "flag": "area_assumed_disk_4mm_constant",
-                },
-            }
+            area_diagnostics: dict[str, dict[str, float | None]] = {}
+            if source_id != HASHIMOTO_SOURCE_ID:
+                for geometry in cohort_spec.geometry_policy_ids:
+                    final_inventory = geometry_inventory_mol[geometry]
+                    if final_inventory is None:
+                        predicted_final_area_m2 = None
+                    elif geometry == SPHERE_CONSTANT_GEOMETRY:
+                        predicted_final_area_m2 = geometry_areas[geometry]
+                    else:
+                        predicted_final_area_m2 = _self_similar_area_m2(
+                            geometry_areas[geometry],
+                            _inventory_mass_kg(final_inventory),
+                            sample_mass_kg,
+                        )
+                    area_diagnostics[geometry] = {
+                        "predicted_final_area_mm2": (
+                            None
+                            if predicted_final_area_m2 is None
+                            else predicted_final_area_m2 * 1_000_000.0
+                        ),
+                        "printed_final_area_mm2": (
+                            None
+                            if printed_final_area_m2 is None
+                            else printed_final_area_m2 * 1_000_000.0
+                        ),
+                    }
+            if source_id == HASHIMOTO_SOURCE_ID:
+                geometry_provenance = {
+                    "sphere_constant": {
+                        "area_m2_initial": geometry_areas["sphere_constant"],
+                        "area_evolution": "constant equal-volume sphere area",
+                        "flag": "area_assumed_sphere_constant",
+                    },
+                    "sphere_shrinking": {
+                        "area_m2_initial": geometry_areas["sphere_shrinking"],
+                        "area_evolution": "A(t)=A0*(remaining_oxide_mass/initial_mass)^(2/3), updated each step",
+                        "flag": "area_assumed_sphere_shrinking",
+                    },
+                    "disk_4mm_constant": {
+                        "area_m2_initial": geometry_areas["disk_4mm_constant"],
+                        "area_evolution": "constant 4 mm diameter disk; hole not subtracted",
+                        "flag": "area_assumed_disk_4mm_constant",
+                    },
+                }
+            else:
+                geometry_provenance = {
+                    geometry: {
+                        "area_m2_initial": geometry_areas[geometry],
+                        "area_evolution": (
+                            "constant printed initial area"
+                            if geometry == SPHERE_CONSTANT_GEOMETRY
+                            else "A(t)=A0*(remaining_oxide_mass/initial_mass)^(2/3), updated each step"
+                        ),
+                        "flag": f"area_assumed_{geometry}",
+                    }
+                    for geometry in cohort_spec.geometry_policy_ids
+                }
             extrapolated_liquids = [
                 row
                 for row in active_liquid_rows[row_key]
@@ -3243,10 +3568,10 @@ def _predict_hashimoto_residue_cohort(
                     alpha_arm == "alpha_runtime_catalog"
                 ),
                 "alpha_assumed_oxygen_gas_unity": True,
-                "area_assumed_sphere_constant": True,
+                "area_assumed_sphere_constant": source_id == HASHIMOTO_SOURCE_ID,
                 "area_assumed_sphere_shrinking": True,
-                "area_assumed_disk_4mm_constant": True,
-                "density_fallback_2700_kg_m3": True,
+                "area_assumed_disk_4mm_constant": source_id == HASHIMOTO_SOURCE_ID,
+                "density_fallback_2700_kg_m3": source_id == HASHIMOTO_SOURCE_ID,
                 "oxygen_unbuffered_vacuum": True,
                 "pressure_on_throw_ignored_for_bc": True,
                 "feo_melt_redox_stack2_pending": True,
@@ -3255,28 +3580,40 @@ def _predict_hashimoto_residue_cohort(
             }
             provenance = {
                 "experiment_id": experiment_id,
-                "source_id": "kems-015-hashimoto-1983",
+                "source_id": source_id,
                 "run_locator": dict(experiment.get("locator") or {}),
                 "temperature_K": temperature_K,
                 "duration_s": duration_s,
                 "sample_mass_kg": sample_mass_kg,
                 "starting_composition_wt_pct": dict(run_wt_pct),
-                "starting_preform_mm": dict(preform_dimensions_mm),
+                "starting_preform_mm": dict(preform_dimensions_mm or {}),
                 "initial_inventory_mol": dict(run_initial_mol),
-                "sample_surface_area_status": "not_tabulated",
+                "sample_surface_area_status": (
+                    "not_tabulated"
+                    if source_id == HASHIMOTO_SOURCE_ID
+                    else "printed_initial_area_mm2"
+                ),
                 "primary_geometry_policy_id": primary_geometry,
                 "geometry_primary_argument": (
                     "A freely receding melt is represented as a fixed-density sphere, "
                     "so area scales with remaining melt mass^(2/3); the cold preform "
                     "and quenched spherule do not establish the molten area. This choice "
                     "was declared without using residue observations."
+                    if source_id == HASHIMOTO_SOURCE_ID
+                    else "Printed initial area; area evolution is unreported, so the existing constant and self-similar-shrinking modes are retained as a sensitivity range."
                 ),
                 "geometry_policies": geometry_provenance,
                 "geometry_policy_id": primary_geometry,
                 "area_m2_initial": primary_area,
                 "area_evolution": geometry_provenance[primary_geometry]["area_evolution"],
-                "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
-                "density_source": _HASHIMOTO_DENSITY_SOURCE,
+                **(
+                    {
+                        "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
+                        "density_source": _HASHIMOTO_DENSITY_SOURCE,
+                    }
+                    if source_id == HASHIMOTO_SOURCE_ID
+                    else {}
+                ),
                 "alpha_arm": alpha_arm,
                 "alpha_source": (
                     "declared_common_unity_sensitivity"
@@ -3299,6 +3636,11 @@ def _predict_hashimoto_residue_cohort(
                 "engine": engine,
                 "oxygen_boundary": "unbuffered vacuum; fO2 control none",
                 "total_pressure_Pa": total_pressure_Pa,
+                **(
+                    {"total_pressure_is_upper_bound": setup.pressure_is_upper_bound}
+                    if source_id != HASHIMOTO_SOURCE_ID
+                    else {}
+                ),
                 "surface_pO2_bar_range_by_geometry": pO2_ranges,
                 "surface_pO2_balance_floor": pO2_balance_floor_by_geometry[
                     primary_geometry
@@ -3364,6 +3706,23 @@ def _predict_hashimoto_residue_cohort(
                 ),
                 "assumption_flags": assumption_flags,
             }
+            if source_id != HASHIMOTO_SOURCE_ID:
+                provenance.update(
+                    {
+                        "initial_area_mm2": (
+                            None
+                            if initial_area_m2 is None
+                            else initial_area_m2 * 1_000_000.0
+                        ),
+                        "printed_final_area_mm2": (
+                            None
+                            if printed_final_area_m2 is None
+                            else printed_final_area_m2 * 1_000_000.0
+                        ),
+                        "area_uncertainty": cohort_spec.area_uncertainty,
+                        "area_diagnostics": area_diagnostics,
+                    }
+                )
             if geometry_inventory_mol[primary_geometry] is not None:
                 provenance["integrated_inventory_mol"] = dict(
                     geometry_inventory_mol[primary_geometry]
@@ -3394,6 +3753,29 @@ def _predict_hashimoto_residue_cohort(
         )
     )
     return tuple(prediction_rows)
+
+
+def _predict_hashimoto_residue_cohort(
+    experiments: Sequence[Mapping[str, Any]],
+    runtime_catalog: Mapping[str, Any],
+    *,
+    preform_dimensions_mm: Mapping[str, float],
+    code_revision: str,
+    engine: str = "openimcc",
+    selected_experiment_ids: frozenset[str] | None = None,
+) -> tuple[_HashimotoResiduePrediction, ...]:
+    """Keep the Hashimoto entry point while delegating to the Langmuir owner."""
+    return _predict_langmuir_residue_cohort(
+        experiments,
+        runtime_catalog,
+        cohort_spec=_LANGMUIR_RESIDUE_COHORTS[HASHIMOTO_SOURCE_ID],
+        source_id=HASHIMOTO_SOURCE_ID,
+        source_document=None,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision=code_revision,
+        engine=engine,
+        selected_experiment_ids=selected_experiment_ids,
+    )
 
 
 _SOSSI_SOURCE_ID = "kems-012-sossi-2019"
@@ -3442,9 +3824,7 @@ def _sossi_initial_inventory(
         inventory[parent] = inventory.get(parent, 0.0) + (
             element_mass_kg / element_molar_mass
         )
-    return inventory, mass_kg, math.fsum(
-        amount * _formula_terms(oxide)[1] for oxide, amount in inventory.items()
-    )
+    return inventory, mass_kg, _inventory_mass_kg(inventory)
 
 
 def _sossi_geometry_areas(sample_mass_kg: float) -> dict[str, float]:
@@ -3467,10 +3847,9 @@ def _inventory_bulk_and_element_masses_kg(
     elements: Sequence[str],
 ) -> tuple[float, dict[str, float]]:
     """Return the integrated bulk mass and requested elemental masses."""
-    total_mass_kg = math.fsum(
-        float(amount) * _formula_terms(oxide)[1]
-        for oxide, amount in inventory_mol.items()
-    ) + min(0.0, buffer_oxygen_exchange_mol) * _formula_terms("O")[1]
+    total_mass_kg = _inventory_mass_kg(inventory_mol) + min(
+        0.0, buffer_oxygen_exchange_mol
+    ) * _formula_terms("O")[1]
     if not math.isfinite(total_mass_kg) or total_mass_kg <= 0.0:
         raise ResidueInventoryRefusal("sossi_residue_mass_invalid")
     element_mass_kg: dict[str, float] = {}
@@ -3949,10 +4328,7 @@ def _predict_sossi_residue_cohort(
             raise ResidueInventoryRefusal(
                 "channel_missing", ",".join(missing_elements)
             )
-        initial_melt_mass_kg = math.fsum(
-            amount * _formula_terms(oxide)[1]
-            for oxide, amount in inventory.items()
-        )
+        initial_melt_mass_kg = _inventory_mass_kg(inventory)
         liquid_rows_used = (
             _hashimoto_liquid_row_provenance(
                 gas_pack,
@@ -3986,9 +4362,8 @@ def _predict_sossi_residue_cohort(
                 initial_total_mass = initial_melt_mass_kg
                 dt = duration_s / steps
                 for _step in range(steps):
-                    current_mass = math.fsum(
-                        amount * _formula_terms(oxide)[1]
-                        for oxide, amount in current_inventory.items()
+                    current_mass = _inventory_mass_kg(
+                        current_inventory
                     ) + min(0.0, buffer_exchange) * _formula_terms("O")[1]
                     if geometry == "pt_loop_bead_sphere_shrinking":
                         area = _self_similar_area_m2(
