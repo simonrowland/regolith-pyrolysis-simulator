@@ -23010,8 +23010,8 @@ def _quoted_atmosphere_values(
     ):
         total = sum(Decimal(str(value)) for value in components.values())
         ratio = re.fullmatch(
-            r"\s*(\d+(?:\.\d+)?)(CO2|CO)\s*:\s*"
-            r"(\d+(?:\.\d+)?)(CO2|CO)\s*",
+            r"\s*(\d+(?:\.\d+)?)(CO2|CO|H2O|H2)\s*:\s*"
+            r"(\d+(?:\.\d+)?)(CO2|CO|H2O|H2)\s*",
             mixture_value,
             re.IGNORECASE,
         )
