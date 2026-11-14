@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 import math
 from pathlib import Path
@@ -348,11 +349,28 @@ def test_fedkin_fit_predicts_and_flags_its_actual_regime(
         assert "1723" in warning and "air" in warning
 
 
+def test_fedkin_fit_regime_pressures_are_yaml_floats():
+    raw = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text())
+    families = raw["families"]
+    potassium = families["metals_k_family"]["vaporisation_coefficients"][
+        "evaporation_alpha"
+    ]
+    sodium = families["metals_na_family"]["vaporisation_coefficients"][
+        "evaporation_alpha"
+    ]["competing_sources"][0]
+    for fit in (potassium, sodium):
+        pressure = fit["calibrated_regime"]["pressure_bar"]
+        assert all(type(value) is float for value in pressure)
+        assert pressure == [1e-5, 1e-5]
+
+
 def test_malformed_alpha_fit_regime_is_rejected_at_the_contract_boundary():
-    contract = _vapor_pressure_data()["metals"]["K"]["evaporation_alpha"]
+    cached = _vapor_pressure_data()["metals"]["K"]["evaporation_alpha"]
+    contract = deepcopy(cached)
     contract["calibrated_regime"]["pressure_bar"] = [True, 1e-5]
     with pytest.raises(AlphaSpecError, match="pressure_bar"):
         parse_alpha_contract(contract)
+    assert cached["calibrated_regime"]["pressure_bar"] == [1e-5, 1e-5]
 
 
 def test_sossi_sodium_family_withdrawal_reaches_every_runtime_store():
