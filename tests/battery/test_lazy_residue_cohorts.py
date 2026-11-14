@@ -23,12 +23,27 @@ def _encode(value: object) -> bytes:
     ).encode("utf-8")
 
 
-def _without_cpu_timing(row: object) -> dict[str, object]:
-    payload = asdict(row)
-    integration = payload["provenance"]["integration"]
-    integration.pop("process_cpu_seconds", None)
-    integration.pop("process_cpu_seconds_by_geometry", None)
-    return payload
+def _assert_no_runtime_fields(value: object) -> None:
+    forbidden = {
+        "git_sha",
+        "git_revision",
+        "code_revision",
+        "process_cpu_seconds",
+        "process_cpu_seconds_by_geometry",
+        "cpu_seconds",
+        "cpu_time_seconds",
+        "wall_seconds",
+        "wall_time_seconds",
+        "elapsed_s",
+        "host",
+    }
+    if isinstance(value, dict):
+        assert forbidden.isdisjoint(value)
+        for nested in value.values():
+            _assert_no_runtime_fields(nested)
+    elif isinstance(value, (list, tuple)):
+        for nested in value:
+            _assert_no_runtime_fields(nested)
 
 
 def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selected(
@@ -126,7 +141,6 @@ def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selec
         experiments,
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="lazy-selection-test",
     )
     assert setup_calls == [
         experiment["experiment_id"] for experiment in experiments
@@ -140,15 +154,14 @@ def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selec
         experiments,
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="lazy-selection-test",
         selected_experiment_ids=frozenset({target_id}),
     )
     assert setup_calls == [target_id]
 
-    # Measured CPU timings are nondeterministic between runs; their follow-up
-    # is tracked in score-overhead-11111640. Keep every other byte pinned.
-    selected_payloads = [_without_cpu_timing(row) for row in selected]
-    full_payloads = [_without_cpu_timing(row) for row in full_target]
+    for row in (*selected, *full_target):
+        _assert_no_runtime_fields(asdict(row))
+    selected_payloads = [asdict(row) for row in selected]
+    full_payloads = [asdict(row) for row in full_target]
     assert selected_payloads == full_payloads
     assert _encode(selected_payloads) == _encode(full_payloads)
     assert {row.experiment_id for row in selected} == {target_id}
@@ -199,7 +212,6 @@ def test_sossi_selected_experiments_match_full_rows_and_integrate_only_selected(
         catalog,
         starting_trace_ppm_by_experiment=starting_trace_by_experiment,
         buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
-        code_revision="lazy-selection-test",
         engine="internal-analytical",
     )
     assert set(integrated_experiments) == experiment_ids
@@ -212,13 +224,14 @@ def test_sossi_selected_experiments_match_full_rows_and_integrate_only_selected(
         catalog,
         starting_trace_ppm_by_experiment=starting_trace_by_experiment,
         buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
-        code_revision="lazy-selection-test",
         engine="internal-analytical",
         selected_experiment_ids=frozenset({target_id}),
     )
 
     assert len(selected) == 1
     assert selected[0].experiment_id == target_id
+    _assert_no_runtime_fields(asdict(selected[0]))
+    _assert_no_runtime_fields(asdict(full_target))
     assert _encode(asdict(selected[0])) == _encode(asdict(full_target))
     assert integrated_experiments
     assert set(integrated_experiments) == {target_id}
@@ -325,7 +338,7 @@ def test_residue_cohort_caches_are_scoped_by_selected_experiments(
                 primary_oxide_wt_pct={"FeO": 1.0},
                 geometry_oxide_wt_pct={"sphere_shrinking": {"FeO": 1.0}},
                 sensitivity_band_wt_pct={"FeO": (1.0, 1.0)},
-                provenance={"code_revision": "test-revision", "integration": {}},
+                provenance={"integration": {}},
             )
             for experiment_id in experiment_ids
             for alpha_arm in (

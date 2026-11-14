@@ -287,6 +287,9 @@ def test_filtered_cli_keeps_published_artifacts_and_labels_subset(
             aggregate=aggregate,
             static_refusals=(),
             selected_reference_count=2,
+            engine_cache_counters={},
+            engine_cache_runtime_identities={},
+            shard_failures=(),
         )
         return 0, metadata
 
@@ -363,6 +366,7 @@ def test_unfiltered_cli_preserves_summary_bytes_and_completion_line(
     battery.mkdir(parents=True)
     stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
     payload = {"records": [{"citation": "Münter 1972"}], "store_stamp": stamp}
+    payload["engine_cache"] = battery_score._engine_cache_summary(None)
     expected_summary = (
         json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n"
     ).encode("utf-8")
@@ -388,6 +392,9 @@ def test_unfiltered_cli_preserves_summary_bytes_and_completion_line(
             aggregate=aggregate,
             static_refusals=(),
             selected_reference_count=0,
+            engine_cache_counters={},
+            engine_cache_runtime_identities={},
+            shard_failures=(),
         )
         return 0, metadata
 

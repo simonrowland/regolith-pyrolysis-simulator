@@ -395,7 +395,12 @@ class _CpuTimerProbeBackend:
         )
 
 
-def _bootstrap_ia_timer_probe(engine: str, *, marker_path: str):
+def _bootstrap_ia_timer_probe(
+    engine: str,
+    engine_settings=None,
+    *,
+    marker_path: str,
+):
     from simulator.diagnostic_helpers.binary_pot_battery import (
         EngineHandle,
         _IsolatedCellEngine,
@@ -409,7 +414,7 @@ def _bootstrap_ia_timer_probe(engine: str, *, marker_path: str):
         takes_fo2=False,
         supports_intrinsic_fo2=False,
     )
-    return _IsolatedCellEngine(handle), "cpu-timer-probe"
+    return _IsolatedCellEngine(handle, engine_settings), "cpu-timer-probe"
 
 
 def test_compilation_census_isolates_each_ia_row_with_cpu_timer(
@@ -6757,10 +6762,19 @@ def test_score_progress_total_is_series_cells(monkeypatch, capsys) -> None:
     from simulator.battery.records import Execution
     from simulator.battery.score import score_store
 
-    ticks = iter([0.0, 61.0])
+    current_time = 0.0
+
+    def advance_monotonic() -> float:
+        nonlocal current_time
+        # Preparation now runs before the scorer timestamp, so the old two-tick
+        # fixture no longer guarantees 60 seconds during scoring. Advance every
+        # read to make the progress interval deterministic.
+        current_time += 61.0
+        return current_time
+
     monkeypatch.setattr(
         "simulator.battery.score.time.monotonic",
-        lambda: next(ticks, 61.0),
+        advance_monotonic,
     )
     identity = replace(_na2o_liquid(), temperature_K=State.unknown("series"))
     series = F.observation(

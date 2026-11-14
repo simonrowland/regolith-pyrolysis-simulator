@@ -24,6 +24,7 @@ import threading
 import time
 import types
 import warnings
+import copy
 from concurrent.futures import Future, TimeoutError as FutureTimeoutError
 from dataclasses import replace
 from pathlib import Path
@@ -73,7 +74,9 @@ from simulator.melt_backend.magemin import (
 _RENDEZVOUS_TIMEOUT_S = 30.0
 
 
-def _bootstrap_sleeping_magemin_worker():
+def _bootstrap_sleeping_magemin_worker(
+    _binary_path=None, _database='ig', _config=None,
+):
     return None, 'sleeping-worker-ready'
 
 
@@ -94,6 +97,7 @@ class _RegisteredMageminPool:
     def __init__(self):
         self.workers = (types.SimpleNamespace(
             name="MAGEMin subprocess pool slot 0",
+            _bootstrap_args=('/fake/MAGEMin', 'ig', {}),
         ),)
         self.closed = False
         engine_pool._LIVE_ENGINE_POOLS.add(self)
@@ -297,12 +301,26 @@ class _ImmediateFailurePool:
         self.close_calls += 1
 
 
+def _attach_fake_magemin_worker(pool, backend):
+    assert backend._binary_path is not None
+    pool.workers = (types.SimpleNamespace(
+        name='MAGEMin subprocess pool slot 0',
+        _bootstrap_args=(
+            str(backend._binary_path.resolve()),
+            backend._database,
+            copy.deepcopy(backend._config),
+        ),
+    ),)
+
+
 def _make_pooled_subprocess_backend(exception):
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = 'subprocess'
     backend._binary_path = Path('/fake/MAGEMin')
-    backend._subprocess_pool = _ImmediateFailurePool(exception)
+    pool = _ImmediateFailurePool(exception)
+    _attach_fake_magemin_worker(pool, backend)
+    backend._subprocess_pool = pool
     return backend
 
 
@@ -343,9 +361,7 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
             self.diagnostic_detail = diagnostic_detail
             self.abort_calls += 1
 
-    pool = PendingPool()
     backend = _make_pooled_subprocess_backend(None)
-    backend._subprocess_pool = pool
     backend._database = database
     if capture_error:
         def fail_diagnostic_capture(**_kwargs):
@@ -360,6 +376,9 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
         'warm_call_timeout_s': 0.05,
         'worker_startup_timeout_s': 0.05,
     }
+    pool = PendingPool()
+    _attach_fake_magemin_worker(pool, backend)
+    backend._subprocess_pool = pool
     projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
     if nonfinite_projection:
         projection = replace(
@@ -451,10 +470,15 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
     failure_kind,
 ):
     diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
+    worker_config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 2.0,
+    }
     pool = engine_pool.EngineWorkerPool(
         lambda index: engine_pool.WarmEngineWorker(
             name=f'fake MAGEMin slot {index}',
             bootstrap=_bootstrap_sleeping_magemin_worker,
+            bootstrap_args=('/fake/MAGEMin', 'ig', worker_config),
             handler=_handle_sleeping_magemin_request,
             startup_timeout_s=2.0,
             call_timeout_s=30.0,
@@ -471,10 +495,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
     worker.call = call_with_long_worker_wall
     backend = _make_pooled_subprocess_backend(None)
     backend._subprocess_pool = pool
-    backend._config = {
-        'warm_call_timeout_s': 0.05,
-        'worker_startup_timeout_s': 2.0,
-    }
+    backend._config = worker_config
     if failure_kind == 'capture-error':
         def fail_diagnostic_capture(**_kwargs):
             raise RuntimeError('diagnostic capture failed')
@@ -564,10 +585,15 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
 @pytest.mark.timeout(20)
 def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
     diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
+    worker_config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 2.0,
+    }
     pool = engine_pool.EngineWorkerPool(
         lambda index: engine_pool.WarmEngineWorker(
             name=f'fake MAGEMin slot {index}',
             bootstrap=_bootstrap_sleeping_magemin_worker,
+            bootstrap_args=('/fake/MAGEMin', 'ig', worker_config),
             handler=_handle_sleeping_magemin_request,
             startup_timeout_s=2.0,
             call_timeout_s=0.05,
@@ -577,10 +603,7 @@ def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
     )
     backend = _make_pooled_subprocess_backend(None)
     backend._subprocess_pool = pool
-    backend._config = {
-        'warm_call_timeout_s': 0.05,
-        'worker_startup_timeout_s': 2.0,
-    }
+    backend._config = worker_config
     projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
     worker = pool.workers[0]
     worker_pid = worker.process.pid
@@ -641,10 +664,15 @@ def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
 
 def test_successful_magemin_worker_call_writes_no_timeout_record(tmp_path):
     diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
+    worker_config = {
+        'warm_call_timeout_s': 1.0,
+        'worker_startup_timeout_s': 2.0,
+    }
     pool = engine_pool.EngineWorkerPool(
         lambda index: engine_pool.WarmEngineWorker(
             name=f'fake MAGEMin slot {index}',
             bootstrap=_bootstrap_sleeping_magemin_worker,
+            bootstrap_args=('/fake/MAGEMin', 'ig', worker_config),
             handler=_handle_successful_magemin_request,
             startup_timeout_s=2.0,
             call_timeout_s=1.0,
@@ -654,10 +682,7 @@ def test_successful_magemin_worker_call_writes_no_timeout_record(tmp_path):
     )
     backend = _make_pooled_subprocess_backend(None)
     backend._subprocess_pool = pool
-    backend._config = {
-        'warm_call_timeout_s': 1.0,
-        'worker_startup_timeout_s': 2.0,
-    }
+    backend._config = worker_config
     projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
     try:
         assert backend._call_magemin(
@@ -675,10 +700,15 @@ def test_successful_magemin_worker_call_writes_no_timeout_record(tmp_path):
 @pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
+    worker_config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 2.0,
+    }
     pool = engine_pool.EngineWorkerPool(
         lambda index: engine_pool.WarmEngineWorker(
             name=f'fake MAGEMin slot {index}',
             bootstrap=_bootstrap_sleeping_magemin_worker,
+            bootstrap_args=('/fake/MAGEMin', 'ig', worker_config),
             handler=_handle_reusable_magemin_request,
             startup_timeout_s=2.0,
             call_timeout_s=30.0,
@@ -715,10 +745,7 @@ def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
 
     backend = _make_pooled_subprocess_backend(None)
     backend._subprocess_pool = pool
-    backend._config = {
-        'warm_call_timeout_s': 0.05,
-        'worker_startup_timeout_s': 2.0,
-    }
+    backend._config = worker_config
     projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
     submitted = []
     original_submit = pool.submit
@@ -872,6 +899,10 @@ def test_magemin_phase_composition_projection_pin_has_no_repair_warning():
 
 def test_magemin_reinitialize_closes_existing_warm_pool(monkeypatch):
     class FakePool:
+        workers = (types.SimpleNamespace(
+            name='MAGEMin subprocess pool slot 0',
+            _bootstrap_args=('/fake/MAGEMin', 'ig', {}),
+        ),)
         close_calls = 0
 
         def close(self, *, cancel_pending=False):
@@ -1004,11 +1035,12 @@ def test_magemin_cold_start_envelope_covers_spawn_startup_and_solve(
 
     pool = ScheduledPool()
     backend = _make_pooled_subprocess_backend(None)
-    backend._subprocess_pool = pool
     backend._config = {
         'warm_call_timeout_s': 15.0,
         'worker_startup_timeout_s': 30.0,
     }
+    _attach_fake_magemin_worker(pool, backend)
+    backend._subprocess_pool = pool
     projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
 
     if should_timeout:
@@ -1289,7 +1321,12 @@ def test_magemin_liquidus_uses_same_hang_guard_for_all_modes(
     backend._bridge = 'subprocess'
     backend._binary_path = Path('/fake/MAGEMin')
     backend._config = {}
-    backend._subprocess_pool = object() if pooled else None
+    if pooled:
+        pool = types.SimpleNamespace()
+        _attach_fake_magemin_worker(pool, backend)
+        backend._subprocess_pool = pool
+    else:
+        backend._subprocess_pool = None
 
     backend.find_liquidus_solidus(
         composition_mol={'SiO2': 1.0, 'MgO': 1.0},
@@ -3114,6 +3151,51 @@ def test_magemin_subprocess_argument_vector_matches_golden():
         '--buffer_n=0.000000',
     ]
     assert (buffer_name, buffer_n) == ('nno', 0.0)
+
+
+def test_magemin_pure_phase_probe_argument_vector_is_preserved(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    backend = MAGEMinBackend()
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = {'fO2_buffer': 'nno', 'timeout_s': 2.0}
+    buffer_name, buffer_n, buffer_warnings = backend._resolve_buffer(
+        temperature_C=1200.0,
+        fO2_log=-9.0,
+    )
+    captured: dict[str, object] = {}
+
+    def run(args, **kwargs):
+        captured['args'] = args
+        output = Path(kwargs['cwd']) / 'output' / '_matlab_output.txt'
+        output.parent.mkdir(parents=True)
+        output.write_text('matlab output', encoding='utf-8')
+        return types.SimpleNamespace(returncode=0, stdout='probe stdout', stderr='')
+
+    monkeypatch.setattr('simulator.melt_backend.magemin.subprocess.run', run)
+
+    stdout, matlab_text, warnings = backend._run_pure_phase_probe(
+        bulk_wt_ig={'SiO2': 49.123456789, 'MgO': 9.0},
+        temperature_C=1200.0,
+        pressure_kbar=2.0,
+    )
+
+    assert captured['args'] == [
+        '/fake/MAGEMin',
+        '--Verb=1',
+        '--db=ig',
+        '--Temp=1200.000000',
+        '--Pres=2.000000',
+        '--sys_in=wt',
+        '--Bulk=49.123457,0.000000,0.000000,9.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000',
+        f'--buffer={buffer_name}',
+        f'--buffer_n={buffer_n:.6f}',
+        '--out_matlab=1',
+    ]
+    assert (stdout, matlab_text, warnings) == (
+        'probe stdout', 'matlab output', list(buffer_warnings)
+    )
 
 
 def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
