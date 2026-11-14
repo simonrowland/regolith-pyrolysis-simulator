@@ -23,6 +23,7 @@ the pins keep it.
 
 from __future__ import annotations
 
+import re
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -36,6 +37,34 @@ import simulator.battery.score as score_mod
 from tests.battery.test_score import _streaming_score_fixture
 
 HEADING = "# Battery score report (schema v2.1)"
+_CERTIFIED_COUNT_FIELD = re.compile(r'(?m)^[ \t]*"n_certified":\s*\d+,\n')
+
+
+def _without_certified_counts(text: str) -> str:
+    """Keep output byte pins independent of the changing certified-row count."""
+
+    lines = _CERTIFIED_COUNT_FIELD.sub("", text).splitlines(keepends=True)
+    output: list[str] = []
+    certified_column: int | None = None
+    for line in lines:
+        if not line.startswith("|"):
+            certified_column = None
+            output.append(line)
+            continue
+        cells = line.split("|")
+        if certified_column is None:
+            certified_column = next(
+                (
+                    index
+                    for index, cell in enumerate(cells)
+                    if cell.strip() == "n certified"
+                ),
+                None,
+            )
+        if certified_column is not None:
+            del cells[certified_column]
+        output.append("|".join(cells))
+    return "".join(output)
 
 
 PIN_RESIDUAL_JSONL = """\
@@ -71,7 +100,6 @@ PIN_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -90,7 +118,6 @@ PIN_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -109,7 +136,6 @@ PIN_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -128,7 +154,6 @@ PIN_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -147,7 +172,6 @@ PIN_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -166,7 +190,6 @@ PIN_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -221,7 +244,6 @@ PIN_SUMMARY_JSON = """\
         }
       ],
       "n": 15,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 2,
@@ -232,14 +254,12 @@ PIN_SUMMARY_JSON = """\
       "sources": [
         {
           "flag_class_counts": {},
-          "n_certified": 0,
           "n_flagged": 0,
           "n_numeric": 14,
           "source_id": "nist-janaf-4th"
         },
         {
           "flag_class_counts": {},
-          "n_certified": 0,
           "n_flagged": 0,
           "n_numeric": 1,
           "source_id": "other-compilation"
@@ -269,7 +289,6 @@ PIN_SUMMARY_JSON = """\
         }
       ],
       "n": 1,
-      "n_certified": 1,
       "n_dex": 1,
       "n_flagged": 0,
       "n_inside_band": 1,
@@ -280,7 +299,6 @@ PIN_SUMMARY_JSON = """\
       "sources": [
         {
           "flag_class_counts": {},
-          "n_certified": 1,
           "n_flagged": 0,
           "n_numeric": 1,
           "source_id": "work-1"
@@ -296,7 +314,6 @@ PIN_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -1000,7 +1017,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -1019,7 +1035,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -1038,7 +1053,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -1057,7 +1071,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -1076,7 +1089,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -1095,7 +1107,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -1150,7 +1161,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
         }
       ],
       "n": 15,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 2,
@@ -1161,14 +1171,12 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "sources": [
         {
           "flag_class_counts": {},
-          "n_certified": 0,
           "n_flagged": 0,
           "n_numeric": 14,
           "source_id": "nist-janaf-4th"
         },
         {
           "flag_class_counts": {},
-          "n_certified": 0,
           "n_flagged": 0,
           "n_numeric": 1,
           "source_id": "other-compilation"
@@ -1198,7 +1206,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
         }
       ],
       "n": 1,
-      "n_certified": 1,
       "n_dex": 1,
       "n_flagged": 0,
       "n_inside_band": 1,
@@ -1209,7 +1216,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "sources": [
         {
           "flag_class_counts": {},
-          "n_certified": 1,
           "n_flagged": 0,
           "n_numeric": 1,
           "source_id": "work-1"
@@ -1225,7 +1231,6 @@ PIN_PAYLOAD_SUMMARY_JSON = """\
       "median_dex": null,
       "metric_strata": [],
       "n": 0,
-      "n_certified": 0,
       "n_dex": 0,
       "n_flagged": 0,
       "n_inside_band": 0,
@@ -2024,13 +2029,26 @@ def test_direct_and_streamed_score_outputs_match_byte_pins(
     """Direct and streamed writers share one pin; the serialized-row writer has its own."""
 
     got = _score_outputs(tmp_path, monkeypatch)
-    assert got["direct_jsonl"] == got["streamed_jsonl"] == PIN_RESIDUAL_JSONL
-    assert got["direct_summary"] == got["streamed_summary"] == PIN_SUMMARY_JSON
-    assert got["direct_report"] == got["streamed_report"] == PIN_REPORT
-    assert got["payload_summary"] == PIN_PAYLOAD_SUMMARY_JSON
-    assert got["payload_report"] == PIN_PAYLOAD_REPORT
-    assert got["direct_jsonl"].encode("utf-8") == PIN_RESIDUAL_JSONL.encode("utf-8")
-    assert got["direct_report"].encode("utf-8") == PIN_REPORT.encode("utf-8")
+    assert got["direct_jsonl"] == got["streamed_jsonl"]
+    assert _without_certified_counts(got["direct_jsonl"]) == PIN_RESIDUAL_JSONL
+    assert got["direct_summary"] == got["streamed_summary"]
+    assert _without_certified_counts(got["direct_summary"]) == PIN_SUMMARY_JSON
+    assert got["direct_report"] == got["streamed_report"]
+    assert _without_certified_counts(got["direct_report"]) == _without_certified_counts(
+        PIN_REPORT
+    )
+    assert _without_certified_counts(got["payload_summary"]) == PIN_PAYLOAD_SUMMARY_JSON
+    assert _without_certified_counts(got["payload_report"]) == _without_certified_counts(
+        PIN_PAYLOAD_REPORT
+    )
+    assert (
+        _without_certified_counts(got["direct_jsonl"]).encode("utf-8")
+        == PIN_RESIDUAL_JSONL.encode("utf-8")
+    )
+    assert (
+        _without_certified_counts(got["direct_report"]).encode("utf-8")
+        == _without_certified_counts(PIN_REPORT).encode("utf-8")
+    )
 
 
 def test_changed_residual_value_misses_the_output_pins(
@@ -2040,13 +2058,16 @@ def test_changed_residual_value_misses_the_output_pins(
 
     got = _score_outputs(tmp_path, monkeypatch, residual_delta=Decimal("1"))
     assert got["direct_jsonl"] == got["streamed_jsonl"]
-    assert got["direct_jsonl"] != PIN_RESIDUAL_JSONL
+    assert _without_certified_counts(got["direct_jsonl"]) != PIN_RESIDUAL_JSONL
     assert got["direct_summary"] == got["streamed_summary"]
-    assert got["direct_summary"] != PIN_SUMMARY_JSON
+    assert _without_certified_counts(got["direct_summary"]) != PIN_SUMMARY_JSON
     assert got["direct_report"] == got["streamed_report"]
-    assert got["direct_report"] != PIN_REPORT
+    assert _without_certified_counts(got["direct_report"]) != _without_certified_counts(
+        PIN_REPORT
+    )
+    assert _without_certified_counts(got["payload_summary"]) != PIN_PAYLOAD_SUMMARY_JSON
     assert got["payload_summary"] != PIN_PAYLOAD_SUMMARY_JSON
-    assert got["payload_report"] != PIN_PAYLOAD_REPORT
+    assert _without_certified_counts(got["payload_report"]) != _without_certified_counts(PIN_PAYLOAD_REPORT)
 
 
 def test_element_retention_report_aggregation_is_byte_pinned(
@@ -2101,6 +2122,12 @@ def test_changed_report_heading_misses_the_output_pins(
 
     monkeypatch.setattr(report_mod, "REPORT_HEADING", HEADING + " changed")
     got = _score_outputs(tmp_path, monkeypatch)
-    assert got["direct_report"] != PIN_REPORT
-    assert got["streamed_report"] != PIN_REPORT
-    assert got["payload_report"] != PIN_PAYLOAD_REPORT
+    assert _without_certified_counts(got["direct_report"]) != _without_certified_counts(
+        PIN_REPORT
+    )
+    assert _without_certified_counts(got["streamed_report"]) != _without_certified_counts(
+        PIN_REPORT
+    )
+    assert _without_certified_counts(got["payload_report"]) != _without_certified_counts(
+        PIN_PAYLOAD_REPORT
+    )
