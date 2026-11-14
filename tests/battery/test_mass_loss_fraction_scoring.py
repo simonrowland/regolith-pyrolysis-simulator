@@ -20,6 +20,7 @@ from simulator.battery.enums import (
 from simulator.battery.migrate import (
     LITERATURE,
     Migrator,
+    experiment_from_plain,
     load_migrated_store,
     load_yaml,
     sample_from_equipment,
@@ -584,6 +585,18 @@ def test_richter_table1_residue_points_use_the_separate_starting_material_row(
     fresh_mass_loss_extracts,
 ) -> None:
     richter_result, _markova_result = fresh_mass_loss_extracts
+    source_document = load_yaml(
+        LITERATURE / "extracts" / "kems-010-richter-2007.yaml"
+    )
+    starting_material_source = next(
+        experiment
+        for experiment in source_document["experiments"]
+        if experiment.get("experiment_id") == "type-b-cai-like-lab-melt"
+    )
+    starting_material = experiment_from_plain(starting_material_source).sample
+    expected_printed = starting_material.printed_composition
+    expected_initial = starting_material.initial_composition
+    assert expected_printed is not None and expected_initial is not None
     residue_rows = [
         row
         for row in richter_result.observations.values()
@@ -597,7 +610,16 @@ def test_richter_table1_residue_points_use_the_separate_starting_material_row(
     }
 
     assert len(residue_rows) == 204
-    assert len({row.experiment_id for row in residue_rows}) == 51
+    experiment_ids = {row.experiment_id for row in residue_rows}
+    assert len(experiment_ids) == 51
+    for experiment_id in experiment_ids:
+        sample = richter_result.experiments[experiment_id].sample
+        assert sample.printed_composition is not None
+        assert sample.printed_composition.state.value == expected_printed.state.value
+        assert sample.printed_composition.locator == expected_printed.locator
+        assert sample.initial_composition is not None
+        assert sample.initial_composition.state.value == expected_initial.state.value
+        assert sample.initial_composition.locator == expected_initial.locator
     for row in residue_rows:
         starting = row.point_conditions["starting_composition"]
         assert starting.state.value == expected, row.experiment_id

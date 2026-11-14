@@ -166,6 +166,19 @@ def test_richter_2007_scores_through_score_store_with_area_and_pressure_flags(
     assert primary.provenance["initial_area_mm2"] == pytest.approx(24.0)
     assert primary.provenance["thermal_schedule_duration_s"] == pytest.approx(5100.0)
     assert primary.provenance["area_uncertainty_percent"] == pytest.approx(10.0)
+    liquid_rows_used = primary.provenance["liquid_rows_used"]
+    assert any(
+        row["temperature_K"] == pytest.approx(1183.15)
+        and row["liquid_row"]["row"] == "SiO2(l)"
+        and row["liquid_row"]["extrapolated_below_floor"]
+        for row in liquid_rows_used
+    )
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.reason == "extrapolated_below_floor"
+        and notice.band == "SiO2(l) [1200, 1500] K"
+        for notice in residual.notices
+    )
     integration = primary.provenance["integration"]
     final_step_s = primary.provenance["thermal_schedule_step_s_by_geometry"]
     for geometry, differences in integration[

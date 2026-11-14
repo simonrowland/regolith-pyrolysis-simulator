@@ -24983,9 +24983,9 @@ class Migrator:
         experiments = doc.get("experiments")
         if not isinstance(experiments, list):
             return doc
-        starting_material = next(
+        starting_material_sample = next(
             (
-                item.get("sample", {}).get("printed_composition")
+                item.get("sample")
                 for item in experiments
                 if isinstance(item, Mapping)
                 and item.get("experiment_id") == "type-b-cai-like-lab-melt"
@@ -25000,6 +25000,16 @@ class Migrator:
                 == "Starting material"
             ),
             None,
+        )
+        starting_material = (
+            starting_material_sample.get("printed_composition")
+            if starting_material_sample is not None
+            else None
+        )
+        starting_initial_composition = (
+            starting_material_sample.get("initial_composition")
+            if starting_material_sample is not None
+            else None
         )
         enriched = []
         for experiment in experiments:
@@ -25025,9 +25035,15 @@ class Migrator:
             )
             if sample is not None and starting_material is not None:
                 # Table 1 residue compositions are measurements, not the
-                # shared starting charge. Correct every run, including rows
-                # without printed initial mass/area.
+                # shared starting charge. Correct both existing source
+                # representations from that row; leave a missing typed value
+                # for the normal downstream initializer to resolve.
                 sample["printed_composition"] = starting_material
+                if (
+                    starting_initial_composition is not None
+                    and isinstance(sample.get("initial_composition"), Mapping)
+                ):
+                    sample["initial_composition"] = starting_initial_composition
             if measurement is not None:
                 mass_mg, area_mm2, source_locator = measurement
                 source_locator = dict(source_locator)

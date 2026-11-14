@@ -3503,7 +3503,11 @@ def _predict_langmuir_residue_cohort(
         runtime_alpha_records: list[dict[str, Any]] = []
         runtime_omissions: list[dict[str, str]] = []
         active_liquid_rows: dict[str, list[dict[str, Any]]] = {
-            "common": list(setup.common_liquid_rows),
+            "common": (
+                list(setup.common_liquid_rows)
+                if source_id == HASHIMOTO_SOURCE_ID
+                else []
+            ),
             "runtime": [],
         }
         for species, (parent, _parent_moles, _pO2_exponent) in gas_channels:
@@ -3521,9 +3525,8 @@ def _predict_langmuir_residue_cohort(
                     {"channel": species, "alpha_value": 1.0, "alpha_assumed": True,
                      "alpha_source": "assumed oxygen-gas alpha=1.0; not measured"}
                 )
-                active_liquid_rows["runtime"].append(
-                    row_by_channel[species]
-                )
+                if source_id == HASHIMOTO_SOURCE_ID:
+                    active_liquid_rows["runtime"].append(row_by_channel[species])
                 continue
 
             catalog_name, catalog_row = setup.catalog_matches[species]
@@ -3580,14 +3583,53 @@ def _predict_langmuir_residue_cohort(
                     ),
                 }
             )
-            active_liquid_rows["runtime"].append(
-                row_by_channel[species]
-            )
+            if source_id == HASHIMOTO_SOURCE_ID:
+                active_liquid_rows["runtime"].append(row_by_channel[species])
 
         if not any(channel.parent_oxide for channel in runtime_channels):
             raise ResidueInventoryRefusal("hashimoto_runtime_alpha_channels_missing")
 
         pressure_models_by_temperature = {temperature_K: pressure_model}
+
+        schedule_liquid_rows_by_temperature: dict[
+            float, tuple[dict[str, Any], ...]
+        ] = {}
+        used_liquid_row_temperatures: dict[str, set[tuple[float, str]]] = {
+            "common": set(),
+            "runtime": set(),
+        }
+
+        def record_schedule_liquid_rows(
+            alpha_arm: str,
+            at_K: float,
+            active_channels: Sequence[ResidueChannel],
+        ) -> None:
+            if source_id == HASHIMOTO_SOURCE_ID:
+                return
+            if at_K not in schedule_liquid_rows_by_temperature:
+                schedule_liquid_rows_by_temperature[at_K] = (
+                    _hashimoto_liquid_row_provenance(
+                        gas_pack, gas_channels, at_K
+                    )
+                )
+            row_key = (
+                "common"
+                if alpha_arm == "alpha_common_unity_sensitivity"
+                else "runtime"
+            )
+            active_species = {channel.species for channel in active_channels}
+            for row in schedule_liquid_rows_by_temperature[at_K]:
+                species = str(row.get("channel") or "")
+                key = (at_K, species)
+                if (
+                    species not in active_species
+                    or key in used_liquid_row_temperatures[row_key]
+                ):
+                    continue
+                active_liquid_rows[row_key].append(
+                    {**row, "temperature_K": at_K}
+                )
+                used_liquid_row_temperatures[row_key].add(key)
 
         def pressure_model_at_temperature(at_K: float):
             model = pressure_models_by_temperature.get(at_K)
@@ -3611,41 +3653,38 @@ def _predict_langmuir_residue_cohort(
 
         def channels_at_temperature(alpha_arm: str, at_K: float):
             if alpha_arm == "alpha_common_unity_sensitivity":
-                return common_channels
-            channels_at_T = []
-            for channel in runtime_channels:
-                if channel.parent_oxide is None:
-                    channels_at_T.append(channel)
-                    continue
-                catalog_name, _catalog_row = setup.catalog_matches[
-                    channel.species
-                ]
-                alpha_spec = setup.alpha_specs.get(catalog_name)
-                if alpha_spec is None:
-                    raise ResidueInventoryRefusal(
-                        "evaporation_coefficients_not_sourced", channel.species
-                    )
-                alpha_context = {"coefficient_spec": alpha_spec}
-                try:
-                    alpha = float(alpha_s(catalog_name, at_K, alpha_context))
-                except (TypeError, ValueError, ArithmeticError) as exc:
-                    raise ResidueInventoryRefusal(
-                        "evaporation_coefficients_invalid", channel.species
-                    ) from exc
-                if not math.isfinite(alpha) or not 0.0 <= alpha <= 1.0:
-                    raise ResidueInventoryRefusal(
-                        "evaporation_coefficients_invalid", channel.species
-                    )
-                channels_at_T.append(replace(channel, alpha=alpha))
+                channels_at_T = tuple(common_channels)
+            else:
+                channels_at_T = []
+                for channel in runtime_channels:
+                    if channel.parent_oxide is None:
+                        channels_at_T.append(channel)
+                        continue
+                    catalog_name, _catalog_row = setup.catalog_matches[
+                        channel.species
+                    ]
+                    alpha_spec = setup.alpha_specs.get(catalog_name)
+                    if alpha_spec is None:
+                        raise ResidueInventoryRefusal(
+                            "evaporation_coefficients_not_sourced", channel.species
+                        )
+                    alpha_context = {"coefficient_spec": alpha_spec}
+                    try:
+                        alpha = float(
+                            alpha_s(catalog_name, at_K, alpha_context)
+                        )
+                    except (TypeError, ValueError, ArithmeticError) as exc:
+                        raise ResidueInventoryRefusal(
+                            "evaporation_coefficients_invalid", channel.species
+                        ) from exc
+                    if not math.isfinite(alpha) or not 0.0 <= alpha <= 1.0:
+                        raise ResidueInventoryRefusal(
+                            "evaporation_coefficients_invalid", channel.species
+                        )
+                    channels_at_T.append(replace(channel, alpha=alpha))
+                channels_at_T = tuple(channels_at_T)
+            record_schedule_liquid_rows(alpha_arm, at_K, channels_at_T)
             return tuple(channels_at_T)
-
-        schedule_liquid_rows = {temperature_K: setup.liquid_rows}
-        if source_id != HASHIMOTO_SOURCE_ID:
-            for at_K, _seconds in thermal_schedule_segments:
-                if at_K not in schedule_liquid_rows:
-                    schedule_liquid_rows[at_K] = _hashimoto_liquid_row_provenance(
-                        gas_pack, gas_channels, at_K
-                    )
 
         arm_channels = (
             ("alpha_common_unity_sensitivity", common_channels, common_alpha_records, "common"),
