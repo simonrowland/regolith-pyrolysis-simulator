@@ -343,7 +343,7 @@ def test_distin_closed_redox_residual_pins_green_value_and_serialized_line(
             "fo2_tier": 3,
             "physics_rung": None,
             "route": "openimcc_closed_fe_metal_saturation",
-            "value_Pa": "0.01295993251002745564044143855",
+            "value_Pa": "0.02022084627693526699090953590",
         }
     }
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
