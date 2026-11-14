@@ -11181,6 +11181,7 @@ def test_complete_ancestry_outputs_are_pinned() -> None:
         unprinted.observation_id,
         table_reader.observation_id,
         "pin-table",
+        work.work_id,
     }
 
     def assert_alias_complete() -> None:
@@ -12214,7 +12215,7 @@ def test_registered_read_from_stays_out_of_the_lineage() -> None:
     works = {work.work_id: work}
     table_ids = _table_ids(works)
     corpus = _asset_ids(works)
-    member_ids = frozenset({row.observation_id, "nasa-cea-thermo"})
+    member_ids = frozenset({row.observation_id, "nasa-cea-thermo", work.work_id})
 
     def check() -> None:
         direct = _observation_lineage(
@@ -12310,7 +12311,7 @@ def test_cross_work_registered_asset_resolves_on_both_paths() -> None:
     table_ids = _table_ids(works)
     corpus = _asset_ids(works)
     direct_ids = frozenset({child.observation_id, parent.observation_id})
-    alias_ids = direct_ids | {"wa-table"}
+    alias_ids = direct_ids | {"wa-table", wa.work_id}
 
     def check() -> None:
         direct = _observation_lineage(
@@ -12614,7 +12615,7 @@ def test_registered_doi_work_without_loaded_members_uses_work_identity() -> None
     )
 
     assert resolved.complete
-    assert resolved.ids == frozenset({work.work_id})
+    assert resolved.ids == frozenset({work.work_id, "nasa-cea-thermo"})
 
     reference = F.observation(
         "registered-doi-work-identity-row",
@@ -12741,12 +12742,126 @@ def test_registered_doi_work_resolves_its_member_ancestry() -> None:
     assert resolved.ids == frozenset(
         {
             "nasa-cea-thermo",
+            registered_work.work_id,
             root.observation_id,
             member.observation_id,
             registered_row.observation_id,
         }
     )
     assert f"doi:{doi}" not in resolved.ids
+
+
+def test_memberless_table_work_is_same_source_in_full_and_filtered_contexts() -> None:
+    import simulator.battery.score as score_module
+    from simulator.battery.validate import (
+        _build_validation_indexes,
+        _observation_lineage,
+        _resolve_coefficient_sources,
+    )
+
+    doi = "10.1234/memberless-table-work"
+    source_work = replace(F.work("memberless-table-work"), doi=doi)
+    pdf, table = source_work.source_files.files
+    table_asset = "memberless-source-table"
+    source_work = replace(
+        source_work,
+        source_files=replace(
+            source_work.source_files,
+            files=(pdf, replace(table, asset_id=table_asset)),
+        ),
+    )
+    source_experiment = F.tabulation_experiment(
+        experiment_id="memberless-table-work-exp", work_id=source_work.work_id
+    )
+    reference_work = replace(
+        F.work("cross-work-table-reference"), doi=None
+    )
+    reference_experiment = F.tabulation_experiment(
+        experiment_id="cross-work-table-reference-exp",
+        work_id=reference_work.work_id,
+    )
+    reference = F.observation(
+        "cross-work-table-derived-reference",
+        reference_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0.1"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id=reference_work.work_id,
+        derived_from=(),
+        derivation=Derivation(
+            relation="derived from a registered work table",
+            inputs=(table_asset,),
+            parameters=(),
+            output_unit="dimensionless",
+        ),
+    )
+    unrelated_work = F.work("unrelated-loaded-work")
+    unrelated_experiment = F.tabulation_experiment(
+        experiment_id="unrelated-loaded-work-exp", work_id=unrelated_work.work_id
+    )
+    unrelated = F.observation(
+        "unrelated-loaded-row",
+        unrelated_experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=unrelated_work.work_id,
+    )
+    works = {
+        work.work_id: work
+        for work in (source_work, reference_work, unrelated_work)
+    }
+    experiments = {
+        experiment.experiment_id: experiment
+        for experiment in (
+            source_experiment,
+            reference_experiment,
+            unrelated_experiment,
+        )
+    }
+    source = (f"doi:{doi}",)
+
+    for observations in (
+        {reference.observation_id: reference, unrelated.observation_id: unrelated},
+        {reference.observation_id: reference},
+    ):
+        resolved = _resolve_coefficient_sources(
+            source, observations, works, experiments
+        )
+        assert resolved.complete
+        assert resolved.ids == frozenset({source_work.work_id, table_asset})
+        assert (
+            score_module.resolve_source_relation(
+                reference,
+                source,
+                True,
+                works=works,
+                observations=observations,
+                experiments=experiments,
+            )
+            is SourceRelation.SAME_INPUT
+        )
+
+        indexes = _build_validation_indexes(works, observations, experiments)
+        cached_reference = _observation_lineage(
+            reference.observation_id,
+            observations,
+            indexes.table_ids,
+            asset_ids=indexes.asset_ids,
+            _cache=indexes.observation_lineages,
+        )
+        assert cached_reference.complete
+        resolved_reference = score_module._reference_lineage_with_work_doi(
+            reference, indexes
+        )
+        assert resolved_reference.ids is not None
+        assert reference_work.work_id in resolved_reference.ids
+        resolver = score_module._ScoringLineageResolver(
+            score_module.ScoreContext(works, experiments, observations), indexes
+        )
+        complete, relation = resolver.for_reference(reference, source)
+        assert complete
+        assert relation is SourceRelation.SAME_INPUT
 
 
 @pytest.mark.parametrize(
