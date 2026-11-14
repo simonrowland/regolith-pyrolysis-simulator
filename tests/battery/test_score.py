@@ -8287,6 +8287,43 @@ def test_alphamelts_invalid_activity_notice_reaches_typed_score_notice() -> None
     assert all(notice.origin == 'engine:alphamelts' for notice in scored_notices)
 
 
+def test_hashimoto_channel_omissions_become_row_input_omitted_notices() -> None:
+    from simulator.battery.score import _hashimoto_channel_omission_notices
+
+    gas_notices = _hashimoto_channel_omission_notices(
+        (
+            {
+                "kind": NoticeKind.INPUT_OMITTED.value,
+                "reason": "gas channel AlSiO omitted: missing active table row",
+            },
+        ),
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        origin="hashimoto-openimcc-gas-channel",
+    )
+    runtime_notices = _hashimoto_channel_omission_notices(
+        (
+            {
+                "kind": NoticeKind.INPUT_OMITTED.value,
+                "channel": "Si2O2",
+                "reason": "runtime_catalog_channel_missing",
+            },
+        ),
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        origin="hashimoto-runtime-catalog",
+    )
+
+    assert [notice.kind for notice in (*gas_notices, *runtime_notices)] == [
+        NoticeKind.INPUT_OMITTED,
+        NoticeKind.INPUT_OMITTED,
+    ]
+    assert "AlSiO" in gas_notices[0].reason
+    assert runtime_notices[0].reason == "Si2O2: runtime_catalog_channel_missing"
+    assert all(
+        notice.affected_quantities == (Quantity.RESIDUE_COMPONENT_COMPOSITION,)
+        for notice in (*gas_notices, *runtime_notices)
+    )
+
+
 def _hero_deck_score_row(
     *,
     rail: str,
