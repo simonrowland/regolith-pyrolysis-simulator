@@ -426,7 +426,16 @@ def test_b127_uncovered_antoine_segment_predicts_and_flags_not_100_pa() -> None:
         efficiency_outcomes=outcomes,
     )
     assert 0.0 < eta <= 1.0
-    assert outcomes == []
+    # d-019 predicts outside the wall-thermochemistry interval and carries
+    # that extrapolation onto the stage outcome instead of dropping its flag.
+    assert any(
+        outcome.get("species") == "Na"
+        and outcome.get("stage_number") == stage.stage_number
+        and outcome.get("status") == "extrapolated"
+        and outcome.get("authority_level") == "extrapolated"
+        and outcome.get("eta") == pytest.approx(eta)
+        for outcome in outcomes
+    )
     assert any(
         record.get("status") == "extrapolated"
         and tuple(record.get("valid_range_K", ())) == valid_range
