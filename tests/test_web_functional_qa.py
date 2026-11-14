@@ -1,5 +1,6 @@
 import json
 import math
+import shutil
 import subprocess
 import time
 from pathlib import Path
@@ -134,6 +135,7 @@ def _close_web_driver(driver):
         client.disconnect()
     for sid in set(_simulations) - driver["before"]:
         _clear_simulation_state(sid)
+    shutil.rmtree(driver["run_dir"], ignore_errors=True)
 
 
 @pytest.fixture
