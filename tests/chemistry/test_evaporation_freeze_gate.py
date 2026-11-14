@@ -701,7 +701,10 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((1018.75, 0.0), (1320.3125, 1.0)),
             ),
         ],
-        # Executable capture: 12 hours, six hour-local curve reads per hour.
+        # Six standing reads occur in each of 12 hours. d-376 amendment 1's
+        # evaluated-pO2 capacity check also reads the liquid-fraction gate at
+        # evaporation.py:1561 in hours 10 and 11, adding one read in each.
+        # These are required consumers; all 74 records retain the same curve.
         'ci_carbonaceous_chondrite_C2B_12h': [
             (
                 'C2B',
@@ -710,7 +713,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1200.000001,
                 ((1200.0, 0.0), (1200.000001, 1.0)),
             ),
-        ] * 72,
+        ] * 74,
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}

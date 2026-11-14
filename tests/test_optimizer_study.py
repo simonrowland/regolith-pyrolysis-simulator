@@ -3791,11 +3791,13 @@ def test_parallel_composition_target_stub_study_completes(
     # 1400-2200 C map was about 1667 C, which is the SiO wall-fit hole:
     # Psat is refused at 1773.15 K, inside the published 1400-2273.15 K
     # numeric range but outside the finite positive-denominator branch. At
-    # 746.67 C the three base points are no longer SiO-refused and remain the
-    # priced Pareto. The thermo step s003 still sits on the
-    # 2200 C ceiling and still refuses SiO at 1773.15 K on
-    # stage_0_to_stage_1 and stage_1_to_stage_2. t-1368 still owns that
-    # rail; s003 stays feasible, unpriced, and off the Pareto.
+    # 746.67 C the three base points are no longer SiO-refused, have no wall
+    # deposit, and remain the priced Pareto. The thermo step s003 still sits
+    # on the 2200 C ceiling and refuses SiO at 1773.15 K on
+    # stage_0_to_stage_1 and stage_1_to_stage_2. d-401 books its positive
+    # supply upper bound, so s003 has a finite deposit/lifetime projection
+    # and objective values; it remains feasible but is dominated on the
+    # Pareto objectives.
     priced_ids = {
         "morris-screen-0-t0000-s000",
         "morris-screen-0-t0000-s001",
@@ -3816,24 +3818,36 @@ def test_parallel_composition_target_stub_study_completes(
     for candidate in result.records:
         summary = candidate.product_summary
         if candidate.candidate_id in priced_ids:
-            assert summary["furnace_amortization_status"] in {
-                "available",
-                "resinter_threshold_ungrounded",
-            }
+            assert summary["furnace_amortization_status"] == "available"
+            assert summary["wall_deposit_total_kg"] == 0.0
+            assert summary["has_positive_qualified_fouling"] is False
+            assert summary["campaigns_to_resinter_worst_segment"] == "infinite"
             refusal = summary.get("wall_deposit_refusal") or {}
             authority = refusal.get("authority") or {}
             refused = authority.get("wall_saturation_pressure_refused_species") or []
             assert "SiO" not in refused
         else:
             assert candidate.candidate_id == hot_id
-            assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-            refusal = summary["wall_deposit_refusal"]
-            authority = refusal["authority"]
-            assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
-            assert authority["wall_saturation_pressure_refused_species"] == ["SiO"]
-            sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
-                "SiO"
-            ]
+            assert summary["furnace_amortization_status"] == (
+                "resinter_threshold_ungrounded"
+            )
+            assert summary["lifespan_cost_status"] == "threshold_unavailable"
+            assert summary["has_positive_qualified_fouling"] is True
+            assert summary["furnace_amortization_batch_cost_equivalents"] is None
+            assert summary.get("wall_deposit_refusal") is None
+            assert candidate.objectives
+            assert any(
+                value is not None and math.isfinite(float(value))
+                for value in candidate.objectives.values()
+            )
+
+        wall_authority = summary["wall_deposit_sticking_authority"]
+        refused = wall_authority.get("wall_saturation_pressure_refused_species") or []
+        if candidate.candidate_id == hot_id:
+            assert "SiO" in list(refused)
+            sio_refusals = wall_authority[
+                "wall_saturation_pressure_refusals_by_species"
+            ]["SiO"]
             assert set(sio_refusals) == {
                 "stage_0_to_stage_1",
                 "stage_1_to_stage_2",
@@ -3843,17 +3857,15 @@ def test_parallel_composition_target_stub_study_completes(
                 and record["temperature_K"] == pytest.approx(1773.15)
                 for record in sio_refusals.values()
             )
-
-        wall_authority = summary["wall_deposit_sticking_authority"]
-        refused = wall_authority.get("wall_saturation_pressure_refused_species") or []
-        if candidate.candidate_id == hot_id:
-            assert "SiO" in list(refused)
             assert summary["wall_deposit_upper_bound_used"] is True
             bounds = summary[
                 "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
             ]
             assert 0.0 < bounds["SiO"] < 0.5
             assert summary["wall_deposit_total_kg"] == pytest.approx(bounds["SiO"])
+            assert summary["campaigns_to_resinter_worst_segment"].startswith(
+                "resinter_threshold_kg / "
+            )
             assert summary["supply_interval_upper_bound_used"]["SiO"] > 0
             bookings = summary["wall_supply_bound_bookings"]
             assert len(bookings) == 1
