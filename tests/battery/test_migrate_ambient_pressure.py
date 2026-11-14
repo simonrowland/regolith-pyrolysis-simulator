@@ -31,6 +31,7 @@ def _ambient_pressure_result(
     exploded: bool = False,
     pressure_basis: str | None = None,
     residue_container: str | None = None,
+    oxygen_buffer_as_published: str | None = None,
 ):
     source_id = "ambient-pressure-fixture"
     extract_dir = tmp_path / "data" / "literature" / "extracts"
@@ -53,6 +54,8 @@ def _ambient_pressure_result(
             if exploded
             else {"P": 25}
         )
+        if oxygen_buffer_as_published is not None:
+            partial_values["oxygen_buffer_as_published"] = oxygen_buffer_as_published
         observation = {
             "observation_id": "partial-pressure",
             "experiment": "open",
@@ -306,6 +309,20 @@ def test_open_furnace_evidence_fills_required_pressure_with_authority_and_notice
         entry.axes == ["total_pressure_Pa"]
         and entry.why == "source does not state a numeric total_pressure_Pa"
         for entry in migrator.result.queue
+    )
+
+
+def test_open_furnace_pressure_refreshes_applied_buffer_fugacity(tmp_path) -> None:
+    _migrator, observation = _ambient_pressure_result(
+        tmp_path,
+        quantity=Quantity.P_PARTIAL,
+        oxygen_buffer_as_published="IW",
+    )
+
+    assert observation.identity.total_pressure_Pa.value == Decimal("101325")
+    assert observation.identity.fO2_Pa.is_value
+    assert observation.identity.fO2_Pa.value == Decimal(
+        "6.373994896233276620146294356E-12"
     )
 
 

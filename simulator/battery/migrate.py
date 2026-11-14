@@ -27799,6 +27799,7 @@ class Migrator:
         # Residue fO2 is the printed-only promotion above. The generic
         # decision covers every other quantity, including a derived ratio
         # copied from the row point.
+        oxygen_applied = False
         if (
             q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             and oxygen_state is not None
@@ -27807,6 +27808,7 @@ class Migrator:
             )
         ):
             ident_kwargs["fO2_Pa"] = oxygen_state
+            oxygen_applied = True
         identity_for_profile = (
             Identity(
                 quantity=State.of(q_token),
