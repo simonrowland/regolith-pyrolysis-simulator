@@ -32,6 +32,7 @@ from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Protocol
 
 import yaml
 
+from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -1140,7 +1141,7 @@ def parse_species_formula(
     text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
-    text = text.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
+    text = fold_subscript_digits(text)
     # formula_composition reads the ASCII-dot water-adduct separator as a
     # decimal count. Refuse that normalized form first; raw fast-path results
     # and explicit middle-dot hydrates stay unchanged.

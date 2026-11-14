@@ -23,6 +23,7 @@ import math
 import os
 import re
 import sys
+import unicodedata
 from collections import Counter
 from decimal import Decimal, DecimalException
 from pathlib import Path
@@ -30,6 +31,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.state_types import StateTag
 from simulator.yaml_cache import load_cached_safe_yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -61,6 +63,15 @@ if str(TOOLS) not in sys.path:
 import extract_merge as em  # noqa: E402
 import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
+from simulator.chemistry.formula_text import (  # noqa: E402
+    UNICODE_MINUS_SIGNS,
+    UNICODE_PLUS_SIGNS,
+    is_superscripted,
+)
+from tools.mineru_table_draft import (  # noqa: E402
+    parse_table_html,
+    printed_formula as draft_printed_formula,
+)
 from simulator.battery import migrate as battery_migrate  # noqa: E402
 from simulator.battery.waypoints import oxygen_condition  # noqa: E402
 from tests.battery import factories as battery_factories  # noqa: E402
@@ -5195,11 +5206,12 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # Leading-decimal strings such as ".19" are measured leaves. Remeasured
 # on this corpus they sit in observations that were already uncovered, so
 # these ceilings did not move.
-# Every string that contains a digit [0-9] is a measured leaf, including
+# Before annotation classification, every string that contains a digit [0-9]
+# counted as a leaf, including
 # printed measurements the numeric grammar does not read. Remeasured on
 # this corpus: 48,631 -> 48,661 observations. The 30 newly uncovered
 # observations are in 13 extracts that were already uncovered, so the
-# extract ceiling did not move and no extract changed certify pass/fail.
+# extract ceiling did not move and no extract changed certify pass/fail then.
 # None of those extracts were review_status reviewed. The ids are
 # barin-1995, filiberto-lpsc2011-2064-volatiles,
 # hertl-1967-solid-sio-disproportionation-vaporization,
@@ -5235,6 +5247,30 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # samples (re-derived with vle.fidelity_source_warnings over every extract; no other extract moved).
 # So uncovered observations 48661 -> 48664, uncovered extracts 616 -> 617, unattested 3128 -> 3131.
 # Not a fidelity regression.
+# t-1753a2: digit-bearing strings under ``ANNOTATION_KEYS`` are extractor
+# annotation, not measured evidence. citation and standard_state are not in
+# that set. Recounted with tools/validate_literature_extracts.py after that
+# admission: uncovered observations 48664 -> 48630 and extracts 617 -> 615;
+# unattested 3131, pilots 57, and source-blind 0 stayed unchanged.
+# A nested locator.note inside values stays a leaf. A reason is annotation
+# only in a condition state whose tag is a non-value StateTag, at any depth.
+# tag:value and a missing tag stay leaves at the observation root and under
+# values. Recount held at 48630 / 615, unattested 3131, pilots 57, and
+# source-blind 0.
+# t-1753a3: a MinerU HTML cell address selects one parsed cell, and formula
+# or species labels fold subscript markup. No extract is review_status
+# reviewed and no sample has reviewed_by, so the source matcher does not
+# run on the corpus. Cell addressing is opt-in. The formula fold adds
+# label spellings and leaves numeric comparison unchanged. Recount held:
+# uncovered observations 48630, extracts 615, unattested 3131, pilots 57,
+# source-blind 0.
+# t-1753a3 review: formula labels match only after that fold, including a
+# digitless label, and a space inside the formula is not a preceding
+# measurement. Digit-group spaces with exactly three digits after the first
+# group are one number. No extract is review_status reviewed and no sample
+# has reviewed_by, so the source matcher does not run. Recount held at the
+# same ceilings.
+# Both coverage ceilings may only fall.
 # b261 landing: the main join adds 67 extracts (782 -> 849). Re-derived with
 # vle.fidelity_source_warnings over every extract on the regen tree cf19376f3:
 # uncovered observations 48664 -> 50791, uncovered extracts 617 -> 639,
@@ -5266,7 +5302,85 @@ _MISSING_OBSERVATION_IDS_CEILING = 0
 _NON_FINITE_EVIDENCE_CEILING = 0
 
 
-def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path):
+def _fidelity_extract_documents():
+    for path in vle.discover_extracts():
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+        if isinstance(doc, dict) and doc.get("schema_version") == vle.SCHEMA_VERSION:
+            yield path.stem, doc
+
+
+def _fidelity_warning_totals(documents, corpus_mount=None, artifact_root=None):
+    totals = Counter()
+    extract_counts = Counter()
+    mount_dependent_pins = 0
+    details = []
+    for label, doc in documents:
+        warnings = vle.fidelity_source_warnings(
+            doc,
+            label=label,
+            corpus_mount=corpus_mount,
+            artifact_root=artifact_root,
+        )
+        for warning in warnings:
+            totals[warning.kind] += warning.count
+            extract_counts[warning.kind] += 1
+            if warning.kind == "source_blind_pin":
+                assert len(warning.reason_codes_by_pin) == warning.count
+                mount_dependent_pins += sum(
+                    vle._mount_absence_only(reason_codes)
+                    for reason_codes in warning.reason_codes_by_pin
+                )
+                details.append(warning.render())
+    return totals, extract_counts, mount_dependent_pins, details
+
+
+def _require_fidelity_corpus_root(root: str | None, mount_dependent_pins: int) -> Path:
+    corpus_root = Path(root).expanduser() if root else None
+    if corpus_root is None or not corpus_root.is_dir():
+        pytest.skip(
+            "REGOLITH_CORPUS_ROOT is not an existing directory; "
+            f"{mount_dependent_pins} mount-dependent pins could not be verified"
+        )
+    return corpus_root
+
+
+def _format_unverified_prefixes(tally: vle.CorpusMountTally) -> str:
+    if not tally.unverified_by_prefix:
+        return "none"
+    return ", ".join(
+        f"{prefix}={count}"
+        for prefix, count in sorted(tally.unverified_by_prefix.items())
+    )
+
+
+def _assert_corpus_pins_open(documents, artifact_root=None) -> vle.CorpusMountTally:
+    """Fail verified corpus pins. Skip when every corpus pin is unverified.
+
+    A pin is counted, not failed, only when every code is a mount absence.
+    An absent token beside an unmounted prefix fails. The returned tally
+    is the count line.
+    """
+    tally = vle.CorpusMountTally()
+    totals, _extract_counts, _mount_dependent_pins, details = (
+        _fidelity_warning_totals(
+            documents, corpus_mount=tally, artifact_root=artifact_root
+        )
+    )
+    failures = totals["source_blind_pin"] - tally.unverified_pins
+    rendered = _format_unverified_prefixes(tally)
+    if failures:
+        raise AssertionError(
+            f"unverified corpus prefixes: {rendered}\n" + "\n".join(details)
+        )
+    if tally.unverified_pins and tally.verified_opens == 0:
+        pytest.skip(
+            "every corpus pin is unverified on this mount: "
+            f"{rendered}"
+        )
+    return tally
+
+
+def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property):
     """Source-fidelity holes are an upper bound, not a green bill of health.
 
     ``auto_migrated_pilot_pin`` is the number of pilot samples. Counting
@@ -5274,74 +5388,59 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path):
     already has one.
     """
 
-    def counts():
-        uncovered_obs = 0
-        uncovered_extracts = 0
-        unattested_samples = 0
-        pilot_extracts = 0
-        pilot_pins = 0
-        source_blind_pins = 0
-        ambiguous_ids = 0
-        missing_ids = 0
-        non_finite = 0
-        for path in vle.discover_extracts():
-            doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
-            if not isinstance(doc, dict):
-                continue
-            if doc.get("schema_version") != vle.SCHEMA_VERSION:
-                continue
-            warnings = vle.fidelity_source_warnings(doc, label=path.stem)
-            by_kind = {warning.kind: warning.count for warning in warnings}
-            uncovered = by_kind.get("uncovered_observation", 0)
-            if uncovered:
-                uncovered_extracts += 1
-                uncovered_obs += uncovered
-            unattested_samples += by_kind.get("unattested_sample", 0)
-            source_blind_pins += by_kind.get("source_blind_pin", 0)
-            ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
-            missing_ids += by_kind.get("missing_observation_id", 0)
-            non_finite += by_kind.get("non_finite_evidence", 0)
-            pilot = by_kind.get("auto_migrated_pilot_pin", 0)
-            pilot_pins += pilot
-            if pilot:
-                pilot_extracts += 1
-        return (
-            uncovered_obs,
-            uncovered_extracts,
-            unattested_samples,
-            pilot_pins,
-            pilot_extracts,
-            source_blind_pins,
-            ambiguous_ids,
-            missing_ids,
-            non_finite,
-        )
-
+    documents = list(_fidelity_extract_documents())
     monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
-    unmounted = counts()
+    unmounted, unmounted_extract_counts, mount_dependent_pins, _details = (
+        _fidelity_warning_totals(documents)
+    )
     monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
-    mounted = counts()
-    assert mounted == unmounted
-    (
-        uncovered_obs,
-        uncovered_extracts,
-        unattested_samples,
-        pilot_pins,
-        pilot_extracts,
-        source_blind_pins,
-        ambiguous_ids,
-        missing_ids,
-        non_finite,
-    ) = unmounted
+    mounted, mounted_extract_counts, _mounted_dependent_pins, _details = (
+        _fidelity_warning_totals(documents)
+    )
+    assert (
+        mounted["uncovered_observation"],
+        mounted_extract_counts["uncovered_observation"],
+    ) == (
+        unmounted["uncovered_observation"],
+        unmounted_extract_counts["uncovered_observation"],
+    )
+    uncovered_obs = unmounted["uncovered_observation"]
+    uncovered_extracts = unmounted_extract_counts["uncovered_observation"]
+    unattested_samples = unmounted["unattested_sample"]
+    pilot_pins = unmounted["auto_migrated_pilot_pin"]
+    pilot_extracts = unmounted_extract_counts["auto_migrated_pilot_pin"]
+    source_blind_pins = unmounted["source_blind_pin"]
+    ambiguous_ids = unmounted["ambiguous_observation_id"]
+    missing_ids = unmounted["missing_observation_id"]
+    non_finite = unmounted["non_finite_evidence"]
+    record_property("mount_dependent_pins", mount_dependent_pins)
+    assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
     assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
     assert pilot_pins <= _PILOT_PINS_CEILING, pilot_pins
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
-    assert source_blind_pins <= _SOURCE_BLIND_PINS_CEILING, source_blind_pins
+    non_mount_dependent_source_blind = source_blind_pins - mount_dependent_pins
+    assert (
+        non_mount_dependent_source_blind <= _SOURCE_BLIND_PINS_CEILING
+    ), f"source_blind_pin={source_blind_pins}; mount_dependent_pins={mount_dependent_pins}"
     assert ambiguous_ids <= _AMBIGUOUS_OBSERVATION_IDS_CEILING, ambiguous_ids
     assert missing_ids <= _MISSING_OBSERVATION_IDS_CEILING, missing_ids
     assert non_finite <= _NON_FINITE_EVIDENCE_CEILING, non_finite
+
+
+def test_fidelity_corpus_pins_open(monkeypatch, record_property):
+    root = os.environ.get("REGOLITH_CORPUS_ROOT", "").strip()
+    if not root or not Path(root).expanduser().is_dir():
+        monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+        _totals, _extract_counts, mount_dependent_pins, _details = (
+            _fidelity_warning_totals(list(_fidelity_extract_documents()))
+        )
+        _require_fidelity_corpus_root(root or None, mount_dependent_pins)
+    _require_fidelity_corpus_root(root, 0)
+    tally = _assert_corpus_pins_open(list(_fidelity_extract_documents()))
+    record_property("verified_corpus_opens", tally.verified_opens)
+    record_property("unverified_corpus_prefixes", _format_unverified_prefixes(tally))
 
 
 def test_auto_migrated_pilot_pin_counts_each_sample():
@@ -5444,6 +5543,234 @@ def _assert_refused_sample_still_covers_addressed_observation(
     ) == max(0, unaddressed - 1)
 
 
+# Closed set pinned against the validator. standard_state and citation are
+# absent: sampled values transcribe printed labels and citations.
+_ADMITTED_ANNOTATION_KEYS = (
+    "attribution",
+    "note",
+    "reason",
+    "schema_gap",
+    "composition_derivation",
+    "parents_not_printed",
+)
+
+
+def test_fidelity_annotation_keys_are_the_reviewed_closed_set():
+    assert vle.ANNOTATION_KEYS == frozenset(_ADMITTED_ANNOTATION_KEYS)
+
+
+@pytest.mark.parametrize(
+    "annotation_key",
+    tuple(key for key in _ADMITTED_ANNOTATION_KEYS if key != "reason"),
+)
+def test_fidelity_annotation_string_is_covered_by_value_leaves_alone(annotation_key):
+    """Pin value leaves alone. The annotation string is not another leaf.
+
+    ``reason`` is absent here. A direct ``values.reason`` has no state tag,
+    so it stays a leaf; the shape test covers that. The temperature range
+    on the minimal extract is removed first. An unpinned scored condition
+    would make every assertion uncovered and would hide a float that the
+    walker had stopped treating as a leaf.
+    """
+    annotation = "Extractor note: based on the 1978 source table."
+
+    covered = _minimal_extract()
+    _strip_scored_conditions(covered)
+    covered["species"]["Fe"]["observations"][0]["values"][annotation_key] = annotation
+    assert _uncovered_observation_count(covered) == 0
+
+    only_annotation_digits = _minimal_extract()
+    _strip_scored_conditions(only_annotation_digits)
+    observation = only_annotation_digits["species"]["Fe"]["observations"][0]
+    observation["values"] = {"quantity": "alpha", annotation_key: annotation}
+    sample = only_annotation_digits["fidelity_samples"][0]
+    sample["path"] = "species.Fe.observations[fe_alpha_1].values.quantity"
+    sample["value"] = "alpha"
+    assert _uncovered_observation_count(only_annotation_digits) == 0
+
+    with_float = _minimal_extract()
+    _strip_scored_conditions(with_float)
+    with_float["species"]["Fe"]["observations"][0]["values"][annotation_key] = 1978.0
+    assert _uncovered_observation_count(with_float) == 1
+
+
+def test_nested_locator_note_inside_values_stays_a_measured_leaf():
+    """A locator note nested under values is printed evidence.
+
+    A direct values.note is annotation. A state reason with no tag is a
+    leaf. The alpha pin does not cover the note.
+    """
+    note = "printed O2 partial pressure at xTiO2=37.91 mol %"
+    bare_reason = "The 30A run is absent from Table 5."
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"]["note"] = "Extractor note from the 1978 table."
+    observation["values"]["oxygen_partial_pressure"] = {
+        "locator": {"note": note},
+    }
+    observation["point_conditions"] = {
+        "composition": {"state": {"reason": bare_reason}},
+    }
+    leaves = set(vle._scored_measured_leaves(observation))
+    assert ("values", "oxygen_partial_pressure", "locator", "note") in leaves
+    assert ("values", "note") not in leaves
+    assert ("point_conditions", "composition", "state", "reason") in leaves
+    assert _uncovered_observation_count(doc) == 1
+    assert vle._observation_has_digit_bearing_string(
+        {"values": {"oxygen_partial_pressure": {"locator": {"note": note}}}}
+    )
+    assert not vle._observation_has_digit_bearing_string(
+        {"values": {"note": "Extractor note from the 1978 table."}}
+    )
+    assert vle._observation_has_digit_bearing_string(
+        {
+            "point_conditions": {
+                "composition": {"state": {"reason": bare_reason}},
+            }
+        }
+    )
+
+
+def test_state_reason_follows_tag_shape_at_any_depth():
+    """A reason is annotation only in a non-value condition state.
+
+    A nested tag:unknown reason is skipped. A nested tag:value reason
+    stays a leaf. The observation root gives the same answer for the
+    same shape. A mapping with no state tag, including values.reason,
+    stays a leaf.
+    """
+    refusal = "Table 3 does not state the cited experiment temperature."
+    printed = "printed O2 at 37.91 mol %"
+    non_value_tags = [
+        member.value for member in StateTag if member is not StateTag.VALUE
+    ]
+    assert StateTag.UNKNOWN.value in non_value_tags
+    assert StateTag.VALUE.value not in non_value_tags
+    assert vle._NON_VALUE_STATE_TAGS == frozenset(non_value_tags)
+
+    def classify(nested: bool, state: dict) -> tuple[tuple, bool, int]:
+        doc = _minimal_extract()
+        _strip_scored_conditions(doc)
+        observation = doc["species"]["Fe"]["observations"][0]
+        body = {"temperature_K": {"state": state}}
+        if nested:
+            observation["values"]["points"] = [{"point_conditions": body}]
+            address = (
+                "values",
+                "points",
+                0,
+                "point_conditions",
+                "temperature_K",
+                "state",
+                "reason",
+            )
+        else:
+            observation["point_conditions"] = body
+            address = ("point_conditions", "temperature_K", "state", "reason")
+        leaves = set(vle._scored_measured_leaves(observation))
+        return address, address in leaves, _uncovered_observation_count(doc)
+
+    for tag in non_value_tags:
+        for nested in (False, True):
+            _address, is_leaf, uncovered = classify(
+                nested, {"tag": tag, "reason": refusal}
+            )
+            assert is_leaf is False
+            assert uncovered == 0
+
+    for nested in (False, True):
+        _address, is_leaf, uncovered = classify(
+            nested, {"tag": StateTag.VALUE.value, "reason": printed}
+        )
+        assert is_leaf is True
+        assert uncovered == 1
+        _address, is_leaf, uncovered = classify(nested, {"reason": printed})
+        assert is_leaf is True
+        assert uncovered == 1
+
+    bare = _minimal_extract()
+    _strip_scored_conditions(bare)
+    observation = bare["species"]["Fe"]["observations"][0]
+    observation["values"]["reason"] = printed
+    assert ("values", "reason") in set(vle._scored_measured_leaves(observation))
+    assert _uncovered_observation_count(bare) == 1
+    numbered = _minimal_extract()
+    _strip_scored_conditions(numbered)
+    numbered["species"]["Fe"]["observations"][0]["values"]["reason"] = 1978.0
+    assert _uncovered_observation_count(numbered) == 1
+    assert not vle._observation_has_digit_bearing_string(
+        {
+            "values": {
+                "points": [
+                    {
+                        "point_conditions": {
+                            "temperature_K": {
+                                "state": {
+                                    "tag": StateTag.UNKNOWN.value,
+                                    "reason": refusal,
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    )
+    assert vle._observation_has_digit_bearing_string(
+        {
+            "values": {
+                "points": [
+                    {
+                        "point_conditions": {
+                            "temperature_K": {
+                                "state": {
+                                    "tag": StateTag.VALUE.value,
+                                    "reason": printed,
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    )
+    assert not vle._observation_has_digit_bearing_string(
+        {
+            "point_conditions": {
+                "temperature_K": {
+                    "state": {
+                        "tag": StateTag.UNKNOWN.value,
+                        "reason": refusal,
+                    }
+                }
+            }
+        }
+    )
+    assert vle._observation_has_digit_bearing_string(
+        {
+            "point_conditions": {
+                "temperature_K": {
+                    "state": {
+                        "tag": StateTag.VALUE.value,
+                        "reason": printed,
+                    }
+                }
+            }
+        }
+    )
+
+
+@pytest.mark.parametrize("printed_key", ["caption", "citation"])
+def test_fidelity_non_annotation_string_stays_a_measured_leaf(printed_key):
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["species"]["Fe"]["observations"][0]["values"][printed_key] = (
+        "Printed text from the 1978 source table."
+    )
+    assert _uncovered_observation_count(doc) == 1
+
+
 _LOCATOR_KEY_SETS = (
     ("source_path",),
     ("quotes_path",),
@@ -5454,11 +5781,23 @@ _LOCATOR_KEY_SETS = (
 )
 _TYPED_LOCATOR_REFUSALS = (
     "corpus_root_unset",
+    "corpus_prefix_unmounted",
     "corpus_artifact_missing",
     "corpus_path_outside_root",
     "artifact_digest_missing",
     "artifact_digest_mismatch",
 )
+_TOKEN_ABSENT_OUTCOMES = frozenset({
+    "token_absent",
+    "digest_valid_token_absent",
+    "record_alternate_token_absent",
+    "first_open_token_absent",
+})
+_LOCATOR_KEY_PREFIX = {
+    "source_path": "text",
+    "quotes_path": "tables",
+    "record": "text",
+}
 _PER_KEY_OUTCOMES = (
     "matched",
     "repository_transcription",
@@ -5498,7 +5837,8 @@ for _keys in _LOCATOR_KEY_SETS:
             for _digest_token in (None, "0.24", "0.25"):
                 _mount_required = any(
                     outcome
-                    in _CORPUS_FILE_OUTCOMES | {"corpus_artifact_missing"}
+                    in _CORPUS_FILE_OUTCOMES
+                    | {"corpus_artifact_missing", "corpus_prefix_unmounted"}
                     for outcome in _outcomes
                 )
                 if _mount_required != _corpus_mounted:
@@ -5547,16 +5887,24 @@ for _keys in _LOCATOR_KEY_SETS:
                     ):
                         _realizable = False
                     elif (
-                        _outcome
-                        in {
-                            "token_absent",
-                            "first_open_token_absent",
-                            "digest_valid_token_absent",
-                            "record_alternate_token_absent",
-                        }
+                        _outcome in _TOKEN_ABSENT_OUTCOMES
                         and _digest_token not in {None, "0.25"}
                     ):
                         _realizable = False
+                # One prefix cannot be both present (missing file or a corpus
+                # file) and absent. source_path and record share text/.
+                _prefix_created = {
+                    _LOCATOR_KEY_PREFIX[key]
+                    for key, outcome in zip(_keys, _outcomes)
+                    if outcome in _CORPUS_FILE_OUTCOMES | {"corpus_artifact_missing"}
+                }
+                _prefix_absent = {
+                    _LOCATOR_KEY_PREFIX[key]
+                    for key, outcome in zip(_keys, _outcomes)
+                    if outcome == "corpus_prefix_unmounted"
+                }
+                if _prefix_created & _prefix_absent:
+                    _realizable = False
                 if _realizable:
                     _LOCATOR_OUTCOME_CASES.append(
                         (_keys, _outcomes, _corpus_mounted, _digest_token)
@@ -5670,6 +6018,8 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
         elif outcome == "corpus_root_unset":
             pass
         elif outcome == "corpus_artifact_missing":
+            (corpus_root / path).parent.mkdir(parents=True, exist_ok=True)
+        elif outcome == "corpus_prefix_unmounted":
             pass
         elif outcome == "corpus_path_outside_root":
             pass
@@ -5702,25 +6052,14 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
     assert (source_blind.kind if source_blind else None) == expected_source_blind_reason
     if source_blind:
         expected_reason_codes = set(outcomes) & set(_TYPED_LOCATOR_REFUSALS)
-        actual_reason_codes = {
-            reason
-            for reason in _TYPED_LOCATOR_REFUSALS
-            if reason in source_blind.detail
-        }
+        if any(outcome in _TOKEN_ABSENT_OUTCOMES for outcome in outcomes):
+            expected_reason_codes.add("cited_token_absent")
+        actual_reason_codes = set().union(*source_blind.reason_codes_by_pin)
         assert actual_reason_codes == expected_reason_codes
         for key, outcome in zip(declared_keys, outcomes):
             if outcome in _TYPED_LOCATOR_REFUSALS:
                 assert f"{outcome} ({locator[key]})" in source_blind.detail
-        token_absent = any(
-            outcome
-            in {
-                "token_absent",
-                "digest_valid_token_absent",
-                "record_alternate_token_absent",
-                "first_open_token_absent",
-            }
-            for outcome in outcomes
-        )
+        token_absent = any(outcome in _TOKEN_ABSENT_OUTCOMES for outcome in outcomes)
         assert ("not in the cited text" in source_blind.detail) == token_absent
 
     _assert_refused_sample_still_covers_addressed_observation(
@@ -5843,6 +6182,7 @@ def test_unset_corpus_root_is_typed_and_keeps_source_blind_count(
 
     warning = _source_blind_warning(doc)
     assert warning.count == 1
+    assert warning.reason_codes_by_pin == (frozenset({"corpus_root_unset"}),)
     assert "corpus_root_unset" in warning.detail
     _assert_refused_sample_still_covers_addressed_observation(doc)
     refusals = vle.certify_extract_source_fidelity(doc, label="corpus-pin")
@@ -5928,6 +6268,160 @@ def test_corpus_artifact_digest_mismatch_is_typed(tmp_path, monkeypatch):
 
     assert "artifact_digest_mismatch" in _source_blind_warning(doc).detail
     _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+def test_fidelity_corpus_pin_ratchets_only_when_mounted(tmp_path, monkeypatch):
+    corpus_root = tmp_path / "corpus"
+    doc = _corpus_pin_document(corpus_root)
+    artifact = corpus_root / "text" / "paper.txt"
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator["source_sha256"] = digest
+    documents = [("fixture-corpus-pin", doc)]
+
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+    totals, _extract_counts, mount_dependent_pins, _details = (
+        _fidelity_warning_totals(documents)
+    )
+    assert totals["source_blind_pin"] - mount_dependent_pins == 0
+    assert mount_dependent_pins == 1
+    with pytest.raises(pytest.skip.Exception, match="1 mount-dependent pins"):
+        _require_fidelity_corpus_root(None, mount_dependent_pins)
+
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+    _assert_corpus_pins_open(documents)
+
+    locator["source_sha256"] = "0" * 64
+    with pytest.raises(AssertionError, match="artifact_digest_mismatch"):
+        _assert_corpus_pins_open(documents)
+
+
+def test_partial_corpus_mount_verifies_present_prefix_only(tmp_path, monkeypatch):
+    """tables/ is checked. An absent text/ prefix is unverified, not a failure.
+
+    The text pin carries a wrong digest on purpose. A sparse mount must not
+    turn that into artifact_digest_mismatch, and must not skip the tables pin.
+    """
+    corpus_root = tmp_path / "corpus"
+    tables_doc = _corpus_pin_document(corpus_root, source_path="tables/paper.txt")
+    text_file = corpus_root / "text" / "paper.txt"
+    blob = text_file.read_bytes()
+    tables_file = corpus_root / "tables" / "paper.txt"
+    tables_file.parent.mkdir(parents=True)
+    tables_file.write_bytes(blob)
+    text_file.unlink()
+    text_file.parent.rmdir()
+    digest = hashlib.sha256(blob).hexdigest()
+    tables_locator = tables_doc["fidelity_samples"][0]["locator"]
+    tables_locator["source_sha256"] = digest
+    text_doc = copy.deepcopy(tables_doc)
+    text_locator = text_doc["fidelity_samples"][0]["locator"]
+    text_locator["source_path"] = "text/paper.txt"
+    text_locator["source_sha256"] = "0" * 64
+    documents = [("tables-pin", tables_doc), ("text-pin", text_doc)]
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    text_warning = _source_blind_warning(text_doc)
+    assert text_warning.reason_codes_by_pin == (
+        frozenset({"corpus_prefix_unmounted"}),
+    )
+    tally = _assert_corpus_pins_open(documents)
+    assert tally.verified_opens == 1
+    assert tally.unverified_pins == 1
+    assert tally.unverified_by_prefix == {"text": 1}
+
+    tables_locator["source_sha256"] = "0" * 64
+    with pytest.raises(AssertionError, match="artifact_digest_mismatch"):
+        _assert_corpus_pins_open(documents)
+
+    with pytest.raises(pytest.skip.Exception, match=r"text=1"):
+        _assert_corpus_pins_open([("text-pin", text_doc)])
+
+
+def test_mixed_locator_absent_token_fails_with_unmounted_prefix(
+    tmp_path, monkeypatch
+):
+    """tables/ is mounted and the token is absent. text/ is not on the mount.
+
+    The unmounted prefix must not exempt the absent token.
+    """
+    repository_root = tmp_path / "repository"
+    corpus_root = tmp_path / "corpus"
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    tables = corpus_root / "tables" / "quotes.txt"
+    tables.parent.mkdir(parents=True)
+    tables.write_text("alpha 0.25 measured\n", encoding="utf-8")
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator.update(
+        {
+            "source_path": "text/source.txt",
+            "quotes_path": "tables/quotes.txt",
+            "page": 2,
+            "source_sha256": hashlib.sha256(tables.read_bytes()).hexdigest(),
+        }
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    tally = vle.CorpusMountTally()
+    warnings = vle.fidelity_source_warnings(
+        doc,
+        label="mixed-locator",
+        artifact_root=repository_root,
+        corpus_mount=tally,
+    )
+    warning = next(item for item in warnings if item.kind == "source_blind_pin")
+    assert warning.reason_codes_by_pin == (
+        frozenset({"corpus_prefix_unmounted", "cited_token_absent"}),
+    )
+    assert tally.unverified_pins == 0
+    assert tally.verified_opens == 0
+    with pytest.raises(AssertionError, match="not in the cited text"):
+        _assert_corpus_pins_open(
+            [("mixed-locator", doc)], artifact_root=repository_root
+        )
+
+
+def test_repository_transcription_token_miss_fails_unmounted(
+    tmp_path, monkeypatch
+):
+    """A repository transcription that lacks the token is not mount-dependent.
+
+    The same locator also cites a corpus path. With the root unset that
+    path is corpus_root_unset, and the token miss must keep the pin a failure.
+    """
+    repository_root = tmp_path / "repository"
+    transcription = repository_root / "text" / "transcription.txt"
+    transcription.parent.mkdir(parents=True)
+    transcription.write_text(
+        "repository transcription\nalpha 0.25 measured\n", encoding="utf-8"
+    )
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator.update(
+        {
+            "source_path": "text/transcription.txt",
+            "quotes_path": "tables/quotes.txt",
+            "page": 2,
+        }
+    )
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    totals, _extract_counts, mount_dependent_pins, _details = (
+        _fidelity_warning_totals(
+            [("repository-token-miss", doc)], artifact_root=repository_root
+        )
+    )
+    warnings = vle.fidelity_source_warnings(
+        doc, label="repository-token-miss", artifact_root=repository_root
+    )
+    warning = next(item for item in warnings if item.kind == "source_blind_pin")
+    assert warning.reason_codes_by_pin == (
+        frozenset({"cited_token_absent", "corpus_root_unset"}),
+    )
+    assert totals["source_blind_pin"] == 1
+    assert mount_dependent_pins == 0
 
 
 def test_repository_override_missing_artifact_refuses_without_corpus_root(
@@ -7770,6 +8264,26 @@ _TOKEN_CASES = (
     # certify per cell; here the comma is not a delimiter.
     ("prose_adjacent_decimals", 0.91, "0.91,0.92\n", False),
     ("prose_adjacent_decimals_second", 0.92, "0.91,0.92\n", False),
+    # Digit groups join only on U+2009, U+202F, or U+00A0. An ASCII space
+    # is two measurements. The first group is 1-3 digits. Each group after
+    # it is exactly three. Not an exponent or a fraction.
+    ("digit_group_space", 1550, "from 1 550 °C to\n", False),
+    ("digit_group_ascii_head", 1, "from 1 100 °C to\n", True),
+    ("digit_group_ascii_tail", 100, "from 1 100 °C to\n", True),
+    ("digit_group_ascii_joined", 1100, "from 1 100 °C to\n", False),
+    ("digit_group_thin", 1550, "from 1\u2009550 °C to\n", True),
+    ("digit_group_narrow", 1550, "from 1\u202f550 °C to\n", True),
+    ("digit_group_nbsp", 1650, "from 1\u00a0650 °C to\n", True),
+    ("digit_group_thin_1650", 1650, "from 1\u2009650 °C to\n", True),
+    ("digit_group_longer_head", 12345, "12\u2009345\n", True),
+    ("digit_group_ascii_longer", 12345, "12 345\n", False),
+    ("digit_group_not_two_numbers", 1234, "12 34\n", False),
+    ("digit_group_short_tail", 155, "1 55\n", False),
+    ("digit_group_ascii_own_token", 1, "from 1 550 °C to\n", True),
+    ("digit_group_decimal_stays", 6.98, "6.98 100\n", True),
+    ("digit_group_exponent", 10, "1e0 001\n", False),
+    ("digit_group_fraction", 15000, "1.5 000\n", False),
+    ("digit_group_trailing_exponent", 1550000, "1 550e3\n", False),
 )
 
 
@@ -9409,6 +9923,2452 @@ def test_table_locator_that_cuts_a_cell_is_source_blind(
         assert "source_blind_pin" in joined
         if mode != "cover":
             assert "cuts through" in joined, (case_name, leaf, errors)
+
+
+# One MinerU line. 6.98 is in two cells, and 16.98 contains those digits.
+_HTML_CROSS_ROW = (
+    "<table>"
+    "<tr><td>SiO2</td><td>6.98</td><td>16.98</td></tr>"
+    "<tr><td>MgO</td><td>1.10</td><td>6.98</td></tr>"
+    "</table>\n"
+)
+_HTML_CROSS_ROW_GRID = (
+    ("SiO2", "6.98", "16.98"),
+    ("MgO", "1.10", "6.98"),
+)
+_HTML_ROWSPAN = (
+    '<table><tr><td rowspan="2">1650</td><td>257</td><td>6.98</td></tr>'
+    "<tr><td>265</td><td>1.10</td></tr></table>\n"
+)
+_HTML_ROWSPAN_GRID = (
+    ("1650", "257", "6.98"),
+    ("1650", "265", "1.10"),
+)
+_HTML_COLSPAN = '<table><tr><td colspan="2">6.98</td><td>1</td></tr></table>\n'
+_HTML_COLSPAN_GRID = (("6.98", "6.98", "1"),)
+_FORMULA_MARKUPS = (
+    ("SiO2", "SiO_{2}"),
+    ("SiO2", "SiO₂"),
+    ("Fe2O3", "Fe_{2}O_{3}"),
+    ("Al2O3", "Al_2O_3"),
+    ("Fe2O3", "Fe₂O₃"),
+    ("SiO2", "$SiO_{2}$"),
+    ("SiO2", " $SiO_{2}$ "),
+    ("Al2O3", r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$"),
+)
+_SUBSCRIPT_DIGITS = "₀₁₂₃₄₅₆₇₈₉"
+
+
+def _html_source_document(
+    root: Path,
+    pin: object,
+    source_text: str,
+    *,
+    key: str = "alpha",
+    relative: str = "text/paper.md",
+    locator_extra: dict | None = None,
+    addressing: str = "path",
+) -> dict:
+    """One attested pin. ``source_text`` is the artifact, not derived from ``pin``."""
+    path = root / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(source_text, encoding="utf-8")
+    locator: dict = {"source_path": relative, "page": 1}
+    if locator_extra:
+        locator.update(locator_extra)
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["review_status"] = "reviewed"
+    doc["species"]["Fe"]["observations"][0]["values"] = {key: pin}
+    sample: dict = {
+        "value": pin,
+        "reviewed_by": "independent reviewer",
+        "reviewed_on": "2026-11-10",
+        "locator": locator,
+    }
+    if addressing == "path":
+        sample["path"] = f"species.Fe.observations[fe_alpha_1].values.{key}"
+    elif addressing == "field":
+        sample["species"] = "Fe"
+        sample["observable"] = "alpha"
+        sample["observation_id"] = "fe_alpha_1"
+        sample["field"] = key
+    elif addressing == "value_key":
+        sample["species"] = "Fe"
+        sample["observable"] = "alpha"
+        sample["observation_id"] = "fe_alpha_1"
+        sample["value_key"] = key
+    else:
+        raise AssertionError(addressing)
+    doc["fidelity_samples"] = [sample]
+    return doc
+
+
+def _assert_cell_certification(
+    root: Path,
+    source_text: str,
+    grid: tuple[tuple[str, ...], ...],
+    *,
+    failures: list[str],
+    label: str,
+) -> None:
+    """Each cell certifies its own text, and 6.98 only when that cell is 6.98."""
+    for row_index, row in enumerate(grid, start=1):
+        for column_index, cell in enumerate(row, start=1):
+            for pin in (cell, 6.98):
+                expected = _oracle_whole_cell_certifies(pin, cell)
+                doc = _html_source_document(
+                    root,
+                    pin,
+                    source_text,
+                    locator_extra={
+                        "table_row": row_index,
+                        "table_column": column_index,
+                    },
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc, label=label, artifact_root=root
+                )
+                where = f"{label} r{row_index}c{column_index} {cell!r} pin {pin!r}"
+                if expected:
+                    if errors:
+                        failures.append(f"accept {where}: {errors}")
+                elif not errors or "source_blind_pin" not in "\n".join(errors):
+                    failures.append(f"refuse {where}: {errors}")
+
+
+def test_html_cell_refuses_a_value_from_another_row(tmp_path: Path):
+    """A token in another cell of the same ``<table>`` line does not certify.
+
+    The grid is independent of the parser. 6.98 occupies row 1 column 2 and
+    row 2 column 3. 16.98 contains those digits and still refuses 6.98.
+    ``table_row_number`` and ``table_column_number`` are the same indexes.
+    """
+    assert "vle." not in inspect.getsource(_oracle_whole_cell_certifies)
+    failures: list[str] = []
+    _assert_cell_certification(
+        tmp_path,
+        _HTML_CROSS_ROW,
+        _HTML_CROSS_ROW_GRID,
+        failures=failures,
+        label="cross-row",
+    )
+    doc = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_CROSS_ROW,
+        locator_extra={"table_row_number": 1, "table_column_number": 2},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="alias", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"alias row 1 column 2: {errors}")
+    doc = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_CROSS_ROW,
+        locator_extra={
+            "table_row": "2",
+            "table_column": "3",
+            "table_row_number": 2,
+            "table_column_number": 3,
+        },
+    )
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="agree", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"agreeing indexes: {errors}")
+    doc = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_CROSS_ROW,
+        locator_extra={"table_row": 1, "table_column": 1},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        doc, label="other-row", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    if "source_blind_pin" not in joined:
+        failures.append(f"SiO2 cell must refuse 6.98: {errors}")
+    assert failures == []
+
+
+def test_html_cell_expands_rowspan_and_colspan(tmp_path: Path):
+    """A spanned slot keeps the origin cell. The neighbour's value stays there."""
+    assert "vle." not in inspect.getsource(_oracle_whole_cell_certifies)
+    failures: list[str] = []
+    _assert_cell_certification(
+        tmp_path,
+        _HTML_ROWSPAN,
+        _HTML_ROWSPAN_GRID,
+        failures=failures,
+        label="rowspan",
+    )
+    _assert_cell_certification(
+        tmp_path,
+        _HTML_COLSPAN,
+        _HTML_COLSPAN_GRID,
+        failures=failures,
+        label="colspan",
+    )
+    covered = _html_source_document(
+        tmp_path,
+        1650,
+        _HTML_ROWSPAN,
+        locator_extra={"table_row": 2, "table_column": 1},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        covered, label="rowspan-origin", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"row 2 column 1 is 1650: {errors}")
+    neighbour = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_ROWSPAN,
+        locator_extra={"table_row": 2, "table_column": 3},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        neighbour, label="rowspan-neighbour", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"row 2 column 3 refuses 6.98: {errors}")
+    spanned = _html_source_document(
+        tmp_path,
+        6.98,
+        _HTML_COLSPAN,
+        locator_extra={"table_row": 1, "table_column": 2},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        spanned, label="colspan-span", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"column 2 keeps 6.98: {errors}")
+    edge = _html_source_document(
+        tmp_path,
+        1,
+        _HTML_COLSPAN,
+        locator_extra={"table_row": 1, "table_column": 2},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        edge, label="colspan-edge", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"column 2 refuses 1: {errors}")
+    # A table line without table_row and table_column is not prose.
+    # 6.98 sits beside 265 on that line and refuses.
+    unaddressed = _html_source_document(tmp_path, 6.98, _HTML_ROWSPAN)
+    errors = vle.certify_extract_source_fidelity(
+        unaddressed, label="rowspan-prose", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    if (
+        "source_blind_pin" not in joined
+        or "html_table_requires_cell_address" not in joined
+    ):
+        failures.append(f"unaddressed rowspan line refuses 6.98: {errors}")
+    mixed = "the oxide is 9.5 percent\n" + _HTML_ROWSPAN
+    prose_only = _html_source_document(
+        tmp_path,
+        9.5,
+        mixed,
+        locator_extra={"line_range": "1-2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        prose_only, label="mixed-prose", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"prose beside a table accepts 9.5: {errors}")
+    table_only = _html_source_document(
+        tmp_path,
+        6.98,
+        mixed,
+        locator_extra={"line_range": "1-2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        table_only, label="mixed-table", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    if (
+        "source_blind_pin" not in joined
+        or "html_table_requires_cell_address" not in joined
+    ):
+        failures.append(f"table value in a mixed span refuses 6.98: {errors}")
+    assert failures == []
+
+
+def test_html_cell_address_is_a_typed_refusal(tmp_path: Path):
+    """An address that does not select one cell refuses, including when the
+    digits sit in the file.
+    """
+    prose = "the oxide is 6.98 percent\n"
+    two_tables = (
+        "<table><tr><td>1.10</td></tr></table>\n"
+        "<table><tr><td>6.98</td></tr></table>\n"
+    )
+    cut_table = "<table>\n<tr><td>6.98</td></tr></table>\n"
+    bad_span = '<table><tr><td rowspan="0">6.98</td></tr></table>\n'
+    cases = (
+        ("absent", prose, {"table_row": 1, "table_column": 1}, "html_table_absent"),
+        ("row-only", _HTML_CROSS_ROW, {"table_row": 1}, "html_cell_address_incomplete"),
+        (
+            "column-only",
+            _HTML_CROSS_ROW,
+            {"table_column": 1},
+            "html_cell_address_incomplete",
+        ),
+        (
+            "zero",
+            _HTML_CROSS_ROW,
+            {"table_row": 0, "table_column": 1},
+            "html_cell_address_invalid",
+        ),
+        (
+            "bool",
+            _HTML_CROSS_ROW,
+            {"table_row": True, "table_column": 1},
+            "html_cell_address_invalid",
+        ),
+        (
+            "float",
+            _HTML_CROSS_ROW,
+            {"table_row": 1.0, "table_column": 1},
+            "html_cell_address_invalid",
+        ),
+        (
+            "dotted",
+            _HTML_CROSS_ROW,
+            {"table_row": "2.0", "table_column": "1"},
+            "html_cell_address_invalid",
+        ),
+        (
+            "disagree",
+            _HTML_CROSS_ROW,
+            {"table_row": 1, "table_row_number": 2, "table_column": 2},
+            "html_cell_address_invalid",
+        ),
+        ("ambiguous", two_tables, {"table_row": 1, "table_column": 1}, "html_table_ambiguous"),
+        (
+            "both-covered",
+            two_tables,
+            {"table_row": 1, "table_column": 1, "line_range": "1-2"},
+            "html_table_ambiguous",
+        ),
+        (
+            "outside",
+            _HTML_CROSS_ROW,
+            {"table_row": 9, "table_column": 1},
+            "html_cell_outside_table",
+        ),
+        (
+            "bad-span",
+            bad_span,
+            {"table_row": 1, "table_column": 1},
+            "html_table_span_invalid",
+        ),
+        (
+            "cut-first",
+            cut_table,
+            {"table_row": 1, "table_column": 1, "line_range": "1"},
+            "cuts through",
+        ),
+        (
+            "cut-second",
+            cut_table,
+            {"table_row": 1, "table_column": 1, "line_range": "2"},
+            "cuts through",
+        ),
+    )
+    failures: list[str] = []
+    for name, source, extra, needle in cases:
+        doc = _html_source_document(
+            tmp_path, 6.98, source, locator_extra=extra
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=name, artifact_root=tmp_path
+        )
+        joined = "\n".join(errors)
+        if "source_blind_pin" not in joined or needle not in joined:
+            failures.append(f"{name}: {errors}")
+    selected = _html_source_document(
+        tmp_path,
+        6.98,
+        two_tables,
+        locator_extra={"table_row": 1, "table_column": 1, "line_range": "2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        selected, label="second-table", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"line 2 selects 6.98: {errors}")
+    other = _html_source_document(
+        tmp_path,
+        1.10,
+        two_tables,
+        locator_extra={"table_row": 1, "table_column": 1, "line_range": "2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        other, label="second-table-other", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"line 2 refuses 1.10: {errors}")
+    covered = _html_source_document(
+        tmp_path,
+        6.98,
+        cut_table,
+        locator_extra={"table_row": 1, "table_column": 1, "line_range": "1-2"},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        covered, label="cut-covered", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"covering span accepts 6.98: {errors}")
+    unaddressed = _html_source_document(tmp_path, 6.98, prose)
+    errors = vle.certify_extract_source_fidelity(
+        unaddressed, label="prose", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"prose without a cell address accepts 6.98: {errors}")
+    power_cell = "<table><tr><td>10<sup>3</sup></td></tr></table>\n"
+    power_pins = (
+        (103, False),
+        (1000, True),
+        (1e3, True),
+        ("1e3", True),
+        ("10^3", True),
+        ("1×10^3", True),
+    )
+    for pin, accepts in power_pins:
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            power_cell,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"power-{pin!r}", artifact_root=tmp_path
+        )
+        joined = "\n".join(errors)
+        if accepts and errors:
+            failures.append(f"power accept {pin!r}: {errors}")
+        if not accepts and (
+            "source_blind_pin" not in joined or "superscript_in_cell" not in joined
+        ):
+            failures.append(f"power refuse {pin!r}: {errors}")
+    structured = (
+        ("<table><tr><td>10<sup>3</sup>2</td></tr></table>\n", 1e3, False),
+        ("<table><tr><td>2 10<sup>3</sup></td></tr></table>\n", 1e3, False),
+        ("<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n", 1.5e3, True),
+        ("<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n", "1.5e3", True),
+        (
+            "<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n",
+            "1.5\u00d710^3",
+            True,
+        ),
+        ("<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n", 1500, True),
+        ("<table><tr><td>1.5x10<sup>3</sup></td></tr></table>\n", 1.5e3, True),
+        ("<table><tr><td>1.5\u00b710<sup>3</sup></td></tr></table>\n", 1.5e3, True),
+        ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", -100.0, True),
+        ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", 100.0, False),
+        ("<table><tr><td>-10<sup>2</sup></td></tr></table>\n", "-10^2", True),
+        ("<table><tr><td>--10<sup>2</sup></td></tr></table>\n", -100.0, False),
+        ("<table><tr><td>--10<sup>2</sup></td></tr></table>\n", 100.0, False),
+        ("<table><tr><td>+-10<sup>2</sup></td></tr></table>\n", -100.0, False),
+        ("<table><tr><td>+-10<sup>2</sup></td></tr></table>\n", 100.0, False),
+        (
+            "<table><tr><td>-\u221210<sup>2</sup></td></tr></table>\n",
+            -100.0,
+            False,
+        ),
+        (
+            "<table><tr><td>-\u221210<sup>2</sup></td></tr></table>\n",
+            100.0,
+            False,
+        ),
+        (
+            "<table><tr><td>-1.5\u00d710<sup>3</sup></td></tr></table>\n",
+            -1500.0,
+            True,
+        ),
+        (
+            "<table><tr><td>-1.5\u00d710<sup>3</sup></td></tr></table>\n",
+            1500.0,
+            False,
+        ),
+    )
+    for cell, pin, accepts in structured:
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            cell,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"power-struct-{pin!r}", artifact_root=tmp_path
+        )
+        joined = "\n".join(errors)
+        if accepts and errors:
+            failures.append(f"power structure accept {pin!r}: {errors}")
+        if not accepts and (
+            "source_blind_pin" not in joined or "superscript_in_cell" not in joined
+        ):
+            failures.append(f"power structure refuse {pin!r}: {errors}")
+    assert failures == []
+
+
+# The superscript-cell family. Each axis is a branch of the power grammar:
+# one leading sign (or a second sign), a base (or none), a times mark (or
+# none), and a superscript exponent (or none). The product is every shape.
+_SUPERSCRIPT_CELL_SIGNS = ("", "+", "-", "--", "+-", "-\u2212")
+_SUPERSCRIPT_CELL_BASES = ("", "0", "10", "1.5", ".5")
+_SUPERSCRIPT_CELL_TIMES = ("", "\u00d7", "x", "\u00b7")
+_SUPERSCRIPT_CELL_EXPONENTS = ("", "2", "-2", "+3")
+
+
+def _superscript_cell_family() -> list[str]:
+    """Every superscript cell in the grammar product, as one HTML table."""
+    cells: list[str] = []
+    for sign, base, times, exponent in itertools.product(
+        _SUPERSCRIPT_CELL_SIGNS,
+        _SUPERSCRIPT_CELL_BASES,
+        _SUPERSCRIPT_CELL_TIMES,
+        _SUPERSCRIPT_CELL_EXPONENTS,
+    ):
+        marked = f"{times}10" if times else ""
+        inner = f"{sign}{base}{marked}<sup>{exponent}</sup>"
+        cells.append(f"<table><tr><td>{inner}</td></tr></table>\n")
+    cells.append("<table><tr><td>10<sup>3</sup>2</td></tr></table>\n")
+    return cells
+
+
+def test_superscript_cell_family_certifies_or_refuses(tmp_path: Path):
+    """A superscript cell returns a certification result. It does not raise.
+
+    ``<sup>2</sup>`` has an empty base. That cell refuses with
+    ``superscript_in_cell``. ``0<sup>2</sup>`` is ``0**2``, which is
+    positive zero, so ``0.0`` certifies and ``-0.0`` refuses.
+    ``-0<sup>2</sup>`` is that power negated with ``copy_negate``, so
+    ``-0.0`` certifies and ``0.0`` refuses. The product is one context
+    that traps an inexact result. ``12345678901234567890123456789<sup>1</sup>``
+    refuses the rounded spelling ``1.2345678901234567890123456790e28``.
+    ``10<sup>-1000</sup>`` refuses 0. ``1.5×10<sup>3</sup>`` certifies
+    1500. The sign comparison is ``_same_signed_decimal`` on both the
+    plain-cell path and the two superscript equalities. The expected
+    sign bits come from ``Decimal``, not from the gate. Pin 1 certifies
+    none of the product. A leading ``x`` with an empty base is an element
+    letter, so that cell refuses with ``charged_species_unsupported``.
+    Every other shape refuses with ``superscript_in_cell``.
+    """
+    reader = inspect.getsource(vle._read_superscript_power)
+    assert 'prefix[:1] in {"+", "-"}' in reader
+    assert "with localcontext() as ctx:" in reader
+    assert "value.copy_negate()" in reader
+    for trap in (
+        "Inexact",
+        "Rounded",
+        "Underflow",
+        "Overflow",
+        "Subnormal",
+        "InvalidOperation",
+    ):
+        assert f"ctx.traps[{trap}] = True" in reader
+    assert not hasattr(vle, "_power_product")
+    leaf = inspect.getsource(vle._superscript_leaf_certifies)
+    assert leaf.count("and _same_signed_decimal") == 2
+    assert "_same_signed_decimal" in inspect.getsource(vle._cell_certifies_leaf)
+    assert vle._superscript_power_decimal("2", ((0, 1),)) is None
+    positive_zero = Decimal(0) ** 2
+    negative_zero = Decimal(repr(-0.0))
+    assert positive_zero.as_tuple().sign == 0
+    assert negative_zero.as_tuple().sign == 1
+    negated = vle._superscript_power_decimal("-02", ((2, 3),))
+    assert negated is not None and negated.is_zero()
+    assert negated.as_tuple().sign == 1
+    long_base = "12345678901234567890123456789"
+    assert (
+        vle._superscript_power_decimal(
+            long_base + "1", ((len(long_base), len(long_base) + 1))
+        )
+        is None
+    )
+    tiny = vle._superscript_power_decimal("10-1000", ((2, 7),))
+    assert tiny is None or not tiny.is_zero()
+    assert vle._superscript_power_decimal("1.5\u00d7103", ((6, 7),)) == Decimal(1500)
+    pins = (
+        ("<table><tr><td><sup>2</sup></td></tr></table>\n", 2, False),
+        ("<table><tr><td>0<sup>2</sup></td></tr></table>\n", 0.0, True),
+        ("<table><tr><td>0<sup>2</sup></td></tr></table>\n", -0.0, False),
+        ("<table><tr><td>-0<sup>2</sup></td></tr></table>\n", -0.0, True),
+        ("<table><tr><td>-0<sup>2</sup></td></tr></table>\n", 0.0, False),
+        (
+            "<table><tr><td>12345678901234567890123456789<sup>1</sup></td></tr></table>\n",
+            "1.2345678901234567890123456790e28",
+            False,
+        ),
+        (
+            "<table><tr><td>12345678901234567890123456789<sup>1</sup></td></tr></table>\n",
+            1.2345678901234567890123456790e28,
+            False,
+        ),
+        ("<table><tr><td>10<sup>-1000</sup></td></tr></table>\n", 0, False),
+        ("<table><tr><td>10<sup>-1000</sup></td></tr></table>\n", 0.0, False),
+        (
+            "<table><tr><td>1.5\u00d710<sup>3</sup></td></tr></table>\n",
+            1500,
+            True,
+        ),
+    )
+    for cell, pin, accepts in pins:
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            cell,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"sup-pin-{pin!r}", artifact_root=tmp_path
+        )
+        if accepts:
+            assert errors == [], (cell, pin, errors)
+            continue
+        joined = "\n".join(errors)
+        assert "source_blind_pin" in joined, (cell, pin, errors)
+        assert "superscript_in_cell" in joined, (cell, pin, errors)
+    family = _superscript_cell_family()
+    assert "<table><tr><td><sup>2</sup></td></tr></table>\n" in family
+    assert "<table><tr><td>0<sup>2</sup></td></tr></table>\n" in family
+    # Pin 1 is not a power in this product. The typed reason is structural:
+    # a leading x and an empty base is an element letter; everything else
+    # is a superscript cell. 6 signs * 4 exponents = 24 charged cells.
+    # The product is 6*5*4*4 = 480. The other 456, plus ``10<sup>3</sup>2``,
+    # are 457.
+    built: list[str] = []
+    charged_count = 0
+    superscript_count = 0
+    family_failures: list[str] = []
+    shapes = list(
+        itertools.product(
+            _SUPERSCRIPT_CELL_SIGNS,
+            _SUPERSCRIPT_CELL_BASES,
+            _SUPERSCRIPT_CELL_TIMES,
+            _SUPERSCRIPT_CELL_EXPONENTS,
+        )
+    )
+    shapes.append(("", "10", "", "3-trailing"))
+    for sign, base, times, exponent in shapes:
+        if exponent == "3-trailing":
+            cell = "<table><tr><td>10<sup>3</sup>2</td></tr></table>\n"
+            expected = "superscript_in_cell"
+        else:
+            marked = f"{times}10" if times else ""
+            inner = f"{sign}{base}{marked}<sup>{exponent}</sup>"
+            cell = f"<table><tr><td>{inner}</td></tr></table>\n"
+            expected = (
+                "charged_species_unsupported"
+                if times == "x" and base == ""
+                else "superscript_in_cell"
+            )
+        built.append(cell)
+        if expected == "charged_species_unsupported":
+            charged_count += 1
+        else:
+            superscript_count += 1
+        other = (
+            "superscript_in_cell"
+            if expected == "charged_species_unsupported"
+            else "charged_species_unsupported"
+        )
+        doc = _html_source_document(
+            tmp_path,
+            1,
+            cell,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="sup-family", artifact_root=tmp_path
+        )
+        joined = "\n".join(errors)
+        if (
+            not errors
+            or expected not in joined
+            or other in joined
+            or "source_blind_pin" not in joined
+        ):
+            family_failures.append(f"{expected} {cell!r}: {errors}")
+    assert built == family
+    assert family_failures == []
+    assert charged_count == 24
+    assert superscript_count == 457
+
+
+def test_formula_label_matches_markup_and_refuses_numbers(tmp_path: Path):
+    """Formula and species labels fold subscript markup. Numbers do not.
+
+    The product is each printed markup against ``formula`` and ``species``,
+    in running text and as one HTML cell. A value key, a longer formula,
+    and a numeric leaf against Unicode-only digits or a formula cell refuse.
+    """
+    assert "_normalize_formula_label" not in inspect.getsource(vle._leaf_in_text)
+    assert "_normalize_formula_label" not in inspect.getsource(vle._cell_certifies_leaf)
+    formula_text = inspect.getsource(vle._formula_label_in_text)
+    assert "_fold_digit_groups" not in formula_text
+    assert "_printed_value_carried" not in formula_text
+    assert "_formula_run_char" in formula_text
+    normalizer = inspect.getsource(vle._normalize_formula_label)
+    assert "fold_subscript_digits" in normalizer
+    assert "_fold_digit_groups" not in normalizer
+    assert "_fold_digit_groups" not in inspect.getsource(vle._formula_cell_matches)
+    assert not hasattr(vle, "_SUBSCRIPT_DIGIT_FOLD")
+    score_text = (REPO_ROOT / "simulator/battery/score.py").read_text(encoding="utf-8")
+    assert "fold_subscript_digits" in score_text
+    assert 'maketrans("₀₁₂₃₄₅₆₇₈₉"' not in score_text
+    assert vle._formula_label_in_text("SiO2", "SiO2 100") is True
+    assert vle._formula_label_in_text("SiO2100", "SiO2 100") is False
+    assert vle._leaf_in_text(100, "SiO2 100") is True
+    assert vle._leaf_in_text(1550, "1 550") is False
+    assert vle._fold_digit_groups("SiO2 100") == "SiO2 100"
+    dispatch = inspect.getsource(vle._pinned_leaf_certifies)
+    assert dispatch.index("formula_label") < dispatch.index("_formula_label_in_text")
+    assert dispatch.index("formula_label") < dispatch.index("_formula_cell_matches")
+    assert dispatch.index("_formula_cell_matches") < dispatch.index("_cell_certifies_leaf")
+    assert dispatch.index("_formula_label_in_text") < dispatch.index("_leaf_in_text")
+    reason = inspect.getsource(vle._locator_source_blind_reason)
+    assert reason.count("_pinned_leaf_certifies") == 5
+    assert reason.count("_charged_formula_miss(") == 1
+    assert "_pinned_leaf_in_text" not in reason
+    assert "_pinned_leaf_in_cells" not in reason
+    mineru_text = (REPO_ROOT / "tools/mineru_table_draft.py").read_text(encoding="utf-8")
+    validator_text = (REPO_ROOT / "tools/validate_literature_extracts.py").read_text(
+        encoding="utf-8"
+    )
+    assert mineru_text.count("⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹") == 1
+    assert "⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹" not in validator_text
+    assert "UNICODE_SUPERSCRIPTS" not in validator_text
+    assert "is_superscripted" in validator_text
+    assert vle._explicit_power_decimal("-10^2") == Decimal("-100")
+    assert vle._explicit_power_decimal("-10^2") != Decimal("100")
+    assert vle._explicit_power_decimal("--10^2") is None
+    assert vle._explicit_power_decimal("+-10^2") is None
+    assert vle._explicit_power_decimal("-\u221210^2") is None
+    assert vle._superscript_power_decimal("-102", ((3, 4),)) == Decimal("-100")
+    assert vle._superscript_power_decimal("--102", ((4, 5),)) is None
+    assert vle._superscript_power_decimal("+-102", ((4, 5),)) is None
+    assert vle._superscript_power_decimal("-\u2212102", ((4, 5),)) is None
+    for numeric in ("2", "2.0", "6.98", "1e-999"):
+        assert vle._formula_label_in_text(numeric, "SiO_{2}") is False
+        assert vle._formula_label_in_text(numeric, "SiO₂") is False
+        assert vle._formula_cell_matches(numeric, " $SiO_{2}$ ") is False
+        assert vle._formula_cell_matches(numeric, "₂") is False
+        assert vle._formula_cell_matches(numeric, "_{2}") is False
+    failures: list[str] = []
+    for label, markup in _FORMULA_MARKUPS:
+        for key in ("formula", "species"):
+            prose = _html_source_document(
+                tmp_path,
+                label,
+                f"oxide {markup} end\n",
+                key=key,
+            )
+            errors = vle.certify_extract_source_fidelity(
+                prose, label=f"prose-{key}", artifact_root=tmp_path
+            )
+            if errors:
+                failures.append(f"prose {key} {label} ~ {markup!r}: {errors}")
+            cell = (
+                "<table><tr>"
+                f"<td>{markup}</td>"
+                "</tr></table>\n"
+            )
+            cited = _html_source_document(
+                tmp_path,
+                label,
+                cell,
+                key=key,
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+            errors = vle.certify_extract_source_fidelity(
+                cited, label=f"cell-{key}", artifact_root=tmp_path
+            )
+            if errors:
+                failures.append(f"cell {key} {label} ~ {markup!r}: {errors}")
+    for addressing in ("field", "value_key"):
+        doc = _html_source_document(
+            tmp_path,
+            "SiO2",
+            "oxide SiO_{2} end\n",
+            key="formula",
+            addressing=addressing,
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=addressing, artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"{addressing}: {errors}")
+    alpha = _html_source_document(
+        tmp_path,
+        "SiO2",
+        "oxide SiO_{2} end\n",
+        key="alpha",
+    )
+    errors = vle.certify_extract_source_fidelity(
+        alpha, label="alpha-key", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"alpha key refuses SiO_{{2}}: {errors}")
+    longer = _html_source_document(
+        tmp_path,
+        "SiO2",
+        "oxide SiO_{22} end\n",
+        key="formula",
+    )
+    errors = vle.certify_extract_source_fidelity(
+        longer, label="longer", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"SiO_{{22}} refuses SiO2: {errors}")
+    extra = _html_source_document(
+        tmp_path,
+        "SiO2",
+        "<table><tr><td>SiO_{2} extra</td></tr></table>\n",
+        key="formula",
+        locator_extra={"table_row": 1, "table_column": 1},
+    )
+    errors = vle.certify_extract_source_fidelity(
+        extra, label="extra", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"longer cell refuses SiO2: {errors}")
+    numeric_leaves = (2, 2.0, 3, "2", 6.98)
+    unicode_sources = {
+        2: "oxide SiO₂ end\n",
+        2.0: "oxide SiO₂ end\n",
+        3: "oxide Fe₂O₃ end\n",
+        "2": "standalone ₂\n",
+        6.98: "oxide SiO₂ end\n",
+    }
+    for pin in numeric_leaves:
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            unicode_sources[pin],
+            key="formula",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"unicode-{pin!r}", artifact_root=tmp_path
+        )
+        if not errors or "source_blind_pin" not in "\n".join(errors):
+            failures.append(f"unicode numeric {pin!r}: {errors}")
+        for markup in (" $SiO_{2}$ ", "_{2}", "₂"):
+            cell = f"<table><tr><td>{markup}</td></tr></table>\n"
+            doc = _html_source_document(
+                tmp_path,
+                pin,
+                cell,
+                key="formula",
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"formula-cell-{pin!r}", artifact_root=tmp_path
+            )
+            if not errors or "source_blind_pin" not in "\n".join(errors):
+                failures.append(f"formula cell {markup!r} numeric {pin!r}: {errors}")
+    for index, subscript in enumerate(_SUBSCRIPT_DIGITS):
+        prose = _html_source_document(
+            tmp_path,
+            index,
+            f"label SiO{subscript} end\n",
+            key="formula",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            prose, label=f"digit-{index}", artifact_root=tmp_path
+        )
+        if not errors or "source_blind_pin" not in "\n".join(errors):
+            failures.append(f"subscript {subscript} refuses {index}: {errors}")
+        label = _html_source_document(
+            tmp_path,
+            f"SiO{index}",
+            f"label SiO{subscript} end\n",
+            key="formula",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            label, label=f"formula-digit-{index}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"SiO{index} accepts SiO{subscript}: {errors}")
+    csv_doc = _html_source_document(
+        tmp_path,
+        "SiO2",
+        "SiO_{2}\n",
+        key="formula",
+        relative="tables/formula.csv",
+    )
+    errors = vle.certify_extract_source_fidelity(
+        csv_doc, label="csv-formula", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"csv formula cell: {errors}")
+    csv_number = _html_source_document(
+        tmp_path,
+        2,
+        "SiO_{2}\n",
+        key="formula",
+        relative="tables/formula.csv",
+    )
+    errors = vle.certify_extract_source_fidelity(
+        csv_number, label="csv-number", artifact_root=tmp_path
+    )
+    if not errors or "source_blind_pin" not in "\n".join(errors):
+        failures.append(f"csv formula cell refuses 2: {errors}")
+    folded = {
+        "SiO $_{2}$": "SiO 2",
+        "SiO $_2$": "SiO 2",
+        "CaO/SiO $_{2}$ ratio": "CaO/SiO 2 ratio",
+        "\\mathrm{SiO}_{2}": "SiO2",
+        r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$": "Al2O3",
+        r"{\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}": "Al2O3",
+        "6.98 Fe_{2}O_{3}": "6.98 Fe2O3",
+        "10 Al_{2}O_{3}": "10 Al2O3",
+        "0.5 H_{2}O": "0.5 H2O",
+        "page 2 stays": "page 2 stays",
+        "Table 2 stays": "Table 2 stays",
+        "Fe 2 O 3": "Fe 2 O 3",
+        "Fe2 O3": "Fe2 O3",
+        "H2 O2": "H2 O2",
+        "oxide SiO 2 N2 end": "oxide SiO 2 N2 end",
+        "CO2 N2": "CO2 N2",
+        "SiO 2": "SiO 2",
+        "(OH) 2": "(OH) 2",
+        "SiO2 Al2O3": "SiO2 Al2O3",
+        "SiO2Al2O3": "SiO2Al2O3",
+    }
+    for raw, expected in folded.items():
+        got = vle._normalize_formula_label(raw)
+        if got != expected:
+            failures.append(f"fold {raw!r}: {got!r} != {expected!r}")
+    prose_pins = (
+        ("formula", "SiO2", "SiO $_{2}$", False),
+        ("formula", "SiO2", "SiO $_2$", False),
+        ("formula", "SiO2", "CaO/SiO $_{2}$ ratio", False),
+        ("formula", "SiO2", "\\mathrm{SiO}_{2}", True),
+        ("formula", "Al2O3", r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$", True),
+        ("formula", "Fe2O3", "6.98 Fe_{2}O_{3}", True),
+        ("alpha", 6.98, "6.98 Fe_{2}O_{3}", True),
+        ("alpha", 2, "6.98 Fe_{2}O_{3}", False),
+        ("alpha", "2", "SiO_{2}", False),
+        ("alpha", 2, "SiO_{2}", False),
+        ("alpha", 2, "Fe_{2}O_{3}", False),
+        ("alpha", "2", "Fe_{2}O_{3}", False),
+        ("alpha", 3, "Fe_{2}O_{3}", False),
+        ("alpha", 2, "SiO₂", False),
+        ("alpha", "2", "SiO₂", False),
+        ("alpha", 100, "SiO_{2} 100", True),
+        ("alpha", 2, "SiO_{2} 100", False),
+        ("alpha", 2, "SiO 2", True),
+        ("formula", "Al2O3", "10 Al_{2}O_{3}", True),
+        ("alpha", 10, "10 Al_{2}O_{3}", True),
+        ("formula", "H2O", "0.5 H_{2}O", True),
+        ("alpha", 0.5, "0.5 H_{2}O", True),
+        ("species", "CO", "oxide CO₂ only\n", False),
+        ("species", "CO", "the gas CO end\n", True),
+        ("formula", "SiO₂", "oxide SiO₂₂ end\n", False),
+        ("formula", "SiO₂", "oxide SiO₂ end\n", True),
+        ("formula", "SiO2", "SiO2 Al2O3", True),
+        ("formula", "Al2O3", "SiO2 Al2O3", True),
+        ("formula", "SiO2", "SiO2Al2O3", False),
+        ("formula", "Al2O3", "SiO2Al2O3", False),
+        ("formula", "H2O2", "H2 O2", False),
+        ("formula", "H2", "H2 O2", True),
+        ("formula", "O2", "H2 O2", True),
+        ("formula", "Fe2O3", "Fe 2 O 3", False),
+        ("formula", "SiO2", "SiO 2", False),
+        ("formula", "Fe", "Fe 6.98", True),
+        ("species", "Fe", "Fe 6.98", True),
+        ("alpha", 6.98, "Fe 6.98", True),
+        ("formula", "Fe6", "Fe 6.98", False),
+        ("formula", "Ca(OH)2", "Ca(OH) 2", False),
+        ("formula", "(OH)2", "(OH) 2", False),
+        ("formula", "SiO2", "oxide SiO 2 N2 end", False),
+        ("formula", "SiO2N2", "oxide SiO 2 N2 end", False),
+        ("formula", "CO2N2", "CO2 N2", False),
+        ("formula", "CO2", "CO2 N2", True),
+        ("formula", "N2", "CO2 N2", True),
+        ("formula", "SiO2", "SiO2 100", True),
+        ("formula", "SiO2100", "SiO2 100", False),
+        ("alpha", 100, "SiO2 100", True),
+    )
+    for key, pin, source, accepts in prose_pins:
+        doc = _html_source_document(tmp_path, pin, source + "\n", key=key)
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"review-{key}-{pin!r}", artifact_root=tmp_path
+        )
+        if accepts and errors:
+            failures.append(f"accept {key} {pin!r} ~ {source!r}: {errors}")
+        if not accepts and (
+            not errors or "source_blind_pin" not in "\n".join(errors)
+        ):
+            failures.append(f"refuse {key} {pin!r} ~ {source!r}: {errors}")
+    cell_pins = (
+        ("formula", "SiO2", "SiO $_{2}$", False),
+        ("formula", "SiO2", "SiO $_2$", False),
+        ("formula", "SiO2", "\\mathrm{SiO}_{2}", True),
+        ("formula", "Al2O3", r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$", True),
+        ("species", "CO", "CO₂", False),
+        ("formula", "SiO₂", "SiO₂₂", False),
+        ("formula", "SiO2", "SiO₂₂", False),
+        ("formula", "H2O2", "H2 O2", False),
+        ("formula", "CO2N2", "CO2 N2", False),
+        ("formula", "SiO2N2", "SiO 2 N2", False),
+    )
+    for key, pin, cell_text, accepts in cell_pins:
+        cell = f"<table><tr><td>{cell_text}</td></tr></table>\n"
+        doc = _html_source_document(
+            tmp_path,
+            pin,
+            cell,
+            key=key,
+            locator_extra={"table_row": 1, "table_column": 1},
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"review-cell-{key}-{pin!r}", artifact_root=tmp_path
+        )
+        if accepts and errors:
+            failures.append(f"cell accept {key} {pin!r} ~ {cell_text!r}: {errors}")
+        if not accepts and (
+            not errors or "source_blind_pin" not in "\n".join(errors)
+        ):
+            failures.append(f"cell refuse {key} {pin!r} ~ {cell_text!r}: {errors}")
+    assert failures == []
+
+
+# Cartesian product of the token-boundary invariant. Layout "apart" is
+# W(A) W(B). Layout "together" is W(A B), one wrapper with a space inside
+# it. Plain, Unicode, and _{n} have no outer delimiter, so the two layouts
+# are the same string and both still have to keep the space.
+_FORMULA_TOKEN_PAIRS = (
+    ("H2", "O2"),
+    ("SiO2", "Al2O3"),
+    ("SiO2", "100"),
+    ("Fe2O3", "6.98"),
+    ("Fe2", "O3"),
+    ("CO", "CO2"),
+    # A count after a space is its own token. Nothing joins it back.
+    ("SiO", "2"),
+    ("Fe", "6.98"),
+    ("(OH)", "2"),
+)
+# Spaces the deleted symbol-count join used to remove.
+_FORMULA_GAPS = (" ", "\u00a0", "\u2009", "\u202f")
+# A caret is a superscript. The plain formula is what deleting ``^`` would
+# invent. The number is the superscript's own digit.
+_SUPERSCRIPT_TOKENS = (
+    ("$O^{2-}$", "O2", 2),
+    ("$Fe^{2+}$", "Fe2", 2),
+    ("$SiO^{2}$", "SiO2", 2),
+)
+_FORMULA_TOKEN_WRAPPERS = (
+    "plain",
+    "dollar",
+    "mathrm",
+    "nested",
+    "unicode",
+    "brace",
+)
+# Sub-formula inside a compound. The stored label must be the whole run.
+# Parentheses and the charge mark · stay inside that run.
+_FORMULA_COMPOUNDS = (
+    ("Fe2(SO4)3", ("SO4",)),
+    ("CaO\u00b7SiO2", ("SiO2",)),
+)
+# Charged species are unsupported. Each source is one raw token. Fe, Fe2,
+# and Fe^{2+} all refuse. A separate neutral Fe in the same text still
+# certifies Fe. The mathrm form closes the brace before the charge.
+_CHARGED_SPECIES_LABELS = ("Fe", "Fe2", "Fe^{2+}")
+# Unicode charge signs. Each source refuses its neutral label.
+_UNICODE_CHARGE_SOURCES = (
+    ("Cl", "Cl\u2212"),
+    ("Cl", "Cl\u207b"),
+    ("Na", "Na\u207a"),
+    ("SO4", "SO\u2084\u00b2\u207b"),
+)
+_CHARGED_SPECIES_SOURCES = (
+    ("dollar", "$Fe^{2+}$"),
+    ("mathrm", "$\\mathrm{Fe}^{2+}$"),
+    ("nested", "${\\mathrm{{Fe}}^{2+}}$"),
+    ("sup", "Fe<sup>2+</sup>"),
+    ("unicode-plus", "Fe\u207a"),
+    ("unicode-two", "Fe\u00b2\u207a"),
+    ("caret", "Fe^{2+}"),
+)
+_FORMULA_UNICODE_DIGITS = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+
+
+def _formula_count_body(token: str, kind: str) -> str:
+    """Spell one token's own digits. A plain number stays contiguous."""
+    if re.fullmatch(r"\d+(?:\.\d+)?", token):
+        return token
+    if kind == "unicode":
+        return re.sub(
+            r"\d+",
+            lambda match: match.group(0).translate(_FORMULA_UNICODE_DIGITS),
+            token,
+        )
+    if kind == "plain":
+        return token
+    return re.sub(r"\d+", lambda match: "_{" + match.group(0) + "}", token)
+
+
+def _formula_wrap_body(body: str, kind: str) -> str:
+    if kind == "dollar":
+        return f"${body}$"
+    if kind == "mathrm":
+        return f"$\\mathrm{{{body}}}$"
+    if kind == "nested":
+        return "${\\mathrm{{" + body + "}}}$"
+    return body
+
+
+def _formula_pair_text(
+    left: str, right: str, kind: str, layout: str, gap: str = " "
+) -> str:
+    """``apart`` wraps each token. ``together`` wraps both around ``gap``."""
+    left_body = _formula_count_body(left, kind)
+    right_body = _formula_count_body(right, kind)
+    if layout == "together" and kind in ("dollar", "mathrm", "nested"):
+        return _formula_wrap_body(f"{left_body}{gap}{right_body}", kind)
+    return (
+        f"{_formula_wrap_body(left_body, kind)}{gap}"
+        f"{_formula_wrap_body(right_body, kind)}"
+    )
+
+
+def _formula_citation(token: str) -> tuple[str, object]:
+    """Formula key for a formula. A plain number certifies as a number."""
+    if re.fullmatch(r"\d+", token):
+        return "alpha", int(token)
+    if re.fullmatch(r"\d+\.\d+", token):
+        return "alpha", float(token)
+    return "formula", token
+
+
+def test_formula_fold_preserves_whitespace_tokens(tmp_path: Path):
+    """Label folding keeps a space between tokens.
+
+    Invariant: folding does not change how many whitespace-separated
+    tokens the cited text has. A space always separates tokens. No
+    wrapper or spacing joins a token across a space. Markup is removed
+    inside each token. For every wrapper and every pair, ``W(A) W(B)``
+    and ``W(A B)`` certify A and certify B and do not certify AB.
+    ``SiO 2`` does not certify ``SiO2``. ``Fe 6.98`` certifies ``Fe``
+    and ``6.98`` and does not certify ``Fe6``. ``(OH) 2`` does not
+    certify ``(OH)2``.
+    A token that contains ``^`` does not certify as that plain formula
+    or as a plain number. A neighbour token still certifies. A subscript
+    digit inside a formula token does not certify as a number, for every
+    wrapper. A separate number token still certifies. A sub-formula inside
+    a compound is not the compound: ``SO4`` is not ``Fe2(SO4)3``, and
+    ``SiO2`` is not ``CaO·SiO2``. A raw token with a caret, ``<sup>``,
+    a Unicode superscript, or a charge sign beside an uppercase element
+    letter is unsupported. ``Fe``, ``Fe2``, and ``Fe^{2+}`` refuse with
+    ``charged_species_unsupported``, including a CSV cell. A neutral
+    ``Fe`` elsewhere still certifies. Every sign in the certification
+    class does that, anywhere in the raw token: ``Cl−,``, ``SO₄−``,
+    ``SO_{4}−``, and ``Fe-rich`` refuse the neutral label on prose, an
+    HTML cell, CSV, and TSV. ``Cl`` certifies ``Cl``. ``-6.98``
+    certifies ``-6.98``. A charge sign that is not a superscript types
+    only the matching element symbols, lowercase letters included.
+    ``SO₄−`` does not type ``SiO2``, ``F−`` does not type ``Fe``, and
+    ``MnO−`` does not type ``MgO``: each is ``cited_token_absent``.
+    An empty ``<sup></sup>`` is still a superscript. A superscripted
+    token or cell certifies no formula label. The decision is the raw
+    text, before spans are stripped. ``SiO<sup></sup>2``,
+    ``<sup>SiO2</sup>``, ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` are
+    ``charged_species_unsupported`` for every formula label on that
+    token or cell, including an unrelated one. A superscript in another
+    token of the same cited span does not type that miss. ``Fe<sup>2</sup>`` is
+    ``charged_species_unsupported`` for ``Fe``, ``Fe2``, and ``SiO2``,
+    not ``superscript_in_cell``.
+    """
+    assert _formula_pair_text("H2", "O2", "dollar", "together") == "$H_{2} O_{2}$"
+    assert (
+        _formula_pair_text("SiO2", "100", "dollar", "together") == "$SiO_{2} 100$"
+    )
+    # The emitter still strips every space in one species cell.
+    assert draft_printed_formula("$H_{2} O_{2}$") == "H2O2"
+    assert (
+        draft_printed_formula(r"${\mathrm{{Al}}}_{2}{\mathrm{O}}_{3}$") == "Al2O3"
+    )
+    assert draft_printed_formula("$O^{2-}$") == "O2-"
+    failures: list[str] = []
+    for kind in _FORMULA_TOKEN_WRAPPERS:
+        for left, right in _FORMULA_TOKEN_PAIRS:
+            for layout in ("apart", "together"):
+                source = _formula_pair_text(left, right, kind, layout)
+                folded = vle._normalize_formula_label(source)
+                where = f"{kind} {layout} {source!r}"
+                if folded.split() != [left, right]:
+                    failures.append(f"tokens {where}: {folded!r}")
+                    continue
+                for token in (left, right):
+                    key, pin = _formula_citation(token)
+                    doc = _html_source_document(
+                        tmp_path, pin, source + "\n", key=key
+                    )
+                    errors = vle.certify_extract_source_fidelity(
+                        doc,
+                        label=f"keep-{kind}-{layout}-{token}",
+                        artifact_root=tmp_path,
+                    )
+                    if errors:
+                        failures.append(
+                            f"accept {key} {pin!r} {where}: {errors}"
+                        )
+                    if re.fullmatch(r"\d+(?:\.\d+)?", token):
+                        continue
+                    for count in re.findall(r"\d+", token):
+                        for pin in (int(count), count):
+                            doc = _html_source_document(
+                                tmp_path, pin, source + "\n", key="alpha"
+                            )
+                            errors = vle.certify_extract_source_fidelity(
+                                doc,
+                                label=f"count-{kind}-{layout}-{count}",
+                                artifact_root=tmp_path,
+                            )
+                            joined = "\n".join(errors)
+                            if not errors or "source_blind_pin" not in joined:
+                                failures.append(
+                                    f"count {pin!r} {where}: {errors}"
+                                )
+                refused = [left + right]
+                if (left, right) == ("Fe", "6.98"):
+                    refused.append("Fe6")
+                for glued in refused:
+                    doc = _html_source_document(
+                        tmp_path, glued, source + "\n", key="formula"
+                    )
+                    errors = vle.certify_extract_source_fidelity(
+                        doc,
+                        label=f"glue-{kind}-{layout}-{glued}",
+                        artifact_root=tmp_path,
+                    )
+                    if not errors or "source_blind_pin" not in "\n".join(errors):
+                        failures.append(f"refuse {glued!r} {where}: {errors}")
+                    if vle._formula_cell_matches(glued, source):
+                        failures.append(f"cell glued {glued!r} {where}")
+    for gap in _FORMULA_GAPS:
+        for kind in _FORMULA_TOKEN_WRAPPERS:
+            for left, right in _FORMULA_TOKEN_PAIRS:
+                for layout in ("apart", "together"):
+                    source = _formula_pair_text(left, right, kind, layout, gap)
+                    folded = vle._normalize_formula_label(source)
+                    where = f"gap {gap!r} {kind} {layout} {source!r}"
+                    if folded.split() != [left, right]:
+                        failures.append(f"gap tokens {where}: {folded!r}")
+                        continue
+                    refused = [left + right]
+                    if (left, right) == ("Fe", "6.98"):
+                        refused.append("Fe6")
+                    for glued in refused:
+                        if vle._formula_label_in_text(glued, source):
+                            failures.append(f"gap join {glued!r} {where}")
+    for source, plain, number in _SUPERSCRIPT_TOKENS:
+        folded = vle._normalize_formula_label(source)
+        if "^" not in folded or plain in folded.split():
+            failures.append(f"superscript fold {source!r}: {folded!r}")
+        neighbour = f"H2 {source}"
+        for key, pin, accepts in (
+            ("formula", plain, False),
+            ("alpha", number, False),
+            ("formula", "H2", True),
+        ):
+            text = source if pin != "H2" else neighbour
+            doc = _html_source_document(tmp_path, pin, text + "\n", key=key)
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"sup-{plain}-{pin!r}", artifact_root=tmp_path
+            )
+            if accepts and errors:
+                failures.append(f"superscript accept {pin!r} ~ {text!r}: {errors}")
+            if not accepts and (
+                not errors or "source_blind_pin" not in "\n".join(errors)
+            ):
+                failures.append(f"superscript refuse {pin!r} ~ {text!r}: {errors}")
+        if vle._formula_cell_matches(plain, source):
+            failures.append(f"superscript cell {plain!r} ~ {source!r}")
+    assert vle._formula_label_in_text("SO4", "Fe₂(SO₄)₃") is False
+    assert vle._formula_label_in_text("Fe2(SO4)3", "Fe₂(SO₄)₃") is True
+    assert vle._formula_label_in_text("SiO2", "CaO\u00b7SiO2") is False
+    assert vle._formula_label_in_text("CaO\u00b7SiO2", "CaO\u00b7SiO2") is True
+    assert vle._formula_label_in_text("SO4", "phase Fe₂(SO₄)₃, next") is False
+    assert vle._formula_label_in_text(
+        "Fe2(SO4)3", "phase Fe₂(SO₄)₃, next"
+    ) is True
+    for kind in _FORMULA_TOKEN_WRAPPERS:
+        for whole, parts in _FORMULA_COMPOUNDS:
+            source = _formula_wrap_body(_formula_count_body(whole, kind), kind)
+            folded = vle._normalize_formula_label(source)
+            where = f"compound {kind} {source!r}"
+            if folded != whole:
+                failures.append(f"compound fold {where}: {folded!r}")
+                continue
+            doc = _html_source_document(
+                tmp_path, whole, source + "\n", key="formula"
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"compound-{kind}-{whole}", artifact_root=tmp_path
+            )
+            if errors:
+                failures.append(f"compound accept {whole!r} {where}: {errors}")
+            for part in parts:
+                doc = _html_source_document(
+                    tmp_path, part, source + "\n", key="formula"
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"compound-part-{kind}-{part}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if not errors or "source_blind_pin" not in joined:
+                    failures.append(f"compound refuse {part!r} {where}: {errors}")
+    assert vle._formula_label_in_text("Fe", r"$\mathrm{Fe}^{2+}$") is False
+    assert vle._formula_label_in_text("Fe2", r"$\mathrm{Fe}^{2+}$") is False
+    assert vle._formula_label_in_text("Fe^{2+}", r"$\mathrm{Fe}^{2+}$") is False
+    assert vle._formula_label_in_text("Fe", r"Fe $\mathrm{Fe}^{2+}$") is True
+    assert vle._formula_label_in_text("Fe^{2+}", "$Fe^{2+}$") is False
+    assert vle._html_cell_is_charged_species("Fe2+", ((2, 4),)) is True
+    assert vle._html_cell_is_charged_species("103", ((2, 3),)) is False
+    assert vle._html_cell_is_charged_species("1.5x103", ((6, 7),)) is False
+    assert (
+        vle._html_cell_is_charged_species("SiO2", (), has_superscript=True) is True
+    )
+    assert vle._html_cell_is_charged_species("10", (), has_superscript=True) is False
+    empty_sup = parse_table_html(
+        "<table><tr><td>SiO<sup></sup>2</td></tr></table>"
+    )[0][0]
+    assert empty_sup.text == "SiO2"
+    assert empty_sup.superscript_spans == ()
+    assert empty_sup.has_superscript is True
+    powered_fe = parse_table_html(
+        "<table><tr><td>Fe<sup>2</sup></td></tr></table>"
+    )[0][0]
+    assert powered_fe.text == "Fe2"
+    assert powered_fe.superscript_spans == ((2, 3),)
+    assert powered_fe.has_superscript is True
+    fe_leaf = vle._PinnedLeaf("Fe", True)
+    fe2_leaf = vle._PinnedLeaf("Fe2", True)
+    sio_leaf = vle._PinnedLeaf("SiO2", True)
+    assert (
+        vle._charged_formula_miss(
+            [fe_leaf], "Fe2", ((2, 3),), has_superscript=True
+        )
+        is True
+    )
+    assert (
+        vle._charged_formula_miss(
+            [fe2_leaf], "Fe2", ((2, 3),), has_superscript=True
+        )
+        is True
+    )
+    assert (
+        vle._charged_formula_miss(
+            [sio_leaf], "Fe2", ((2, 3),), has_superscript=True
+        )
+        is True
+    )
+    assert (
+        vle._charged_formula_miss([sio_leaf], "SiO2", (), has_superscript=True)
+        is True
+    )
+    assert (
+        vle._charged_formula_miss([fe_leaf], "SiO2", (), has_superscript=True)
+        is True
+    )
+    # The flattened cell without superscript metadata is not that refusal.
+    assert vle._charged_formula_miss([fe_leaf], "Fe2") is False
+    for kind, source in _CHARGED_SPECIES_SOURCES:
+        for key in ("formula", "species"):
+            for label in _CHARGED_SPECIES_LABELS:
+                doc = _html_source_document(
+                    tmp_path, label, source + "\n", key=key
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"charged-{key}-{kind}-{label}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if (
+                    "charged_species_unsupported" not in joined
+                    or "source_blind_pin" not in joined
+                ):
+                    failures.append(
+                        f"charged refuse {key} {label!r} {kind} {source!r}: {errors}"
+                    )
+        neighbour = f"Fe {source}\n"
+        doc = _html_source_document(
+            tmp_path, "Fe", neighbour, key="formula"
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"charged-neutral-{kind}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"neutral Fe {kind} {source!r}: {errors}")
+        for label in ("Fe2", "Fe^{2+}"):
+            doc = _html_source_document(
+                tmp_path, label, neighbour, key="formula"
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc,
+                label=f"charged-neighbour-{kind}-{label}",
+                artifact_root=tmp_path,
+            )
+            joined = "\n".join(errors)
+            if "charged_species_unsupported" not in joined:
+                failures.append(
+                    f"charged neighbour {label!r} {kind}: {errors}"
+                )
+    cell = "<table><tr><td>Fe<sup>2+</sup></td></tr></table>\n"
+    for key in ("formula", "species"):
+        for label in _CHARGED_SPECIES_LABELS:
+            doc = _html_source_document(
+                tmp_path,
+                label,
+                cell,
+                key=key,
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"charged-cell-{key}-{label}", artifact_root=tmp_path
+            )
+            joined = "\n".join(errors)
+            if (
+                "charged_species_unsupported" not in joined
+                or "superscript_in_cell" in joined
+            ):
+                failures.append(f"charged cell {key} {label!r}: {errors}")
+    for kind, source in _CHARGED_SPECIES_SOURCES:
+        for key in ("formula", "species"):
+            for label in _CHARGED_SPECIES_LABELS:
+                doc = _html_source_document(
+                    tmp_path,
+                    label,
+                    source + "\n",
+                    key=key,
+                    relative="tables/charged.csv",
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"charged-csv-{key}-{kind}-{label}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if (
+                    "charged_species_unsupported" not in joined
+                    or "source_blind_pin" not in joined
+                ):
+                    failures.append(
+                        f"charged csv {key} {label!r} {kind} {source!r}: {errors}"
+                    )
+        neighbour = f"Fe,{source}\n"
+        doc = _html_source_document(
+            tmp_path,
+            "Fe",
+            neighbour,
+            key="formula",
+            relative="tables/charged.csv",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"charged-csv-neutral-{kind}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"csv neutral Fe {kind} {source!r}: {errors}")
+        for label in ("Fe2", "Fe^{2+}"):
+            doc = _html_source_document(
+                tmp_path,
+                label,
+                neighbour,
+                key="formula",
+                relative="tables/charged.csv",
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc,
+                label=f"charged-csv-neighbour-{kind}-{label}",
+                artifact_root=tmp_path,
+            )
+            joined = "\n".join(errors)
+            if "charged_species_unsupported" not in joined:
+                failures.append(
+                    f"charged csv neighbour {label!r} {kind}: {errors}"
+                )
+    assert vle._UNICODE_MINUS_SIGNS is UNICODE_MINUS_SIGNS
+    assert vle._UNICODE_PLUS_SIGNS is UNICODE_PLUS_SIGNS
+    assert "FORMULA_CHARGE_SIGNS" not in inspect.getsource(vle)
+    assert not hasattr(vle, "_TRAILING_FORMULA_CHARGE_RE")
+    charge_signs = "+-" + UNICODE_MINUS_SIGNS + UNICODE_PLUS_SIGNS
+    for sign in charge_signs:
+        if not vle._raw_token_is_charged_species(f"Cl{sign}"):
+            failures.append(f"charge sign {sign!r} does not charge Cl")
+        if vle._formula_label_in_text("Cl", f"Cl{sign}"):
+            failures.append(f"charge sign {sign!r} certifies Cl")
+    assert vle._raw_token_is_charged_species("Cl") is False
+    assert vle._raw_token_is_charged_species("-6.98") is False
+    assert vle._raw_token_is_charged_species("1.2E-3") is False
+    assert vle._raw_token_is_charged_species("0.24E+2.") is False
+    assert vle._raw_token_is_charged_species("1.2E\u22123") is False
+    assert vle._formula_label_in_text("Cl", "Cl\u2212,") is False
+    assert vle._formula_label_in_text("SO4", "SO\u2084\u2212") is False
+    assert vle._formula_label_in_text("SO4", "SO_{4}\u2212") is False
+    assert vle._formula_label_in_text("Fe", "Fe-rich") is False
+    assert vle._formula_label_in_text("Fe", "Fe-Ti") is False
+    assert vle._formula_label_in_text("Cl", "Cl") is True
+    assert vle._formula_label_in_text("Fe", "Fe Fe-rich") is True
+    assert vle._leaf_in_text(-6.98, "-6.98") is True
+    charge_sources = [("Cl", f"Cl{sign}") for sign in charge_signs]
+    charge_sources.extend(_UNICODE_CHARGE_SOURCES)
+    charge_sources.extend(
+        (
+            ("Cl", "Cl\u2212,"),
+            ("SO4", "SO\u2084\u2212"),
+            ("SO4", "SO_{4}\u2212"),
+            ("Fe", "Fe-rich"),
+        )
+    )
+    for neutral, source in charge_sources:
+        # A comma stays inside the CSV cell. ``Cl−,`` is one cell.
+        csv_cell = source
+        if any(ch in source for ch in ",\"\n"):
+            csv_cell = '"' + source.replace('"', '""') + '"'
+        surfaces = (
+            ("prose", source + "\n", "text/unicode-charge.md", None),
+            (
+                "html",
+                f"<table><tr><td>{source}</td></tr></table>\n",
+                "text/unicode-charge.html",
+                {"table_row": 1, "table_column": 1},
+            ),
+            ("csv", csv_cell + "\n", "tables/unicode-charge.csv", None),
+            ("tsv", source + "\n", "tables/unicode-charge.tsv", None),
+        )
+        for kind, text, relative, locator_extra in surfaces:
+            for key in ("formula", "species"):
+                doc = _html_source_document(
+                    tmp_path,
+                    neutral,
+                    text,
+                    key=key,
+                    relative=relative,
+                    locator_extra=locator_extra,
+                )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"unicode-charge-{kind}-{key}-{neutral}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if "charged_species_unsupported" not in joined:
+                    failures.append(
+                        f"unicode charge {kind} {key} {neutral!r} ~ {source!r}: {errors}"
+                    )
+                if kind == "html" and "superscript_in_cell" in joined:
+                    failures.append(
+                        f"unicode charge html power {neutral!r} ~ {source!r}: {errors}"
+                    )
+                if kind != "html" and "source_blind_pin" not in joined:
+                    failures.append(
+                        f"unicode charge {kind} blind {neutral!r}: {errors}"
+                    )
+    neutral_surfaces = (
+        ("prose", "Cl\n", "text/neutral-cl.md", None),
+        (
+            "html",
+            "<table><tr><td>Cl</td></tr></table>\n",
+            "text/neutral-cl.html",
+            {"table_row": 1, "table_column": 1},
+        ),
+        ("csv", "Cl\n", "tables/neutral-cl.csv", None),
+        ("tsv", "Cl\n", "tables/neutral-cl.tsv", None),
+    )
+    for kind, text, relative, locator_extra in neutral_surfaces:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path,
+                "Cl",
+                text,
+                key=key,
+                relative=relative,
+                locator_extra=locator_extra,
+            )
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"neutral-cl-{kind}-{key}", artifact_root=tmp_path
+            )
+            if errors:
+                failures.append(f"neutral Cl {kind} {key}: {errors}")
+    number_surfaces = (
+        ("prose", "-6.98\n", "text/signed-number.md", None),
+        (
+            "html",
+            "<table><tr><td>-6.98</td></tr></table>\n",
+            "text/signed-number.html",
+            {"table_row": 1, "table_column": 1},
+        ),
+        ("csv", "-6.98\n", "tables/signed-number.csv", None),
+        ("tsv", "-6.98\n", "tables/signed-number.tsv", None),
+    )
+    for kind, text, relative, locator_extra in number_surfaces:
+        doc = _html_source_document(
+            tmp_path,
+            -6.98,
+            text,
+            relative=relative,
+            locator_extra=locator_extra,
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"signed-number-{kind}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"number -6.98 {kind}: {errors}")
+    neighbour = _html_source_document(
+        tmp_path, "Fe", "Fe Fe-rich\n", key="formula"
+    )
+    errors = vle.certify_extract_source_fidelity(
+        neighbour, label="fe-rich-neighbour", artifact_root=tmp_path
+    )
+    if errors:
+        failures.append(f"neutral Fe beside Fe-rich: {errors}")
+    unrelated = _html_source_document(
+        tmp_path, "SiO2", "Fe-rich measured\n", key="formula"
+    )
+    errors = vle.certify_extract_source_fidelity(
+        unrelated, label="fe-rich-unrelated", artifact_root=tmp_path
+    )
+    joined = "\n".join(errors)
+    if (
+        "source_blind_pin" not in joined
+        or "charged_species_unsupported" in joined
+    ):
+        failures.append(f"unrelated SiO2 beside Fe-rich: {errors}")
+    assert vle._formula_element_symbols("SiO2") == ("Si", "O")
+    assert vle._formula_element_symbols("SO\u2084\u2212") == ("S", "O")
+    assert vle._formula_element_symbols("Fe") == ("Fe",)
+    assert vle._formula_element_symbols("F\u2212") == ("F",)
+    assert vle._formula_element_symbols("MgO") == ("Mg", "O")
+    assert vle._formula_element_symbols("MnO\u2212") == ("Mn", "O")
+    assert vle._formula_element_symbols("SO4") == ("S", "O")
+    assert vle._formula_element_symbols("Fe-rich") == ("Fe",)
+    assert vle._formula_element_symbols("Fe2") == ("Fe",)
+    assert vle._formula_element_symbols("Fe^{2+}") == ("Fe",)
+    assert vle._charged_token_carries_label("SO\u2084\u2212", "SiO2") is False
+    assert vle._charged_token_carries_label("F\u2212", "Fe") is False
+    assert vle._charged_token_carries_label("MnO\u2212", "MgO") is False
+    assert vle._charged_token_carries_label("SO\u2084\u2212", "SO4") is True
+    assert vle._charged_token_carries_label("Fe-rich", "Fe") is True
+    assert vle._charged_token_carries_label("Cl\u2212,", "Cl") is True
+    assert not hasattr(vle, "_uppercase_element_letters")
+    # A shared uppercase skeleton is not the charged reason.
+    skeleton_misses = (
+        ("SiO2", "SO\u2084\u2212"),
+        ("Fe", "F\u2212"),
+        ("MgO", "MnO\u2212"),
+    )
+    for label, source in skeleton_misses:
+        csv_cell = source
+        surfaces = (
+            ("prose", source + "\n", "text/skeleton-miss.md", None),
+            (
+                "html",
+                f"<table><tr><td>{source}</td></tr></table>\n",
+                "text/skeleton-miss.html",
+                {"table_row": 1, "table_column": 1},
+            ),
+            ("csv", csv_cell + "\n", "tables/skeleton-miss.csv", None),
+            ("tsv", source + "\n", "tables/skeleton-miss.tsv", None),
+        )
+        for kind, text, relative, locator_extra in surfaces:
+            for key in ("formula", "species"):
+                doc = _html_source_document(
+                    tmp_path,
+                    label,
+                    text,
+                    key=key,
+                    relative=relative,
+                    locator_extra=locator_extra,
+                )
+                warnings = vle.fidelity_source_warnings(
+                    doc, label=f"skeleton-{kind}-{key}", artifact_root=tmp_path
+                )
+                blind = [
+                    warning
+                    for warning in warnings
+                    if warning.kind == "source_blind_pin"
+                ]
+                codes = (
+                    set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                    if blind and blind[0].reason_codes_by_pin
+                    else set()
+                )
+                if codes != {"cited_token_absent"}:
+                    failures.append(
+                        f"skeleton {kind} {key} {label!r} ~ {source!r}: {codes}"
+                    )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"skeleton-cert-{kind}-{key}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if (
+                    "source_blind_pin" not in joined
+                    or "charged_species_unsupported" in joined
+                ):
+                    failures.append(
+                        f"skeleton certify {kind} {key} {label!r}: {errors}"
+                    )
+    # A superscripted cell certifies no formula label. An unrelated label
+    # on that cell is charged, not cited. A charge sign without a
+    # superscript still uses the symbol comparison above.
+    html_sup_pins = (
+        (
+            "<table><tr><td>SiO<sup></sup>2</td></tr></table>\n",
+            "SiO2",
+            "charged_species_unsupported",
+        ),
+        (
+            "<table><tr><td>SiO<sup></sup>2</td></tr></table>\n",
+            "Fe",
+            "charged_species_unsupported",
+        ),
+        (
+            "<table><tr><td>Fe<sup>2</sup></td></tr></table>\n",
+            "Fe",
+            "charged_species_unsupported",
+        ),
+        (
+            "<table><tr><td>Fe<sup>2</sup></td></tr></table>\n",
+            "Fe2",
+            "charged_species_unsupported",
+        ),
+        (
+            "<table><tr><td>Fe<sup>2</sup></td></tr></table>\n",
+            "SiO2",
+            "charged_species_unsupported",
+        ),
+    )
+    for source, label, expected in html_sup_pins:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path,
+                label,
+                source,
+                key=key,
+                relative="text/empty-sup.html",
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc, label=f"sup-meta-{key}-{label}", artifact_root=tmp_path
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {expected}:
+                failures.append(
+                    f"sup meta {key} {label!r} ~ {source!r}: {codes} != {expected}"
+                )
+            errors = vle.certify_extract_source_fidelity(
+                doc,
+                label=f"sup-meta-cert-{key}-{label}",
+                artifact_root=tmp_path,
+            )
+            joined = "\n".join(errors)
+            if "source_blind_pin" not in joined or "superscript_in_cell" in joined:
+                failures.append(f"sup meta certify {key} {label!r}: {errors}")
+            if (
+                expected == "charged_species_unsupported"
+                and "charged_species_unsupported" not in joined
+            ):
+                failures.append(f"sup meta charged {key} {label!r}: {errors}")
+            if (
+                expected == "cited_token_absent"
+                and "charged_species_unsupported" in joined
+            ):
+                failures.append(f"sup meta cited {key} {label!r}: {errors}")
+    assert failures == []
+
+
+def test_superscripted_token_or_cell_certifies_no_formula(tmp_path: Path):
+    """A superscript on the raw token or cell certifies no formula.
+
+    ``<sup>SiO2</sup>``, ``SiO2ⁿ``, ``SiO2ᵃ``, and ``Fe^{x}`` refuse.
+    Plain ``SiO2`` still certifies. Every code point whose Unicode name
+    contains SUPERSCRIPT, appended to ``SiO2``, refuses. That walk is
+    ``unicodedata.name``, not ``is_superscripted``. A numeric power stays
+    on the power path: ``10<sup>3</sup>`` certifies 1000.
+    """
+    letter = parse_table_html(
+        "<table><tr><td><sup>SiO2</sup></td></tr></table>"
+    )[0][0]
+    assert letter.text == "SiO2"
+    assert letter.raw_text == "<sup>SiO2</sup>"
+    assert letter.has_superscript is True
+    assert is_superscripted(letter.raw_text) is True
+    assert is_superscripted(letter.text) is False
+    assert is_superscripted("SiO2") is False
+    assert is_superscripted("SiO₂") is False
+    assert vle._formula_cell_matches("SiO2", "SiO2") is True
+    assert vle._formula_cell_matches("SiO2", "SiO2ⁿ") is False
+    assert vle._formula_cell_matches("SiO2", "SiO2ᵃ") is False
+    assert vle._formula_cell_matches("Fe", "Fe^{x}") is False
+    assert vle._formula_label_in_text("SiO2", "SiO2ⁿ") is False
+    assert vle._formula_label_in_text("SiO2", "SiO2") is True
+    assert vle._formula_label_in_text("SiO2", "SiO₂") is True
+
+    failures: list[str] = []
+    html_address = {"table_row": 1, "table_column": 1}
+
+    def certify(label, source, relative, locator_extra, key):
+        doc = _html_source_document(
+            tmp_path,
+            label,
+            source,
+            key=key,
+            relative=relative,
+            locator_extra=locator_extra,
+        )
+        return vle.certify_extract_source_fidelity(
+            doc, label=f"{key}-{label}", artifact_root=tmp_path
+        )
+
+    def expect_charged(kind, label, source, relative, locator_extra):
+        for key in ("formula", "species"):
+            errors = certify(label, source, relative, locator_extra, key)
+            joined = "\n".join(errors)
+            if (
+                "charged_species_unsupported" not in joined
+                or "source_blind_pin" not in joined
+                or "superscript_in_cell" in joined
+            ):
+                failures.append(f"{kind} {key} {label!r}: {errors}")
+
+    def expect_accept(kind, label, source, relative, locator_extra, key):
+        errors = certify(label, source, relative, locator_extra, key)
+        if errors:
+            failures.append(f"accept {kind} {key} {label!r}: {errors}")
+
+    def surfaces(body: str, stem: str):
+        return (
+            ("prose", body + "\n", f"text/{stem}.md", None),
+            (
+                "html",
+                f"<table><tr><td>{body}</td></tr></table>\n",
+                f"text/{stem}.html",
+                html_address,
+            ),
+            ("csv", body + "\n", f"tables/{stem}.csv", None),
+            ("tsv", body + "\n", f"tables/{stem}.tsv", None),
+        )
+
+    for kind, source, relative, locator_extra in surfaces(
+        "<sup>SiO2</sup>", "letter-sup"
+    ):
+        expect_charged(kind, "SiO2", source, relative, locator_extra)
+    expect_charged(
+        "letter-sup-unrelated",
+        "Fe",
+        "<table><tr><td><sup>SiO2</sup></td></tr></table>\n",
+        "text/letter-sup-fe.html",
+        html_address,
+    )
+    for body, label, stem in (
+        ("SiO2ⁿ", "SiO2", "sio2-n"),
+        ("SiO2ᵃ", "SiO2", "sio2-mod"),
+        ("Fe^{x}", "Fe", "fe-caret"),
+    ):
+        for kind, source, relative, locator_extra in surfaces(body, stem):
+            expect_charged(kind, label, source, relative, locator_extra)
+    for kind, source, relative, locator_extra in surfaces("SiO2", "plain-sio2"):
+        for key in ("formula", "species"):
+            expect_accept(kind, "SiO2", source, relative, locator_extra, key)
+    expect_accept(
+        "neighbour",
+        "Fe",
+        "Fe SiO2ⁿ\n",
+        "text/neighbour-fe.md",
+        None,
+        "formula",
+    )
+    expect_accept(
+        "power",
+        1000,
+        "<table><tr><td>10<sup>3</sup></td></tr></table>\n",
+        "text/power-1000.html",
+        html_address,
+        "alpha",
+    )
+    empty_power = certify(
+        10,
+        "<table><tr><td>10<sup></sup></td></tr></table>\n",
+        "text/power-empty.html",
+        html_address,
+        "alpha",
+    )
+    empty_joined = "\n".join(empty_power)
+    if (
+        "superscript_in_cell" not in empty_joined
+        or "source_blind_pin" not in empty_joined
+        or "charged_species_unsupported" in empty_joined
+    ):
+        failures.append(f"empty power: {empty_power}")
+
+    characters: list[tuple[str, str]] = []
+    for code in range(sys.maxunicode + 1):
+        character = chr(code)
+        try:
+            name = unicodedata.name(character)
+        except ValueError:
+            continue
+        if "SUPERSCRIPT" in name:
+            characters.append((character, name))
+    assert any(character == "ⁿ" for character, _name in characters)
+    for character, name in characters:
+        source = "SiO2" + character
+        assert is_superscripted(source) is True
+        errors = certify(
+            "SiO2",
+            source + "\n",
+            "text/superscript-family.md",
+            None,
+            "formula",
+        )
+        joined = "\n".join(errors)
+        if (
+            "charged_species_unsupported" not in joined
+            or "source_blind_pin" not in joined
+        ):
+            failures.append(f"family {name}: {errors}")
+    assert failures == []
+
+
+def test_decimal_stoichiometry_is_part_of_the_formula_run(tmp_path: Path):
+    """A decimal count stays inside one formula run.
+
+    ``SiO2.5`` and ``SiO_{2.5}`` are the token ``SiO2.5`` and do not
+    certify ``SiO2``. ``FeO1.5`` does not certify ``FeO``. A period
+    that is not followed by a digit is still a boundary, so ``SiO2.``
+    at the end of a sentence certifies ``SiO2``.
+    """
+    assert vle._formula_label_in_text("SiO2", "SiO2.5") is False
+    assert vle._formula_label_in_text("SiO2", "SiO_{2.5}") is False
+    assert vle._formula_label_in_text("SiO2.5", "SiO2.5") is True
+    assert vle._formula_label_in_text("SiO2.5", "SiO_{2.5}") is True
+    assert vle._formula_label_in_text("FeO", "FeO1.5") is False
+    assert vle._formula_label_in_text("SiO2", "The oxide is SiO2.") is True
+    assert vle._formula_label_in_text("SiO2", "SiO2. Next") is True
+    assert vle._formula_label_in_text("Fe2O3", "6.98 Fe_{2}O_{3}") is True
+    failures: list[str] = []
+    refusals = (
+        ("SiO2.5\n", "SiO2", "text/sio2-decimal.md"),
+        ("SiO_{2.5}\n", "SiO2", "text/sio2-latex-decimal.md"),
+        ("FeO1.5\n", "FeO", "text/feo-decimal.md"),
+    )
+    for source, label, relative in refusals:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path, label, source, key=key, relative=relative
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc, label=f"decimal-{key}-{label}", artifact_root=tmp_path
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {"cited_token_absent"}:
+                failures.append(f"refuse {key} {label!r} ~ {source!r}: {codes}")
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"decimal-cert-{key}-{label}", artifact_root=tmp_path
+            )
+            joined = "\n".join(errors)
+            if (
+                "source_blind_pin" not in joined
+                or "charged_species_unsupported" in joined
+            ):
+                failures.append(f"certify {key} {label!r}: {errors}")
+    for key in ("formula", "species"):
+        doc = _html_source_document(
+            tmp_path,
+            "SiO2",
+            "The oxide is SiO2.\n",
+            key=key,
+            relative="text/sio2-sentence.md",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"sentence-{key}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"sentence {key}: {errors}")
+    assert failures == []
+
+
+def test_leading_decimal_count_is_part_of_the_formula_run(tmp_path: Path):
+    """A fractional count with no leading digit stays in the formula run.
+
+    ``FeO.5``, ``FeO_{.5}``, and ``FeO_{0.5}`` do not certify ``FeO``.
+    ``_{.5}`` folds to ``.5`` and certifies ``FeO.5``. ``_{0.5}`` folds
+    to ``FeO0.5``. A period that is not followed by a digit is still a
+    boundary, so ``FeO.`` at the end of a sentence certifies ``FeO``.
+    An ordinary underscore is not a subscript count.
+    """
+    assert vle._normalize_formula_label("FeO_{.5}") == "FeO.5"
+    assert vle._normalize_formula_label("FeO_.5") == "FeO.5"
+    assert vle._normalize_formula_label("FeO_{0.5}") == "FeO0.5"
+    assert vle._normalize_formula_label("FeO_{2.5}") == "FeO2.5"
+    assert vle._normalize_formula_label("FeO_bar") == "FeO_bar"
+    assert vle._formula_label_in_text("FeO", "FeO.5") is False
+    assert vle._formula_label_in_text("FeO", "FeO_{.5}") is False
+    assert vle._formula_label_in_text("FeO", "FeO_{0.5}") is False
+    assert vle._formula_label_in_text("FeO.5", "FeO.5") is True
+    assert vle._formula_label_in_text("FeO.5", "FeO_{.5}") is True
+    assert vle._formula_label_in_text("FeO0.5", "FeO_{0.5}") is True
+    assert vle._formula_label_in_text("FeO", "(FeO).5") is False
+    assert vle._formula_label_in_text("(FeO).5", "(FeO).5") is True
+    assert vle._formula_label_in_text("FeO", "FeO.") is True
+    assert vle._formula_label_in_text("FeO", "The oxide is FeO.") is True
+    assert vle._formula_label_in_text("FeO", "FeO. Next") is True
+    failures: list[str] = []
+    refusals = (
+        ("FeO.5\n", "FeO", "text/feo-leading-decimal.md"),
+        ("FeO_{.5}\n", "FeO", "text/feo-latex-leading.md"),
+        ("FeO_{0.5}\n", "FeO", "text/feo-latex-zero-decimal.md"),
+    )
+    for source, label, relative in refusals:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path, label, source, key=key, relative=relative
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc, label=f"leading-{key}-{relative}", artifact_root=tmp_path
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {"cited_token_absent"}:
+                failures.append(f"refuse {key} {source!r}: {codes}")
+            errors = vle.certify_extract_source_fidelity(
+                doc, label=f"leading-cert-{key}-{relative}", artifact_root=tmp_path
+            )
+            joined = "\n".join(errors)
+            if (
+                "source_blind_pin" not in joined
+                or "charged_species_unsupported" in joined
+            ):
+                failures.append(f"certify {key} {source!r}: {errors}")
+    for key in ("formula", "species"):
+        doc = _html_source_document(
+            tmp_path,
+            "FeO",
+            "The oxide is FeO.\n",
+            key=key,
+            relative="text/feo-sentence.md",
+        )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"feo-sentence-{key}", artifact_root=tmp_path
+        )
+        if errors:
+            failures.append(f"sentence {key}: {errors}")
+    assert failures == []
+
+
+def test_superscript_span_does_not_type_an_unrelated_formula(tmp_path: Path):
+    """A superscript types its own token or cell, not the cited span.
+
+    ``oxide SiO2ⁿ end`` refuses ``SiO2`` as charged and refuses
+    ``Al2O3`` as cited. The lone token ``SiO2ⁿ`` refuses ``Fe``.
+    """
+    sio = vle._PinnedLeaf("SiO2", True)
+    fe = vle._PinnedLeaf("Fe", True)
+    al = vle._PinnedLeaf("Al2O3", True)
+    assert vle._charged_formula_miss([sio], "oxide SiO2ⁿ end") is True
+    assert vle._charged_formula_miss([al], "oxide SiO2ⁿ end") is False
+    assert vle._charged_formula_miss([fe], "SiO2ⁿ") is True
+    assert vle._charged_formula_miss([sio], "SO\u2084\u2212") is False
+    assert (
+        vle._charged_formula_miss([fe], "SiO2", (), has_superscript=True) is True
+    )
+    failures: list[str] = []
+    cases = (
+        ("oxide SiO2ⁿ end\n", "SiO2", "charged_species_unsupported"),
+        ("oxide SiO2ⁿ end\n", "Al2O3", "cited_token_absent"),
+        ("SiO2ⁿ\n", "Fe", "charged_species_unsupported"),
+    )
+    for source, label, expected in cases:
+        doc = _html_source_document(
+            tmp_path,
+            label,
+            source,
+            key="formula",
+            relative="text/span-superscript.md",
+        )
+        warnings = vle.fidelity_source_warnings(
+            doc, label=f"span-{label}", artifact_root=tmp_path
+        )
+        blind = [
+            warning for warning in warnings if warning.kind == "source_blind_pin"
+        ]
+        codes = (
+            set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+            if blind and blind[0].reason_codes_by_pin
+            else set()
+        )
+        if codes != {expected}:
+            failures.append(f"{label!r} ~ {source!r}: {codes} != {expected}")
+    assert failures == []
+
+
+def test_csv_tsv_cell_superscript_is_classified_whole(tmp_path: Path):
+    """A CSV or TSV cell is one unit, the same classifier as an HTML cell.
+
+    ``SiO2 ⁿ`` refuses ``SiO2`` as charged, not cited. The same cell
+    refuses ``Al2O3`` as charged. A second cell does not: ``Fe`` beside
+    ``SiO2 ⁿ`` refuses ``Al2O3`` as cited and ``SiO2`` as charged. A
+    space in prose still splits tokens. ``SO₄−`` does not type ``SiO2``.
+    """
+    sio = vle._PinnedLeaf("SiO2", True)
+    al = vle._PinnedLeaf("Al2O3", True)
+    cell = "SiO2 ⁿ"
+    assert vle._charged_formula_miss([sio], cell, cells=(cell,)) is True
+    assert vle._charged_formula_miss([al], cell, cells=(cell,)) is True
+    assert (
+        vle._charged_formula_miss([al], "Fe\n" + cell, cells=("Fe", cell))
+        is False
+    )
+    assert (
+        vle._charged_formula_miss([sio], "Fe\n" + cell, cells=("Fe", cell))
+        is True
+    )
+    assert vle._charged_formula_miss([sio], cell) is False
+    assert (
+        vle._charged_formula_miss([sio], "SO\u2084\u2212", cells=("SO\u2084\u2212",))
+        is False
+    )
+    failures: list[str] = []
+    cases = (
+        ("SiO2 ⁿ\n", "SiO2", "charged_species_unsupported", "tables/sio2-spaced.csv"),
+        ("SiO2 ⁿ\n", "SiO2", "charged_species_unsupported", "tables/sio2-spaced.tsv"),
+        ("SiO2 ⁿ\n", "Al2O3", "charged_species_unsupported", "tables/sio2-spaced-al.csv"),
+        ("Fe,SiO2 ⁿ\n", "Al2O3", "cited_token_absent", "tables/sio2-neighbour.csv"),
+        ("Fe,SiO2 ⁿ\n", "SiO2", "charged_species_unsupported", "tables/sio2-neighbour-hit.csv"),
+        ("Fe\tSiO2 ⁿ\n", "Al2O3", "cited_token_absent", "tables/sio2-neighbour.tsv"),
+        ("Fe\tSiO2 ⁿ\n", "SiO2", "charged_species_unsupported", "tables/sio2-neighbour-hit.tsv"),
+    )
+    for source, label, expected, relative in cases:
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path, label, source, key=key, relative=relative
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc, label=f"cell-{key}-{label}", artifact_root=tmp_path
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {expected}:
+                failures.append(
+                    f"{key} {label!r} ~ {relative}: {codes} != {expected}"
+                )
+    assert failures == []
+
+
+def test_addressed_cell_charge_is_one_unit(tmp_path: Path):
+    """Every addressed cell is one unit on the one charge check.
+
+    HTML, CSV, and TSV. The shapes are ``Fe -``, ``SiO2 ⁿ``,
+    ``Fe<sup>2</sup>``, and ``Cl−``. Each refuses its formula as
+    ``charged_species_unsupported``. A space in the cell does not
+    split it. Prose still splits, so ``Fe -`` in prose does not
+    charge ``Fe``. ``Fe -`` does not type ``SiO2``.
+    """
+    reason = inspect.getsource(vle._locator_source_blind_reason)
+    assert reason.count("_charged_formula_miss(") == 1
+    fe = vle._PinnedLeaf("Fe", True)
+    sio = vle._PinnedLeaf("SiO2", True)
+    spaced = "Fe -"
+    assert vle._charged_formula_miss([fe], spaced, cells=(spaced,)) is True
+    assert vle._charged_formula_miss([sio], spaced, cells=(spaced,)) is False
+    assert vle._charged_formula_miss([fe], spaced) is False
+    assert vle._formula_element_symbols(spaced) == ("Fe",)
+    shapes = (
+        ("Fe -", "Fe", "fe-space"),
+        ("SiO2 ⁿ", "SiO2", "sio2-space-sup"),
+        ("Fe<sup>2</sup>", "Fe", "fe-sup"),
+        ("Cl\u2212", "Cl", "cl-minus"),
+    )
+    failures: list[str] = []
+
+    def surfaces(body: str, stem: str):
+        return (
+            (
+                "html",
+                f"<table><tr><td>{body}</td></tr></table>\n",
+                f"text/{stem}.html",
+                {"table_row": 1, "table_column": 1},
+            ),
+            ("csv", body + "\n", f"tables/{stem}.csv", None),
+            ("tsv", body + "\n", f"tables/{stem}.tsv", None),
+        )
+
+    for body, label, stem in shapes:
+        for kind, source, relative, locator_extra in surfaces(body, stem):
+            for key in ("formula", "species"):
+                doc = _html_source_document(
+                    tmp_path,
+                    label,
+                    source,
+                    key=key,
+                    relative=relative,
+                    locator_extra=locator_extra,
+                )
+                warnings = vle.fidelity_source_warnings(
+                    doc,
+                    label=f"cell-unit-{kind}-{key}-{stem}",
+                    artifact_root=tmp_path,
+                )
+                blind = [
+                    warning
+                    for warning in warnings
+                    if warning.kind == "source_blind_pin"
+                ]
+                codes = (
+                    set().union(
+                        *(warning.reason_codes_by_pin[0] for warning in blind)
+                    )
+                    if blind and blind[0].reason_codes_by_pin
+                    else set()
+                )
+                if codes != {"charged_species_unsupported"}:
+                    failures.append(
+                        f"{kind} {key} {label!r} ~ {body!r}: {codes}"
+                    )
+                errors = vle.certify_extract_source_fidelity(
+                    doc,
+                    label=f"cell-unit-cert-{kind}-{key}-{stem}",
+                    artifact_root=tmp_path,
+                )
+                joined = "\n".join(errors)
+                if (
+                    "source_blind_pin" not in joined
+                    or "charged_species_unsupported" not in joined
+                    or "superscript_in_cell" in joined
+                ):
+                    failures.append(
+                        f"certify {kind} {key} {label!r} ~ {body!r}: {errors}"
+                    )
+    for kind, source, relative, locator_extra in surfaces(
+        "Fe -", "fe-space-unrelated"
+    ):
+        for key in ("formula", "species"):
+            doc = _html_source_document(
+                tmp_path,
+                "SiO2",
+                source,
+                key=key,
+                relative=relative,
+                locator_extra=locator_extra,
+            )
+            warnings = vle.fidelity_source_warnings(
+                doc,
+                label=f"cell-unit-unrelated-{kind}-{key}",
+                artifact_root=tmp_path,
+            )
+            blind = [
+                warning
+                for warning in warnings
+                if warning.kind == "source_blind_pin"
+            ]
+            codes = (
+                set().union(*(warning.reason_codes_by_pin[0] for warning in blind))
+                if blind and blind[0].reason_codes_by_pin
+                else set()
+            )
+            if codes != {"cited_token_absent"}:
+                failures.append(f"unrelated {kind} {key}: {codes}")
+    assert failures == []
+
+
+def test_digit_group_spacing_is_one_number(tmp_path: Path):
+    """A typographic digit group is one number. An ASCII space is not.
+
+    ``1 100`` certifies 1 and 100 and does not certify 1100. Thin space,
+    narrow no-break space, and no-break space join, so ``1\\u2009650`` and
+    ``1\\u00a0650`` are 1650. ``12 34`` is not 1234. A short group leaves
+    the separated run unjoined, so ``12\\u200934\\u2009567`` is not 34567
+    and ``1\\u2009650\\u20091`` is not 1650. ``1,000`` stays a
+    comma group. A canonical spelling and a digitless leaf do not join
+    groups. A formula label does not use this fold.
+    """
+    assert vle._fold_digit_groups("1 550") == "1 550"
+    assert vle._fold_digit_groups("1 100") == "1 100"
+    assert vle._fold_digit_groups("SiO2 100") == "SiO2 100"
+    assert vle._fold_digit_groups("SiO2\u2009100") == "SiO2\u2009100"
+    assert vle._fold_digit_groups("(1 550)") == "(1 550)"
+    assert vle._fold_digit_groups("(1\u2009550)") == "(1550)"
+    assert vle._fold_digit_groups("1\u2009550") == "1550"
+    assert vle._fold_digit_groups("1\u202f550") == "1550"
+    assert vle._fold_digit_groups("1\u2009650") == "1650"
+    assert vle._fold_digit_groups("1\u00a0650") == "1650"
+    assert vle._fold_digit_groups("12 345") == "12 345"
+    assert vle._fold_digit_groups("12\u2009345") == "12345"
+    assert vle._fold_digit_groups("12\u200934\u2009567") == "12\u200934\u2009567"
+    assert vle._fold_digit_groups("1\u2009650\u20091") == "1\u2009650\u20091"
+    assert vle._fold_digit_groups("1\u2009234\u2009567") == "1234567"
+    assert vle._fold_digit_groups("12 34") == "12 34"
+    assert vle._fold_digit_groups("1 55") == "1 55"
+    assert vle._fold_digit_groups("6.98 100") == "6.98 100"
+    assert vle._fold_digit_groups("1,000") == "1,000"
+    assert vle._fold_digit_groups("1e0 001") == "1e0 001"
+    assert vle._fold_digit_groups("1.5 000") == "1.5 000"
+    assert vle._fold_digit_groups("-1 550") == "-1 550"
+    assert vle._fold_digit_groups("-1\u2009550") == "-1\u2009550"
+    assert vle._fold_digit_groups("1 550.25") == "1 550.25"
+    assert vle._fold_digit_groups("1\u2009550.25") == "1550.25"
+    assert vle._fold_digit_groups("1 550e3") == "1 550e3"
+    assert vle._fold_digit_groups("1\u2009550e3") == "1\u2009550e3"
+    assert vle._fold_digit_groups("1 550E3") == "1 550E3"
+    assert vle._fold_digit_groups("1\u2009550") == vle._fold_digit_groups(
+        vle._fold_digit_groups("1\u2009550")
+    )
+    assert vle._leaf_in_text(1, "1 100") is True
+    assert vle._leaf_in_text(100, "1 100") is True
+    assert vle._leaf_in_text(1100, "1 100") is False
+    assert vle._leaf_in_text(1650, "1\u2009650") is True
+    assert vle._leaf_in_text(1650, "1\u00a0650") is True
+    assert "_fold_digit_groups" not in inspect.getsource(vle._spelling_is_complete_token)
+    string_leaf = inspect.getsource(vle._string_leaf_in_text)
+    assert string_leaf.index("_string_has_ascii_digit") < string_leaf.index(
+        "_fold_digit_groups"
+    )
+    assert "_fold_digit_groups" in inspect.getsource(vle._citation_token_matches)
+    assert "_fold_digit_groups" in inspect.getsource(vle._whole_cell_number)
+    failures: list[str] = []
+    prose = (
+        (1550, "from 1 550 °C to\n", False),
+        (1, "from 1 550 °C to\n", True),
+        (550, "from 1 550 °C to\n", True),
+        (1550, "(1 550)\n", False),
+        (1, "(1 550)\n", True),
+        (550, "(1 550)\n", True),
+        (100, "SiO2 100\n", True),
+        (1550, "from 1\u2009550 °C to\n", True),
+        (1550, "from 1\u202f550 °C to\n", True),
+        (1650, "from 1\u2009650 °C to\n", True),
+        (1650, "1\u00a0650\n", True),
+        (1, "1 100\n", True),
+        (100, "1 100\n", True),
+        (1100, "1 100\n", False),
+        (12345, "12 345\n", False),
+        (12345, "12\u2009345\n", True),
+        (34567, "12\u200934\u2009567\n", False),
+        (1234567, "12\u200934\u2009567\n", False),
+        (1650, "1\u2009650\u20091\n", False),
+        (1234567, "1\u2009234\u2009567\n", True),
+        (1234, "12 34\n", False),
+        (155, "1 55\n", False),
+        (10, "1e0 001\n", False),
+        (15000, "1.5 000\n", False),
+        (1.5, "1.5 000\n", True),
+        ("1550", "from 1 550 °C to\n", False),
+        ("1650", "1\u2009650\n", True),
+        ("1650", "1\u00a0650\n", True),
+        (1550000, "1 550e3\n", False),
+        (1550, "1 550e3\n", False),
+        (1550000, "1\u2009550e3\n", False),
+        (1550, "1\u2009550e3\n", False),
+    )
+    for pin, source, accepts in prose:
+        doc = _literal_source_document(tmp_path, pin, source)
+        errors = vle.certify_extract_source_fidelity(
+            doc, label="digit-group", artifact_root=tmp_path
+        )
+        if accepts and errors:
+            failures.append(f"prose {pin!r} ~ {source!r}: {errors}")
+        if not accepts and (
+            not errors or "source_blind_pin" not in "\n".join(errors)
+        ):
+            failures.append(f"prose refuse {pin!r} ~ {source!r}: {errors}")
+    cells = (
+        ("csv", "1 550\n", 1550, False),
+        ("csv", "1 550\n", 1, False),
+        ("csv", "1\u2009550\n", 1550, True),
+        ("csv", "1\u2009650\n", 1650, True),
+        ("csv", "1\u00a0650\n", 1650, True),
+        ("csv", "12 34\n", 1234, False),
+        ("csv", "1e0 001\n", 10, False),
+        ("csv", "1.5 000\n", 1.5, False),
+        ("csv", "1.5 000\n", 15000, False),
+        ("csv", '"1,000"\n', 1000, False),
+        ("html", "1 550", 1550, False),
+        ("html", "1 550", 1, False),
+        ("html", "1\u202f550", 1550, True),
+        ("html", "1\u00a0650", 1650, True),
+        ("html", "1\u2009650", 1650, True),
+        ("html", "12\u200934\u2009567", 34567, False),
+        ("html", "1\u2009650\u20091", 1650, False),
+        ("csv", "12\u200934\u2009567\n", 34567, False),
+        ("csv", "1\u2009650\u20091\n", 1650, False),
+        ("html", "12 34", 1234, False),
+        ("html", "1e0 001", 10, False),
+        ("html", "1.5 000", 1.5, False),
+        ("html", "1 550e3", 1550000, False),
+        ("html", "1 550e3", 1550, False),
+        ("html", "1\u2009550e3", 1550, False),
+    )
+    for kind, source, pin, accepts in cells:
+        if kind == "csv":
+            doc = _tabular_source_document(tmp_path, pin, "csv", source)
+        else:
+            doc = _html_source_document(
+                tmp_path,
+                pin,
+                f"<table><tr><td>{source}</td></tr></table>\n",
+                locator_extra={"table_row": 1, "table_column": 1},
+            )
+        errors = vle.certify_extract_source_fidelity(
+            doc, label=f"digit-group-{kind}", artifact_root=tmp_path
+        )
+        if accepts and errors:
+            failures.append(f"{kind} {pin!r} ~ {source!r}: {errors}")
+        if not accepts and (
+            not errors or "source_blind_pin" not in "\n".join(errors)
+        ):
+            failures.append(f"{kind} refuse {pin!r} ~ {source!r}: {errors}")
+    assert failures == []
 
 
 # Stored value versus the sample spelling. ``within`` pairs satisfy
