@@ -502,6 +502,26 @@ def test_direct_gas_couple_numeric_outputs_are_pinned_before_extension(polys):
     assert h2.log10_fO2 == pytest.approx(-4.956493206418616, abs=1e-12)
 
 
+def test_wgs_solver_keeps_a_pinned_direct_couple_value_at_equilibrium(polys):
+    temperature_K = 1682.15
+    h2_moles = 10.0
+    h2o_moles = 2000.0
+    # Choose CO2/CO so the input Q equals the production CEA WGS K. The shift
+    # extent is zero and the result must retain the direct H2/H2O golden value.
+    gas = {
+        "H2": h2_moles,
+        "H2O": h2o_moles,
+        "CO": 1.0,
+        "CO2": (h2o_moles / h2_moles)
+        * 10.0 ** water_gas_shift_log10_K(polys, temperature_K),
+    }
+    result = imposed_fo2(gas, temperature_K, polys)
+
+    # Mutation: invert K_CO/K_H2 to K_H2/K_CO; this numeric pin fails.
+    assert result.extent_mol == pytest.approx(0.0, abs=1e-10)
+    assert result.log10_fO2 == pytest.approx(-4.956493206418616, abs=1e-12)
+
+
 def test_imposed_fo2_returns_the_ceajanaf_wgs_source_spread(polys):
     from decimal import Decimal
 
