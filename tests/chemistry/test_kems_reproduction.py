@@ -11,6 +11,7 @@ import pytest
 import yaml
 
 from simulator.chemistry.langmuir_knudsen import langmuir_molar_flux
+from simulator.physical_constants import PA_PER_BAR
 from simulator.diagnostic_helpers.kems import (
     KEMSAdapter,
     KEMSSchemaError,
@@ -59,7 +60,7 @@ def test_kems_observation_oxygen_reaches_transport_unchanged(adapter, monkeypatc
     surface, runtime = adapter._surface({
         'oxide': {'formula': 'MgO'},
         'provider_inputs': {'pO2_bar': oxygen},
-        'exterior_chamber_pressure': {'value_pa': oxygen * 1e5},
+        'exterior_chamber_pressure': {'value_pa': oxygen * PA_PER_BAR},
     }, temperature_K=1873.15)
     assert surface['Mg'] > 0
     assert receipts == [(oxygen, oxygen)]

@@ -3859,7 +3859,7 @@ def _sossi_openimcc_pressure_model(
         return {
             species: float(base.get(species, 0.0))
             * pO2_bar ** pO2_exponents[species]
-            * 100_000.0
+            * PA_PER_BAR
             for species, _parent, _n, _o2 in gas_channels
             if species in pO2_exponents
         }
@@ -4066,7 +4066,7 @@ def _predict_sossi_residue_cohort(
                     response = _internal_analytical_vapor_pressure_adapter(
                         core=analytical_core,
                         temperature_C=temperature_K - 273.15,
-                        pressure_bar=total_pressure_Pa / 100_000.0,
+                        pressure_bar=total_pressure_Pa / PA_PER_BAR,
                         composition_kg=None,
                         composition_mol=composition,
                         fO2_log=log10_pO2_bar,

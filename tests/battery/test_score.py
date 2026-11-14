@@ -25,6 +25,7 @@ from typing import Mapping
 import pytest
 import yaml
 
+from simulator.physical_constants import PA_PER_BAR
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -495,10 +496,10 @@ def test_mathieu_partial_pressure_prediction_is_independent_of_total_pressure(
         temperature_C = float(reference.identity.temperature_K.value) - 273.15
         assert reference.identity.fO2_Pa is not None
         assert reference.identity.fO2_Pa.is_value
-        po2_bar = float(reference.identity.fO2_Pa.value) / 100000.0
+        po2_bar = float(reference.identity.fO2_Pa.value) / PA_PER_BAR
         po2_request = Po2Request(mode=PO2_COMMANDED, po2_bar=po2_bar)
     for pressure_pa in (Decimal("0.1"), Decimal("100000")):
-        pressure_bar = float(pressure_pa) / 100000.0
+        pressure_bar = float(pressure_pa) / PA_PER_BAR
         if engine is Engine.INTERNAL_ANALYTICAL:
             assert internal_backend is not None
             result = internal_backend.equilibrate(
@@ -8485,7 +8486,7 @@ def test_battery_hero_deck_uses_solved_oxygen_balance_notice() -> None:
     assert redox["oxygen_source"] == "openimcc_oxygen_balance_condition_only"
     assert redox["oxygen_kind"] == "fo2_oxygen_balance_effusion_solved"
     assert float(redox["x_value"]).hex() == float(expected_delta_iw).hex()
-    assert Decimal(str(redox["fO2_Pa"])) == pO2_bar * Decimal("1e5")
+    assert Decimal(str(redox["fO2_Pa"])) == pO2_bar * Decimal(str(PA_PER_BAR))
     assert evolution["oxygen_mode"] == "solved"
     assert evolution["oxygen_source"] == redox["oxygen_source"]
     assert evolution["oxygen_kind"] == redox["oxygen_kind"]

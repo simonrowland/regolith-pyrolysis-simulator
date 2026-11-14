@@ -103,6 +103,7 @@ from simulator.optimize.study import (
     _write_leaderboard,
 )
 from simulator.recipe import RecipePatch, RecipeSchema
+from simulator.physical_constants import PA_PER_BAR
 from simulator.reduced_real_determinism import (
     PT0CacheMiss,
     PT0DeterminismStore,
@@ -5277,7 +5278,7 @@ def _exercise_knudsen_result(_tmp_path, monkeypatch) -> None:
         if calls["fe"] < calls["predict"]:
             _fe_pressure("FeO_association_gas")
             calls["fe"] += 1
-        return {"Fe": 1e-8 * 10 ** (-logp / 2), "O2": 1e5 * 10**logp}
+        return {"Fe": 1e-8 * 10 ** (-logp / 2), "O2": PA_PER_BAR * 10**logp}
 
     monkeypatch.setattr(residue, "predict_knudsen_residue_composition", counting)
     monkeypatch.setattr(residue, "_make_residue_pressure_model", lambda *_a, **_k: pressure)
