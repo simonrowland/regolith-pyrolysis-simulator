@@ -2674,14 +2674,16 @@ def predict_mass_loss_fraction(
             if term.parent_moles_per_product
         }
         capped_channels = set(inventory_capped_channels)
-        parent_scales: dict[str, float] = {}
+        parent_channel_scales: dict[str, dict[str, float]] = {}
         inventory_bounds_by_parent = {}
         # A divergent channel can consume at most each initial parent amount, ONCE:
         # splitting time or sharing that parent between gases creates no matter.
         # Cap the accumulated parent sum, including preheat, rather than shadow-
         # debiting the point state. This leaves the original trajectories intact.
-        # Bounds are apportioned by each reactant's mass share; the tightest
-        # shared-parent cap is applied to the whole gas channel.
+        # Bounds are apportioned by each reactant's mass share. Finite channels
+        # keep priority while they fit; if their sum alone exceeds inventory,
+        # scale that finite group too and leave no mass for divergent channels.
+        # A mixed-parent gas uses the tightest scale from any parent it consumes.
         for parent in sorted(
             {
                 parent
@@ -2709,24 +2711,51 @@ def predict_mass_loss_fraction(
             # Keep the prior single-parent ceiling arithmetic: inventory is
             # normalized to moles, then returned to mass.
             ceiling = initial_inventory_mol[parent] * _formula_terms(parent)[1]
-            remaining = max(0.0, ceiling - finite_total)
-            scale = min(1.0, remaining / capped_total) if capped_total > 0.0 else 1.0
-            parent_scales[parent] = scale
+            if finite_total > ceiling:
+                finite_scale = ceiling / finite_total
+                capped_scale = 0.0
+            else:
+                finite_scale = 1.0
+                remaining = max(0.0, ceiling - finite_total)
+                capped_scale = (
+                    min(1.0, remaining / capped_total)
+                    if capped_total > 0.0 else 1.0
+                )
+            parent_channel_scales[parent] = {
+                "finite": finite_scale,
+                "capped": capped_scale,
+            }
             inventory_bounds_by_parent[parent] = {
                 "uncapped_bound_kg": total, "ceiling_kg": ceiling,
-                "applied_bound_kg": min(total, ceiling),
             }
         channel_scales = {
             species: min(
-                parent_scales[parent]
+                parent_channel_scales[parent][
+                    "capped" if species in capped_channels else "finite"
+                ]
                 for parent in term_by_species[species].parent_moles_per_product
+                if parent in parent_channel_scales
             )
-            for species in capped_channels
+            for species, term in term_by_species.items()
+            if any(
+                parent in parent_channel_scales
+                for parent in term.parent_moles_per_product
+            )
         }
         for mapping in (bounds_by_channel, preheat_bounds_by_channel):
             for species, scale in channel_scales.items():
                 if species in mapping:
                     mapping[species] *= scale
+        for parent, cap in inventory_bounds_by_parent.items():
+            species = [
+                name for name, term in term_by_species.items()
+                if parent in term.parent_moles_per_product
+            ]
+            cap["applied_bound_kg"] = math.fsum(
+                mapping.get(name, 0.0) * parent_mass_share_by_channel[name][parent]
+                for mapping in (bounds_by_channel, preheat_bounds_by_channel)
+                for name in species
+            )
         unsourced_bound_kg = math.fsum(bounds_by_channel.values())
         preheat_bound_kg = math.fsum(preheat_bounds_by_channel.values())
         point_loss_kg = documented_loss_kg
