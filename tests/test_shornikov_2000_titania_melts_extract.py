@@ -170,81 +170,97 @@ def test_figure_extract_migrates_figure_only_observations():
     assert len(oxygen_rows) == 22
     expected_unlinked = {
         f"{source_id}::shornikov_2000_f1_TiO_02",
+        f"{source_id}::shornikov_2000_f1_TiO_12",
+        f"{source_id}::shornikov_2000_f1_TiO_16",
     }
     observed_unlinked = set()
-    linked_pairs = {}
     unlinked_pairs = {}
     linked_count = 0
+
+    def qualifying_oxygen_rows(tio_raw_row, oxygen_candidates):
+        target_x = (
+            Decimal(tio_raw_row["values"]["composition_mol"]["TiO2"])
+            * Decimal("100")
+        )
+        qualifying = {}
+        for oxygen_raw_row in oxygen_candidates:
+            oxygen_x = (
+                Decimal(oxygen_raw_row["values"]["composition_mol"]["TiO2"])
+                * Decimal("100")
+            )
+            gap = abs(target_x - oxygen_x)
+            pair_bound = (
+                composition_x_allowance_mol_pct(tio_raw_row)
+                + composition_x_allowance_mol_pct(oxygen_raw_row)
+            )
+            if gap <= pair_bound:
+                qualifying[oxygen_raw_row["observation_id"]] = (gap, pair_bound)
+        return qualifying
+
     for row in tio_rows:
         row_id = row.observation_id.split("::", 1)[1]
         target_x = (
             Decimal(raw_tio_rows[row_id]["values"]["composition_mol"]["TiO2"])
             * Decimal("100")
         )
-        nearest_gap, nearest_source_row = min(
-            [
-                (
-                    abs(
-                        target_x
-                        - Decimal(source_row["values"]["composition_mol"]["TiO2"])
-                        * Decimal("100")
-                    ),
-                    source_row,
-                )
-                for source_row in raw_oxygen_rows.values()
-            ],
-            key=lambda pair: pair[0],
+        oxygen_candidates = list(raw_oxygen_rows.values())
+        qualifying = qualifying_oxygen_rows(
+            raw_tio_rows[row_id], oxygen_candidates
         )
-        pair_tolerance_mol_pct = (
-            composition_x_allowance_mol_pct(raw_tio_rows[row_id])
-            + composition_x_allowance_mol_pct(nearest_source_row)
+        reversed_qualifying = qualifying_oxygen_rows(
+            raw_tio_rows[row_id], list(reversed(oxygen_candidates))
         )
+        assert qualifying == reversed_qualifying
+
         condition = row.point_conditions.get("fO2_Pa")
-        if nearest_gap > pair_tolerance_mol_pct:
+        if len(qualifying) != 1:
             assert row.observation_id in expected_unlinked
             assert condition is None or (
                 condition.state.is_unknown and condition.inference is None
             )
             assert linked_source_pressure(row) is None
             observed_unlinked.add(row.observation_id)
-            unlinked_pairs[row_id] = (
-                nearest_source_row["observation_id"],
-                nearest_gap,
-                pair_tolerance_mol_pct,
-            )
+            unlinked_pairs[row_id] = qualifying
+            if len(qualifying) > 1:
+                locator_note = raw_tio_rows[row_id]["locator"]["note"]
+                assert "ambiguous" in locator_note.lower()
+                for oxygen_id, (gap, _bound) in qualifying.items():
+                    assert oxygen_id in locator_note
+                    assert f"gap={gap:.4f} mol%" in locator_note
             continue
 
         assert row.observation_id not in expected_unlinked
+        oxygen_id, (source_gap, pair_bound) = next(
+            iter(qualifying.items())
+        )
+        source_oxygen_raw_row = raw_oxygen_rows[oxygen_id]
         assert condition is not None
         assert condition.state.is_value
         assert condition.inference is not None
         assert condition.inference.relation.startswith("source_oxygen_condition;")
-        assert f"at most {pair_tolerance_mol_pct} mol%" in condition.inference.relation
+        assert "unique Fig. 1 O sibling" in condition.inference.relation
+        assert f"gap {source_gap:.4f} mol%" in condition.inference.relation
+        assert f"pair bound {pair_bound} mol%" in condition.inference.relation
         assert (
             f"±{composition_x_allowance_mol_pct(raw_tio_rows[row_id])} mol%"
             in condition.inference.relation
         )
         assert (
-            f"±{composition_x_allowance_mol_pct(nearest_source_row)} mol%"
+            f"±{composition_x_allowance_mol_pct(source_oxygen_raw_row)} mol%"
             in condition.inference.relation
         )
         assert len(condition.inference.inputs) == 1
         assert row.observation_id not in condition.inference.inputs
         source_oxygen = oxygen_rows[condition.inference.inputs[0]]
         assert source_oxygen.observation_id == (
-            f"{source_id}::{nearest_source_row['observation_id']}"
+            f"{source_id}::{oxygen_id}"
         )
         source_x = (
-            Decimal(nearest_source_row["values"]["composition_mol"]["TiO2"])
+            Decimal(source_oxygen_raw_row["values"]["composition_mol"]["TiO2"])
             * Decimal("100")
         )
-        assert abs(target_x - source_x) == nearest_gap
-        assert nearest_gap <= pair_tolerance_mol_pct
-        linked_pairs[row_id] = (
-            nearest_source_row["observation_id"],
-            nearest_gap,
-            pair_tolerance_mol_pct,
-        )
+        assert abs(target_x - source_x) == source_gap
+        assert source_gap <= pair_bound
         assert source_oxygen.identity.species.formula == "O"
         assert source_oxygen.experiment_id == row.experiment_id
         assert source_oxygen.locator is not None
@@ -265,20 +281,17 @@ def test_figure_extract_migrates_figure_only_observations():
         assert _source_oxygen_pressure_for_score(mutated) == linked
         linked_count += 1
 
-    assert linked_count == 20
+    assert linked_count == 18
     assert observed_unlinked == expected_unlinked
-    # TiO_12 links on its wider row-specific allowance; TiO_02 is unlinked
-    # because its narrow pair allowance does not cover the composition gap.
-    assert linked_pairs["shornikov_2000_f1_TiO_12"][0] == "shornikov_2000_f1_O_12"
-    assert (
-        linked_pairs["shornikov_2000_f1_TiO_12"][1]
-        <= linked_pairs["shornikov_2000_f1_TiO_12"][2]
-    )
-    assert unlinked_pairs["shornikov_2000_f1_TiO_02"][0] == "shornikov_2000_f1_O_02"
-    assert (
-        unlinked_pairs["shornikov_2000_f1_TiO_02"][1]
-        > unlinked_pairs["shornikov_2000_f1_TiO_02"][2]
-    )
+    assert unlinked_pairs["shornikov_2000_f1_TiO_02"] == {}
+    assert set(unlinked_pairs["shornikov_2000_f1_TiO_12"]) == {
+        "shornikov_2000_f1_O_12",
+        "shornikov_2000_f1_O_13",
+    }
+    assert set(unlinked_pairs["shornikov_2000_f1_TiO_16"]) == {
+        "shornikov_2000_f1_O_16",
+        "shornikov_2000_f1_O_17",
+    }
 
     experiment = result.experiments[tio_rows[0].experiment_id]
     assert experiment.bench_id is not None
