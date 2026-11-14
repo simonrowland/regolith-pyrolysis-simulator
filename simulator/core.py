@@ -4458,12 +4458,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         self._headspace_downstream_pressure_bar(),
                     )
                 )
+                # Predict the same exposure as OVERHEAD_BLEED: kg/s *
+                # seconds/h * dt[h] = kg. At .5 mol/h, .25 h removes
+                # .125 mol rather than the full reference-hour .5 mol.
                 bleed_kg = (
                     self._headspace_bleed_conductance_kg_s(
                         species_kg_for_M_avg=holdup_kg,
                     )
                     * pressure_capacity_fraction
                     * 3600.0
+                    * self._step_dt_hr
                 )
                 if bleed_kg > 0.0:
                     avg_molar_mass = total_kg / total_mol
