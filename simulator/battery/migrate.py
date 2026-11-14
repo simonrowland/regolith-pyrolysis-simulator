@@ -25471,6 +25471,9 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
+        extract_notices = tuple(
+            _notice_from_plain(notice) for notice in (obs.get("notices") or ())
+        )
         context = source_context or {}
         closure_components_by_observation = context.get(
             "same_row_composition_closure_components"
@@ -27668,16 +27671,17 @@ class Migrator:
             oxygen_decision,
             from_fallback=oxygen_decision_fallback,
         )
-        # Residue fO2 is the printed-only promotion above. The generic
-        # decision covers every other quantity, including a derived ratio
-        # copied from the row point.
-        if (
+        oxygen_applied = (
             q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             and oxygen_state is not None
             and not _defaulted_row_derived_plante_oxygen(
                 admission, row_point_conditions
             )
-        ):
+        )
+        # Residue fO2 is the printed-only promotion above. The generic
+        # decision covers every other quantity, including a derived ratio
+        # copied from the row point.
+        if oxygen_applied:
             ident_kwargs["fO2_Pa"] = oxygen_state
         identity_for_profile = (
             Identity(
@@ -28085,7 +28089,11 @@ class Migrator:
                     source_derivation=source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
-                    notices=(*point_notices, *ambient_pressure_notices),
+                    notices=(
+                        *extract_notices,
+                        *point_notices,
+                        *ambient_pressure_notices,
+                    ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
                     parent_values=values,
@@ -28213,6 +28221,7 @@ class Migrator:
                         phase_provenance=phase_provenance,
                         identity_provenance=identity_provenance,
                         notices=(
+                            *extract_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28351,6 +28360,7 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
+                        *extract_notices,
                         *(
                             ()
                             if total_iron_notice is None
@@ -28550,6 +28560,7 @@ class Migrator:
                         source_derivation=source_derivation,
                         phase_provenance=sample_source_provenance,
                         notices=(
+                            *extract_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -28611,7 +28622,7 @@ class Migrator:
             elif obs.get("uncertainty"):
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
-        observation_notices: list[Notice] = []
+        observation_notices: list[Notice] = list(extract_notices)
         if ambient_pressure_notice is not None:
             observation_notices.append(ambient_pressure_notice)
         if obs.get("standard_pressure") == "not_printed":
@@ -29212,7 +29223,6 @@ class Migrator:
             q_token, ident_kwargs.get("subtype")
         )
         coord = None
-        val = None
         trail = "identity"
         extra_unc = None
         extra_unc_k: int | None = None
@@ -29550,7 +29560,6 @@ class Migrator:
                         "duplicate_of_observation_id"
                     ],
                 }
-            val = value_sel.amount
             trail = value_sel.unit_trail
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
@@ -32132,7 +32141,7 @@ class Migrator:
         count = self._count(rel)
         try:
             doc = load_json(path) if path.suffix == ".json" else load_yaml(path)
-        except (OSError, json.JSONDecodeError, yaml.YAMLError) as exc:
+        except (OSError, json.JSONDecodeError, yaml.YAMLError):
             count.metadata_in += 1
             return
         if not isinstance(doc, Mapping):

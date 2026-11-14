@@ -360,7 +360,7 @@ derivation:
   references: [none_printed]
 notices:
   - kind: engine_model_caveat
-    affected_quantities: [partial_pressure]
+    affected_quantities: [p_partial]
     reason: "input_references_none_printed: source names no input references"
     origin: literature_extract
 ```
