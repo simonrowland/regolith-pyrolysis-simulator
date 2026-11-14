@@ -10,9 +10,9 @@ scan:
 counts:
   sources: 2338
   by_stage:
-    unknown: 357
+    unknown: 358
     in_progress: 192
-    inbox: 1251
+    inbox: 1250
     ingested_complete: 149
     located: 206
     ingested_partial: 183
@@ -812,7 +812,7 @@ anti_loss:
       - zaitsev-2000-ms2000-045
       - zigo-1987-gehlenite-fusion
   stale_inbox:
-    count: 1251
+    count: 1250
     ids:
     - abdelkarim-1977-ferrous-oxide-activities
     - abdellatif-2006-pilot-condenser
@@ -2057,7 +2057,6 @@ anti_loss:
     - zhang-2025-lunar-spa-basin-mantle-redox
     - zhao-2006-mno-cmas-phase-equilibria
     - zhao-2009-ti-cmas-carbon-phase-equilibria
-    - zhao-2019-ce2o3-ternary-public-appendix
     - zhmoginov-2011-channeling-fusion
     - zhou-2013-strong-diffusion
     - zhou-2022-particle-in
@@ -38799,9 +38798,9 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: zhao-2019-ce2o3-ternary-public-appendix
-  stage: inbox
+  stage: unknown
   evidence:
-    decided_by: inbox
+    decided_by: unknown
     artefacts:
     - raw/zhao-2019-ce2o3-ternary-public-appendix/SOURCE.md
     - raw/zhao-2019-ce2o3-ternary-public-appendix/provenance/MAIN-ROUTES.md
@@ -38997,10 +38996,12 @@ sources:
     - raw/zhao-2019-ce2o3-ternary-public-appendix/reading/table-9.png
     - raw/zhao-2019-ce2o3-ternary-public-appendix/reading/table-9.svg
     - raw/zhao-2019-ce2o3-ternary-public-appendix/zhao-2019-ce2o3-ternary-public-appendix.html
-    reason: document in corpus raw/; no extract
+    reason: 'covered_by: source is covered by zhao-2019-ce2o3-ternary-thermodynamics; The appendix adds no
+      distinct numeric rows (189/189 rows match Tables AI-AXX).'
   usable_rows: 0
   total_rows: 0
-  inbox_exclusion_reason: null
+  inbox_exclusion_reason: 'covered_by: source is covered by zhao-2019-ce2o3-ternary-thermodynamics; The
+    appendix adds no distinct numeric rows (189/189 rows match Tables AI-AXX).'
 - source_id: zhao-2019-ce2o3-ternary-thermodynamics
   stage: in_progress
   evidence:
