@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping, Sequence
+from dataclasses import fields
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -35,6 +36,16 @@ from simulator.battery.score import (
 
 Document = Mapping[str, Any]
 Store = tuple[dict[str, Work], dict[str, Experiment], dict[str, Observation]]
+
+# The Phase A setup review contract, including explicitly absent determinants.
+# Failure prevented: deleting a setup entry and its declared path together.
+_SETUP_REVIEW_PATHS = (
+    ("method",), ("sample", "initial_composition"), ("sample", "printed_composition"),
+    ("sample", "mass_kg"), ("sample", "form"), ("sample", "container"),
+    ("sample", "pretreatment"), ("sample", "surface_area_m2"), ("conditions",),
+    ("thermal_schedule",), ("pressure_environment",), ("fO2_control",),
+    ("apparatus",), ("bench_id",), ("equipment_context_id",), ("work_id",),
+)
 
 
 def compare_point(observation: Observation, candidate: Decimal | None) -> dict[str, Any]:
@@ -167,6 +178,22 @@ def _review_causes(run: Document, review: Document, scope: Document) -> list[dic
     actual = [tuple(entry["ref"]) for entry in entries]
     if len(set(actual)) != len(actual) or set(actual) != expected or not actual:
         causes.append({"cause": "review_stale", "reason": "consumed_path_coverage"})
+    required: set[tuple[str | int, ...]] = set()
+    frozen = review["frozen_run"]
+    for group in frozen["outcomes"]:
+        for oid in group["observation_ids"]:
+            required.update(("observations", oid, field.name) for field in fields(Observation))
+    for eid in frozen["experiment_ids"]:
+        required.update(("experiments", eid, *path) for path in _SETUP_REVIEW_PATHS)
+        for field, owner in (("bench_id", "benches"), ("equipment_context_id", "contexts")):
+            linked = resolve_path(scope, ["experiments", eid, field])
+            if linked is not None:
+                required.add((owner, linked))
+    required.update(tuple(item["context_ref"]) for item in frozen["printed_inventory"]
+                    if item.get("context_ref"))
+    for path in sorted(required, key=str):
+        if not any(path[:len(ref)] == ref for ref in actual):
+            causes.append({"cause": "review_stale", "reason": "uncovered_consumed_path", "path": list(path)})
     for entry in entries:
         ref = entry["ref"]
         if resolve_path(scope, ref) != entry["resolved"]:

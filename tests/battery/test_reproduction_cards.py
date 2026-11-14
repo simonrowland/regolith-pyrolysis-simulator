@@ -1,7 +1,7 @@
 """Phase A contracts; paper values are independent of engine replay."""
 
 from copy import deepcopy
-from dataclasses import replace
+from dataclasses import fields, replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -10,7 +10,7 @@ import yaml
 
 from simulator.battery.enums import NoticeKind, UncertaintyKind, ValueKind
 from simulator.battery.migrate import load_migrated_store, to_plain
-from simulator.battery.records import Notice, State, Uncertainty, Value
+from simulator.battery.records import Notice, Observation, State, Uncertainty, Value
 from simulator.battery.reproduction_cards import (
     compare_point,
     evaluate_card,
@@ -170,7 +170,11 @@ def complete_contract(paper_point):
                {"ref": ["observations", oid, "value"], "resolved": to_plain(obs.value),
                 "status": "reviewed", "reviewer": "fixture", "locator": to_plain(obs.locator),
                 "quote": "22.74", "unit": "wt%"}]
-    for path in (["uncertainty"], ["notices"], ["identity"], ["evidence"], ["admission"]):
+    entries.append({"ref": ["experiments", obs.experiment_id],
+                    "resolved": deepcopy(scope["experiments"][obs.experiment_id]),
+                    "status": "reviewed", "reviewer": "fixture", "locator": {"page": 2},
+                    "quote": "source-only setup fixture", "unit": "as printed"})
+    for path in ([field.name] for field in fields(Observation) if field.name != "value"):
         entries.append({"ref": ["observations", oid, *path],
                         "resolved": resolve_path(scope, ["observations", oid, *path]),
                         "status": "reviewed", "reviewer": "fixture",
@@ -277,6 +281,17 @@ def test_omitted_review_cannot_authorize_an_unreviewed_wider_band(complete_contr
     assert receipt["review_current"] is False
     assert any(cause.get("reason") == "uncovered_consumed_path"
                and cause["path"][:2] == ["observations", oid] for cause in receipt["causes"])
+
+
+def test_setup_coverage_cannot_be_removed_from_both_review_lists(complete_contract):
+    args = complete_contract
+    args[2]["entries"] = [entry for entry in args[2]["entries"]
+                           if entry["ref"][0] != "experiments"]
+    args[2]["consumed_paths"] = [entry["ref"] for entry in args[2]["entries"]]
+    receipt = evaluate_card(*args)
+    assert receipt["verdict"] == "NOT_PASS"
+    assert any(cause.get("reason") == "uncovered_consumed_path"
+               and cause["path"][0] == "experiments" for cause in receipt["causes"])
 
 
 def test_group_gate_rejects_coordinate_availability_swap(complete_contract):
