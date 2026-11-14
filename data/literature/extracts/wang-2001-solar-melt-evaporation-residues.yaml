@@ -32,9 +32,9 @@ notes:
   the individual La–Lu ppm values are typed.
 - >-
   Table 1 prints 1σ standard errors for individual components. Nonzero cell errors are retained as standard_errors
-  in each row; printed zero errors are omitted. The current residue-series migration does not carry these component-specific
-  errors onto migrated observations. The printed definition is “Uncertainties are ±1σ standard errors calculated from
-  replicate analyses.”
+  in each v1 row; printed zero errors are omitted. The residue-series migration carries these component-specific
+  errors as numeric printed uncertainties with the one-sigma confidence level. The printed definition is “Uncertainties
+  are ±1σ standard errors calculated from replicate analyses.”
 experiments:
 - experiment_id: run-sc1
   method: langmuir_free_evaporation

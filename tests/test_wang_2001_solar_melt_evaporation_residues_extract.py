@@ -11,6 +11,7 @@ import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
 from simulator.battery.migrate import Migrator
+from simulator.battery.score import _printed_uncertainty_band
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -256,6 +257,21 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         assert uncertainty.kind.value == "printed"
         assert uncertainty.value == Decimal(error)
         assert uncertainty.basis == "wt%"
+        assert uncertainty.verbatim["verbatim"] == (
+            "Uncertainties are ±1σ standard errors calculated from replicate analyses."
+        )
+        assert uncertainty.verbatim["confidence_level"] == "one_sigma"
+        if formula == "MgO" and sample == "SC12":
+            scored_band = _printed_uncertainty_band(
+                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                uncertainty,
+                matches[0].value.point,
+                source_observation=matches[0],
+            )
+            assert scored_band.refusal is None
+            assert scored_band.band is not None
+            assert scored_band.band.value == Decimal("0.5879891953620162")
+            assert scored_band.notice is None
 
     sc1_experiment_id = "10.1016/s0016-7037(00)00529-9::experiment::run-sc1"
     sc1_experiment = migrator.result.experiments[sc1_experiment_id]
