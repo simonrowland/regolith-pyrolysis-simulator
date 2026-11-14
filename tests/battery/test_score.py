@@ -12501,6 +12501,56 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     assert lineage_complete_for(packaged_default_sources) is True
 
 
+def test_openimcc_canonical_doi_is_a_terminal_source_root() -> None:
+    from simulator.battery.score import lineage_complete_for
+    from simulator.battery.validate import AncestryFailure, _resolve_coefficient_sources
+
+    doi_root = "doi:10.1098/rspa.1965.0176"
+    works = {}
+    observations = {}
+    experiments = {}
+
+    resolved = _resolve_coefficient_sources(
+        (doi_root,), observations, works, experiments
+    )
+    assert resolved.complete
+    assert resolved.ids == frozenset({doi_root})
+    assert lineage_complete_for(
+        (doi_root,), works=works, observations=observations, experiments=experiments
+    )
+    malformed = _resolve_coefficient_sources(
+        ("doi:not-a-canonical-doi",), observations, works, experiments
+    )
+    assert malformed.failure is AncestryFailure.UNKNOWN_ALIAS
+
+
+def test_openimcc_doi_matching_a_registered_work_is_same_source() -> None:
+    from simulator.battery.validate import resolve_source_relation
+
+    doi = "10.1098/rspa.1965.0176"
+    work = replace(F.work("masson-1965-doi-lineage"), doi=doi)
+    experiment = F.tabulation_experiment(
+        experiment_id="masson-1965-doi-lineage-exp", work_id=work.work_id
+    )
+    reference = F.observation(
+        "masson-1965-doi-lineage-row",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+
+    assert resolve_source_relation(
+        reference,
+        (f"doi:{doi}",),
+        True,
+        works={work.work_id: work},
+        observations={reference.observation_id: reference},
+        experiments={experiment.experiment_id: experiment},
+    ) is SourceRelation.SAME_INPUT
+
+
 @pytest.mark.parametrize(
     "unknown_alias",
     (
