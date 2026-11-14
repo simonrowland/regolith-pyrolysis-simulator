@@ -607,7 +607,6 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
         assert _hx_tree(balance["dominant_O_carriers"]) == expected["O"]
         assert _hx_tree(balance["dominant_metal_carriers"]) == expected["metal"]
         assert float(solved["pO2_bar"]).hex() == expected["pO2"]
-        assert diagnostics["authority"] is None
         assert diagnostics["openimcc_provenance"] == gas_provenance
         assert gas["domain_flags"] == _DOMAIN_FLAGS[(pot_id, temperature_K)]
         assert gas["provenance_class"] == _PROVENANCE_CLASSES
@@ -616,11 +615,17 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
             for species, reason in _DOMAIN_FLAGS[(pot_id, temperature_K)].items()
             if reason
         }
-        assert {
+        # OpenIMCC 9c reports extrapolation per gas channel. The aggregate
+        # authority is present only when at least one channel is extrapolated.
+        assert diagnostics["authority"] == (
+            "extrapolated" if expected_gas_notices else None
+        )
+        actual_gas_notices = {
             (notice["kind"], notice["authority"], notice["species"], notice["reason"])
             for notice in diagnostics["imcc_notices"]
             if notice["kind"] == "openimcc_gas_flag"
-        } == expected_gas_notices
+        }
+        assert actual_gas_notices == expected_gas_notices
         assert tuple(
             (notice["species"], notice["reason"])
             for notice in diagnostics["imcc_notices"]
