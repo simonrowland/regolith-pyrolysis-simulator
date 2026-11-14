@@ -20210,12 +20210,23 @@ def _bare_log_frame_decision(
                     f"full_balance_cea_janaf_and_mix_band={_dec_str(full_band)} dex; "
                     f"combined_allowance={_dec_str(tolerance + full_band)} dex"
                 )
+                domain_reasons = resolution.domain_reasons
+                domain_notice = (
+                    PrintedOxygenNotice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        reason=(
+                            "gas-mixture full balance is outside its certified "
+                            "species domain: " + "; ".join(domain_reasons)
+                        ),
+                    ),
+                ) if domain_reasons else ()
                 decision = checked_gas_mix_decision(
                     atmosphere,
                     expected,
                     full_band,
                     band_text,
-                    Authority.CERTIFIED,
+                    Authority.EXTRAPOLATED if domain_reasons else Authority.CERTIFIED,
+                    notices=domain_notice,
                 )
                 if decision is not None:
                     return decision

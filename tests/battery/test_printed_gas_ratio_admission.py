@@ -139,6 +139,7 @@ def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatc
         )
         if decision.state.is_value:
             assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            assert decision.notice_authority.value == "certified"
             admitted += 1
         else:
             assert decision.state.is_unknown
@@ -186,6 +187,94 @@ def test_n2_dilution_only_cancels_when_dissociation_is_negligible_and_ratio_move
     original_ratio, _, _ = _resolution(atmosphere, Decimal("1600"))
     assert changed_ratio.log10_fO2 != original_ratio.log10_fO2
 
+    co2_rich = "CO2:H2:N2 = 99.0:1.0:0.0 c.c.s/min"
+    co2_rich_diluted = "CO2:H2:N2 = 99.0:1.0:900.0 c.c.s/min"
+    hot_rich, _, _ = _resolution(co2_rich, Decimal("2173"))
+    hot_rich_diluted, _, _ = _resolution(co2_rich_diluted, Decimal("2173"))
+    assert abs(hot_rich_diluted.log10_fO2 - hot_rich.log10_fO2) == pytest.approx(
+        0.6, abs=0.12
+    )
+    cool_rich, _, _ = _resolution(co2_rich, Decimal("1000"))
+    cool_rich_diluted, _, _ = _resolution(co2_rich_diluted, Decimal("1000"))
+    assert cool_rich_diluted.log10_fO2 == pytest.approx(
+        cool_rich.log10_fO2, abs=1e-7
+    )
+
+
+def test_jayasuriya_fev15_precision_band_admits_printed_value() -> None:
+    jayasuriya = _source_doc("jayasuriya-2004-iron-mossbauer.yaml")
+    observation = next(
+        item
+        for item in jayasuriya["species"]["Fe"]["observations"]
+        if item["observation_id"] == "jayasuriya_2004_rt_1pct"
+    )
+    point = next(
+        point
+        for point in observation["values"]["points"]
+        if point["sample_as_published"] == "FeV15"
+    )
+    atmosphere = point["gas_mix_as_printed"]
+    parsed = _printed_sccm_gas_mixture(atmosphere)
+    assert parsed is not None
+    species_mol, relative_precision = parsed
+    gibbs, gas_constant = _janaf_gas_formation_inputs(
+        ("CO", "CO2", "H2", "H2O", "O2"), Decimal("1682.15")
+    )
+    result, _cea, band = _full_balance_fo2_with_janaf_band(
+        {name: float(amount) for name, amount in species_mol.items()},
+        1682.15,
+        gibbs,
+        gas_constant,
+        load_buffer_polynomials(),
+        initial_total_pressure_bar=1.01325,
+        relative_precision=relative_precision,
+    )
+    printed = Decimal(str(point["log_fO2_as_published"]))
+    printed_tolerance = Decimal("0.01")
+    combined_allowance = printed_tolerance + Decimal(str(band))
+    mismatch = abs(printed - Decimal(str(result.log10_fO2)))
+    assert result.log10_fO2 == pytest.approx(-3.949, abs=0.005)
+    assert float(mismatch) == pytest.approx(0.039, abs=0.002)
+    assert mismatch <= combined_allowance
+
+
+@pytest.mark.parametrize("sample", ("FeV2", "FeV12", "FeV15", "FeV19", "FeV22"))
+def test_jayasuriya_real_mixtures_stay_certified(sample: str) -> None:
+    jayasuriya = _source_doc("jayasuriya-2004-iron-mossbauer.yaml")
+    observation = next(
+        item
+        for item in jayasuriya["species"]["Fe"]["observations"]
+        if item["observation_id"] == "jayasuriya_2004_rt_1pct"
+    )
+    point = next(
+        point
+        for point in observation["values"]["points"]
+        if point["sample_as_published"] == sample
+    )
+    atmosphere = point["gas_mix_as_printed"]
+    temperature = Decimal(str(point["T_C"])) + Decimal("273.15")
+    decision = _bare_log_frame_decision(
+        Decimal(str(point["log_fO2_as_published"])),
+        temperature,
+        printed_atmospheres=(atmosphere,),
+    )
+    assert decision.state.is_value
+    assert decision.notice_authority.value == "certified"
+    assert not any("graphite saturation" in notice.reason for notice in decision.notices)
+
+
+def test_graphite_saturated_match_keeps_value_but_downgrades_authority() -> None:
+    atmosphere = "9CO:1CO2"
+    result, _cea, _band = _resolution(atmosphere, Decimal("1000"))
+    decision = _bare_log_frame_decision(
+        Decimal(str(result.log10_fO2)),
+        Decimal("1000"),
+        printed_atmospheres=(atmosphere,),
+    )
+    assert decision.state.is_value
+    assert decision.notice_authority.value == "extrapolated"
+    assert any("graphite saturation a_C=" in notice.reason for notice in decision.notices)
+
 
 def test_real_sossi_record_oxygen_balance_fails_when_free_o2_term_is_dropped() -> None:
     sossi = _source_doc("sossi-2020-magma-ocean-redox.yaml")
@@ -213,13 +302,14 @@ def test_real_sossi_record_oxygen_balance_fails_when_free_o2_term_is_dropped() -
     eq = result.equilibrium_partial_pressures_bar
     complete = 2 * eq["CO2"] + eq["CO"] + eq["H2O"] + 2 * eq["O2"]
     dropped_o2 = 2 * eq["CO2"] + eq["CO"] + eq["H2O"]
-    assert complete == pytest.approx(initial_oxygen_atoms, abs=1e-12)
-    assert abs(dropped_o2 - initial_oxygen_atoms) > 1e-4
+    oxygen_scale = 1.0 - eq["O2"]
+    assert complete == pytest.approx(initial_oxygen_atoms * oxygen_scale, abs=1e-12)
+    assert abs(dropped_o2 - initial_oxygen_atoms * oxygen_scale) > 1e-4
 
 
 @pytest.mark.parametrize(
     ("sample", "expected_log_fO2"),
-    [("FeV15", "-3.9488"), ("FeV19", "-12.9442")],
+    [("FeV15", "-3.9489"), ("FeV19", "-12.9442")],
 )
 def test_real_jayasuriya_mixtures_use_full_balance(
     sample: str, expected_log_fO2: str

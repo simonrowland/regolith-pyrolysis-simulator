@@ -31,6 +31,7 @@ from simulator.chemistry.offgas_fo2 import (
     H2_COUPLE_ONLY,
     WGS_EQUILIBRATED,
     OffgasFO2Unavailable,
+    _full_element_balance_fo2,
     imposed_fo2,
     load_buffer_polynomials,
     shift_extent,
@@ -599,8 +600,129 @@ def test_full_element_balance_keeps_free_oxygen_and_co2_limit(polys):
     eq = mixture.equilibrium_partial_pressures_bar
     complete = 2 * eq["CO2"] + eq["CO"] + eq["H2O"] + 2 * eq["O2"]
     dropped_o2 = 2 * eq["CO2"] + eq["CO"] + eq["H2O"]
-    assert complete == pytest.approx(oxygen_initial, abs=1e-12)
-    assert abs(dropped_o2 - oxygen_initial) > 1e-4
+    oxygen_scale = 1.0 - eq["O2"]
+    assert complete == pytest.approx(oxygen_initial * oxygen_scale, abs=1e-12)
+    assert abs(dropped_o2 - oxygen_initial * oxygen_scale) > 1e-4
+    assert sum(eq.values()) == pytest.approx(1.0, abs=1e-12)
+
+
+def test_full_element_balance_accepts_pure_oxygen_endpoint():
+    from simulator.chemistry.offgas_fo2 import _full_element_balance_fo2
+
+    result = _full_element_balance_fo2(
+        {"O2": 1.0},
+        1000.0,
+        {},
+        8.31441,
+        initial_total_pressure_bar=1.01325,
+    )
+    assert result.log10_fO2 == pytest.approx(math.log10(1.01325), abs=1e-12)
+    assert result.equilibrium_partial_pressures_bar["O2"] == pytest.approx(1.01325)
+
+
+def test_full_balance_extreme_minor_species_matches_decimal_root(polys):
+    """Tiny equilibrium partners stay finite and agree with an independent solve."""
+    from decimal import Decimal, localcontext
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        _janaf_gas_formation_gibbs_J_per_mol,
+    )
+
+    def decimal_reference(amounts, temperature):
+        with localcontext() as context:
+            context.prec = 70
+            t = Decimal(str(temperature))
+            gibbs = {
+                species: _janaf_gas_formation_gibbs_J_per_mol(species, t)
+                for species in ("CO", "CO2", "H2", "H2O", "O2")
+            }
+            gas_constant = JANAF_R_J_PER_MOL_K
+            log_k_co = -(
+                gibbs["CO"] + gibbs["O2"] / 2 - gibbs["CO2"]
+            ) / (gas_constant * t)
+            log_k_h2 = -(
+                gibbs["H2"] + gibbs["O2"] / 2 - gibbs["H2O"]
+            ) / (gas_constant * t)
+            co_k, h2_k = log_k_co.exp(), log_k_h2.exp()
+            total = sum(Decimal(str(value)) for value in amounts.values())
+            normalized = {
+                key: Decimal(str(value)) / total for key, value in amounts.items()
+            }
+            carbon = normalized.get("CO", 0) + normalized.get("CO2", 0)
+            hydrogen = normalized.get("H2", 0) + normalized.get("H2O", 0)
+            inert = sum(normalized.get(key, 0) for key in ("N2", "AR"))
+            non_o2 = carbon + hydrogen + inert
+            oxygen = (
+                2 * normalized.get("CO2", 0)
+                + normalized.get("CO", 0)
+                + normalized.get("H2O", 0)
+                + 2 * normalized.get("O2", 0)
+            )
+
+            def residual(p_o2):
+                scale = (Decimal(1) - p_o2) / non_o2
+                co_ratio = co_k / p_o2.sqrt()
+                h2_ratio = h2_k / p_o2.sqrt()
+                p_co2 = scale * carbon / (1 + co_ratio)
+                p_co = scale * carbon * co_ratio / (1 + co_ratio)
+                p_h2o = scale * hydrogen / (1 + h2_ratio)
+                p_h2 = scale * hydrogen * h2_ratio / (1 + h2_ratio)
+                oxygen_offset = 2 * carbon + hydrogen - oxygen
+                reduced_oxygen = (
+                    carbon * co_ratio / (1 + co_ratio)
+                    + hydrogen * h2_ratio / (1 + h2_ratio)
+                )
+                return scale * (oxygen_offset - reduced_oxygen) + 2 * p_o2
+
+            lo, hi = Decimal("1e-100"), Decimal("0.999999999999999999999999")
+            for _ in range(500):
+                mid = (lo + hi) / 2
+                if residual(mid) > 0:
+                    hi = mid
+                else:
+                    lo = mid
+            return float(((lo + hi) / 2).ln() / Decimal(10).ln())
+
+    cases = (
+        ({"CO2": 1.0}, 300.0, -30.0),
+        ({"H2": 1.0, "CO2": 1e-17}, 1500.0, -45.5),
+    )
+    for gas, temperature, expected_approx in cases:
+        gibbs = {
+            species: float(
+                _janaf_gas_formation_gibbs_J_per_mol(species, Decimal(str(temperature)))
+            )
+            for species in ("CO", "CO2", "H2", "H2O", "O2")
+        }
+        result = _full_element_balance_fo2(
+            gas,
+            temperature,
+            gibbs,
+            float(JANAF_R_J_PER_MOL_K),
+            initial_total_pressure_bar=1.0,
+        )
+        reference = decimal_reference(gas, temperature)
+        assert math.isfinite(result.log10_fO2)
+        assert result.log10_fO2 == pytest.approx(expected_approx, abs=0.5)
+        assert abs(result.log10_fO2 - reference) < 0.5
+
+    traces = []
+    for trace in (1e-15, 1e-16, 1e-17):
+        gibbs = {
+            species: float(
+                _janaf_gas_formation_gibbs_J_per_mol(species, Decimal("1500"))
+            )
+            for species in ("CO", "CO2", "H2", "H2O", "O2")
+        }
+        traces.append(
+            _full_element_balance_fo2(
+                {"H2": 1.0, "CO2": trace}, 1500.0, gibbs,
+                float(JANAF_R_J_PER_MOL_K), initial_total_pressure_bar=1.0,
+            ).log10_fO2
+        )
+    assert all(math.isfinite(value) for value in traces)
+    assert all(left > right for left, right in zip(traces, traces[1:])), traces
 
 
 def test_non_finite_and_negative_amounts_are_not_treated_as_present(polys):

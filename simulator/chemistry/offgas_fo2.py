@@ -233,6 +233,41 @@ class OffgasFO2:
 class _ElementBalanceFO2:
     log10_fO2: float
     equilibrium_partial_pressures_bar: dict[str, float]
+    domain_reasons: tuple[str, ...] = ()
+
+
+def _graphite_saturation_log10_activity(
+    equilibrium_partial_pressures_bar: Mapping[str, float], T_K: float
+) -> float | None:
+    """Return log10(a_C) from C + CO2 = 2 CO and the sourced Boudouard Kp."""
+
+    p_co = equilibrium_partial_pressures_bar.get("CO", 0.0)
+    p_co2 = equilibrium_partial_pressures_bar.get("CO2", 0.0)
+    if p_co <= 0.0:
+        return None
+    if p_co2 <= 0.0:
+        return math.inf
+    # Kp = pCO^2 / (a_C * pCO2), with every pressure in bar and p°=1 bar.
+    # Keep the check in log space so tiny gas fractions do not underflow.
+    from simulator.chemistry.organics_pyrolysis import boudouard_lg_kp
+
+    return 2.0 * math.log10(p_co) - math.log10(p_co2) - boudouard_lg_kp(T_K)
+
+
+def _with_graphite_domain(
+    result: _ElementBalanceFO2, T_K: float
+) -> _ElementBalanceFO2:
+    log10_activity = _graphite_saturation_log10_activity(
+        result.equilibrium_partial_pressures_bar, T_K
+    )
+    if log10_activity is None or log10_activity < 0.0:
+        return result
+    activity = "infinite" if math.isinf(log10_activity) else f"10^{log10_activity:.3g}"
+    return _ElementBalanceFO2(
+        result.log10_fO2,
+        result.equilibrium_partial_pressures_bar,
+        (f"graphite saturation a_C={activity} is at or above 1",),
+    )
 
 
 def _full_element_balance_fo2(
@@ -243,7 +278,11 @@ def _full_element_balance_fo2(
     *,
     initial_total_pressure_bar: float,
 ) -> _ElementBalanceFO2:
-    """Equilibrate CO2/CO/O2 and H2O/H2/O2 at fixed T and volume."""
+    """Equilibrate CO2/CO/O2 and H2O/H2/O2 at fixed T and total pressure.
+
+    Every trial normalizes partial pressures by the current total moles. The
+    flowing-furnace closure is isobaric: ``p_i = n_i * P / sum(n)``.
+    """
 
     T = _coerce_T_K(T_K)
     try:
@@ -269,21 +308,9 @@ def _full_element_balance_fo2(
     fraction_total = sum(amounts.values())
     if fraction_total <= 0.0:
         raise OffgasFO2Unavailable("full gas balance has no initial gas")
-    # Mole fractions times the initial pressure give bar partial pressures;
-    # normalization preserves the printed ratios when rounded input sums drift.
+    # Normalize the feed so rounded printed ratios cannot alter its elemental
+    # inventory or the chosen total-pressure basis.
     initial = {name: value * pressure / fraction_total for name, value in amounts.items()}
-    required = ("CO", "CO2", "H2", "H2O", "O2")
-    if any(name not in formation_gibbs_J_per_mol for name in required):
-        raise OffgasFO2Unavailable("full gas balance lacks JANAF Gibbs data for CO-H-O species")
-
-    logK_co = _log10_K_from_formation_gibbs_J_per_mol(
-        (("CO", 1.0), ("O2", 0.5), ("CO2", -1.0)),
-        formation_gibbs_J_per_mol, T, gas_constant,
-    )
-    logK_h2 = _log10_K_from_formation_gibbs_J_per_mol(
-        (("H2", 1.0), ("O2", 0.5), ("H2O", -1.0)),
-        formation_gibbs_J_per_mol, T, gas_constant,
-    )
     carbon = initial.get("CO2", 0.0) + initial.get("CO", 0.0)
     hydrogen = initial.get("H2O", 0.0) + initial.get("H2", 0.0)
     oxygen_atoms = (
@@ -295,15 +322,46 @@ def _full_element_balance_fo2(
     if oxygen_atoms <= 0.0:
         raise OffgasFO2Unavailable("gas elemental balance has no oxygen and imposes no finite fO2")
 
+    non_o2_moles = sum(
+        initial.get(name, 0.0)
+        for name in ("CO", "CO2", "H2", "H2O", "N2", "AR")
+    )
+    if non_o2_moles == 0.0:
+        # No reaction can make or consume O2 without C or H. This also handles
+        # the exact pure-oxidant endpoint whose residual is zero at pO2=P.
+        p_o2 = initial.get("O2", 0.0)
+        if p_o2 <= 0.0:
+            raise OffgasFO2Unavailable("gas elemental balance has no positive pO2 root")
+        return _ElementBalanceFO2(
+            math.log10(p_o2),
+            {"CO2": 0.0, "CO": 0.0, "O2": p_o2, "H2O": 0.0, "H2": 0.0},
+        )
+
+    required = ("CO", "CO2", "H2", "H2O", "O2")
+    if any(name not in formation_gibbs_J_per_mol for name in required):
+        raise OffgasFO2Unavailable("full gas balance lacks JANAF Gibbs data for CO-H-O species")
+    logK_co = _log10_K_from_formation_gibbs_J_per_mol(
+        (("CO", 1.0), ("O2", 0.5), ("CO2", -1.0)),
+        formation_gibbs_J_per_mol, T, gas_constant,
+    )
+    logK_h2 = _log10_K_from_formation_gibbs_J_per_mol(
+        (("H2", 1.0), ("O2", 0.5), ("H2O", -1.0)),
+        formation_gibbs_J_per_mol, T, gas_constant,
+    )
+
     def species_at_log_p(log_p: float) -> dict[str, float]:
         p_o2 = 10.0**log_p
         log_ratio = -0.5 * log_p
         co_ratio = 10.0 ** max(-300.0, min(300.0, logK_co + log_ratio))
         h2_ratio = 10.0 ** max(-300.0, min(300.0, logK_h2 + log_ratio))
-        p_co = carbon * co_ratio / (1.0 + co_ratio) if carbon else 0.0
-        p_co2 = carbon - p_co
-        p_h2 = hydrogen * h2_ratio / (1.0 + h2_ratio) if hydrogen else 0.0
-        p_h2o = hydrogen - p_h2
+        # The common scale is P/N_total. Compute both members directly: taking
+        # the minor pressure away from the total destroys the major species
+        # below machine epsilon (e.g. pure CO2 at 300 K).
+        scale = max(0.0, pressure - p_o2) / non_o2_moles
+        p_co2 = scale * carbon / (1.0 + co_ratio) if carbon else 0.0
+        p_co = scale * carbon * co_ratio / (1.0 + co_ratio) if carbon else 0.0
+        p_h2o = scale * hydrogen / (1.0 + h2_ratio) if hydrogen else 0.0
+        p_h2 = scale * hydrogen * h2_ratio / (1.0 + h2_ratio) if hydrogen else 0.0
         result = {
             "CO2": p_co2,
             "CO": p_co,
@@ -311,28 +369,47 @@ def _full_element_balance_fo2(
             "H2O": p_h2o,
             "H2": p_h2,
         }
-        result.update({name: value for name, value in initial.items() if name in {"N2", "AR"}})
+        result.update({name: scale * value for name, value in initial.items() if name in {"N2", "AR"}})
         return result
 
     def oxygen_residual(log_p: float) -> float:
         eq = species_at_log_p(log_p)
-        return (
-            2.0 * eq["CO2"] + eq["CO"] + eq["H2O"] + 2.0 * eq["O2"]
-            - oxygen_atoms
+        scale = max(0.0, pressure - eq["O2"]) / non_o2_moles
+        co_ratio = 10.0 ** max(-300.0, min(300.0, logK_co - 0.5 * log_p))
+        h2_ratio = 10.0 ** max(-300.0, min(300.0, logK_h2 - 0.5 * log_p))
+        # Expand O_eq - O_feed around each couple's major species. Subtracting
+        # near-equal totals erased tiny roots; evaluating r/(1+r) also rounds
+        # to 1 when r is huge. Use the minor member directly on either side of
+        # r=1, with the corresponding oxygen count in the base inventory.
+        carbon_base = 2.0 * carbon if co_ratio <= 1.0 else carbon
+        carbon_adjustment = (
+            -carbon * co_ratio / (1.0 + co_ratio)
+            if co_ratio <= 1.0
+            else carbon / (1.0 + co_ratio)
         )
+        hydrogen_base = hydrogen if h2_ratio <= 1.0 else 0.0
+        hydrogen_adjustment = (
+            -hydrogen * h2_ratio / (1.0 + h2_ratio)
+            if h2_ratio <= 1.0
+            else hydrogen / (1.0 + h2_ratio)
+        )
+        oxygen_offset = carbon_base + hydrogen_base - oxygen_atoms
+        return scale * (
+            oxygen_offset + carbon_adjustment + hydrogen_adjustment
+        ) + 2.0 * eq["O2"]
 
-    # Premise: the feed starts at fixed T and volume, then CO2 ⇌ CO + ½O2
+    # Premise: the feed starts at fixed T and total pressure, then CO2 ⇌ CO + ½O2
     # and H2O ⇌ H2 + ½O2 reach ideal-gas equilibrium. For each trial pO2,
     # Kp_CO = (pCO/p°)*sqrt(pO2/p°)/(pCO2/p°), and likewise for H2O/H2;
-    # C: CO2+CO=C0 and H: H2+H2O=H0 determine each split. The root closes
-    # O: 2CO2+CO+H2O+2O2=O0. N: 2N2=N0 and Ar=Ar0 because both are inert.
-    # Unit check: mole fractions × bar give bar-equivalent partial pressures,
-    # so each elemental-balance term is bar; every Kp factor is p/p° with
+    # C: CO2+CO=C0 and H: H2+H2O=H0 determine each split in moles. The common
+    # scale P/N_total converts those inventories to partial pressures; inert
+    # moles stay fixed and their partials are scaled with the same N_total.
+    # The root closes O: 2CO2+CO+H2O+2O2=O0. Every Kp factor is p/p° with
     # JANAF p°=1 bar and is dimensionless. At pure CO2, the CO2 dissociation
     # and free-O2 terms both remain, recovering its oxidizing-limit fO2; added
     # H2 cannot raise fO2 above that limit.
-    lo, hi = -300.0, math.log10(max(oxygen_atoms / 2.0, pressure))
-    if oxygen_residual(lo) >= 0.0 or oxygen_residual(hi) <= 0.0:
+    lo, hi = -300.0, math.log10(pressure)
+    if oxygen_residual(lo) >= 0.0 or oxygen_residual(hi) < 0.0:
         raise OffgasFO2Unavailable("full gas elemental oxygen balance has no positive pO2 root")
     for _ in range(220):
         mid = (lo + hi) / 2.0
@@ -341,7 +418,9 @@ def _full_element_balance_fo2(
         else:
             lo = mid
     log_p = (lo + hi) / 2.0
-    return _ElementBalanceFO2(log_p, species_at_log_p(log_p))
+    return _with_graphite_domain(
+        _ElementBalanceFO2(log_p, species_at_log_p(log_p)), T
+    )
 
 
 def _full_balance_fo2_with_janaf_band(
@@ -395,6 +474,12 @@ def _full_balance_fo2_with_janaf_band(
         component_spread = max(abs(value - janaf.log10_fO2) for value in variations)
         precision_spread_sq += component_spread * component_spread
     band = math.hypot(source_spread, math.sqrt(precision_spread_sq))
+    domain_reasons = tuple(dict.fromkeys((*janaf.domain_reasons, *cea.domain_reasons)))
+    janaf = _ElementBalanceFO2(
+        janaf.log10_fO2,
+        janaf.equilibrium_partial_pressures_bar,
+        domain_reasons,
+    )
     return janaf, cea.log10_fO2, band
 
 
