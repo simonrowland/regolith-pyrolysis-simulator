@@ -31,6 +31,7 @@ from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
+    refuse_proprietary_engine_use,
 )
 from simulator.backends import (
     BackendSelectionPolicy,
@@ -802,6 +803,10 @@ def evaluate(
             patch=validated_patch,
             candidate_id=candidate_id,
         ) from exc
+    refuse_proprietary_engine_use(
+        run_config.backend_name,
+        mode="optimizer evaluation",
+    )
     key = cache_key(spec)
     objective_profile = _objective_profile_for_spec(profile, spec)
     domain_reason = real_backend_feedstock_domain_reason(
@@ -6636,6 +6641,17 @@ def _cache_trace_payload(
             decided_backend_status=decided_backend_status,
         )
     )
+    # Local import: result_trust is the owner of the stamp rule. Importing it
+    # at module top would couple evaluate's import graph to the store's trust
+    # collector for one transcription step.
+    from simulator.optimize.result_trust import (
+        attach_producer_engine_stamp,
+        producer_engine_stamp_from_execution,
+    )
+
+    producer_stamp = producer_engine_stamp_from_execution(run_execution)
+    if producer_stamp is not None:
+        attach_producer_engine_stamp(payload, producer_stamp)
 
     reduced_real_cache = getattr(run_execution, "reduced_real_cache", None)
     if isinstance(reduced_real_cache, Mapping) and reduced_real_cache:
@@ -6700,6 +6716,15 @@ def _cache_trace_payload(
         payload["high_t_melt_activity_fallback_notice"] = _compact_jsonable(
             high_t_activity_notice
         )
+    carbon_reader = getattr(
+        simulator, "stage0_carbon_allocation_run_notice", None
+    )
+    if callable(carbon_reader):
+        carbon_notice = carbon_reader()
+        if isinstance(carbon_notice, MappingABC) and carbon_notice:
+            payload["stage0_carbon_allocation_notice"] = _compact_jsonable(
+                dict(carbon_notice)
+            )
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",

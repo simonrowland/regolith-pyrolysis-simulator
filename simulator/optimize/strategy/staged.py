@@ -1714,10 +1714,7 @@ def _mapping_get(value: Any, key: str, default: Any = None) -> Any:
         return value.get(key, default)
     getter = getattr(value, "get", None)
     if callable(getter):
-        try:
-            return getter(key, default)
-        except Exception:
-            return default
+        return getter(key, default)
     return getattr(value, key, default)
 
 

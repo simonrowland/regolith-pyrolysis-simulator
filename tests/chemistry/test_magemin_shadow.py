@@ -638,7 +638,7 @@ def test_provider_finalizer_reaps_when_collection_runs_on_consumer_thread():
             assert collection_on_consumer and any(collection_on_consumer)
             assert pool._close_complete.wait(timeout=5.0)
             assert not unraisable, f'unraisable finalizer errors: {unraisable!r}'
-            assert not pool.workers[0]._pending_reap
+            assert pool.workers[0]._launch_owner is None
             assert not child_is_alive(child_pid), 'provider child survived close'
         finally:
             gc.callbacks.remove(observe_collection)

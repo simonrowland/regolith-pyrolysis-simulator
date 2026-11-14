@@ -107,7 +107,7 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "c5307738f0477e343923a509311bf9d0ba94673996ae622dfd31fbb13327e731"
+        "db9b5ffda079b4886252281c2fabad6413ac60c76a29f175b799188fb8696e3a"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
@@ -544,6 +544,47 @@ def test_backend_status_aggregation_preserves_recovered_domain_edges():
         "not_converged"
     )
     assert _aggregate_backend_status(("ok",), "ok") == "ok"
+
+
+@pytest.mark.parametrize("broken_stage", ["latest-status", "history"])
+def test_backend_status_aggregation_failure_is_typed(
+    monkeypatch: pytest.MonkeyPatch,
+    broken_stage: str,
+) -> None:
+    primary_failure = RuntimeError("simulation failed")
+
+    class BrokenLatestStatus:
+        _last_backend_status = "ok"
+        _backend_status_history = ()
+
+        @property
+        def _backend_selection_status(self):
+            raise ValueError("status projection failed")
+
+    class BrokenHistory:
+        def __iter__(self):
+            raise ValueError("history aggregation failed")
+
+    if broken_stage == "latest-status":
+        simulator = BrokenLatestStatus()
+    else:
+        simulator = SimpleNamespace(
+            _last_backend_status="ok",
+            _backend_status_history=BrokenHistory(),
+        )
+    session = SimpleNamespace(simulator=simulator)
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise primary_failure
+
+    monkeypatch.setattr("simulator.run_executor.drive_session", fail_drive_session)
+
+    with pytest.raises(RuntimeError, match="backend status aggregation failed") as exc:
+        RunExecutor().execute_session(session, hours=1)
+
+    assert type(exc.value).__name__ == "BackendStatusAggregationFailure"
+    assert exc.value.run_exception is primary_failure
+    assert exc.value != "unavailable"
 
 
 def test_run_executor_degraded_envelope_preserves_refusal(monkeypatch):

@@ -72,7 +72,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: The paper gives no total pressure for this activity point.
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -129,16 +129,30 @@ observations:
         page: 4
         published_page: 882
         equation: '5'
-        note: Absolute log activity stated in prose immediately before Eq. (5).
     fO2_log:
       state:
         tag: unknown
-        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+        reason: The paper gives no oxygen pressure or fugacity for this activity point.
       locator:
-        page: 4
-        published_page: 882
-        equation: '5'
-        note: Absolute log activity stated in prose immediately before Eq. (5).
+        page: 1
+        published_page: 879
+        section: Experimental
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Na2O
+            - '0.33'
+          - - SiO2
+            - '0.67'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 881
+        equation: '3'
+        note: Equation (3) gives 0.33 Na2O + 0.67 SiO2; Eq. (5) gives the activity at X_Na2O = 0.33.
   derived_from:
   - itoh-yokokawa-1984-sodium-activity-nas::itoh_yokokawa_1984_eq5_printed_log_input
   derivation:
@@ -148,6 +162,8 @@ observations:
     parameters: []
     output_unit: dimensionless activity
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: itoh-yokokawa-1984-sodium-activity-nas::itoh_yokokawa_1984_eq5_printed_log_input
   experiment_id: 10.2320/matertrans1960.25.879::experiment::itoh_yokokawa_1984_concentration_cell_emf
   identity:
@@ -218,13 +234,29 @@ observations:
         page: 4
         published_page: 882
         equation: '5'
-        note: Printed log activity immediately before Eq. (5).
     fO2_log:
       state:
         tag: unknown
-        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+        reason: The paper gives no oxygen pressure or fugacity for this activity point.
       locator:
-        page: 4
-        published_page: 882
-        equation: '5'
-        note: Printed log activity immediately before Eq. (5).
+        page: 1
+        published_page: 879
+        section: Experimental
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Na2O
+            - '0.33'
+          - - SiO2
+            - '0.67'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 881
+        equation: '3'
+        note: Equation (3) gives 0.33 Na2O + 0.67 SiO2; Eq. (5) gives the activity at X_Na2O = 0.33.
+  provenance:
+    printed_phase: l

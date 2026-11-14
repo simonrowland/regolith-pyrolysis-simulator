@@ -1,0 +1,205 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1111/j.1151-2916.1990.tb09820.x
+  citation: 'Filsinger, D. H. & Bourrie, D. B. (1990). Silica to Silicon: Key Carbothermic Reactions and Kinetics. Journal
+    of the American Ceramic Society, 73(6), 1726–1732.'
+  source_ids:
+  - filsinger-1990-silica-silicon-carbothermic-kinetics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:filsinger-1990-silica-silicon-carbothermic-kinetics
+      role: pdf
+      path: raw/filsinger-1990-silica-silicon-carbothermic-kinetics/filsinger-1990-silica-silicon-carbothermic-kinetics.pdf
+      sha256:
+        tag: value
+        value: e2c6012a2f35a6de17ecc406222006aac9af0c139a8ff60f4ec583e3525c4782
+    - asset_id: pdftotext:filsinger-1990-silica-silicon-carbothermic-kinetics
+      role: pdftotext
+      path: text/filsinger-1990-silica-silicon-carbothermic-kinetics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:filsinger-1990-silica-silicon-carbothermic-kinetics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1111/j.1151-2916.1990.tb09820.x
+experiments:
+- experiment_id: 10.1111/j.1151-2916.1990.tb09820.x::filsinger-1990-silica-silicon-carbothermic-kinetics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1111/j.1151-2916.1990.tb09820.x
+  locator:
+    page: 4
+    published_page: 1729
+    pdf_page_index: 3
+    table: II
+    note: table_row_number=3; table_column_number=6
+context:
+- observation_id: filsinger90_figure3_weight_loss
+  type: figure_only
+  locator:
+    page: 6
+    published_page: 1731
+    pdf_page_index: 5
+    section: Kinetic Analysis
+    figure: '3'
+  units: as plotted; no numeric curve coordinates
+  values:
+    quantity: figure_only_isothermal_weight_loss_curve
+    method_class: figure_only
+    axes_as_printed: TGA weight loss and approximate reaction extent versus time (minutes)
+    caption_as_printed: Isothermal TGA analysis of reaction SiO2 + 3C → SiC + 2CO.
+    series:
+    - label_as_printed: SiO2 + 3C → SiC + 2CO
+      temperature_labels_as_printed:
+      - 1460°C
+      - 1560°C
+      - 1610°C
+      - 1660°C
+    digitisation: No curve coordinates digitized in this wave.
+  context_id: filsinger-1990-silica-silicon-carbothermic-kinetics::context::filsinger90_figure3_weight_loss
+  work_id: 10.1111/j.1151-2916.1990.tb09820.x
+  source_id: filsinger-1990-silica-silicon-carbothermic-kinetics
+  species: CO
+- observation_id: filsinger90_figure4_log_weight
+  type: figure_only
+  locator:
+    page: 6
+    published_page: 1731
+    pdf_page_index: 5
+    section: Kinetic Analysis
+    figure: '4'
+  units: as plotted; no numeric curve coordinates
+  values:
+    quantity: figure_only_log_weight_time_curve
+    method_class: figure_only
+    axes_as_printed: ln(weight of reactants) versus time
+    caption_as_printed: Derivative of isothermal analysis of reaction SiO2 + 3C → SiC + 2CO.
+    series:
+    - label_as_printed: SiO2 + 3C → SiC + 2CO
+      temperature_labels_as_printed:
+      - 1460°C
+      - 1560°C
+      - 1610°C
+      - 1660°C
+    digitisation: No curve coordinates digitized in this wave.
+  context_id: filsinger-1990-silica-silicon-carbothermic-kinetics::context::filsinger90_figure4_log_weight
+  work_id: 10.1111/j.1151-2916.1990.tb09820.x
+  source_id: filsinger-1990-silica-silicon-carbothermic-kinetics
+  species: CO
+- observation_id: filsinger90_figure6_legend
+  type: figure_only
+  locator:
+    page: 6
+    published_page: 1731
+    pdf_page_index: 5
+    section: Kinetic Analysis
+    figure: '6'
+  units: as plotted; legend text only
+  values:
+    quantity: figure_only_arrhenius_plot_legend
+    method_class: figure_only
+    axes_as_printed: log(k) versus 10000/T (K^-1)
+    caption_as_printed: Arrhenius plots for SiO and SiO2 reactions.
+    series:
+    - label_as_printed: 'A: SiO(s) → SiO(g)'
+    - label_as_printed: 'B: SiO2 + Si → 2SiO'
+    - label_as_printed: 'C: SiO2 + 3C → SiC + 2CO'
+    - label_as_printed: 'D: SiO + 2C → SiC + CO (lid)'
+    - label_as_printed: 'E: SiO + SiC → 2Si + CO (loose lid)'
+    - label_as_printed: 'F: SiO + SiC → 2Si + CO (tight lid)'
+    - label_as_printed: 'G: 2SiO2 + SiC → 3SiO + CO'
+    - label_as_printed: 'H: SiO(s) → SiO(g) (lid)'
+    digitisation: No curve coordinates digitized in this wave.
+  context_id: filsinger-1990-silica-silicon-carbothermic-kinetics::context::filsinger90_figure6_legend
+  work_id: 10.1111/j.1151-2916.1990.tb09820.x
+  source_id: filsinger-1990-silica-silicon-carbothermic-kinetics
+  species: SiO
+- observation_id: filsinger90_pure_silica_evaporation_context
+  type: printed_data_context
+  locator:
+    page: 2
+    published_page: 1727
+    pdf_page_index: 1
+    section: Thermal Analysis of Reactants
+  units: as printed
+  values:
+    quantity: pure_silica_weight_loss_context
+    method_class: measured_direct
+    weight_loss_as_printed: 6%
+    temperature_range_as_printed: 1700–2000°C
+    reactant_as_printed: α-quartz SiO2; no carbon in this run
+    phase_note: The interval crosses the printed 1710°C melting point; the source later refers to fused α-quartz.
+    atmosphere_as_printed: helium with <0.5 ppm oxygen
+    pressure_as_printed: not reported for this run
+    separation_note: Kept outside the carbothermic SiO kinetics; not described as vacuum evaporation.
+  context_id: filsinger-1990-silica-silicon-carbothermic-kinetics::context::filsinger90_pure_silica_evaporation_context
+  work_id: 10.1111/j.1151-2916.1990.tb09820.x
+  source_id: filsinger-1990-silica-silicon-carbothermic-kinetics
+  species: SiO2
+- observation_id: filsinger90_table_i_reagents
+  type: printed_data_context
+  locator:
+    page: 2
+    published_page: 1727
+    pdf_page_index: 1
+    table: I
+  units: as printed
+  values:
+    quantity: reagent_characterization_as_printed
+    method_class: measured_direct
+    printed_row_count: 6
+    rows:
+    - reagent: Si
+      source_as_printed: Hemlock Semiconductor Corp., Hemlock, MI; IVO190, lot S-03759
+      x_ray_analysis_as_printed: Si
+    - reagent: SiC
+      source_as_printed: Cerac Pure, Milwaukee, WI; S-1058, lot 1587; 7 μm average
+      x_ray_analysis_as_printed: α-SiC
+    - reagent: 'SiC: β form'
+      source_as_printed: Produced via SiO + 2C (see Table II)
+      x_ray_analysis_as_printed: 75% β-SiC; 2% C (graphite); remainder α-SiC
+    - reagent: SiO
+      source_as_printed: Cerac Pure, Milwaukee, WI; S-1064, lot 1858; 325 mesh
+      x_ray_analysis_as_printed: No crystalline phases detected
+    - reagent: SiO2
+      source_as_printed: Cerac Pure, Milwaukee, WI; S-1061, lot 2957; 325 mesh
+      x_ray_analysis_as_printed: α-quartz
+    - reagent: 'C: graphite'
+      source_as_printed: Cerac Pure, Milwaukee, WI; G-1059, lot 480; 325 mesh
+      x_ray_analysis_as_printed: Graphite
+  context_id: filsinger-1990-silica-silicon-carbothermic-kinetics::context::filsinger90_table_i_reagents
+  work_id: 10.1111/j.1151-2916.1990.tb09820.x
+  source_id: filsinger-1990-silica-silicon-carbothermic-kinetics
+  species: SiO2

@@ -323,16 +323,17 @@ def test_stage0_hot_wall_diagnostic_is_sibling_and_route_neutral():
     base_route = base.route(flux, melt)
     custom_route = custom.route(flux, melt)
 
+    # b-282: the stage-0 schedule band is not a violation threshold. SiO has
+    # no pure wall P_sat, so raising that band to 1425 C does not invent a
+    # hot-wall finding on a 1410 C segment.
+    assert base.last_cold_spot_diagnostic['upstream_hot_wall_min_C'] is None
+    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_min_C'] is None
     assert not base.last_cold_spot_diagnostic[
         'has_upstream_hot_wall_violation'
     ]
-    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_min_C'] == 1425.0
-    assert custom.last_cold_spot_diagnostic[
+    assert not custom.last_cold_spot_diagnostic[
         'has_upstream_hot_wall_violation'
     ]
-    assert custom.last_cold_spot_diagnostic['upstream_hot_wall_findings'][0][
-        'segment'
-    ] == 'stage_0_to_stage_1'
     assert base_route.cold_spot_warnings == ()
     assert custom_route.cold_spot_warnings == ()
     assert custom_route.remaining_by_species == base_route.remaining_by_species
@@ -900,7 +901,7 @@ def test_setpoints_condensation_temperature_overrides_refuse_bad_input():
 def test_shipped_setpoints_pass_the_override_guard_unchanged():
     """The guard must be golden-neutral against the config we actually ship.
 
-    All 11 entries under condensation_train.condensation_temperatures_C are
+    All 9 entries under condensation_train.condensation_temperatures_C are
     known species with parseable values AND already equal the defaults, so a
     correct guard changes nothing here. If this fails, either the guard is too
     strict or setpoints.yaml gained an entry nobody reviewed.

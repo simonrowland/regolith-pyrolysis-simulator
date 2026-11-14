@@ -100,6 +100,16 @@ fidelity_samples:
     published_page: 193
     table: Annexe III
     note: row 3, CaO cell visually read from the 600 dpi PDF render
+experiments:
+  - experiment_id: georges_2000_tga_series
+    method: tga
+    locator:
+      source_path: corpus/raw/georges-2000-potassium-evaporation-thesis/georges-2000-potassium-evaporation-thesis.pdf
+      page: 43
+      pdf_page_index: 42
+      published_page: 27
+      section: II.2.1
+      note: 'The author identifies thermogravimetry as the method used to determine potassium partial pressure.'
 species:
   MgO:
     observations:
@@ -11006,6 +11016,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 3; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_001
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.77'
+                Al2O3: '11.60'
+                SiO2: '36.24'
+                K2O: '0.49'
+                CaO: '45.11'
+          locator: *id281
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -11061,6 +11084,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id281
+      point_conditions:
+        composition: *georges_comp_001
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -11110,6 +11135,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id281
+      point_conditions:
+        composition: *georges_comp_001
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -11159,6 +11186,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id281
+      point_conditions:
+        composition: *georges_comp_001
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -11208,6 +11237,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id281
+      point_conditions:
+        composition: *georges_comp_001
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -11263,6 +11294,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 5; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_002
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.18'
+                Al2O3: '0.02'
+                SiO2: '42.98'
+                K2O: '0.70'
+                CaO: '45.20'
+          locator: *id282
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -11312,6 +11356,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id282
+      point_conditions:
+        composition: *georges_comp_002
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -11361,6 +11407,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id282
+      point_conditions:
+        composition: *georges_comp_002
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -11410,6 +11458,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id282
+      point_conditions:
+        composition: *georges_comp_002
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -11459,6 +11509,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id282
+      point_conditions:
+        composition: *georges_comp_002
       uncertainty:
         value: '0.27'
         units: 'wt%'
@@ -11514,6 +11566,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 7; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_003
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.70'
+                Al2O3: '0.01'
+                SiO2: '47.65'
+                K2O: '2.08'
+                CaO: '39.24'
+          locator: *id283
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -11563,6 +11628,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id283
+      point_conditions:
+        composition: *georges_comp_003
       uncertainty:
         value: '0.01'
         units: 'wt%'
@@ -11612,6 +11679,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id283
+      point_conditions:
+        composition: *georges_comp_003
       uncertainty:
         value: '0.79'
         units: 'wt%'
@@ -11661,6 +11730,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id283
+      point_conditions:
+        composition: *georges_comp_003
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -11710,6 +11781,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id283
+      point_conditions:
+        composition: *georges_comp_003
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -11765,6 +11838,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 9; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_004
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.38'
+                Al2O3: '0.02'
+                SiO2: '52.23'
+                K2O: '4.38'
+                CaO: '33.72'
+          locator: *id284
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -11814,6 +11900,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id284
+      point_conditions:
+        composition: *georges_comp_004
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -11863,6 +11951,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id284
+      point_conditions:
+        composition: *georges_comp_004
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -11912,6 +12002,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id284
+      point_conditions:
+        composition: *georges_comp_004
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -11961,6 +12053,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id284
+      point_conditions:
+        composition: *georges_comp_004
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -12016,6 +12110,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 11; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_005
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.17'
+                Al2O3: '0.02'
+                SiO2: '55.01'
+                K2O: '7.44'
+                CaO: '27.31'
+          locator: *id285
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -12065,6 +12172,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id285
+      point_conditions:
+        composition: *georges_comp_005
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -12114,6 +12223,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id285
+      point_conditions:
+        composition: *georges_comp_005
       uncertainty:
         value: '0.32'
         units: 'wt%'
@@ -12163,6 +12274,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id285
+      point_conditions:
+        composition: *georges_comp_005
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -12212,6 +12325,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id285
+      point_conditions:
+        composition: *georges_comp_005
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -12267,6 +12382,20 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 13; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_006
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.49'
+                Al2O3: '10.92'
+                SiO2: '36.47'
+                K2O: '0.19'
+                CaO: '46.00'
+          locator: *id286
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -12316,6 +12445,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id286
+      point_conditions:
+        composition: *georges_comp_006
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -12365,6 +12496,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id286
+      point_conditions:
+        composition: *georges_comp_006
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -12414,6 +12547,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id286
+      point_conditions:
+        composition: *georges_comp_006
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -12463,6 +12598,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id286
+      point_conditions:
+        composition: *georges_comp_006
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -12512,6 +12649,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id286
+      point_conditions:
+        composition: *georges_comp_006
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -12561,6 +12700,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 15; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_007
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.88'
+                Al2O3: '0.00'
+                SiO2: '45.83'
+                K2O: '0.70'
+                CaO: '40.68'
+          locator: *id287
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -12610,6 +12762,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id287
+      point_conditions:
+        composition: *georges_comp_007
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -12653,6 +12807,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id287
+      point_conditions:
+        composition: *georges_comp_007
       uncertainty:
         value: '0.50'
         units: 'wt%'
@@ -12702,6 +12858,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id287
+      point_conditions:
+        composition: *georges_comp_007
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -12751,6 +12909,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id287
+      point_conditions:
+        composition: *georges_comp_007
       uncertainty:
         value: '0.41'
         units: 'wt%'
@@ -12800,6 +12960,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id287
+      point_conditions:
+        composition: *georges_comp_007
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -12849,6 +13011,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 17; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_008
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '10.09'
+                Al2O3: '0.02'
+                SiO2: '51.27'
+                K2O: '1.74'
+                CaO: '35.66'
+          locator: *id288
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -12898,6 +13073,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id288
+      point_conditions:
+        composition: *georges_comp_008
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -12947,6 +13124,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id288
+      point_conditions:
+        composition: *georges_comp_008
       uncertainty:
         value: '0.39'
         units: 'wt%'
@@ -12996,6 +13175,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id288
+      point_conditions:
+        composition: *georges_comp_008
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -13045,6 +13226,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id288
+      point_conditions:
+        composition: *georges_comp_008
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -13094,6 +13277,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id288
+      point_conditions:
+        composition: *georges_comp_008
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -13143,6 +13328,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 19; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_009
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.59'
+                Al2O3: '0.01'
+                SiO2: '54.62'
+                K2O: '4.05'
+                CaO: '29.35'
+          locator: *id289
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -13192,6 +13390,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id289
+      point_conditions:
+        composition: *georges_comp_009
       uncertainty:
         value: '0.01'
         units: 'wt%'
@@ -13241,6 +13441,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id289
+      point_conditions:
+        composition: *georges_comp_009
       uncertainty:
         value: '0.20'
         units: 'wt%'
@@ -13290,6 +13492,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id289
+      point_conditions:
+        composition: *georges_comp_009
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -13339,6 +13543,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id289
+      point_conditions:
+        composition: *georges_comp_009
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -13388,6 +13594,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id289
+      point_conditions:
+        composition: *georges_comp_009
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -13437,6 +13645,20 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 21; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_010
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.41'
+                Al2O3: '10.31'
+                SiO2: '36.06'
+                K2O: '0.21'
+                CaO: '46.87'
+          locator: *id290
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -13486,6 +13708,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id290
+      point_conditions:
+        composition: *georges_comp_010
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -13535,6 +13759,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id290
+      point_conditions:
+        composition: *georges_comp_010
       uncertainty:
         value: '0.47'
         units: 'wt%'
@@ -13584,6 +13810,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id290
+      point_conditions:
+        composition: *georges_comp_010
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -13633,6 +13861,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id290
+      point_conditions:
+        composition: *georges_comp_010
       uncertainty:
         value: '0.61'
         units: 'wt%'
@@ -13682,6 +13912,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id290
+      point_conditions:
+        composition: *georges_comp_010
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -13731,6 +13963,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 23; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_011
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '10.08'
+                Al2O3: '0.03'
+                SiO2: '49.15'
+                K2O: '0.65'
+                CaO: '38.72'
+          locator: *id291
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -13780,6 +14025,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id291
+      point_conditions:
+        composition: *georges_comp_011
       uncertainty:
         value: '0.01'
         units: 'wt%'
@@ -13829,6 +14076,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id291
+      point_conditions:
+        composition: *georges_comp_011
       uncertainty:
         value: '0.53'
         units: 'wt%'
@@ -13878,6 +14127,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id291
+      point_conditions:
+        composition: *georges_comp_011
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -13927,6 +14178,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id291
+      point_conditions:
+        composition: *georges_comp_011
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -13976,6 +14229,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id291
+      point_conditions:
+        composition: *georges_comp_011
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -14025,6 +14280,20 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 25; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_012
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.35'
+                Al2O3: '10.34'
+                SiO2: '36.38'
+                K2O: '0.20'
+                CaO: '46.52'
+          locator: *id292
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -14074,6 +14343,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id292
+      point_conditions:
+        composition: *georges_comp_012
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -14123,6 +14394,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id292
+      point_conditions:
+        composition: *georges_comp_012
       uncertainty:
         value: '0.29'
         units: 'wt%'
@@ -14172,6 +14445,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id292
+      point_conditions:
+        composition: *georges_comp_012
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -14221,6 +14496,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id292
+      point_conditions:
+        composition: *georges_comp_012
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -14270,6 +14547,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id292
+      point_conditions:
+        composition: *georges_comp_012
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -14319,6 +14598,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 27; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_013
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.61'
+                Al2O3: '0.02'
+                SiO2: '55.27'
+                K2O: '3.38'
+                CaO: '29.70'
+          locator: *id293
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -14368,6 +14660,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id293
+      point_conditions:
+        composition: *georges_comp_013
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -14417,6 +14711,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id293
+      point_conditions:
+        composition: *georges_comp_013
       uncertainty:
         value: '0.54'
         units: 'wt%'
@@ -14466,6 +14762,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id293
+      point_conditions:
+        composition: *georges_comp_013
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -14515,6 +14813,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id293
+      point_conditions:
+        composition: *georges_comp_013
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -14564,6 +14864,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id293
+      point_conditions:
+        composition: *georges_comp_013
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -14613,6 +14915,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 29; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_014
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.43'
+                Al2O3: '10.81'
+                SiO2: '35.53'
+                K2O: '0.35'
+                CaO: '46.02'
+          locator: *id294
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -14662,6 +14977,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id294
+      point_conditions:
+        composition: *georges_comp_014
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -14711,6 +15028,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id294
+      point_conditions:
+        composition: *georges_comp_014
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -14760,6 +15079,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id294
+      point_conditions:
+        composition: *georges_comp_014
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -14809,6 +15130,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id294
+      point_conditions:
+        composition: *georges_comp_014
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -14858,6 +15181,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id294
+      point_conditions:
+        composition: *georges_comp_014
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -14907,6 +15232,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 31; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_015
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.97'
+                Al2O3: '0.01'
+                SiO2: '43.01'
+                K2O: '0.42'
+                CaO: '44.95'
+          locator: *id295
       uncertainty:
         value: '2.30'
         units: 'wt%'
@@ -14956,6 +15294,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id295
+      point_conditions:
+        composition: *georges_comp_015
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -15005,6 +15345,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id295
+      point_conditions:
+        composition: *georges_comp_015
       uncertainty:
         value: '0.62'
         units: 'wt%'
@@ -15054,6 +15396,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id295
+      point_conditions:
+        composition: *georges_comp_015
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -15103,6 +15447,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id295
+      point_conditions:
+        composition: *georges_comp_015
       uncertainty:
         value: '1.76'
         units: 'wt%'
@@ -15152,6 +15498,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id295
+      point_conditions:
+        composition: *georges_comp_015
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -15201,6 +15549,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 33; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_016
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.57'
+                Al2O3: '0.01'
+                SiO2: '54.16'
+                K2O: '5.75'
+                CaO: '28.85'
+          locator: *id296
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -15250,6 +15611,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id296
+      point_conditions:
+        composition: *georges_comp_016
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -15299,6 +15662,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id296
+      point_conditions:
+        composition: *georges_comp_016
       uncertainty:
         value: '0.65'
         units: 'wt%'
@@ -15348,6 +15713,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id296
+      point_conditions:
+        composition: *georges_comp_016
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -15397,6 +15764,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id296
+      point_conditions:
+        composition: *georges_comp_016
       uncertainty:
         value: '0.31'
         units: 'wt%'
@@ -15446,6 +15815,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id296
+      point_conditions:
+        composition: *georges_comp_016
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -15495,6 +15866,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 35; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_017
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.48'
+                Al2O3: '10.81'
+                SiO2: '35.53'
+                K2O: '0.35'
+                CaO: '45.99'
+          locator: *id297
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -15544,6 +15928,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id297
+      point_conditions:
+        composition: *georges_comp_017
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -15593,6 +15979,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id297
+      point_conditions:
+        composition: *georges_comp_017
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -15642,6 +16030,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id297
+      point_conditions:
+        composition: *georges_comp_017
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -15691,6 +16081,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id297
+      point_conditions:
+        composition: *georges_comp_017
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -15746,6 +16138,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 37; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_018
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.41'
+                Al2O3: '10.60'
+                SiO2: '36.17'
+                K2O: '0.33'
+                CaO: '46.38'
+          locator: *id298
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -15795,6 +16200,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id298
+      point_conditions:
+        composition: *georges_comp_018
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -15844,6 +16251,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id298
+      point_conditions:
+        composition: *georges_comp_018
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -15893,6 +16302,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id298
+      point_conditions:
+        composition: *georges_comp_018
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -15942,6 +16353,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id298
+      point_conditions:
+        composition: *georges_comp_018
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -15997,6 +16410,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 39; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_019
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '10.70'
+                Al2O3: '0.00'
+                SiO2: '43.35'
+                K2O: '0.20'
+                CaO: '44.41'
+          locator: *id299
       uncertainty:
         value: '3.00'
         units: 'wt%'
@@ -16046,6 +16472,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id299
+      point_conditions:
+        composition: *georges_comp_019
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -16089,6 +16517,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id299
+      point_conditions:
+        composition: *georges_comp_019
       uncertainty:
         value: '0.78'
         units: 'wt%'
@@ -16138,6 +16568,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id299
+      point_conditions:
+        composition: *georges_comp_019
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -16187,6 +16619,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id299
+      point_conditions:
+        composition: *georges_comp_019
       uncertainty:
         value: '2.50'
         units: 'wt%'
@@ -16242,6 +16676,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 41; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_020
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.79'
+                Al2O3: '0.01'
+                SiO2: '43.32'
+                K2O: '0.48'
+                CaO: '45.75'
+          locator: *id300
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -16291,6 +16738,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id300
+      point_conditions:
+        composition: *georges_comp_020
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -16340,6 +16789,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id300
+      point_conditions:
+        composition: *georges_comp_020
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -16389,6 +16840,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id300
+      point_conditions:
+        composition: *georges_comp_020
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -16438,6 +16891,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id300
+      point_conditions:
+        composition: *georges_comp_020
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -16493,6 +16948,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 43; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_021
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.93'
+                Al2O3: '0.00'
+                SiO2: '42.11'
+                K2O: '0.43'
+                CaO: '46.78'
+          locator: *id301
       uncertainty:
         value: '0.64'
         units: 'wt%'
@@ -16542,6 +17010,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id301
+      point_conditions:
+        composition: *georges_comp_021
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -16585,6 +17055,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id301
+      point_conditions:
+        composition: *georges_comp_021
       uncertainty:
         value: '1.19'
         units: 'wt%'
@@ -16634,6 +17106,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id301
+      point_conditions:
+        composition: *georges_comp_021
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -16683,6 +17157,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id301
+      point_conditions:
+        composition: *georges_comp_021
       uncertainty:
         value: '1.02'
         units: 'wt%'
@@ -16738,6 +17214,20 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 45; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_022
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.59'
+                Al2O3: '10.26'
+                SiO2: '35.70'
+                K2O: '0.260'
+                CaO: '46.30'
+          locator: *id302
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -16787,6 +17277,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id302
+      point_conditions:
+        composition: *georges_comp_022
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -16836,6 +17328,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id302
+      point_conditions:
+        composition: *georges_comp_022
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -16885,6 +17379,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id302
+      point_conditions:
+        composition: *georges_comp_022
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -16934,6 +17430,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id302
+      point_conditions:
+        composition: *georges_comp_022
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -16983,6 +17481,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id302
+      point_conditions:
+        composition: *georges_comp_022
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -17032,6 +17532,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 47; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_023
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.24'
+                Al2O3: '4.30'
+                SiO2: '41.67'
+                K2O: '0.42'
+                CaO: '43.27'
+          locator: *id303
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -17081,6 +17594,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id303
+      point_conditions:
+        composition: *georges_comp_023
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -17130,6 +17645,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id303
+      point_conditions:
+        composition: *georges_comp_023
       uncertainty:
         value: '0.37'
         units: 'wt%'
@@ -17179,6 +17696,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id303
+      point_conditions:
+        composition: *georges_comp_023
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -17228,6 +17747,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id303
+      point_conditions:
+        composition: *georges_comp_023
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -17277,6 +17798,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id303
+      point_conditions:
+        composition: *georges_comp_023
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -17326,6 +17849,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 49; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_024
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.82'
+                Al2O3: '4.90'
+                SiO2: '47.18'
+                K2O: '2.29'
+                CaO: '33.96'
+          locator: *id304
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -17375,6 +17911,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id304
+      point_conditions:
+        composition: *georges_comp_024
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -17424,6 +17962,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id304
+      point_conditions:
+        composition: *georges_comp_024
       uncertainty:
         value: '0.54'
         units: 'wt%'
@@ -17473,6 +18013,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id304
+      point_conditions:
+        composition: *georges_comp_024
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -17522,6 +18064,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id304
+      point_conditions:
+        composition: *georges_comp_024
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -17571,6 +18115,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id304
+      point_conditions:
+        composition: *georges_comp_024
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -17620,6 +18166,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 51; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_025
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.87'
+                Al2O3: '4.16'
+                SiO2: '47.61'
+                K2O: '4.95'
+                CaO: '28.02'
+          locator: *id305
       uncertainty:
         value: '0.19'
         units: 'wt%'
@@ -17669,6 +18228,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id305
+      point_conditions:
+        composition: *georges_comp_025
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -17718,6 +18279,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id305
+      point_conditions:
+        composition: *georges_comp_025
       uncertainty:
         value: '1.17'
         units: 'wt%'
@@ -17767,6 +18330,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id305
+      point_conditions:
+        composition: *georges_comp_025
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -17816,6 +18381,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id305
+      point_conditions:
+        composition: *georges_comp_025
       uncertainty:
         value: '0.27'
         units: 'wt%'
@@ -17865,6 +18432,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id305
+      point_conditions:
+        composition: *georges_comp_025
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -17914,6 +18483,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 53; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_026
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.50'
+                Al2O3: '10.23'
+                SiO2: '36.71'
+                K2O: '0.22'
+                CaO: '46.42'
+          locator: *id306
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -17963,6 +18545,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id306
+      point_conditions:
+        composition: *georges_comp_026
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -18012,6 +18596,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id306
+      point_conditions:
+        composition: *georges_comp_026
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -18061,6 +18647,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id306
+      point_conditions:
+        composition: *georges_comp_026
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -18110,6 +18698,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id306
+      point_conditions:
+        composition: *georges_comp_026
       uncertainty:
         value: '0.29'
         units: 'wt%'
@@ -18165,6 +18755,20 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 55; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_027
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.43'
+                Al2O3: '10.07'
+                SiO2: '37.04'
+                K2O: '0.240'
+                CaO: '46.26'
+          locator: *id307
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -18214,6 +18818,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id307
+      point_conditions:
+        composition: *georges_comp_027
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -18263,6 +18869,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id307
+      point_conditions:
+        composition: *georges_comp_027
       uncertainty:
         value: '0.39'
         units: 'wt%'
@@ -18312,6 +18920,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id307
+      point_conditions:
+        composition: *georges_comp_027
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -18361,6 +18971,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id307
+      point_conditions:
+        composition: *georges_comp_027
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -18410,6 +19022,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id307
+      point_conditions:
+        composition: *georges_comp_027
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -18459,6 +19073,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 57; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_028
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.56'
+                Al2O3: '5.40'
+                SiO2: '42.06'
+                K2O: '0.44'
+                CaO: '42.23'
+          locator: *id308
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -18508,6 +19135,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id308
+      point_conditions:
+        composition: *georges_comp_028
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -18557,6 +19186,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id308
+      point_conditions:
+        composition: *georges_comp_028
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -18606,6 +19237,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id308
+      point_conditions:
+        composition: *georges_comp_028
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -18655,6 +19288,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id308
+      point_conditions:
+        composition: *georges_comp_028
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -18704,6 +19339,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id308
+      point_conditions:
+        composition: *georges_comp_028
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -18753,6 +19390,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 59; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_029
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.57'
+                Al2O3: '4.81'
+                SiO2: '41.83'
+                K2O: '0.42'
+                CaO: '42.65'
+          locator: *id309
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -18802,6 +19452,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id309
+      point_conditions:
+        composition: *georges_comp_029
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -18851,6 +19503,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id309
+      point_conditions:
+        composition: *georges_comp_029
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -18900,6 +19554,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id309
+      point_conditions:
+        composition: *georges_comp_029
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -18949,6 +19605,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id309
+      point_conditions:
+        composition: *georges_comp_029
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -18998,6 +19656,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id309
+      point_conditions:
+        composition: *georges_comp_029
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -19047,6 +19707,19 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 61; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_030
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.67'
+                Al2O3: '4.59'
+                SiO2: '41.64'
+                K2O: '0.38'
+                CaO: '42.91'
+          locator: *id310
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -19096,6 +19769,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id310
+      point_conditions:
+        composition: *georges_comp_030
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -19145,6 +19820,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id310
+      point_conditions:
+        composition: *georges_comp_030
       uncertainty:
         value: '0.46'
         units: 'wt%'
@@ -19194,6 +19871,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id310
+      point_conditions:
+        composition: *georges_comp_030
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -19243,6 +19922,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id310
+      point_conditions:
+        composition: *georges_comp_030
       uncertainty:
         value: '0.36'
         units: 'wt%'
@@ -19292,6 +19973,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id310
+      point_conditions:
+        composition: *georges_comp_030
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -19341,6 +20024,20 @@ species:
         published_page: 193
         table: Annexe III
         note: MinerU table p209-t52 row 63; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_031
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.31'
+                Al2O3: '9.86'
+                SiO2: '37.37'
+                K2O: '0.15'
+                CaO: '45.33'
+          locator: *id311
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -19390,6 +20087,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id311
+      point_conditions:
+        composition: *georges_comp_031
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -19439,6 +20138,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id311
+      point_conditions:
+        composition: *georges_comp_031
       uncertainty:
         value: '0.31'
         units: 'wt%'
@@ -19488,6 +20189,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id311
+      point_conditions:
+        composition: *georges_comp_031
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -19537,6 +20240,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id311
+      point_conditions:
+        composition: *georges_comp_031
       uncertainty:
         value: '0.48'
         units: 'wt%'
@@ -19586,6 +20291,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id311
+      point_conditions:
+        composition: *georges_comp_031
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -19635,6 +20342,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 65; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_032
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.37'
+                Al2O3: '9.46'
+                SiO2: '40.99'
+                K2O: '0.27'
+                CaO: '40.27'
+          locator: *id312
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -19684,6 +20404,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id312
+      point_conditions:
+        composition: *georges_comp_032
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -19733,6 +20455,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id312
+      point_conditions:
+        composition: *georges_comp_032
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -19782,6 +20506,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id312
+      point_conditions:
+        composition: *georges_comp_032
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -19831,6 +20557,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id312
+      point_conditions:
+        composition: *georges_comp_032
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -19886,6 +20614,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 67; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_033
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.30'
+                Al2O3: '9.38'
+                SiO2: '44.13'
+                K2O: '0.63'
+                CaO: '35.96'
+          locator: *id313
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -19935,6 +20676,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id313
+      point_conditions:
+        composition: *georges_comp_033
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -19984,6 +20727,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id313
+      point_conditions:
+        composition: *georges_comp_033
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -20033,6 +20778,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id313
+      point_conditions:
+        composition: *georges_comp_033
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -20082,6 +20829,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id313
+      point_conditions:
+        composition: *georges_comp_033
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -20137,6 +20886,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 69; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_034
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.44'
+                Al2O3: '9.65'
+                SiO2: '49.57'
+                K2O: '2.41'
+                CaO: '28.75'
+          locator: *id314
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -20186,6 +20948,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id314
+      point_conditions:
+        composition: *georges_comp_034
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -20235,6 +20999,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id314
+      point_conditions:
+        composition: *georges_comp_034
       uncertainty:
         value: '0.36'
         units: 'wt%'
@@ -20284,6 +21050,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id314
+      point_conditions:
+        composition: *georges_comp_034
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -20333,6 +21101,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id314
+      point_conditions:
+        composition: *georges_comp_034
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -20388,6 +21158,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 71; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_035
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.29'
+                Al2O3: '10.62'
+                SiO2: '35.50'
+                K2O: '0.30'
+                CaO: '45.73'
+          locator: *id315
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -20437,6 +21220,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id315
+      point_conditions:
+        composition: *georges_comp_035
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -20486,6 +21271,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id315
+      point_conditions:
+        composition: *georges_comp_035
       uncertainty:
         value: '0.51'
         units: 'wt%'
@@ -20535,6 +21322,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id315
+      point_conditions:
+        composition: *georges_comp_035
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -20584,6 +21373,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id315
+      point_conditions:
+        composition: *georges_comp_035
       uncertainty:
         value: '0.37'
         units: 'wt%'
@@ -20633,6 +21424,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id315
+      point_conditions:
+        composition: *georges_comp_035
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -20682,6 +21475,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 73; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_036
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.91'
+                Al2O3: '9.50'
+                SiO2: '38.77'
+                K2O: '0.75'
+                CaO: '40.32'
+          locator: *id316
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -20731,6 +21537,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id316
+      point_conditions:
+        composition: *georges_comp_036
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -20780,6 +21588,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id316
+      point_conditions:
+        composition: *georges_comp_036
       uncertainty:
         value: '0.56'
         units: 'wt%'
@@ -20829,6 +21639,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id316
+      point_conditions:
+        composition: *georges_comp_036
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -20878,6 +21690,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id316
+      point_conditions:
+        composition: *georges_comp_036
       uncertainty:
         value: '0.34'
         units: 'wt%'
@@ -20933,6 +21747,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 75; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_037
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.67'
+                Al2O3: '9.21'
+                SiO2: '41.74'
+                K2O: '2.06'
+                CaO: '35.14'
+          locator: *id317
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -20982,6 +21809,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id317
+      point_conditions:
+        composition: *georges_comp_037
       uncertainty:
         value: '0.20'
         units: 'wt%'
@@ -21031,6 +21860,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id317
+      point_conditions:
+        composition: *georges_comp_037
       uncertainty:
         value: '0.57'
         units: 'wt%'
@@ -21080,6 +21911,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id317
+      point_conditions:
+        composition: *georges_comp_037
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -21129,6 +21962,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id317
+      point_conditions:
+        composition: *georges_comp_037
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -21184,6 +22019,20 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 77; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_038
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.26'
+                Al2O3: '9.90'
+                SiO2: '37.41'
+                K2O: '0.14'
+                CaO: '45.58'
+          locator: *id318
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -21233,6 +22082,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id318
+      point_conditions:
+        composition: *georges_comp_038
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -21282,6 +22133,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id318
+      point_conditions:
+        composition: *georges_comp_038
       uncertainty:
         value: '0.31'
         units: 'wt%'
@@ -21331,6 +22184,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id318
+      point_conditions:
+        composition: *georges_comp_038
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -21380,6 +22235,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id318
+      point_conditions:
+        composition: *georges_comp_038
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -21429,6 +22286,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id318
+      point_conditions:
+        composition: *georges_comp_038
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -21478,6 +22337,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 79; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_039
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.37'
+                Al2O3: '9.20'
+                SiO2: '40.57'
+                K2O: '0.27'
+                CaO: '40.94'
+          locator: *id319
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -21527,6 +22399,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id319
+      point_conditions:
+        composition: *georges_comp_039
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -21576,6 +22450,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id319
+      point_conditions:
+        composition: *georges_comp_039
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -21625,6 +22501,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id319
+      point_conditions:
+        composition: *georges_comp_039
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -21674,6 +22552,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id319
+      point_conditions:
+        composition: *georges_comp_039
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -21729,6 +22609,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 81; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_040
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.25'
+                Al2O3: '9.34'
+                SiO2: '40.59'
+                K2O: '0.25'
+                CaO: '41.30'
+          locator: *id320
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -21778,6 +22671,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id320
+      point_conditions:
+        composition: *georges_comp_040
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -21827,6 +22722,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id320
+      point_conditions:
+        composition: *georges_comp_040
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -21876,6 +22773,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id320
+      point_conditions:
+        composition: *georges_comp_040
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -21925,6 +22824,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id320
+      point_conditions:
+        composition: *georges_comp_040
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -21980,6 +22881,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 83; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_041
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.51'
+                Al2O3: '9.77'
+                SiO2: '46.81'
+                K2O: '1.47'
+                CaO: '32.40'
+          locator: *id321
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -22029,6 +22943,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id321
+      point_conditions:
+        composition: *georges_comp_041
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -22078,6 +22994,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id321
+      point_conditions:
+        composition: *georges_comp_041
       uncertainty:
         value: '0.39'
         units: 'wt%'
@@ -22127,6 +23045,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id321
+      point_conditions:
+        composition: *georges_comp_041
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -22176,6 +23096,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id321
+      point_conditions:
+        composition: *georges_comp_041
       uncertainty:
         value: '0.29'
         units: 'wt%'
@@ -22231,6 +23153,20 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 85; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_042
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.45'
+                Al2O3: '10.61'
+                SiO2: '36.80'
+                K2O: '0.270'
+                CaO: '45.58'
+          locator: *id322
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -22280,6 +23216,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id322
+      point_conditions:
+        composition: *georges_comp_042
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -22329,6 +23267,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id322
+      point_conditions:
+        composition: *georges_comp_042
       uncertainty:
         value: '0.32'
         units: 'wt%'
@@ -22378,6 +23318,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id322
+      point_conditions:
+        composition: *georges_comp_042
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -22427,6 +23369,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id322
+      point_conditions:
+        composition: *georges_comp_042
       uncertainty:
         value: '0.27'
         units: 'wt%'
@@ -22476,6 +23420,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id322
+      point_conditions:
+        composition: *georges_comp_042
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -22525,6 +23471,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 87; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_043
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.78'
+                Al2O3: '9.56'
+                SiO2: '40.29'
+                K2O: '0.58'
+                CaO: '40.73'
+          locator: *id323
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -22574,6 +23533,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id323
+      point_conditions:
+        composition: *georges_comp_043
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -22623,6 +23584,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id323
+      point_conditions:
+        composition: *georges_comp_043
       uncertainty:
         value: '0.34'
         units: 'wt%'
@@ -22672,6 +23635,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id323
+      point_conditions:
+        composition: *georges_comp_043
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -22721,6 +23686,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id323
+      point_conditions:
+        composition: *georges_comp_043
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -22776,6 +23743,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 89; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_044
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.41'
+                Al2O3: '9.51'
+                SiO2: '44.61'
+                K2O: '1.62'
+                CaO: '36.15'
+          locator: *id324
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -22825,6 +23805,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id324
+      point_conditions:
+        composition: *georges_comp_044
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -22874,6 +23856,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id324
+      point_conditions:
+        composition: *georges_comp_044
       uncertainty:
         value: '0.40'
         units: 'wt%'
@@ -22923,6 +23907,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id324
+      point_conditions:
+        composition: *georges_comp_044
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -22972,6 +23958,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id324
+      point_conditions:
+        composition: *georges_comp_044
       uncertainty:
         value: '0.31'
         units: 'wt%'
@@ -23027,6 +24015,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 91; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_045
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.46'
+                Al2O3: '9.37'
+                SiO2: '47.28'
+                K2O: '3.07'
+                CaO: '30.92'
+          locator: *id325
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -23076,6 +24077,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id325
+      point_conditions:
+        composition: *georges_comp_045
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -23125,6 +24128,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id325
+      point_conditions:
+        composition: *georges_comp_045
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -23174,6 +24179,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id325
+      point_conditions:
+        composition: *georges_comp_045
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -23223,6 +24230,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id325
+      point_conditions:
+        composition: *georges_comp_045
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -23278,6 +24287,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 93; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_046
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.69'
+                Al2O3: '9.05'
+                SiO2: '51.03'
+                K2O: '5.94'
+                CaO: '25.29'
+          locator: *id326
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -23327,6 +24349,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id326
+      point_conditions:
+        composition: *georges_comp_046
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -23376,6 +24400,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id326
+      point_conditions:
+        composition: *georges_comp_046
       uncertainty:
         value: '0.36'
         units: 'wt%'
@@ -23425,6 +24451,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id326
+      point_conditions:
+        composition: *georges_comp_046
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -23474,6 +24502,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id326
+      point_conditions:
+        composition: *georges_comp_046
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -23529,6 +24559,20 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 95; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_047
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.34'
+                Al2O3: '10.48'
+                SiO2: '36.28'
+                K2O: '0.290'
+                CaO: '46.22'
+          locator: *id327
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -23578,6 +24622,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id327
+      point_conditions:
+        composition: *georges_comp_047
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -23627,6 +24673,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id327
+      point_conditions:
+        composition: *georges_comp_047
       uncertainty:
         value: '0.27'
         units: 'wt%'
@@ -23676,6 +24724,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id327
+      point_conditions:
+        composition: *georges_comp_047
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -23725,6 +24775,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id327
+      point_conditions:
+        composition: *georges_comp_047
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -23774,6 +24826,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id327
+      point_conditions:
+        composition: *georges_comp_047
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -23823,6 +24877,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 97; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_048
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '6.70'
+                Al2O3: '14.14'
+                SiO2: '40.84'
+                K2O: '2.01'
+                CaO: '34.45'
+          locator: *id328
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -23872,6 +24939,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id328
+      point_conditions:
+        composition: *georges_comp_048
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -23921,6 +24990,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id328
+      point_conditions:
+        composition: *georges_comp_048
       uncertainty:
         value: '0.36'
         units: 'wt%'
@@ -23970,6 +25041,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id328
+      point_conditions:
+        composition: *georges_comp_048
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -24019,6 +25092,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id328
+      point_conditions:
+        composition: *georges_comp_048
       uncertainty:
         value: '0.20'
         units: 'wt%'
@@ -24074,6 +25149,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 99; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_049
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.38'
+                Al2O3: '13.89'
+                SiO2: '44.16'
+                K2O: '3.79'
+                CaO: '29.39'
+          locator: *id329
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -24123,6 +25211,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id329
+      point_conditions:
+        composition: *georges_comp_049
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -24172,6 +25262,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id329
+      point_conditions:
+        composition: *georges_comp_049
       uncertainty:
         value: '0.29'
         units: 'wt%'
@@ -24221,6 +25313,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id329
+      point_conditions:
+        composition: *georges_comp_049
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -24270,6 +25364,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id329
+      point_conditions:
+        composition: *georges_comp_049
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -24325,6 +25421,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 101; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_050
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.39'
+                Al2O3: '11.06'
+                SiO2: '35.03'
+                K2O: '0.42'
+                CaO: '45.67'
+          locator: *id330
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -24374,6 +25483,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id330
+      point_conditions:
+        composition: *georges_comp_050
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -24423,6 +25534,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id330
+      point_conditions:
+        composition: *georges_comp_050
       uncertainty:
         value: '0.61'
         units: 'wt%'
@@ -24472,6 +25585,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id330
+      point_conditions:
+        composition: *georges_comp_050
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -24521,6 +25636,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id330
+      point_conditions:
+        composition: *georges_comp_050
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -24570,6 +25687,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id330
+      point_conditions:
+        composition: *georges_comp_050
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -24619,6 +25738,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 103; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_051
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '6.32'
+                Al2O3: '14.15'
+                SiO2: '37.04'
+                K2O: '1.12'
+                CaO: '39.28'
+          locator: *id331
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -24668,6 +25800,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id331
+      point_conditions:
+        composition: *georges_comp_051
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -24717,6 +25851,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id331
+      point_conditions:
+        composition: *georges_comp_051
       uncertainty:
         value: '0.46'
         units: 'wt%'
@@ -24766,6 +25902,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id331
+      point_conditions:
+        composition: *georges_comp_051
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -24815,6 +25953,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id331
+      point_conditions:
+        composition: *georges_comp_051
       uncertainty:
         value: '0.32'
         units: 'wt%'
@@ -24870,6 +26010,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 105; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_052
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.88'
+                Al2O3: '13.86'
+                SiO2: '44.17'
+                K2O: '5.29'
+                CaO: '28.75'
+          locator: *id332
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -24919,6 +26072,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id332
+      point_conditions:
+        composition: *georges_comp_052
       uncertainty:
         value: '0.20'
         units: 'wt%'
@@ -24968,6 +26123,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id332
+      point_conditions:
+        composition: *georges_comp_052
       uncertainty:
         value: '0.59'
         units: 'wt%'
@@ -25017,6 +26174,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id332
+      point_conditions:
+        composition: *georges_comp_052
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -25066,6 +26225,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id332
+      point_conditions:
+        composition: *georges_comp_052
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -25121,6 +26282,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 107; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_053
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.91'
+                Al2O3: '14.47'
+                SiO2: '45.62'
+                K2O: '7.31'
+                CaO: '24.45'
+          locator: *id333
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -25170,6 +26344,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id333
+      point_conditions:
+        composition: *georges_comp_053
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -25219,6 +26395,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id333
+      point_conditions:
+        composition: *georges_comp_053
       uncertainty:
         value: '0.55'
         units: 'wt%'
@@ -25268,6 +26446,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id333
+      point_conditions:
+        composition: *georges_comp_053
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -25317,6 +26497,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id333
+      point_conditions:
+        composition: *georges_comp_053
       uncertainty:
         value: '0.19'
         units: 'wt%'
@@ -25372,6 +26554,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 109; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_054
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.33'
+                Al2O3: '10.84'
+                SiO2: '35.31'
+                K2O: '0.39'
+                CaO: '45.64'
+          locator: *id334
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -25421,6 +26616,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id334
+      point_conditions:
+        composition: *georges_comp_054
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -25470,6 +26667,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id334
+      point_conditions:
+        composition: *georges_comp_054
       uncertainty:
         value: '0.50'
         units: 'wt%'
@@ -25519,6 +26718,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id334
+      point_conditions:
+        composition: *georges_comp_054
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -25568,6 +26769,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id334
+      point_conditions:
+        composition: *georges_comp_054
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -25617,6 +26820,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id334
+      point_conditions:
+        composition: *georges_comp_054
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -25666,6 +26871,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 111; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_055
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.03'
+                Al2O3: '0.01'
+                SiO2: '53.02'
+                K2O: '6.50'
+                CaO: '28.82'
+          locator: *id335
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -25715,6 +26933,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id335
+      point_conditions:
+        composition: *georges_comp_055
       uncertainty:
         value: '0.01'
         units: 'wt%'
@@ -25764,6 +26984,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id335
+      point_conditions:
+        composition: *georges_comp_055
       uncertainty:
         value: '0.48'
         units: 'wt%'
@@ -25813,6 +27035,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id335
+      point_conditions:
+        composition: *georges_comp_055
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -25862,6 +27086,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id335
+      point_conditions:
+        composition: *georges_comp_055
       uncertainty:
         value: '0.36'
         units: 'wt%'
@@ -25917,6 +27143,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 113; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_056
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.45'
+                Al2O3: '4.56'
+                SiO2: '50.96'
+                K2O: '6.90'
+                CaO: '26.61'
+          locator: *id336
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -25966,6 +27205,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id336
+      point_conditions:
+        composition: *georges_comp_056
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -26015,6 +27256,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id336
+      point_conditions:
+        composition: *georges_comp_056
       uncertainty:
         value: '0.54'
         units: 'wt%'
@@ -26064,6 +27307,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id336
+      point_conditions:
+        composition: *georges_comp_056
       uncertainty:
         value: '0.34'
         units: 'wt%'
@@ -26113,6 +27358,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id336
+      point_conditions:
+        composition: *georges_comp_056
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -26168,6 +27415,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 115; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_057
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.07'
+                Al2O3: '14.08'
+                SiO2: '47.61'
+                K2O: '8.88'
+                CaO: '22.45'
+          locator: *id337
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -26217,6 +27477,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id337
+      point_conditions:
+        composition: *georges_comp_057
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -26266,6 +27528,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id337
+      point_conditions:
+        composition: *georges_comp_057
       uncertainty:
         value: '0.61'
         units: 'wt%'
@@ -26315,6 +27579,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id337
+      point_conditions:
+        composition: *georges_comp_057
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -26364,6 +27630,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id337
+      point_conditions:
+        composition: *georges_comp_057
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -26419,6 +27687,20 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 117; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_058
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.17'
+                Al2O3: '9.56'
+                SiO2: '36.27'
+                K2O: '0.150'
+                CaO: '46.09'
+          locator: *id338
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -26468,6 +27750,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id338
+      point_conditions:
+        composition: *georges_comp_058
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -26517,6 +27801,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id338
+      point_conditions:
+        composition: *georges_comp_058
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -26566,6 +27852,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id338
+      point_conditions:
+        composition: *georges_comp_058
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -26615,6 +27903,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id338
+      point_conditions:
+        composition: *georges_comp_058
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -26664,6 +27954,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id338
+      point_conditions:
+        composition: *georges_comp_058
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -26713,6 +28005,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 119; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_059
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.96'
+                Al2O3: '0.01'
+                SiO2: '51.21'
+                K2O: '1.63'
+                CaO: '35.67'
+          locator: *id339
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -26762,6 +28067,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id339
+      point_conditions:
+        composition: *georges_comp_059
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -26811,6 +28118,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id339
+      point_conditions:
+        composition: *georges_comp_059
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -26860,6 +28169,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id339
+      point_conditions:
+        composition: *georges_comp_059
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -26909,6 +28220,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id339
+      point_conditions:
+        composition: *georges_comp_059
       uncertainty:
         value: '0.34'
         units: 'wt%'
@@ -26964,6 +28277,19 @@ species:
         published_page: 194
         table: Annexe III
         note: MinerU table p209-t52 row 121; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_060
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.62'
+                Al2O3: '13.73'
+                SiO2: '44.03'
+                K2O: '2.45'
+                CaO: '29.35'
+          locator: *id340
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -27013,6 +28339,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id340
+      point_conditions:
+        composition: *georges_comp_060
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -27062,6 +28390,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id340
+      point_conditions:
+        composition: *georges_comp_060
       uncertainty:
         value: '0.36'
         units: 'wt%'
@@ -27111,6 +28441,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id340
+      point_conditions:
+        composition: *georges_comp_060
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -27160,6 +28492,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id340
+      point_conditions:
+        composition: *georges_comp_060
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -27215,6 +28549,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 125; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_061
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.25'
+                Al2O3: '10.66'
+                SiO2: '33.95'
+                K2O: '0.32'
+                CaO: '45.71'
+          locator: *id341
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -27264,6 +28611,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id341
+      point_conditions:
+        composition: *georges_comp_061
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -27313,6 +28662,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id341
+      point_conditions:
+        composition: *georges_comp_061
       uncertainty:
         value: '0.45'
         units: 'wt%'
@@ -27362,6 +28713,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id341
+      point_conditions:
+        composition: *georges_comp_061
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -27411,6 +28764,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id341
+      point_conditions:
+        composition: *georges_comp_061
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -27460,6 +28815,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id341
+      point_conditions:
+        composition: *georges_comp_061
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -27509,6 +28866,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 127; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_062
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.53'
+                Al2O3: '0.11'
+                SiO2: '43.27'
+                K2O: '0.52'
+                CaO: '45.44'
+          locator: *id342
       uncertainty:
         value: '0.58'
         units: 'wt%'
@@ -27558,6 +28928,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id342
+      point_conditions:
+        composition: *georges_comp_062
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -27607,6 +28979,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id342
+      point_conditions:
+        composition: *georges_comp_062
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -27656,6 +29030,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id342
+      point_conditions:
+        composition: *georges_comp_062
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -27705,6 +29081,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id342
+      point_conditions:
+        composition: *georges_comp_062
       uncertainty:
         value: '0.63'
         units: 'wt%'
@@ -27760,6 +29138,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 129; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_063
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.95'
+                Al2O3: '4.50'
+                SiO2: '40.43'
+                K2O: '0.66'
+                CaO: '42.27'
+          locator: *id343
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -27809,6 +29200,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id343
+      point_conditions:
+        composition: *georges_comp_063
       uncertainty:
         value: '0.67'
         units: 'wt%'
@@ -27858,6 +29251,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id343
+      point_conditions:
+        composition: *georges_comp_063
       uncertainty:
         value: '0.71'
         units: 'wt%'
@@ -27907,6 +29302,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id343
+      point_conditions:
+        composition: *georges_comp_063
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -27956,6 +29353,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id343
+      point_conditions:
+        composition: *georges_comp_063
       uncertainty:
         value: '0.38'
         units: 'wt%'
@@ -28011,6 +29410,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 131; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_064
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.00'
+                Al2O3: '9.69'
+                SiO2: '38.99'
+                K2O: '0.87'
+                CaO: '40.97'
+          locator: *id344
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -28060,6 +29472,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id344
+      point_conditions:
+        composition: *georges_comp_064
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -28109,6 +29523,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id344
+      point_conditions:
+        composition: *georges_comp_064
       uncertainty:
         value: '0.37'
         units: 'wt%'
@@ -28158,6 +29574,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id344
+      point_conditions:
+        composition: *georges_comp_064
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -28207,6 +29625,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id344
+      point_conditions:
+        composition: *georges_comp_064
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -28262,6 +29682,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 133; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_065
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.97'
+                Al2O3: '14.46'
+                SiO2: '37.55'
+                K2O: '0.92'
+                CaO: '39.45'
+          locator: *id345
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -28311,6 +29744,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id345
+      point_conditions:
+        composition: *georges_comp_065
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -28360,6 +29795,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id345
+      point_conditions:
+        composition: *georges_comp_065
       uncertainty:
         value: '0.62'
         units: 'wt%'
@@ -28409,6 +29846,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id345
+      point_conditions:
+        composition: *georges_comp_065
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -28458,6 +29897,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id345
+      point_conditions:
+        composition: *georges_comp_065
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -28513,6 +29954,20 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 135; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_066
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.22'
+                Al2O3: '9.81'
+                SiO2: '36.77'
+                K2O: '0.150'
+                CaO: '46.24'
+          locator: *id346
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -28562,6 +30017,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id346
+      point_conditions:
+        composition: *georges_comp_066
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -28611,6 +30068,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id346
+      point_conditions:
+        composition: *georges_comp_066
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -28660,6 +30119,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id346
+      point_conditions:
+        composition: *georges_comp_066
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -28709,6 +30170,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id346
+      point_conditions:
+        composition: *georges_comp_066
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -28758,6 +30221,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id346
+      point_conditions:
+        composition: *georges_comp_066
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -28807,6 +30272,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 137; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_067
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.90'
+                Al2O3: '0.02'
+                SiO2: '47.62'
+                K2O: '0.61'
+                CaO: '40.74'
+          locator: *id347
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -28856,6 +30334,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id347
+      point_conditions:
+        composition: *georges_comp_067
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -28905,6 +30385,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id347
+      point_conditions:
+        composition: *georges_comp_067
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -28954,6 +30436,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id347
+      point_conditions:
+        composition: *georges_comp_067
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -29003,6 +30487,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id347
+      point_conditions:
+        composition: *georges_comp_067
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -29058,6 +30544,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 139; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_068
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.44'
+                Al2O3: '4.68'
+                SiO2: '45.18'
+                K2O: '0.67'
+                CaO: '38.42'
+          locator: *id348
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -29107,6 +30606,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id348
+      point_conditions:
+        composition: *georges_comp_068
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -29156,6 +30657,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id348
+      point_conditions:
+        composition: *georges_comp_068
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -29205,6 +30708,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id348
+      point_conditions:
+        composition: *georges_comp_068
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -29254,6 +30759,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id348
+      point_conditions:
+        composition: *georges_comp_068
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -29309,6 +30816,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 141; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_069
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.13'
+                Al2O3: '9.15'
+                SiO2: '43.85'
+                K2O: '0.90'
+                CaO: '36.44'
+          locator: *id349
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -29358,6 +30878,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id349
+      point_conditions:
+        composition: *georges_comp_069
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -29407,6 +30929,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id349
+      point_conditions:
+        composition: *georges_comp_069
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -29456,6 +30980,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id349
+      point_conditions:
+        composition: *georges_comp_069
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -29505,6 +31031,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id349
+      point_conditions:
+        composition: *georges_comp_069
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -29560,6 +31088,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 143; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_070
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '6.74'
+                Al2O3: '14.10'
+                SiO2: '41.27'
+                K2O: '0.96'
+                CaO: '35.25'
+          locator: *id350
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -29609,6 +31150,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id350
+      point_conditions:
+        composition: *georges_comp_070
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -29658,6 +31201,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id350
+      point_conditions:
+        composition: *georges_comp_070
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -29707,6 +31252,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id350
+      point_conditions:
+        composition: *georges_comp_070
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -29756,6 +31303,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id350
+      point_conditions:
+        composition: *georges_comp_070
       uncertainty:
         value: '0.19'
         units: 'wt%'
@@ -29811,6 +31360,20 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 145; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_071
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.42'
+                Al2O3: '10.15'
+                SiO2: '35.99'
+                K2O: '0.210'
+                CaO: '45.93'
+          locator: *id351
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -29860,6 +31423,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id351
+      point_conditions:
+        composition: *georges_comp_071
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -29909,6 +31474,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id351
+      point_conditions:
+        composition: *georges_comp_071
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -29958,6 +31525,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id351
+      point_conditions:
+        composition: *georges_comp_071
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -30007,6 +31576,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id351
+      point_conditions:
+        composition: *georges_comp_071
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -30056,6 +31627,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id351
+      point_conditions:
+        composition: *georges_comp_071
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -30105,6 +31678,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 147; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_072
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '10.09'
+                Al2O3: '0.00'
+                SiO2: '54.56'
+                K2O: '4.21'
+                CaO: '29.74'
+          locator: *id352
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -30154,6 +31740,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id352
+      point_conditions:
+        composition: *georges_comp_072
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -30197,6 +31785,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id352
+      point_conditions:
+        composition: *georges_comp_072
       uncertainty:
         value: '0.34'
         units: 'wt%'
@@ -30246,6 +31836,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id352
+      point_conditions:
+        composition: *georges_comp_072
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -30295,6 +31887,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id352
+      point_conditions:
+        composition: *georges_comp_072
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -30350,6 +31944,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 149; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_073
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.22'
+                Al2O3: '4.67'
+                SiO2: '52.09'
+                K2O: '4.66'
+                CaO: '27.28'
+          locator: *id353
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -30399,6 +32006,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id353
+      point_conditions:
+        composition: *georges_comp_073
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -30448,6 +32057,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id353
+      point_conditions:
+        composition: *georges_comp_073
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -30497,6 +32108,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id353
+      point_conditions:
+        composition: *georges_comp_073
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -30546,6 +32159,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id353
+      point_conditions:
+        composition: *georges_comp_073
       uncertainty:
         value: '0.19'
         units: 'wt%'
@@ -30601,6 +32216,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 151; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_074
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.57'
+                Al2O3: '9.20'
+                SiO2: '49.60'
+                K2O: '4.79'
+                CaO: '26.23'
+          locator: *id354
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -30650,6 +32278,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id354
+      point_conditions:
+        composition: *georges_comp_074
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -30699,6 +32329,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id354
+      point_conditions:
+        composition: *georges_comp_074
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -30748,6 +32380,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id354
+      point_conditions:
+        composition: *georges_comp_074
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -30797,6 +32431,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id354
+      point_conditions:
+        composition: *georges_comp_074
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -30852,6 +32488,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 153; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_075
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '6.93'
+                Al2O3: '13.02'
+                SiO2: '46.99'
+                K2O: '4.65'
+                CaO: '26.46'
+          locator: *id355
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -30901,6 +32550,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id355
+      point_conditions:
+        composition: *georges_comp_075
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -30950,6 +32601,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id355
+      point_conditions:
+        composition: *georges_comp_075
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -30999,6 +32652,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id355
+      point_conditions:
+        composition: *georges_comp_075
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -31048,6 +32703,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id355
+      point_conditions:
+        composition: *georges_comp_075
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -31103,6 +32760,20 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 155; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_076
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.48'
+                Al2O3: '10.39'
+                SiO2: '36.16'
+                K2O: '0.230'
+                CaO: '45.58'
+          locator: *id356
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -31152,6 +32823,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id356
+      point_conditions:
+        composition: *georges_comp_076
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -31201,6 +32874,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id356
+      point_conditions:
+        composition: *georges_comp_076
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -31250,6 +32925,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id356
+      point_conditions:
+        composition: *georges_comp_076
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -31299,6 +32976,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id356
+      point_conditions:
+        composition: *georges_comp_076
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -31348,6 +33027,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id356
+      point_conditions:
+        composition: *georges_comp_076
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -31397,6 +33078,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 157; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_077
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.48'
+                Al2O3: '5.12'
+                SiO2: '41.53'
+                K2O: '0.41'
+                CaO: '41.24'
+          locator: *id357
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -31446,6 +33140,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id357
+      point_conditions:
+        composition: *georges_comp_077
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -31495,6 +33191,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id357
+      point_conditions:
+        composition: *georges_comp_077
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -31544,6 +33242,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id357
+      point_conditions:
+        composition: *georges_comp_077
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -31593,6 +33293,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id357
+      point_conditions:
+        composition: *georges_comp_077
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -31648,6 +33350,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 159; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_078
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.44'
+                Al2O3: '13.88'
+                SiO2: '37.41'
+                K2O: '0.55'
+                CaO: '38.85'
+          locator: *id358
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -31697,6 +33412,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id358
+      point_conditions:
+        composition: *georges_comp_078
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -31746,6 +33463,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id358
+      point_conditions:
+        composition: *georges_comp_078
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -31795,6 +33514,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id358
+      point_conditions:
+        composition: *georges_comp_078
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -31844,6 +33565,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id358
+      point_conditions:
+        composition: *georges_comp_078
       uncertainty:
         value: '0.39'
         units: 'wt%'
@@ -31899,6 +33622,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 161; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_079
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.86'
+                Al2O3: '4.42'
+                SiO2: '53.18'
+                K2O: '5.21'
+                CaO: '26.68'
+          locator: *id359
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -31948,6 +33684,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id359
+      point_conditions:
+        composition: *georges_comp_079
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -31997,6 +33735,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id359
+      point_conditions:
+        composition: *georges_comp_079
       uncertainty:
         value: '0.31'
         units: 'wt%'
@@ -32046,6 +33786,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id359
+      point_conditions:
+        composition: *georges_comp_079
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -32095,6 +33837,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id359
+      point_conditions:
+        composition: *georges_comp_079
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -32150,6 +33894,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 163; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_080
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '6.63'
+                Al2O3: '13.78'
+                SiO2: '46.87'
+                K2O: '4.93'
+                CaO: '25.74'
+          locator: *id360
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -32199,6 +33956,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id360
+      point_conditions:
+        composition: *georges_comp_080
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -32248,6 +34007,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id360
+      point_conditions:
+        composition: *georges_comp_080
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -32297,6 +34058,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id360
+      point_conditions:
+        composition: *georges_comp_080
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -32346,6 +34109,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id360
+      point_conditions:
+        composition: *georges_comp_080
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -32401,6 +34166,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 165; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_081
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.58'
+                Al2O3: '11.20'
+                SiO2: '36.23'
+                K2O: '0.33'
+                CaO: '45.39'
+          locator: *id361
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -32450,6 +34228,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id361
+      point_conditions:
+        composition: *georges_comp_081
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -32499,6 +34279,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id361
+      point_conditions:
+        composition: *georges_comp_081
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -32548,6 +34330,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id361
+      point_conditions:
+        composition: *georges_comp_081
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -32597,6 +34381,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id361
+      point_conditions:
+        composition: *georges_comp_081
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -32646,6 +34432,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id361
+      point_conditions:
+        composition: *georges_comp_081
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -32695,6 +34483,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 167; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_082
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '0.01'
+                Al2O3: '14.49'
+                SiO2: '42.93'
+                K2O: '2.15'
+                CaO: '40.02'
+          locator: *id362
       uncertainty:
         value: '0.01'
         units: 'wt%'
@@ -32744,6 +34545,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id362
+      point_conditions:
+        composition: *georges_comp_082
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -32793,6 +34596,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id362
+      point_conditions:
+        composition: *georges_comp_082
       uncertainty:
         value: '0.40'
         units: 'wt%'
@@ -32842,6 +34647,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id362
+      point_conditions:
+        composition: *georges_comp_082
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -32891,6 +34698,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id362
+      point_conditions:
+        composition: *georges_comp_082
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -32946,6 +34755,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 169; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_083
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '2.70'
+                Al2O3: '14.42'
+                SiO2: '39.61'
+                K2O: '1.16'
+                CaO: '41.38'
+          locator: *id363
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -32995,6 +34817,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id363
+      point_conditions:
+        composition: *georges_comp_083
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -33044,6 +34868,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id363
+      point_conditions:
+        composition: *georges_comp_083
       uncertainty:
         value: '0.27'
         units: 'wt%'
@@ -33093,6 +34919,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id363
+      point_conditions:
+        composition: *georges_comp_083
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -33142,6 +34970,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id363
+      point_conditions:
+        composition: *georges_comp_083
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -33197,6 +35027,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 171; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_084
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '14.79'
+                Al2O3: '14.57'
+                SiO2: '34.95'
+                K2O: '0.47'
+                CaO: '35.13'
+          locator: *id364
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -33246,6 +35089,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id364
+      point_conditions:
+        composition: *georges_comp_084
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -33295,6 +35140,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id364
+      point_conditions:
+        composition: *georges_comp_084
       uncertainty:
         value: '0.29'
         units: 'wt%'
@@ -33344,6 +35191,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id364
+      point_conditions:
+        composition: *georges_comp_084
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -33393,6 +35242,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id364
+      point_conditions:
+        composition: *georges_comp_084
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -33448,6 +35299,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 173; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_085
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.29'
+                Al2O3: '10.57'
+                SiO2: '35.90'
+                K2O: '0.33'
+                CaO: '45.55'
+          locator: *id365
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -33497,6 +35361,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id365
+      point_conditions:
+        composition: *georges_comp_085
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -33546,6 +35412,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id365
+      point_conditions:
+        composition: *georges_comp_085
       uncertainty:
         value: '0.39'
         units: 'wt%'
@@ -33595,6 +35463,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id365
+      point_conditions:
+        composition: *georges_comp_085
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -33644,6 +35514,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id365
+      point_conditions:
+        composition: *georges_comp_085
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -33693,6 +35565,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id365
+      point_conditions:
+        composition: *georges_comp_085
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -33742,6 +35616,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 175; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_086
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '0.01'
+                Al2O3: '14.34'
+                SiO2: '53.36'
+                K2O: '8.81'
+                CaO: '23.16'
+          locator: *id366
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -33791,6 +35678,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id366
+      point_conditions:
+        composition: *georges_comp_086
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -33840,6 +35729,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id366
+      point_conditions:
+        composition: *georges_comp_086
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -33889,6 +35780,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id366
+      point_conditions:
+        composition: *georges_comp_086
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -33938,6 +35831,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id366
+      point_conditions:
+        composition: *georges_comp_086
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -33993,6 +35888,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 177; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_087
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '2.72'
+                Al2O3: '14.56'
+                SiO2: '51.07'
+                K2O: '8.29'
+                CaO: '22.58'
+          locator: *id367
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -34042,6 +35950,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id367
+      point_conditions:
+        composition: *georges_comp_087
       uncertainty:
         value: '0.19'
         units: 'wt%'
@@ -34091,6 +36001,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id367
+      point_conditions:
+        composition: *georges_comp_087
       uncertainty:
         value: '0.62'
         units: 'wt%'
@@ -34140,6 +36052,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id367
+      point_conditions:
+        composition: *georges_comp_087
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -34189,6 +36103,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id367
+      point_conditions:
+        composition: *georges_comp_087
       uncertainty:
         value: '0.19'
         units: 'wt%'
@@ -34244,6 +36160,19 @@ species:
         published_page: 195
         table: Annexe III
         note: MinerU table p209-t52 row 179; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_088
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '13.99'
+                Al2O3: '14.42'
+                SiO2: '46.74'
+                K2O: '5.48'
+                CaO: '19.06'
+          locator: *id368
       uncertainty:
         value: '0.19'
         units: 'wt%'
@@ -34293,6 +36222,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id368
+      point_conditions:
+        composition: *georges_comp_088
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -34342,6 +36273,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id368
+      point_conditions:
+        composition: *georges_comp_088
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -34391,6 +36324,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id368
+      point_conditions:
+        composition: *georges_comp_088
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -34440,6 +36375,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id368
+      point_conditions:
+        composition: *georges_comp_088
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -34495,6 +36432,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 183; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_089
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.49'
+                Al2O3: '11.22'
+                SiO2: '36.87'
+                K2O: '0.34'
+                CaO: '44.91'
+          locator: *id369
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -34544,6 +36494,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id369
+      point_conditions:
+        composition: *georges_comp_089
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -34593,6 +36545,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id369
+      point_conditions:
+        composition: *georges_comp_089
       uncertainty:
         value: '0.44'
         units: 'wt%'
@@ -34642,6 +36596,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id369
+      point_conditions:
+        composition: *georges_comp_089
       uncertainty:
         value: '0.04'
         units: 'wt%'
@@ -34691,6 +36647,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id369
+      point_conditions:
+        composition: *georges_comp_089
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -34740,6 +36698,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id369
+      point_conditions:
+        composition: *georges_comp_089
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -34789,6 +36749,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 185; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_090
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '2.49'
+                Al2O3: '14.57'
+                SiO2: '40.12'
+                K2O: '1.40'
+                CaO: '40.49'
+          locator: *id370
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -34838,6 +36811,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id370
+      point_conditions:
+        composition: *georges_comp_090
       uncertainty:
         value: '0.20'
         units: 'wt%'
@@ -34887,6 +36862,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id370
+      point_conditions:
+        composition: *georges_comp_090
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -34936,6 +36913,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id370
+      point_conditions:
+        composition: *georges_comp_090
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -34985,6 +36964,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id370
+      point_conditions:
+        composition: *georges_comp_090
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -35040,6 +37021,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 187; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_091
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '2.46'
+                Al2O3: '14.07'
+                SiO2: '51.87'
+                K2O: '9.29'
+                CaO: '21.61'
+          locator: *id371
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -35089,6 +37083,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id371
+      point_conditions:
+        composition: *georges_comp_091
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -35138,6 +37134,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id371
+      point_conditions:
+        composition: *georges_comp_091
       uncertainty:
         value: '0.37'
         units: 'wt%'
@@ -35187,6 +37185,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id371
+      point_conditions:
+        composition: *georges_comp_091
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -35236,6 +37236,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id371
+      point_conditions:
+        composition: *georges_comp_091
       uncertainty:
         value: '0.29'
         units: 'wt%'
@@ -35291,6 +37293,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 189; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_092
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '14.59'
+                Al2O3: '14.60'
+                SiO2: '33.69'
+                K2O: '0.51'
+                CaO: '35.14'
+          locator: *id372
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -35340,6 +37355,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id372
+      point_conditions:
+        composition: *georges_comp_092
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -35389,6 +37406,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id372
+      point_conditions:
+        composition: *georges_comp_092
       uncertainty:
         value: '0.38'
         units: 'wt%'
@@ -35438,6 +37457,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id372
+      point_conditions:
+        composition: *georges_comp_092
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -35487,6 +37508,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id372
+      point_conditions:
+        composition: *georges_comp_092
       uncertainty:
         value: '0.32'
         units: 'wt%'
@@ -35542,6 +37565,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 191; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_093
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '14.27'
+                Al2O3: '14.33'
+                SiO2: '45.57'
+                K2O: '6.16'
+                CaO: '19.00'
+          locator: *id373
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -35591,6 +37627,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id373
+      point_conditions:
+        composition: *georges_comp_093
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -35640,6 +37678,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id373
+      point_conditions:
+        composition: *georges_comp_093
       uncertainty:
         value: '0.59'
         units: 'wt%'
@@ -35689,6 +37729,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id373
+      point_conditions:
+        composition: *georges_comp_093
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -35738,6 +37780,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id373
+      point_conditions:
+        composition: *georges_comp_093
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -35793,6 +37837,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 193; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_094
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.50'
+                Al2O3: '10.59'
+                SiO2: '36.64'
+                K2O: '0.41'
+                CaO: '45.95'
+          locator: *id374
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -35842,6 +37899,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id374
+      point_conditions:
+        composition: *georges_comp_094
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -35891,6 +37950,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id374
+      point_conditions:
+        composition: *georges_comp_094
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -35940,6 +38001,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id374
+      point_conditions:
+        composition: *georges_comp_094
       uncertainty:
         value: '0.05'
         units: 'wt%'
@@ -35989,6 +38052,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id374
+      point_conditions:
+        composition: *georges_comp_094
       uncertainty:
         value: '0.31'
         units: 'wt%'
@@ -36038,6 +38103,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id374
+      point_conditions:
+        composition: *georges_comp_094
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -36087,6 +38154,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 195; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_095
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '0.01'
+                Al2O3: '14.43'
+                SiO2: '42.44'
+                K2O: '2.48'
+                CaO: '39.88'
+          locator: *id375
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -36136,6 +38216,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id375
+      point_conditions:
+        composition: *georges_comp_095
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -36185,6 +38267,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id375
+      point_conditions:
+        composition: *georges_comp_095
       uncertainty:
         value: '0.40'
         units: 'wt%'
@@ -36234,6 +38318,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id375
+      point_conditions:
+        composition: *georges_comp_095
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -36283,6 +38369,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id375
+      point_conditions:
+        composition: *georges_comp_095
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -36338,6 +38426,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 197; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_096
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '0.01'
+                Al2O3: '13.21'
+                SiO2: '53.41'
+                K2O: '10.82'
+                CaO: '21.73'
+          locator: *id376
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -36387,6 +38488,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id376
+      point_conditions:
+        composition: *georges_comp_096
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -36436,6 +38539,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id376
+      point_conditions:
+        composition: *georges_comp_096
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -36485,6 +38590,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id376
+      point_conditions:
+        composition: *georges_comp_096
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -36534,6 +38641,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id376
+      point_conditions:
+        composition: *georges_comp_096
       uncertainty:
         value: '0.38'
         units: 'wt%'
@@ -36589,6 +38698,20 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 199; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_097
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.24'
+                Al2O3: '9.98'
+                SiO2: '37.08'
+                K2O: '0.32'
+                CaO: '46.34'
+          locator: *id377
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -36638,6 +38761,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id377
+      point_conditions:
+        composition: *georges_comp_097
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -36687,6 +38812,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id377
+      point_conditions:
+        composition: *georges_comp_097
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -36736,6 +38863,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id377
+      point_conditions:
+        composition: *georges_comp_097
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -36785,6 +38914,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id377
+      point_conditions:
+        composition: *georges_comp_097
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -36834,6 +38965,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id377
+      point_conditions:
+        composition: *georges_comp_097
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -36883,6 +39016,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 201; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_098
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '9.11'
+                Al2O3: '4.68'
+                SiO2: '45.02'
+                K2O: '1.36'
+                CaO: '37.89'
+          locator: *id378
       uncertainty:
         value: '0.24'
         units: 'wt%'
@@ -36932,6 +39078,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id378
+      point_conditions:
+        composition: *georges_comp_098
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -36981,6 +39129,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id378
+      point_conditions:
+        composition: *georges_comp_098
       uncertainty:
         value: '0.79'
         units: 'wt%'
@@ -37030,6 +39180,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id378
+      point_conditions:
+        composition: *georges_comp_098
       uncertainty:
         value: '0.06'
         units: 'wt%'
@@ -37079,6 +39231,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id378
+      point_conditions:
+        composition: *georges_comp_098
       uncertainty:
         value: '0.35'
         units: 'wt%'
@@ -37134,6 +39288,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 203; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_099
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '6.29'
+                Al2O3: '14.18'
+                SiO2: '43.95'
+                K2O: '3.69'
+                CaO: '30.19'
+          locator: *id379
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -37183,6 +39350,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id379
+      point_conditions:
+        composition: *georges_comp_099
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -37232,6 +39401,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id379
+      point_conditions:
+        composition: *georges_comp_099
       uncertainty:
         value: '0.34'
         units: 'wt%'
@@ -37281,6 +39452,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id379
+      point_conditions:
+        composition: *georges_comp_099
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -37330,6 +39503,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id379
+      point_conditions:
+        composition: *georges_comp_099
       uncertainty:
         value: '0.20'
         units: 'wt%'
@@ -37385,6 +39560,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 205; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_100
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '8.94'
+                Al2O3: '4.77'
+                SiO2: '49.44'
+                K2O: '3.23'
+                CaO: '32.29'
+          locator: *id380
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -37434,6 +39622,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id380
+      point_conditions:
+        composition: *georges_comp_100
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -37483,6 +39673,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id380
+      point_conditions:
+        composition: *georges_comp_100
       uncertainty:
         value: '0.46'
         units: 'wt%'
@@ -37532,6 +39724,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id380
+      point_conditions:
+        composition: *georges_comp_100
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -37581,6 +39775,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id380
+      point_conditions:
+        composition: *georges_comp_100
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -37636,6 +39832,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 207; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_101
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '7.75'
+                Al2O3: '9.24'
+                SiO2: '46.77'
+                K2O: '3.51'
+                CaO: '31.18'
+          locator: *id381
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -37685,6 +39894,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id381
+      point_conditions:
+        composition: *georges_comp_101
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -37734,6 +39945,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id381
+      point_conditions:
+        composition: *georges_comp_101
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -37783,6 +39996,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id381
+      point_conditions:
+        composition: *georges_comp_101
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -37832,6 +40047,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id381
+      point_conditions:
+        composition: *georges_comp_101
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -37887,6 +40104,20 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 209; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_102
+          analysis_selection_rule: 'K2O uses the printed ion-probe mean because the electron-probe value was below 0.3 wt%.'
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.37'
+                Al2O3: '10.25'
+                SiO2: '36.79'
+                K2O: '0.28'
+                CaO: '46.50'
+          locator: *id382
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -37936,6 +40167,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id382
+      point_conditions:
+        composition: *georges_comp_102
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -37985,6 +40218,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id382
+      point_conditions:
+        composition: *georges_comp_102
       uncertainty:
         value: '0.27'
         units: 'wt%'
@@ -38034,6 +40269,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id382
+      point_conditions:
+        composition: *georges_comp_102
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -38083,6 +40320,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id382
+      point_conditions:
+        composition: *georges_comp_102
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -38132,6 +40371,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id382
+      point_conditions:
+        composition: *georges_comp_102
       values:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
@@ -38181,6 +40422,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 211; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_103
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '14.02'
+                Al2O3: '13.76'
+                SiO2: '46.02'
+                K2O: '4.77'
+                CaO: '19.63'
+          locator: *id383
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -38230,6 +40484,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id383
+      point_conditions:
+        composition: *georges_comp_103
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -38279,6 +40535,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id383
+      point_conditions:
+        composition: *georges_comp_103
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -38328,6 +40586,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id383
+      point_conditions:
+        composition: *georges_comp_103
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -38377,6 +40637,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id383
+      point_conditions:
+        composition: *georges_comp_103
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -38432,6 +40694,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 213; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_104
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '4.69'
+                Al2O3: '19.50'
+                SiO2: '47.65'
+                K2O: '10.72'
+                CaO: '15.55'
+          locator: *id384
       uncertainty:
         value: '0.12'
         units: 'wt%'
@@ -38481,6 +40756,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id384
+      point_conditions:
+        composition: *georges_comp_104
       uncertainty:
         value: '0.20'
         units: 'wt%'
@@ -38530,6 +40807,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id384
+      point_conditions:
+        composition: *georges_comp_104
       uncertainty:
         value: '0.22'
         units: 'wt%'
@@ -38579,6 +40858,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id384
+      point_conditions:
+        composition: *georges_comp_104
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -38628,6 +40909,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id384
+      point_conditions:
+        composition: *georges_comp_104
       uncertainty:
         value: '0.28'
         units: 'wt%'
@@ -38683,6 +40966,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 215; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_105
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '4.51'
+                Al2O3: '19.30'
+                SiO2: '46.81'
+                K2O: '11.61'
+                CaO: '15.31'
+          locator: *id385
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -38732,6 +41028,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id385
+      point_conditions:
+        composition: *georges_comp_105
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -38781,6 +41079,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id385
+      point_conditions:
+        composition: *georges_comp_105
       uncertainty:
         value: '0.33'
         units: 'wt%'
@@ -38830,6 +41130,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id385
+      point_conditions:
+        composition: *georges_comp_105
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -38879,6 +41181,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id385
+      point_conditions:
+        composition: *georges_comp_105
       uncertainty:
         value: '0.34'
         units: 'wt%'
@@ -38934,6 +41238,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 217; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_106
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '4.46'
+                Al2O3: '19.40'
+                SiO2: '47.02'
+                K2O: '11.91'
+                CaO: '15.06'
+          locator: *id386
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -38983,6 +41300,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id386
+      point_conditions:
+        composition: *georges_comp_106
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -39032,6 +41351,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id386
+      point_conditions:
+        composition: *georges_comp_106
       uncertainty:
         value: '0.23'
         units: 'wt%'
@@ -39081,6 +41402,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id386
+      point_conditions:
+        composition: *georges_comp_106
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -39130,6 +41453,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id386
+      point_conditions:
+        composition: *georges_comp_106
       uncertainty:
         value: '0.27'
         units: 'wt%'
@@ -39185,6 +41510,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 219; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_107
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.63'
+                Al2O3: '11.41'
+                SiO2: '35.95'
+                K2O: '0.38'
+                CaO: '44.85'
+          locator: *id387
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -39234,6 +41572,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id387
+      point_conditions:
+        composition: *georges_comp_107
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -39283,6 +41623,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id387
+      point_conditions:
+        composition: *georges_comp_107
       uncertainty:
         value: '0.34'
         units: 'wt%'
@@ -39332,6 +41674,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id387
+      point_conditions:
+        composition: *georges_comp_107
       uncertainty:
         value: '0.03'
         units: 'wt%'
@@ -39381,6 +41725,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id387
+      point_conditions:
+        composition: *georges_comp_107
       uncertainty:
         value: '0.37'
         units: 'wt%'
@@ -39436,6 +41782,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 221; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_108
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.52'
+                Al2O3: '11.16'
+                SiO2: '35.79'
+                K2O: '0.40'
+                CaO: '45.19'
+          locator: *id388
       uncertainty:
         value: '0.07'
         units: 'wt%'
@@ -39485,6 +41844,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id388
+      point_conditions:
+        composition: *georges_comp_108
       uncertainty:
         value: '0.13'
         units: 'wt%'
@@ -39534,6 +41895,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id388
+      point_conditions:
+        composition: *georges_comp_108
       uncertainty:
         value: '0.18'
         units: 'wt%'
@@ -39583,6 +41946,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id388
+      point_conditions:
+        composition: *georges_comp_108
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -39632,6 +41997,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id388
+      point_conditions:
+        composition: *georges_comp_108
       uncertainty:
         value: '0.19'
         units: 'wt%'
@@ -39687,6 +42054,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 223; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_109
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '4.19'
+                Al2O3: '10.93'
+                SiO2: '61.56'
+                K2O: '14.44'
+                CaO: '7.39'
+          locator: *id389
       uncertainty:
         value: '0.08'
         units: 'wt%'
@@ -39736,6 +42116,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id389
+      point_conditions:
+        composition: *georges_comp_109
       uncertainty:
         value: '0.11'
         units: 'wt%'
@@ -39785,6 +42167,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id389
+      point_conditions:
+        composition: *georges_comp_109
       uncertainty:
         value: '0.54'
         units: 'wt%'
@@ -39834,6 +42218,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id389
+      point_conditions:
+        composition: *georges_comp_109
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -39883,6 +42269,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id389
+      point_conditions:
+        composition: *georges_comp_109
       uncertainty:
         value: '0.32'
         units: 'wt%'
@@ -39938,6 +42326,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 225; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_110
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '4.20'
+                Al2O3: '10.99'
+                SiO2: '60.42'
+                K2O: '15.20'
+                CaO: '7.20'
+          locator: *id390
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -39987,6 +42388,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id390
+      point_conditions:
+        composition: *georges_comp_110
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -40036,6 +42439,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id390
+      point_conditions:
+        composition: *georges_comp_110
       uncertainty:
         value: '0.40'
         units: 'wt%'
@@ -40085,6 +42490,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id390
+      point_conditions:
+        composition: *georges_comp_110
       uncertainty:
         value: '0.17'
         units: 'wt%'
@@ -40134,6 +42541,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id390
+      point_conditions:
+        composition: *georges_comp_110
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -40189,6 +42598,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 227; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_111
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '4.09'
+                Al2O3: '11.07'
+                SiO2: '60.58'
+                K2O: '15.18'
+                CaO: '7.13'
+          locator: *id391
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -40238,6 +42660,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id391
+      point_conditions:
+        composition: *georges_comp_111
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -40287,6 +42711,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id391
+      point_conditions:
+        composition: *georges_comp_111
       uncertainty:
         value: '0.32'
         units: 'wt%'
@@ -40336,6 +42762,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id391
+      point_conditions:
+        composition: *georges_comp_111
       uncertainty:
         value: '0.15'
         units: 'wt%'
@@ -40385,6 +42813,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id391
+      point_conditions:
+        composition: *georges_comp_111
       uncertainty:
         value: '0.21'
         units: 'wt%'
@@ -40440,6 +42870,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 229; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_112
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.54'
+                Al2O3: '11.13'
+                SiO2: '36.00'
+                K2O: '0.33'
+                CaO: '45.10'
+          locator: *id392
       uncertainty:
         value: '0.10'
         units: 'wt%'
@@ -40489,6 +42932,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id392
+      point_conditions:
+        composition: *georges_comp_112
       uncertainty:
         value: '0.09'
         units: 'wt%'
@@ -40538,6 +42983,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id392
+      point_conditions:
+        composition: *georges_comp_112
       uncertainty:
         value: '0.26'
         units: 'wt%'
@@ -40587,6 +43034,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id392
+      point_conditions:
+        composition: *georges_comp_112
       uncertainty:
         value: '0.02'
         units: 'wt%'
@@ -40636,6 +43085,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id392
+      point_conditions:
+        composition: *georges_comp_112
       uncertainty:
         value: '0.34'
         units: 'wt%'
@@ -40691,6 +43142,19 @@ species:
         published_page: 196
         table: Annexe III
         note: MinerU table p209-t52 row 231; mean and following SD row visually checked on 600 dpi page render.
+      point_conditions:
+        composition: &georges_comp_113
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+                MgO: '5.59'
+                Al2O3: '11.17'
+                SiO2: '36.03'
+                K2O: '0.35'
+                CaO: '45.03'
+          locator: *id393
       uncertainty:
         value: '0.14'
         units: 'wt%'
@@ -40740,6 +43204,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id393
+      point_conditions:
+        composition: *georges_comp_113
       uncertainty:
         value: '0.16'
         units: 'wt%'
@@ -40789,6 +43255,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id393
+      point_conditions:
+        composition: *georges_comp_113
       uncertainty:
         value: '0.25'
         units: 'wt%'
@@ -40838,6 +43306,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id393
+      point_conditions:
+        composition: *georges_comp_113
       uncertainty:
         value: '0.01'
         units: 'wt%'
@@ -40887,6 +43357,8 @@ species:
       class_tag: measured_direct
       units: wt%
       locator: *id393
+      point_conditions:
+        composition: *georges_comp_113
       uncertainty:
         value: '0.30'
         units: 'wt%'
@@ -48123,6 +50595,7 @@ species:
   K:
     observations:
     - observation_id: georges_2000_table_iii_3_pk_1
+      experiment: georges_2000_tga_series
       type: partial_pressure
       class_tag: measured_direct
       phase: gas
@@ -48146,6 +50619,7 @@ species:
           units: log10(atm)
         standard_state: K(g) partial pressure as printed; no inferred oxygen conversion.
     - observation_id: georges_2000_table_iii_3_pk_2
+      experiment: georges_2000_tga_series
       type: partial_pressure
       class_tag: measured_direct
       phase: gas
@@ -48169,6 +50643,7 @@ species:
           units: log10(atm)
         standard_state: K(g) partial pressure as printed; no inferred oxygen conversion.
     - observation_id: georges_2000_table_iii_3_pk_3
+      experiment: georges_2000_tga_series
       type: partial_pressure
       class_tag: measured_direct
       phase: gas
@@ -48192,6 +50667,7 @@ species:
           units: log10(atm)
         standard_state: K(g) partial pressure as printed; no inferred oxygen conversion.
     - observation_id: georges_2000_table_iii_3_pk_4
+      experiment: georges_2000_tga_series
       type: partial_pressure
       class_tag: measured_direct
       phase: gas
@@ -48215,6 +50691,7 @@ species:
           units: log10(atm)
         standard_state: K(g) partial pressure as printed; no inferred oxygen conversion.
     - observation_id: georges_2000_table_iii_4_pk_1
+      experiment: georges_2000_tga_series
       type: partial_pressure
       class_tag: measured_direct
       phase: gas
@@ -48238,6 +50715,7 @@ species:
           units: log10(atm)
         standard_state: K(g) partial pressure as printed; no inferred oxygen conversion.
     - observation_id: georges_2000_table_iii_6_pk_1
+      experiment: georges_2000_tga_series
       type: partial_pressure
       class_tag: measured_direct
       phase: gas
@@ -48261,6 +50739,7 @@ species:
           units: log10(atm)
         standard_state: K(g) partial pressure as printed; no inferred oxygen conversion.
     - observation_id: georges_2000_table_iii_6_pk_2
+      experiment: georges_2000_tga_series
       type: partial_pressure
       class_tag: measured_direct
       phase: gas
@@ -48284,6 +50763,7 @@ species:
           units: log10(atm)
         standard_state: K(g) partial pressure as printed; no inferred oxygen conversion.
     - observation_id: georges_2000_table_iii_7_pk_1
+      experiment: georges_2000_tga_series
       type: partial_pressure
       class_tag: measured_direct
       phase: gas

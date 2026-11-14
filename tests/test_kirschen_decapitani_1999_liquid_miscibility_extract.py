@@ -82,6 +82,64 @@ def test_all_table_cells_migrate_with_species_temperature_and_atmosphere() -> No
     _migrated_rows()
 
 
+def test_measured_glass_rows_bind_their_printed_phase_compositions() -> None:
+    document, result = _migrated_rows()
+    source_rows = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+    }
+    measured_count = 0
+    for observation_id, raw in source_rows.items():
+        values = raw["values"]
+        if values.get("status") == "typed_refusal":
+            continue
+        measured_count += 1
+        printed = raw["point_conditions"]["composition"]
+        assert printed["state"]["tag"] == "value", observation_id
+        payload = printed["state"]["value"]
+        assert payload["basis"] == "wt_percent", observation_id
+        assert payload["amount_basis"] == "mass_percent", observation_id
+
+        observation = result.observations[f"{SOURCE_ID}::{observation_id}"]
+        assert observation.identity.species.formula == values["formula"]
+        assert observation.identity.composition.is_value, observation_id
+        condition = observation.point_conditions["composition"]
+        assert condition.state.is_value, observation_id
+        assert condition.locator.page == raw["locator"]["page"]
+        assert condition.locator.table == raw["locator"]["table"]
+    assert measured_count == 466
+
+    # Independently transcribed from Table 1 (PDF p. 9) and Table 2 (PDF p. 15).
+    expected = {
+        "kirschen_decapitani_1999_t1_stc_10_1_phase1_cao": [
+            ["CaO", "0.26"],
+            ["SiO2", "95.91"],
+            ["TiO2", "5.57"],
+        ],
+        "kirschen_decapitani_1999_t1_stc_10_1_phase2_cao": [
+            ["CaO", "18.84"],
+            ["SiO2", "32.44"],
+            ["TiO2", "50.43"],
+        ],
+        "kirschen_decapitani_1999_t2_scm_3_1h_phase1_cao": [
+            ["CaO", "2.96"],
+            ["MgO", "1.07"],
+            ["SiO2", "96.27"],
+        ],
+        "kirschen_decapitani_1999_t2_stmc_4_1h_phase1_cao": [
+            ["CaO", "5.91"],
+            ["MgO", "3.86"],
+            ["SiO2", "45.30"],
+            ["TiO2", "45.56"],
+        ],
+    }
+    for observation_id, components in expected.items():
+        raw = source_rows[observation_id]
+        point = raw["point_conditions"]["composition"]
+        assert point["state"]["value"]["components"] == components
+
+
 def test_render_transcribed_stmc_grids_and_printed_precision() -> None:
     document, result = _migrated_rows()
     source_rows = {

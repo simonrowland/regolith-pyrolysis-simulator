@@ -97,6 +97,8 @@ observations:
       locator:
         pdf_page_index: 2
         section: The proper way of determining true evaporation coefficients
+  provenance:
+    printed_phase: molten_SiO2
 - observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_knudsen_rate_cell
   experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-knudsen-ir-cell-1800C
   identity:
@@ -149,6 +151,8 @@ observations:
       locator:
         pdf_page_index: 2
         section: The proper way of determining true evaporation coefficients
+  provenance:
+    printed_phase: molten_SiO2_or_SiO2_plus_Ir
 - observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_langmuir_rate_loop
   experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C
   identity:
@@ -205,3 +209,5 @@ observations:
         figure: '3'
         section: The proper way of determining true evaporation coefficients
         note: prose value; Fig. 3 curve not digitized
+  provenance:
+    printed_phase: molten_SiO2_with_1wtpct_Ir

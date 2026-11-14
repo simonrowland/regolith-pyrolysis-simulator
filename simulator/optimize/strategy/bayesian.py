@@ -321,80 +321,7 @@ class OptunaTPEStrategy:
                     break
 
     def tell(self, results: Sequence[tuple[Candidate, "ScoredResult"]]) -> None:
-        batch: list[TellBatchRow] = []
-        seen: set[str] = set()
-        scored_result_type: Any | None = None
-
-        for pair in results:
-            if not isinstance(pair, tuple) or len(pair) != 2:
-                raise ValueError(
-                    "tell results must contain (Candidate, ScoredResult) 2-tuples"
-                )
-            candidate, scored = pair
-            if not isinstance(candidate, Candidate):
-                raise ValueError("tell result candidate must be a Candidate")
-            if scored_result_type is None:
-                from simulator.optimize.evaluate import ScoredResult as _ScoredResult
-
-                scored_result_type = _ScoredResult
-            if not isinstance(scored, scored_result_type):
-                raise ValueError("tell result scored value must be a ScoredResult")
-            scored_candidate_id = getattr(scored, "candidate_id", None)
-            if scored_candidate_id != candidate.id:
-                raise ValueError(
-                    "ScoredResult.candidate_id must match Candidate.id "
-                    f"({scored_candidate_id!r} != {candidate.id!r})"
-                )
-            if candidate.id not in self._planned_by_id:
-                raise ValueError(f"candidate_id was not planned: {candidate.id!r}")
-            planned = self._planned_by_id[candidate.id]
-            if planned.patch.canonical_json() != candidate.patch.canonical_json():
-                raise ValueError(f"candidate patch does not match plan: {candidate.id!r}")
-            if dict(planned.metadata) != dict(candidate.metadata):
-                raise ValueError(f"candidate metadata does not match plan: {candidate.id!r}")
-            if candidate.id in seen:
-                raise ValueError(f"duplicate candidate_id in tell batch: {candidate.id!r}")
-            if candidate.id in self._result_by_id:
-                raise ValueError(f"candidate_id already recorded: {candidate.id!r}")
-            trial = self._trial_by_candidate_id.get(candidate.id)
-            if trial is None:
-                raise ValueError(f"candidate trial is unknown: {candidate.id!r}")
-            objective_values = self._objective_values(scored)
-            constraint_names, constraint_values = _constraint_values(scored)
-            seen.add(candidate.id)
-            batch.append(
-                (
-                    candidate,
-                    scored,
-                    trial,
-                    objective_values,
-                    constraint_values,
-                    constraint_names,
-                )
-            )
-
-        for candidate, scored, trial, values, constraints, constraint_names in batch:
-            trial.set_user_attr(_CANDIDATE_ID_ATTR, candidate.id)
-            trial.set_user_attr(_CONSTRAINT_NAMES_ATTR, constraint_names)
-            trial.set_user_attr(_CONSTRAINT_VALUES_ATTR, constraints)
-            trial.set_user_attr(
-                _INFEASIBLE_ATTR,
-                not bool(getattr(scored, "feasible", False)),
-            )
-            _tell_optuna_trial(
-                self._study,
-                trial,
-                values=values,
-                executed_definitions=executed_definitions_for_scored(
-                    self.objective_profile,
-                    self._objective_definitions,
-                    scored,
-                ),
-                frozen_definitions=self._objective_definitions,
-            )
-            self._result_by_id[candidate.id] = scored
-            self._results.append((candidate, scored))
-            self._tell_count += 1
+        _tell_optuna_strategy(self, results)
 
     def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...] | None:
         return objective_values_for_executed_spec(
@@ -761,6 +688,86 @@ def _failed_trial_state() -> Any:
 
 def _pruned_trial_state() -> Any:
     return _require_optuna().trial.TrialState.PRUNED
+
+
+def _tell_optuna_strategy(
+    strategy: Any,
+    results: Sequence[tuple[Candidate, "ScoredResult"]],
+) -> None:
+    batch: list[TellBatchRow] = []
+    seen: set[str] = set()
+    scored_result_type: Any | None = None
+
+    for pair in results:
+        if not isinstance(pair, tuple) or len(pair) != 2:
+            raise ValueError(
+                "tell results must contain (Candidate, ScoredResult) 2-tuples"
+            )
+        candidate, scored = pair
+        if not isinstance(candidate, Candidate):
+            raise ValueError("tell result candidate must be a Candidate")
+        if scored_result_type is None:
+            from simulator.optimize.evaluate import ScoredResult as _ScoredResult
+
+            scored_result_type = _ScoredResult
+        if not isinstance(scored, scored_result_type):
+            raise ValueError("tell result scored value must be a ScoredResult")
+        scored_candidate_id = getattr(scored, "candidate_id", None)
+        if scored_candidate_id != candidate.id:
+            raise ValueError(
+                "ScoredResult.candidate_id must match Candidate.id "
+                f"({scored_candidate_id!r} != {candidate.id!r})"
+            )
+        if candidate.id not in strategy._planned_by_id:
+            raise ValueError(f"candidate_id was not planned: {candidate.id!r}")
+        planned = strategy._planned_by_id[candidate.id]
+        if planned.patch.canonical_json() != candidate.patch.canonical_json():
+            raise ValueError(f"candidate patch does not match plan: {candidate.id!r}")
+        if dict(planned.metadata) != dict(candidate.metadata):
+            raise ValueError(f"candidate metadata does not match plan: {candidate.id!r}")
+        if candidate.id in seen:
+            raise ValueError(f"duplicate candidate_id in tell batch: {candidate.id!r}")
+        if candidate.id in strategy._result_by_id:
+            raise ValueError(f"candidate_id already recorded: {candidate.id!r}")
+        trial = strategy._trial_by_candidate_id.get(candidate.id)
+        if trial is None:
+            raise ValueError(f"candidate trial is unknown: {candidate.id!r}")
+        objective_values = strategy._objective_values(scored)
+        constraint_names, constraint_values = _constraint_values(scored)
+        seen.add(candidate.id)
+        batch.append(
+            (
+                candidate,
+                scored,
+                trial,
+                objective_values,
+                constraint_values,
+                constraint_names,
+            )
+        )
+
+    for candidate, scored, trial, values, constraints, constraint_names in batch:
+        trial.set_user_attr(_CANDIDATE_ID_ATTR, candidate.id)
+        trial.set_user_attr(_CONSTRAINT_NAMES_ATTR, constraint_names)
+        trial.set_user_attr(_CONSTRAINT_VALUES_ATTR, constraints)
+        trial.set_user_attr(
+            _INFEASIBLE_ATTR,
+            not bool(getattr(scored, "feasible", False)),
+        )
+        _tell_optuna_trial(
+            strategy._study,
+            trial,
+            values=values,
+            executed_definitions=executed_definitions_for_scored(
+                strategy.objective_profile,
+                strategy._objective_definitions,
+                scored,
+            ),
+            frozen_definitions=strategy._objective_definitions,
+        )
+        strategy._result_by_id[candidate.id] = scored
+        strategy._results.append((candidate, scored))
+        strategy._tell_count += 1
 
 
 def _validate_non_negative_int(name: str, value: int) -> None:

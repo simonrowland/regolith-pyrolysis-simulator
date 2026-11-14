@@ -11,11 +11,14 @@ real MAGEMin binary runs end to end when one is built locally.
 
 from __future__ import annotations
 
+import ast
+import io
 import json
 import os
 import re
 import subprocess
 import sys
+import tokenize
 import tempfile
 import threading
 import time
@@ -38,10 +41,17 @@ from simulator.engine_pool import (
 )
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.domain_reason import OutOfDomainReason
-from engines.magemin.domain import MAGEMinDomainGate
+from engines.magemin.domain import (
+    MAGEMIN_NATIVE_MELT_ACTIVITIES,
+    MAGEMinDomainGate,
+)
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
+from simulator.melt_backend.base import (
+    LiquidFractionInvalidError,
+    MeltCompositionError,
+    project_melt_to_oxide_projection,
+)
 from simulator.feedstock_composition import FEOT_FROM_FE2O3
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
@@ -1605,7 +1615,7 @@ def test_magemin_object_negative_convergence_discards_phase_rows(monkeypatch):
 
 @pytest.mark.parametrize(
     'mode_line',
-    ['0.8 bad', '0.8 nan', '0.8 -0.2', '0.8 1.2'],
+    ['0.8 bad', '0.8 nan', '0.8 -0.2', '0.0 1.0011', '0.8 1.2'],
 )
 def test_magemin_subprocess_parser_rejects_any_invalid_mode_token(mode_line):
     from simulator.melt_backend.magemin import _MAGEMinEngineCallError
@@ -1617,16 +1627,530 @@ def test_magemin_subprocess_parser_rejects_any_invalid_mode_token(mode_line):
     assert raised.value.exception_type == 'MAGEMinOutputError'
 
 
-def test_magemin_subprocess_parser_rejects_nonunit_mode_vector():
+def _renormalised_mode_notice(result):
+    notices = result.diagnostics['magemin_mode_token_notices']
+    assert len(notices) == 1
+    notice = notices[0]
+    assert notice['type'] == 'typed_notice'
+    assert notice['kind'] == 'mode_vector_renormalised'
+    return notice
+
+
+_VERB0_MASS_RESIDUAL_1E5 = 'Mass residual      : +1.20000e-05\n'
+
+
+def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
+    monkeypatch,
+):
+    """A lone liq token of 1.00003 is renormalised. Green refuses it."""
+    monkeypatch.setattr(
+        'simulator.melt_backend.magemin.subprocess.run',
+        lambda args, **_kwargs: subprocess.CompletedProcess(
+            args,
+            0,
+            stdout=(
+                f'{_VERB0_MASS_RESIDUAL_1E5}'
+                'Phase: liq\nMode: 1.00003\n'
+            ),
+            stderr='',
+        ),
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={'SiO2': 1.0},
+        pressure_bar=1.0,
+        fO2_log=-8.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.phase_masses_kg['liq'] == 1.0
+    assert sum(result.phase_masses_kg.values()) == 1.0
+    notice = _renormalised_mode_notice(result)
+    assert notice['raw_tokens'] == [
+        {'phase': 'liq', 'raw_token': '1.00003'},
+    ]
+    assert notice['raw_sum'] == pytest.approx(1.00003)
+    assert notice['mass_residual'] == pytest.approx(1.2e-5)
+    assert any(
+        'renormalised to 1' in warning and '1.00003' in warning
+        for warning in result.warnings
+    )
+
+
+def test_magemin_hour156_mode_sum_is_renormalised_to_one(monkeypatch):
+    """Hour 156 prints 1.00003 + 0.00008, raw sum 1.00011.
+
+    Physics re-ruling 2026-11-10: that sum excess is under the 1e-3 cap,
+    so the whole vector is divided by the raw sum. The ~1e-5 Mass
+    residual is recorded and does not decide the class. d-367 forbids
+    refusing the row into an unphysical miss.
+    """
+    monkeypatch.setattr(
+        'simulator.melt_backend.magemin.subprocess.run',
+        lambda args, **_kwargs: subprocess.CompletedProcess(
+            args,
+            0,
+            stdout=(
+                f'{_VERB0_MASS_RESIDUAL_1E5}'
+                'Phase: liq ol\nMode: 1.00003 0.00008\n'
+            ),
+            stderr='',
+        ),
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+
+    result = backend.equilibrate(
+        1250.0,
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+        pressure_bar=1.0,
+        fO2_log=-8.0,
+    )
+
+    assert result.status == 'ok'
+    assert sum(result.phase_masses_kg.values()) == 1.0
+    # Liquid is 1.00003/1.00011. Olivine stays 0.00008/1.00011.
+    # The largest component takes the closure residual, so a last-token
+    # remainder fails the olivine pin.
+    assert result.phase_masses_kg['liq'] == 0.9999200087990321
+    assert result.phase_masses_kg['ol'] == 7.999120096789353e-05
+    notice = _renormalised_mode_notice(result)
+    assert notice['raw_tokens'] == [
+        {'phase': 'liq', 'raw_token': '1.00003'},
+        {'phase': 'ol', 'raw_token': '0.00008'},
+    ]
+    assert notice['raw_sum'] == pytest.approx(1.00011)
+    assert notice['mass_residual'] == pytest.approx(1.2e-5)
+
+
+def test_magemin_mode_100003_00005_sums_to_one_and_native_mode_agrees():
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        f'{_VERB0_MASS_RESIDUAL_1E5}'
+        'Phase: liq ol\nMode: 1.00003 0.00005\n',
+        metadata=metadata,
+    )
+
+    assert parsed['liq']['mass_kg'] == 0.99995000399968
+    # 0.00005/1.00008. The largest component takes the closure residual.
+    assert parsed['ol']['mass_kg'] == 4.99960003199744e-05
+    assert parsed['liq']['mass_kg'] + parsed['ol']['mass_kg'] == 1.0
+    assert metadata['mode_fractions']['liq'] == parsed['liq']['mass_kg']
+    assert metadata['mode_fractions']['ol'] == parsed['ol']['mass_kg']
+    notice = metadata['mode_token_notices'][0]
+    assert notice['kind'] == 'mode_vector_renormalised'
+    assert notice['raw_sum'] == pytest.approx(1.00008)
+    assert notice['mass_residual'] == pytest.approx(1.2e-5)
+
+
+def test_magemin_trace_phase_survives_renormalisation():
+    """A 1e-20 olivine beside liquid 1.0002 stays a positive phase.
+
+    Controller ruling 2026-11-10: the closure residual is written onto
+    the largest component. The last-token assignment rounds this liquid
+    to 1 and replaces the olivine with 0, and the parser then drops it.
+    d-367 forbids that silent zero. The olivine pin is the independent
+    quotient 1e-20 / (1.0002 + 1e-20).
+    """
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        f'{_VERB0_MASS_RESIDUAL_1E5}'
+        'Phase: liq ol\nMode: 1.0002 1e-20\n',
+        metadata=metadata,
+    )
+
+    assert parsed['liq']['mass_kg'] == 1.0
+    assert parsed['ol']['mass_kg'] == 9.998000399920016e-21
+    assert metadata['mode_fractions']['ol'] == parsed['ol']['mass_kg']
+    assert metadata['mode_fractions']['liq'] == parsed['liq']['mass_kg']
+    assert parsed['liq']['mass_kg'] + parsed['ol']['mass_kg'] == 1.0
+    notice = metadata['mode_token_notices'][0]
+    assert notice['kind'] == 'mode_vector_renormalised'
+    assert notice['raw_tokens'] == [
+        {'phase': 'liq', 'raw_token': '1.0002'},
+        {'phase': 'ol', 'raw_token': '1e-20'},
+    ]
+
+
+def test_magemin_mode_deficit_outside_green_closure_stays_refusal():
+    """A deficit between 1e-4 and 1e-3 stays the mass-deficit refusal.
+
+    0.50000 + 0.49950 = 0.99950. The 2026-11-10 ruling renormalises
+    excesses only. The ~1e-5 residual does not turn the deficit into a
+    renormalised success.
+    """
+    from simulator.melt_backend.magemin import _MAGEMinModeVectorMassDeficit
+
+    with pytest.raises(_MAGEMinModeVectorMassDeficit, match='Mode vector must sum to 1.0'):
+        MAGEMinBackend._parse_subprocess_stdout(
+            f'{_VERB0_MASS_RESIDUAL_1E5}'
+            'Phase: liq ol\nMode: 0.50000 0.49950\n',
+        )
+
+
+def test_magemin_lone_mode_token_1_0002_is_renormalised():
+    """A lone liq token of 1.0002 is an excess of 2e-4.
+
+    Physics re-ruling 2026-11-10 renormalises a token excess up to 1e-3
+    and attaches a mode_vector_renormalised notice. The ticket's
+    "1.0002 still refused" sentence is superseded. The Mass residual
+    does not decide the class. d-367: do not refuse this into a miss.
+    """
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        f'{_VERB0_MASS_RESIDUAL_1E5}'
+        'Phase: liq\nMode: 1.0002\n',
+        metadata=metadata,
+    )
+
+    assert parsed == {'liq': {'mass_kg': 1.0}}
+    notice = metadata['mode_token_notices'][0]
+    assert notice['kind'] == 'mode_vector_renormalised'
+    assert notice['raw_tokens'] == [
+        {'phase': 'liq', 'raw_token': '1.0002'},
+    ]
+    assert notice['raw_sum'] == pytest.approx(1.0002)
+    assert notice['mass_residual'] == pytest.approx(1.2e-5)
+    assert notice['bound'] == 1.0e-3
+
+
+def test_magemin_lone_mode_token_1_0011_is_refused():
+    """A lone liq token of 1.0011 is an excess of 1.1e-3, above the cap."""
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
+
+    with pytest.raises(
+        _MAGEMinEngineCallError, match='Mode token'
+    ) as raised:
+        MAGEMinBackend._parse_subprocess_stdout(
+            f'{_VERB0_MASS_RESIDUAL_1E5}'
+            'Phase: liq\nMode: 1.0011\n',
+        )
+    assert raised.value.exception_type == 'MAGEMinOutputError'
+    assert '1.0011' in str(raised.value)
+
+
+@pytest.mark.parametrize(
+    'mode_line',
+    ['0.8 0.8', '0.5 0.5011'],
+)
+def test_magemin_subprocess_parser_rejects_nonunit_mode_vector(mode_line):
     from simulator.melt_backend.magemin import _MAGEMinEngineCallError
 
     with pytest.raises(
         _MAGEMinEngineCallError, match='Mode vector must sum to 1.0'
     ) as raised:
         MAGEMinBackend._parse_subprocess_stdout(
-            'Phase: liq ol\nMode: 0.8 0.8\n'
+            f'Phase: liq ol\nMode: {mode_line}\n'
         )
     assert raised.value.exception_type == 'MAGEMinOutputError'
+
+
+def test_magemin_mode_deficit_outside_bound_stays_typed_refusal():
+    """A deficit of 1.2e-3 stays the typed mass-deficit refusal.
+
+    0.50000 + 0.49880 = 0.99880. A residual above that deficit does not
+    turn it into a renormalised success.
+    """
+    with pytest.raises(RuntimeError, match='Mode vector must sum to 1.0'):
+        MAGEMinBackend._parse_subprocess_stdout(
+            'Mass residual      : +5.00000e-03\n'
+            'Phase: liq ol\n'
+            'Mode: 0.50000 0.49880\n'
+        )
+
+
+def test_magemin_mode_sum_excess_of_1_2e_3_is_refused():
+    """A sum excess of 1.2e-3 is refused. A larger residual does not widen the cap.
+
+    0.50000 + 0.50120 = 1.00120.
+    """
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
+
+    with pytest.raises(
+        _MAGEMinEngineCallError, match='Mode vector must sum to 1.0'
+    ) as raised:
+        MAGEMinBackend._parse_subprocess_stdout(
+            'Mass residual      : +5.00000e-03\n'
+            'Phase: liq ol\n'
+            'Mode: 0.50000 0.50120\n'
+        )
+    assert raised.value.exception_type == 'MAGEMinOutputError'
+
+
+# Expected class is a literal, not a second copy of the parser. Bands
+# (physics re-ruling 2026-11-10, d-367):
+# raw = tokens in [0, 1] and the float sum within abs 1e-4 of 1;
+# renormalised = a sum or token excess in (0, 1e-3], including a lone
+# 1.0002 and hour 156 (1.00003 0.00008); invalid_token = a token outside
+# [0, 1+1e-3], including 1.0011; mass_deficit = a deficit outside 1e-4;
+# sum_excess = a sum excess above 1e-3. The Mass residual is an axis
+# and does not change the class.
+_MODE_CLOSURE_CASES = (
+    ('liq', '1', 'raw'),
+    ('liq', '0', 'mass_deficit'),
+    ('liq', '1.0000', 'raw'),
+    ('liq', '1.00003', 'renormalised'),
+    ('liq', '1.00003e0', 'renormalised'),
+    ('liq', '1.00009', 'renormalised'),
+    ('liq', '1.0001', 'renormalised'),
+    ('liq', '1.00010', 'renormalised'),
+    ('liq', '1.00011', 'renormalised'),
+    ('liq', '1.0002', 'renormalised'),
+    ('liq', '1.0002e0', 'renormalised'),
+    ('liq', '1.001', 'renormalised'),
+    ('liq', '1.0010001', 'invalid_token'),
+    ('liq', '1.0011', 'invalid_token'),
+    ('liq', '1.2', 'invalid_token'),
+    ('liq', '-0.1', 'invalid_token'),
+    ('liq', 'nan', 'invalid_token'),
+    ('liq', 'inf', 'invalid_token'),
+    ('liq', 'bad', 'invalid_token'),
+    ('liq ol', '0.50000 0.50000', 'raw'),
+    ('liq ol', '0.50000 0.49995', 'raw'),
+    ('liq ol', '0.50000 0.49990', 'raw'),
+    ('liq ol', '0.50000 0.49989', 'mass_deficit'),
+    ('liq ol', '0.50000 0.49950', 'mass_deficit'),
+    ('liq ol', '0.50000 0.49880', 'mass_deficit'),
+    ('liq ol', '0.50000 0.50005', 'raw'),
+    ('liq ol', '0.50000 0.50010', 'raw'),
+    ('liq ol', '0.50000 0.50011', 'renormalised'),
+    ('liq ol', '0.50000 0.50050', 'renormalised'),
+    ('liq ol', '0.50000 0.50100', 'renormalised'),
+    ('liq ol', '0.50000 0.50120', 'sum_excess'),
+    ('liq ol', '1.00003 0.00008', 'renormalised'),
+    ('liq ol', '1.00003 0.00005', 'renormalised'),
+    ('liq ol', '1.00003 0', 'renormalised'),
+    ('liq ol', '1.00003 0.00010', 'renormalised'),
+    ('liq ol', '1.00003 0.00011', 'renormalised'),
+    ('liq ol', '1.0001 0.0001', 'renormalised'),
+    ('liq ol', '1.00011 0.00008', 'renormalised'),
+    ('liq ol', '0.8 0.8', 'sum_excess'),
+    ('liq ol', '0.8 1.0002', 'sum_excess'),
+    ('liq ol', '0.5 0.5011', 'sum_excess'),
+    ('liq ol', '0.0 1', 'raw'),
+    ('liq ol', '0.0 1.00003', 'renormalised'),
+    ('liq ol', '0.0 1.0002', 'renormalised'),
+    ('spl liq qfm', '0.00175 0.97265 0.02558', 'raw'),
+    ('liq qfm', '0.50000 0.50000', 'raw'),
+    ('liq qfm', '1.00003 0.00008', 'renormalised'),
+    ('ol liq spl', '0.25000 0.50000 0.25000', 'raw'),
+    ('ol liq spl', '0.25000 0.50005 0.25000', 'raw'),
+    ('ol liq spl', '0.25000 0.50010 0.25000', 'raw'),
+    ('ol liq spl', '0.25000 0.50011 0.25000', 'renormalised'),
+    ('ol liq spl', '0.25000 0.50020 0.25000', 'renormalised'),
+    ('ol liq spl', '1.00003 0.00004 0.00004', 'renormalised'),
+    ('ol liq spl', '1.00003 0.00006 0.00006', 'renormalised'),
+    ('ol liq spl qfm', '0.02491 0.96156 0.00213 0.01140', 'raw'),
+    ('ol liq spl qfm', '0.02491 0.96156 0.00213 0.01151', 'renormalised'),
+)
+
+
+@pytest.mark.parametrize('residual', [None, '+1.20000e-05', '+5.00000e-03'])
+@pytest.mark.parametrize('phases,modes,kind', _MODE_CLOSURE_CASES)
+def test_magemin_mode_closure_is_one_class_for_every_vector(
+    phases, modes, kind, residual,
+):
+    """Every printed vector is raw, renormalised, or a typed refusal.
+
+    ``kind`` is the literal class for that row. A positive non-buffer
+    token is never stored as a silent 0. The Mass residual does not
+    change the class. Green rows keep the printed floats. A renormalised
+    vector's stored fractions sum to 1 and the notice carries the raw
+    tokens and the 1e-3 cap.
+    """
+    from decimal import Decimal
+
+    from simulator.melt_backend.magemin import (
+        _MAGEMinEngineCallError,
+        _MAGEMinModeVectorMassDeficit,
+    )
+
+    names = phases.split()
+    mode_tokens = modes.split()
+    assert len(names) == len(mode_tokens)
+    lines = []
+    if residual is not None:
+        lines.append(f'Mass residual      : {residual}')
+    lines.append(f'Phase: {phases}')
+    lines.append(f'Mode: {modes}')
+    stdout = '\n'.join(lines) + '\n'
+    if kind == 'mass_deficit':
+        with pytest.raises(
+            _MAGEMinModeVectorMassDeficit,
+            match='Mode vector must sum to 1.0',
+        ):
+            MAGEMinBackend._parse_subprocess_stdout(stdout)
+        return
+    if kind in ('invalid_token', 'sum_excess'):
+        match = (
+            'Mode token'
+            if kind == 'invalid_token'
+            else 'Mode vector must sum to 1.0'
+        )
+        with pytest.raises(_MAGEMinEngineCallError, match=match) as raised:
+            MAGEMinBackend._parse_subprocess_stdout(stdout)
+        assert raised.value.exception_type == 'MAGEMinOutputError'
+        return
+
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        stdout, metadata=metadata,
+    )
+    buffers = MAGEMinBackend._BUFFER_CHOICES
+    for name, token in zip(names, mode_tokens):
+        if name.lower() in buffers or float(token) <= 0.0:
+            assert name not in parsed
+        else:
+            assert parsed[name]['mass_kg'] > 0.0
+    if kind == 'raw':
+        assert 'mode_token_notices' not in metadata
+        for name, token in zip(names, mode_tokens):
+            assert metadata['mode_fractions'][name] == float(token)
+        return
+    assert sum(metadata['mode_fractions'].values()) == 1.0
+    notice = metadata['mode_token_notices'][0]
+    assert notice['kind'] == 'mode_vector_renormalised'
+    assert notice['bound'] == 1.0e-3
+    assert [item['raw_token'] for item in notice['raw_tokens']] == mode_tokens
+    raw_sum = sum((Decimal(token) for token in mode_tokens), Decimal(0))
+    assert notice['raw_sum'] == float(raw_sum)
+    if residual is None:
+        assert notice['mass_residual'] is None
+    else:
+        assert notice['mass_residual'] == pytest.approx(float(residual))
+    # Hour 156's split is pinned as literals so a renormaliser that only
+    # preserves the total can still fail.
+    if phases == 'liq ol' and modes == '1.00003 0.00008':
+        assert metadata['mode_fractions']['liq'] == 0.9999200087990321
+        assert metadata['mode_fractions']['ol'] == 7.999120096789353e-05
+
+
+def test_magemin_duplicate_phase_names_close_before_they_are_summed():
+    """Two printed rows are closed as a vector, then summed by name.
+
+    0.60000 + 0.60000 = 1.20000, both tokens inside [0, 1]. The sum
+    excess is 0.2, above the 1e-3 cap, so the vector is refused as a
+    sum. Adding the rows first would make one token 1.20000 and refuse
+    it as an invalid token instead. 0.50020 + 0.50020 = 1.00040 is
+    inside the cap and renormalises either way, so it does not separate
+    the two orders.
+    """
+    from simulator.melt_backend.magemin import _MAGEMinEngineCallError
+
+    with pytest.raises(
+        _MAGEMinEngineCallError, match='Mode vector must sum to 1.0'
+    ) as raised:
+        MAGEMinBackend._parse_subprocess_stdout(
+            'Phase: ol ol\nMode: 0.60000 0.60000\n'
+        )
+    assert raised.value.exception_type == 'MAGEMinOutputError'
+
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        'Phase: ol ol\nMode: 0.50000 0.50000\n',
+        metadata=metadata,
+    )
+    assert parsed == {'ol': {'mass_kg': 1.0}}
+    assert 'mode_token_notices' not in metadata
+
+
+def test_magemin_liquidus_flags_flat_renormalised_bracket(monkeypatch):
+    """A renormalised sample on a flat liquidus bracket keeps its melt fraction.
+
+    δ = 1e-3 and the local slope is 4e-6 per K, so ΔT_bound is 250 K.
+    That exceeds tolerance_C = 2 K and the notice carries the flag.
+    """
+    from simulator.melt_backend.base import EquilibriumResult
+
+    def fraction(temperature_C: float) -> float:
+        temperature_C = float(temperature_C)
+        if temperature_C <= 1000.0:
+            return 0.0
+        if temperature_C <= 1050.0:
+            return 0.5 * (temperature_C - 1000.0) / 50.0
+        if temperature_C <= 1100.0:
+            return 0.5 + 0.498 * (temperature_C - 1050.0) / 50.0
+        return 0.998 + 0.002 * (temperature_C - 1100.0) / 500.0
+
+    def fake_equilibrate(temperature_C, **_kwargs):
+        temperature_C = float(temperature_C)
+        diagnostics = {}
+        if temperature_C == 1350.0:
+            diagnostics['magemin_mode_token_notices'] = [{
+                'type': 'typed_notice',
+                'kind': 'mode_vector_renormalised',
+                'raw_tokens': [{'phase': 'liq', 'raw_token': '1.001'}],
+                'raw_sum': 1.001,
+                'bound': 0.001,
+                'mass_residual': 1.2e-5,
+            }]
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            status='ok',
+            liquid_fraction=fraction(temperature_C),
+            diagnostics=diagnostics,
+        )
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    monkeypatch.setattr(backend, 'equilibrate', fake_equilibrate)
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={'SiO2': 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1.0,
+        min_T_C=1000.0,
+        max_T_C=1600.0,
+        scan_step_C=50.0,
+        tolerance_C=2.0,
+    )
+
+    assert result.status == 'ok'
+    assert result.liquidus_T_C == pytest.approx(1350.0, abs=2.0)
+    notices = result.diagnostics['magemin_mode_token_notices']
+    assert len(notices) == 1
+    assert notices[0]['delta_T_bound'] == pytest.approx(250.0)
+    assert notices[0]['renormalisation_may_shift_bracket'] is True
+    assert any(
+        'may shift a bracket' in warning and '250' in warning
+        for warning in result.warnings
+    )
+
+
+def test_magemin_verb0_lunar_1350_closure_stays_raw():
+    """Lunar 1350 C prints 0.00175 + 0.97265 + 0.02558 = 0.99998.
+
+    That deficit is inside green's 1e-4 closure and every token is in
+    [0, 1], so the row stays the raw floats green stored. The Mass
+    residual is on the line and does not move those values.
+    """
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        ' Status             :            0\n'
+        ' Mass residual      : +8.99565e-06\n'
+        ' Phase :      spl      liq      qfm\n'
+        ' Mode  :  0.00175  0.97265  0.02558\n',
+        metadata=metadata,
+    )
+
+    assert 'mode_token_notices' not in metadata
+    assert parsed == {
+        'spl': {'mass_kg': float('0.00175')},
+        'liq': {'mass_kg': float('0.97265')},
+    }
+    assert metadata['mode_fractions'] == {
+        'spl': float('0.00175'),
+        'liq': float('0.97265'),
+        'qfm': float('0.02558'),
+    }
 
 
 def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
@@ -1638,12 +2162,19 @@ def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
         / 'magemin'
         / 'lfdrop-diag-1-1700-phase-mode.stdout'
     ).read_text()
-    parsed = MAGEMinBackend._parse_subprocess_stdout(stdout)
+    metadata: dict = {}
+    parsed = MAGEMinBackend._parse_subprocess_stdout(stdout, metadata=metadata)
     result = EquilibriumResult(liquid_fraction=0.0)
     MAGEMinBackend()._populate_result(result, {'phases': parsed})
 
-    # The captured Mode vector prints 0.71766 liquid and 0.99999 total mass;
-    # the production resolver divides these because MAGEMin rounds to 5 places.
+    # The captured Mode vector prints 0.71766 liquid and 0.99999 total
+    # mass. That closure is inside 1e-4, so the row stays the raw floats
+    # and the production resolver divides liquid by the printed total.
+    assert 'mode_token_notices' not in metadata
+    assert parsed['liq']['mass_kg'] == 0.71766
+    assert sum(entry['mass_kg'] for entry in parsed.values()) == pytest.approx(
+        0.99999
+    )
     assert result.liquid_fraction == pytest.approx(0.7176672, abs=1e-7)
 
 
@@ -1714,10 +2245,13 @@ def test_magemin_plante_mode_vector_is_not_renormalized():
 
 
 def test_magemin_control_mode_vector_serialization_is_byte_identical():
+    metadata: dict = {}
     parsed = MAGEMinBackend._parse_subprocess_stdout(
         'Phase : liq cpx ol qfm\n'
-        'Mode  : 0.72251 0.00001 0.23073 0.04675\n'
+        'Mode  : 0.72251 0.00001 0.23073 0.04675\n',
+        metadata=metadata,
     )
+    assert 'mode_token_notices' not in metadata
 
     assert repr(parsed) == (
         "{'liq': {'mass_kg': 0.72251}, "
@@ -2500,6 +3034,20 @@ def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
     assert any("H2O" in warning and "MnO" in warning for warning in igad.warnings)
 
 
+def test_magemin_db_projection_preserves_native_feot_input():
+    backend = MAGEMinBackend()
+
+    projected = backend._build_db_bulk_projection(
+        {"SiO2": 60.0, "Al2O3": 30.0, "FeOt": 10.0},
+    )
+
+    assert projected.composition_wt_pct == {
+        "SiO2": 60.0,
+        "Al2O3": 30.0,
+        "FeOt": 10.0,
+    }
+
+
 def test_magemin_db_projection_ume_and_mtl_orders_are_not_ig_shaped():
     backend = MAGEMinBackend()
     composition = {
@@ -2926,7 +3474,7 @@ def test_magemin_equilibrate_parser_local_defect_propagates(
     backend._bridge = 'subprocess'
     backend._binary_path = Path('/fake/MAGEMin')
 
-    def broken_parser(_stdout):
+    def broken_parser(_stdout, **_kwargs):
         raise local_error('local MAGEMin parser defect')
 
     monkeypatch.setattr(backend, '_parse_subprocess_stdout', broken_parser)
@@ -2953,7 +3501,7 @@ def test_magemin_subprocess_parser_value_error_propagates(monkeypatch):
         ),
     )
 
-    def broken_parser(_stdout):
+    def broken_parser(_stdout, **_kwargs):
         raise ValueError('local MAGEMin parser defect')
 
     monkeypatch.setattr(backend, '_parse_subprocess_stdout', broken_parser)
@@ -3380,26 +3928,29 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     )
     assert result.status == "ok", result.warnings
 
-    projection = backend._build_db_bulk_projection(composition)
+    # Use the same kg-to-normalized-wt%-to-MAGEMin projection as equilibrate().
+    # The raw fixture sums to 99 kg, so passing it straight to the CLI would
+    # compare against a different bulk than the adapter solved.
+    melt_projection = project_melt_to_oxide_projection(
+        composition_kg=composition,
+        composition_mol=None,
+        oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+    )
+    projection = backend._build_db_bulk_projection(
+        melt_projection.oxide_wt_pct
+    )
     pressure_kbar = backend._GPa_to_kbar(
         backend._pressure_bar_to_GPa(pressure_bar)
     )
-    buffer_name, buffer_n, _warnings = backend._resolve_buffer(
-        temperature_C=temperature_C,
-        fO2_log=fO2_log,
+    direct_args, _buffer_name, _buffer_n, _buffer_warnings = (
+        backend._build_magemin_subprocess_args(
+            bulk_projection=projection,
+            temperature_C=temperature_C,
+            pressure_kbar=pressure_kbar,
+            fO2_log=fO2_log,
+            capture_native_activities=True,
+        )
     )
-    direct_args = [
-        str(_LIVE_MAGEMIN_BINARY.resolve()),
-        "--Verb=1",
-        "--db=ig",
-        f"--Temp={temperature_C:.6f}",
-        f"--Pres={pressure_kbar:.6f}",
-        "--sys_in=wt",
-        "--Bulk=" + ",".join(f"{value:.6f}" for value in projection.vector),
-        f"--buffer={buffer_name}",
-        f"--buffer_n={buffer_n:.6f}",
-        "--out_matlab=1",
-    ]
     from simulator.melt_backend.alphamelts import _run_alphamelts_subprocess
 
     with _magemin_subprocess_slot(20.0):
@@ -3418,10 +3969,11 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
             ).read_text()
 
     direct_fields = backend._parse_subprocess_native_activities(matlab_text)
-    for formula, field in (("MgO", "aMgO"), ("SiO2", "aSiO2")):
+    assert {"MgO", "SiO2"} <= set(MAGEMIN_NATIVE_MELT_ACTIVITIES)
+    for formula, (field, _polymorph) in MAGEMIN_NATIVE_MELT_ACTIVITIES.items():
         direct_activity = direct_fields[field]
         adapted_activity = result.activity_coefficients[formula]
-        assert abs(adapted_activity - direct_activity) / abs(direct_activity) <= 1e-9
+        assert adapted_activity == direct_activity
     assert result.diagnostics["magemin_solver_status"] == 0
     assert result.diagnostics["magemin_native_phase"]
     assert result.diagnostics["magemin_iterations"] > 0
@@ -4263,10 +4815,57 @@ def test_magemin_qfm_nonpositive_kelvin_behavior_is_bit_pinned():
         MAGEMinBackend._qfm_logfo2_oneill(-273.15)
 
 
+def _executable_source(source: str) -> str:
+    """Source with comments and docstrings removed. Strings in code stay."""
+
+    tree = ast.parse(source)
+    docstring_lines: set[int] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        if not node.body:
+            continue
+        first = node.body[0]
+        if (
+            isinstance(first, ast.Expr)
+            and isinstance(first.value, ast.Constant)
+            and isinstance(first.value.value, str)
+            and first.end_lineno is not None
+        ):
+            docstring_lines.update(range(first.lineno, first.end_lineno + 1))
+    kept: list[str] = []
+    reader = io.StringIO(source).readline
+    for token in tokenize.generate_tokens(reader):
+        if token.type == tokenize.COMMENT:
+            continue
+        if token.type == tokenize.STRING and token.start[0] in docstring_lines:
+            continue
+        if token.type in {
+            tokenize.NL,
+            tokenize.NEWLINE,
+            tokenize.ENCODING,
+            tokenize.ENDMARKER,
+            tokenize.INDENT,
+            tokenize.DEDENT,
+        }:
+            continue
+        kept.append(token.string)
+    return " ".join(kept)
+
+
 def test_oneill_qfm_coefficient_has_one_production_owner():
     repo_root = Path(__file__).resolve().parents[1]
     tracked = subprocess.run(
-        ["git", "ls-files", "--", "simulator", "engines"],
+        [
+            "git",
+            "ls-files",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+            "--",
+            "simulator",
+            "engines",
+        ],
         cwd=repo_root,
         check=True,
         capture_output=True,
@@ -4279,8 +4878,10 @@ def test_oneill_qfm_coefficient_has_one_production_owner():
         if not relative_path.endswith(".py"):
             continue
         source_path = repo_root / relative_path
-        for line in source_path.read_text(encoding="utf-8").splitlines():
-            if coefficient.search(line):
-                occurrences.append(relative_path)
+        if not source_path.is_file():
+            continue
+        source = source_path.read_text(encoding="utf-8")
+        if coefficient.search(_executable_source(source)):
+            occurrences.append(relative_path)
 
-    assert occurrences == ["simulator/chemistry/qfm_oneill.py"]
+    assert occurrences == ["simulator/oxygen_buffers.py"]

@@ -1,0 +1,117 @@
+source_id: takeda-1990-sn-slag-matertrans
+source_kind: scanned_article
+machine_reads:
+  primary: MinerU table blocks and markdown
+  secondary: page-marked Tesseract scan OCR
+  authority_for_cells: 600 dpi page render where OCR was uncertain or only one read was usable
+printed_tables:
+  - table: '1'
+    caption: Reported values of the activity coefficient of SnO in slags.
+    physical_pdf_page: 2
+    published_page: 794
+    printed_data_rows: 14
+    extract_rows: takeda_1990_table1_gamma_01 through takeda_1990_table1_gamma_14
+    columns:
+      '1': SnO activity-coefficient cell; dimensionless; retain printed range or scalar
+      '2': SiO2 slag composition range; mol%
+      '3': CaO slag composition range or printed em dash; mol%
+      '4': FeOx slag composition range or printed em dash; mol%
+      '5': Al2O3 slag composition range or printed em dash; mol%
+      '6': SnO slag composition range or printed em dash; mol%
+      '7': temperature; K
+      '8': investigator attribution and superscript reference number
+    row_assignment_note: MinerU labels the first nine data rows as headers; physical rows 3–16 are all 14 printed data rows.
+    render_checks: The Koike fifth row prints 1.4 to 0.9 in descending order; store ordered endpoints and preserve the exact string. Carbo's single composition is not closed to 100 mol% and FeOx has no fixed stoichiometry. Nagamori's 1473 K and 1573 K are not paired with endpoints.
+  - table: '2'
+    caption: E.m.f. of the oxygen concentration cell equilibrated with tin oxide and metallic tin.
+    physical_pdf_page: 3
+    published_page: 795
+    printed_data_rows: 5
+    extract_rows: takeda_1990_t2_row_01 through takeda_1990_t2_row_05
+    columns:
+      '1': test identifier
+      '2': temperature; K
+      '3': EMF; mV, printed central value plus uncertainty and SnO phase footnote
+      '4': MgO in liquid tin oxide; mass%
+    render_checks: Tesseract fuses the first EMF uncertainty into the central value and loses several digits in the temperature column. The five EMF cells were read from the 600 dpi render.
+  - table: '3'
+    caption: Experimental data on the equilibria of slags and Fe-Sn metals in iron crucibles.
+    physical_pdf_page: 4
+    published_page: 796
+    printed_data_rows: 11
+    extract_rows: takeda_1990_t3_row_* (11 rows)
+    columns:
+      '1': test identifier
+      '2': temperature; K
+      '3': log pO2
+      '4': Sn in slag; mass%
+      '5': CaO in slag; mass%
+      '6': SiO2 in slag; mass%
+      '7': Fe2+ in slag; mass%
+      '8': Fe3+ in slag; mass%
+      '9': Sn in metal; mass%
+      '10': Fe in metal; mass%
+  - table: '4'
+    caption: Experimental data on the equilibria of slags and two metal phases of 80 mass% Sn-Fe and 53 mass% Sn-Fe (aSn=0.8) in magnesia crucibles at 1573 K.
+    physical_pdf_page: 4
+    published_page: 796
+    printed_data_rows: 29
+    extract_rows: takeda_1990_t4_row_* (29 rows)
+    columns:
+      '1': test identifier
+      '2': log pO2
+      '3': Sn in slag; mass%
+      '4': CaO in slag; mass%
+      '5': MgO in slag; mass%
+      '6': SiO2 in slag; mass%
+      '7': Fe2+ in slag; mass%
+      '8': Fe3+ in slag; mass%
+    shared_caption_values: T=1573 K and aSn=0.8; row pO2 values are not assigned to the separate quoted miscibility-gap activity.
+  - table: '5'
+    caption: Experimental data on equilibria of slags without silica and Sn-Fe metals in magnesia crucibles at 1473 K.
+    physical_pdf_page: 5
+    published_page: 797
+    printed_data_rows: 6
+    extract_rows: takeda_1990_t5_row_* (6 rows)
+    shared_caption_values: temperature=1473 K applies to all six rows; the temperature is a caption condition, not a body cell.
+    columns:
+      '1': test identifier
+      '2': log pO2
+      '3': Sn in slag; mass%
+      '4': CaO in slag; mass%
+      '5': MgO in slag; mass%
+      '6': Fe2+ in slag; mass%
+      '7': Fe3+ in slag; mass%
+      '8': Sn in metal; mass%
+      '9': Fe in metal; mass%
+    footnote: D-S45 has coexisting 81 mass% Sn-Fe and 49 mass% Sn-Fe metal phases.
+  - table: '6'
+    caption: Experimental data on the equilibria of slags and Sn-Fe metals in magnesia crucibles at 1573 K.
+    physical_pdf_pages: [5]
+    published_page: 797
+    printed_data_rows: 81
+    extract_rows: takeda_1990_t6_row_* (81 rows; Table 6 continues across two MinerU blocks)
+    columns:
+      '1': test identifier
+      '2': log pO2
+      '3': Sn in slag; mass%
+      '4': CaO in slag; mass%
+      '5': MgO in slag; mass%
+      '6': SiO2 in slag; mass%
+      '7': Fe2+ in slag, or the printed merged FeT total-iron cell
+      '8': Fe3+ in slag, when present as a separate cell
+      '9': Sn in metal; mass%
+      '10': Fe in metal; mass%
+    row_assignment_note: Physical data rows are tests 51–131, 81 rows. FeT entries are a single merged printed cell, not separate Fe2+ and Fe3+ values.
+    ignored_block: p006-t08 is MinerU's invented details-table reading of Figure 4 and is not source data.
+printed_figures:
+  - figure: '4'
+    physical_pdf_page: 6
+    published_page: 798
+    extraction: nine legend marker-to-composition pairings; no plot points digitized
+    columns:
+      marker: render-verified glyph and line style
+      first_ratio: n(CaO+MgO)/(n(CaO+MgO)+n(SiO2))
+      second_ratio: n(FeOn)/(n(CaO+MgO)+n(SiO2)+n(FeOn))
+  - figures: ['2', '3', '5', '6', '7', '8']
+    extraction: figure-read values deferred; list as candidates in the audit report

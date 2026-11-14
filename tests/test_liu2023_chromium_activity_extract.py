@@ -39,6 +39,33 @@ def _assert_render_pins(document: dict) -> None:
     assert len(table2) == 24
     assert table2[0]["composition_wt_pct"]["MoO2"] == "32.39"
 
+    acr_rows = [
+        row
+        for row in document["species"]["Cr"]["observations"]
+        if row["observation_id"].startswith("liu23_t3_a_cr_")
+    ]
+    assert len(acr_rows) == 12
+    assert all(row["values"]["method_class"] == "model_derived" for row in acr_rows)
+    assert all(row["values"]["evidence_class"] == "model_derived" for row in acr_rows)
+    assert acr_rows[0]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert acr_rows[0]["derivation"]["method"]["locator"]["section"] == (
+        "3.3. Activity of Chromium Oxide in Slags"
+    )
+    assert acr_rows[0]["derivation"]["method"]["state"]["value"] == (
+        "The activity coefficient of chromium in copper was measured by Kobayashi et al. [27]. "
+        "In the present research, it is calculated to be 11.91 at 1 823 K (1 550°C)."
+    )
+    assert "equation" not in acr_rows[0]["derivation"]["method"]["locator"]
+    assert acr_rows[0]["derivation"]["references"] == [
+        "Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]"
+    ]
+    crox = document["species"]["CrOx"]["observations"][0]
+    assert crox["values"]["method_class"] == "model_derived"
+    assert crox["values"]["evidence_class"] == "model_derived"
+    assert crox["derivation"]["method"]["locator"]["equation"] == "15"
+    assert len(crox["derived_from"]) == 24
+    assert crox["derivation"]["inputs"] == crox["derived_from"]
+
     cro15 = document["species"]["CrO1.5"]["observations"]
     assert len(cro15) == 12
     row1 = cro15[0]["values"]["points"][0]
@@ -84,6 +111,23 @@ def test_render_pin_detects_a_mutated_cell():
     point["activity"] = 3.262
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
+
+    mutated_class = deepcopy(_document())
+    acr = next(
+        row
+        for row in mutated_class["species"]["Cr"]["observations"]
+        if row["observation_id"] == "liu23_t3_a_cr_row01"
+    )
+    acr["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(mutated_class)
+
+    mutated_crox_class = deepcopy(_document())
+    mutated_crox_class["species"]["CrOx"]["observations"][0]["values"][
+        "evidence_class"
+    ] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(mutated_crox_class)
 
 
 def test_real_migrator_receives_each_rows_conditions_and_lineage():
@@ -140,6 +184,17 @@ def test_real_migrator_receives_each_rows_conditions_and_lineage():
         "Cu-Cr alloy is not tabulated"
         in representatives["Cr"].point_conditions["composition"].state.reason
     )
+    chromium_activity = [
+        observation
+        for observation in admitted
+        if observation.identity.species.formula == "Cr"
+    ]
+    assert len(chromium_activity) == 12
+    for observation in chromium_activity:
+        assert observation.evidence.class_.value == "model_derived"
+        assert observation.derivation is not None
+        assert observation.derivation.raw_inputs is not None
+        assert observation.derivation.raw_inputs.state.value.value == "not_printed"
     for species in ("CrO1.5", "CrO"):
         composition = representatives[species].identity.composition
         assert composition.is_value
@@ -289,9 +344,11 @@ def test_cr_oxide_formula_unit_mapping_and_component_mutation():
 
     from simulator.battery import migrate as migrate_module
 
+    # Removing CrO1.5 makes it an unknown dropped component. The green 0.5 wt%
+    # limit refuses rows above that amount and admits rows at or below it.
     removed = {
         name: migrate_module._COMPOSITION_COMPONENTS.pop(name)
-        for name in ("CrO", "CrO1.5", "CaF2", "MoO2")
+        for name in ("CrO1.5",)
     }
     try:
         migrator = Migrator(root=ROOT)
@@ -305,6 +362,31 @@ def test_cr_oxide_formula_unit_mapping_and_component_mutation():
             and o.admission.status.value == "admitted"
         ]
         assert len(observations) == 24
-        assert all(o.identity.composition.is_unknown for o in observations)
+        fractional = [o for o in observations if o.identity.species.formula == "CrO1.5"]
+        integer = [o for o in observations if o.identity.species.formula == "CrO"]
+        assert len(fractional) == len(integer) == 12
+        document = _document()
+        raw_amount_by_id = {
+            observation["observation_id"]: Decimal(
+                str(observation["values"]["points"][0]["composition_wt_pct"]["CrO1.5"])
+            )
+            for formula in ("CrO1.5", "CrO")
+            for observation in document["species"][formula]["observations"]
+        }
+        for observation in observations:
+            source_id = observation.observation_id.rsplit("::", 2)[-2]
+            raw_amount = raw_amount_by_id[source_id]
+            composition = observation.identity.composition
+            if raw_amount > Decimal("0.5"):
+                assert composition.is_unknown, (
+                    observation.observation_id,
+                    raw_amount,
+                    composition,
+                )
+                assert (
+                    f"CrO1.5={raw_amount} wt%" in composition.reason
+                )
+            else:
+                assert composition.is_value
     finally:
         migrate_module._COMPOSITION_COMPONENTS.update(removed)

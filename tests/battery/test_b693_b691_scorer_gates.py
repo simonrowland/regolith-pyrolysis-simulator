@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 
@@ -62,9 +63,13 @@ from simulator.battery.score import (
     headline_payload_records,
     headline_records,
     headline_rows,
+    _has_calibration_not_grounded,
+    _missing_apparatus_fact,
+    _unverified_apparatus_notices,
     score_store,
 )
 from simulator.battery.validate import ValidationIssue, ValidationReport
+from simulator.battery.validity import GateOutcome
 from tests.battery import factories as F
 
 
@@ -1192,3 +1197,31 @@ def test_pin_production_report_renders_all_numeric_headline() -> None:
     assert "ALL NUMERIC" in report.upper() or "All-numeric" in report
     assert "IQR" in report
     assert "kems-022-demaria-1971" in report
+
+
+def test_scorer_rejects_gate_checks_without_passed():
+    missing_passed = SimpleNamespace(
+        name="kems_calibration", detail={"flag": "calibration_not_grounded"}
+    )
+
+    with pytest.raises(TypeError, match="invalid gate check"):
+        _has_calibration_not_grounded((missing_passed,))
+    with pytest.raises(TypeError, match="invalid gate check"):
+        _missing_apparatus_fact(
+            missing_passed,
+            allow_calibration=False,
+            allow_unknown_method=True,
+        )
+
+    experiment = F.kems_experiment("invalid-check-exp", "invalid-check-work")
+    reference = F.observation(
+        "invalid-check-row",
+        experiment.experiment_id,
+        _partial_identity(),
+        Decimal("1e-6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    gates = GateOutcome(passed=True, checks=(missing_passed,))
+
+    with pytest.raises(TypeError, match="invalid gate check"):
+        _unverified_apparatus_notices(reference, experiment, gates)

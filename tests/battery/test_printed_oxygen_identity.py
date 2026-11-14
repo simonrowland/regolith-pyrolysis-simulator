@@ -5,25 +5,28 @@ O'Neill and Eggins 2002 Table 7 are the rows that print a log fO2 on
 activity-coefficient observations. The log stays on point conditions.
 identity.fO2_Pa is the same conversion used for redox rows.
 
-A named buffer offset is not converted. There is no buffer curve in this
-owner. A row with no printed oxygen stays unknown.
+A named IW, QFM, or NNO offset converts through fo2_buffers. A printed
+absolute log still wins. A row with no printed oxygen stays unknown.
 """
 
 from __future__ import annotations
 
-from decimal import Decimal
+from collections import Counter
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Authority, NoticeKind, Quantity, ValueKind
 from simulator.battery.identity import IdentityEqualKind, identity_equal
 from simulator.battery.migrate import (
     Migrator,
     _BARE_LOG_BAR_NOTICE,
     _BARE_LOG_SCALE_UNKNOWN,
     _BOUNDED_FO2_REASON,
+    _band_text,
     _log_fO2_to_pa,
 )
 from simulator.battery.records import Located, Value
+from simulator.chemistry.fo2_buffers import evaluate_buffer
 from tests.battery.test_migrate import _scalar_extract, _write_min_tree
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -348,7 +351,76 @@ def test_unitless_log_without_temperature_stays_unknown(tmp_path: Path) -> None:
     assert "fO2_Pa" in outcome.fields
 
 
-def test_activity_buffer_offset_stays_unknown(tmp_path: Path) -> None:
+def _activity_control(result, control: str):
+    matches = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+        and isinstance((observation.point_conditions or {}).get("fO2_control"), Located)
+        and (observation.point_conditions or {})["fO2_control"].state.value == control
+    ]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def _used_pressure_bar(observation) -> Decimal | None:
+    pressure = observation.identity.total_pressure_Pa
+    if pressure is None or not pressure.is_value or not pressure.value > 0:
+        return None
+    return pressure.value / Decimal("100000")
+
+
+def _assert_buffer_conversion(
+    observation,
+    *,
+    buffer: str,
+    offset: Decimal,
+    temperature_K: Decimal,
+    kind: NoticeKind,
+    calibration_id: str,
+    pressure_bar: Decimal | None,
+) -> None:
+    oxygen = observation.identity.fO2_Pa
+    evaluation = evaluate_buffer(
+        buffer,
+        temperature_K,
+        pressure_bar=pressure_bar,
+        calibration_id=calibration_id,
+    )
+    assert oxygen is not None and oxygen.is_value
+    assert oxygen.value == _log_fO2_to_pa(evaluation.log10_fO2_bar + offset)
+    notices = [notice for notice in observation.notices if notice.kind is kind]
+    assert len(notices) == 1
+    notice = notices[0]
+    assert notice.band == _band_text(evaluation.band_dex)
+    assert notice.authority is (
+        Authority.CERTIFIED
+        if evaluation.authority == "certified"
+        else Authority.EXTRAPOLATED
+    )
+    assert f"buffer={buffer}" in notice.reason
+    assert f"calibration={calibration_id}" in notice.reason
+    assert f"T_K={temperature_K}" in notice.reason
+    assert f"authority={evaluation.authority}" in notice.reason
+    assert f"band_dex={notice.band}" in notice.reason
+    if pressure_bar is None:
+        assert "P_bar=" not in notice.reason
+    else:
+        assert "P_bar=" in notice.reason
+    extrapolated = [
+        item
+        for item in observation.notices
+        if item.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and item.reason == notice.reason
+    ]
+    if evaluation.authority == "extrapolated":
+        assert len(extrapolated) == 1
+    else:
+        assert extrapolated == []
+
+
+def test_activity_buffer_offset_uses_canonical_qfm(tmp_path: Path) -> None:
     result = _migrate_fixture(
         tmp_path,
         quantity="activity",
@@ -364,24 +436,99 @@ def test_activity_buffer_offset_stays_unknown(tmp_path: Path) -> None:
             "locator": {"published_page": 1, "table": "1", "row": "1"},
         },
     )
-    matches = [
-        observation
-        for observation in result.observations.values()
-        if observation.identity.quantity.is_value
-        and observation.identity.quantity.value is Quantity.ACTIVITY
-        and isinstance((observation.point_conditions or {}).get("fO2_control"), Located)
-    ]
-    assert len(matches) == 1
-    oxygen = matches[0].identity.fO2_Pa
-    assert oxygen is not None and oxygen.is_unknown
-    assert oxygen.reason is not None
-    assert oxygen.reason.startswith("buffer-relative fO2 (")
-    assert "FMQ+2.7" in oxygen.reason
-    assert matches[0].point_conditions["fO2_control"].state.value == "FMQ+2.7"
+    observation = _activity_control(result, "FMQ+2.7")
+    _assert_buffer_conversion(
+        observation,
+        buffer="QFM",
+        offset=Decimal("2.7"),
+        temperature_K=Decimal(1673),
+        kind=NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        calibration_id="oneill_1987_ammin_72_reaction2_emf",
+        pressure_bar=_used_pressure_bar(observation),
+    )
+    assert "offset=+2.7" in observation.notices[0].reason or any(
+        "offset=+2.7" in notice.reason for notice in observation.notices
+    )
+    # Unprinted FMQ uses the gate-8 O'Neill 1987 curve (CODATA R), not the
+    # author-R survey row. _assert_buffer_conversion checks that value.
+    assert _used_pressure_bar(observation) in (None, Decimal(1))
+    assert observation.point_conditions["fO2_control"].state.value == "FMQ+2.7"
+
+
+def _activity_iw(tmp_path: Path, control: str):
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 1473,
+            "activity": "0.2",
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": control},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    return _activity_control(result, control)
+
+
+def _bar_log(observation) -> Decimal:
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    return (oxygen.value / Decimal("100000")).log10()
+
+
+def test_unicode_minus_offset_matches_ascii_and_the_survey_table(tmp_path: Path) -> None:
+    # Unprinted IW is the gate-8 O'Neill 1988 curve at the row temperature.
+    # Offset -1 is the printed sign, including U+2212, U+2013, and U+2014.
+    # U+002D is the ASCII control.
+    base = evaluate_buffer("IW", Decimal(1473)).log10_fO2_bar
+    expected = base + Decimal("-1")
+    controls = ("IW-1", "IW − 1", "IW – 1", "IW — 1", "IW = -2")
+    expected_by_control = {
+        "IW-1": expected,
+        "IW − 1": expected,
+        "IW – 1": expected,
+        "IW — 1": expected,
+        "IW = -2": base + Decimal("-2"),
+    }
+    logs = {}
+    for index, control in enumerate(controls):
+        observation = _activity_iw(tmp_path / str(index), control)
+        recovered = _bar_log(observation)
+        assert recovered.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP) == (
+            expected_by_control[control].quantize(
+                Decimal("0.0001"), rounding=ROUND_HALF_UP
+            )
+        )
+        token = "offset=-2" if control == "IW = -2" else "offset=-1"
+        assert any(token in (notice.reason or "") for notice in observation.notices)
+        logs[control] = observation.identity.fO2_Pa.value
+    assert logs["IW − 1"] == logs["IW-1"]
+    assert logs["IW – 1"] == logs["IW-1"]
+    assert logs["IW — 1"] == logs["IW-1"]
+
+
+def test_dangling_printed_sign_is_not_offset_zero(tmp_path: Path) -> None:
+    for control in ("IW +", "IW =", "IW −"):
+        observation = _activity_iw(tmp_path / str(ord(control[-1])), control)
+        oxygen = observation.identity.fO2_Pa
+        assert oxygen is not None and oxygen.is_unknown
+        assert "not a point" in (oxygen.reason or "")
+        assert not any(
+            notice.kind
+            in (
+                NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED,
+                NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+            )
+            for notice in observation.notices
+        )
 
 
 def test_child_buffer_beats_parent_log(tmp_path: Path) -> None:
-    # Parent log -9 bar is 1e-4 Pa. The child's named buffer is a refusal.
+    # Parent log -9 bar is 1e-4 Pa. The child's IW+2 is its own conversion.
     result = _migrate_fixture(
         tmp_path,
         quantity="activity",
@@ -399,20 +546,530 @@ def test_child_buffer_beats_parent_log(tmp_path: Path) -> None:
             "locator": {"published_page": 1, "table": "1", "row": "1"},
         },
     )
+    observation = _activity_control(result, "IW+2")
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    assert oxygen.value != _log_fO2_to_pa(Decimal("-9"))
+    _assert_buffer_conversion(
+        observation,
+        buffer="IW",
+        offset=Decimal(2),
+        temperature_K=Decimal(1673),
+        kind=NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        calibration_id="oneill_1988_ammin_73_eq11",
+        pressure_bar=_used_pressure_bar(observation),
+    )
+
+
+def test_printed_calibration_is_used_when_the_owner_has_it(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 1200,
+            "activity": "0.2",
+            "buffer_calibration": "O'Neill 1987",
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": "FMQ+1"},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _activity_control(result, "FMQ+1")
+    _assert_buffer_conversion(
+        observation,
+        buffer="QFM",
+        offset=Decimal(1),
+        temperature_K=Decimal(1200),
+        kind=NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED,
+        calibration_id="oneill_1987_ammin_72_reaction2_emf",
+        pressure_bar=_used_pressure_bar(observation),
+    )
+    assert not any(
+        notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        for notice in observation.notices
+    )
+
+
+def test_printed_absolute_log_beats_buffer_offset(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "log_fO2": {"value": "-9.56", "units": "log10(bar)"},
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": "FMQ+2.7"},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _activity_control(result, "FMQ+2.7")
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    assert oxygen.value == _log_fO2_to_pa(Decimal("-9.56"))
+    assert not any(
+        notice.kind
+        in {
+            NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED,
+            NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        }
+        for notice in observation.notices
+    )
+
+
+def test_state_wrapped_log_beats_buffer_offset(tmp_path: Path) -> None:
+    # Neuman stores the printed log as `{state: {value}}` with no top-level
+    # value, beside IW+3. That number is the absolute log. Empty units are
+    # the 1 bar entry, not a bare-log refusal and not a buffer conversion.
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 2273,
+            "activity": "0.2",
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": "IW+3"},
+                    "locator": {"published_page": 1},
+                },
+                "log_fO2": {
+                    "state": {"tag": "value", "value": "-2.33"},
+                    "locator": {"published_page": 1},
+                },
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _activity_control(result, "IW+3")
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    assert oxygen.value == _log_fO2_to_pa(Decimal("-2.33"))
+    assert not any(
+        notice.kind
+        in {
+            NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED,
+            NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        }
+        for notice in observation.notices
+    )
+
+
+def test_blank_log_does_not_veto_buffer_offset(tmp_path: Path) -> None:
+    # A blank cell stored as state tag unknown is absence, not a bound.
+    # IW-1 still converts. A real bound keeps the typed refusal.
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 2073,
+            "activity": "0.2",
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": "IW-1"},
+                    "locator": {"published_page": 1},
+                },
+                "fO2_log": {
+                    "state": {
+                        "tag": "unknown",
+                        "reason": "blank cell; no log fO2 value printed for this row",
+                    },
+                    "locator": {"published_page": 1},
+                },
+                "log_fO2": {
+                    "state": {
+                        "tag": "unknown",
+                        "reason": "blank cell; no log fO2 value printed for this row",
+                    },
+                    "locator": {"published_page": 1},
+                },
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _activity_control(result, "IW-1")
+    _assert_buffer_conversion(
+        observation,
+        buffer="IW",
+        offset=Decimal("-1"),
+        temperature_K=Decimal(2073),
+        kind=NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        calibration_id="oneill_1988_ammin_73_eq11",
+        pressure_bar=_used_pressure_bar(observation),
+    )
+
+
+def test_ideal_feo_fe_ratio_diw_carries_its_notice(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "buffer_calibration": "ideal xFeO and metal Fe",
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": "IW-1"},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _activity_control(result, "IW-1")
+    _assert_buffer_conversion(
+        observation,
+        buffer="IW",
+        offset=Decimal("-1"),
+        temperature_K=Decimal(1673),
+        kind=NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        calibration_id="oneill_1988_ammin_73_eq11",
+        pressure_bar=_used_pressure_bar(observation),
+    )
+    ideal = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.DELTA_IW_FROM_IDEAL_FEO_FE_RATIO
+    ]
+    assert len(ideal) == 1
+    assert ideal[0].authority is Authority.EXTRAPOLATED
+
+
+def _activity_buffer(tmp_path: Path, label: str, temperature_K: int):
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": temperature_K,
+            "activity": "0.2",
+            "oxygen_buffer_as_published": label,
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
     matches = [
         observation
         for observation in result.observations.values()
         if observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.ACTIVITY
-        and isinstance((observation.point_conditions or {}).get("fO2_control"), Located)
-        and (observation.point_conditions or {})["fO2_control"].state.value == "IW+2"
     ]
     assert len(matches) == 1
-    oxygen = matches[0].identity.fO2_Pa
+    return matches[0]
+
+
+def test_unknown_buffer_stays_a_typed_refusal(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "CCO", 1673)
+    oxygen = observation.identity.fO2_Pa
     assert oxygen is not None and oxygen.is_unknown
     assert oxygen.reason is not None
     assert oxygen.reason.startswith("buffer-relative fO2 (")
-    assert "IW+2" in oxygen.reason
+    assert "CCO" in oxygen.reason
+    assert "no calibration in the buffer owner" in oxygen.reason
+    assert observation.notices == ()
+
+
+def test_co_co2_label_without_a_ratio_stays_a_typed_refusal(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "CO-CO2.", 1673)
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.reason is not None
+    assert "CO-CO2." in oxygen.reason
+    assert "no calibration in the buffer owner" in oxygen.reason
+    assert not any(
+        notice.kind
+        in {
+            NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED,
+            NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+            NoticeKind.BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS,
+        }
+        for notice in observation.notices
+    )
+
+
+def _assert_extended_conversion(
+    observation,
+    *,
+    buffer: str,
+    temperature_K: Decimal,
+    region: int,
+) -> None:
+    evaluation = evaluate_buffer(buffer, temperature_K)
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    assert oxygen.value == _log_fO2_to_pa(evaluation.log10_fO2_bar)
+    notices = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    ]
+    assert len(notices) == 1
+    reason = notices[0].reason
+    assert f"buffer={buffer}" in reason
+    assert f"calibration={evaluation.calibration_id}" in reason
+    assert f"T_K={temperature_K}" in reason
+    assert f"authority={evaluation.authority}" in reason
+    assert f"region={region}" in reason
+    assert f"band_dex={_band_text(evaluation.band_dex)}" in reason
+    for offset in evaluation.edge_offsets:
+        signed = format(offset.signed_dex, "f")
+        if not signed.startswith("-"):
+            signed = "+" + signed
+        assert f"edge_offset={offset.route_id}@" in reason
+        assert signed in reason
+    store_authority = (
+        Authority.CERTIFIED
+        if evaluation.authority in {"certified", "tabulated_thermochemistry"}
+        else Authority.EXTRAPOLATED
+    )
+    assert notices[0].authority is store_authority
+    extrapolated = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    ]
+    unsized = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS
+    ]
+    if evaluation.authority == "extrapolated":
+        assert len(extrapolated) == 1
+    else:
+        assert extrapolated == []
+    if evaluation.unsized_notice:
+        assert len(unsized) == 1
+        assert notices[0].band == "unsized"
+    else:
+        assert unsized == []
+    if evaluation.divergence_note:
+        assert evaluation.divergence_note in reason
+
+
+def test_mo_moo2_label_converts(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "Mo-MoO2.", 1473)
+    _assert_extended_conversion(
+        observation, buffer="Mo-MoO2", temperature_K=Decimal(1473), region=2
+    )
+
+
+def test_mh_and_m_h_labels_convert(tmp_path: Path) -> None:
+    mh = _activity_buffer(tmp_path, "MH", 1473)
+    _assert_extended_conversion(
+        mh, buffer="MH", temperature_K=Decimal(1473), region=2
+    )
+
+
+def test_m_h_hyphen_label_converts(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "M-H", 1423)
+    _assert_extended_conversion(
+        observation, buffer="MH", temperature_K=Decimal(1423), region=2
+    )
+
+
+def test_mw_label_converts_and_carries_the_wustite_warning(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "MW", 1281)
+    _assert_extended_conversion(
+        observation, buffer="MW", temperature_K=Decimal(1281), region=2
+    )
+    assert any(
+        "Fe0.947O" in notice.reason
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    )
+
+
+def test_mh_above_1800_k_is_unsized(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "MH", 1873)
+    _assert_extended_conversion(
+        observation, buffer="MH", temperature_K=Decimal(1873), region=3
+    )
+
+
+def test_borisov_veksler_2021_rows_convert_per_buffer_family() -> None:
+    """Real supplement rows. Counts are component observations, not source rows."""
+
+    result = _migrated("borisov-veksler-2021-k-fe-supplement.yaml")
+    families = {
+        "mo-moo2": "Mo-MoO2",
+        "mh": "MH",
+        "m-h": "M-H",
+        "mw": "MW",
+        "co-co2": "CO-CO2",
+    }
+    converted: Counter[str] = Counter()
+    refused: Counter[str] = Counter()
+    seen_temperature = set()
+    for observation in result.observations.values():
+        control = (observation.point_conditions or {}).get("fO2_control")
+        if not isinstance(control, Located) or not control.state.is_value:
+            continue
+        label = str(control.state.value).strip()
+        family = families.get(label.casefold().rstrip("."))
+        if family is None:
+            continue
+        oxygen = observation.identity.fO2_Pa
+        conversion = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        ]
+        if family == "CO-CO2":
+            assert oxygen is not None and oxygen.is_unknown
+            assert oxygen.reason is not None and "CO-CO2." in oxygen.reason
+            assert conversion == []
+            refused[family] += 1
+            continue
+        assert oxygen is not None and oxygen.is_value
+        assert len(conversion) == 1
+        reason = conversion[0].reason
+        temperature = observation.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        assert f"T_K={temperature.value}" in reason
+        buffer = "MH" if family == "M-H" else family
+        assert f"buffer={buffer}" in reason
+        pressure = observation.identity.total_pressure_Pa
+        if pressure is not None and pressure.is_value:
+            assert "P_bar=" in reason
+        seen_temperature.add(family)
+        converted[family] += 1
+    assert seen_temperature == {"Mo-MoO2", "MH", "M-H", "MW"}
+    assert dict(converted) == {
+        "Mo-MoO2": 2904,
+        "MH": 728,
+        "M-H": 78,
+        "MW": 52,
+    }
+    assert refused["CO-CO2"] == 72
+
+
+def test_approximate_buffer_phrase_is_not_a_point(tmp_path: Path) -> None:
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": "near FMQ"},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    observation = _activity_control(result, "near FMQ")
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.reason is not None
+    assert oxygen.reason.startswith("buffer-relative fO2 (")
+    assert "not a point offset" in oxygen.reason
+
+
+def test_lu_2026_diw_converts_into_absolute_fo2_and_discloses_calibration() -> None:
+    result = _migrated("lu-2026-mercury-sulfur-liquidus.yaml")
+    observation = _one(result, "lu26_mer10_3gpa_a22_1675c_02_s_in_glass")
+    oxygen = observation.identity.fO2_Pa
+    # t-1619 / d-324: the printed ΔIW now populates the absolute identity.
+    assert oxygen is not None and oxygen.is_value
+    assert "fO2_Pa" not in (observation.point_conditions or {})
+    evaluation = evaluate_buffer(
+        "IW",
+        Decimal("1948.15"),
+        pressure_bar=Decimal(30000),
+    )
+    assert oxygen.value == _log_fO2_to_pa(
+        evaluation.log10_fO2_bar + Decimal("-6.5")
+    )
+    notices = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    ]
+    assert len(notices) == 1
+    reason = notices[0].reason
+    assert "buffer=IW" in reason
+    assert "offset=−6.5" in reason or "offset=-6.5" in reason
+    assert "calibration=oneill_1988_ammin_73_eq11" in reason
+    assert "T_K=1948.15" in reason
+    assert "P_bar=30000" in reason
+    assert "authority=extrapolated" in reason
+    assert f"band_dex={_band_text(evaluation.band_dex)}" in reason
+    assert "Cartier" not in reason
+    assert notices[0].authority is Authority.EXTRAPOLATED
+    assert notices[0].band == _band_text(evaluation.band_dex)
+    logged = reason.split("log10_fO2_bar=", 1)[1].split(" ", 1)[0]
+    assert Decimal(logged) == evaluation.log10_fO2_bar + Decimal("-6.5")
+    assert not any(
+        notice.kind is NoticeKind.DELTA_IW_FROM_IDEAL_FEO_FE_RATIO
+        for notice in observation.notices
+    )
+
+
+def test_jugo_sb5_uses_canonical_fmq_with_frost_pressure_correction() -> None:
+    result = _migrated("jugo-2010-sulfur-xanes.yaml")
+    matches = [
+        observation
+        for observation in result.observations.values()
+        if isinstance((observation.point_conditions or {}).get("fO2_control"), Located)
+        and observation.point_conditions["fO2_control"].state.is_value
+        and observation.point_conditions["fO2_control"].state.value == "FMQ+2.7"
+    ]
+    assert len(matches) == 1
+    observation = matches[0]
+
+    assert _decimal_point(observation.identity.temperature_K) == Decimal("1323.15")
+    assert _decimal_point(observation.identity.total_pressure_Pa) == Decimal("200000000")
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    # O'Neill (1987) reaction (2) supplies the canonical 1-bar FMQ base at
+    # 1323.15 K. Frost's beta-quartz molar-volume term adds
+    # 0.110 K/bar * (2000 - 1) bar / 1323.15 K = 0.166186751 dex; the printed
+    # FMQ+2.7 then gives this independent nine-decimal log literal.
+    expected_log = Decimal("-7.491317884")
+    assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
+    notices = [
+        notice.reason
+        for notice in observation.notices
+        if notice.reason.startswith("buffer_relative_fO2_converted:")
+    ]
+    assert len(notices) == 1
+    reason = notices[0]
+    assert "offset_as_printed=FMQ+2.7" in reason
+    assert "calibration=oneill_1987_ammin_72_reaction2_emf" in reason
+    assert "band=±0.125419 dex" in reason
+    assert "band_basis=absolute canonical-to-Frost 1991 spread" in reason
+    assert "pressure=2000 bar" in reason
+    assert "pressure correction=Frost 1991 molar-volume ΔV term" in reason
+
+
+def test_mavrogenes_mav1_uses_pressure_delta_v_after_inheritance() -> None:
+    result = _migrated("mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas.yaml")
+    observation = _one(result, "mavrogenes_oneill_1999_mav1_s_in_quenched_glass")
+
+    assert _decimal_point(observation.identity.temperature_K) == Decimal("1673.15")
+    assert _decimal_point(observation.identity.total_pressure_Pa) == Decimal("500000000")
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    # O'Neill (1988) eq. 11 third segment is the 1-bar IW base at 1673.15 K:
+    # μ° = -551159 + 269.404T - 16.9484T ln(T) J/mol, then μ°/(R T ln 10).
+    # Frost's published IW pressure term adds 0.055(5000-1)/T dex, followed
+    # by the printed -1.56. All terms are dimensionless; independent evaluation
+    # gives -11.101141516 log10(fO2/bar) (predict-and-flag above IW's range).
+    expected_log = Decimal("-11.101141516")
+    assert abs(oxygen.value.log10() - Decimal(5) - expected_log) < Decimal("5e-9")
+    assert any(
+        "delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7"
+        in notice.reason
+        and "pressure correction=Frost 1991 molar-volume ΔV term" in notice.reason
+        for notice in observation.notices
+    )
 
 
 def test_child_typed_pressure_beats_parent_log(tmp_path: Path) -> None:

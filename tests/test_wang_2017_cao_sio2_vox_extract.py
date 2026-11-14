@@ -6,7 +6,7 @@ from decimal import Decimal
 import yaml
 
 from simulator.battery.enums import NoticeKind, PhaseRole, Quantity
-from simulator.battery.migrate import REPO_ROOT
+from simulator.battery.migrate import REPO_ROOT, wt_pct_to_mole_fraction
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -54,6 +54,7 @@ def test_wang_s1_s32_rows_migrate_with_component_and_conditions() -> None:
     assert not migrator.result.registry_issues
 
     by_sample: dict[str, set[str]] = {}
+    composition_by_measurement: dict[str, dict[str, Decimal] | None] = {}
     for container, raw in source_rows:
         raw_id = str(raw["observation_id"])
         observation = migrated[f"{SOURCE_ID}::{raw_id}"]
@@ -74,6 +75,55 @@ def test_wang_s1_s32_rows_migrate_with_component_and_conditions() -> None:
         assert observation.point_conditions["pO2_Pa"].state.value == EXPECTED_PO2_PA
         assert observation.point_conditions["printed_sum"].state.value == printed_sum
         assert observation.point_conditions["pO2_Pa"].locator.section == "Article title"
+        assert observation.identity.composition is not None
+        measurement_id = raw_id.rsplit("_", 1)[0]
+        composition_condition = observation.point_conditions.get("composition")
+        if observation.identity.composition.is_unknown:
+            printed_composition = {
+                component: Decimal(str(amount))
+                for component, amount in values["composition_wt_pct"].items()
+            }
+            printed_composition_total = sum(printed_composition.values())
+            assert printed_composition_total < Decimal("95")
+            assert (
+                f"partial analysis: kept sum={printed_composition_total} wt% is below 95 wt%"
+                in observation.identity.composition.reason
+            )
+            if composition_condition is not None:
+                assert composition_condition.state.is_unknown
+                assert composition_condition.locator.table == raw["locator"]["table"]
+            composition = None
+        else:
+            assert observation.identity.composition.is_value
+            assert composition_condition is not None
+            assert composition_condition.locator.table == raw["locator"]["table"]
+            # The row prints no phase, so provenance stays unset. Both copies
+            # keep the printed composition, including retained V2O3.
+            assert (
+                composition_condition.state.value.components
+                == observation.identity.composition.value.components
+            )
+            assert observation.identity.composition.value.input_provenance is None
+            assert composition_condition.state.value.input_provenance is None
+            composition = dict(observation.identity.composition.value.as_map())
+            assert set(composition) == {"CaO", "SiO2", "V2O3"}
+            expected_composition = wt_pct_to_mole_fraction(
+                {
+                    component: Decimal(str(amount))
+                    for component, amount in values["composition_wt_pct"].items()
+                }
+            )
+            assert composition == expected_composition.as_map()
+        if measurement_id in composition_by_measurement:
+            assert composition_by_measurement[measurement_id] == composition
+        else:
+            composition_by_measurement[measurement_id] = composition
+        if measurement_id == "wang_2017_s1_sample101_liquid_point_1":
+            assert values["composition_wt_pct"] == {
+                "CaO": "33.69",
+                "SiO2": "56.87",
+                "V2O3": "5.38",
+            }
         assert observation.locator.table == raw["locator"]["table"]
         assert container in {"CaO", "SiO2", "V2O3"}
         by_sample.setdefault(str(raw["experiment"]), set()).add(
@@ -81,6 +131,9 @@ def test_wang_s1_s32_rows_migrate_with_component_and_conditions() -> None:
         )
     assert all(len(experiment_ids) == 1 for experiment_ids in by_sample.values())
     assert len(by_sample) == 29
+    assert len(composition_by_measurement) == 172
+    assert sum(value is not None for value in composition_by_measurement.values()) == 157
+    assert sum(value is None for value in composition_by_measurement.values()) == 15
 
     contexts = [
         row
@@ -93,6 +146,22 @@ def test_wang_s1_s32_rows_migrate_with_component_and_conditions() -> None:
         and row["values"]["total_as_printed"]
         for row in contexts
     )
+
+
+def test_wang_s1_point_composition_deletion_is_not_silent(tmp_path) -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    rows = _observations(document)
+    raw_id = "wang_2017_s1_sample101_liquid_point_1_cao"
+    row = next(row for _, row in rows if row["observation_id"] == raw_id)
+    del row["values"]["composition_wt_pct"]
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+
+    migrator = migrate_one_extract(REPO_ROOT, mutated_extract, index=None, aliases={})
+    migrator.finalize()
+    observation = migrator.result.observations[f"{SOURCE_ID}::{raw_id}"]
+
+    assert observation.identity.composition is None or not observation.identity.composition.is_value
 
 
 def test_wang_fidelity_cells_reject_an_extract_cell_mutation() -> None:

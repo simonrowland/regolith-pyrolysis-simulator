@@ -233,6 +233,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_02_p_t
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -464,6 +466,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_03_p_t
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -695,6 +699,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_04_p_t
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -935,6 +941,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_05_p_t
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -1175,6 +1183,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_06_p_t
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -1415,6 +1425,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_01_p_t
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -1669,6 +1681,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_02_p_t
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -1923,6 +1937,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_03_p_t
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -2186,6 +2202,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_04_p_t
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -2449,6 +2467,8 @@ observations:
           equation: '13'
     output_unit: atm
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_quoted_naoh_pressure_1e5_atm
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_quoted_NaOH_pressure
   identity:
@@ -2498,7 +2518,7 @@ observations:
       reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
-      reason: in_cell_total_pressure_not_derivable
+      reason: The quoted value is a partial pressure; the source does not state the quoted experiment's total pressure.
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2586,6 +2606,8 @@ observations:
         pdf_page_index: 2
         equation: '17'
         note: Footnote below Eq. (17), PDF page 3 render.
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_b
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -2875,6 +2897,8 @@ observations:
           note: MinerU grid row 12, column 4; PDF page 2 render checked.; row=binary parameter b; column=Parameters*
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_density_01
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -3160,6 +3184,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 10; PDF page 2 render checked.; row=1; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_density_02
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -3445,6 +3471,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 11; PDF page 2 render checked.; row=2; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_density_03
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -3730,6 +3758,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 12; PDF page 2 render checked.; row=3; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_density_04
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -4025,6 +4055,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 13; PDF page 2 render checked.; row=4; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_density_05
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -4320,6 +4352,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 14; PDF page 2 render checked.; row=5; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_density_06
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -4615,6 +4649,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 15; PDF page 2 render checked.; row=6; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_k2
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -4808,6 +4844,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_k4
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -5001,6 +5039,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_m
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -5207,6 +5247,8 @@ observations:
     parameters: []
     output_unit: not stated; dimension implied by Eq. (1)
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_r
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
   identity:
@@ -5412,6 +5454,8 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_b
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -5720,6 +5764,8 @@ observations:
           note: MinerU grid row 5, column 4; PDF page 2 render checked.; row=ternary parameter b; column=Parameters*
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_density_01
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -6028,6 +6074,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 5; PDF page 2 render checked.; row=1; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_density_02
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -6336,6 +6384,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 6; PDF page 2 render checked.; row=2; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_density_03
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -6654,6 +6704,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 7; PDF page 2 render checked.; row=3; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_density_04
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -6972,6 +7024,8 @@ observations:
           note: Table I measurement pair; MinerU grid row 8; PDF page 2 render checked.; row=4; column=rho_t
     output_unit: kg_per_m3
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_k2
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -7188,6 +7242,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_k4
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -7404,6 +7460,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_m
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -7629,6 +7687,8 @@ observations:
     parameters: []
     output_unit: not stated; dimension implied by Eq. (1)
     references: []
+  provenance:
+    printed_phase: g
 - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_r
   experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
   identity:
@@ -7853,3 +7913,5 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
+  provenance:
+    printed_phase: g

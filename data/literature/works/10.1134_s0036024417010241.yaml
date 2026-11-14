@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:shornikov-2017-spinel-evaporation
       role: pdf
@@ -108,6 +108,7 @@ experiments:
     pdf_page_index: 1
     section: EXPERIMENTAL
   bench_id: 10.1134/s0036024417010241::bench::shornikov_2017_spinel_mo_kems
+  equipment_context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_spinel_evaporation_apparatus_record
 benches:
 - id: 10.1134/s0036024417010241::bench::shornikov_2017_spinel_mo_kems
   work_id: 10.1134/s0036024417010241
@@ -142,6 +143,35 @@ benches:
       section: EXPERIMENTAL
   other_facts: []
 context:
+- observation_id: shornikov_2017_spinel_evaporation_apparatus_record
+  type: apparatus
+  experiment: shornikov_2017_spinel_molybdenum_series
+  locator:
+    page: 2
+    published_page: 11
+    pdf_page_index: 1
+    section: EXPERIMENTAL
+  units: as printed
+  values:
+    apparatus: MI-1201 serial mass spectrometer with a modified high-temperature ion source; molybdenum effusion container.
+    instrument: MI-1201 serial mass spectrometer equipped with a modified ion source for high-temperature measurements (up
+      to 3000 K)
+    sample_holder_or_cell_material_as_printed: molybdenum container
+    series_temperature_range_as_printed: 1850–2250 K
+    loop_wire_diameter_as_printed: not stated
+    cell_inner_dimensions_and_orifice_size_as_printed: not stated
+    sample_mass_as_printed: not stated
+    run_duration_at_temperature_as_printed: not stated
+    loop_Fe_presaturation_and_method_as_printed: not stated
+    pre_run_sample_analysis_as_printed: X-ray diffraction and chemical analysis of the spinel samples.
+    post_run_bulk_analysis_of_total_Fe_alkalis_or_cell_material_pickup: not stated
+    cell_oxygen_condition_as_printed: not stated
+    method_quote_as_published: The evaporation of stoichiometric spinel from a molybdenum container was studied via Knudsen
+      effusion mass spectrometry in the temperature range of 1850–2250 K.
+  context_id: shornikov-2017-spinel-evaporation::context::shornikov_2017_spinel_evaporation_apparatus_record
+  work_id: 10.1134/s0036024417010241
+  source_id: shornikov-2017-spinel-evaporation
+  species: MgAl2O4
 - observation_id: shornikov_2017_table1_row_1
   type: literature_summary
   locator:

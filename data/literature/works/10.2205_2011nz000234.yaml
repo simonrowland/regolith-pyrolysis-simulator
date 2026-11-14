@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:kems-029-yakovlev-shornikov-2011
       role: pdf
@@ -79,10 +79,10 @@ experiments:
       locator:
         published_page: 1
         section: opening methods paragraphs
-        note: 'Several meteorite and CAI materials; no single series composition; L3 refuse composition: multiple meteorite/CAI
-          materials without a single printed composition map; L3 refuse oxygen_condition: O2 table is model_derived (admission
-          model_output_not_measurement), not a printed fO2_control/buffer/pO2 point; L3 refuse pressure_boundary: chamber/run
-          pressure not printed as a point'
+        note: 'Several named meteorite and CAI materials, but no starting-composition values are published; no single series
+          composition; L3 refuse composition: multiple meteorite/CAI materials without a single printed composition map; L3
+          refuse oxygen_condition: O2 table is model_derived (admission model_output_not_measurement), not a printed fO2_control/buffer/pO2
+          point; L3 refuse pressure_boundary: chamber/run pressure not printed as a point'
   conditions:
     temperature_K:
       state:
@@ -311,7 +311,7 @@ context:
   type: apparatus
   locator:
     published_page: 1
-    pdf_page_index: 1
+    pdf_page_index: 0
     note: Vestnik NZ6104 3-page PDF, page 1
     paragraph: The Knudsen effusion method was used in combination with the mass spectrometric analysis of the vapor phase
       (MS-1301 mass spectrometer)

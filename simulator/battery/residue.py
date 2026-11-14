@@ -24,6 +24,7 @@ from simulator.battery.oxygen_balance import (
     _solve_vacuum_oxygen_balance,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
 
@@ -399,6 +400,28 @@ class _HashimotoGeometryIntegration:
 
 
 @dataclass(frozen=True)
+class _HashimotoRunSetup:
+    experiment_id: str
+    temperature_K: float
+    duration_s: float
+    sample_mass_kg: float
+    total_pressure_Pa: float
+    starting_composition_wt_pct: Mapping[str, Any]
+    initial_inventory_mol: dict[str, float]
+    steps: int
+    geometry_areas: dict[str, float]
+    gas_channels: tuple[Any, ...]
+    liquid_rows: tuple[dict[str, Any], ...]
+    common_channels: tuple[ResidueChannel, ...]
+    common_alpha_records: tuple[dict[str, Any], ...]
+    common_liquid_rows: tuple[dict[str, Any], ...]
+    catalog_matches: Mapping[str, tuple[str, Mapping[str, Any]]]
+    alpha_specs: Mapping[str, Any]
+    pressure_model: Any
+    engine_floor_inversion_diagnostics: dict[str, dict[str, object]]
+
+
+@dataclass(frozen=True)
 class _HashimotoResiduePrediction:
     """One run and alpha arm, with the declared geometry sensitivity surface."""
 
@@ -408,6 +431,8 @@ class _HashimotoResiduePrediction:
     primary_oxide_wt_pct: Mapping[str, float]
     geometry_oxide_wt_pct: Mapping[str, Mapping[str, float]]
     sensitivity_band_wt_pct: Mapping[str, tuple[float, float]]
+    initial_inventory_mol: Mapping[str, float]
+    primary_inventory_mol: Mapping[str, float] | None
     provenance: Mapping[str, object]
 
 
@@ -630,7 +655,7 @@ def _finite_step_fluxes(
             species_formula_registry={},
         ),
         temperature_C=temperature_K - 273.15,
-        pressure_bar=background_pressure_Pa / 100_000.0,
+        pressure_bar=background_pressure_Pa / PA_PER_BAR,
         control_inputs={
             "vapour_batch_flux_pressures_Pa": {
                 term.source.species: _net_evaporation_pressure_Pa(
@@ -1065,6 +1090,9 @@ def integrate_knudsen_residue_inventory(
     if any(term.source.alpha != 1.0 for term in terms):
         raise ResidueInventoryRefusal("knudsen_equilibrium_channels_required")
     from scipy.integrate import solve_ivp
+    from simulator.chemistry.langmuir_knudsen import (
+        knudsen_effusion_relative_weight,
+    )
 
     parents = tuple(inventory)
     gases = tuple(term.source.species for term in terms)
@@ -1116,7 +1144,9 @@ def integrate_knudsen_residue_inventory(
                 pressure = float(pressures[species])
                 if not math.isfinite(pressure) or pressure < 0.0:
                     raise ResidueInventoryRefusal("residue_pressure_invalid", species)
-                rates[species] = pressure / math.sqrt(term.molar_mass_kg_mol)
+                rates[species] = knudsen_effusion_relative_weight(
+                    pressure, term.molar_mass_kg_mol
+                )
             denominator = math.fsum(term.molar_mass_kg_mol * rates[term.source.species] for term in terms)
             if not math.isfinite(denominator) or denominator <= 0.0:
                 raise ResidueInventoryRefusal("knudsen_extent_unreachable")
@@ -1380,7 +1410,7 @@ def _make_residue_pressure_model(
                 str(species): (
                     float(base_pressure_bar.get(species, 0.0))
                     * pO2_bar ** pressure_exponents[str(species)]
-                    * 100_000.0
+                    * PA_PER_BAR
                 )
                 for species, _reaction in gas_channels
             }
@@ -1398,7 +1428,6 @@ def _make_residue_pressure_model(
             _new_internal_analytical_core,
         )
         from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, _oxygen_atom_partial_pressure_bar
-        from simulator.physical_constants import PA_PER_BAR
         from simulator.vapour_rail.nasa_cea import NasaCeaError
 
         analytical_core = _new_internal_analytical_core()
@@ -1425,7 +1454,7 @@ def _make_residue_pressure_model(
                 response = _internal_analytical_vapor_pressure_adapter(
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
-                    pressure_bar=total_pressure_Pa / 100_000.0,
+                    pressure_bar=total_pressure_Pa / PA_PER_BAR,
                     composition_kg=None,
                     composition_mol=inventory,
                     fO2_log=log10_pO2_bar,
@@ -1974,7 +2003,7 @@ def predict_knudsen_residue_composition(
                 notice = replace(notice, reason=notice.reason + "; SC-360: d-142 is about 3 dex (W) / 2.5 dex (Mo) above measured cell pO2; pO2 sets relative volatility via P_i proportional to pO2^-nu")
                 if notice not in notices:
                     notices.append(notice)
-        source_logs.append(None if pressure is None else math.log10(float(pressure) / 100000.0))
+        source_logs.append(None if pressure is None else math.log10(float(pressure) / PA_PER_BAR))
         oxygen_sources.append({"mass_loss_fraction": x, "temperature_K": t, "source": source, "used_observations": used})
     provenance = {
         "measured_mass_loss_fraction": target, "temperature_path": path,
@@ -2021,11 +2050,20 @@ def predict_knudsen_residue_composition(
         except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
             diagnostic = {"refusal": getattr(exc, "reason", str(exc))}
         _append_omission_notices(notices, pressure_callbacks)
+        formula_oxygen_atoms_mol = math.fsum(
+            amount * _formula_terms(oxide)[0].get("O", 0.0)
+            for oxide, amount in primary.residue_mol.items()
+        )
         return {
             "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
             "measured_mass_loss_fraction": target, "temperature_path": path,
             "oxygen_sources": oxygen_sources, "notices": tuple(notices),
+            "initial_inventory_mol": dict(initial),
+            "final_inventory_mol": dict(primary.residue_mol),
             "retained_oxygen_atoms_mol": primary.retained_oxygen_atoms_mol,
+            "final_bulk_mass_adjustment_kg": (
+                primary.retained_oxygen_atoms_mol - formula_oxygen_atoms_mol
+            ) * _formula_terms("O")[1],
             "atom_closure_mol": dict(primary.atom_closure_mol),
             "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
             "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
@@ -2686,6 +2724,181 @@ def _hashimoto_integrate_geometry(
     )
 
 
+def _hashimoto_run_setup(
+    experiment: Mapping[str, Any],
+    *,
+    gas_pack: Any,
+    catalog_rows: Sequence[tuple[str, Mapping[str, Any]]],
+    alpha_specs: Mapping[str, Any],
+    preform_dimensions_mm: Mapping[str, float],
+    engine: str,
+    engine_metadata: Mapping[str, str],
+    reference_printed_wt_pct: Mapping[str, Any],
+) -> _HashimotoRunSetup:
+    """Build the shared per-run inputs used by cohort and refinement checks."""
+    from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _openimcc_gas_channels_and_omission_notices,
+    )
+
+    experiment_id = str(experiment["experiment_id"])
+    temperature_K = _hashimoto_point_value(experiment["conditions"]["temperature_K"])
+    duration_s = _hashimoto_point_value(
+        experiment["thermal_schedule"]["total_duration_s"]
+    )
+    sample_mass_kg = _hashimoto_point_value(experiment["sample"]["mass_kg"])
+    total_pressure_Pa = _hashimoto_point_value(
+        experiment["pressure_environment"]["total_pressure_Pa"]
+    )
+    if not math.isclose(sample_mass_kg, 1.0e-4, rel_tol=0.0, abs_tol=1.0e-12):
+        raise ResidueInventoryRefusal("hashimoto_printed_mass_changed", experiment_id)
+    run_wt_pct = experiment["sample"]["printed_composition"]["state"]["value"]
+    if dict(run_wt_pct) != dict(reference_printed_wt_pct):
+        raise ResidueInventoryRefusal(
+            "hashimoto_printed_composition_changed", experiment_id
+        )
+    initial_inventory_mol = {
+        str(oxide): float(wt_pct) * sample_mass_kg / 100.0
+        / _formula_terms(str(oxide))[1]
+        for oxide, wt_pct in run_wt_pct.items()
+    }
+    gas_channels, channel_omissions = _openimcc_gas_channels_and_omission_notices(
+        tuple(initial_inventory_mol), gas_pack
+    )
+    if channel_omissions:
+        raise ResidueInventoryRefusal(
+            "hashimoto_openimcc_channel_missing", str(channel_omissions)
+        )
+    if not gas_channels:
+        raise ResidueInventoryRefusal("hashimoto_openimcc_channels_missing")
+
+    steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
+    geometry_areas = _hashimoto_geometry_areas(
+        sample_mass_kg, preform_dimensions_mm
+    )
+    liquid_rows = _hashimoto_liquid_row_provenance(
+        gas_pack, gas_channels, temperature_K
+    )
+    catalog_matches: dict[str, tuple[str, Mapping[str, Any]]] = {}
+    for species, (parent, _parent_moles, _pO2_exponent) in gas_channels:
+        if not parent:
+            continue
+        matches = [
+            (name, row)
+            for name, row in catalog_rows
+            if row.get("formula") == species
+            and row.get("parent_oxide") == parent
+        ]
+        active_matches = [
+            item for item in matches if item[1].get("flux_dormant") is not True
+        ]
+        if not matches:
+            raise ResidueInventoryRefusal(
+                "hashimoto_runtime_catalog_channel_missing",
+                f"no catalog row for {species}/{parent}",
+            )
+        catalog_matches[species] = (active_matches or matches)[0]
+
+    common_channels: list[ResidueChannel] = []
+    common_alpha_records: list[dict[str, Any]] = []
+    common_liquid_rows: list[dict[str, Any]] = []
+    row_by_channel = {str(row["channel"]): dict(row) for row in liquid_rows}
+    for species, (parent, _parent_moles, _pO2_exponent) in gas_channels:
+        if not parent:
+            alpha_source = (
+                _OXYGEN_GAS_ALPHA_SOURCE
+                if species in _OXYGEN_CHANNELS
+                else "OpenIMCC gas channel with no parent oxide"
+            )
+            common_channels.append(
+                ResidueChannel(species, species, None, 1.0, alpha_source)
+            )
+            common_alpha_records.append(
+                {
+                    "channel": species,
+                    "alpha_value": 1.0,
+                    "alpha_assumed": True,
+                    "alpha_source": alpha_source,
+                }
+            )
+            common_liquid_rows.append(row_by_channel[species])
+            continue
+
+        catalog_name, catalog_row = catalog_matches[species]
+        if catalog_row.get("flux_dormant") is True:
+            continue
+        common_source = (
+            f"declared alpha=1 sensitivity; {catalog_name} runtime catalog row "
+            "is provenance only, not the common-unity alpha source"
+        )
+        common_channels.append(
+            ResidueChannel(species, species, parent, 1.0, common_source)
+        )
+        common_alpha_records.append(
+            {
+                "channel": species,
+                "catalog_row": catalog_name,
+                "alpha_value": 1.0,
+                "alpha_source": common_source,
+                "alpha_assumed": True,
+                "author_ratio_assumption": "alpha_i/alpha_j=1",
+            }
+        )
+        common_liquid_rows.append(row_by_channel[species])
+
+    if not any(channel.parent_oxide for channel in common_channels):
+        raise ResidueInventoryRefusal("hashimoto_common_unity_channels_missing")
+    engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
+    pressure_model = _make_residue_pressure_model(
+        engine,
+        gas_channels,
+        gas_pack,
+        temperature_K=temperature_K,
+        total_pressure_Pa=total_pressure_Pa,
+        engine_metadata=engine_metadata,
+        engine_flags=set(),
+        missing_channels_reason="hashimoto_internal_analytical_channels_missing",
+        caller="Hashimoto residue cohort",
+        floor_inversion_diagnostics=(
+            engine_floor_inversion_diagnostics
+            if engine == "internal-analytical"
+            else None
+        ),
+    )
+    return _HashimotoRunSetup(
+        experiment_id=experiment_id,
+        temperature_K=temperature_K,
+        duration_s=duration_s,
+        sample_mass_kg=sample_mass_kg,
+        total_pressure_Pa=total_pressure_Pa,
+        starting_composition_wt_pct=run_wt_pct,
+        initial_inventory_mol=initial_inventory_mol,
+        steps=steps,
+        geometry_areas=geometry_areas,
+        gas_channels=tuple(gas_channels),
+        liquid_rows=tuple(liquid_rows),
+        common_channels=tuple(common_channels),
+        common_alpha_records=tuple(common_alpha_records),
+        common_liquid_rows=tuple(common_liquid_rows),
+        catalog_matches=catalog_matches,
+        alpha_specs=alpha_specs,
+        pressure_model=pressure_model,
+        engine_floor_inversion_diagnostics=engine_floor_inversion_diagnostics,
+    )
+
+
+def _residue_catalog_rows(
+    legacy_catalog: Mapping[str, Any],
+) -> list[tuple[str, Mapping[str, Any]]]:
+    return [
+        (str(name), row)
+        for group in legacy_catalog.values()
+        if isinstance(group, Mapping)
+        for name, row in group.items()
+        if isinstance(row, Mapping) and row.get("formula")
+    ]
+
+
 def _predict_hashimoto_residue_cohort(
     experiments: Sequence[Mapping[str, Any]],
     runtime_catalog: Mapping[str, Any],
@@ -2693,7 +2906,7 @@ def _predict_hashimoto_residue_cohort(
     preform_dimensions_mm: Mapping[str, float],
     code_revision: str,
     engine: str = "openimcc",
-    _allow_partial_cohort_for_test: bool = False,
+    selected_experiment_ids: frozenset[str] | None = None,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce both alpha arms and geometry bands, without reading residues."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -2704,10 +2917,17 @@ def _predict_hashimoto_residue_cohort(
     if (
         not experiments
         or len(experiment_ids) != len(experiments)
-        or (len(experiments) != 24 and not _allow_partial_cohort_for_test)
+        or len(experiments) != 24
     ):
         raise ResidueInventoryRefusal(
             "hashimoto_cohort_invalid", "R2 requires 24 distinct physical runs"
+        )
+    if selected_experiment_ids is not None and (
+        not selected_experiment_ids or not selected_experiment_ids <= experiment_ids
+    ):
+        raise ResidueInventoryRefusal(
+            "hashimoto_experiment_selection_invalid",
+            "selected runs must be a non-empty subset of the validated cohort",
         )
     if not code_revision.strip():
         raise ResidueInventoryRefusal("hashimoto_code_revision_missing")
@@ -2721,10 +2941,6 @@ def _predict_hashimoto_residue_cohort(
             "openimcc_not_importable", str(exc)
         ) from exc
 
-    from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        _openimcc_gas_channels_and_omission_notices,
-    )
     from simulator.melt_backend import openimcc_bridge
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
     from simulator.evaporation import _load_evaporation_alpha_by_species
@@ -2732,35 +2948,10 @@ def _predict_hashimoto_residue_cohort(
 
     gas_pack = load_gas_datapack()
     legacy_catalog = vapor_pressure_legacy_view(runtime_catalog)
-    catalog_rows = [
-        (str(species), row)
-        for group in legacy_catalog.values()
-        if isinstance(group, Mapping)
-        for species, row in group.items()
-        if isinstance(row, Mapping) and row.get("formula")
-    ]
+    catalog_rows = _residue_catalog_rows(legacy_catalog)
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
     first = experiments[0]
     printed_wt_pct = first["sample"]["printed_composition"]["state"]["value"]
-    initial_oxide_mass_kg = {
-        str(oxide): float(wt_pct)
-        * _hashimoto_point_value(first["sample"]["mass_kg"])
-        / 100.0
-        for oxide, wt_pct in printed_wt_pct.items()
-    }
-    initial_composition_mol = {
-        oxide: mass_kg / _formula_terms(oxide)[1]
-        for oxide, mass_kg in initial_oxide_mass_kg.items()
-    }
-    gas_channels, channel_omissions = _openimcc_gas_channels_and_omission_notices(
-        tuple(initial_composition_mol), gas_pack
-    )
-    if channel_omissions:
-        raise ResidueInventoryRefusal(
-            "hashimoto_openimcc_channel_missing", str(channel_omissions)
-        )
-    if not gas_channels:
-        raise ResidueInventoryRefusal("hashimoto_openimcc_channels_missing")
     engine_binding_identity = (
         openimcc_bridge.engine_binding_identity(
             openimcc_bridge._load_pack(
@@ -2776,78 +2967,45 @@ def _predict_hashimoto_residue_cohort(
     prediction_rows: list[_HashimotoResiduePrediction] = []
 
     for experiment in experiments:
-        experiment_id = str(experiment["experiment_id"])
-        temperature_K = _hashimoto_point_value(experiment["conditions"]["temperature_K"])
-        duration_s = _hashimoto_point_value(
-            experiment["thermal_schedule"]["total_duration_s"]
+        setup = _hashimoto_run_setup(
+            experiment,
+            gas_pack=gas_pack,
+            catalog_rows=catalog_rows,
+            alpha_specs=alpha_specs,
+            preform_dimensions_mm=preform_dimensions_mm,
+            engine=engine,
+            engine_metadata=melt_pack_identity,
+            reference_printed_wt_pct=printed_wt_pct,
         )
-        sample_mass_kg = _hashimoto_point_value(experiment["sample"]["mass_kg"])
-        total_pressure_Pa = _hashimoto_point_value(
-            experiment["pressure_environment"]["total_pressure_Pa"]
-        )
-        if not math.isclose(sample_mass_kg, 1.0e-4, rel_tol=0.0, abs_tol=1.0e-12):
-            raise ResidueInventoryRefusal(
-                "hashimoto_printed_mass_changed", experiment_id
-            )
-        run_wt_pct = experiment["sample"]["printed_composition"]["state"]["value"]
-        if dict(run_wt_pct) != dict(printed_wt_pct):
-            raise ResidueInventoryRefusal(
-                "hashimoto_printed_composition_changed", experiment_id
-            )
-        run_initial_mol = {
-            str(oxide): float(wt_pct) * sample_mass_kg / 100.0
-            / _formula_terms(str(oxide))[1]
-            for oxide, wt_pct in run_wt_pct.items()
-        }
-        initial_steps = min(
-            _HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0))
-        )
-        geometry_areas = _hashimoto_geometry_areas(
-            sample_mass_kg, preform_dimensions_mm
-        )
-        liquid_rows = _hashimoto_liquid_row_provenance(
-            gas_pack, gas_channels, temperature_K
-        )
-        catalog_matches: dict[str, tuple[str, Mapping[str, Any]]] = {}
-        for species, (parent, _parent_moles, _pO2_exponent) in gas_channels:
-            if not parent:
-                continue
-            matches = [
-                (name, row)
-                for name, row in catalog_rows
-                if row.get("formula") == species
-                and row.get("parent_oxide") == parent
-            ]
-            active_matches = [
-                item for item in matches if item[1].get("flux_dormant") is not True
-            ]
-            if not matches:
-                raise ResidueInventoryRefusal(
-                    "hashimoto_runtime_catalog_channel_missing",
-                    f"no catalog row for {species}/{parent}",
-                )
-            catalog_matches[species] = (active_matches or matches)[0]
-
-        common_channels: list[ResidueChannel] = []
+        experiment_id = setup.experiment_id
+        if (
+            selected_experiment_ids is not None
+            and experiment_id not in selected_experiment_ids
+        ):
+            continue
+        temperature_K = setup.temperature_K
+        duration_s = setup.duration_s
+        sample_mass_kg = setup.sample_mass_kg
+        total_pressure_Pa = setup.total_pressure_Pa
+        run_wt_pct = setup.starting_composition_wt_pct
+        run_initial_mol = setup.initial_inventory_mol
+        initial_steps = setup.steps
+        geometry_areas = setup.geometry_areas
+        gas_channels = setup.gas_channels
+        row_by_channel = {str(row["channel"]): dict(row) for row in setup.liquid_rows}
+        common_channels = setup.common_channels
+        common_alpha_records = setup.common_alpha_records
+        pressure_model = setup.pressure_model
+        engine_floor_inversion_diagnostics = setup.engine_floor_inversion_diagnostics
         runtime_channels: list[ResidueChannel] = []
-        common_alpha_records: list[dict[str, Any]] = []
         runtime_alpha_records: list[dict[str, Any]] = []
         runtime_omissions: list[dict[str, str]] = []
         active_liquid_rows: dict[str, list[dict[str, Any]]] = {
-            "common": [],
+            "common": list(setup.common_liquid_rows),
             "runtime": [],
         }
-        row_by_channel = {str(row["channel"]): dict(row) for row in liquid_rows}
         for species, (parent, _parent_moles, _pO2_exponent) in gas_channels:
             if not parent:
-                alpha_source = (
-                    _OXYGEN_GAS_ALPHA_SOURCE
-                    if species in _OXYGEN_CHANNELS
-                    else "OpenIMCC gas channel with no parent oxide"
-                )
-                common_channels.append(
-                    ResidueChannel(species, species, None, 1.0, alpha_source)
-                )
                 runtime_channels.append(
                     ResidueChannel(
                         species,
@@ -2857,44 +3015,22 @@ def _predict_hashimoto_residue_cohort(
                         "assumed oxygen-gas alpha=1.0; not measured",
                     )
                 )
-                common_alpha_records.append(
-                    {"channel": species, "alpha_value": 1.0, "alpha_assumed": True,
-                     "alpha_source": alpha_source}
-                )
                 runtime_alpha_records.append(
                     {"channel": species, "alpha_value": 1.0, "alpha_assumed": True,
                      "alpha_source": "assumed oxygen-gas alpha=1.0; not measured"}
                 )
-                active_liquid_rows["common"].append(row_by_channel[species])
-                active_liquid_rows["runtime"].append(row_by_channel[species])
+                active_liquid_rows["runtime"].append(
+                    row_by_channel[species]
+                )
                 continue
 
-            catalog_name, catalog_row = catalog_matches[species]
+            catalog_name, catalog_row = setup.catalog_matches[species]
             if catalog_row.get("flux_dormant") is True:
                 runtime_omissions.append(
                     {"channel": species, "reason": "flux_dormant_reporting_only"}
                 )
                 continue
-            common_source = (
-                f"declared alpha=1 sensitivity; {catalog_name} runtime catalog row "
-                "is provenance only, not the common-unity alpha source"
-            )
-            common_channels.append(
-                ResidueChannel(species, species, parent, 1.0, common_source)
-            )
-            common_alpha_records.append(
-                {
-                    "channel": species,
-                    "catalog_row": catalog_name,
-                    "alpha_value": 1.0,
-                    "alpha_source": common_source,
-                    "alpha_assumed": True,
-                    "author_ratio_assumption": "alpha_i/alpha_j=1",
-                }
-            )
-            active_liquid_rows["common"].append(row_by_channel[species])
-
-            alpha_spec = alpha_specs.get(catalog_name)
+            alpha_spec = setup.alpha_specs.get(catalog_name)
             if alpha_spec is None:
                 runtime_omissions.append(
                     {"channel": species, "reason": "runtime_catalog_alpha_missing"}
@@ -2942,31 +3078,12 @@ def _predict_hashimoto_residue_cohort(
                     ),
                 }
             )
-            active_liquid_rows["runtime"].append(row_by_channel[species])
+            active_liquid_rows["runtime"].append(
+                row_by_channel[species]
+            )
 
-        if not any(channel.parent_oxide for channel in common_channels):
-            raise ResidueInventoryRefusal("hashimoto_common_unity_channels_missing")
         if not any(channel.parent_oxide for channel in runtime_channels):
             raise ResidueInventoryRefusal("hashimoto_runtime_alpha_channels_missing")
-
-        engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
-        pressure_model = _make_residue_pressure_model(
-            engine,
-            gas_channels,
-            gas_pack,
-            temperature_K=temperature_K,
-            total_pressure_Pa=total_pressure_Pa,
-            engine_metadata=melt_pack_identity,
-            engine_flags=set(),
-            missing_channels_reason="hashimoto_internal_analytical_channels_missing",
-            caller="Hashimoto residue cohort",
-            floor_inversion_diagnostics=(
-                engine_floor_inversion_diagnostics
-                if engine == "internal-analytical"
-                else None
-            ),
-        )
-
 
         arm_channels = (
             ("alpha_common_unity_sensitivity", common_channels, common_alpha_records, "common"),
@@ -2974,6 +3091,7 @@ def _predict_hashimoto_residue_cohort(
         )
         for alpha_arm, channels, alpha_records, row_key in arm_channels:
             geometry_predictions: dict[str, dict[str, float]] = {}
+            geometry_inventory_mol: dict[str, Mapping[str, float] | None] = {}
             pO2_ranges: dict[str, list[float] | None] = {}
             pO2_balance_floor_by_geometry: dict[
                 str, dict[str, float | int | None]
@@ -3002,14 +3120,7 @@ def _predict_hashimoto_residue_cohort(
                 refinement_status = "unconverged_at_cap"
                 while True:
                     started_cpu = time.process_time()
-                    (
-                        values,
-                        pO2_steps,
-                        exhaustions,
-                        refusal,
-                        atom_closure,
-                        pO2_balance_floor,
-                    ) = _hashimoto_integrate_geometry(
+                    integration_result = _hashimoto_integrate_geometry(
                         run_initial_mol,
                         channels,
                         pressure_model,
@@ -3018,6 +3129,22 @@ def _predict_hashimoto_residue_cohort(
                         steps=steps,
                         geometry_policy_id=geometry,
                         initial_area_m2=geometry_areas[geometry],
+                    )
+                    (
+                        values,
+                        pO2_steps,
+                        exhaustions,
+                        refusal,
+                        atom_closure,
+                        pO2_balance_floor,
+                    ) = integration_result
+                    integrated_inventory = getattr(
+                        integration_result, "inventory_mol", None
+                    )
+                    geometry_inventory_mol[geometry] = (
+                        dict(integrated_inventory)
+                        if isinstance(integrated_inventory, Mapping)
+                        else None
                     )
                     cpu_seconds += time.process_time() - started_cpu
                     tried_steps.append(steps)
@@ -3135,6 +3262,7 @@ def _predict_hashimoto_residue_cohort(
                 "sample_mass_kg": sample_mass_kg,
                 "starting_composition_wt_pct": dict(run_wt_pct),
                 "starting_preform_mm": dict(preform_dimensions_mm),
+                "initial_inventory_mol": dict(run_initial_mol),
                 "sample_surface_area_status": "not_tabulated",
                 "primary_geometry_policy_id": primary_geometry,
                 "geometry_primary_argument": (
@@ -3236,6 +3364,10 @@ def _predict_hashimoto_residue_cohort(
                 ),
                 "assumption_flags": assumption_flags,
             }
+            if geometry_inventory_mol[primary_geometry] is not None:
+                provenance["integrated_inventory_mol"] = dict(
+                    geometry_inventory_mol[primary_geometry]
+                )
             prediction_rows.append(
                 _HashimotoResiduePrediction(
                     experiment_id=experiment_id,
@@ -3244,6 +3376,12 @@ def _predict_hashimoto_residue_cohort(
                     primary_oxide_wt_pct=dict(geometry_predictions[primary_geometry]),
                     geometry_oxide_wt_pct=geometry_predictions,
                     sensitivity_band_wt_pct=band,
+                    initial_inventory_mol=dict(run_initial_mol),
+                    primary_inventory_mol=(
+                        None
+                        if geometry_inventory_mol[primary_geometry] is None
+                        else dict(geometry_inventory_mol[primary_geometry])
+                    ),
                     provenance=provenance,
                 )
             )
@@ -3323,30 +3461,150 @@ def _sossi_geometry_areas(sample_mass_kg: float) -> dict[str, float]:
     }
 
 
-def _sossi_project_element_ppm(
+def _inventory_bulk_and_element_masses_kg(
     inventory_mol: Mapping[str, float],
     buffer_oxygen_exchange_mol: float,
     elements: Sequence[str],
-) -> dict[str, float]:
+) -> tuple[float, dict[str, float]]:
+    """Return the integrated bulk mass and requested elemental masses."""
     total_mass_kg = math.fsum(
         float(amount) * _formula_terms(oxide)[1]
         for oxide, amount in inventory_mol.items()
     ) + min(0.0, buffer_oxygen_exchange_mol) * _formula_terms("O")[1]
     if not math.isfinite(total_mass_kg) or total_mass_kg <= 0.0:
         raise ResidueInventoryRefusal("sossi_residue_mass_invalid")
-    result: dict[str, float] = {}
+    element_mass_kg: dict[str, float] = {}
     for element in elements:
-        parent = _SOSSI_TRACE_PARENTS[element]
-        element_atoms = _formula_terms(element)[0]
-        parent_atoms = _formula_terms(parent)[0]
-        element_moles = (
-            float(inventory_mol.get(parent, 0.0))
-            * element_atoms.get(element, 0.0)
-            / parent_atoms.get(element, 0.0)
+        element_moles = math.fsum(
+            float(amount) * _formula_terms(oxide)[0].get(element, 0.0)
+            for oxide, amount in inventory_mol.items()
         )
-        element_mass_kg = element_moles * _formula_terms(element)[1]
-        result[element] = element_mass_kg / total_mass_kg * 1.0e6
-    return result
+        element_mass_kg[element] = element_moles * _formula_terms(element)[1]
+    return total_mass_kg, element_mass_kg
+
+
+def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapping[str, Any]]:
+    state = getattr(located_definition, "state", None)
+    value = getattr(state, "value", None) if getattr(state, "is_value", False) else None
+    if not isinstance(value, Mapping):
+        raise ResidueInventoryRefusal(
+            "fo_definition_unprinted", "missing point_conditions.fm_definition"
+        )
+    definition = value.get("definition")
+    quote = value.get("quote")
+    page = value.get("page")
+    if (
+        definition not in {"concentration_retention", "mass_retention"}
+        or not isinstance(quote, str)
+        or not quote.strip()
+        or isinstance(page, bool)
+        or not isinstance(page, int)
+        or page <= 0
+    ):
+        raise ResidueInventoryRefusal(
+            "fo_definition_unprinted",
+            "fm_definition needs a named definition, printed quote, and page",
+        )
+    return str(definition), value
+
+
+def _require_element_retention_transport_inputs(inputs: Mapping[str, object]) -> None:
+    def has_value(value: object) -> bool:
+        if value is None:
+            return False
+        if isinstance(value, str):
+            return bool(value.strip())
+        if isinstance(value, Mapping):
+            return bool(value) and all(has_value(item) for item in value.values())
+        if isinstance(value, (tuple, list)):
+            return bool(value) and all(has_value(item) for item in value)
+        kind = getattr(value, "kind", None)
+        if getattr(kind, "value", kind) == "unavailable":
+            return False
+        state = getattr(value, "state", None)
+        if state is None and hasattr(value, "is_value"):
+            state = value
+        if state is not None and hasattr(state, "is_value"):
+            return bool(state.is_value) and has_value(state.value)
+        return True
+
+    labels = (
+        ("duration", "duration_missing", "duration"),
+        ("temperature", "temperature_missing", "T"),
+        ("fO2", "fO2_missing", "fO2"),
+        ("starting_composition", "starting_composition_missing", "starting composition"),
+        ("sample_area_or_geometry", "sample_area_or_geometry_missing", "sample area/geometry"),
+        ("gas_conditions", "gas_conditions_missing", "gas conditions"),
+    )
+    for key, reason, label in labels:
+        value = inputs.get(key)
+        if not has_value(value):
+            raise ResidueInventoryRefusal(reason, f"missing {label}")
+
+
+def _element_retention_ratio_from_inventories(
+    initial_inventory_mol: Mapping[str, float],
+    final_inventory_mol: Mapping[str, float],
+    element: str,
+    definition: str,
+    *,
+    initial_oxygen_exchange_mol: float = 0.0,
+    final_oxygen_exchange_mol: float = 0.0,
+    initial_bulk_mass_adjustment_kg: float = 0.0,
+    final_bulk_mass_adjustment_kg: float = 0.0,
+) -> float:
+    if definition not in {"concentration_retention", "mass_retention"}:
+        raise ResidueInventoryRefusal("fo_definition_unprinted")
+    if not any(
+        float(amount) > 0.0 and _formula_terms(formula)[0].get(element, 0.0) > 0.0
+        for formula, amount in initial_inventory_mol.items()
+    ):
+        raise ResidueInventoryRefusal(
+            "element_unavailable", f"integrator does not carry {element}"
+        )
+    initial_bulk_mass_kg, initial_element_mass_kg = (
+        _inventory_bulk_and_element_masses_kg(
+            initial_inventory_mol, initial_oxygen_exchange_mol, (element,)
+        )
+    )
+    final_bulk_mass_kg, final_element_mass_kg = (
+        _inventory_bulk_and_element_masses_kg(
+            final_inventory_mol, final_oxygen_exchange_mol, (element,)
+        )
+    )
+    initial_bulk_mass_kg += initial_bulk_mass_adjustment_kg
+    final_bulk_mass_kg += final_bulk_mass_adjustment_kg
+    initial_element_mass = initial_element_mass_kg[element]
+    final_element_mass = final_element_mass_kg[element]
+    if initial_element_mass <= 0.0:
+        raise ResidueInventoryRefusal(
+            "starting_component_missing", f"no initial {element} in integrated inventory"
+        )
+    if final_element_mass < 0.0 or not math.isfinite(final_element_mass):
+        raise ResidueInventoryRefusal(
+            "element_inventory_invalid", f"invalid final {element} inventory"
+        )
+    mass_retention = final_element_mass / initial_element_mass
+    if definition == "mass_retention":
+        return mass_retention
+    bulk_mass_factor = final_bulk_mass_kg / initial_bulk_mass_kg
+    if not math.isfinite(bulk_mass_factor) or bulk_mass_factor <= 0.0:
+        raise ResidueInventoryRefusal("residue_bulk_mass_invalid")
+    return mass_retention / bulk_mass_factor
+
+
+def _sossi_project_element_ppm(
+    inventory_mol: Mapping[str, float],
+    buffer_oxygen_exchange_mol: float,
+    elements: Sequence[str],
+) -> dict[str, float]:
+    total_mass_kg, element_mass_kg = _inventory_bulk_and_element_masses_kg(
+        inventory_mol, buffer_oxygen_exchange_mol, elements
+    )
+    return {
+        element: element_mass_kg[element] / total_mass_kg * 1.0e6
+        for element in elements
+    }
 
 
 def _predict_sossi_residue_cohort(
@@ -3357,6 +3615,7 @@ def _predict_sossi_residue_cohort(
     buffered_fO2_log_by_experiment: Mapping[str, float],
     code_revision: str,
     engine: str,
+    selected_experiment_ids: frozenset[str] | None = None,
 ) -> tuple[_SossiResiduePrediction, ...]:
     """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -3370,14 +3629,20 @@ def _predict_sossi_residue_cohort(
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     legacy_catalog = vapor_pressure_legacy_view(runtime_catalog)
-    catalog_rows = [
-        (str(name), row)
-        for group in legacy_catalog.values()
-        if isinstance(group, Mapping)
-        for name, row in group.items()
-        if isinstance(row, Mapping) and row.get("formula")
-    ]
+    catalog_rows = _residue_catalog_rows(legacy_catalog)
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
+    experiment_ids = {
+        str(experiment.get("experiment_id") or "") for experiment in experiments
+    }
+    if selected_experiment_ids is not None and (
+        not selected_experiment_ids
+        or "" in experiment_ids
+        or not selected_experiment_ids <= experiment_ids
+    ):
+        raise ResidueInventoryRefusal(
+            "sossi_experiment_selection_invalid",
+            "selected runs must be a non-empty subset of the supplied experiments",
+        )
     engine_binding_identity: dict[str, str] | None = None
     if engine == "openimcc":
         try:
@@ -3412,6 +3677,11 @@ def _predict_sossi_residue_cohort(
         experiment_id = str(experiment.get("experiment_id") or "")
         if not experiment_id:
             raise ResidueInventoryRefusal("sossi_experiment_id_missing")
+        if (
+            selected_experiment_ids is not None
+            and experiment_id not in selected_experiment_ids
+        ):
+            continue
         schedule = experiment.get("thermal_schedule", {})
         setpoints = schedule.get("setpoints_and_holds", ())
         if not setpoints or not isinstance(setpoints[0], Mapping):
@@ -3601,7 +3871,7 @@ def _predict_sossi_residue_cohort(
                 return {
                     species: float(base.get(species, 0.0))
                     * pO2_bar ** pO2_exponents[species]
-                    * 100_000.0
+                    * PA_PER_BAR
                     for species, _parent, _n, _o2 in gas_channels
                     if species in pO2_exponents
                 }
@@ -3621,7 +3891,7 @@ def _predict_sossi_residue_cohort(
                 response = _internal_analytical_vapor_pressure_adapter(
                     core=analytical_core,
                     temperature_C=temperature_K - 273.15,
-                    pressure_bar=total_pressure_Pa / 100_000.0,
+                    pressure_bar=total_pressure_Pa / PA_PER_BAR,
                     composition_kg=None,
                     composition_mol=composition,
                     fO2_log=log10_pO2_bar,
@@ -3699,6 +3969,7 @@ def _predict_sossi_residue_cohort(
         areas = _sossi_geometry_areas(sample_mass_kg)
         steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
         geometry_predictions: dict[str, dict[str, float]] = {}
+        geometry_inventory_mol: dict[str, dict[str, float]] = {}
         geometry_buffer_exchange: dict[str, float] = {}
         geometry_refinement: dict[str, dict[str, Any]] = {}
         run_refusal: ResidueEngineNonconvergence | None = None
@@ -3762,6 +4033,7 @@ def _predict_sossi_residue_cohort(
             if run_refusal is not None:
                 break
             geometry_predictions[geometry] = accepted
+            geometry_inventory_mol[geometry] = dict(current_inventory)
             geometry_buffer_exchange[geometry] = buffer_exchange
             geometry_refinement[geometry] = {
                 "steps_tried": tried,
@@ -3801,6 +4073,8 @@ def _predict_sossi_residue_cohort(
             )
             for element in supported_elements
         }
+        primary_inventory = geometry_inventory_mol[_SOSSI_PRIMARY_GEOMETRY]
+        primary_buffer_exchange = geometry_buffer_exchange[_SOSSI_PRIMARY_GEOMETRY]
         printed_composition = sample.get("printed_composition", {})
         prediction_rows.append(
             _SossiResiduePrediction(
@@ -3816,6 +4090,8 @@ def _predict_sossi_residue_cohort(
                     "code_revision": code_revision,
                     "sample_mass_kg": sample_mass_kg,
                     "total_pressure_Pa": total_pressure_Pa,
+                    "temperature_K": temperature_K,
+                    "duration_s": duration_s,
                     "buffered_fO2_log": buffered_logp,
                     "buffered_boundary": "printed log10 fO2; reservoir oxygen exchange included",
                     "buffer_oxygen_exchange_mol_by_geometry": geometry_buffer_exchange,
@@ -3836,6 +4112,8 @@ def _predict_sossi_residue_cohort(
                     "starting_trace_basis": "element ppm on the printed approximately 25 mg chemical basis",
                     "geometry_policy_id": _SOSSI_PRIMARY_GEOMETRY,
                     "geometry_areas_m2": areas,
+                    "integrated_inventory_mol": primary_inventory,
+                    "initial_inventory_mol": dict(inventory),
                     "area_m2_initial_by_geometry": areas,
                     "area_evolution_by_geometry": {
                         _SOSSI_GEOMETRIES[0]: "constant sphere area",

@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:mysen-1984-alkaline-earth-redox
       role: pdf
@@ -65,3 +65,33 @@ experiments:
     published_page: 835
     pdf_page_index: 1
     section: Experimental methods
+  equipment_context_id: mysen-1984-alkaline-earth-redox::context::mysen_1984_experimental_apparatus_and_run_conditions
+context:
+- observation_id: mysen_1984_experimental_apparatus_and_run_conditions
+  type: apparatus
+  experiment: mysen_1984_alkaline_earth_redox
+  locator:
+    page: 2
+    published_page: 835
+    pdf_page_index: 1
+    section: Experimental methods
+  units: as printed
+  values:
+    quantity: experimental_apparatus_and_run_conditions
+    method_class: method_only
+    apparatus: The samples (30-70mg) were suspended on 0.1-mm Pt loops in vertical Pt- and MoSi2-heated, quench furnaces.
+    notes:
+    - 'Sample mass: 30-70mg.'
+    - 'Run duration at temperature: not stated.'
+    - 'Fe-presaturation of the Pt loops: not stated.'
+    - The oxygen fugacity in the furnace was controlled with CO-CO2 gas mixing and monitored with an Y2O3-doped ZrO2 oxygen
+      sensor.
+    - The composition of the glasses, within analytical uncertainty (2%, relative), accords with the nominal values. Electron-microprobe
+      analyses are available from the authors upon request.
+    - 'No numerical per-run post-run bulk analyses of total Fe or alkalis are printed; the paper says glass compositions accord
+      with nominal values within analytical uncertainty. Pt or Mo pickup: not stated.'
+    - The source reports loop-furnace experiments, not a Knudsen cell.
+  context_id: mysen-1984-alkaline-earth-redox::context::mysen_1984_experimental_apparatus_and_run_conditions
+  work_id: 40dedafb27b503fd9faae3f02c089e9fcdc221c06390ce63ce0ba7e6e5a504d4
+  source_id: mysen-1984-alkaline-earth-redox
+  species: Fe

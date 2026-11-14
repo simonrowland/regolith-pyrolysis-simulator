@@ -1,0 +1,50 @@
+source_id: kems-138-bischof-2023
+source:
+  citation: Bischof et al. (2023), Calphad 80, 102507; DOI 10.1016/j.calphad.2022.102507.
+input_order:
+  primary_machine_text:
+    - text/kems-138-bischof-2023/mineru
+    - text/kems-138-bischof-2023/pdftotext-layout.txt
+  render_policy: Rendered physical pages 3, 8, 9, and 17 for method, six paragraph values, and Table 12.
+printed_data:
+  - locator: {page: 8, paragraph: results_polytherm}
+    printed_rows: 3
+    species: [Ga2O, Ga, GaO]
+    temperature_K: [1752, 1752, 1752]
+    values_Pa: ['0.79', '0.11', '0.007']
+    uncertainties_Pa: ['0.3', '0.016', '0.002']
+    run_link: not_published for these summary values
+    verification: Render route (b); species, pressure, and temperature assignments checked against the printed prose.
+  - locator: {page: 9, paragraph: results_In}
+    printed_rows: 3
+    species: [In2O, In, InO]
+    temperature_K: [1611, 1611, 1611]
+    values_Pa: ['1.41', '0.30', '0.0036']
+    uncertainties_Pa: ['0.52', '0.05', '0.001']
+    run_link: not_published for these summary values
+    verification: Render route (b); species, pressure, and temperature assignments checked against the printed prose.
+  - printed_table: '12'
+    pdf_page: 17
+    printed_rows: 2
+    mapped_cells:
+      - {row: 3, column: 2, species: In, T_K: 1425, value_Pa: '0.003', run: Oct. 2019}
+      - {row: 3, column: 4, species: In, T_K: 1550, value_Pa: '0.072', run: Oct. 2019}
+      - {row: 4, column: 2, species: In2O, T_K: 1425, value_Pa: '0.014', run: Oct. 2019}
+      - {row: 4, column: 4, species: In2O, T_K: 1550, value_Pa: '0.327', run: Oct. 2019}
+    verification: MinerU Table 12 compare matched all 4 cells; rendered physical page 17 confirms both this-work columns and row labels.
+    printed_uncertainty: No uncertainty is printed for these four cells.
+sample_and_controls:
+  initial_sample: >-
+    Methods state pure (>99.9%) alpha-Ga2O3 or alpha-In2O3 fine powder. The impurity identities and exact assay are not printed, so no
+    exact composition map is asserted.
+  apparatus: KEMS with an approximately 10^-6 mbar chamber pressure (physical page 3); no in-cell total pressure is derived.
+  oxygen: Absolute fO2 is not published for these rows.
+  phase: The charge is crystalline alpha oxide. The liquid-engine scorer refusal is applicable to these p_partial rows.
+uncertainty:
+  printed_widths: Six paragraph rows retain the parent uncertainty width, original quote, and confidence_level: not_stated.
+  table_12: Four cells have no printed width.
+  migrator_rule: Existing width fields are consumed by w1108ruleC; no per-point sigma is added.
+compare:
+  table_tool: tools/mineru_table_draft.py compare
+  target_table: Table 12, PDF page 17, MinerU draft p017-t12
+  artifact: kems-138-bischof-2023-spike-link.compare.txt

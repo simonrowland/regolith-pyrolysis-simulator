@@ -598,16 +598,19 @@ from simulator.fe_redox import (
     _non_absolute_redox_state_kwargs,
     _reanchor_redox_state,
     calphad_ferrous_feo_activity_diagnostic,
-    feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
     intrinsic_melt_fO2,
-    legacy_iw_log10_fO2_bar,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
     kress91_split,
     melt_mol_fractions_for_kress91,
     normalize_redox_state,
+)
+from simulator.oxygen_buffers import (
+    delta_iw_log10,
+    feo_iw_log10_fO2_bar,
+    legacy_iw_log10_fO2_bar,
 )
 from simulator.melt_regime import (
     MeltRegime,
@@ -701,6 +704,7 @@ from simulator.chemistry.kernel import (
     normalize_chemistry_kernel_config,
     normalize_oxygen_sink_channel_mode,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 # BuiltinVaporPressureProvider is imported lazily inside
 # _build_chemistry_kernel: simulator/__init__.py -> simulator.core ->
@@ -1265,6 +1269,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapor_pressures_source: dict[str, str] = {}
         self._backend_failed = False
         self._stage0_carbon_cleanup_specs: list[dict] = []
+        self._stage0_carbon_allocation_notices: list[dict] = []
         self._stage0_carbonate_decomposition_specs: list[dict] = []
         self._stage0_perchlorate_cleanup_specs: list[dict] = []
         self._stage0_foulant_diagnostics: list[dict] = []
@@ -2548,14 +2553,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         backend = provider._ensure_backend()
         if backend is None or not backend.is_available():
-            raise EvaporationFluxRefusal(
-                'liquid_fraction_provider_missing_input',
-                {
+            import multiprocessing
+
+            daemon_context = multiprocessing.current_process().daemon
+            initialization_error = getattr(
+                provider, '_backend_initialization_error', None
+            )
+            child_start_refusal = (
+                daemon_context
+                and isinstance(initialization_error, AssertionError)
+                and str(initialization_error)
+                == 'daemonic processes are not allowed to have children'
+            )
+            if child_start_refusal:
+                reason = (
+                    "liquid_fraction_provider_unavailable_daemonic_process_"
+                    "cannot_start_child_workers"
+                )
+                diagnostic = {
+                    'reason': reason,
+                    'input': 'liquid_fraction_provider',
+                    'provider': self._liquid_fraction_provider,
+                    'status': 'unavailable',
+                    'detail': (
+                        'a daemonic process cannot start child worker processes'
+                    ),
+                }
+            else:
+                diagnostic = {
                     'reason': 'missing_input',
                     'input': 'liquid_fraction_provider',
                     'provider': self._liquid_fraction_provider,
                     'status': 'unavailable',
-                },
+                }
+                if daemon_context:
+                    diagnostic['daemon_context'] = True
+                reason = 'liquid_fraction_provider_missing_input'
+            raise EvaporationFluxRefusal(
+                reason,
+                diagnostic,
             )
 
     def _register_magemin_shadow_if_available(self) -> None:
@@ -4348,7 +4384,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if volume_m3 <= 0.0 or T_head_K <= 0.0:
             return 0.0
         return o2 * GAS_CONSTANT * T_head_K / (
-            volume_m3 * 1.0e5
+            volume_m3 * PA_PER_BAR
         )
 
     def _headspace_o2_mol_for_pO2_bar(self, pO2_bar: float) -> float:
@@ -4358,7 +4394,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 0.0
         return (
             max(0.0, float(pO2_bar))
-            * 1.0e5
+            * PA_PER_BAR
             * volume_m3
             / (GAS_CONSTANT * T_head_K)
         )
@@ -4412,7 +4448,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if volume_m3 > 0.0 and T_head_K > 0.0:
                     p_total_bar = (
                         total_mol * GAS_CONSTANT * T_head_K
-                        / (volume_m3 * 1.0e5)
+                        / (volume_m3 * PA_PER_BAR)
                     )
                 from engines.builtin.overhead_bleed import (
                     compressible_pressure_capacity_fraction,
@@ -7273,7 +7309,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if capacity_result is not None
                 else self._headspace_ledger_pO2_bar_from_o2_mol(
                     self._overhead_holdup_mol().get(OXYGEN_SPECIES, 0.0)
-                ) * 100000.0
+                ) * PA_PER_BAR
             )
             controls.update({
                 'cold_train_capacity': capacity,
@@ -7299,7 +7335,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if capacity_result is not None:
                 controls['p_total_bar'] = sum(
                     capacity_result.partial_pressures_Pa.values()
-                ) / 100000.0
+                ) / PA_PER_BAR
         result = self._dispatch_and_commit(
             ChemistryIntent.OVERHEAD_BLEED,
             control_inputs=controls,
@@ -7561,7 +7597,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ),
                 ),
                 downstream_pressure_Pa=(
-                    self._headspace_downstream_pressure_bar() * 100000.0
+                    self._headspace_downstream_pressure_bar() * PA_PER_BAR
                 ),
                 k_relief_kg_hr_Pa=cold_train.relief['k_relief_kg_hr_Pa'],
                 p_open_Pa=cold_train.relief['p_open_Pa'],
@@ -7936,7 +7972,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # FeO(l) = Fe(metal) + 1/2 O2; Holzheid et al. 1997
         # doi:10.1016/S0009-2541(97)00030-2 grounds FeO(l) DeltaG in
         # feo_iw_log10_fO2_bar(), so a_FeO,sat = 10^((log fO2 - IW)/2).
-        saturation_log10 = (float(fO2_log) - pure_feo_iw) / 2.0
+        saturation_log10 = delta_iw_log10(float(fO2_log), pure_feo_iw) / 2.0
         if saturation_log10 > 300.0:
             a_feo_saturation = float('inf')
         elif saturation_log10 < -300.0:
@@ -9657,6 +9693,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._sulfur_saturation_steps = steps
         steps.append(step)
 
+    def stage0_carbon_allocation_run_notice(self) -> Dict[str, Any] | None:
+        """Out-of-domain or refused stage-0 sulfate carbon ranking.
+
+        In-domain rankings stay off the report. An extrapolated ranking
+        is a flagged best estimate and must be visible. A scarce budget
+        with no reaction-specific dG is a typed refusal of that quantity.
+        """
+        notices = getattr(self, '_stage0_carbon_allocation_notices', None)
+        if not isinstance(notices, list) or not notices:
+            return None
+        notice = notices[0]
+        if not isinstance(notice, dict):
+            return None
+        payload = copy.deepcopy(notice)
+        claims = payload.get('claims') or []
+        out_of_domain = [
+            str(claim['species'])
+            for claim in claims
+            if isinstance(claim, dict)
+            and claim.get('confidence') == 'out_of_domain'
+        ]
+        payload['out_of_domain'] = bool(out_of_domain)
+        payload['out_of_domain_species'] = list(
+            payload.get('out_of_domain_species') or out_of_domain
+        )
+        if payload.get('reason') == (
+            'stage0_cation_sulfate_carbon_ranking_refused'
+        ):
+            return payload
+        if not payload['out_of_domain']:
+            return None
+        return payload
+
     def sulfur_saturation_run_notice(self) -> Dict[str, Any] | None:
         """Run-level SulfSat notice, or None when every step was in range."""
 
@@ -10330,10 +10399,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         standalone equilibrium probes omit it.
 
         Behaviour:
-          - Below 400 K this method returns before kernel dispatch and preserves
+          - Below 400 K this method skips kernel vapor evaluation and preserves
             the backend vapor-pressure surface and matching activity-source
-            notices. It does not establish that either surface is empty; that
-            is a separate provider contract.
+            notices. An empty surface on this path means no prediction, not a
+            measured zero. The diagnostic records only this call's CO2 notice,
+            when present; it never reuses an earlier kernel diagnostic.
           - When the kernel returns a populated ``vapor_pressures_Pa``
             it replaces the equilibrium-result dict in place. For
             ThermoEngine-sourced species whose backend value agrees with
@@ -10354,8 +10424,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             the existing zero-state behaviour is preserved.
           - If the kernel raises, propagate — silent fallback was
             explicitly forbidden by the goal spec.
+
+        Published vapor and high-temperature diagnostics are cleared at
+        entry so a failure cannot expose a prior call's result. The prior
+        high-temperature activity snapshot is retained locally as a
+        continuation input for this dispatch; only a successful dispatch
+        publishes this call's activity state.
         """
 
+        previous_high_t_melt_activity = getattr(
+            self, '_last_high_t_melt_activity', {}
+        ) or {}
+        previous_high_t_melt_activity_temperature_K = getattr(
+            self, '_last_high_t_melt_activity_temperature_K', None
+        )
+        self._last_vapor_pressure_diagnostic = {}
+        self._last_vapor_pressures_source = {}
+        self._last_high_t_melt_activity = {}
+        self._last_high_t_melt_activity_temperature_K = None
         backend_diagnostics = dict(
             getattr(self, '_last_backend_diagnostics', {}) or {}
         )
@@ -10390,8 +10476,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     result.warnings.append(warning)
         if T_C + 273.15 < 400:
             restore_retained_backend_activity_sources()
-            self._last_high_t_melt_activity = {}
-            self._last_high_t_melt_activity_temperature_K = None
             self._last_vapor_pressures_source = dict(
                 getattr(result, 'vapor_pressures_source', {}) or {}
             )
@@ -10441,12 +10525,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'backend_vapor_pressures_source': dict(backend_sources),
                     'backend_vapor_pressures_Pa': dict(backend_vp),
                 }
-                self._last_vapor_pressures_source = {}
                 if getattr(self, '_headspace_co2_dissociation_diagnostic', None):
                     diagnostic['co2_dissociation'] = dict(self._headspace_co2_dissociation_diagnostic)
                 self._last_vapor_pressure_diagnostic = diagnostic
-                self._last_high_t_melt_activity = {}
-                self._last_high_t_melt_activity_temperature_K = None
                 return
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
@@ -10501,12 +10582,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'high_t_melt_activity': getattr(
                     self, '_high_t_melt_activity', 'openimcc'
                 ),
-                'high_t_melt_activity_previous_temperature_K': getattr(
-                    self, '_last_high_t_melt_activity_temperature_K', None
+                'high_t_melt_activity_previous_temperature_K': (
+                    previous_high_t_melt_activity_temperature_K
                 ),
-                'high_t_melt_activity_previous': getattr(
-                    self, '_last_high_t_melt_activity', {}
-                ),
+                'high_t_melt_activity_previous': previous_high_t_melt_activity,
                 'simulation_hour': simulation_hour,
             }
         dispatch_kwargs = {
@@ -10801,6 +10880,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         additives_kg: Dict[str, float],
     ) -> None:
         self._stage0_bakeout_reserved_carbon_kg = 0.0
+        self._stage0_carbon_allocation_notices = []
         required_kg = max(0.0, float(
             self.inventory.carbon_reductant_required_kg))
         if required_kg <= 1e-12:
@@ -10976,12 +11056,181 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         return True, carbon_mol_remaining - carbon_mol
 
+    def _stage0_cation_sulfate_allocation_order(
+        self,
+        cation_feed: Mapping[str, float],
+        *,
+        to_sulfide: bool,
+        carbon_mol_remaining: float,
+    ) -> list[str]:
+        """Greedy carbon order: most negative dG per mol C, then species name.
+
+        Dict insertion follows ``_processable_stage0_components``, which is
+        a set, so insertion order is hash-seed dependent. Competing sulfates
+        share one carbon budget and must not.
+        """
+        active = [
+            (str(species), float(feed_kg))
+            for species, feed_kg in cation_feed.items()
+            if float(feed_kg) > 1e-12
+        ]
+        if len(active) <= 1:
+            return [species for species, _feed_kg in active]
+
+        from engines.builtin.foulant_disposition import (
+            FoulantCarbonRankingRefusal,
+            foulant_dg_kJ_per_mol_carbon,
+        )
+
+        temp_range = getattr(
+            getattr(self, 'inventory', None), 'stage0_temp_range_C', None
+        )
+        if not isinstance(temp_range, (tuple, list)) or len(temp_range) != 2:
+            raise AccountingError(
+                'stage0 cation-sulfate carbon ranking requires '
+                'stage0_temp_range_C'
+            )
+        try:
+            final_c = float(temp_range[1])
+        except (TypeError, ValueError) as exc:
+            raise AccountingError(
+                'stage0_temp_range_C final temperature must be a number'
+            ) from exc
+        if not math.isfinite(final_c):
+            raise AccountingError(
+                'stage0_temp_range_C final temperature must be finite'
+            )
+        temperature_K = final_c + 273.15
+        registry = self._load_foulant_registry_cached()
+        stoich_table = (
+            STAGE0_CATION_SULFATE_SULFIDE_STOICH
+            if to_sulfide
+            else STAGE0_CATION_SULFATE_OXIDE_STOICH
+        )
+        claims: list[dict] = []
+        refused: list[dict] = []
+        carbon_mol_demand = 0.0
+        for species, feed_kg in active:
+            stoich = stoich_table.get(species)
+            if stoich is None:
+                kind = 'sulfide' if to_sulfide else 'oxide'
+                raise AccountingError(
+                    f'unsupported cation-sulfate {kind} stoich for {species!r}'
+                )
+            feed_coeff = float(stoich['feed'])
+            if feed_coeff <= 0.0:
+                raise AccountingError(
+                    f'cation-sulfate stoich feed for {species!r} must be positive'
+                )
+            c_per_mol = float(stoich['C']) / feed_coeff
+            feed_mol = feed_kg / resolve_species_formula(
+                species, self.species_formula_registry
+            ).molar_mass_kg_per_mol()
+            carbon_mol_demand += feed_mol * c_per_mol
+            entry = registry.carriers.get(species)
+            pointer = None if entry is None else entry.thermo.get('dG_row')
+            dg_key = str(pointer).split('.', 1)[-1] if pointer else ''
+            dg_row = registry.foulant_dG.get(dg_key) if dg_key else None
+            if dg_row is None:
+                raise AccountingError(
+                    f'cation sulfate {species!r} has no foulant dG row '
+                    'for carbon ranking'
+                )
+            reaction = str(dg_row.get('reaction') or '')
+            # Sulfide cleanup is not the oxide-decomposition table. Dividing
+            # that thermal dG by the sulfide carbon demand is not a ranking
+            # input, even when the oxygen couple happens to be false.
+            if to_sulfide:
+                refused.append({
+                    'species': species,
+                    'basis': dg_key,
+                    'reaction': reaction,
+                    'detail': (
+                        'sulfide cleanup has no reaction-specific dG; '
+                        'the oxide decomposition table is a different reaction'
+                    ),
+                })
+                continue
+            try:
+                dg_per_mol_c, confidence, oxygen_couple = (
+                    foulant_dg_kJ_per_mol_carbon(
+                        dg_row,
+                        temperature_K,
+                        species=species,
+                        carbon_per_mol_feed=c_per_mol,
+                    )
+                )
+            except FoulantCarbonRankingRefusal as exc:
+                refused.append({
+                    'species': species,
+                    'basis': dg_key,
+                    'reaction': exc.reaction,
+                    'detail': exc.detail,
+                })
+                continue
+            except (KeyError, ValueError) as exc:
+                raise AccountingError(
+                    f'cation sulfate {species!r} has no usable foulant '
+                    f'dG per mol C: {exc}'
+                ) from exc
+            claims.append({
+                'species': species,
+                'dG_kJ_per_mol_C': dg_per_mol_c,
+                'confidence': confidence,
+                'basis': dg_key,
+                'oxygen_couple': oxygen_couple,
+                'carbon_mol_demand': feed_mol * c_per_mol,
+            })
+        rationed = carbon_mol_demand > float(carbon_mol_remaining) + 1e-9
+        if refused:
+            if rationed:
+                self._stage0_carbon_allocation_notices = [{
+                    'reason': 'stage0_cation_sulfate_carbon_ranking_refused',
+                    'temperature_K': temperature_K,
+                    'refused': refused,
+                    'carbon_mol_demand': carbon_mol_demand,
+                    'carbon_mol_supplied': float(carbon_mol_remaining),
+                    'rationed': True,
+                }]
+                details = '; '.join(
+                    f"{item['species']}: {item['detail']}" for item in refused
+                )
+                raise AccountingError(
+                    'stage-0 cation-sulfate carbon ranking refused: '
+                    f'{details}'
+                )
+            # Carbon covers every stoichiometric claim, so the missing
+            # ranking input cannot change an extent. Do not sort on it.
+            return sorted(species for species, _feed_kg in active)
+        claims.sort(key=lambda claim: (
+            float(claim['dG_kJ_per_mol_C']),
+            str(claim['species']),
+        ))
+        out_of_domain_species = [
+            str(claim['species'])
+            for claim in claims
+            if claim['confidence'] == 'out_of_domain'
+        ]
+        self._stage0_carbon_allocation_notices = [{
+            'reason': 'stage0_cation_sulfate_carbon_ranked_by_dg',
+            'temperature_K': temperature_K,
+            'order': [str(claim['species']) for claim in claims],
+            'claims': claims,
+            'carbon_mol_demand': carbon_mol_demand,
+            'carbon_mol_supplied': float(carbon_mol_remaining),
+            'rationed': rationed,
+            'out_of_domain': bool(out_of_domain_species),
+            'out_of_domain_species': out_of_domain_species,
+        }]
+        return [str(claim['species']) for claim in claims]
+
     def _apply_stage0_cation_sulfate_carbon_reactions(
         self,
         feedstock: Mapping[str, Any],
         carbon_mol_remaining: float,
         specs: list[dict],
     ) -> float:
+        self._stage0_carbon_allocation_notices = []
         if carbon_mol_remaining <= 1e-12:
             return 0.0
         cleanup = feedstock.get('stage0_carbon_cleanup') or {}
@@ -11004,7 +11253,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ).molar_mass_kg_per_mol()
             for species in molar_species
         }
-        for species, feed_kg in list(cation_feed.items()):
+        # One sulfate has no competitor, so feed order cannot change the extent.
+        active = [
+            species
+            for species, feed_kg in cation_feed.items()
+            if float(feed_kg) > 1e-12
+        ]
+        if len(active) > 1:
+            species_order = self._stage0_cation_sulfate_allocation_order(
+                cation_feed,
+                to_sulfide=to_sulfide,
+                carbon_mol_remaining=carbon_mol_remaining,
+            )
+        else:
+            species_order = active
+        for species in species_order:
+            feed_kg = float(cation_feed.get(species, 0.0))
             if feed_kg <= 1e-12:
                 continue
             feed_formula = resolve_species_formula(

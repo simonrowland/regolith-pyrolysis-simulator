@@ -51,7 +51,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No total pressure is stated for the TGA run.
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -109,6 +109,8 @@ observations:
         page: 3
         pdf_page_index: 2
         section: Results
+  provenance:
+    printed_phase: l
 - observation_id: yang-teng-seetharaman-2012-vanadium-evaporation::yang_2012_results_co2_mass_loss_fraction
   experiment_id: 10.1007/s11663-012-9742-3::yang-teng-seetharaman-2012-vanadium-evaporation
   identity:
@@ -158,7 +160,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No total pressure is stated for the TGA run.
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -216,6 +218,8 @@ observations:
         page: 3
         pdf_page_index: 2
         section: Results
+  provenance:
+    printed_phase: l
 - observation_id: yang-teng-seetharaman-2012-vanadium-evaporation::yang_2012_results_oxygen_mass_loss_fraction
   experiment_id: 10.1007/s11663-012-9742-3::yang-teng-seetharaman-2012-vanadium-evaporation
   identity:
@@ -265,7 +269,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: No total pressure is stated for the TGA run.
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -323,3 +327,5 @@ observations:
         page: 3
         pdf_page_index: 2
         section: Results
+  provenance:
+    printed_phase: l

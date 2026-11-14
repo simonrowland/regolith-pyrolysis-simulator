@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 67d9991672be628c7d87b4aaa3fc5ad4b9158d23
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:wood-wade-2013-trace-activities
       role: pdf
@@ -120,6 +120,40 @@ experiments:
         published_page: 918
         pdf_page_index: 7
         note: 'Proof string: ‘The capsule was made of SiO2 glass’.'
+- experiment_id: 10.1007/s00410-013-0896-z::wood-wade-2013-trace-activities
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-013-0896-z
+  locator:
+    page: 5
+    published_page: 915
+    pdf_page_index: 4
+    figure: '2'
+    note: row=gamma = 0.5; branch 1; digitized point 1
 context:
 - observation_id: wood_wade_2013_bw1102_table1_partitioning_inputs
   type: typed_context
@@ -129,8 +163,8 @@ context:
     published_page: 918
     pdf_page_index: 7
     table: '1'
-    note: 'Table 1, identifier BW1102; proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’. MinerU and pdftotext
-      agree on the numeric cell text; the PDF render confirms row/column placement.'
+    note: 'Table 1, identifier BW1102; proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’. The numeric cell
+      text was checked against pdftotext; the PDF render confirms row/column placement.'
   units: as printed
   values:
     method_class: method_only
@@ -219,6 +253,164 @@ context:
   work_id: 10.1007/s00410-013-0896-z
   source_id: wood-wade-2013-trace-activities
   species: PbO
+- observation_id: wood_wade_2013_fig1_nio_digitization_context
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 913
+    pdf_page_index: 2
+    figure: '1'
+  units: dimensionless activity coefficient and ternary endmember mole fractions
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    evidence_class: model_derived
+    contour_fit_as_printed: NiO activity-coefficient contours fitted with Eq. (2) to 172 literature data for silicate melts
+      saturated with Ni metal at known oxygen fugacity.
+    axis_calibration:
+      method: affine barycentric calibration from the three printed ternary endmember vertices
+      panel_raster_pixels: 650 x 564
+      Diopside_vertex_pixel:
+      - 60
+      - 500
+      Anorthite_vertex_pixel:
+      - 330
+      - 30
+      Forsterite_vertex_pixel:
+      - 600
+      - 500
+      axis_composition_basis: mole fraction of printed endmember component
+    sampling:
+      method: resample contour polyline at no more than 0.05 ternary-composition arc-length per interval
+      min_points_per_labelled_contour: 6
+      endpoints_and_axis_intersections_included: true
+    read_uncertainty:
+      each_ternary_component_mole_fraction: ±0.02
+      gamma: half of last displayed contour-label digit; recorded per point
+    model_status: fitted/calculated contours, not measured point data
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_fig1_nio_digitization_context
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: NiO
+- observation_id: wood_wade_2013_fig2_feo_digitization_context
+  type: figure_record
+  locator:
+    page: 5
+    published_page: 915
+    pdf_page_index: 4
+    figure: '2'
+  units: dimensionless activity coefficient and ternary endmember mole fractions
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    evidence_class: model_derived
+    contour_fit_as_printed: FeO activity-coefficient contours fitted with Eq. (2) to 83 literature data for silicate melts
+      saturated with Fe metal at known oxygen fugacity.
+    axis_calibration:
+      method: affine barycentric calibration from the three printed ternary endmember vertices
+      panel_raster_pixels: 650 x 564
+      Diopside_vertex_pixel:
+      - 60
+      - 508
+      Anorthite_vertex_pixel:
+      - 330
+      - 30
+      Forsterite_vertex_pixel:
+      - 600
+      - 508
+      axis_composition_basis: mole fraction of printed endmember component
+    sampling:
+      method: resample contour polyline at no more than 0.05 ternary-composition arc-length per interval
+      min_points_per_labelled_contour: 6
+      endpoints_and_axis_intersections_included: true
+    read_uncertainty:
+      each_ternary_component_mole_fraction: ±0.02
+      gamma: half of last displayed contour-label digit; recorded per point
+    model_status: fitted/calculated contours, not measured point data
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_fig2_feo_digitization_context
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: FeO
+- observation_id: wood_wade_2013_fig3_moo2_digitization_context
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 916
+    pdf_page_index: 5
+    figure: '3'
+  units: dimensionless activity coefficient and ternary endmember mole fractions
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    evidence_class: model_derived
+    contour_fit_as_printed: MoO2 activity-coefficient contours fitted using literature data for silicate melts saturated with
+      Mo metal at known oxygen fugacity and measured Mo metal–silicate partition coefficients; the paper notes estimated MoO2
+      melting properties based on TiO2.
+    axis_calibration:
+      method: affine barycentric calibration from the three printed ternary endmember vertices
+      panel_raster_pixels: 650 x 564
+      Diopside_vertex_pixel:
+      - 60
+      - 500
+      Anorthite_vertex_pixel:
+      - 330
+      - 30
+      Forsterite_vertex_pixel:
+      - 600
+      - 500
+      axis_composition_basis: mole fraction of printed endmember component
+    sampling:
+      method: resample contour polyline at no more than 0.05 ternary-composition arc-length per interval
+      min_points_per_labelled_contour: 6
+      endpoints_and_axis_intersections_included: true
+    read_uncertainty:
+      each_ternary_component_mole_fraction: ±0.02
+      gamma: half of last displayed contour-label digit; recorded per point
+    model_status: fitted/calculated contours, not measured point data
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_fig3_moo2_digitization_context
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: MoO2
+- observation_id: wood_wade_2013_fig4_wo3_digitization_context
+  type: figure_record
+  locator:
+    page: 7
+    published_page: 917
+    pdf_page_index: 6
+    figure: '4'
+  units: dimensionless activity coefficient and ternary endmember mole fractions
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    evidence_class: model_derived
+    contour_fit_as_printed: WO3 activity-coefficient contours calculated from fitted metal–silicate partitioning and saturation
+      data using Eq. (9); the paper reports an RT ln KD standard error of 7.4 kJ and about factor 1.6 gamma uncertainty before
+      gamma_FeO cubed sensitivity.
+    axis_calibration:
+      method: affine barycentric calibration from the three printed ternary endmember vertices
+      panel_raster_pixels: 650 x 564
+      Diopside_vertex_pixel:
+      - 60
+      - 500
+      Anorthite_vertex_pixel:
+      - 330
+      - 30
+      Forsterite_vertex_pixel:
+      - 600
+      - 500
+      axis_composition_basis: mole fraction of printed endmember component
+    sampling:
+      method: resample contour polyline at no more than 0.05 ternary-composition arc-length per interval
+      min_points_per_labelled_contour: 6
+      endpoints_and_axis_intersections_included: true
+    read_uncertainty:
+      each_ternary_component_mole_fraction: ±0.02
+      gamma: half of last displayed contour-label digit; recorded per point
+    model_status: fitted/calculated contours, not measured point data
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_fig4_wo3_digitization_context
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: WO3
 - observation_id: wood_wade_2013_metal_silicate_method_and_constants
   type: typed_context
   experiment: wood_wade_2013_bw1102

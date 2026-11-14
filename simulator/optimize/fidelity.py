@@ -34,6 +34,7 @@ from simulator.optimize.objective import (
     objective_metric_aliases,
 )
 from simulator.optimize.pool import (
+    _backend_name_for_fidelity,
     _default_feedstocks,
     _task_stage0_subprocess_required,
     resolve_eval_timeout_seconds,
@@ -333,6 +334,8 @@ def _run_eval_batch(
     *,
     max_workers: int,
 ) -> Mapping[tuple[str, int], EvalOutcome]:
+    for task in tasks:
+        _task_backend_name(task)
     worker_count = min(max_workers, len(tasks), os.cpu_count() or 1)
     warm_runtime_spec = _warm_runtime_spec(tasks)
     ctx = mp.get_context(_start_method())
@@ -665,15 +668,8 @@ def _fidelity_worker_count(tasks: Sequence[_FidelityTask], n_total: int) -> int:
 
 
 def _task_backend_name(task: _FidelityTask) -> str:
-    # Read raw from the profile (not the EvalSpec), so fold the
-    # Normalize legacy profile inputs before comparing them with EvalSpec.
-    return canonical_backend_name(
-        str(
-            _task_run_options(task).get(
-                "backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
-            )
-            or ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
-        )
+    return _backend_name_for_fidelity(
+        task.profile, task.fidelity, mode="optimizer_search"
     )
 
 
@@ -861,8 +857,6 @@ def _inherited_evidence_class_from_token(token: object) -> str:
 
 def _start_method() -> str:
     methods = mp.get_all_start_methods()
-    if "PYTEST_CURRENT_TEST" in os.environ and "fork" in methods:
-        return "fork"
     if "spawn" in methods:
         return "spawn"
     return methods[0]

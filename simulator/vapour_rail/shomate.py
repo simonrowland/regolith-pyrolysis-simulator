@@ -31,7 +31,8 @@ Algebra: as above; free-energy conveniences used by reaction ``K(T)``::
   G°/(R T) = H°/(R T) − S°/R
 
 Units: ``T`` in K; ``Cp, S`` in J/(mol·K); Shomate ``H`` equation in kJ/mol;
-SI companions multiply accordingly. ``R = 8.314462618`` J/(mol·K).
+SI companions multiply accordingly. R is ``nasa_cea.R_J_PER_MOL_K``
+(GAS_CONSTANT_10SIG), not the full CODATA leaf.
 
 Sanity (NIST WebBook O2(g), 100–700 K segment, Chase 1998)::
 
@@ -69,6 +70,7 @@ from simulator.vapour_rail.nasa_cea import (
     StandardState,
     ThermoState,
 )
+from simulator.physical_constants import PA_PER_BAR
 
 StandardStateShomate = StandardState  # same typed conventions
 
@@ -236,7 +238,7 @@ class ShomatePolynomial:
     formula: str | None = None
     delta_f_H_298_15_J_per_mol: float | None = None
     citation: str | None = None
-    reference_pressure_Pa: float = 100_000.0
+    reference_pressure_Pa: float = PA_PER_BAR
 
     def __post_init__(self) -> None:
         if self.standard_state not in (

@@ -161,6 +161,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_literature_jackson_duffin_34_nacl_dew_point::T=910:h=2ba7930f8d6e
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -320,6 +322,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_literature_kohl_na2so4_dew_point::T=1260:h=6feb769125e9
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -479,6 +483,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section3_3_2_na2so4_experimental_dew_point_gas_i::T=1240:h=95d6bcad29aa
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -637,12 +643,14 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate::T=1100:h=c99c8fe75f54
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: K2SO4
       phase:
@@ -655,12 +663,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
     temperature_K:
       tag: value
       value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000029'
     approximate: false
   uncertainty:
     kind: none
@@ -749,12 +799,39 @@ observations:
         published_page: 158
         section: 4.5.5
         note: experimental maximum potassium-sulphate rate at 1100 K
+  derivation:
+    relation: mg_per_m2_s_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.9'
+        locator:
+          page: 167
+          published_page: 158
+          section: 4.5.5
+          note: experimental maximum potassium-sulphate rate at 1100 K
+    - - factor
+      - state:
+          tag: value
+          value: '0.000001'
+        locator:
+          page: 167
+          published_page: 158
+          section: 4.5.5
+          note: experimental maximum potassium-sulphate rate at 1100 K
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section4_5_5_na2so4_model_comparator_rate::points:h=e6867159edf7
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: Na2SO4
       phase:
@@ -767,9 +844,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000023'
     approximate: false
   uncertainty:
     kind: none
@@ -853,6 +975,35 @@ observations:
         section: 4.5.5
         note: PDF p167 comparison; PDF p160 states "The theoretically calculated maximum deposition rate at 1200 K is 2.3
           mg/m²·s, for the experimental case this value is approximately 20% lower."
+  derivation:
+    relation: mg_per_m2_s_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '2.3'
+        locator:
+          page: 167
+          published_page: 158
+          section: 4.5.5
+          note: PDF p167 comparison; PDF p160 states "The theoretically calculated maximum deposition rate at 1200 K is 2.3
+            mg/m²·s, for the experimental case this value is approximately 20% lower."
+    - - factor
+      - state:
+          tag: value
+          value: '0.000001'
+        locator:
+          page: 167
+          published_page: 158
+          section: 4.5.5
+          note: PDF p167 comparison; PDF p160 states "The theoretically calculated maximum deposition rate at 1200 K is 2.3
+            mg/m²·s, for the experimental case this value is approximately 20% lower."
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section4_5_6_pbo_measured_dew_point::T=1090:h=d579b87ef457
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1014,12 +1165,14 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate::T=1000:h=a5b53190e399
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: PbO
       phase:
@@ -1032,13 +1185,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
     temperature_K:
       tag: value
       value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
+    kind: point
+    point: '0.000003'
+    approximate: true
   uncertainty:
     kind: none
   evidence:
@@ -1126,6 +1321,33 @@ observations:
         published_page: 160
         section: 4.5.6
         note: experimental PbO maximum rate at approximately 1000 K
+  derivation:
+    relation: mg_per_m2_s_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3'
+        locator:
+          page: 169
+          published_page: 160
+          section: 4.5.6
+          note: experimental PbO maximum rate at approximately 1000 K
+    - - factor
+      - state:
+          tag: value
+          value: '0.000001'
+        locator:
+          page: 169
+          published_page: 160
+          section: 4.5.6
+          note: experimental PbO maximum rate at approximately 1000 K
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm::points:row=2:h=1291a9ec8cd0
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1223,6 +1445,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace A
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm::points:row=3:h=1a605478cbaa
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1320,6 +1544,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace B
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm::points:row=5:h=fc69259a42ee
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1417,6 +1643,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace D
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm::points:row=7:h=e21297a03b66
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1514,6 +1742,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace F
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm::points:row=8:h=826de561a756
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1611,6 +1841,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace G
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm::points:row=9:h=bc9ff8f52447
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1708,6 +1940,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace H
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm::points:row=2:h=34ede6becd5c
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1805,6 +2039,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace A
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm::points:row=3:h=ee588531d1d3
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1902,6 +2138,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace B
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm::points:row=4:h=012da7c5bbd8
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -1999,6 +2237,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace C
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm::points:row=5:h=2a6b928676fc
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2096,6 +2336,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace D
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm::points:row=7:h=3907b014a35f
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2193,6 +2435,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace F
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm::points:row=8:h=18013593a652
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2290,6 +2534,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace G
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm::points:row=9:h=aa2486d11580
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2387,6 +2633,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace H
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm::points:row=2:h=ef421aae3e3e
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2484,6 +2732,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace A
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm::points:row=3:h=ca5ad6098323
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2581,6 +2831,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace B
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm::points:row=4:h=157a31b66d79
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2678,6 +2930,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace C
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm::points:row=5:h=78ba5f857feb
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2775,6 +3029,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace D
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm::points:row=6:h=76316b42c33e
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2872,6 +3128,8 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace E
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm::points:row=8:h=146a8ca6e9fa
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -2969,12 +3227,14 @@ observations:
         published_page: 19
         table: '1.5'
         note: furnace G
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=16:h=3397540b6e98
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3068,12 +3328,14 @@ observations:
         page: 73
         published_page: 64
         note: unnumbered continuation of Table 2.4; I furnace, second port; along furnace length
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=16:h=5a507590f6c0
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3167,12 +3429,14 @@ observations:
         page: 73
         published_page: 64
         note: unnumbered continuation of Table 2.4; I furnace, first port; along furnace length
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=16:h=93383c5acf56
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3266,12 +3530,14 @@ observations:
         page: 73
         published_page: 64
         note: unnumbered continuation of Table 2.4; I furnace, fourth port; along furnace length
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=16:h=ac3a2c1362f4
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3365,12 +3631,14 @@ observations:
         page: 73
         published_page: 64
         note: unnumbered continuation of Table 2.4; I furnace, third port; along furnace length
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=16:h=bfdbd29a7793
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3464,12 +3732,14 @@ observations:
         page: 73
         published_page: 64
         note: unnumbered continuation of Table 2.4; H furnace, first port; along furnace length
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=16:h=d0a2955af0cd
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3563,12 +3833,14 @@ observations:
         page: 73
         published_page: 64
         note: unnumbered continuation of Table 2.4; H furnace, third port; along furnace length
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=16:h=f6bb7c2e3f62
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3662,12 +3934,14 @@ observations:
         page: 73
         published_page: 64
         note: unnumbered continuation of Table 2.4; H furnace, second port; along furnace length
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=1d29b5eea134
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3768,12 +4042,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port B
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=290f12894177
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3874,12 +4150,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port M
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=2b869c3a8165
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -3980,12 +4258,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port I
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=4ad23b022b2d
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -4086,12 +4366,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port L
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=5316e2190926
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -4192,12 +4474,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port A
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=564b9c3407a1
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -4298,12 +4582,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port J
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=6c96d5b02159
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -4404,12 +4690,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port E
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=7dace0edc035
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -4510,12 +4798,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port G
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=a4c6acdb4e06
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -4616,12 +4906,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port C
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=bbb88e859260
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -4722,12 +5014,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port H
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=e57f4c61b86b
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -4828,12 +5122,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port F
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover::points:row=4:h=f4b1a6df9a3f
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'water_cooled_paddle_carryover_mass_per_24h'
+      reason: particulate_carryover_out_of_model_scope
     species:
       formula: unknown
       phase:
@@ -4934,12 +5230,14 @@ observations:
         published_page: 64
         table: '2.4'
         note: first or end port K
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl::points:row=2:h=d3d4f218c8b9
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: Na2SO4
       phase:
@@ -4952,9 +5250,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000007777777777777777777777777778'
     approximate: false
   uncertainty:
     kind: none
@@ -5036,12 +5379,39 @@ observations:
         page: 137
         published_page: 128
         table: '4.2'
+  derivation:
+    relation: mg_per_cm2_h_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.28'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=2; table_row_number=2; column=3; table_column_number=3
+    - - factor
+      - state:
+          tag: value
+          value: '360000'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=2; table_row_number=2; column=3; table_column_number=3
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl::points:row=3:h=7d380e431310
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: Na2SO4
       phase:
@@ -5054,9 +5424,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000001944444444444444444444444444'
     approximate: false
   uncertainty:
     kind: none
@@ -5138,12 +5553,39 @@ observations:
         page: 137
         published_page: 128
         table: '4.2'
+  derivation:
+    relation: mg_per_cm2_h_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.7'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=3; table_row_number=3; column=3; table_column_number=3
+    - - factor
+      - state:
+          tag: value
+          value: '360000'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=3; table_row_number=3; column=3; table_column_number=3
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl::points:row=4:h=29a41297bf8a
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: Na2SO4
       phase:
@@ -5156,9 +5598,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000002888888888888888888888888889'
     approximate: false
   uncertainty:
     kind: none
@@ -5240,12 +5727,39 @@ observations:
         page: 137
         published_page: 128
         table: '4.2'
+  derivation:
+    relation: mg_per_cm2_h_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.04'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=4; table_row_number=4; column=3; table_column_number=3
+    - - factor
+      - state:
+          tag: value
+          value: '360000'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=4; table_row_number=4; column=3; table_column_number=3
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl::points:row=5:h=c79ea357b005
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: Na2SO4
       phase:
@@ -5258,9 +5772,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000003888888888888888888888888889'
     approximate: false
   uncertainty:
     kind: none
@@ -5342,12 +5901,39 @@ observations:
         page: 137
         published_page: 128
         table: '4.2'
+  derivation:
+    relation: mg_per_cm2_h_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.4'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=5; table_row_number=5; column=3; table_column_number=3
+    - - factor
+      - state:
+          tag: value
+          value: '360000'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=5; table_row_number=5; column=3; table_column_number=3
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment::points:row=2:h=23f1288496e8
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: Na2SO4
       phase:
@@ -5360,9 +5946,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000001055555555555555555555555556'
     approximate: false
   uncertainty:
     kind: none
@@ -5443,12 +6074,39 @@ observations:
         page: 137
         published_page: 128
         table: '4.2'
+  derivation:
+    relation: mg_per_cm2_h_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.38'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=2; table_row_number=2; column=2; table_column_number=2
+    - - factor
+      - state:
+          tag: value
+          value: '360000'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=2; table_row_number=2; column=2; table_column_number=2
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment::points:row=3:h=607b439c02da
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: Na2SO4
       phase:
@@ -5461,9 +6119,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000002888888888888888888888888889'
     approximate: false
   uncertainty:
     kind: none
@@ -5544,12 +6247,39 @@ observations:
         page: 137
         published_page: 128
         table: '4.2'
+  derivation:
+    relation: mg_per_cm2_h_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.04'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=3; table_row_number=3; column=2; table_column_number=2
+    - - factor
+      - state:
+          tag: value
+          value: '360000'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=3; table_row_number=3; column=2; table_column_number=2
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment::points:row=4:h=ca8241a08e29
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: Na2SO4
       phase:
@@ -5562,9 +6292,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00000325'
     approximate: false
   uncertainty:
     kind: none
@@ -5645,12 +6420,39 @@ observations:
         page: 137
         published_page: 128
         table: '4.2'
+  derivation:
+    relation: mg_per_cm2_h_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.17'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=4; table_row_number=4; column=2; table_column_number=2
+    - - factor
+      - state:
+          tag: value
+          value: '360000'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=4; table_row_number=4; column=2; table_column_number=2
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment::points:row=5:h=ef9a1200e12f
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'surface_deposition_areal_mass_rate'
+      tag: value
+      value: wall_deposit_areal_rate
     species:
       formula: Na2SO4
       phase:
@@ -5663,9 +6465,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use subtype
+    per:
+      tag: value
+      value: area_time
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile wall_deposit_areal_rate does not use sample_mass_kg
+    wall:
+      tag: unknown
+      reason: no wall mapped from source
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000004444444444444444444444444444'
     approximate: false
   uncertainty:
     kind: none
@@ -5746,6 +6593,33 @@ observations:
         page: 137
         published_page: 128
         table: '4.2'
+  derivation:
+    relation: mg_per_cm2_h_to_kg_per_m2_s
+    inputs:
+    - pdf:related-beerkens-1986-deposits-condensation-thesis
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.6'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=5; table_row_number=5; column=2; table_column_number=2
+    - - factor
+      - state:
+          tag: value
+          value: '360000'
+        locator:
+          page: 137
+          published_page: 128
+          table: '4.2'
+          note: row=5; table_row_number=5; column=2; table_column_number=2
+    output_unit: kg_per_m2_s
+    references: []
+  provenance:
+    printed_phase: cr
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_10::T=1252:row=2:h=214f37177a33
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -5796,7 +6670,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -5900,6 +6774,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_10::T=1290:row=3:h=d43cda1b8bc2
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -5950,7 +6826,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -6054,6 +6930,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_10::T=1310:row=4:h=05f0e8465378
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -6104,7 +6982,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -6208,6 +7086,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_10::T=1328:row=5:h=26ee5b805aa8
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -6258,7 +7138,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -6362,6 +7242,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_1::T=1290:row=2:h=f092bc7bb546
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -6412,7 +7294,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -6516,6 +7398,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_1::T=1338:row=3:h=c64832517a2c
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -6566,7 +7450,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -6670,6 +7554,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_1::T=1362:row=4:h=225582c95ff7
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -6720,7 +7606,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -6824,6 +7710,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_1::T=1377:row=5:h=85ba8dcf5f2e
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -6874,7 +7762,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -6978,6 +7866,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_experiment::T=1120:row=2:h=8cc834c0f83f
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -7028,7 +7918,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -7131,6 +8021,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_experiment::T=1190:row=3:h=c1176b2a950e
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -7181,7 +8073,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -7284,6 +8176,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_experiment::T=1237:row=4:h=7c33f07ec119
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -7334,7 +8228,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -7437,6 +8331,8 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas
 - observation_id: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_experiment::T=1263:row=5:h=7056a49fc498
   experiment_id: 05b5e54d878f82fdc08148c1f432d9e9f34899be7ba3368a279198afa9d5c136::related-beerkens-1986-deposits-condensation-thesis
   identity:
@@ -7487,7 +8383,7 @@ observations:
       reason: profile transition_temperature does not use fO2_Pa
     total_pressure_Pa:
       tag: unknown
-      reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+      reason: No experimental total pressure is printed.
     sweep_gas:
       tag: not_applicable
       reason: profile transition_temperature does not use sweep_gas
@@ -7590,3 +8486,5 @@ observations:
     parameters: []
     output_unit: K
     references: []
+  provenance:
+    printed_phase: gas

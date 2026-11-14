@@ -401,6 +401,14 @@ omit it.
   change the gate or any simulated number. The same notice is copied into
   `product_classification` for operator markdown rendering and forwarded
   into optimizer traces and product summaries.
+* `stage0_carbon_allocation_notice` is emitted when competing stage-0 cation
+  sulfates were ranked with a foulant dG outside its table, or when that
+  ranking was refused because the table is not the cleanup reaction. A
+  ranking carries the species order, each claim's basis and `out_of_domain`
+  flag, and the carbon demand. A refusal carries the refused species, the
+  table reaction, and why it is not a ranking input. In-domain rankings
+  omit the key. The same notice is copied into `product_classification`
+  when the ranking was extrapolated.
 * Handled failure envelopes emit the same base fidelity fields as successful
   runs: `backend_status`, `backend_authoritative`, `backend_real_active`,
   `evidence_class`, `runtime_status`, `label_source`,
@@ -465,7 +473,12 @@ omit it.
 ```
 
 * `wall_deposit_by_species_kg` is the aggregate kg projection used by
-  existing SiO report surfaces.
+  existing SiO report surfaces. It includes every species with positive
+  evaporated supply in the run, using the committed wall-account mass for that
+  species (zero when the model booked no wall deposit); a positive amount is a
+  deposited outcome. Per-hour `condensation_refusals_by_species` retains the
+  condensation model's outcome labels and reasons, including pass-through and
+  wall-pressure refusals.
 * `deposit_by_surface_species_kg` is the final wall deposit projection
   by interstage segment/species, sourced from the same snapshot/trace
   wall-deposit data exported per hour.

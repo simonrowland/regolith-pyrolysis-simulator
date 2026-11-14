@@ -13,6 +13,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum
+from fractions import Fraction
 import hashlib
 import json
 import marshal
@@ -65,6 +66,7 @@ from simulator.vapour_rail.shomate import (
     ShomateSegment,
     coefficients_from_mapping,
 )
+from simulator.physical_constants import PA_PER_BAR
 
 
 SCHEMA_VERSION = 2
@@ -90,7 +92,7 @@ RUNTIME_THERMO_EVALUATOR_FAMILIES = frozenset(
     {"nasa_cea_7", "nasa_cea_9", "shomate"}
 )
 # CEA / JANAF standard-state pressure P° (Pa).
-_THERMO_REFERENCE_PRESSURE_PA = 100_000.0
+_THERMO_REFERENCE_PRESSURE_PA = PA_PER_BAR
 _THERMO_EXTRACT_DIR = (
     Path(__file__).resolve().parents[2] / "data" / "literature" / "extracts"
 )
@@ -319,6 +321,45 @@ def _strip_phase_suffix(formula: str) -> str:
 def _is_dioxygen_formula(formula: str) -> bool:
     """True for O2 with optional phase suffix (``O2``, ``O2(g)``, …)."""
     return _strip_phase_suffix(formula) == "O2"
+
+
+def _source_reaction_components(
+    reaction: object,
+) -> tuple[tuple[int, str, Fraction], ...] | None:
+    if not isinstance(reaction, Mapping):
+        return None
+    components: list[tuple[int, str, Fraction]] = []
+    for sign, side in ((-1, "reactants"), (1, "products")):
+        members = reaction.get(side)
+        if members is None:
+            members = []
+        if not isinstance(members, list):
+            return None
+        for member in members:
+            if not isinstance(member, Mapping):
+                return None
+            formula = member.get("formula")
+            try:
+                amount = Fraction(str(member.get("stoichiometry")))
+            except (TypeError, ValueError, ZeroDivisionError):
+                return None
+            if not formula or amount <= 0:
+                return None
+            components.append((sign, str(formula), amount))
+    return tuple(components) or None
+
+
+def source_reaction_terms(reaction: object) -> dict[str, Fraction] | None:
+    """Return the signed bare-formula map for one declared source reaction."""
+
+    components = _source_reaction_components(reaction)
+    if components is None:
+        return None
+    signed: dict[str, Fraction] = {}
+    for sign, formula, amount in components:
+        key = _strip_phase_suffix(formula)
+        signed[key] = signed.get(key, Fraction(0)) + sign * amount
+    return {key: value for key, value in signed.items() if value != 0} or None
 
 
 def _domain_temperature_bounds(
@@ -3148,28 +3189,20 @@ def _compile_thermo_reference_model(
                     activity_input.get("component_id"),
                     f"{species_id}.reaction.activity_input.component_id",
                 )
-                for sign, key in ((-1.0, "reactants"), (1.0, "products")):
-                    participants = reaction.get(key)
-                    if not isinstance(participants, list):
-                        raise CatalogCompileError(
-                            f"{species_id}: reaction requires {key}"
-                        )
-                    for item in participants:
-                        part = _mapping(item, f"{species_id}.reaction.{key}")
-                        formula = _required_string(
-                            part.get("formula"), f"{species_id}.reaction.formula"
-                        )
-                        amount = _finite_positive(
-                            part.get("stoichiometry"),
-                            f"{species_id}.reaction.stoichiometry",
-                        )
-                        formula_keys = {formula, _strip_phase_suffix(formula)}
-                        if sign > 0.0 and not formula_keys.isdisjoint(target_keys):
-                            final_vapor_nu += amount
-                        if _is_dioxygen_formula(formula):
-                            final_nu_o2 += sign * amount
-                        if sign < 0.0 and formula == activity_component:
-                            condensed_activity_nu += amount
+                components = _source_reaction_components(reaction)
+                if components is None:
+                    raise CatalogCompileError(
+                        f"{species_id}: reaction terms are unreadable"
+                    )
+                for sign, formula, coefficient in components:
+                    amount = float(coefficient)
+                    formula_keys = {formula, _strip_phase_suffix(formula)}
+                    if sign > 0 and not formula_keys.isdisjoint(target_keys):
+                        final_vapor_nu += amount
+                    if _is_dioxygen_formula(formula):
+                        final_nu_o2 += sign * amount
+                    if sign < 0 and formula == activity_component:
+                        condensed_activity_nu += amount
                 if final_vapor_nu <= 0.0 or condensed_activity_nu <= 0.0:
                     raise CatalogCompileError(
                         f"{species_id}: final reaction must consume its declared "
@@ -3255,7 +3288,7 @@ def _compile_thermo_reference_model(
                 log10_base_pa = float(base_reference.log10_pressure(temperature_K))
                 log10_base_ratio = log10_base_pa - math.log10(Pstd)
                 log10_pO2_over_Pstd = math.log10(
-                    (pO2_reference_bar * 1.0e5) / Pstd
+                    (pO2_reference_bar * PA_PER_BAR) / Pstd
                 )
                 log10_target_ratio = (
                     log10_K
@@ -3393,7 +3426,7 @@ def _compile_thermo_reference_model(
             # Use stoichiometric ν_O2 in the pre-root division — NOT
             # −pO2_exponent. The declared outer exponent is already
             # −ν_O2/ν_v; using its negation here double-applies 1/ν_v.
-            pO2_over_Pstd = (pO2_reference_bar * 1.0e5) / Pstd
+            pO2_over_Pstd = (pO2_reference_bar * PA_PER_BAR) / Pstd
             if abs(nu_o2) > 0.0:
                 K_eff = K / (pO2_over_Pstd**nu_o2)
             else:

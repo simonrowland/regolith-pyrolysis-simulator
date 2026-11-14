@@ -14,7 +14,10 @@ import pytest
 
 from simulator.battery.enums import RefusalReason
 from simulator.battery.migrate import (
+    _InvalidDecimalValue,
+    _as_dec_or_none,
     _mole_fraction_composition_from_values,
+    _parse_declared_decimal,
     migrate,
     parse_declared_amount,
 )
@@ -29,6 +32,95 @@ _MALFORMED = {
         "CaO": "0.4",
     }
 }
+
+
+def test_mixed_map_decimal_predicate_keeps_nonnumeric_text_as_none() -> None:
+    assert _as_dec_or_none(None) is None
+    assert _as_dec_or_none("") is None
+    assert _as_dec_or_none("not_reported_individually") is None
+    assert _as_dec_or_none("AD") is None
+    assert _as_dec_or_none("not-a-number") is None
+    with pytest.raises(_InvalidDecimalValue, match="invalid numeric value"):
+        _parse_declared_decimal("not-a-number")
+
+
+def test_mixed_status_and_phase_labels_keep_numeric_observation(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="pure_Psat",
+        units="atm",
+        obs_type="psat_series",
+        values={
+            "quantity": "pure_Psat",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "series": [
+                {
+                    "sample": "AD",
+                    "T_K": 1200,
+                    "pressure_atm": "0.038",
+                    "point_uncertainty_status": "not_reported_individually",
+                }
+            ],
+        },
+    )
+    extract["species"]["Na"]["observations"][0]["phase"] = "l"
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    stored = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith("fixture-source::na_psat")
+    ]
+    assert len(stored) == 1
+    assert stored[0].value.kind.value == "point"
+    assert stored[0].value.point is not None
+    assert stored[0].value.point > 0
+    assert not any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "not_reported_individually" in (issue.detail or "")
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_malformed_optional_decimal_becomes_invalid_source_issue(
+    tmp_path: Path,
+) -> None:
+    values = {
+        "quantity": "residue_component_composition",
+        "value": "12",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "starting_measured_ppm": "not-a-number",
+        "composition_wt_pct": {"SiO2": "50", "MgO": "50"},
+    }
+    root = _write_min_tree(
+        tmp_path,
+        _scalar_extract(
+            quantity="residue_component_composition",
+            units="wt%",
+            obs_type="residue_component_composition",
+            values=values,
+        ),
+    )
+
+    result = migrate(root, write=False)
+    hard = result.validation.hard_issues if result.validation is not None else ()
+    matches = [
+        issue
+        for issue in hard
+        if issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.path is not None
+        and "observation[" in issue.path
+        and issue.detail is not None
+        and "not-a-number" in issue.detail
+    ]
+    assert len(matches) == 1
+    assert not any(
+        observation.observation_id.startswith("fixture-source::")
+        for observation in result.observations.values()
+    )
 
 
 def test_b692_parse_declared_amount_is_single_owner() -> None:

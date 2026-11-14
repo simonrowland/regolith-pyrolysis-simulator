@@ -21,6 +21,7 @@ from simulator.chemistry.sgte_unary import (  # noqa: E402
     record_to_yaml,
 )
 
+
 def cli() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, default=COMPILATION_ROOT)
