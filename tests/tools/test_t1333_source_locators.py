@@ -265,7 +265,8 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
 
 def test_extract_discovery_matches_migrator() -> None:
     extracts = _all_extracts()
-    assert len(extracts) == 849  # b261: main join adds 67 extracts
+    # The extract count is pinned once, by name, in tests/manifests/literature_extract_source_ids.jsonl
+    # (tests/test_corpus_extract_source_on_file.py); this test only checks discovery agrees with the migrator.
     assert extracts == discover_extracts(EXTRACTS_DIR)
 
 
