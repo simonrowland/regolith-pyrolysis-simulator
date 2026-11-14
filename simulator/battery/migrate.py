@@ -20156,7 +20156,7 @@ def _bare_log_frame_decision(
                 try:
                     formation_gibbs, janaf_gas_constant = (
                         _janaf_gas_formation_inputs(
-                            ("CO", "CO2", "H2", "H2O", "O2"),
+                            ("CO", "CO2", "H2", "H2O", "O2", "CH4"),
                             temperature_K,
                         )
                     )
@@ -20191,6 +20191,7 @@ def _bare_log_frame_decision(
                             load_buffer_polynomials(),
                             initial_total_pressure_bar=float(pressure_bar),
                             relative_precision=relative_precision,
+                            methane_formation_gibbs_J_per_mol=formation_gibbs["CH4"],
                         )
                     )
                 except (

@@ -33,13 +33,16 @@ def _resolution(
     atmosphere: str,
     temperature_K: Decimal,
     total_pressure_bar: float = 1.01325,
+    *,
+    check_methane: bool = False,
 ):
     mix = _printed_sccm_gas_mixture(atmosphere)
     assert mix is not None, atmosphere
     species_mol, _precision = mix
-    gibbs, gas_constant = _janaf_gas_formation_inputs(
-        ("CO", "CO2", "H2", "H2O", "O2"), temperature_K
+    formulas = ("CO", "CO2", "H2", "H2O", "O2", "CH4") if check_methane else (
+        "CO", "CO2", "H2", "H2O", "O2"
     )
+    gibbs, gas_constant = _janaf_gas_formation_inputs(formulas, temperature_K)
     return _full_balance_fo2_with_janaf_band(
         {name: float(amount) for name, amount in species_mol.items()},
         float(temperature_K),
@@ -47,6 +50,7 @@ def _resolution(
         gas_constant,
         load_buffer_polynomials(),
         initial_total_pressure_bar=total_pressure_bar,
+        methane_formation_gibbs_J_per_mol=(gibbs["CH4"] if check_methane else None),
     )
 
 
@@ -274,6 +278,26 @@ def test_graphite_saturated_match_keeps_value_but_downgrades_authority() -> None
     assert decision.state.is_value
     assert decision.notice_authority.value == "extrapolated"
     assert any("graphite saturation a_C=" in notice.reason for notice in decision.notices)
+
+
+def test_cold_hydrogen_rich_mix_downgrades_when_methane_moves_fo2() -> None:
+    atmosphere = "1CO2:9H2"
+    result, _cea, band = _resolution(
+        atmosphere, Decimal("700"), check_methane=True
+    )
+    decision = _bare_log_frame_decision(
+        Decimal(str(result.log10_fO2)),
+        Decimal("700"),
+        printed_atmospheres=(atmosphere,),
+    )
+    assert decision.state.is_value
+    assert decision.notice_authority.value == "extrapolated"
+    methane_notice = next(
+        notice.reason for notice in decision.notices
+        if "CH4 not negligible" in notice.reason
+    )
+    assert "versus a" in methane_notice and "dex" in methane_notice
+    assert f"{band:.3g} dex" in methane_notice
 
 
 def test_real_sossi_record_oxygen_balance_fails_when_free_o2_term_is_dropped() -> None:

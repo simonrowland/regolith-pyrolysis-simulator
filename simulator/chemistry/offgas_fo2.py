@@ -277,11 +277,13 @@ def _full_element_balance_fo2(
     gas_constant_J_per_mol_K: float,
     *,
     initial_total_pressure_bar: float,
+    methane_formation_gibbs_J_per_mol: float | None = None,
 ) -> _ElementBalanceFO2:
     """Equilibrate CO2/CO/O2 and H2O/H2/O2 at fixed T and total pressure.
 
     Every trial normalizes partial pressures by the current total moles. The
-    flowing-furnace closure is isobaric: ``p_i = n_i * P / sum(n)``.
+    flowing-furnace closure is isobaric: ``p_i = n_i * P / sum(n)``. When
+    methane thermochemistry is supplied, C + 2H2 ⇌ CH4 is included too.
     """
 
     T = _coerce_T_K(T_K)
@@ -348,20 +350,72 @@ def _full_element_balance_fo2(
         (("H2", 1.0), ("O2", 0.5), ("H2O", -1.0)),
         formation_gibbs_J_per_mol, T, gas_constant,
     )
+    logK_ch4 = None
+    if methane_formation_gibbs_J_per_mol is not None:
+        methane_gibbs = dict(formation_gibbs_J_per_mol)
+        methane_gibbs["CH4"] = methane_formation_gibbs_J_per_mol
+        logK_ch4 = _log10_K_from_formation_gibbs_J_per_mol(
+            (("CH4", 1.0), ("H2O", 1.0), ("CO", -1.0), ("H2", -3.0)),
+            methane_gibbs,
+            T,
+            gas_constant,
+        )
 
-    def species_at_log_p(log_p: float) -> dict[str, float]:
+    def methane_extent(log_p: float, co_ratio: float, h2_ratio: float) -> float:
+        if logK_ch4 is None or carbon <= 0.0 or hydrogen <= 0.0:
+            return 0.0
+        p_o2 = 10.0**log_p
+        if p_o2 >= pressure:
+            return 0.0
+        extent_hi = min(carbon, hydrogen / 2.0)
+        if extent_hi <= 0.0:
+            return 0.0
+
+        def log10_reaction_quotient(extent: float) -> float:
+            carbon_left = carbon - extent
+            hydrogen_left = hydrogen - 2.0 * extent
+            scale = (pressure - p_o2) / (non_o2_moles - 2.0 * extent)
+            p_ch4 = scale * extent
+            p_h2o = scale * hydrogen_left / (1.0 + h2_ratio)
+            p_co = scale * carbon_left * co_ratio / (1.0 + co_ratio)
+            p_h2 = scale * hydrogen_left * h2_ratio / (1.0 + h2_ratio)
+            if min(p_ch4, p_h2o, p_co, p_h2) <= 0.0:
+                return math.inf if extent > 0.0 else -math.inf
+            # Kp for CO + 3H2 = CH4 + H2O. All pressures are relative to
+            # the 1 bar JANAF standard state; its Δn=-2 makes this quotient
+            # depend on the isobaric P/N scale.
+            return (
+                math.log10(p_ch4)
+                + math.log10(p_h2o)
+                - math.log10(p_co)
+                - 3.0 * math.log10(p_h2)
+            )
+
+        lo, hi = 0.0, extent_hi
+        for _ in range(140):
+            mid = (lo + hi) / 2.0
+            if log10_reaction_quotient(mid) > logK_ch4:
+                hi = mid
+            else:
+                lo = mid
+        return (lo + hi) / 2.0
+
+    def species_at_log_p(log_p: float) -> tuple[dict[str, float], float, float]:
         p_o2 = 10.0**log_p
         log_ratio = -0.5 * log_p
         co_ratio = 10.0 ** max(-300.0, min(300.0, logK_co + log_ratio))
         h2_ratio = 10.0 ** max(-300.0, min(300.0, logK_h2 + log_ratio))
+        extent = methane_extent(log_p, co_ratio, h2_ratio)
+        carbon_remaining = carbon - extent
+        hydrogen_remaining = hydrogen - 2.0 * extent
+        scale = max(0.0, pressure - p_o2) / (non_o2_moles - 2.0 * extent)
         # The common scale is P/N_total. Compute both members directly: taking
         # the minor pressure away from the total destroys the major species
         # below machine epsilon (e.g. pure CO2 at 300 K).
-        scale = max(0.0, pressure - p_o2) / non_o2_moles
-        p_co2 = scale * carbon / (1.0 + co_ratio) if carbon else 0.0
-        p_co = scale * carbon * co_ratio / (1.0 + co_ratio) if carbon else 0.0
-        p_h2o = scale * hydrogen / (1.0 + h2_ratio) if hydrogen else 0.0
-        p_h2 = scale * hydrogen * h2_ratio / (1.0 + h2_ratio) if hydrogen else 0.0
+        p_co2 = scale * carbon_remaining / (1.0 + co_ratio) if carbon_remaining else 0.0
+        p_co = scale * carbon_remaining * co_ratio / (1.0 + co_ratio) if carbon_remaining else 0.0
+        p_h2o = scale * hydrogen_remaining / (1.0 + h2_ratio) if hydrogen_remaining else 0.0
+        p_h2 = scale * hydrogen_remaining * h2_ratio / (1.0 + h2_ratio) if hydrogen_remaining else 0.0
         result = {
             "CO2": p_co2,
             "CO": p_co,
@@ -369,29 +423,32 @@ def _full_element_balance_fo2(
             "H2O": p_h2o,
             "H2": p_h2,
         }
+        if logK_ch4 is not None:
+            result["CH4"] = scale * extent
         result.update({name: scale * value for name, value in initial.items() if name in {"N2", "AR"}})
-        return result
+        return result, extent, scale
 
     def oxygen_residual(log_p: float) -> float:
-        eq = species_at_log_p(log_p)
-        scale = max(0.0, pressure - eq["O2"]) / non_o2_moles
+        eq, extent, scale = species_at_log_p(log_p)
         co_ratio = 10.0 ** max(-300.0, min(300.0, logK_co - 0.5 * log_p))
         h2_ratio = 10.0 ** max(-300.0, min(300.0, logK_h2 - 0.5 * log_p))
         # Expand O_eq - O_feed around each couple's major species. Subtracting
         # near-equal totals erased tiny roots; evaluating r/(1+r) also rounds
         # to 1 when r is huge. Use the minor member directly on either side of
         # r=1, with the corresponding oxygen count in the base inventory.
-        carbon_base = 2.0 * carbon if co_ratio <= 1.0 else carbon
+        carbon_remaining = carbon - extent
+        hydrogen_remaining = hydrogen - 2.0 * extent
+        carbon_base = 2.0 * carbon_remaining if co_ratio <= 1.0 else carbon_remaining
         carbon_adjustment = (
-            -carbon * co_ratio / (1.0 + co_ratio)
+            -carbon_remaining * co_ratio / (1.0 + co_ratio)
             if co_ratio <= 1.0
-            else carbon / (1.0 + co_ratio)
+            else carbon_remaining / (1.0 + co_ratio)
         )
-        hydrogen_base = hydrogen if h2_ratio <= 1.0 else 0.0
+        hydrogen_base = hydrogen_remaining if h2_ratio <= 1.0 else 0.0
         hydrogen_adjustment = (
-            -hydrogen * h2_ratio / (1.0 + h2_ratio)
+            -hydrogen_remaining * h2_ratio / (1.0 + h2_ratio)
             if h2_ratio <= 1.0
-            else hydrogen / (1.0 + h2_ratio)
+            else hydrogen_remaining / (1.0 + h2_ratio)
         )
         oxygen_offset = carbon_base + hydrogen_base - oxygen_atoms
         return scale * (
@@ -401,7 +458,8 @@ def _full_element_balance_fo2(
     # Premise: the feed starts at fixed T and total pressure, then CO2 ⇌ CO + ½O2
     # and H2O ⇌ H2 + ½O2 reach ideal-gas equilibrium. For each trial pO2,
     # Kp_CO = (pCO/p°)*sqrt(pO2/p°)/(pCO2/p°), and likewise for H2O/H2;
-    # C: CO2+CO=C0 and H: H2+H2O=H0 determine each split in moles. The common
+    # C: CO2+CO+CH4=C0 and H: H2+H2O+2CH4=H0 determine each split in moles.
+    # JANAF for CO+3H2=CH4+H2O supplies the third equilibrium relation. The common
     # scale P/N_total converts those inventories to partial pressures; inert
     # moles stay fixed and their partials are scaled with the same N_total.
     # The root closes O: 2CO2+CO+H2O+2O2=O0. Every Kp factor is p/p° with
@@ -418,9 +476,8 @@ def _full_element_balance_fo2(
         else:
             lo = mid
     log_p = (lo + hi) / 2.0
-    return _with_graphite_domain(
-        _ElementBalanceFO2(log_p, species_at_log_p(log_p)), T
-    )
+    equilibrium, _extent, _scale = species_at_log_p(log_p)
+    return _with_graphite_domain(_ElementBalanceFO2(log_p, equilibrium), T)
 
 
 def _full_balance_fo2_with_janaf_band(
@@ -432,6 +489,7 @@ def _full_balance_fo2_with_janaf_band(
     *,
     initial_total_pressure_bar: float,
     relative_precision: Mapping[str, float] | None = None,
+    methane_formation_gibbs_J_per_mol: float | None = None,
 ) -> tuple[_ElementBalanceFO2, float, float]:
     """Return JANAF central fO2 and a full-balance source/mixture band."""
 
@@ -475,6 +533,22 @@ def _full_balance_fo2_with_janaf_band(
         precision_spread_sq += component_spread * component_spread
     band = math.hypot(source_spread, math.sqrt(precision_spread_sq))
     domain_reasons = tuple(dict.fromkeys((*janaf.domain_reasons, *cea.domain_reasons)))
+    if methane_formation_gibbs_J_per_mol is not None:
+        methane = _full_element_balance_fo2(
+            initial_mole_fractions,
+            T,
+            janaf_formation_gibbs_J_per_mol,
+            janaf_gas_constant_J_per_mol_K,
+            initial_total_pressure_bar=initial_total_pressure_bar,
+            methane_formation_gibbs_J_per_mol=methane_formation_gibbs_J_per_mol,
+        )
+        methane_shift = abs(methane.log10_fO2 - janaf.log10_fO2)
+        if methane_shift >= band:
+            domain_reasons += (
+                "CH4 not negligible: equilibrium methane shifts log10(fO2) "
+                f"by {methane_shift:.3g} dex versus a {band:.3g} dex "
+                "JANAF/CEA and mixture precision band",
+            )
     janaf = _ElementBalanceFO2(
         janaf.log10_fO2,
         janaf.equilibrium_partial_pressures_bar,
