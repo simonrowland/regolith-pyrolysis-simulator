@@ -212,26 +212,23 @@ def test_sio_undersaturated_strip_does_not_deposit():
     assert outcomes[-1]["reason"] == "no_supersaturation"
 
 
-def test_sio_missing_po2_refuses_capture():
-    """A declared wall reaction with no parcel pO2 refuses.
-
-    The covered path calls the wall law, not ``_try_antoine_psat_pa``.
-    Stubbing that helper cannot turn the refusal into a full-pressure deposit.
-    """
+def test_sio_missing_po2_uses_flagged_conservative_capture():
+    """d-402 uses an available pO2-free wall reaction as a conservative bound."""
 
     model = _configured_model()
     stage = model.train.stages[3]
     stage.temp_range_C = (1000.0, 1000.0)
 
-    with pytest.raises(
-        condensation.WallSaturationPressureRefusal,
-        match="reason=wall_pO2_required",
-    ):
-        model._condensation_efficiency(
-            stage=stage, species="SiO", T_cond_C=1050.0, residence_s=4.0,
-            available_kg=1.0, alpha_s_value=0.5,
-            inlet_partial_pressure_pa=100.0,
-        )
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage, species="SiO", T_cond_C=1050.0, residence_s=4.0,
+        available_kg=1.0, alpha_s_value=0.5,
+        inlet_partial_pressure_pa=100.0, efficiency_outcomes=outcomes,
+    )
+    assert eta > 0.0
+    flag = next(item for item in outcomes if item["status"] == "status_bearing")
+    assert flag["authority_level"] == "status_bearing"
+    assert flag["reason"] == "wall_pO2_unknown_pO2_free_route_used"
 
 
 def test_band_capture_integrates_33_centers_with_inclusive_reactive_cutoff(monkeypatch):
