@@ -1,5 +1,6 @@
 """Table 1 residue-composition pins for Mendybaev et al. (2017)."""
 
+import re
 from decimal import Decimal
 from pathlib import Path
 
@@ -57,7 +58,7 @@ def test_table_1_first_last_and_largest_two_sigma_cells_match_page() -> None:
     assert cells[("FUNC-4", "Al2O3")] == ("32.15", "0.54")
     assert all(
         point["locator"]["table"] == "1"
-        and point["locator"]["pdf_page_index"] == 39
+        and point["locator"]["pdf_page_index"] == 38
         and point["locator"]["row"] == point["sample"]
         and point["locator"]["column"] in OXIDES
         for point in rows
@@ -86,9 +87,9 @@ def test_table_1_residues_migrate_with_run_charge_clock_and_conditions() -> None
         elapsed = row.point_conditions["time_min"]
         assert elapsed.state.is_value
         assert elapsed.locator is not None
-        assert elapsed.locator.pdf_page_index == 39
+        assert elapsed.locator.pdf_page_index == 38
         assert elapsed.locator.table == "1"
-        assert row.locator.pdf_page_index == 39
+        assert row.locator.pdf_page_index == 38
         assert row.locator.table == "1"
 
     scheduled_experiments = [
@@ -112,6 +113,34 @@ def test_table_1_residues_migrate_with_run_charge_clock_and_conditions() -> None
         assert duration_locator is not None
         assert duration_locator.section == "3.1"
         assert duration_locator.pdf_page_index == 8
+
+
+def test_table_locators_resolve_to_the_physical_page_named_by_extract() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    page_note = re.search(
+        r"PDF page (\d+) used to map Table 1 and Table 2",
+        document["extraction"]["method"],
+    )
+    assert page_note is not None
+    expected_index = int(page_note.group(1)) - 1
+    table_indices: dict[str, set[int]] = {}
+
+    def collect_table_locators(value: object) -> None:
+        if isinstance(value, dict):
+            locator = value.get("locator")
+            if isinstance(locator, dict) and "table" in locator:
+                table_indices.setdefault(str(locator["table"]), set()).add(
+                    locator["pdf_page_index"]
+                )
+            for child in value.values():
+                collect_table_locators(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect_table_locators(child)
+
+    collect_table_locators(document)
+
+    assert table_indices == {"1": {expected_index}, "2": {expected_index}}
 
 
 def test_table_1_cell_value_and_sigma_mutations_reach_migrated_rows(tmp_path: Path) -> None:
