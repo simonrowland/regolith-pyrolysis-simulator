@@ -5,6 +5,7 @@ import pytest
 
 import yaml
 
+from simulator.battery import migrate as migrate_module
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -2721,25 +2722,42 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 assert values["reference_state_as_printed"] == (
                     "entropy increment from 298.15 K"
                 )
-            if reference == "formation from simple oxides":
-                declared_reason = values["schema_gap"]
-                actual_reasons = [row.value.unavailable_reason for row in migrated]
-                print(
-                    f"SC-475 reason {observation_id}: expected={declared_reason!r}; "
+            declared_reason = values["schema_gap"]
+            actual_reasons = [row.value.unavailable_reason for row in migrated]
+            print(
+                f"SC-475 reason {observation_id}: expected={declared_reason!r}; "
+                f"actual={actual_reasons!r}"
+            )
+            if any(reason != declared_reason for reason in actual_reasons):
+                reason_mismatches.append(
+                    f"{observation_id}: expected={declared_reason!r}; "
                     f"actual={actual_reasons!r}"
                 )
-                if any(reason != declared_reason for reason in actual_reasons):
-                    reason_mismatches.append(
-                        f"{observation_id}: expected={declared_reason!r}; "
-                        f"actual={actual_reasons!r}"
-                    )
-                if any(row.admission.status.value == "admitted" for row in migrated):
-                    reason_mismatches.append(
-                        f"{observation_id}: a typed refusal was admitted"
-                    )
+            if any(row.admission.status.value == "admitted" for row in migrated):
+                reason_mismatches.append(
+                    f"{observation_id}: a typed refusal was admitted"
+                )
     assert not reason_mismatches, "SC-475 reason mismatches:\n" + "\n".join(
         reason_mismatches
     )
+
+
+def test_increment_reason_assertions_catch_entropy_increment_mutation(monkeypatch):
+    select_declared_source = migrate_module.select_declared_source
+
+    def drop_entropy_increment_schema_gap(declared, units, payload):
+        if (
+            isinstance(payload, dict)
+            and "entropy increment from 298.15 K" in str(payload.get("schema_gap", ""))
+        ):
+            payload = {key: value for key, value in payload.items() if key != "schema_gap"}
+        return select_declared_source(declared, units, payload)
+
+    monkeypatch.setattr(
+        migrate_module, "select_declared_source", drop_entropy_increment_schema_gap
+    )
+    with pytest.raises(AssertionError, match="SC-475 reason mismatches"):
+        test_increment_and_frame_repairs_migrate_unavailable()
 
 
 def test_printed_reference_temperatures_are_recorded_only_for_verified_p1_rows():

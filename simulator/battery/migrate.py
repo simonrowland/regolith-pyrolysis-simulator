@@ -11985,6 +11985,13 @@ def _pressure_series_quantity(
     return None
 
 
+def _declared_schema_gap(payload: Mapping[str, Any] | None) -> str | None:
+    if not isinstance(payload, Mapping):
+        return None
+    reason = payload.get("schema_gap")
+    return reason.strip() if isinstance(reason, str) and reason.strip() else None
+
+
 def map_quantity(
     obs_type: str | None,
     values: Mapping[str, Any] | list[Any] | None,
@@ -12084,13 +12091,8 @@ def map_quantity(
     if quantity_absent and obs_type in TYPE_QUANTITY:
         inferred = TYPE_QUANTITY[obs_type]
         if not _quantity_corroborated(inferred, values, units, row):
-            declared_gap = (
-                values.get("schema_gap") if isinstance(values, Mapping) else None
-            )
-            reason = (
-                declared_gap.strip()
-                if isinstance(declared_gap, str) and declared_gap.strip()
-                else "row type is a curation label, not a statement of the observable"
+            reason = _declared_schema_gap(values) or (
+                "row type is a curation label, not a statement of the observable"
             )
             contradiction = _quantity_contradiction(
                 inferred, obs_type, values, units, row
@@ -12103,9 +12105,8 @@ def map_quantity(
             return State.unknown(contradiction), contradiction
         return State.of(inferred), None
     if isinstance(raw, str) and raw:
-        declared_gap = values.get("schema_gap") if isinstance(values, Mapping) else None
-        if isinstance(declared_gap, str) and declared_gap.strip():
-            reason = declared_gap.strip()
+        reason = _declared_schema_gap(values)
+        if reason is not None:
             return State.unknown(reason), reason
         return (
             State.unknown(f"unsupported quantity {raw!r}"),
@@ -17670,14 +17671,10 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
-    declared_schema_gap = payload.get("schema_gap")
-    if (
-        q_token is None
-        and isinstance(declared_schema_gap, str)
-        and declared_schema_gap.strip()
-    ):
+    declared_schema_gap = _declared_schema_gap(payload)
+    if q_token is None and declared_schema_gap is not None:
         return _unavailable_selection(
-            declared_schema_gap.strip(),
+            declared_schema_gap,
             condition_ranges=condition_ranges,
             unused_ancillary=unused,
         )
@@ -29559,8 +29556,7 @@ class Migrator:
             if (
                 q_token is None
                 and isinstance(parent_values, Mapping)
-                and isinstance(parent_values.get("schema_gap"), str)
-                and parent_values["schema_gap"].strip()
+                and _declared_schema_gap(parent_values) is not None
                 and "schema_gap" not in selection_payload
             ):
                 selection_payload = {
