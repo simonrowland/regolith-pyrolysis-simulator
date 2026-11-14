@@ -202,28 +202,24 @@ def _compilation_engines_for_pair(
 ) -> tuple[Engine, ...]:
     """Route compilation thermo cells to engines with a matching phase path."""
 
-    if quantity not in _THERMO_QUANTITIES:
-        return tuple(engines)
-    if phase is Phase.G:
-        phase_engines = {
-            Engine.VAPOROCK,
-            Engine.NASA_CEA_9,
-            Engine.INTERNAL_ANALYTICAL,
-        }
-    elif phase is Phase.CR:
-        phase_engines = {
-            Engine.THERMOENGINE,
-            Engine.MAGEMIN,
-            Engine.INTERNAL_ANALYTICAL,
-        }
-    elif phase is Phase.L:
-        phase_engines = {Engine.INTERNAL_ANALYTICAL}
-    elif phase is None:
+    from simulator.battery.score import MELTS_ENGINES
+
+    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        return tuple(engine for engine in engines if engine in MELTS_ENGINES)
+    if quantity is Quantity.P_PARTIAL:
+        return tuple(engine for engine in engines if engine is not Engine.MAGEMIN)
+    if quantity is Quantity.FE3_FE2_RATIO:
         return tuple(
             engine
             for engine in engines
-            if quantity in _engine_thermo_quantities(engine)
+            if engine not in {Engine.MAGEMIN, Engine.VAPOROCK}
         )
+    if quantity not in _THERMO_QUANTITIES:
+        return tuple(engines)
+    if phase is Phase.G:
+        phase_engines = {Engine.VAPOROCK, Engine.NASA_CEA_9}
+    elif phase is Phase.CR:
+        phase_engines = {Engine.THERMOENGINE, Engine.MAGEMIN}
     else:
         return ()
     return tuple(
@@ -232,6 +228,64 @@ def _compilation_engines_for_pair(
         if engine in phase_engines
         and quantity in _engine_thermo_quantities(engine)
     )
+
+
+def unrouted_compilation_summary_lines(
+    observations: Mapping[str, Observation],
+    origins: Mapping[str, str],
+    engines: Sequence[Engine],
+) -> list[str]:
+    """Aggregate compilation engine pairs omitted by the production router."""
+
+    from simulator.battery.score import (
+        is_compilation_source,
+        is_internal_consistency,
+    )
+
+    counts: dict[tuple[str, str, str], int] = defaultdict(int)
+    for observation in observations.values():
+        origin = origins.get(observation.observation_id)
+        if not (
+            is_compilation_evidence(observation)
+            or is_compilation_source(observation.source_id, origin)
+        ):
+            continue
+        for point in _iter_compilation_series_cells(observation, origin):
+            if not isinstance(point.identity, Identity):
+                continue
+            quantity = quantity_token(point.identity)
+            if quantity is None:
+                continue
+            phase = (
+                phase_token(point.identity.species)
+                if point.identity.species is not None
+                else None
+            )
+            for engine in engines:
+                routed = (
+                    ()
+                    if is_internal_consistency(origin)
+                    else _compilation_engines_for_pair(engines, quantity, phase)
+                )
+                if engine not in routed:
+                    phase_name = "unknown" if phase is None else phase.value
+                    counts[(engine.value, quantity.value, phase_name)] += 1
+    if not counts:
+        return []
+    lines = [
+        "",
+        "### Unrouted compilation engine pairs",
+        "",
+        "Each row summarizes compilation cells skipped before engine scoring.",
+        "",
+        "| engine | quantity | phase | skipped cells |",
+        "|---|---|---|---:|",
+    ]
+    lines.extend(
+        f"| {engine} | {quantity} | {phase} | {count} |"
+        for (engine, quantity, phase), count in sorted(counts.items())
+    )
+    return lines
 
 
 @dataclass(frozen=True)

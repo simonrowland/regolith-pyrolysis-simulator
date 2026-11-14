@@ -866,20 +866,6 @@ def _engine_lacks_quantity_capability(
     return quantity not in _engine_thermo_quantities(engine)
 
 
-def _compilation_pair_is_routed_away(
-    engine: Engine, quantity: Quantity
-) -> bool:
-    """Whether a compilation cell has a declared engine path elsewhere."""
-
-    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
-        return engine not in MELTS_ENGINES
-    if quantity is Quantity.P_PARTIAL:
-        return engine is Engine.MAGEMIN
-    if quantity is Quantity.FE3_FE2_RATIO:
-        return engine in {Engine.MAGEMIN, Engine.VAPOROCK}
-    return False
-
-
 def _engine_quantity_not_predicted_detail(
     engine: Engine,
     identity: Identity | None,
@@ -18423,7 +18409,6 @@ def _score_store_with_decisions(
                 flush=True,
             )
     from simulator.battery.compilation_tier import (
-        _THERMO_QUANTITIES,
         _compilation_series_point_count,
         _compilation_engines_for_pair,
         _iter_compilation_series_cells,
@@ -18565,38 +18550,21 @@ def _score_store_with_decisions(
                         is_compilation_evidence(point)
                         or is_compilation_source(point.source_id, point_origin)
                     )
-                    if compilation_source and is_internal_consistency(point_origin):
-                        if _stream is not None:
-                            for engine in engine_set:
-                                _stream.add_compilation_route_skip(
-                                    engine, quantity, compilation_phase
-                                )
+                    if (
+                        predict is None
+                        and compilation_source
+                        and is_internal_consistency(point_origin)
+                    ):
                         continue
                     for engine in engine_set:
                         if (
-                            compilation_source
+                            predict is None
+                            and compilation_source
                             and isinstance(point.identity, Identity)
-                            and quantity in _THERMO_QUANTITIES
                             and engine not in _compilation_engines_for_pair(
-                                engine_set,
-                                quantity,
-                                compilation_phase,
+                                (engine,), quantity, compilation_phase
                             )
                         ):
-                            if _stream is not None:
-                                _stream.add_compilation_route_skip(
-                                    engine,
-                                    quantity,
-                                    compilation_phase,
-                                )
-                            continue
-                        if compilation_source and _compilation_pair_is_routed_away(
-                            engine, quantity
-                        ):
-                            if _stream is not None:
-                                _stream.add_compilation_route_skip(
-                                    engine, quantity, compilation_phase
-                                )
                             continue
                         lineage_id = (
                             obs.observation_id
@@ -23103,7 +23071,7 @@ def _render_score_report_from_payloads_legacy(
         e15_lines=_e15_report_lines(aggregate.e15_points, context.observations),
         flagged_rows=aggregate.flagged_records(),
         condition_lines=aggregate.condition_hull_lines(),
-        compilation_lines=aggregate.compilation_lines(),
+        compilation_lines=aggregate.compilation_lines(engines=engines),
         refusal_counts=aggregate.refusal_counts,
         pending=pending,
         admitted=admitted,
@@ -23503,19 +23471,6 @@ class _ResidualJsonlStream:
                 self.static_refusal_counts.items()
             )
         ]
-
-    def add_compilation_route_skip(
-        self, engine: Engine, quantity: Quantity | None, phase: Phase | None
-    ) -> None:
-        phase_name = "unknown" if phase is None else phase.value
-        quantity_name = "unknown" if quantity is None else quantity.value
-        self.static_refusal_counts[
-            (
-                engine.value,
-                Rail.THERMOCHEMISTRY.value,
-                f"unrouted_compilation:{quantity_name}:{phase_name}",
-            )
-        ] += 1
 
     def append(
         self,
@@ -24589,32 +24544,22 @@ class _ScorePayloadAccumulator:
             }
         )
 
-    def compilation_lines(self) -> list[str]:
-        from simulator.battery.compilation_tier import _tier_markdown
+    def compilation_lines(
+        self, *, engines: Sequence[Engine] | None = None
+    ) -> list[str]:
+        from simulator.battery.compilation_tier import (
+            _tier_markdown,
+            unrouted_compilation_summary_lines,
+        )
 
         lines = _tier_markdown((), accumulator=self.tier_accumulator)
-        routed_away = [
-            row
-            for row in self.static_refusals
-            if str(row.get("reason", "")).startswith("unrouted_compilation:")
-        ]
-        if routed_away:
-            lines.extend(
-                [
-                    "",
-                    "### Unrouted compilation engine pairs",
-                    "",
-                    "Each row summarizes compilation cells skipped before engine scoring.",
-                    "",
-                    "| engine | quantity | phase | skipped cells |",
-                    "|---|---|---|---:|",
-                ]
+        lines.extend(
+            unrouted_compilation_summary_lines(
+                self.context.observations,
+                self.context.origins,
+                self.engines if engines is None else engines,
             )
-            for row in routed_away:
-                _, quantity, phase = str(row["reason"]).split(":", 2)
-                lines.append(
-                    f"| {row['engine']} | {quantity} | {phase} | {row['count']} |"
-                )
+        )
         return lines
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
@@ -24735,6 +24680,7 @@ def render_score_report_from_payloads(
         from simulator.battery.compilation_tier import (
             compilation_row_observation,
             compilation_tier_lines_from_payloads,
+            unrouted_compilation_summary_lines,
         )
 
         def is_compilation(row: Mapping[str, object]) -> bool:
@@ -24754,6 +24700,9 @@ def render_score_report_from_payloads(
         compilation_rows = _FilteredPayloadRows(unflagged_rows, is_compilation)
         compilation_lines = compilation_tier_lines_from_payloads(
             unflagged_rows, observations, origins
+        )
+        compilation_lines.extend(
+            unrouted_compilation_summary_lines(observations, origins or {}, engines)
         )
     all_numeric_records = all_numeric_payload_records(
         rows, engines=engines, observations=observations, origins=origins

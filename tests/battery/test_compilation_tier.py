@@ -547,7 +547,7 @@ def test_compilation_no_band_label_uses_source_band_owners_reason() -> None:
 
     experiment = F.tabulation_experiment()
     identity = replace(
-        _pure_phase_identity(),
+        _na2o_liquid(Quantity.CP),
         reaction=State.not_applicable("not a formation quantity"),
         formation_elements=State.not_applicable("not a formation quantity"),
     )
@@ -695,7 +695,7 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
     monkeypatch.setattr(compilation_tier, "predict_thermo_attempt", echo_fit)
     comparisons = _nasa9_fit_comparisons(
         context,
-        engines=(Engine.INTERNAL_ANALYTICAL,),
+        engines=(Engine.THERMOENGINE,),
         invoke_pure_phase=False,
         fit_records=(record,),
     )
@@ -739,46 +739,31 @@ def test_nasa9_fit_channel_uses_accepted_cells_and_shared_residuals(
 
 def test_compilation_thermo_routes_by_phase_and_engine_quantity_capability() -> None:
     from simulator.battery.compilation_tier import _compilation_engines_for_pair
-    from simulator.battery.score import (
-        SCORE_ENGINE_SET,
-        _compilation_pair_is_routed_away,
-    )
+    from simulator.battery.score import SCORE_ENGINE_SET
 
-    engines = SCORE_ENGINE_SET
     assert _compilation_engines_for_pair(
-        engines, Quantity.DELTA_FH, Phase.G
+        SCORE_ENGINE_SET, Quantity.DELTA_FH, Phase.G
     ) == (Engine.NASA_CEA_9,)
     assert _compilation_engines_for_pair(
-        engines, Quantity.CP, Phase.G
+        SCORE_ENGINE_SET, Quantity.CP, Phase.G
     ) == (Engine.VAPOROCK, Engine.NASA_CEA_9)
     assert _compilation_engines_for_pair(
-        engines, Quantity.CP, Phase.CR
+        SCORE_ENGINE_SET, Quantity.CP, Phase.CR
     ) == (Engine.THERMOENGINE, Engine.MAGEMIN)
     assert _compilation_engines_for_pair(
-        engines, Quantity.DELTA_FH, Phase.CR
+        SCORE_ENGINE_SET, Quantity.CP, Phase.L
     ) == ()
     assert _compilation_engines_for_pair(
-        engines, Quantity.DELTA_FG, Phase.CR
-    ) == (Engine.INTERNAL_ANALYTICAL,)
-    assert _compilation_engines_for_pair(
-        engines, Quantity.CP, Phase.L
-    ) == ()
-    assert _compilation_engines_for_pair(
-        engines, Quantity.DELTA_FG, Phase.L
-    ) == (Engine.INTERNAL_ANALYTICAL,)
-    assert tuple(
-        engine
-        for engine in engines
-        if not _compilation_pair_is_routed_away(
-            engine, Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        )
+        SCORE_ENGINE_SET, Quantity.EQUILIBRIUM_PHASE_COMPOSITION, Phase.L
     ) == (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN)
-    assert _compilation_pair_is_routed_away(Engine.MAGEMIN, Quantity.P_PARTIAL)
-    assert _compilation_pair_is_routed_away(
-        Engine.MAGEMIN, Quantity.FE3_FE2_RATIO
+    assert _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, Quantity.P_PARTIAL, Phase.G
+    ) == tuple(engine for engine in SCORE_ENGINE_SET if engine is not Engine.MAGEMIN)
+    assert Engine.MAGEMIN not in _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, Quantity.FE3_FE2_RATIO, Phase.CR
     )
-    assert _compilation_pair_is_routed_away(
-        Engine.VAPOROCK, Quantity.FE3_FE2_RATIO
+    assert Engine.VAPOROCK not in _compilation_engines_for_pair(
+        SCORE_ENGINE_SET, Quantity.FE3_FE2_RATIO, Phase.G
     )
 
 
@@ -787,7 +772,6 @@ def test_compilation_routing_reduces_refusals_without_changing_routed_residuals(
 
     observation = _mgo_janaf_observation()
     context = _context(observation)
-    engines = SCORE_ENGINE_SET
     baseline = tuple(
         compile_residual(
             observation,
@@ -795,68 +779,69 @@ def test_compilation_routing_reduces_refusals_without_changing_routed_residuals(
             context=context,
             comparison_ids={observation.observation_id},
         )[0]
-        for engine in engines
+        for engine in SCORE_ENGINE_SET
     )
     routed_engines = (Engine.THERMOENGINE, Engine.MAGEMIN)
     routed_residuals, _ = score_store(context, engines=routed_engines)
-
-    def values(residuals, selected):
-        return {
-            (residual.candidate_request.engine, residual.numeric.value)
-            for residual in residuals
-            if residual.candidate_request is not None
-            and residual.candidate_request.engine in selected
-            and residual.numeric is not None
-        }
-
-    assert values(baseline, routed_engines) == values(
-        routed_residuals, routed_engines
-    )
-    assert sum(residual.status is ResidualStatus.REFUSED for residual in baseline) > sum(
-        residual.status is ResidualStatus.REFUSED for residual in routed_residuals
+    baseline_values = {
+        residual.candidate_request.engine: residual.numeric.value
+        for residual in baseline
+        if residual.candidate_request is not None
+        and residual.candidate_request.engine in routed_engines
+        and residual.numeric is not None
+    }
+    routed_values = {
+        residual.candidate_request.engine: residual.numeric.value
+        for residual in routed_residuals
+        if residual.candidate_request is not None
+        and residual.numeric is not None
+    }
+    assert routed_values == baseline_values
+    assert sum(row.status is ResidualStatus.REFUSED for row in baseline) > sum(
+        row.status is ResidualStatus.REFUSED for row in routed_residuals
     )
 
 
 def test_nasa9_delta_fh_residual_uses_glenn_fit_and_janaf_cell() -> None:
-    from simulator.battery.records import Reaction, ReactionTerm
-    from simulator.battery.score import compile_residual, predict_with_engine
+    from simulator.battery.compilation_tier import _iter_compilation_series_cells
+    from simulator.battery.generators.janaf import generate_table
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+    from simulator.battery.score import compile_residual
 
-    temperature = Decimal("298.15")
-    identity = replace(
-        F.o2_identity(temperature),
-        quantity=Quantity.DELTA_FH,
-        reaction=State.of(
-            Reaction(
-                (ReactionTerm(Species("O2", Phase.G), Fraction(1)),)
-            )
-        ),
-        formation_elements=State.unknown("elemental reference fixture"),
+    table_path = TABLES_DIR / "H-064.yaml"
+    source = generate_table(
+        load_table_document(table_path), source_path=str(table_path)
     )
-    experiment = F.tabulation_experiment(T_K=temperature)
-    observation = F.observation(
-        "janaf-glenn-o2-delta-fh",
-        experiment.experiment_id,
-        identity,
-        Decimal("0"),
-        evidence=EvidenceClass.COMPILATION_ASSESSED,
-        source_id="nist-janaf-4th",
+    cell = next(
+        point
+        for item in source.observations
+        for point in _iter_compilation_series_cells(item)
+        if point.identity.quantity.is_value
+        and point.identity.quantity.value is Quantity.DELTA_FH
+        and point.identity.species is not None
+        and point.identity.species.phase.is_value
+        and point.identity.species.phase.value is Phase.G
+        and point.identity.temperature_K.is_value
+        and point.identity.temperature_K.value == Decimal("298.15")
+    )
+    observation = replace(
+        cell.parent,
+        observation_id=cell.observation_id,
+        identity=cell.identity,
+        value=Value.point_of(cell.value.point),
+    )
+    experiment = replace(
+        F.tabulation_experiment(), experiment_id=observation.experiment_id
     )
     context = _context(
         observation,
         experiments={experiment.experiment_id: experiment},
     )
-    prediction = predict_with_engine(
-        Engine.NASA_CEA_9,
-        observation,
-        experiment=experiment,
-    )
-    assert prediction.value is not None
     residual, _candidate = compile_residual(
         observation,
         Engine.NASA_CEA_9,
         context=context,
-        prediction=prediction,
-        comparison_ids={observation.observation_id},
+        comparison_ids=set(),
     )
     assert residual.numeric is not None, residual.refusal
 
@@ -1017,7 +1002,7 @@ def test_al091_h_minus_h298_fit_restores_all_qualified_comparisons() -> None:
 
     comparisons = _nasa9_fit_comparisons(
         context,
-        engines=(Engine.THERMOENGINE,),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
         invoke_pure_phase=False,
         fit_records=(record,),
     )
@@ -1027,6 +1012,7 @@ def test_al091_h_minus_h298_fit_restores_all_qualified_comparisons() -> None:
         for comparison in comparisons
         if comparison.quantity is Quantity.H_MINUS_H298
     ]
+    # The fit record is liquid-phase; no JANAF liquid evaluator is routed.
     assert h_comparisons == []
 
 
@@ -1040,6 +1026,7 @@ def test_nasa9_fit_census_is_separate_and_lists_regolith_species() -> None:
         invoke_pure_phase=False,
         audit_compile_residual=False,
     )
+    # Crystal Cp is not an internal analytical comparison capability.
     assert not any(
         row["formula"] == record["formula"]
         and row["phase"] == record["phase"]
@@ -1496,13 +1483,7 @@ def test_compilation_series_score_pins_cell_results_and_partial_refusal(monkeypa
     from simulator.battery.records import DecisionBand, Execution
     from simulator.battery.score import ENGINE_CHANNELS, score_store
 
-    identity = replace(
-        F.o2_identity(),
-        quantity=Quantity.CP,
-        temperature_K=State.unknown("series"),
-        reaction=State.not_applicable("not a formation quantity"),
-        formation_elements=State.not_applicable("not a formation quantity"),
-    )
+    identity = replace(_na2o_liquid(), temperature_K=State.unknown("series"))
     series = F.observation(
         "cell-pin-series",
         "exp-1",
@@ -2379,8 +2360,8 @@ def test_engine_prediction_mutation_cannot_create_a_source_band(
             experiment.experiment_id,
             identity,
             Decimal(10 + index),
-            evidence=EvidenceClass.COMPILATION_ASSESSED,
-            source_id="janaf-4th",
+            evidence=EvidenceClass.MODEL_DERIVED,
+            source_id="fixture-cp",
         )
         if index == 10:
             observation = replace(
@@ -2399,7 +2380,7 @@ def test_engine_prediction_mutation_cannot_create_a_source_band(
                 ),
             )
         observations.append(observation)
-        origins[observation.observation_id] = "compilations-usgs-b1452/grid.yaml"
+        origins[observation.observation_id] = "fixture/cp-grid.yaml"
     ctx = _context(*observations, origins=origins)
     offset_by_id = {
         observation.observation_id: Decimal(offset)
@@ -2408,10 +2389,10 @@ def test_engine_prediction_mutation_cannot_create_a_source_band(
 
     def predict(engine, observation, **kwargs):
         del kwargs
-        scale = Decimal("10") if engine is Engine.MAGEMIN else Decimal("1")
+        scale = Decimal("10") if engine is Engine.VAPOROCK else Decimal("1")
         return EnginePrediction(
             engine=engine,
-            channel=score_module.ENGINE_CHANNELS[engine],
+            channel="internal-analytical",
             execution=Execution(ExecutionState.PRODUCED, "test prediction"),
             value=observation.value.point + offset_by_id[observation.observation_id] * scale,
             unit="J_per_declared_mol_basis_per_K",
@@ -2423,7 +2404,7 @@ def test_engine_prediction_mutation_cannot_create_a_source_band(
 
     residuals, _ = score_store(
         ctx,
-        engines=(Engine.THERMOENGINE, Engine.MAGEMIN),
+        engines=(Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK),
         predict=predict,
     )
     by_reference = {
@@ -2431,23 +2412,23 @@ def test_engine_prediction_mutation_cannot_create_a_source_band(
         for residual in residuals
     }
     for observation, offset in zip(observations[:10], offsets[:10]):
-        residual = by_reference[(observation.observation_id, Engine.THERMOENGINE.value)]
+        residual = by_reference[(observation.observation_id, Engine.INTERNAL_ANALYTICAL.value)]
         assert residual.source_relation is SourceRelation.UNKNOWN
         assert residual.numeric is not None
         assert residual.numeric.decision_band is None
         assert residual.status is ResidualStatus.NO_BAND
-        vaporock_residual = by_reference[(observation.observation_id, Engine.MAGEMIN.value)]
+        vaporock_residual = by_reference[(observation.observation_id, Engine.VAPOROCK.value)]
         assert vaporock_residual.numeric is not None
         assert vaporock_residual.numeric.decision_band is None
         assert vaporock_residual.status is ResidualStatus.NO_BAND
-    printed = by_reference[(observations[10].observation_id, Engine.THERMOENGINE.value)]
+    printed = by_reference[(observations[10].observation_id, Engine.INTERNAL_ANALYTICAL.value)]
     assert printed.source_relation is SourceRelation.UNKNOWN
     assert printed.numeric is not None
     assert printed.numeric.decision_band is not None
     assert printed.numeric.decision_band.rule.startswith("printed_unstated:")
     assert printed.numeric.decision_band.value == Decimal("0.1")
     assert printed.status is ResidualStatus.MISMATCH
-    vaporock = by_reference[(observations[0].observation_id, Engine.MAGEMIN.value)]
+    vaporock = by_reference[(observations[0].observation_id, Engine.VAPOROCK.value)]
     assert vaporock.numeric is not None
     assert vaporock.numeric.decision_band is None
     small_ctx = _context(
@@ -2456,7 +2437,7 @@ def test_engine_prediction_mutation_cannot_create_a_source_band(
     )
     small, _ = score_store(
         small_ctx,
-        engines=(Engine.THERMOENGINE,),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
         predict=predict,
     )
     assert len(small) == 9
@@ -2482,7 +2463,13 @@ def test_log10_k_star_stays_typed_outside_formation_ellingham() -> None:
 def test_zero_kelvin_row_does_not_blank_later_series_points() -> None:
     from simulator.battery.compilation_tier import compilation_tier_census
 
-    identity = replace(_na2o_liquid(), temperature_K=State.unknown("series"))
+    identity = replace(
+        F.o2_identity(),
+        quantity=Quantity.CP,
+        temperature_K=State.unknown("series"),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
     experiment = F.tabulation_experiment()
     series = F.observation(
         "na2o-series",
@@ -2501,7 +2488,7 @@ def test_zero_kelvin_row_does_not_blank_later_series_points() -> None:
     )
     out = compilation_tier_census(
         _context(series),
-        engines=(Engine.INTERNAL_ANALYTICAL,),
+        engines=(Engine.NASA_CEA_9,),
         audit_compile_residual=False,
     )
     row = out["rows"][0]
@@ -3162,8 +3149,7 @@ def test_compilation_census_calls_only_resolved_pure_phases(monkeypatch) -> None
     assert calls[0][0] is Engine.MAGEMIN
     row = next(row for row in result["rows"] if row["quantity"] == Quantity.CP.value)
     assert row["numeric"] == 1
-    assert row["reachable"] == 2
-    assert row["refused"] == {}
+    assert row["refused"]["unsupported:pure-phase-is-crystal-only"] == 1
 
 
 def test_compilation_census_does_not_call_pure_phase_by_default(monkeypatch) -> None:
@@ -3676,7 +3662,14 @@ def _assert_vaporock_census_fixture_parity(
     group_token = score_module._group_token(group_key)
     derived_band = source_bands.get(group_token)
     derived_band_reason = source_band_reasons.get(group_token)
-    for engine in score_module.SCORE_ENGINE_SET:
+    from simulator.battery.compilation_tier import _compilation_engines_for_pair
+
+    routed_engines = _compilation_engines_for_pair(
+        score_module.SCORE_ENGINE_SET,
+        Quantity.CP,
+        Phase.G,
+    )
+    for engine in routed_engines:
         predict = None if memo_enabled else fixture_predict
         scored, candidates = score_module.score_store(
             context,
