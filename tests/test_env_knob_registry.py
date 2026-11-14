@@ -22,10 +22,9 @@ ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
-# Exact b260 delta, confirmed with git log -S: simulator/yaml_cache.py:256
-# (ab04fd) and scripts/check_yaml_cache_parity.py:43,45,46 (2d044). Both
-# commits are ancestors of green 42044855e.
-ENV_ACCESS_TOKEN_CEILING = 95
+# Current production token count after removing two local-alias tokens from
+# scripts/grind_home.py; its actual ``os.environ`` read remains counted once.
+ENV_ACCESS_TOKEN_CEILING = 94
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep
