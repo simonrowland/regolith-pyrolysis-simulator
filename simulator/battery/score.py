@@ -4708,12 +4708,6 @@ def fusion_comparison_reference(
         )
         return replace(
             reference,
-            identity=replace(
-                identity,
-                reference_state=State.unknown(
-                    "Temkin reference lacks the recorded iron-saturation conversion shape"
-                ),
-            ),
             notices=union_notices(reference.notices, (notice,)),
         )
     formula = standard_state.endmember.formula
