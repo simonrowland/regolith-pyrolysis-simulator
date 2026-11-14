@@ -1,17 +1,10 @@
 #!/usr/bin/env python3
-"""Report landing evidence and close tasks from the single offer being landed.
+"""Report historical landing evidence and close explicitly selected tasks.
 
-Usage for the train: on landing offer X, run
-``reconcile_landing.py close-landed --offer X --green <new green>``. ``X`` may
-be the offer body file or the id of its merge-request envelope, and the caller
-must pass the current offer being landed. Its body needs one active tip line
-(``Offer sha: <tip>``; existing ``Ref ..., tip <tip>`` lines are also accepted)
-and one anchored ``Closes: <task-id>[, <task-id>...]`` line. For example::
-
-    Offer sha: abc1234
-    Closes: t-123, b-456
-
-The historical census is report-only; only the live command reads ``Closes:``.
+Train usage: on landing an offer whose text says ``Closes: t-A, b-B``, run
+``reconcile_landing.py close-landed --tip <offer tip> --green <new green> --close t-A --close b-B``.
+The train agent reads the offer and supplies its tip and each exact task id;
+this command does not parse offer text. The historical census is report-only.
 """
 
 from __future__ import annotations
@@ -572,135 +565,19 @@ def _ledger_path(root: Path) -> Path:
     raise RuntimeError(f"landing ledger not found at {path} or {fallback}")
 
 
-CLOSES_LINE = re.compile(rf"^Closes:\s+({TASK_ID_TOKEN}(?:,\s*{TASK_ID_TOKEN})*)\s*$")
-OFFER_SHA_LINE = re.compile(rf"^Offer sha:\s+({SHA_PATTERN})(?:\s+.*)?$", re.IGNORECASE)
-REF_TIP_LINE = re.compile(rf"^Ref\b[^\n]*?\btip\s+({SHA_PATTERN})(?:\s+.*)?$", re.IGNORECASE)
-TASK_NOTE_HEADING = re.compile(rf"^\s*{TASK_ID_TOKEN}\s+notes?\s*:", re.IGNORECASE)
-
-
-def _eligible_offer_lines(body: str) -> list[tuple[int, str]]:
-    eligible: list[tuple[int, str]] = []
-    fence: tuple[str, int] | None = None
-    in_task_note = False
-    for line_number, line in enumerate(body.splitlines(), 1):
-        fence_match = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
-        if fence:
-            if fence_match:
-                marker, trailing = fence_match.groups()
-                if marker[0] == fence[0] and len(marker) >= fence[1] and not trailing.strip():
-                    fence = None
-            continue
-        if fence_match:
-            marker, info = fence_match.groups()
-            if marker[0] == "`" and "`" in info:
-                continue
-            fence = (marker[0], len(marker))
-            continue
-        if line.lstrip().startswith(">"):
-            continue
-        if TASK_NOTE_HEADING.match(line):
-            in_task_note = True
-        if in_task_note:
-            continue
-        eligible.append((line_number, line))
-    return eligible
-
-
-def _offer_declarations(body: str) -> tuple[list[str], list[dict[str, str]]]:
-    declared: list[str] = []
-    refusals: list[dict[str, str]] = []
-    for line_number, line in _eligible_offer_lines(body):
-        if not line.startswith("Closes:"):
-            continue
-        match = CLOSES_LINE.fullmatch(line)
-        if not match:
-            refusals.append({"type": "invalid-closes-declaration", "line": str(line_number), "message": "Closes line must contain exact task ids separated by commas"})
-            continue
-        if declared:
-            refusals.append({"type": "multiple-closes-declarations", "line": str(line_number), "message": "offer must contain one Closes line"})
-            return [], refusals
-        declared.extend(value.strip() for value in match.group(1).split(","))
-    return list(dict.fromkeys(declared)), refusals
-
-
-def _offer_tip(body: str) -> tuple[str | None, str | None]:
-    tips = [
-        match.group(1)
-        for _, line in _eligible_offer_lines(body)
-        for pattern in (OFFER_SHA_LINE, REF_TIP_LINE)
-        if (match := pattern.fullmatch(line))
-    ]
-    unique = list(dict.fromkeys(tips))
-    if not unique:
-        return None, "offer has no active Offer sha or Ref ..., tip declaration"
-    if len(unique) != 1:
-        return None, "offer has multiple distinct Offer sha declarations"
-    return unique[0], None
-
-
-def _merge_request_body(reference: str, root: Path) -> tuple[str, str]:
-    requested_path = Path(reference).expanduser()
-    paths = [requested_path]
-    if not requested_path.is_absolute():
-        paths.append(root / requested_path)
-    for path in paths:
-        if not path.is_file():
-            continue
-        text = path.read_text(encoding="utf-8")
-        try:
-            envelope = json.loads(text)
-        except json.JSONDecodeError:
-            return text, str(path)
-        if isinstance(envelope, dict) and envelope.get("type") == "merge-request":
-            payload = envelope.get("payload")
-            if isinstance(payload, dict) and isinstance(payload.get("text"), str):
-                return payload["text"], str(envelope.get("id", path))
-            raise RuntimeError("invalid-offer-envelope: merge-request payload has no text body")
-        return text, str(path)
-
-    messages = Path.home() / ".goal-flight/messages"
-    if not messages.is_dir():
-        raise RuntimeError(f"offer file or envelope not found: {reference}")
-    matches: list[dict[str, Any]] = []
-    for stream_path in messages.iterdir():
-        if stream_path.suffix != ".jsonl" or not stream_path.is_file():
-            continue
-        with stream_path.open(encoding="utf-8") as stream:
-            for line in stream:
-                try:
-                    envelope = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                if isinstance(envelope, dict) and envelope.get("id") == reference and envelope.get("type") == "merge-request":
-                    matches.append(envelope)
-    if len(matches) != 1:
-        reason = "not found" if not matches else "ambiguous"
-        raise RuntimeError(f"offer envelope {reason}: {reference}")
-    payload = matches[0].get("payload")
-    if not isinstance(payload, dict) or not isinstance(payload.get("text"), str):
-        raise RuntimeError("invalid-offer-envelope: merge-request payload has no text body")
-    return payload["text"], str(matches[0]["id"])
-
-
-def _offer_close_candidates(
-    body: str,
+def _close_candidates(
+    tip_text: str,
+    close_ids: list[str],
     history: GitHistory,
     items: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], list[dict[str, str]], list[str]]:
-    targets, refusals = _offer_declarations(body)
-    if refusals:
-        return [], refusals, targets
+    targets = list(dict.fromkeys(close_ids))
+    refusals: list[dict[str, str]] = []
     if not targets:
-        refusals.append({"type": "no-closes-declaration", "message": "offer contains no anchored Closes declaration"})
-        return [], refusals, []
-
-    tip_text, tip_error = _offer_tip(body)
-    if tip_error:
-        refusals.append({"type": "invalid-offer-tip", "message": tip_error})
-        return [], refusals, targets
-    tip = history._resolve(tip_text or "")
+        return [], [{"type": "no-close-ids", "message": "at least one --close task id is required"}], []
+    tip = history._resolve(tip_text)
     if tip is None:
-        refusals.append({"type": "unresolved-offer-tip", "message": f"offer tip {tip_text} does not resolve to a commit in this repository"})
+        refusals.append({"type": "unknown-offer-tip", "message": f"offer tip {tip_text} does not resolve to a commit in this repository"})
         return [], refusals, targets
     if tip not in history.ancestors:
         refusals.append({"type": "offer-tip-not-ancestor", "message": f"offer tip {tip} is not an ancestor of green {history.green}"})
@@ -722,11 +599,11 @@ def _offer_close_candidates(
             candidates.append(
                 {
                     "id": target,
-                    "kind": "offer-closes",
+                    "kind": "explicit-close",
                     "tip": tip,
                     "green_commit": history.green,
-                    "declaration": target,
-                    "explanation": f"this offer at {tip} declares Closes: {target}",
+                    "close_id": target,
+                    "explanation": f"explicit --close {target} supplied for offer tip {tip}",
                 }
             )
     return candidates, refusals, targets
@@ -759,7 +636,7 @@ def _render_report(
         f"Unknown: {unknown_count}",
         f"Stranded: {stranded_count}",
         f"Unresolved hashes ignored: {unresolved_hashes}",
-        "Offer authors: add one Closes: <task-id>[, <task-id>...] line per offer; at landing, pass only that offer to close-landed.",
+        "At landing, pass the offer tip and each exact id from its Closes: line with --tip and repeated --close arguments.",
     ]
     lines.append(f"Report-only evidence: {len(report_only)}")
     for row in report_only:
@@ -788,33 +665,30 @@ def _apply_offer_closes(
 
 
 def _render_close_landed(
-    offer_label: str,
+    tip: str,
     green: str,
-    declarations: list[str],
+    close_ids: list[str],
     applied: list[str],
     refusals: list[dict[str, str]],
 ) -> str:
-    lines = [f"Offer: {offer_label}", f"Green: {green}"]
-    lines.append(f"Declared closes: {', '.join(declarations) if declarations else '(none)'}")
+    lines = [f"Offer tip: {tip}", f"Green: {green}"]
+    lines.append(f"Requested closes: {', '.join(close_ids) if close_ids else '(none)'}")
     lines.append(f"Applied landed-on-green to: {', '.join(applied) if applied else '(none)'}")
     for refusal in refusals:
         identity = f" {refusal['id']}" if refusal.get("id") else ""
         line = f"Refusal{identity} [{refusal['type']}]: {refusal['message']}"
-        if refusal.get("line"):
-            line += f" (offer line {refusal['line']})"
         lines.append(line)
     lines.append(f"Refusal count: {len(refusals)}")
     return "\n".join(lines) + "\n"
 
 
-def _run_close_landed(offer_ref: str, green: str, root: Path) -> tuple[str, int]:
-    body, offer_label = _merge_request_body(offer_ref, root)
+def _run_close_landed(tip_text: str, green: str, close_ids: list[str], root: Path) -> tuple[str, int]:
     history = GitHistory(root, green)
     items = _load_store()
-    candidates, refusals, declarations = _offer_close_candidates(body, history, items)
+    candidates, refusals, targets = _close_candidates(tip_text, close_ids, history, items)
 
     def done(candidate: dict[str, Any]) -> None:
-        note = f"offer {offer_label} at {candidate['tip']} declares Closes: {candidate['declaration']}; green {candidate['green_commit']}"
+        note = f"train supplied --close {candidate['close_id']} for offer tip {candidate['tip']}; green {candidate['green_commit']}"
         result = subprocess.run(
             [sys.executable, str(TASK_SCRIPT), "done", candidate["id"], "--resolution", "landed-on-green", "--note", note],
             cwd=root,
@@ -829,7 +703,7 @@ def _run_close_landed(offer_ref: str, green: str, root: Path) -> tuple[str, int]
 
     applied, owner_refusals = _apply_offer_closes(candidates, done)
     refusals.extend(owner_refusals)
-    return _render_close_landed(offer_label, history.green, declarations, applied, refusals), 1 if refusals else 0
+    return _render_close_landed(tip_text, history.green, targets, applied, refusals), 1 if refusals else 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -837,14 +711,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--green", dest="census_green", help="green commit SHA for the historical census")
     parser.add_argument("--since", help="limit evidence to commits and ledger events at or after an ISO date or green ancestor SHA")
     commands = parser.add_subparsers(dest="command")
-    close_landed = commands.add_parser("close-landed", help="close tasks declared by one offer being landed")
-    close_landed.add_argument("--offer", required=True, help="offer body file or merge-request envelope id")
+    close_landed = commands.add_parser("close-landed", help="close explicitly supplied task ids from a landed offer")
+    close_landed.add_argument("--tip", required=True, help="offer commit SHA")
     close_landed.add_argument("--green", required=True, help="new green commit SHA")
+    close_landed.add_argument("--close", dest="close_ids", action="append", required=True, metavar="ID", help="exact task-store id to close; repeat for each id")
     args = parser.parse_args(argv)
     root = Path(__file__).resolve().parents[1]
     try:
         if args.command == "close-landed":
-            output, status = _run_close_landed(args.offer, args.green, root)
+            output, status = _run_close_landed(args.tip, args.green, args.close_ids, root)
             sys.stdout.write(output)
             return status
         if not args.census_green:

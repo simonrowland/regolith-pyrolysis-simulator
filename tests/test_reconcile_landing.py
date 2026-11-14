@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import json
+import contextlib
+import io
 import subprocess
 import tempfile
 import unittest
@@ -10,13 +11,12 @@ from pathlib import Path
 from scripts.reconcile_landing import (
     GitHistory,
     _apply_offer_closes,
+    _close_candidates,
     _content_present,
-    _merge_request_body,
     _normalize_task_id,
-    _offer_close_candidates,
-    _offer_tip,
     _render_close_landed,
     ledger_events,
+    main,
     report_candidates,
     recorded_tip,
     stranded_rows,
@@ -209,120 +209,70 @@ class LandingReconciliationTests(unittest.TestCase):
         self.assertIn(new_tip[:10], rows[0]["why"])
         self.assertNotIn(old_tip[:10], rows[0]["why"])
 
-    def test_anchored_offer_declaration_closes_exact_target_only(self) -> None:
+    def test_explicit_close_ids_close_exact_targets_only(self) -> None:
         offer_tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
         green = self.repo.commit_file("green.txt", "green\n", "green")
         items = [
             {"id": "t-2", "kind": "task", "done": False, "notes": []},
             {"id": "t-2a", "kind": "task", "done": False, "notes": []},
         ]
-        body = f"Offer sha: {offer_tip}\n\nCloses: t-2\n"
-        candidates, refusals, declarations = _offer_close_candidates(body, GitHistory(self.repo.root, green), items)
-        self.assertEqual(declarations, ["t-2"])
+        candidates, refusals, close_ids = _close_candidates(offer_tip, ["t-2"], GitHistory(self.repo.root, green), items)
+        self.assertEqual(close_ids, ["t-2"])
         self.assertEqual([candidate["id"] for candidate in candidates], ["t-2"])
+        self.assertEqual(candidates[0]["close_id"], "t-2")
         self.assertEqual(refusals, [])
-        applied, apply_refusals = _apply_offer_closes(candidates, lambda candidate: None)
+
+        applied_ids: list[str] = []
+        applied, apply_refusals = _apply_offer_closes(candidates, lambda candidate: applied_ids.append(candidate["id"]))
         self.assertEqual(applied, ["t-2"])
+        self.assertEqual(applied_ids, ["t-2"])
         self.assertEqual(apply_refusals, [])
 
-    def test_fenced_quoted_inline_and_other_task_note_closes_are_ignored(self) -> None:
+    def test_unknown_and_suffixed_close_ids_are_typed_refusals(self) -> None:
         tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
         green = self.repo.commit_file("green.txt", "green\n", "green")
-        history = GitHistory(self.repo.root, green)
         items = [{"id": "t-2", "kind": "task", "done": False, "notes": []}]
-        bodies = {
-            "fenced": f"Offer sha: {tip}\n```text\nCloses: t-2\n```\n",
-            "quote": f"Offer sha: {tip}\n> Closes: t-2\n",
-            "inline": f"Offer sha: {tip}\nexample > Closes: t-2\n",
-            "other task note": f"Offer sha: {tip}\nt-99 note:\nCloses: t-2\n",
-        }
-        for label, body in bodies.items():
-            with self.subTest(label=label):
-                candidates, _, declarations = _offer_close_candidates(body, history, items)
-                self.assertEqual(declarations, [])
+        for close_id in ("t-2a", "t-99"):
+            with self.subTest(close_id=close_id):
+                candidates, refusals, close_ids = _close_candidates(tip, [close_id], GitHistory(self.repo.root, green), items)
+                self.assertEqual(close_ids, [close_id])
                 self.assertEqual(candidates, [])
-
-    def test_nonclosing_fence_line_keeps_closes_example_inert(self) -> None:
-        tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
-        green = self.repo.commit_file("green.txt", "green\n", "green")
-        body = f"Offer sha: {tip}\n```text\n```python\nCloses: t-2\n```\n"
-        items = [{"id": "t-2", "kind": "task", "done": False, "notes": []}]
-
-        candidates, _, declarations = _offer_close_candidates(body, GitHistory(self.repo.root, green), items)
-        self.assertEqual(declarations, [])
-        self.assertEqual(candidates, [])
-
-    def test_offer_tip_ignores_fenced_quoted_and_task_note_examples(self) -> None:
-        tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
-        green = self.repo.commit_file("green.txt", "green\n", "green")
-        items = [{"id": "t-2", "kind": "task", "done": False, "notes": []}]
-        bodies = [
-            f"Example:\n```text\nOffer sha: {tip}\n```\nCloses: t-2\n",
-            f"> Offer sha: {tip}\nCloses: t-2\n",
-            f"t-99 note:\nOffer sha: {tip}\nCloses: t-2\n",
-        ]
-        for body in bodies:
-            with self.subTest(body=body):
-                self.assertIsNone(_offer_tip(body)[0])
-                candidates, refusals, declarations = _offer_close_candidates(body, GitHistory(self.repo.root, green), items)
-                self.assertEqual(declarations, ["t-2"] if "Closes:" in body and not body.startswith("t-99 note:") else [])
-                self.assertEqual(candidates, [])
-                self.assertEqual(refusals[0]["type"], "invalid-offer-tip" if declarations else "no-closes-declaration")
-
-    def test_real_ref_tip_line_supplies_offer_identity(self) -> None:
-        tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
-        green = self.repo.commit_file("green.txt", "green\n", "green")
-        body = f"Ref origin review/t-2, tip {tip}\nCloses: t-2\n"
-        items = [{"id": "t-2", "kind": "task", "done": False, "notes": []}]
-
-        candidates, refusals, declarations = _offer_close_candidates(body, GitHistory(self.repo.root, green), items)
-        self.assertEqual(declarations, ["t-2"])
-        self.assertEqual([candidate["id"] for candidate in candidates], ["t-2"])
-        self.assertEqual(refusals, [])
-
-    def test_unknown_suffix_is_not_normalized_to_parent_id(self) -> None:
-        tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
-        green = self.repo.commit_file("green.txt", "green\n", "green")
-        items = [{"id": "t-2", "kind": "task", "done": False, "notes": []}]
-        body = f"Offer sha: {tip}\nCloses: t-2a\n"
-
-        candidates, refusals, declarations = _offer_close_candidates(body, GitHistory(self.repo.root, green), items)
-        self.assertEqual(declarations, ["t-2a"])
-        self.assertEqual(candidates, [])
-        self.assertEqual(refusals[0]["type"], "unknown-task-id")
-        self.assertEqual(refusals[0]["id"], "t-2a")
+                self.assertEqual(refusals[0]["type"], "unknown-task-id")
+                self.assertEqual(refusals[0]["id"], close_id)
         self.assertEqual(_normalize_task_id("t-2a"), "t-2a")
-        report = _render_close_landed("offer-1", green, declarations, [], refusals)
+        report = _render_close_landed(tip, green, ["t-2a"], [], [{"id": "t-2a", "type": "unknown-task-id", "message": "no exact task-store id matches t-2a"}])
         self.assertIn("Refusal t-2a [unknown-task-id]", report)
 
-    def test_offer_tip_must_be_an_ancestor_of_green(self) -> None:
+    def test_tip_must_be_an_ancestor_of_green(self) -> None:
         self.repo.git("checkout", "-q", "-b", "offer", self.base)
         offer_tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
         self.repo.git("checkout", "-q", "main")
         green = self.repo.commit_file("green.txt", "green\n", "green")
-        body = f"Offer sha: {offer_tip}\nCloses: t-2\n"
         items = [{"id": "t-2", "kind": "task", "done": False, "notes": []}]
 
-        candidates, refusals, declarations = _offer_close_candidates(body, GitHistory(self.repo.root, green), items)
-        self.assertEqual(declarations, ["t-2"])
+        candidates, refusals, close_ids = _close_candidates(offer_tip, ["t-2"], GitHistory(self.repo.root, green), items)
+        self.assertEqual(close_ids, ["t-2"])
         self.assertEqual(candidates, [])
         self.assertEqual(refusals[0]["type"], "offer-tip-not-ancestor")
 
-    def test_merge_request_envelope_id_resolves_one_offer_body(self) -> None:
-        messages = self.repo.root / ".goal-flight" / "messages"
-        messages.mkdir(parents=True)
-        envelope_id = "offer-envelope-1"
-        envelope = {
-            "id": envelope_id,
-            "type": "merge-request",
-            "payload": {"text": "Offer sha: deadbee\nCloses: t-2\n"},
-        }
-        (messages / "offers.jsonl").write_text(json.dumps(envelope) + "\n", encoding="utf-8")
+    def test_close_landed_requires_explicit_close_arguments(self) -> None:
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as caught:
+            main(["close-landed", "--tip", self.base, "--green", self.base])
+        self.assertEqual(caught.exception.code, 2)
 
-        with patch.object(Path, "home", return_value=self.repo.root):
-            body, resolved_id = _merge_request_body(envelope_id, self.repo.root)
-        self.assertEqual(body, envelope["payload"]["text"])
-        self.assertEqual(resolved_id, envelope_id)
+    def test_close_landed_passes_repeated_close_ids_to_runner(self) -> None:
+        with patch("scripts.reconcile_landing._run_close_landed", return_value=("report\n", 0)) as run:
+            with contextlib.redirect_stdout(io.StringIO()):
+                status = main([
+                    "close-landed",
+                    "--tip", self.base,
+                    "--green", self.base,
+                    "--close", "t-2",
+                    "--close", "b-4",
+                ])
+        self.assertEqual(status, 0)
+        self.assertEqual(run.call_args.args[:3], (self.base, self.base, ["t-2", "b-4"]))
+        self.assertEqual(run.call_args.args[3], Path(__file__).resolve().parents[1])
 
     def test_colliding_task_ids_remain_distinct_in_history_report(self) -> None:
         tip = self.repo.commit_file("offer.txt", "offer\n", "offer")
