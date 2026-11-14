@@ -27,7 +27,7 @@ def _stage3_unavailable_psat_model():
     return model
 
 
-def test_stage3_unavailable_psat_predicts_flagged_capture():
+def test_stage3_unknown_po2_predicts_flagged_capture():
     model = _stage3_unavailable_psat_model()
     outcomes = []
     stage = next(stage for stage in model.train.stages if stage.stage_number == 3)
@@ -36,11 +36,9 @@ def test_stage3_unavailable_psat_predicts_flagged_capture():
         available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
     )
     assert 0.0 < eta <= 1.0
-    flag = next(item for item in outcomes if item["status"] == "extrapolated")
-    assert flag["authority_level"] == "extrapolated"
-    assert flag["reason"] == "antoine_psat_unavailable_at_T"
-    assert flag["original_reason"]
-    assert flag["valid_range_K"]
+    flag = next(item for item in outcomes if item["status"] == "status_bearing")
+    assert flag["authority_level"] == "status_bearing"
+    assert flag["reason"] == "wall_pO2_unknown_pO2_free_route_used"
     assert flag["eta"] == eta
 
 
@@ -89,9 +87,10 @@ def test_k_trap_area_admission_keeps_sio_route_authority(cartridge_area):
     )
 
     authority = result.condensation_authority_by_species["SiO"]
-    assert authority["authority_level"] == "extrapolated"
-    # An extrapolated route is never authoritative, so a missing cartridge
-    # cannot read as authoritative terminal offgas downstream.
+    assert authority["authority_level"] == "status_bearing"
+    assert authority["reason"] == "wall_pO2_unknown_pO2_free_route_used"
+    # The conservative pO2-free bound is never authoritative, so a missing
+    # cartridge cannot certify terminal offgas downstream.
     assert authority["authoritative_for_condensation"] is False
     # The terminal-offgas flag may be unset (None) when nothing escapes; it
     # must never be True.
@@ -120,13 +119,15 @@ def test_declared_non_sio_extension_preserves_physical_zeros(case):
         model.stage_area_m2_by_stage = {"4": 0.0}
     outcomes = []
     if case == "positive":
-        # A source-reaction pressure is not a wall saturation curve. The
-        # removed numerical budget must not invent a positive capture.
-        with pytest.raises(condensation.WallSaturationPressureRefusal):
-            model._condensation_efficiency(
-                stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
-                available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
-            )
+        # d-402 selects Na2's pO2-free association route; capture remains
+        # status-bearing because oxygen was not supplied to the wall.
+        eta = model._condensation_efficiency(
+            stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+            available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+        )
+        assert eta > 0.0
+        flag = next(item for item in outcomes if item["status"] == "status_bearing")
+        assert flag["reason"] == "wall_pO2_unknown_pO2_free_route_used"
     else:
         eta = model._condensation_efficiency(
             stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
@@ -181,11 +182,17 @@ def test_declared_non_sio_extension_area_does_not_supply_missing_wall_pressure()
     model.wall_species_partial_pressures_pa = {"Na2": 100.0}
     model.stage_area_m2_by_stage = {"stage_5": 1.0}
     stage = next(stage for stage in model.train.stages if stage.stage_number == 5)
-    with pytest.raises(condensation.WallSaturationPressureRefusal):
-        model._condensation_efficiency(
-            stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
-            available_kg=1.0, alpha_s_value=1.0,
-        )
+    outcomes = []
+    eta = model._condensation_efficiency(
+        stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+        available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+    )
+    assert eta > 0.0
+    assert any(
+        item.get("reason") == "wall_pO2_unknown_pO2_free_route_used"
+        and item.get("authority_level") == "status_bearing"
+        for item in outcomes
+    )
 
 
 def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
