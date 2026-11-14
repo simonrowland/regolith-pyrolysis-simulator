@@ -52,9 +52,21 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # dex -0.013180332034779389
 # The offer frame is a_D * f from the Darken & Gurry factor.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "6894aec2a81a2b215add00ee4576865fc0bcc87eb144ba3eb6574f426b97d971"
+    "1ef4e953f09368dd3ef28f334689d5aabee8e83eb4c4f1c75f36559fd4af3f7a"
 )
-_DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10057837869175247")
+# Distin prints a_D = 0.952 at 1880 C (p. 74, Table I / Experimental
+# results), and the extract records the Temkin-frame N0 =
+# 0.9861097841165973149618546920. The owned conversion is
+# a_FeO = a_D * f / N0; since residual = log10(predicted / measured),
+# r_new = r_old + log10(N0), with f cancelling from the ratio. Activities,
+# f, N0, and the logarithm's argument are dimensionless, so the residual is
+# dimensionless dex. log10(N0) = -0.00607473213597273368 dex; adding it to
+# r_old = -0.10057837869175247 gives -0.10665311082772520368 dex. The pin
+# delta, (-0.10665311082772519) - (-0.10057837869175247), is
+# -0.00607473213597272 dex; its 1.37e-17 dex difference from log10(N0) is one
+# binary64 ULP because compute_metric reports math.log10(float(ratio)) as
+# Decimal(str(...)), rounding each residual. Thus all of the move is N0.
+_DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10665311082772519")
 
 
 def _openimcc_sources(
@@ -271,7 +283,7 @@ def distin_migration():
     return migrator.result
 
 
-def test_distin_closed_redox_residual_line_matches_green_bytes(
+def test_distin_closed_redox_residual_pins_d333_converted_value_and_line(
     distin_migration,
 ) -> None:
     observation = next(
