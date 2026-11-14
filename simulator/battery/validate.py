@@ -2243,12 +2243,6 @@ def _resolve_coefficient_sources(
             )
         elif src in indexes.table_ids:
             nested = Ancestry.of({src})
-        elif _canonical_doi_source(src) is not None:
-            # A declared DOI is a stable external source identity. Resolve it
-            # as that root even when a registered work has incomplete member
-            # extracts; completeness of the source ID does not depend on every
-            # observation in that work having a complete derivation graph.
-            nested = Ancestry.of({src})
         else:
             work = indexes.work_by_alias.get(src)
             if work is not None:
@@ -2260,6 +2254,11 @@ def _resolve_coefficient_sources(
                     indexes.asset_ids,
                     _indexes=indexes,
                 )
+            elif _canonical_doi_source(src) is not None:
+                # A DOI is a terminal source root only when this context has
+                # no registered Work for it. A registered Work contributes
+                # its complete member ancestry through the branch above.
+                nested = Ancestry.of({src})
             else:
                 result = Ancestry.incomplete(AncestryFailure.UNKNOWN_ALIAS)
                 indexes.coefficient_source_lineages[source_key] = result
