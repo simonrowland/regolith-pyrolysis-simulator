@@ -5868,7 +5868,8 @@ def _runner_failure_result(
         "schema_version": RUNNER_SCHEMA_VERSION,
         "feedstock_id": feedstock_id,
         "campaign": campaign,
-        "hours_requested": coerce_nonnegative_hours(hours),
+        # This envelope reports rejected input too; admission already failed.
+        "hours_requested": _json_safe(hours),
         "hours_completed": _execution_hours_completed(execution),
         "mass_kg": _json_safe(float(mass_kg)),
         "additives_kg": _json_safe(dict(additives_kg)),
