@@ -527,6 +527,7 @@ def test_pumping_context_refuses_a_snapshot_missing_the_vented_flow_field():
 def test_pumping_context_only_costs_o2_not_already_compressed_by_turbine():
     snapshot = SimpleNamespace(
         hour=1,
+        duration_h=1.0,
         temperature_C=300.0,
         overhead=SimpleNamespace(
             pressure_mbar=1.0,
@@ -567,6 +568,7 @@ def test_pumping_context_only_costs_o2_not_already_compressed_by_turbine():
 def test_pumping_context_forwards_only_explicit_validated_line_conductance():
     snapshot = SimpleNamespace(
         hour=1,
+        duration_h=1.0,
         temperature_C=300.0,
         overhead=SimpleNamespace(
             pressure_mbar=1.0,

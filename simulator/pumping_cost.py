@@ -30,6 +30,7 @@ import math
 from typing import Any
 
 from simulator.cost_energy import json_safe_number, unavailable_quantity
+from simulator.scalar_boundary import coerce_nonnegative_hours
 from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR, PA_PER_MBAR
 from simulator.environment import (
     ASTEROID_VACUUM_FLOOR_BAR,
@@ -635,11 +636,25 @@ def pumping_context_from_sim(
             temperature_C = _float_or_nan(getattr(snapshot, "temperature_C", math.nan))
             gas_temperature_K = temperature_C + 273.15
         offgas_mol_per_s = uncompressed_o2_mol_hr / _SECONDS_PER_HOUR
+        raw_duration_h = getattr(snapshot, "duration_h", None)
+        try:
+            duration_h = coerce_nonnegative_hours(raw_duration_h)
+        except (TypeError, ValueError):
+            return _pumping_context_refusal(
+                "missing-step-duration" if raw_duration_h is None else "invalid-step-duration",
+                body=body,
+                feedstock_id=feedstock_id,
+                hour=getattr(snapshot, "hour", len(rows)),
+                ambient_pressure_pa=ambient_pressure_pa,
+                ambient_pressure_source=ambient_pressure_source,
+            )
         row = {
             "hour": int(getattr(snapshot, "hour", len(rows))),
             "target_pressure_pa": target_pressure_pa,
             "offgas_mol_per_s": offgas_mol_per_s,
-            "duration_s": _SECONDS_PER_HOUR,
+            # Exposure [h] * seconds/h = s. A .25 h snapshot charges
+            # 900 s of pumping, so four equal substeps cost one hour.
+            "duration_s": duration_h * _SECONDS_PER_HOUR,
             "gas_temperature_K": gas_temperature_K,
         }
         validated_line_conductance = getattr(
