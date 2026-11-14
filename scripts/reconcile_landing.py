@@ -17,7 +17,8 @@ from typing import Any, Callable
 TASK_SCRIPT = Path.home() / ".goal-flight/skill/goalflight_task.py"
 LEDGER_RELATIVE = Path("docs-private/controller-tools/mb-20260923/pending-landings.txt")
 LANDING_GRACE = 1
-SHA_PATTERN = r"(?<![0-9a-f])(?=[0-9a-f]{7,40}(?![0-9a-f]))(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}(?![0-9a-f])"
+# Accept valid all-numeric SHA prefixes without matching digits inside task or branch IDs.
+SHA_PATTERN = r"(?<![0-9a-z_-])(?=[0-9a-f]{7,40}(?![0-9a-f]))[0-9a-f]{7,40}(?![0-9a-f])"
 TASK_ID = re.compile(r"\b(?:t-?\d+[a-z]?|b-\d+[a-z]?)\b", re.IGNORECASE)
 SUBJECT_TASK_ID = re.compile(r"(?<![a-z0-9])((?:t-?\d+[a-z]?|b-\d+[a-z]?))(?![a-z0-9])", re.IGNORECASE)
 TIMESTAMP = re.compile(r"^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})")

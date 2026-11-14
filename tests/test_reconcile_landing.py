@@ -11,6 +11,7 @@ from scripts.reconcile_landing import (
     _content_present,
     ledger_events,
     open_close_candidates,
+    recorded_tip,
     stranded_rows,
 )
 
@@ -126,12 +127,18 @@ class LandingReconciliationTests(unittest.TestCase):
         green = self.repo.commit_file("note.md", "note\n", "land note only")
         item = {"id": "t-20", "kind": "task", "done": False, "notes": [{"text": f"OFFERED review/range {note_tip[:10]}"}]}
 
+        self.assertEqual(recorded_tip(item), note_tip[:10])
         closeable, report_only = open_close_candidates([item], GitHistory(self.repo.root, green))
         self.assertEqual(closeable, [])
         partial = next(row for row in report_only if row["id"] == "t-20")
+        self.assertFalse(partial["closeable"])
         self.assertEqual(partial["kind"], "partial-files")
         self.assertEqual(partial["matched_files"], 1)
         self.assertEqual(partial["changed_files"], 2)
+
+    def test_recorded_tip_accepts_an_all_numeric_sha_prefix(self) -> None:
+        item = {"notes": [{"text": "OFFERED review/numeric 1234567890"}]}
+        self.assertEqual(recorded_tip(item), "1234567890")
 
     def test_landed_green_destination_is_not_the_offer_tip(self) -> None:
         green = self.repo.commit_file("batch.txt", "unrelated batch\n", "unrelated batch")
