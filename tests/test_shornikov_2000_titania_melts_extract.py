@@ -111,6 +111,7 @@ def test_figure_records_preserve_panels_standards_and_digitisation_status():
 
 
 def test_figure_extract_migrates_figure_only_observations():
+    extract = yaml.safe_load(EXTRACT.read_text())
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -131,31 +132,90 @@ def test_figure_extract_migrates_figure_only_observations():
     from simulator.battery.score import _source_oxygen_pressure_for_score
     from simulator.battery.source_oxygen import linked_source_pressure
 
+    source_id = extract["source_id"]
+    raw_tio_rows = {
+        row["observation_id"]: row
+        for row in extract["species"]["TiO"]["observations"]
+        if row["observation_id"].startswith("shornikov_2000_f1_TiO_")
+    }
+    raw_oxygen_rows = {
+        row["observation_id"]: row
+        for row in extract["species"]["O"]["observations"]
+        if row["observation_id"].startswith("shornikov_2000_f1_O_")
+    }
     tio_rows = [
         row for row in result.observations.values()
-        if row.source_id == extract["source_id"]
+        if row.source_id == source_id
         and row.observation_id.startswith(
-            f'{extract["source_id"]}::shornikov_2000_f1_TiO_'
+            f"{source_id}::shornikov_2000_f1_TiO_"
         )
     ]
     oxygen_rows = {
         row.observation_id: row
         for row in result.observations.values()
-        if row.source_id == extract["source_id"]
+        if row.source_id == source_id
         and row.observation_id.startswith(
-            f'{extract["source_id"]}::shornikov_2000_f1_O_'
+            f"{source_id}::shornikov_2000_f1_O_"
         )
     }
     assert len(tio_rows) == 21
     assert len(oxygen_rows) == 22
+    # Each marker's extracted x has a ±0.023 mol% allowance; the sum is the
+    # conservative pair bound for the two independently digitized centres.
+    pair_tolerance_mol_pct = Decimal("0.046")
+    expected_unlinked = {
+        f"{source_id}::shornikov_2000_f1_TiO_02",
+        f"{source_id}::shornikov_2000_f1_TiO_12",
+    }
+    observed_unlinked = set()
+    linked_count = 0
     for row in tio_rows:
-        condition = row.point_conditions["fO2_Pa"]
+        row_id = row.observation_id.split("::", 1)[1]
+        target_x = (
+            Decimal(raw_tio_rows[row_id]["values"]["composition_mol"]["TiO2"])
+            * Decimal("100")
+        )
+        nearest_gap, nearest_source_row = min(
+            [
+                (
+                    abs(
+                        target_x
+                        - Decimal(source_row["values"]["composition_mol"]["TiO2"])
+                        * Decimal("100")
+                    ),
+                    source_row,
+                )
+                for source_row in raw_oxygen_rows.values()
+            ],
+            key=lambda pair: pair[0],
+        )
+        condition = row.point_conditions.get("fO2_Pa")
+        if nearest_gap > pair_tolerance_mol_pct:
+            assert row.observation_id in expected_unlinked
+            assert condition is None or (
+                condition.state.is_unknown and condition.inference is None
+            )
+            assert linked_source_pressure(row) is None
+            observed_unlinked.add(row.observation_id)
+            continue
+
+        assert row.observation_id not in expected_unlinked
+        assert condition is not None
         assert condition.state.is_value
         assert condition.inference is not None
         assert condition.inference.relation.startswith("source_oxygen_condition;")
         assert len(condition.inference.inputs) == 1
         assert row.observation_id not in condition.inference.inputs
         source_oxygen = oxygen_rows[condition.inference.inputs[0]]
+        assert source_oxygen.observation_id == (
+            f"{source_id}::{nearest_source_row['observation_id']}"
+        )
+        source_x = (
+            Decimal(nearest_source_row["values"]["composition_mol"]["TiO2"])
+            * Decimal("100")
+        )
+        assert abs(target_x - source_x) == nearest_gap
+        assert nearest_gap <= pair_tolerance_mol_pct
         assert source_oxygen.identity.species.formula == "O"
         assert source_oxygen.experiment_id == row.experiment_id
         assert source_oxygen.locator is not None
@@ -174,6 +234,10 @@ def test_figure_extract_migrates_figure_only_observations():
         assert mutated.value.point != row.value.point
         assert linked_source_pressure(mutated) == linked
         assert _source_oxygen_pressure_for_score(mutated) == linked
+        linked_count += 1
+
+    assert linked_count == 19
+    assert observed_unlinked == expected_unlinked
 
     experiment = result.experiments[tio_rows[0].experiment_id]
     assert experiment.bench_id is not None
