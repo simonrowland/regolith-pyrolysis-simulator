@@ -42,11 +42,17 @@ from simulator.battery.enums import (
     SourceRelation,
     ValenceDenominatorKind,
     ValenceValueForm,
+    ValueKind,
     effective_phase_basis,
     ppm_mass_to_wt_percent,
 )
 from simulator.battery.identity import Identity, ValenceBasis, celsius_to_kelvin, profile_for
-from simulator.battery.migrate import REPO_ROOT, is_engine_map_oxide_key, migrate
+from simulator.battery.migrate import (
+    REPO_ROOT,
+    is_engine_map_oxide_key,
+    migrate,
+    select_declared_source,
+)
 from simulator.battery.records import (
     Composition,
     Derivation,
@@ -77,7 +83,7 @@ from simulator.battery.score import (
 )
 from simulator.melt_backend.base import EquilibriumResult
 from tests.battery import factories as F
-from tests.battery.test_migrate import _write_min_tree
+from tests.battery.test_migrate import _extract_observation, _write_min_tree
 
 SULFIDE_EQUATION = (
     "log10 C_S = log10(wt% S) + 0.5 log10(pO2/pS2), Fincham and Richardson"
@@ -92,6 +98,68 @@ SULFIDE_EXPONENT_ON_CHLORIDE = (
 )
 T_C = 1400
 P_O2_PA = 10
+
+
+@pytest.mark.parametrize(
+    ("extract", "observation_id", "printed_field", "printed_cell"),
+    (
+        (
+            "borisov-veksler-2021-k-fe-supplement.yaml",
+            "borisov_2021_excluded_row_10_cl",
+            "printed_cell_as_published",
+            "",
+        ),
+        (
+            "borisov-veksler-2021-k-fe-supplement.yaml",
+            "borisov_2021_excluded_row_10_f",
+            "printed_cell_as_published",
+            "",
+        ),
+        (
+            "kirschen-decapitani-1999-liquid-miscibility.yaml",
+            "kirschen_decapitani_1999_t1_stc_10_1_phase1_mgo",
+            "printed_cell_as_published",
+            "...",
+        ),
+        (
+            "kirschen-decapitani-1999-liquid-miscibility.yaml",
+            "kirschen_decapitani_1999_t1_stc_10_1_phase2_mgo",
+            "printed_cell_as_published",
+            "...",
+        ),
+        (
+            "holzheid-lodders-2001-copper-solubility.yaml",
+            "hl01_fe1_s1_SI2_silicate_S",
+            "value_as_published",
+            "<0.008",
+        ),
+        (
+            "holzheid-lodders-2001-copper-solubility.yaml",
+            "hl01_fe0_s1_SI18_silicate_S",
+            "value_as_published",
+            "n.d.",
+        ),
+    ),
+)
+def test_phase_composition_missing_or_nonpoint_cells_stay_refused(
+    extract: str,
+    observation_id: str,
+    printed_field: str,
+    printed_cell: str,
+) -> None:
+    """Blank, ellipsis, upper-bound, and n.d. source cells never become zero."""
+    row = _extract_observation(extract, observation_id)
+    values = row["values"]
+    assert values["quantity"] == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+    assert values[printed_field] == printed_cell
+
+    selection = select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        row.get("units"),
+        values,
+    )
+    assert selection.value.kind is ValueKind.UNAVAILABLE
+    assert selection.amount is None
 
 
 def test_mass_ppm_phase_reference_converts_to_wt_percent() -> None:
