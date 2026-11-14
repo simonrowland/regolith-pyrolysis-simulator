@@ -92,7 +92,6 @@ from simulator.battery.migrate import (
     parse_quantity_suffix,
     split_qualified_quantity,
     QUANTITY_ALIASES,
-    QUANTITY_SOURCE_FIELDS,
     _HISTORICAL_PREFIX_STEMS,
     compilation_quantity_from_record,
     choose_read_from,
@@ -116,9 +115,7 @@ from simulator.battery.migrate import (
     lift_vaporization_reaction_from_ledger_note,
     pressure_from_equipment,
     resolve_equipment_context,
-    select_declared_source,
     to_plain,
-    observation_from_plain,
     work_id_for,
     write_outputs,
 
@@ -2297,6 +2294,67 @@ def test_production_migration_accepts_model_derived_raw_input_method(
     assert reloaded.derivation == observation.derivation
 
 
+@pytest.mark.parametrize(
+    ("fallback", "reason"),
+    [
+        ("method_unknown", "method_unknown: no method located in source"),
+        (
+            "none_printed",
+            "input_references_none_printed: source names no input references",
+        ),
+    ],
+)
+@pytest.mark.parametrize("shape", ["scalar", "series"])
+def test_production_migration_preserves_model_derived_fallback_notices(
+    tmp_path: Path, fallback: str, reason: str, shape: str
+) -> None:
+    extract = _raw_inputs_extract("model_derived", include_method=True)
+    row = extract["species"]["Na"]["observations"][0]
+    values = row["values"]
+    derivation = values["derivation"]
+    if fallback == "method_unknown":
+        derivation.pop("method")
+    else:
+        derivation["references"] = ["none_printed"]
+    if shape == "scalar":
+        values.pop("series")
+        values.update(T_K=1200.0, pressure_atm=1.0)
+    row["notices"] = [
+        {
+            "kind": "engine_model_caveat",
+            "affected_quantities": ["p_sat"],
+            "reason": reason,
+            "origin": "literature_extract",
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observations = list(result.observations.values())
+    assert len(observations) == (1 if shape == "scalar" else 2)
+    for observation in observations:
+        assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert any(notice.reason == reason for notice in observation.notices)
+        payload = to_plain(observation)
+        assert any(notice["reason"] == reason for notice in payload["notices"])
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+
+def test_documented_model_derived_notice_decodes_canonical_quantity() -> None:
+    payload = {
+        "kind": "engine_model_caveat",
+        "affected_quantities": ["p_partial"],
+        "reason": "input_references_none_printed: source names no input references",
+        "origin": "literature_extract",
+    }
+
+    notice = _notice_from_plain(payload)
+
+    assert notice.affected_quantities == (Quantity.P_PARTIAL,)
+    assert to_plain(notice) == payload
+
+
 def test_shornikov_2015_extract_migrates_model_derived_provenance(
     tmp_path: Path,
 ) -> None:
@@ -4084,7 +4142,7 @@ def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
         for p in (root / "data").rglob("*")
         if p.is_file() and "extracts/fixture-source.yaml" not in p.as_posix()
     }
-    second = migrate(root, write=True)
+    migrate(root, write=True)
     second_bytes = {
         p.relative_to(root): p.read_bytes()
         for p in (root / "data").rglob("*")
