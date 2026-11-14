@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 import re
-from typing import Any
-
 import yaml
 
 from simulator.yaml_cache import YAML12SafeLoader
@@ -77,7 +75,7 @@ def _deliberate_printed_string_reason(relative: str, key_path: str) -> str | Non
     return None
 
 
-def _find_untyped_exponents(node: yaml.Node, value: Any, path: tuple[str, ...]):
+def _find_untyped_exponents(node: yaml.Node, path: tuple[str, ...]):
     if isinstance(node, yaml.ScalarNode):
         if (
             node.tag == "tag:yaml.org,2002:str"
@@ -91,16 +89,14 @@ def _find_untyped_exponents(node: yaml.Node, value: Any, path: tuple[str, ...]):
                 node.end_mark.index,
             )
         return
-    if isinstance(node, yaml.MappingNode) and isinstance(value, dict):
+    if isinstance(node, yaml.MappingNode):
         for key_node, value_node in node.value:
-            key = key_node.value
-            if key in value:
-                yield from _find_untyped_exponents(
-                    value_node, value[key], path + (str(key),)
-                )
-    elif isinstance(node, yaml.SequenceNode) and isinstance(value, list):
-        for index, (value_node, item) in enumerate(zip(node.value, value)):
-            yield from _find_untyped_exponents(value_node, item, path + (str(index),))
+            yield from _find_untyped_exponents(
+                value_node, path + (str(key_node.value),)
+            )
+    elif isinstance(node, yaml.SequenceNode):
+        for index, value_node in enumerate(node.value):
+            yield from _find_untyped_exponents(value_node, path + (str(index),))
 
 
 def _load_with_source_nodes(source: str):
@@ -108,9 +104,8 @@ def _load_with_source_nodes(source: str):
     try:
         node = loader.get_single_node()
         if node is None:
-            return None, []
-        value = loader.construct_document(node)
-        return value, list(_find_untyped_exponents(node, value, ()))
+            return []
+        return list(_find_untyped_exponents(node, ()))
     finally:
         loader.dispose()
 
@@ -125,7 +120,7 @@ def test_every_data_yaml_has_no_untyped_dotless_exponent_in_numeric_fields():
     for path in yaml_paths:
         source = path.read_text(encoding="utf-8")
         try:
-            _loaded, untyped = _load_with_source_nodes(source)
+            untyped = _load_with_source_nodes(source)
         except yaml.YAMLError as exc:
             # P3: a strict parser refusal means there are no loaded scalar
             # values to inspect in this document. Keep it visible in failures.
