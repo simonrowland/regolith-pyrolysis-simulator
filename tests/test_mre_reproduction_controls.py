@@ -311,7 +311,8 @@ def test_plant_mre_isolated_from_reproduction_loader_and_driver(
 
 
 @pytest.mark.parametrize("campaign", (CampaignPhase.C5, CampaignPhase.MRE_BASELINE))
-def test_subhour_mre_snapshot_rate_matches_terminal_oxygen_amount(campaign):
+@pytest.mark.parametrize("dt_hr", [0.25, 1.0])
+def test_subhour_mre_snapshot_rate_matches_terminal_oxygen_amount(campaign, dt_hr):
     bundle = load_config_bundle()
     setpoints = copy.deepcopy(bundle.setpoints)
     setpoints["mre_voltage_sequence"] = {"sequence": [{
@@ -337,9 +338,18 @@ def test_subhour_mre_snapshot_rate_matches_terminal_oxygen_amount(campaign):
         sim.melt.mre_max_voltage_V = 0.8
     account = "terminal.oxygen_mre_anode_stored"
     before = sim.atom_ledger.mol_by_account(account).get("O2", 0.0)
-    snapshot = sim.step(dt_hr=0.25)
+    before_transitions = len(sim.atom_ledger.transitions)
+    snapshot = sim.step(dt_hr=dt_hr)
     delta = sim.atom_ledger.mol_by_account(account).get("O2", 0.0) - before
     assert delta > 0
     assert snapshot.mre_anode_O2_mol_hr == pytest.approx(delta / snapshot.duration_h)
     assert snapshot.overhead.mre_anode_O2_mol_hr == snapshot.mre_anode_O2_mol_hr
+    metal_kg = sum(
+        lot.species_kg.get("Fe", 0.0)
+        for transition in sim.atom_ledger.transitions[before_transitions:]
+        if transition.name == "mre_electrolysis_reduction"
+        for lot in transition.credits if lot.account == "process.metal_phase"
+    )
+    assert metal_kg > 0.0
+    assert snapshot.mre_metals_kg_hr["Fe"] == pytest.approx(metal_kg / snapshot.duration_h)
     assert sim.atom_ledger.assert_balanced()

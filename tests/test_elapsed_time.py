@@ -488,3 +488,64 @@ def test_remaining_live_target_readers_forward_the_interval(monkeypatch, reader)
     assert samples == [1500.0]
     # Revert: removing either caller's dt_hr makes this unchanged real-owner
     # spy fail; C7 additionally samples 1550 C instead of the 1500 C plateau.
+
+
+@pytest.mark.parametrize("dt_hr", [0.25, 1.0])
+@pytest.mark.parametrize("campaign,path,temperature_C,reagent", [
+    ("C3_K", "A", 800.0, "K"),
+    ("C3_NA", "A", 200.0, "Na"),
+    ("C3_NA", "A_staged", 1100.0, "Na"),
+])
+def test_shuttle_snapshot_rates_close_against_committed_interval_amounts(
+    dt_hr, campaign, path, temperature_C, reagent,
+):
+    from simulator.account_ids import METAL_PHASE_ACCOUNTS
+    from simulator.state import CampaignPhase
+    from tests.chemistry.conftest import _build_sim, _load_yaml
+
+    setpoints = _load_yaml("setpoints.yaml")
+    # These temperatures exercise the existing positive-margin K/Fe, Na/Cr
+    # and staged Na/Fe domains. Disable only the optional freeze gate to
+    # isolate the telemetry contract; chemistry and ledger commits are real.
+    setpoints["freeze_gate"] = {**setpoints.get("freeze_gate", {}), "enabled": False}
+    sim = _build_sim(
+        "lunar_mare_low_ti", _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"), setpoints, additives_kg={reagent: 12.0},
+    )
+    sim.start_campaign(CampaignPhase[campaign])
+    sim.record.path = path
+    sim.melt.temperature_C = temperature_C
+    sim.campaign_mgr.overrides[campaign] = {"ramp_rate": 0.0}
+    before = len(sim.atom_ledger.transitions)
+    snapshot = sim.step(dt_hr=dt_hr)
+    transitions = [
+        transition for transition in sim.atom_ledger.transitions[before:]
+        if transition.name in {"c3_k_shuttle_fe_reduction", "c3_na_shuttle_reduction"}
+    ]
+    assert transitions, sim._last_shuttle_refusal_diagnostic
+    assert snapshot.duration_h == dt_hr
+    # Isolate the committed shuttle deltas: whole-account differences would
+    # also include this step's evaporation, native-Fe split and metal routing.
+    injected = sum(
+        lot.species_kg.get(reagent, 0.0)
+        for transition in transitions for lot in transition.debits
+        if lot.account == "process.reagent_inventory"
+    )
+    reduced = sum(
+        kg for transition in transitions for lot in transition.debits
+        if lot.account == "process.cleaned_melt" for kg in lot.species_kg.values()
+    )
+    metal = sum(
+        kg for transition in transitions for lot in transition.credits
+        if lot.account in METAL_PHASE_ACCOUNTS for kg in lot.species_kg.values()
+    )
+    for rate, amount in (
+        (snapshot.shuttle_injected_kg_hr, injected),
+        (snapshot.shuttle_reduced_kg_hr, reduced),
+        (snapshot.shuttle_metal_produced_kg_hr, metal),
+    ):
+        assert amount > 0.0
+        assert rate == pytest.approx(amount / snapshot.duration_h)
+    assert sim.atom_ledger.assert_balanced()
+    # Mutation: dropping /duration_h at projection reports quarter-hour kg/h
+    # four times low, while the committed ledger quantities stay unchanged.
