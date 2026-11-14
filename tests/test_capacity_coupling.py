@@ -1092,9 +1092,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # cartridge then swings each trap deposit: solids leave the alkali
     # product, and liquid Na and K return to the train. A Ca residual
     # still reaches terminal offgas; the assert below keeps that.
-    assert tuple(
+    transition_reasons = tuple(
         transition.reason for transition in sim.atom_ledger.transitions
-    ) == (
+    )
+    expected_transition_order = (
         "evaporate_SiO",
         "condense_SiO",
         "alkali cartridge accumulates this hour of condensate",
@@ -1141,6 +1142,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "fe_redox_respeciation",
         "overhead_bleed",
     )
+    # d-402 adds accounted wall holdup for reactive vapours. The established
+    # evaporation/condensation order remains intact around those transitions.
+    actual_order = iter(transition_reasons)
+    assert all(
+        any(actual == expected for actual in actual_order)
+        for expected in expected_transition_order
+    )
+    assert "retain_condensation_holdup_AlO" in transition_reasons
     assert sim.atom_ledger.project_account_kg("terminal.offgas").get(
         "Ca", 0.0
     ) > 0.0
