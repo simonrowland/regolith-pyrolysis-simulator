@@ -34,6 +34,15 @@ runs:
     independent: true
     blockers:
     - unsupported
+  - group_id: quench-phase-compositions
+    observation_ids:
+    - kems-015-hashimoto-1983::hashimoto_1983_table4_phase_compositions__run_17c1
+    required_coordinates: 16
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
   printed_inventory:
   - group_id: vaporized-fraction
     context_ref:
@@ -120,6 +129,24 @@ runs:
     blocker: unsupported
     note: Blank/n.d./valence marker is absence, never zero.
     required: false
+  - group_id: quench-phase-compositions
+    context_ref:
+    - extracts
+    - kems-015-hashimoto-1983
+    - species
+    - Fe
+    - observations
+    - 41
+    locator:
+      page: 8
+      pdf_page_index: 7
+      table: '4'
+      paragraph: hashimoto-1983-run-17c1
+      published_page: 118
+    required: true
+    blocker: unsupported
+    note: 'Same physical charge: magnetite has six printed oxide coordinates, olivine and glass five each. Totals
+      and analysis counts remain dependent metadata. No phase-vector comparator is implemented.'
   assumptions: []
 - card_id: hashimoto-1983-run-17c3-1
   experiment_ids:
@@ -1104,6 +1131,15 @@ runs:
     independent: true
     blockers:
     - unsupported
+  - group_id: quench-phase-compositions
+    observation_ids:
+    - kems-015-hashimoto-1983::hashimoto_1983_table4_phase_compositions__run_18b6-1
+    required_coordinates: 16
+    comparator: battery_point
+    independent: true
+    blockers:
+    - unsupported
+    - NO_BAND
   printed_inventory:
   - group_id: vaporized-fraction
     context_ref:
@@ -1190,6 +1226,24 @@ runs:
     blocker: unsupported
     note: Blank/n.d./valence marker is absence, never zero.
     required: false
+  - group_id: quench-phase-compositions
+    context_ref:
+    - extracts
+    - kems-015-hashimoto-1983
+    - species
+    - Fe
+    - observations
+    - 40
+    locator:
+      page: 8
+      pdf_page_index: 7
+      table: '4'
+      paragraph: hashimoto-1983-run-18b6-1
+      published_page: 118
+    required: true
+    blocker: unsupported
+    note: 'Same physical charge: magnetite has six printed oxide coordinates, olivine and glass five each. Totals
+      and analysis counts remain dependent metadata. No phase-vector comparator is implemented.'
   assumptions: []
 - card_id: hashimoto-1983-run-18b6-2
   experiment_ids:
@@ -1554,13 +1608,13 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: residue-composition
+  - group_id: iron-valence-determination
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
     independent: true
     blockers:
-    - NO_BAND
+    - unsupported
   printed_inventory:
   - group_id: vaporized-fraction
     context_ref:
@@ -1598,7 +1652,7 @@ runs:
     locator: *id014
     blocker: NO_BAND
     note: Printed Table 3 outcome; replicas are not duplicates.
-    required: true
+    required: false
   - group_id: texture
     context_ref:
     - extracts
@@ -1647,6 +1701,23 @@ runs:
     blocker: unsupported
     note: Blank/n.d./valence marker is absence, never zero.
     required: false
+  - group_id: iron-valence-determination
+    context_ref:
+    - extracts
+    - kems-015-hashimoto-1983
+    - species
+    - Fe
+    - observations
+    - 5
+    - values
+    - series
+    - 13
+    - composition_status
+    locator: *id014
+    required: true
+    blocker: unsupported
+    note: Table 3 v marker means this sample was used for iron-valence determination; no residue composition is
+      printed.
   assumptions: []
 - card_id: hashimoto-1983-run-18c1-1
   experiment_ids:
@@ -1891,13 +1962,13 @@ runs:
   - 10.2343/geochemj.17.111::experiment::hashimoto-1983-run-18c1-3
   setup_ref: 10.2343/geochemj.17.111::experiment::hashimoto-1983-run-18c1-3
   outcomes:
-  - group_id: residue-composition
+  - group_id: iron-valence-determination
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
     independent: true
     blockers:
-    - NO_BAND
+    - unsupported
   printed_inventory:
   - group_id: vaporized-fraction
     context_ref:
@@ -1935,7 +2006,7 @@ runs:
     locator: *id017
     blocker: NO_BAND
     note: Printed Table 3 outcome; replicas are not duplicates.
-    required: true
+    required: false
   - group_id: texture
     context_ref:
     - extracts
@@ -1984,6 +2055,23 @@ runs:
     blocker: unsupported
     note: Blank/n.d./valence marker is absence, never zero.
     required: false
+  - group_id: iron-valence-determination
+    context_ref:
+    - extracts
+    - kems-015-hashimoto-1983
+    - species
+    - Fe
+    - observations
+    - 5
+    - values
+    - series
+    - 16
+    - composition_status
+    locator: *id017
+    required: true
+    blocker: unsupported
+    note: Table 3 v marker means this sample was used for iron-valence determination; no residue composition is
+      printed.
   assumptions: []
 - card_id: hashimoto-1983-run-18c3-1
   experiment_ids:
@@ -2362,13 +2450,13 @@ runs:
     blockers:
     - unsupported
     - NO_BAND
-  - group_id: residue-composition
+  - group_id: iron-valence-determination
     observation_ids: []
     required_coordinates: 1
     comparator: unsupported
     independent: true
     blockers:
-    - NO_BAND
+    - unsupported
   printed_inventory:
   - group_id: vaporized-fraction
     context_ref:
@@ -2406,7 +2494,7 @@ runs:
     locator: *id021
     blocker: NO_BAND
     note: Printed Table 3 outcome; replicas are not duplicates.
-    required: true
+    required: false
   - group_id: texture
     context_ref:
     - extracts
@@ -2455,6 +2543,23 @@ runs:
     blocker: unsupported
     note: Blank/n.d./valence marker is absence, never zero.
     required: false
+  - group_id: iron-valence-determination
+    context_ref:
+    - extracts
+    - kems-015-hashimoto-1983
+    - species
+    - Fe
+    - observations
+    - 5
+    - values
+    - series
+    - 20
+    - composition_status
+    locator: *id021
+    required: true
+    blocker: unsupported
+    note: Table 3 v marker means this sample was used for iron-valence determination; no residue composition is
+      printed.
   assumptions: []
 - card_id: hashimoto-1983-run-18c5-1
   experiment_ids:

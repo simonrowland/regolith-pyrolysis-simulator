@@ -26,6 +26,7 @@ from simulator.battery.records import Experiment, Observation, Work
 from simulator.battery.score import (
     _printed_uncertainty_band,
     _rms,
+    _row_out_of_certified_band,
     match_status,
     metric_operation_for_identity,
     populate_numeric,
@@ -284,13 +285,15 @@ def evaluate_card(
         })
     all_causes = causes + [cause for group in groups for cause in group["causes"]]
     passed = bool(groups) and not all_causes and all(group["reproduced"] for group in groups)
+    flagged = any(_row_out_of_certified_band(str(flag.get("kind", "")), flag)
+                  for group in groups for row in group["coordinates"] for flag in row["flags"])
     independent = [group for group in groups if group["independent"]]
     full_rms = None
     if groups and all(group["rms_band"] is not None for group in groups) and independent:
         full_rms = _rms_text([Decimal(group["rms_band"]) for group in independent])
     return {
         "card_id": frozen["card_id"], "evidence_label": "development_validation",
-        "verdict": "PASS" if passed else "NOT_PASS", "causes": all_causes,
+        "verdict": ("PASS_WITH_FLAGS" if flagged else "PASS") if passed else "NOT_PASS", "causes": all_causes,
         "authoring_revision": manifest["authoring_revision"],
         "engine_policy": manifest["engine_policy"], "ordinary_row_conversions": 0,
         "n_required_groups": len(groups), "n_reproduced_groups": sum(group["reproduced"] for group in groups),
@@ -375,6 +378,28 @@ def write_study(
         receipts.append({key: receipt[key] for key in ("card_id", "verdict", "group_fraction", "rms_band")})
     summary = {"study_id": manifest["study_id"], "n_cards": len(receipts),
                "n_pass": sum(card["verdict"] == "PASS" for card in receipts),
+               "n_pass_with_flags": sum(card["verdict"] == "PASS_WITH_FLAGS" for card in receipts),
                "ordinary_row_conversions": 0, "group_gate_mode": "report_only", "cards": receipts}
+    (output_dir / "reproduction-summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    return summary
+
+
+def write_studies(
+    root: Path,
+    manifest_paths: Sequence[Path],
+    output_dir: Path | None = None,
+    *,
+    store: Store | None = None,
+) -> dict[str, Any]:
+    """Keep all four studies in the summary instead of overwriting earlier cards."""
+    output_dir = output_dir or root / "data/battery/reproduction-cards"
+    studies = [write_study(root, path, output_dir, store=store) for path in manifest_paths]
+    summary = {
+        "n_cards": sum(study["n_cards"] for study in studies),
+        "n_pass": sum(study["n_pass"] for study in studies),
+        "n_pass_with_flags": sum(study["n_pass_with_flags"] for study in studies),
+        "ordinary_row_conversions": 0, "group_gate_mode": "report_only",
+        "studies": studies,
+    }
     (output_dir / "reproduction-summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     return summary

@@ -18,6 +18,7 @@ from simulator.battery.reproduction_cards import (
     load_review_scope,
     resolve_path,
     write_study,
+    write_studies,
 )
 from simulator.battery.score import NORMAL_95_TICKET_MULTIPLIER
 
@@ -132,6 +133,12 @@ def test_real_inventory_and_foreign_keys(store, source, count):
         assert receipt["rms_band"] is None
         assert receipt["n_required_groups"] == len(run["outcomes"])
         assert not any(c["cause"] == "review_stale" for c in receipt["causes"])
+    expected = {oid for oid, obs in store[2].items()
+                if obs.source_id == source and obs.admission.status.value == "admitted"
+                and obs.identity.quantity.is_value
+                and obs.identity.quantity.value.value in {"residue_component_composition", "mass_loss_fraction"}}
+    selected = {oid for run in manifest["runs"] for group in run["outcomes"] for oid in group["observation_ids"]}
+    assert expected <= selected
 
 
 @pytest.fixture
@@ -240,6 +247,10 @@ def test_stale_plain_scope_cannot_hide_a_widened_band_or_source_flag(complete_co
     receipt = evaluate_card(*args)
     assert receipt["verdict"] == "NOT_PASS"
     assert receipt["groups"][0]["coordinates"][0]["flags"]
+    next(entry for entry in args[2]["entries"] if entry["ref"][-1] == "notices")["resolved"] = to_plain((notice,))
+    qualified = evaluate_card(*args)
+    assert qualified["verdict"] == "PASS_WITH_FLAGS"
+    assert qualified["evidence_label"] == "development_validation"
 
 
 def test_setup_review_can_expire_while_existing_observation_certification_stays_green(
@@ -300,3 +311,11 @@ def test_derived_receipts_and_summary(store, tmp_path, source, count):
     assert summary["n_cards"] == count
     assert summary["n_pass"] == 0
     assert len(list(derived.glob("*.json"))) == count + 1
+
+
+def test_four_study_summary_keeps_every_card(store, tmp_path):
+    manifests = [ROOT / "data/literature/reproduction-cards" / f"{source}.yaml" for source in SOURCES]
+    summary = write_studies(ROOT, manifests, tmp_path, store=store)
+    assert summary["n_cards"] == 128
+    assert summary["n_pass"] == summary["n_pass_with_flags"] == 0
+    assert len(list(tmp_path.glob("*.json"))) == 129
