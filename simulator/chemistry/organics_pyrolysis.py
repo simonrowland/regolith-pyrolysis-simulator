@@ -199,11 +199,21 @@ def voropaev_release_fraction(
     ys = [float(v) for v in curves[species]]
     fraction = _interp_cumulative(temperature_C, temps, ys)
     run_end = float(cfg.get("run_end_C") or 800.0)
+    below_lowest_knot = temperature_C < temps[0]
     return {
         "fraction": fraction,
         "status": "partly_grounded",
         "run_end_normalization": temperature_C >= run_end - 1e-9,
         "run_end_is_complete_release": False,
+        "release_below_lowest_knot": (
+            {
+                "reason": "release_below_lowest_knot",
+                "band_C": (temps[0], run_end),
+                "authority_level": str(cfg.get("status") or "unknown"),
+            }
+            if below_lowest_knot
+            else None
+        ),
         "source": cfg.get("source"),
         "use": cfg.get("use"),
     }

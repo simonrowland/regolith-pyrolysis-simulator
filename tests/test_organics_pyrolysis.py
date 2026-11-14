@@ -119,6 +119,29 @@ def test_voropaev_co2_organic_population_is_half_at_500c() -> None:
     assert 0.0 < early["fraction"] < 0.2
 
 
+def test_voropaev_below_lowest_knot_is_flagged_without_moving_fraction() -> None:
+    params = load_organics_pyrolysis_params()
+    curve = params["voropaev_2023_release"]
+    low_C = curve["temperature_C"][0]
+    high_C = curve["run_end_C"]
+    first_knot_fraction = curve["cumulative_pct"]["CH4"][0] / 100.0
+
+    below = voropaev_release_fraction("CH4", low_C - 0.1, params)
+    at_low_edge = voropaev_release_fraction("CH4", low_C, params)
+    inside = voropaev_release_fraction("CH4", (low_C + high_C) / 2.0, params)
+    at_high_edge = voropaev_release_fraction("CH4", high_C, params)
+
+    assert below["fraction"] == first_knot_fraction
+    assert below["release_below_lowest_knot"] == {
+        "reason": "release_below_lowest_knot",
+        "band_C": (low_C, high_C),
+        "authority_level": curve["status"],
+    }
+    assert at_low_edge["release_below_lowest_knot"] is None
+    assert inside["release_below_lowest_knot"] is None
+    assert at_high_edge["release_below_lowest_knot"] is None
+
+
 def test_primary_pyrolysis_has_no_co_and_emits_h2() -> None:
     atoms = {"C": 100.0, "H": 75.0, "O": 15.0, "N": 3.5, "S": 2.0}
     result = primary_pyrolysis(atoms, 800.0)
