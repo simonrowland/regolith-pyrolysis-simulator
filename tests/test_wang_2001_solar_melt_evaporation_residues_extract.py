@@ -258,10 +258,15 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         assert uncertainty.kind.value == "printed"
         assert uncertainty.value == Decimal(error)
         assert uncertainty.basis == "wt%"
-        assert uncertainty.verbatim["verbatim"] == (
-            "Uncertainties are ±1σ standard errors calculated from replicate analyses."
+        source_observation = next(
+            row
+            for block in source["species"].values()
+            for row in block.get("observations", ())
+            if row["observation_id"] == observation_id
         )
-        assert uncertainty.verbatim["confidence_level"] == "one_sigma"
+        declared_uncertainty = source_observation["uncertainty"]
+        assert uncertainty.verbatim["verbatim"] == declared_uncertainty["verbatim"]
+        assert uncertainty.verbatim["confidence_level"] == declared_uncertainty["confidence_level"]
         if (
             formula == "MgO"
             and sample == "SC12"
@@ -277,7 +282,6 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
             assert scored_band.band is not None
             assert scored_band.band.value == Decimal("0.5879891953620162")
             assert scored_band.notice is None
-
     sc1_experiment_id = "10.1016/s0016-7037(00)00529-9::experiment::run-sc1"
     sc1_experiment = migrator.result.experiments[sc1_experiment_id]
     assert sc1_experiment.sample.mass_kg.state.value.point == Decimal("0.0001653")
@@ -386,3 +390,34 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
             assert actual_by_sample[(Quantity.ISOTOPE_DELTA, sample)] == Counter({"O": 2, "Mg": 2, "Si": 2})
         else:
             assert actual_by_sample[(Quantity.ISOTOPE_DELTA, sample)] == Counter()
+
+
+def test_component_errors_without_extract_uncertainty_declaration_are_not_one_sigma(
+    tmp_path: Path,
+) -> None:
+    source = yaml.safe_load(EXTRACT.read_text())
+    for block in source["species"].values():
+        for observation in block.get("observations", ()):
+            if observation.get("values", {}).get("quantity") == "residue_composition_vs_time":
+                observation.pop("uncertainty", None)
+
+    mutated_extract = tmp_path / EXTRACT.name
+    mutated_extract.write_text(yaml.safe_dump(source, sort_keys=False))
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(mutated_extract)
+    migrator.finalize()
+
+    migrated_errors = [
+        row for row in migrator.result.observations.values()
+        if row.uncertainty.value is not None
+    ]
+    assert len(migrated_errors) == 182
+    for observation in migrated_errors:
+        scored_band = _printed_uncertainty_band(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            observation.uncertainty,
+            observation.value.point,
+            source_observation=observation,
+        )
+        assert scored_band.notice is not None
+        assert scored_band.notice.reason == "confidence_level_not_stated"

@@ -29988,12 +29988,11 @@ class Migrator:
         if component_standard_error is not None:
             unc = Uncertainty(
                 kind=UncertaintyKind.PRINTED,
-                verbatim={
-                    "verbatim": (
-                        "Uncertainties are ±1σ standard errors calculated from replicate analyses."
-                    ),
-                    "confidence_level": "one_sigma",
-                },
+                verbatim=(
+                    uncertainty.verbatim
+                    if isinstance(uncertainty.verbatim, Mapping)
+                    else {}
+                ),
                 value=_parse_declared_decimal(component_standard_error),
                 basis=units,
                 locator=point_locator,

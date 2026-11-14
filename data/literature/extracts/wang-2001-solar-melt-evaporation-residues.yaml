@@ -32,9 +32,8 @@ notes:
   the individual La–Lu ppm values are typed.
 - >-
   Table 1 prints 1σ standard errors for individual components. Nonzero cell errors are retained as standard_errors
-  in each v1 row; printed zero errors are omitted. The residue-series migration carries these component-specific
-  errors as numeric printed uncertainties with the one-sigma confidence level. The printed definition is “Uncertainties
-  are ±1σ standard errors calculated from replicate analyses.”
+  in each v1 row; printed zero errors are omitted. Each residue-series observation declares the printed definition
+  and confidence level for these component-specific errors.
 experiments:
 - experiment_id: run-sc1
   method: langmuir_free_evaporation
@@ -165,6 +164,10 @@ species:
     observations:
     - observation_id: wang_2001_table1_electron_microprobe_residue_compositions
       type: composition_series
+      uncertainty:
+        kind: printed
+        verbatim: "Uncertainties are ±1σ standard errors calculated from replicate analyses."
+        confidence_level: one_sigma
       locator:
         page: 4
         published_page: 482
@@ -1294,6 +1297,10 @@ species:
           FeO_wt_pct: '0.003'
     - observation_id: wang_2001_table1_ion_microprobe_residue_compositions
       type: composition_series
+      uncertainty:
+        kind: printed
+        verbatim: "Uncertainties are ±1σ standard errors calculated from replicate analyses."
+        confidence_level: one_sigma
       locator:
         page: 4
         published_page: 482
