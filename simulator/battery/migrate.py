@@ -4560,6 +4560,14 @@ class MeasuredCounts:
 
 
 @dataclass
+class QueueWorkCounts:
+    backlog_by_source: Counter[str] = field(default_factory=Counter)
+    reference_by_source: Counter[str] = field(default_factory=Counter)
+    backlog_by_path: Counter[str] = field(default_factory=Counter)
+    reference_by_path: Counter[str] = field(default_factory=Counter)
+
+
+@dataclass
 class MigrationResult:
     works: dict[str, Work] = field(default_factory=dict)
     benches: dict[str, Bench] = field(default_factory=dict)
@@ -4580,6 +4588,7 @@ class MigrationResult:
         default_factory=lambda: defaultdict(list)
     )
     queue: list[QueueEntry] = field(default_factory=list)
+    queue_work_counts: QueueWorkCounts | None = None
     source_counts: dict[str, SourceCount] = field(default_factory=dict)
     measured: MeasuredCounts = field(default_factory=MeasuredCounts)
     aliases: dict[str, str] = field(default_factory=dict)
@@ -27668,6 +27677,7 @@ class Migrator:
             oxygen_decision,
             from_fallback=oxygen_decision_fallback,
         )
+        oxygen_applied = False
         # Residue fO2 is the printed-only promotion above. The generic
         # decision covers every other quantity, including a derived ratio
         # copied from the row point.
@@ -27679,6 +27689,7 @@ class Migrator:
             )
         ):
             ident_kwargs["fO2_Pa"] = oxygen_state
+            oxygen_applied = True
         identity_for_profile = (
             Identity(
                 quantity=State.of(q_token),
@@ -29212,7 +29223,6 @@ class Migrator:
             q_token, ident_kwargs.get("subtype")
         )
         coord = None
-        val = None
         trail = "identity"
         extra_unc = None
         extra_unc_k: int | None = None
@@ -29550,7 +29560,6 @@ class Migrator:
                         "duplicate_of_observation_id"
                     ],
                 }
-            val = value_sel.amount
             trail = value_sel.unit_trail
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
@@ -32132,7 +32141,7 @@ class Migrator:
         count = self._count(rel)
         try:
             doc = load_json(path) if path.suffix == ".json" else load_yaml(path)
-        except (OSError, json.JSONDecodeError, yaml.YAMLError) as exc:
+        except (OSError, json.JSONDecodeError, yaml.YAMLError):
             count.metadata_in += 1
             return
         if not isinstance(doc, Mapping):
@@ -33383,6 +33392,9 @@ class Migrator:
             validation.issues + tuple(self.result.registry_issues),
             validation.notices,
         )
+        self.result.queue_work_counts = _queue_work_counts(
+            self.result.queue, self.root
+        )
 
     def run(self) -> MigrationResult:
         self.migrate_index_only_sources()
@@ -33584,6 +33596,8 @@ def migration_queue_document(
 
 def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     root = root or REPO_ROOT
+    if result.queue_work_counts is None:
+        result.queue_work_counts = _queue_work_counts(result.queue, root)
     works_dir = root / "data" / "literature" / "works"
     extracts_v2 = root / "data" / "literature" / "extracts-v2"
     observations_v2 = root / "data" / "literature" / "observations-v2"
@@ -33816,6 +33830,56 @@ def _store_regeneration_differences(
     )
 
 
+def _queue_work_counts(
+    queue: Iterable[QueueEntry], root: Path
+) -> QueueWorkCounts:
+    """Count intake backlog and non-scoring reference inputs by manifest source."""
+
+    backlog: Counter[str] = Counter()
+    reference_inputs: Counter[str] = Counter()
+    backlog_by_path: Counter[str] = Counter()
+    references_by_path: Counter[str] = Counter()
+    manifest_cache: dict[Path, Mapping[str, Any]] = {}
+    compilations = root / "data" / "literature" / "compilations"
+    for entry in queue:
+        source = entry.source or ""
+        source_path = root / source
+        manifest_path = next(
+            (
+                parent / "manifest.yaml"
+                for parent in source_path.parents
+                if parent.is_relative_to(compilations)
+                and (parent / "manifest.yaml").is_file()
+            ),
+            None,
+        )
+        manifest: Mapping[str, Any] = {}
+        if manifest_path is not None:
+            if manifest_path not in manifest_cache:
+                loaded = load_yaml(manifest_path)
+                manifest_cache[manifest_path] = (
+                    loaded if isinstance(loaded, Mapping) else {}
+                )
+            manifest = manifest_cache[manifest_path]
+        role = manifest.get("compilation_role")
+        role = role if isinstance(role, Mapping) else {}
+        source_name = str(manifest.get("source_id") or source or "<unknown>")
+        target = reference_inputs if role.get("scoring_eligible") is False else backlog
+        target[source_name] += 1
+        path_target = (
+            references_by_path
+            if role.get("scoring_eligible") is False
+            else backlog_by_path
+        )
+        path_target[source] += 1
+    return QueueWorkCounts(
+        backlog_by_source=backlog,
+        reference_by_source=reference_inputs,
+        backlog_by_path=backlog_by_path,
+        reference_by_path=references_by_path,
+    )
+
+
 def write_report(result: MigrationResult, path: Path) -> None:
     measured = result.measured
     hard = 0 if result.validation is None else len(result.validation.hard_issues)
@@ -33829,6 +33893,11 @@ def write_report(result: MigrationResult, path: Path) -> None:
         else "<missing_reason>"
         for observation in unavailable_work
     )
+    queue_work_counts = result.queue_work_counts
+    if queue_work_counts is None:
+        raise ValueError("migration queue work counts are not classified")
+    backlog_count = sum(queue_work_counts.backlog_by_source.values())
+    reference_count = sum(queue_work_counts.reference_by_source.values())
     lines = [
         "# Battery v2.1 migration report",
         "",
@@ -33837,6 +33906,8 @@ def write_report(result: MigrationResult, path: Path) -> None:
         f"works: {len(result.works)}",
         f"experiments: {len(result.experiments)}",
         f"queue size: {len(result.queue)}",
+        f"queue backlog: {backlog_count}",
+        f"reference inputs: {reference_count}",
         f"identical-payload dedupe aliases: {len(result.dedupe_aliases)}",
         f"metadata files: {sum(c.metadata_in for c in result.source_counts.values())}",
         f"index sources: {sum(c.index_works_in for c in result.source_counts.values())}",
@@ -33920,14 +33991,14 @@ def write_report(result: MigrationResult, path: Path) -> None:
         lines.extend(["", "| token | count |", "|---|---:|"])
         for token, n in sorted(unrecognised.items(), key=lambda kv: (-kv[1], kv[0])):
             lines.append(f"| `{token}` | {n} |")
-    lines.extend(["", "## Per source", "", "| source | rows in | observations out | queued |", "|---|---:|---:|---:|"])
-    queued_by_source: dict[str, int] = defaultdict(int)
-    for entry in result.queue:
-        queued_by_source[entry.source or ""] += 1
+    lines.extend(["", "## Per source", "", "| source | rows in | observations out | queued backlog | reference inputs |", "|---|---:|---:|---:|---:|"])
     for src, rec in sorted(result.source_counts.items()):
         lines.append(
-            f"| `{src}` | {rec.rows_in} | {rec.observations_out} | {queued_by_source.get(src, 0)} |"
+            f"| `{src}` | {rec.rows_in} | {rec.observations_out} | {queue_work_counts.backlog_by_path.get(src, 0)} | {queue_work_counts.reference_by_path.get(src, 0)} |"
         )
+    lines.extend(["", "## Reference inputs by source", "", "| source | count |", "|---|---:|"])
+    for src, count in sorted(queue_work_counts.reference_by_source.items()):
+        lines.append(f"| `{src}` | {count} |")
     if result.validation is not None and result.validation.hard_issues:
         hard_census: dict[str, int] = defaultdict(int)
         for issue in result.validation.hard_issues:
