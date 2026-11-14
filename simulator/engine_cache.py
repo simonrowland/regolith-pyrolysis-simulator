@@ -327,8 +327,8 @@ ENGINE_CHEMISTRY_VERSION = {
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
-        "identity": "commit:66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84",
-        "date": "2026-11-08",
+        "identity": "commit:744aade47ceef645e6426e5a6b84a891c27ae856",
+        "date": "2026-11-14",
     },
     "internal-analytical": {
         "identity": "source-sha256:ac03c54243b61890960158318fb40a52972f301e9ac1dc9c381fa3a495818740",
