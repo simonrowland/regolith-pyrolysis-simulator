@@ -380,6 +380,16 @@ def _dummy_sio_sim() -> SimpleNamespace:
     return sim
 
 
+def test_sio_owner_fixture_accepts_the_live_interval_keyword():
+    sim = _dummy_sio_sim()
+    _prepare_sio_campaign_start(sim, t_hold_c="1200.0")
+    assert sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C2A, 0.0, sim.melt, dt_hr=0.25,
+    ) == (1200.0, 5.0)
+    # Revert: a three-argument fixture target rejects the forwarded keyword,
+    # preventing the existing scalar-admission guards from reaching their owner.
+
+
 def _sio_start(value: Any) -> float:
     sim = _dummy_sio_sim()
     _prepare_sio_campaign_start(sim, t_low_c=value)
