@@ -589,6 +589,24 @@ def test_cost_rollup_uses_snapshot_electrical_breakdown_for_mre_auxiliary():
     assert o2.electrical_kWh == pytest.approx(5.0)
 
 
+def test_cost_rollup_matches_each_fractional_snapshot_without_hour_collisions():
+    from simulator.state import EnergyRecord, HourSnapshot
+
+    times = [0.25, 0.5, 0.75, 1.0]
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=tuple({"hour": hour, "T_C": 1000.0} for hour in times),
+        products_kg={"O2": 1.0},
+        snapshots=tuple(
+            HourSnapshot(hour=hour, duration_h=0.25,
+                         energy=EnergyRecord(turbine_kWh=float(index)))
+            for index, hour in enumerate(times, 1)
+        ),
+    )
+    components = diagnostic["auxiliary_electrical_diagnostic"]["components_kWh"]
+    assert components["turbine"] == 10.0
+
+
 def test_cost_rollup_breakdown_aliases_do_not_double_sum():
     diagnostic = build_cost_rollup_diagnostic(
         cost_ledger=CostLedger(),

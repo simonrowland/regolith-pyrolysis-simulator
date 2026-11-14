@@ -299,3 +299,40 @@ def test_c6_subhour_ramp_dispatch_and_hold_use_the_same_sample(monkeypatch):
     assert comparisons[0] == (1225.0, 1225.0)
     assert dispatch_temperatures == [1225.0]
     assert snapshot.c6_at_hold_target is True
+
+
+def test_fractional_notice_ticks_and_redox_source_times_remain_distinct():
+    session = _isothermal_session(0.25)
+    sim = session.simulator
+    times = [0.25, 0.5, 0.75, 1.0]
+    sim._high_t_melt_activity_fallback_steps = [
+        {"hour": hour, "campaign": "C2A", "parent_oxides": ["FeO"],
+         "reason": {"code": "openimcc_evaluation_refused"}}
+        for hour in times
+    ]
+    sim._sulfur_saturation_steps = [
+        {"hour": hour, "notice": {"calibration_status": "out_of_range",
+                                  "warnings": ["outside calibration"]}}
+        for hour in times
+    ]
+    high_t = sim.high_t_melt_activity_run_notice()
+    sulfur = sim.sulfur_saturation_run_notice()
+    assert high_t["affected_tick_count"] == sulfur["count"] == 4
+    assert high_t["first_hour"] == sulfur["first_hour"] == 0.25
+    assert high_t["last_hour"] == sulfur["last_hour"] == 1.0
+
+    for hour in times:
+        assert session.advance(dt_hr=0.25).snapshot.hour == hour
+        # Record a diagnostic source at the real endpoint. The bookkeeping
+        # term does not commit a chemistry transition or alter inventories.
+        sim._reset_redox_source_diagnostics_for_hour()
+        sim._accumulate_redox_source_terms_for_hour(
+            "_redox_source_terms_this_hr", {"diagnostic_probe": 1.0},
+        )
+        diagnostic = sim._redox_source_breakdown_diagnostic()
+        snapshot = sim._make_snapshot()
+        assert diagnostic["source_context"]["hour"] == hour
+        assert diagnostic["source_hour"] == hour
+        assert diagnostic["source_campaign_hour"] == hour
+        assert snapshot.oxygen_reservoir["redox_source_hour"] == hour
+        assert snapshot.oxygen_reservoir["redox_source_campaign_hour"] == hour

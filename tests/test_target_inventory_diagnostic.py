@@ -78,6 +78,17 @@ def _assert_kinetics_gap(record: dict) -> None:
     assert record["stage0_release_kinetics"] == STAGE0_RELEASE_KINETICS
 
 
+def test_fractional_target_inventory_times_and_first_depletion_are_preserved():
+    sim = _c0_sim("lunar_mare_low_ti")
+    for hour in (0.25, 0.5, 0.75, 1.0):
+        sim.melt.hour = hour
+        sim._update_target_inventory_diagnostic()
+        record = sim._last_target_inventory_diagnostic
+        assert record["hour"] == hour
+        assert record["depleted"] is True
+        assert record["depletion_hour"] == 0.25
+
+
 def test_lunar_c0_depleted_from_load_with_kinetics_gap() -> None:
     sim = _c0_sim("lunar_mare_low_ti")
     sim.step()

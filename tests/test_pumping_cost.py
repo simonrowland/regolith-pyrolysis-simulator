@@ -615,6 +615,7 @@ def test_quarter_hour_pumping_snapshots_charge_one_hour(conductance):
         sim, [snapshot(i / 4, 0.25) for i in range(1, 5)],
     )
     assert [row["duration_s"] for row in quarter_context["rows"]] == [900.0] * 4
+    assert [row["hour"] for row in quarter_context["rows"]] == [0.25, 0.5, 0.75, 1.0]
     full_cost, full = run_pumping_input_cost(full_context)
     quarter_cost, quarter = run_pumping_input_cost(quarter_context)
     assert full_cost is not None and quarter_cost is not None
@@ -623,6 +624,7 @@ def test_quarter_hour_pumping_snapshots_charge_one_hour(conductance):
     )
     assert quarter["status"] == full["status"]
     assert quarter["feasible"] is full["feasible"]
+    assert [row["hour"] for row in quarter["rows"]] == [0.25, 0.5, 0.75, 1.0]
     if conductance is None:
         assert all(row["status"] == "missing-validated-line-conductance"
                    for row in quarter["rows"])
@@ -633,11 +635,12 @@ def test_pumping_context_refuses_unknown_or_invalid_step_duration(duration):
     context = pumping_context_from_sim(
         SimpleNamespace(melt=SimpleNamespace(body="mars", ambient_pressure_mbar=6.1)),
         [HourSnapshot(
-            duration_h=duration, O2_vented_mol_hr=2.0,
+            hour=0.25, duration_h=duration, O2_vented_mol_hr=2.0,
             overhead=OverheadGas(pressure_mbar=1.0, headspace_temperature_K=300.0),
         )],
     )
     assert context["status"] == "refused"
+    assert context["hour"] == 0.25
     assert context["reason"] == (
         "missing-step-duration" if duration is None else "invalid-step-duration"
     )
