@@ -2251,9 +2251,16 @@ class _MELTSBackendSupport(MeltBackend):
         phases = self._parse_phase_main_output(phase_block)
         instances = phases['phase_instances']
         for phase in instances:
-            if not all(math.isfinite(float(phase[key])) for key in (
-                'enthalpy_J', 'entropy_J_K', 'solver_basis_mass_kg',
-            )) or phase['solver_basis_mass_kg'] < 0:
+            phase_thermodynamics = tuple(
+                phase.get(key)
+                for key in (
+                    'enthalpy_J', 'entropy_J_K', 'solver_basis_mass_kg',
+                )
+            )
+            if not all(
+                value is not None and math.isfinite(float(value))
+                for value in phase_thermodynamics
+            ) or phase_thermodynamics[2] < 0:
                 raise ValueError('cooling path invalid phase thermodynamics')
         masses = {name: data['reference_mass_kg']
                   for name, data in phases['phase_thermo'].items()}
