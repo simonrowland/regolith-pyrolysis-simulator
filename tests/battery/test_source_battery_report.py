@@ -5,7 +5,6 @@ from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 
@@ -278,47 +277,20 @@ def test_source_scoring_reconciles_full_context_cross_source_numeric_band(
 
 
 def test_json_cli_uses_full_context_and_keeps_progress_out_of_stdout(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys
+    monkeypatch: pytest.MonkeyPatch, capsys
 ) -> None:
-    context_sources_requested = []
+    expected_payload = {"source_id": "fixture-source"}
+    builder_calls = []
 
-    def capture_context_builder(
-        _source_id,
-        *,
-        repo_root,
-        migrated_root,
-        scratch_root,
-        context_sources,
-    ):
-        context_sources_requested.append(context_sources)
-
-    def score_with_progress(_context, _source_id, *, engines):
+    def build_report_stub(_source_id, *, engines=None, context_sources=None):
+        builder_calls.append((engines, context_sources))
         print("score progress 1/1 residuals")
-        return (), ()
+        return expected_payload
 
-    def temporary_report_dir(*, prefix):
-        path = tmp_path / prefix
-        path.mkdir()
-        return str(path)
-
-    monkeypatch.setattr(source_battery_report, "_isolated_source_root", lambda *_: None)
-    monkeypatch.setattr(
-        source_battery_report,
-        "migrate",
-        lambda *_args, **_kwargs: SimpleNamespace(
-            validation=SimpleNamespace(hard_issues=()),
-            source_counts={},
-            observations=(),
-        ),
-    )
-    monkeypatch.setattr(source_battery_report, "write_outputs", lambda *_: None)
-    monkeypatch.setattr(
-        source_battery_report, "_score_context_for_source", capture_context_builder
-    )
-    monkeypatch.setattr(source_battery_report, "_score_source", score_with_progress)
-    monkeypatch.setattr(source_battery_report.tempfile, "mkdtemp", temporary_report_dir)
+    # main() resolves this module attribute directly at call time.
+    monkeypatch.setattr(source_battery_report, "build_source_report", build_report_stub)
     assert source_battery_report.main(["fixture-source", "--json"]) == 0
     captured = capsys.readouterr()
-    assert context_sources_requested == [None]
-    assert json.loads(captured.out) == {"source_id": "fixture-source"}
+    assert builder_calls == [(None, None)]
+    assert json.loads(captured.out) == expected_payload
     assert "score progress 1/1 residuals" in captured.err
