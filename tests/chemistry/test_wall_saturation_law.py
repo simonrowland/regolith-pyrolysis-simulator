@@ -659,15 +659,22 @@ def test_record_state_cache_tracks_path_and_file_version(
     original_loader = getattr(wall_module, loader_name)
     loaded_paths: list[Path] = []
     polynomial_calls = []
+    polynomial_evaluations = []
 
     if thermo == "nasa":
         original_polynomial = wall_module.NasaCeaPolynomial
+        original_evaluate = original_polynomial.evaluate
 
         def counted_polynomial(*args: object, **kwargs: object):
             polynomial_calls.append((args, kwargs))
             return original_polynomial(*args, **kwargs)
 
+        def counted_evaluate(polynomial: object, temperature_K: float):
+            polynomial_evaluations.append(temperature_K)
+            return original_evaluate(polynomial, temperature_K)
+
         monkeypatch.setattr(wall_module, "NasaCeaPolynomial", counted_polynomial)
+        monkeypatch.setattr(original_polynomial, "evaluate", counted_evaluate)
 
     def counted_loader(path: Path) -> dict[str, object]:
         loaded_paths.append(path)
@@ -690,6 +697,7 @@ def test_record_state_cache_tracks_path_and_file_version(
     assert loaded_paths == [target_a]
     if thermo == "nasa":
         assert len(polynomial_calls) == 1
+        assert polynomial_evaluations == []
 
     # Same record ID and file metadata in a different root is a different source.
     monkeypatch.setattr(wall_module, root_name, root_b)
@@ -697,6 +705,7 @@ def test_record_state_cache_tracks_path_and_file_version(
     assert loaded_paths == [target_a, target_b]
     if thermo == "nasa":
         assert len(polynomial_calls) == 2
+        assert polynomial_evaluations == []
 
     before = target_b.stat()
     document = original_loader(target_b)
@@ -735,6 +744,7 @@ def test_record_state_cache_tracks_path_and_file_version(
     assert loaded_paths == [target_a, target_b, target_b]
     if thermo == "nasa":
         assert len(polynomial_calls) == 3
+        assert polynomial_evaluations == []
 
 
 def test_cro_janaf_log_sits_beside_nasa() -> None:
