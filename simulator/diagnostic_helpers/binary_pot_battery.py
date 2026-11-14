@@ -3910,6 +3910,7 @@ class _InternalAnalyticalBatteryBackend:
         core = self._core
         core._high_t_melt_activity_fallback_steps = []
         core._last_vapor_pressure_diagnostic = {}
+        core._high_t_melt_activity_table_fallback_ticks = {}
         return _internal_analytical_vapor_pressure_adapter(
             core=self._core,
             temperature_C=temperature_C,
