@@ -248,7 +248,7 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         matches = [
             row for row in migrated_errors
             if f"::{observation_id}::" in row.observation_id
-            and row.locator.row == sample
+            and re.search(rf"row={re.escape(sample)}(?!\d)", row.locator.note or "")
             and row.identity.species.formula == formula
         ]
         assert len(matches) == 1, (observation_id, sample, formula)
@@ -268,7 +268,7 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     sc1_silica = [
         row for row in observations
         if row.identity.species.formula == "SiO2"
-        and row.locator.row == "SC1"
+        and re.search(r"row=SC1(?!\d)", row.locator.note or "")
         and "table1_electron_microprobe_residue_compositions" in row.observation_id
     ]
     assert len(sc1_silica) == 1

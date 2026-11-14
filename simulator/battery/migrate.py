@@ -27671,6 +27671,7 @@ class Migrator:
         # Residue fO2 is the printed-only promotion above. The generic
         # decision covers every other quantity, including a derived ratio
         # copied from the row point.
+        oxygen_applied = False
         if (
             q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             and oxygen_state is not None
@@ -27678,6 +27679,7 @@ class Migrator:
                 admission, row_point_conditions
             )
         ):
+            oxygen_applied = True
             ident_kwargs["fO2_Pa"] = oxygen_state
         identity_for_profile = (
             Identity(
@@ -29212,10 +29214,10 @@ class Migrator:
             q_token, ident_kwargs.get("subtype")
         )
         coord = None
-        val = None
         trail = "identity"
         extra_unc = None
         extra_unc_k: int | None = None
+        component_standard_error = None
         point_locator = locator
         t_trail: str | None = None
         t_original: object = None
@@ -29550,7 +29552,6 @@ class Migrator:
                         "duplicate_of_observation_id"
                     ],
                 }
-            val = value_sel.amount
             trail = value_sel.unit_trail
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
@@ -29564,6 +29565,13 @@ class Migrator:
                     source=source_key,
                     observation_id=point_id,
                 )
+            if (
+                q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                and isinstance(raw_item, Mapping)
+            ):
+                standard_errors = raw_item.get("standard_errors")
+                if isinstance(standard_errors, Mapping):
+                    component_standard_error = standard_errors.get(species.formula)
             extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
             if extra_unc is None and _WIMPENNY_DELTA_2SIGMA_FIELD in raw_item:
                 extra_unc = raw_item.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
@@ -29977,7 +29985,17 @@ class Migrator:
         if parent_id in self._author_derivations:
             self._author_derivations[point_id] = self._author_derivations[parent_id]
         unc = uncertainty
-        if extra_unc is not None:
+        if component_standard_error is not None:
+            unc = Uncertainty(
+                kind=UncertaintyKind.PRINTED,
+                verbatim=(
+                    "Uncertainties are ±1σ standard errors calculated from replicate analyses."
+                ),
+                value=_parse_declared_decimal(component_standard_error),
+                basis=units,
+                locator=point_locator,
+            )
+        elif extra_unc is not None:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
             if isinstance(uncertainty.verbatim, Mapping):
                 confidence_level = uncertainty.verbatim.get("confidence_level")
@@ -32132,7 +32150,7 @@ class Migrator:
         count = self._count(rel)
         try:
             doc = load_json(path) if path.suffix == ".json" else load_yaml(path)
-        except (OSError, json.JSONDecodeError, yaml.YAMLError) as exc:
+        except (OSError, json.JSONDecodeError, yaml.YAMLError):
             count.metadata_in += 1
             return
         if not isinstance(doc, Mapping):
