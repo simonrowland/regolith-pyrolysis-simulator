@@ -200,10 +200,13 @@ class OffgasFO2:
     #: CH4-bearing and CO-free (organics_pyrolysis emits H2/CH4/H2O/CO2/N2/
     #: H2S/COS with CO forced to zero).
     unmodelled_species_mol: dict[str, float] = field(default_factory=dict)
+    #: Full CEA-vs-JANAF post-WGS log fO2 spread, in dex. None when no second
+    #: equilibrium-constant source was supplied or WGS did not run.
+    uncertainty_band_dex: float | None = None
     notes: tuple[str, ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
-        return {
+        result = {
             "schema": self.schema,
             "status": self.status,
             "coupling": self.coupling,
@@ -220,6 +223,9 @@ class OffgasFO2:
             "unmodelled_species_mol": dict(self.unmodelled_species_mol),
             "notes": list(self.notes),
         }
+        if self.uncertainty_band_dex is not None:
+            result["uncertainty_band_dex"] = self.uncertainty_band_dex
+        return result
 
 
 @dataclass(frozen=True)
@@ -1024,6 +1030,9 @@ def imposed_fo2(
     species_mol: Mapping[str, float],
     T_K: float,
     polynomials: Mapping[str, NasaCeaPolynomial] | None = None,
+    *,
+    janaf_formation_gibbs_J_per_mol: Mapping[str, float] | None = None,
+    janaf_gas_constant_J_per_mol_K: float | None = None,
 ) -> OffgasFO2:
     """The single fO2 an offgas imposes at ``T_K``, after shift equilibration.
 
@@ -1031,6 +1040,13 @@ def imposed_fo2(
     a gas of pure H2 with no oxidised partner imposes an unboundedly low fO2, and
     there is no honest finite number to return.
     """
+
+    if (janaf_formation_gibbs_J_per_mol is None) != (
+        janaf_gas_constant_J_per_mol_K is None
+    ):
+        raise OffgasFO2Unavailable(
+            "JANAF WGS comparison needs both formation Gibbs energies and gas constant"
+        )
 
     polys = polynomials if polynomials is not None else load_buffer_polynomials()
     # Normalise the temperature ONCE, here, and use this value everywhere below.
@@ -1193,6 +1209,48 @@ def imposed_fo2(
         log10_K_h2,
     )
 
+    uncertainty_band_dex: float | None = None
+    if janaf_formation_gibbs_J_per_mol is not None:
+        required_species = ("CO", "CO2", "H2", "H2O", "O2")
+        missing_species = tuple(
+            formula
+            for formula in required_species
+            if formula not in janaf_formation_gibbs_J_per_mol
+        )
+        if missing_species:
+            raise OffgasFO2Unavailable(
+                "JANAF WGS comparison lacks formation Gibbs energies for "
+                + ", ".join(missing_species)
+            )
+        assert janaf_gas_constant_J_per_mol_K is not None
+        janaf_log10_K_co = _log10_K_from_formation_gibbs_J_per_mol(
+            (("CO2", 1.0), ("CO", -1.0), ("O2", -0.5)),
+            janaf_formation_gibbs_J_per_mol,
+            T_K,
+            janaf_gas_constant_J_per_mol_K,
+        )
+        janaf_log10_K_h2 = _log10_K_from_formation_gibbs_J_per_mol(
+            (("H2O", 1.0), ("H2", -1.0), ("O2", -0.5)),
+            janaf_formation_gibbs_J_per_mol,
+            T_K,
+            janaf_gas_constant_J_per_mol_K,
+        )
+        _, _, _, janaf_value = _equilibrated_wgs_prediction(
+            n_CO,
+            n_H2O,
+            n_CO2,
+            n_H2,
+            janaf_log10_K_co,
+            janaf_log10_K_h2,
+        )
+        # Premise: CEA remains the central value, while JANAF is a second
+        # equilibrium-constant source with its own WGS extent. Algebra:
+        # δ=|log10(fO2_CEA)-log10(fO2_JANAF)|, so CEA±δ encloses both source
+        # predictions. Both terms are log10(fO2/bar), hence their difference
+        # is a dimensionless dex band. Sanity limit: identical source
+        # predictions give δ=0; this is source spread, not kinetic uncertainty.
+        uncertainty_band_dex = abs(value - janaf_value)
+
     log10_Q_over_K: float | None = None
     disagreement: float | None = None
     if n_CO > 0.0 and n_H2O > 0.0 and n_CO2 > 0.0 and n_H2 > 0.0:
@@ -1261,6 +1319,7 @@ def imposed_fo2(
         log10_fO2_co_couple_raw=raw_co,
         raw_couple_disagreement_dex=disagreement,
         assumption_strain_dex=strain,
+        uncertainty_band_dex=uncertainty_band_dex,
         equilibrium_assumption_verified=False,
         equilibrated_mol=eq,
         unmodelled_species_mol=unmodelled,
