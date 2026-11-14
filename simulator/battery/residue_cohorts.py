@@ -52,6 +52,7 @@ class LangmuirResidueCohortSpec:
     missing_area_reason: str | None
     vacuum_upper_bound_identity: bool
     geometry_notice_reason: str | None
+    thermal_schedule_notice_reasons: tuple[str, ...]
 
 
 _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
@@ -68,6 +69,7 @@ _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
             missing_area_reason=None,
             vacuum_upper_bound_identity=False,
             geometry_notice_reason=None,
+            thermal_schedule_notice_reasons=(),
         ),
         RICHTER_2007_SOURCE_ID: LangmuirResidueCohortSpec(
             extract_path="data/literature/extracts/kems-010-richter-2007.yaml",
@@ -84,6 +86,14 @@ _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
             missing_area_reason="initial_area_unreported",
             vacuum_upper_bound_identity=True,
             geometry_notice_reason="area_evolution_unreported",
+            thermal_schedule_notice_reasons=(
+                "thermal_preheat_path_unreported: the source says about one "
+                "hour to 900 C but omits the starting temperature and ramp; "
+                "this preheat segment is omitted from the point trajectory",
+                "thermal_cooling_path_unresolved: the source says cooling "
+                "to room temperature took a few minutes but gives no "
+                "temperature path; cooling is omitted from the trajectory",
+            ),
         ),
         RICHTER_2011_SOURCE_ID: LangmuirResidueCohortSpec(
             extract_path=(
@@ -103,6 +113,7 @@ _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
             missing_area_reason="initial_area_unreported",
             vacuum_upper_bound_identity=False,
             geometry_notice_reason="area_evolution_unreported",
+            thermal_schedule_notice_reasons=(),
         ),
     }
 )

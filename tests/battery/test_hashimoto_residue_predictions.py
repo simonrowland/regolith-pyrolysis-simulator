@@ -827,7 +827,7 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     monkeypatch.setattr(openimcc_bridge, "evaluate", track_activities)
     gas_pack = load_gas_datapack()
     for experiment in experiments[:2]:
-        setup = residue._hashimoto_run_setup(
+        setup = residue._langmuir_run_setup(
             experiment,
             gas_pack=gas_pack,
             catalog_rows=catalog_rows,
@@ -838,6 +838,9 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
             reference_printed_wt_pct=(
                 experiments[0]["sample"]["printed_composition"]["state"]["value"]
             ),
+            cohort_spec=residue._LANGMUIR_RESIDUE_COHORTS[
+                residue.HASHIMOTO_SOURCE_ID
+            ],
         )
         residue._hashimoto_integrate_geometry(
             setup.initial_inventory_mol,

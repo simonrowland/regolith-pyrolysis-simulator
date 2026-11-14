@@ -122,8 +122,11 @@ def test_nagabayashi_unlabeled_chamber_dimensions_do_not_become_a_length(
         plain_fact["value"]["state"]["value"]["categorical"]
         == "0.42 x 0.52 x 1 m"
     )
-    assert plain_fact["value"]["locator"]["page"] == 140
-    assert plain_fact["value"]["locator"]["section"] == "2. Experimentals"
+    locator = plain_fact["value"]["locator"]
+    assert locator["page"] == 1
+    assert locator["published_page"] == 140
+    assert locator["pdf_page_index"] == 0
+    assert locator["section"] == "2. Experimentals"
 
 
 def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
@@ -550,6 +553,7 @@ def test_richter_declared_sample_survives_fresh_migration() -> None:
     source_experiments = {
         str(item["experiment_id"]): item for item in doc["experiments"]
     }
+    starting_sample = source_experiments["type-b-cai-like-lab-melt"]["sample"]
     migrator = migrate_one_extract(REPO_ROOT, _RICHTER_EXTRACT)
 
     for raw_id in _RICHTER_STARTING_EXPERIMENTS:
@@ -578,9 +582,13 @@ def test_richter_declared_sample_survives_fresh_migration() -> None:
 
         printed = sample.printed_composition
         assert printed is not None and printed.state.is_value
+        assert printed.locator is not None
+        assert printed.locator.published_page == 5549
+        assert printed.locator.table == "1"
+        assert printed.locator.row == "Starting material"
         expected_printed = {
             str(name): as_decimal(value)
-            for name, value in source["sample"]["printed_composition"]["state"][
+            for name, value in starting_sample["printed_composition"]["state"][
                 "value"
             ].items()
         }

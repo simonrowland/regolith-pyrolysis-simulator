@@ -11,6 +11,7 @@ import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
+from decimal import Decimal
 from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any
@@ -25,7 +26,7 @@ from simulator.battery.oxygen_balance import (
     _solve_vacuum_oxygen_balance,
 )
 from simulator.battery.enums import NoticeKind, Quantity
-from simulator.battery.records import Notice, as_decimal
+from simulator.battery.records import Notice, as_decimal, nominal_pressure_pa
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -406,7 +407,7 @@ class _HashimotoGeometryIntegration:
 
 
 @dataclass(frozen=True)
-class _HashimotoRunSetup:
+class _LangmuirRunSetup:
     experiment_id: str
     temperature_K: float
     duration_s: float
@@ -1225,11 +1226,14 @@ def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
     state = record.get("state")
     if not isinstance(state, Mapping) or state.get("tag") != "value":
         raise ResidueInventoryRefusal("hashimoto_printed_input_missing")
-    value = state.get("value")
-    if isinstance(value, Mapping):
-        value = value.get("point")
+    # The same serialized point is a temperature, a mass, or a pressure.
+    # The nominal reader is the one pressure identity uses, so a band's
+    # point is the call pressure and a bare decimal stays a bare decimal.
+    point = nominal_pressure_pa(state)
+    if point is None:
+        raise ResidueInventoryRefusal("hashimoto_printed_input_invalid")
     try:
-        numeric = float(value)
+        numeric = float(point)
     except (TypeError, ValueError, OverflowError) as exc:
         raise ResidueInventoryRefusal("hashimoto_printed_input_invalid") from exc
     if not math.isfinite(numeric):
@@ -2983,7 +2987,7 @@ def _hashimoto_integrate_langmuir_schedule(
     )
 
 
-def _hashimoto_run_setup(
+def _langmuir_run_setup(
     experiment: Mapping[str, Any],
     *,
     gas_pack: Any,
@@ -2993,11 +2997,11 @@ def _hashimoto_run_setup(
     engine: str,
     engine_metadata: Mapping[str, str],
     reference_printed_wt_pct: Mapping[str, Any],
+    cohort_spec: LangmuirResidueCohortSpec,
     sample_mass_kg_override: float | None = None,
     geometry_areas_override: Mapping[str, float] | None = None,
     allow_pressure_upper_bound: bool = False,
-    source_id: str = HASHIMOTO_SOURCE_ID,
-) -> _HashimotoRunSetup:
+) -> _LangmuirRunSetup:
     """Build the shared per-run inputs used by cohort and refinement checks."""
     from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -3034,7 +3038,7 @@ def _hashimoto_run_setup(
     if dict(run_wt_pct) != dict(reference_printed_wt_pct):
         raise ResidueInventoryRefusal(
             "hashimoto_printed_composition_changed"
-            if source_id == HASHIMOTO_SOURCE_ID
+            if cohort_spec.geometry_source == "hashimoto_metadata_dimensions"
             else "langmuir_printed_composition_changed",
             experiment_id,
         )
@@ -3148,7 +3152,7 @@ def _hashimoto_run_setup(
             else None
         ),
     )
-    return _HashimotoRunSetup(
+    return _LangmuirRunSetup(
         experiment_id=experiment_id,
         temperature_K=temperature_K,
         duration_s=duration_s,
@@ -3248,10 +3252,13 @@ def _predict_langmuir_residue_cohort(
     selected_experiment_ids: frozenset[str] | None = None,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce the declared alpha arms and area geometries for one cohort."""
+    is_hashimoto_mode = (
+        cohort_spec.geometry_source == "hashimoto_metadata_dimensions"
+    )
     if engine not in {"openimcc", "internal-analytical"}:
         raise ResidueInventoryRefusal(
             "hashimoto_engine_unsupported"
-            if source_id == HASHIMOTO_SOURCE_ID
+            if is_hashimoto_mode
             else "langmuir_engine_unsupported",
             engine,
         )
@@ -3269,7 +3276,7 @@ def _predict_langmuir_residue_cohort(
     ):
         raise ResidueInventoryRefusal(
             "hashimoto_cohort_invalid"
-            if source_id == HASHIMOTO_SOURCE_ID
+            if is_hashimoto_mode
             else "langmuir_cohort_invalid",
             f"expected {cohort_spec.experiment_count} distinct physical runs; "
             f"received {len(experiment_ids)}",
@@ -3284,7 +3291,7 @@ def _predict_langmuir_residue_cohort(
     if not code_revision.strip():
         raise ResidueInventoryRefusal(
             "hashimoto_code_revision_missing"
-            if source_id == HASHIMOTO_SOURCE_ID
+            if is_hashimoto_mode
             else "langmuir_code_revision_missing"
         )
     if (
@@ -3336,8 +3343,7 @@ def _predict_langmuir_residue_cohort(
     for experiment in experiments:
         experiment_id = str(experiment.get("experiment_id") or "")
         if (
-            source_id != HASHIMOTO_SOURCE_ID
-            and selected_experiment_ids is not None
+            selected_experiment_ids is not None
             and experiment_id not in selected_experiment_ids
         ):
             continue
@@ -3377,7 +3383,7 @@ def _predict_langmuir_residue_cohort(
             starting_composition_wt_pct = experiment["sample"][
                 "printed_composition"
             ]["state"]["value"]
-            setup = _hashimoto_run_setup(
+            setup = _langmuir_run_setup(
                 experiment,
                 gas_pack=gas_pack,
                 catalog_rows=catalog_rows,
@@ -3386,12 +3392,12 @@ def _predict_langmuir_residue_cohort(
                 engine=engine,
                 engine_metadata=melt_pack_identity,
                 reference_printed_wt_pct=printed_wt_pct,
+                cohort_spec=cohort_spec,
                 sample_mass_kg_override=sample_mass_override_kg,
                 geometry_areas_override=geometry_areas_override,
-                allow_pressure_upper_bound=source_id != HASHIMOTO_SOURCE_ID,
-                source_id=source_id,
+                allow_pressure_upper_bound=not is_hashimoto_mode,
             )
-            if source_id != HASHIMOTO_SOURCE_ID:
+            if not is_hashimoto_mode:
                 thermal_schedule_segments = _mass_loss_thermal_segments(
                     experiment, setup.temperature_K
                 )[2]
@@ -3406,7 +3412,7 @@ def _predict_langmuir_residue_cohort(
                         "thermal_schedule_invalid", experiment_id
                     )
         except ResidueInventoryRefusal as exc:
-            if source_id == HASHIMOTO_SOURCE_ID:
+            if is_hashimoto_mode:
                 raise
             geometry_refusals = {
                 geometry: {
@@ -3445,11 +3451,6 @@ def _predict_langmuir_residue_cohort(
                     )
                 )
             continue
-        if (
-            selected_experiment_ids is not None
-            and experiment_id not in selected_experiment_ids
-        ):
-            continue
         temperature_K = setup.temperature_K
         duration_s = setup.duration_s
         sample_mass_kg = setup.sample_mass_kg
@@ -3457,7 +3458,7 @@ def _predict_langmuir_residue_cohort(
         run_wt_pct = setup.starting_composition_wt_pct
         run_initial_mol = setup.initial_inventory_mol
         initial_steps = setup.steps
-        if source_id != HASHIMOTO_SOURCE_ID:
+        if not is_hashimoto_mode:
             assert thermal_schedule_duration_s is not None
             initial_steps = min(
                 _HASHIMOTO_N_CAP,
@@ -3470,33 +3471,18 @@ def _predict_langmuir_residue_cohort(
         common_alpha_records = setup.common_alpha_records
         pressure_model = setup.pressure_model
         engine_floor_inversion_diagnostics = setup.engine_floor_inversion_diagnostics
-        schedule_notices: tuple[Notice, ...] = ()
-        if source_id == "kems-010-richter-2007":
-            schedule_notices = (
-                Notice(
-                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                    reason=(
-                        "thermal_preheat_path_unreported: the source says about one "
-                        "hour to 900 C but omits the starting temperature and ramp; "
-                        "this preheat segment is omitted from the point trajectory"
-                    ),
-                    origin=f"{source_id}:thermal-schedule",
-                ),
-                Notice(
-                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                    reason=(
-                        "thermal_cooling_path_unresolved: the source says cooling "
-                        "to room temperature took a few minutes but gives no "
-                        "temperature path; cooling is omitted from the trajectory"
-                    ),
-                    origin=f"{source_id}:thermal-schedule",
-                ),
+        schedule_notices = tuple(
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=reason,
+                origin=f"{source_id}:thermal-schedule",
             )
+            for reason in cohort_spec.thermal_schedule_notice_reasons
+        )
         integration_kwargs = (
             {"initial_sample_mass_kg": sample_mass_kg}
-            if source_id != HASHIMOTO_SOURCE_ID
+            if not is_hashimoto_mode
             else {}
         )
         runtime_channels: list[ResidueChannel] = []
@@ -3505,7 +3491,7 @@ def _predict_langmuir_residue_cohort(
         active_liquid_rows: dict[str, list[dict[str, Any]]] = {
             "common": (
                 list(setup.common_liquid_rows)
-                if source_id == HASHIMOTO_SOURCE_ID
+                if is_hashimoto_mode
                 else []
             ),
             "runtime": [],
@@ -3525,7 +3511,7 @@ def _predict_langmuir_residue_cohort(
                     {"channel": species, "alpha_value": 1.0, "alpha_assumed": True,
                      "alpha_source": "assumed oxygen-gas alpha=1.0; not measured"}
                 )
-                if source_id == HASHIMOTO_SOURCE_ID:
+                if is_hashimoto_mode:
                     active_liquid_rows["runtime"].append(row_by_channel[species])
                 continue
 
@@ -3583,7 +3569,7 @@ def _predict_langmuir_residue_cohort(
                     ),
                 }
             )
-            if source_id == HASHIMOTO_SOURCE_ID:
+            if is_hashimoto_mode:
                 active_liquid_rows["runtime"].append(row_by_channel[species])
 
         if not any(channel.parent_oxide for channel in runtime_channels):
@@ -3604,7 +3590,7 @@ def _predict_langmuir_residue_cohort(
             at_K: float,
             active_channels: Sequence[ResidueChannel],
         ) -> None:
-            if source_id == HASHIMOTO_SOURCE_ID:
+            if is_hashimoto_mode:
                 return
             if at_K not in schedule_liquid_rows_by_temperature:
                 schedule_liquid_rows_by_temperature[at_K] = (
@@ -3724,7 +3710,7 @@ def _predict_langmuir_residue_cohort(
                 refinement_status = "unconverged_at_cap"
                 while True:
                     started_cpu = time.process_time()
-                    if source_id == HASHIMOTO_SOURCE_ID:
+                    if is_hashimoto_mode:
                         integration_result = _hashimoto_integrate_geometry(
                             run_initial_mol,
                             channels,
@@ -3793,7 +3779,7 @@ def _predict_langmuir_residue_cohort(
                         }
                         mass_loss_converged = True
                         current_mass_loss_kg = 0.0
-                        if source_id != HASHIMOTO_SOURCE_ID:
+                        if not is_hashimoto_mode:
                             current_mass_loss_kg = max(
                                 0.0,
                                 sample_mass_kg
@@ -3827,7 +3813,7 @@ def _predict_langmuir_residue_cohort(
                             refinement_status = "converged"
                             break
                     previous_values = values
-                    if source_id == HASHIMOTO_SOURCE_ID:
+                    if is_hashimoto_mode:
                         if steps >= _HASHIMOTO_N_CAP:
                             refinement_status = "unconverged_at_cap"
                             refinement_notices.append(
@@ -3907,7 +3893,7 @@ def _predict_langmuir_residue_cohort(
             }
             primary_area = geometry_areas[primary_geometry]
             area_diagnostics: dict[str, dict[str, float | None]] = {}
-            if source_id != HASHIMOTO_SOURCE_ID:
+            if not is_hashimoto_mode:
                 for geometry in cohort_spec.geometry_policy_ids:
                     final_inventory = geometry_inventory_mol[geometry]
                     if final_inventory is None:
@@ -3932,7 +3918,7 @@ def _predict_langmuir_residue_cohort(
                             else printed_final_area_m2 * 1_000_000.0
                         ),
                     }
-            if source_id == HASHIMOTO_SOURCE_ID:
+            if is_hashimoto_mode:
                 geometry_provenance = {
                     "sphere_constant": {
                         "area_m2_initial": geometry_areas["sphere_constant"],
@@ -3980,10 +3966,10 @@ def _predict_langmuir_residue_cohort(
                     alpha_arm == "alpha_runtime_catalog"
                 ),
                 "alpha_assumed_oxygen_gas_unity": True,
-                "area_assumed_sphere_constant": source_id == HASHIMOTO_SOURCE_ID,
+                "area_assumed_sphere_constant": is_hashimoto_mode,
                 "area_assumed_sphere_shrinking": True,
-                "area_assumed_disk_4mm_constant": source_id == HASHIMOTO_SOURCE_ID,
-                "density_fallback_2700_kg_m3": source_id == HASHIMOTO_SOURCE_ID,
+                "area_assumed_disk_4mm_constant": is_hashimoto_mode,
+                "density_fallback_2700_kg_m3": is_hashimoto_mode,
                 "oxygen_unbuffered_vacuum": True,
                 "pressure_on_throw_ignored_for_bc": True,
                 "feo_melt_redox_stack2_pending": True,
@@ -4006,7 +3992,7 @@ def _predict_langmuir_residue_cohort(
                             refinement_step_seconds_by_geometry
                         ),
                     }
-                    if source_id != HASHIMOTO_SOURCE_ID
+                    if not is_hashimoto_mode
                     else {}
                 ),
                 "sample_mass_kg": sample_mass_kg,
@@ -4015,7 +4001,7 @@ def _predict_langmuir_residue_cohort(
                 "initial_inventory_mol": dict(run_initial_mol),
                 "sample_surface_area_status": (
                     "not_tabulated"
-                    if source_id == HASHIMOTO_SOURCE_ID
+                    if is_hashimoto_mode
                     else "printed_initial_area_mm2"
                 ),
                 "primary_geometry_policy_id": primary_geometry,
@@ -4024,7 +4010,7 @@ def _predict_langmuir_residue_cohort(
                     "so area scales with remaining melt mass^(2/3); the cold preform "
                     "and quenched spherule do not establish the molten area. This choice "
                     "was declared without using residue observations."
-                    if source_id == HASHIMOTO_SOURCE_ID
+                    if is_hashimoto_mode
                     else "Printed initial area; area evolution is unreported, so the existing constant and self-similar-shrinking modes are retained as a sensitivity range."
                 ),
                 "geometry_policies": geometry_provenance,
@@ -4036,7 +4022,7 @@ def _predict_langmuir_residue_cohort(
                         "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
                         "density_source": _HASHIMOTO_DENSITY_SOURCE,
                     }
-                    if source_id == HASHIMOTO_SOURCE_ID
+                    if is_hashimoto_mode
                     else {}
                 ),
                 "alpha_arm": alpha_arm,
@@ -4063,7 +4049,7 @@ def _predict_langmuir_residue_cohort(
                 "total_pressure_Pa": total_pressure_Pa,
                 **(
                     {"total_pressure_is_upper_bound": setup.pressure_is_upper_bound}
-                    if source_id != HASHIMOTO_SOURCE_ID
+                    if not is_hashimoto_mode
                     else {}
                 ),
                 "surface_pO2_bar_range_by_geometry": pO2_ranges,
@@ -4131,7 +4117,7 @@ def _predict_langmuir_residue_cohort(
                 ),
                 "assumption_flags": assumption_flags,
             }
-            if source_id != HASHIMOTO_SOURCE_ID:
+            if not is_hashimoto_mode:
                 provenance.update(
                     {
                         "initial_area_mm2": (
@@ -4258,7 +4244,10 @@ def _predict_langmuir_residue_rows(
         text=True,
     ).stdout.strip()
     runtime_catalog = load_yaml(REPO_ROOT / "data/vapor_pressures.yaml")
-    if source_id == HASHIMOTO_SOURCE_ID:
+    is_hashimoto_mode = (
+        cohort_spec.geometry_source == "hashimoto_metadata_dimensions"
+    )
+    if is_hashimoto_mode:
         return _predict_hashimoto_residue_cohort(
             experiments,
             runtime_catalog,
@@ -4430,6 +4419,9 @@ def _inventory_bulk_and_element_masses_kg(
     return total_mass_kg, element_mass_kg
 
 
+_FM_CONCENTRATION_BASES = frozenset({"mass_fraction", "mole_fraction_single_cation_oxide"})
+
+
 def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapping[str, Any]]:
     state = getattr(located_definition, "state", None)
     value = getattr(state, "value", None) if getattr(state, "is_value", False) else None
@@ -4440,6 +4432,9 @@ def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapp
     definition = value.get("definition")
     quote = value.get("quote")
     page = value.get("page")
+    # The generic point-condition migrator preserves numeric metadata as Decimal.
+    if isinstance(page, Decimal) and page.is_finite() and page == page.to_integral_value():
+        page = int(page)
     if (
         definition not in {"concentration_retention", "mass_retention"}
         or not isinstance(quote, str)
@@ -4451,6 +4446,14 @@ def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapp
         raise ResidueInventoryRefusal(
             "fo_definition_unprinted",
             "fm_definition needs a named definition, printed quote, and page",
+        )
+    if (
+        definition == "concentration_retention"
+        and value.get("concentration_basis") not in _FM_CONCENTRATION_BASES
+    ):
+        raise ResidueInventoryRefusal(
+            "fm_concentration_basis_unprinted_or_unknown",
+            "fm_definition needs a printed concentration_basis",
         )
     return str(definition), value
 
@@ -4495,6 +4498,7 @@ def _element_retention_ratio_from_inventories(
     element: str,
     definition: str,
     *,
+    concentration_basis: str | None = None,
     initial_oxygen_exchange_mol: float = 0.0,
     final_oxygen_exchange_mol: float = 0.0,
     initial_bulk_mass_adjustment_kg: float = 0.0,
@@ -4502,6 +4506,11 @@ def _element_retention_ratio_from_inventories(
 ) -> float:
     if definition not in {"concentration_retention", "mass_retention"}:
         raise ResidueInventoryRefusal("fo_definition_unprinted")
+    if (
+        definition == "concentration_retention"
+        and concentration_basis not in _FM_CONCENTRATION_BASES
+    ):
+        raise ResidueInventoryRefusal("fm_concentration_basis_unprinted_or_unknown")
     if not any(
         float(amount) > 0.0 and _formula_terms(formula)[0].get(element, 0.0) > 0.0
         for formula, amount in initial_inventory_mol.items()
@@ -4534,6 +4543,29 @@ def _element_retention_ratio_from_inventories(
     mass_retention = final_element_mass / initial_element_mass
     if definition == "mass_retention":
         return mass_retention
+    if concentration_basis == "mole_fraction_single_cation_oxide":
+        # Norris 2016 Eq. 5.1 (physical p.232 / folio 202) prints
+        # X_i = n_i / N, N = sum of single-cation oxide moles. Each oxide
+        # contributes its non-oxygen atom count (Al2O3 -> 2 AlO1.5,
+        # Na2O -> 2 NaO0.5); oxygen exchanged with the buffer adds no cations.
+        # Thus FM = (n_i,f/n_i,0) / (N_f/N_0). The elemental molar mass
+        # cancels in n_i,f/n_i,0, so mass_retention supplies that ratio.
+        # Units: (mol/mol)/(mol/mol) is dimensionless. Sanity: FeO + MgO,
+        # 1 + 1 -> 0.8 + 0.4, gives 0.8/(1.2/2) = 1.333333, whereas
+        # mass fractions give 1.219053 (independently pinned in the test).
+        cation_totals = [
+            math.fsum(
+                float(amount) * math.fsum(
+                    count for atom, count in _formula_terms(oxide)[0].items()
+                    if atom != "O"
+                )
+                for oxide, amount in inventory.items()
+            )
+            for inventory in (initial_inventory_mol, final_inventory_mol)
+        ]
+        if any(not math.isfinite(total) or total <= 0.0 for total in cation_totals):
+            raise ResidueInventoryRefusal("residue_cation_inventory_invalid")
+        return mass_retention / (cation_totals[1] / cation_totals[0])
     bulk_mass_factor = final_bulk_mass_kg / initial_bulk_mass_kg
     if not math.isfinite(bulk_mass_factor) or bulk_mass_factor <= 0.0:
         raise ResidueInventoryRefusal("residue_bulk_mass_invalid")
