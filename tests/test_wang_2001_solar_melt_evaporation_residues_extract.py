@@ -262,7 +262,11 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
             "Uncertainties are ±1σ standard errors calculated from replicate analyses."
         )
         assert uncertainty.verbatim["confidence_level"] == "one_sigma"
-        if formula == "MgO" and sample == "SC12":
+        if (
+            formula == "MgO"
+            and sample == "SC12"
+            and observation_id == "wang_2001_table1_electron_microprobe_residue_compositions"
+        ):
             scored_band = _printed_uncertainty_band(
                 Quantity.RESIDUE_COMPONENT_COMPOSITION,
                 uncertainty,
