@@ -117,6 +117,14 @@ def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:
             'authoritative': False,
             'extrapolation': True,
             'high_uncertainty': True,
+            'notice': {
+                'reason': 'temperature is below the Kress91 liquid calibration floor',
+                'certified_band': {
+                    'min_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+                    'max_T_C': KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+                },
+                'authority_level': 'extrapolated',
+            },
         }
     # CASE 1200-1630 C: AUTHORITATIVE Kress & Carmichael 1991, REF-001,
     # doi:10.1007/BF00307328. Kilinc 1983 (REF-054) and Jayasuriya 2004
@@ -143,6 +151,14 @@ def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:
             'authoritative': False,
             'extrapolation': True,
             'high_uncertainty': False,
+            'notice': {
+                'reason': 'temperature is above the Kress91 calibration band',
+                'certified_band': {
+                    'min_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+                    'max_T_C': KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+                },
+                'authority_level': 'extrapolated_experimentally_confirmed',
+            },
         }
     # CASE 2100-2500 C: extrapolation with growing uncertainty; REF-053 is
     # the nearest experimental confirmation, but uncertainty grows beyond it.
@@ -154,6 +170,14 @@ def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:
             'authoritative': False,
             'extrapolation': True,
             'high_uncertainty': True,
+            'notice': {
+                'reason': 'temperature is above the Kress91 calibration band',
+                'certified_band': {
+                    'min_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+                    'max_T_C': KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+                },
+                'authority_level': 'extrapolated',
+            },
         }
     # CASE >2500 C: F0-style high-uncertainty flag. The caller may refuse a
     # transaction; diagnostics de-authorize the temperature band either way.
@@ -164,6 +188,14 @@ def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:
         'authoritative': False,
         'extrapolation': True,
         'high_uncertainty': True,
+        'notice': {
+            'reason': 'temperature is above the Kress91 calibration band',
+            'certified_band': {
+                'min_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+                'max_T_C': KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+            },
+            'authority_level': 'extrapolated',
+        },
     }
 
 
@@ -1369,6 +1401,7 @@ def kress91_split(
         'temperature_band_case': temperature_band['case'],
         'temperature_band_status': temperature_band['status'],
         'temperature_band_source': temperature_band['source'],
+        'temperature_band_notice': temperature_band.get('notice'),
         'authoritative': temperature_band['authoritative'],
         'extrapolation': temperature_band['extrapolation'],
         'high_uncertainty': temperature_band['high_uncertainty'],

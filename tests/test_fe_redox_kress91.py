@@ -273,6 +273,7 @@ def test_kress91_valid_finite_controls_stay_exactly_golden_neutral() -> None:
         'temperature_band_case': '1200C_1630C_kress91_authoritative',
         'temperature_band_status': 'authoritative',
         'temperature_band_source': 'REF-001 Kress91 1200-1630 C calibration band',
+        'temperature_band_notice': None,
         'authoritative': True,
         'extrapolation': False,
         'high_uncertainty': False,
@@ -468,6 +469,27 @@ def test_kress91_temperature_band_cases_gate_authority(
     assert band['authoritative'] is authoritative
     assert band['extrapolation'] is extrapolation
     assert band['high_uncertainty'] is high_uncertainty
+
+
+def test_kress91_temperature_band_notice_marks_below_floor_without_changing_fit():
+    below_floor = KRESS91_LIQUID_CALIBRATION_MIN_T_C - 1.0
+    inside_band = KRESS91_LIQUID_CALIBRATION_MIN_T_C
+
+    reference_T_K = inside_band + 273.15
+    target_T_K = below_floor + 273.15
+    shift_before_notice = kress91_ln_fO2_temperature_delta(
+        reference_T_K, target_T_K
+    )
+    notice = kress91_temperature_band_case(below_floor)['notice']
+    assert notice == {
+        'reason': 'temperature is below the Kress91 liquid calibration floor',
+        'certified_band': {'min_T_C': 1200.0, 'max_T_C': 1630.0},
+        'authority_level': 'extrapolated',
+    }
+    assert kress91_temperature_band_case(inside_band).get('notice') is None
+    assert kress91_ln_fO2_temperature_delta(reference_T_K, target_T_K) == (
+        shift_before_notice
+    )
 
 
 @pytest.mark.parametrize('fO2_log', [float('nan'), float('inf'), float('-inf')])
