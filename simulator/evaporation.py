@@ -4103,7 +4103,6 @@ class EvaporationMixin:
         depletion_fraction = -math.expm1(-k_hr * dt_hr)
         depletion_fraction = max(0.0, min(max_fraction, depletion_fraction))
         allowed_o2_draw_kg = float(available_o2_kg) * depletion_fraction
-        by_species_draw = dict(o2_draws)
         for species, required_o2_kg_hr in o2_draws:
             if required_o2_kg_hr <= 1e-12:
                 continue
@@ -4113,8 +4112,13 @@ class EvaporationMixin:
                 / total_o2_draw_kg_hr
             )
             current_rate = float(effective_rates.get(species, 0.0))
-            allowed_rate = current_rate * (
-                allowed_draw_kg / by_species_draw[species])
+            # The allocation is O2 kg over this interval. Dividing by the
+            # O2 demand [kg/h] gives h; multiplying carrier [kg/h] gives kg.
+            # Convert that amount back to kg/h once: at dt=.25 h, .25 kg
+            # of allocated carrier means 1 kg/h, not .25 kg/h.
+            allowed_product_kg = current_rate * (
+                allowed_draw_kg / required_o2_kg_hr)
+            allowed_rate = allowed_product_kg / dt_hr
             if allowed_rate <= 1e-12:
                 effective_rates.pop(species, None)
             else:
