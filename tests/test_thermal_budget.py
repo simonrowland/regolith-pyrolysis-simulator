@@ -26,6 +26,17 @@ BASE_THERMAL_BUDGET_ARGS = {
 }
 
 
+def test_empty_evaporation_enthalpy_sinks_are_float_zeros():
+    result = evaporation_enthalpy_budget({})
+
+    for key in ("latent_kWh", "dissociation_kWh", "evaporation_thermal_kWh"):
+        assert type(result[key]) is float
+        assert result[key] == 0.0
+    for value in result["heat_flows_kWh"].values():
+        assert type(value) is float
+        assert value == 0.0
+
+
 def test_evaporation_enthalpy_budget_adds_latent_and_dissociation_sinks():
     result = evaporation_enthalpy_budget(
         {"Na": 1.0},
