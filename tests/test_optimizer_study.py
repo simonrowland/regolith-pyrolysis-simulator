@@ -3787,17 +3787,17 @@ def test_parallel_composition_target_stub_study_completes(
     payload = json.loads(pareto_path.read_text())
     # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to the
     # 20 C collector band. The Morris base (seed 0, level 1/3) now places the
-    # upstream walls at 746.67 C. The same unit coordinate on the old
-    # 1400-2200 C map was about 1667 C, which is the SiO wall-fit hole:
-    # Psat is refused at 1773.15 K, inside the published 1400-2273.15 K
-    # numeric range but outside the finite positive-denominator branch. At
-    # 746.67 C the three base points are no longer SiO-refused, have no wall
-    # deposit, and remain the priced Pareto. The thermo step s003 still sits
-    # on the 2200 C ceiling and refuses SiO at 1773.15 K on
-    # stage_0_to_stage_1 and stage_1_to_stage_2. d-401 books its positive
-    # supply upper bound, so s003 has a finite deposit/lifetime projection
-    # and objective values; it remains feasible but is dominated on the
-    # Pareto objectives.
+    # upstream walls at 746.67 C. The cold candidates commit a small measured
+    # Fe deposit on stage_0_to_stage_1; the d-401 booking path only replaces
+    # species named by wall saturation-pressure refusals. Their reported
+    # per-campaign load is higher than the run cumulative load because this
+    # 24-hour run represents 24/35 of a campaign. The thermal remobilization
+    # flag is diagnostic and does not subtract mass from the committed ledger.
+    # The thermo step s003 still sits on the 2200 C ceiling and refuses SiO at
+    # 1773.15 K on stage_0_to_stage_1 and stage_1_to_stage_2. d-401 books its
+    # positive supply upper bound, so s003 has a finite deposit/lifetime
+    # projection and objective values; it remains feasible but is dominated
+    # on the Pareto objectives.
     priced_ids = {
         "morris-screen-0-t0000-s000",
         "morris-screen-0-t0000-s001",
@@ -3818,14 +3818,23 @@ def test_parallel_composition_target_stub_study_completes(
     for candidate in result.records:
         summary = candidate.product_summary
         if candidate.candidate_id in priced_ids:
-            assert summary["furnace_amortization_status"] == "available"
-            assert summary["wall_deposit_total_kg"] == 0.0
-            assert summary["has_positive_qualified_fouling"] is False
-            assert summary["campaigns_to_resinter_worst_segment"] == "infinite"
-            refusal = summary.get("wall_deposit_refusal") or {}
-            authority = refusal.get("authority") or {}
-            refused = authority.get("wall_saturation_pressure_refused_species") or []
-            assert "SiO" not in refused
+            assert summary["furnace_amortization_status"] == (
+                "resinter_threshold_ungrounded"
+            )
+            assert summary["has_positive_qualified_fouling"] is True
+            assert summary["wall_deposit_kg_by_species"]["Fe"] == pytest.approx(
+                6.181281691758682e-12,
+                rel=1e-9,
+            )
+            assert summary["wall_deposit_cumulative_kg_by_species"]["Fe"] == (
+                pytest.approx(4.238593160063097e-12, rel=1e-9)
+            )
+            ungrounded_lifetime = "resinter_threshold_kg / 6.18128169176e-12"
+            assert summary["campaigns_to_resinter"] == ungrounded_lifetime
+            assert summary["campaigns_to_resinter_worst_segment"] == (
+                ungrounded_lifetime
+            )
+            assert summary["furnace_amortization_cost_per_run_usd"] is None
         else:
             assert candidate.candidate_id == hot_id
             assert summary["furnace_amortization_status"] == (
