@@ -45,6 +45,7 @@ class LangmuirResidueCohortSpec:
     ]
     missing_mass_reason: str | None
     missing_area_reason: str | None
+    vacuum_upper_bound_identity: bool
     zero_time_rule: Literal[
         "none",
         "refuse_if_residue_matches_charge",
@@ -66,6 +67,7 @@ _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
             initial_mass_source="experiment_sample_mass_kg",
             missing_mass_reason=None,
             missing_area_reason=None,
+            vacuum_upper_bound_identity=False,
             zero_time_rule="none",
             area_uncertainty=None,
             geometry_notice_reason=None,
@@ -83,6 +85,7 @@ _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
             initial_mass_source="table1_initial_weight_mg",
             missing_mass_reason=None,
             missing_area_reason="initial_area_unreported",
+            vacuum_upper_bound_identity=True,
             zero_time_rule="refuse_if_residue_matches_charge",
             area_uncertainty="printed_unstated",
             geometry_notice_reason="area_evolution_unreported",
@@ -103,6 +106,7 @@ _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
             initial_mass_source="unreported",
             missing_mass_reason="initial_mass_unreported",
             missing_area_reason="initial_area_unreported",
+            vacuum_upper_bound_identity=False,
             zero_time_rule="retain_product",
             area_uncertainty="printed_unstated",
             geometry_notice_reason="area_evolution_unreported",

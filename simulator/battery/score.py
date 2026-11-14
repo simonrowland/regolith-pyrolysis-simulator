@@ -8139,6 +8139,14 @@ def _comparison_identity(
         quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
+    cohort_spec = _LANGMUIR_RESIDUE_COHORTS.get(reference.source_id or "")
+    vacuum_upper_bound_identity = (
+        cohort_spec is not None
+        and cohort_spec.vacuum_upper_bound_identity
+        and quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and prediction.refusal_detail.get("total_pressure_is_upper_bound")
+        and prediction.refusal_detail.get("total_pressure_Pa") is not None
+    )
     knudsen_total_pressure = _knudsen_total_pressure_details(
         prediction.notices
     )
@@ -8149,6 +8157,7 @@ def _comparison_identity(
         and not comparison_activity
         and not redox
         and knudsen_total_pressure is None
+        and not vacuum_upper_bound_identity
         and melt_identity is identity
         and not fusion_polymorph_flag
     ):
@@ -8171,6 +8180,15 @@ def _comparison_identity(
         and (identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value)
     ):
         updates["total_pressure_Pa"] = State.of(knudsen_total_pressure[0])
+    if vacuum_upper_bound_identity:
+        if identity.fO2_Pa is None or not identity.fO2_Pa.is_value:
+            updates["fO2_Pa"] = State.not_applicable(
+                "unbuffered vacuum has no commanded oxygen fugacity"
+            )
+        if identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value:
+            updates["total_pressure_Pa"] = State.of(
+                Decimal(str(prediction.refusal_detail["total_pressure_Pa"]))
+            )
     if fusion_polymorph_flag:
         call_evidence = prediction.execution.call_evidence or ""
         fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
@@ -15820,20 +15838,6 @@ def _langmuir_residue_prediction(
             None,
         )
         run_refusal = timeout_refusal or geometry_refusals.get(primary_geometry)
-        if run_refusal:
-            from simulator.battery.residue import ResidueInventoryRefusal
-
-            raise ResidueInventoryRefusal(
-                str(
-                    run_refusal.get("reason")
-                    or (
-                        "hashimoto_run_refused"
-                        if source_id == _HASHIMOTO_SOURCE_ID
-                        else "langmuir_run_refused"
-                    )
-                ),
-                json.dumps(run_refusal, sort_keys=True, default=str),
-            )
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
             _element_retention_ratio_from_inventories,
@@ -15856,6 +15860,18 @@ def _langmuir_residue_prediction(
                 measured_component
             ) == as_decimal(starting_component):
                 raise ResidueInventoryRefusal("starting_bulk_not_residue")
+        if run_refusal:
+            raise ResidueInventoryRefusal(
+                str(
+                    run_refusal.get("reason")
+                    or (
+                        "hashimoto_run_refused"
+                        if source_id == _HASHIMOTO_SOURCE_ID
+                        else "langmuir_run_refused"
+                    )
+                ),
+                json.dumps(run_refusal, sort_keys=True, default=str),
+            )
         if is_retention:
             definition, definition_record = _printed_fm_definition(
                 (reference.point_conditions or {}).get("fm_definition")

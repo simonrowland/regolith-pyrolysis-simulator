@@ -3206,6 +3206,8 @@ def _predict_langmuir_residue_cohort(
         printed_final_area_m2: float | None = None
         sample_mass_override_kg: float | None = None
         geometry_areas_override: dict[str, float] | None = None
+        duration_s: float | None = None
+        starting_composition_wt_pct: Mapping[str, Any] | None = None
         try:
             if cohort_spec.geometry_source == "per_experiment_printed_area_mm2":
                 (
@@ -3221,6 +3223,19 @@ def _predict_langmuir_residue_cohort(
                     geometry: initial_area_m2
                     for geometry in cohort_spec.geometry_policy_ids
                 }
+            duration_s = _hashimoto_point_value(
+                experiment["thermal_schedule"]["total_duration_s"]
+            )
+            starting_composition_wt_pct = experiment["sample"][
+                "printed_composition"
+            ]["state"]["value"]
+            if (
+                cohort_spec.zero_time_rule == "refuse_if_residue_matches_charge"
+                and duration_s == 0.0
+            ):
+                raise ResidueInventoryRefusal(
+                    "residue_duration_invalid", experiment_id
+                )
             setup = _hashimoto_run_setup(
                 experiment,
                 gas_pack=gas_pack,
@@ -3265,6 +3280,10 @@ def _predict_langmuir_residue_cohort(
                             "experiment_id": experiment_id,
                             "geometry_refusal_by_geometry": geometry_refusals,
                             "run_refusal": geometry_refusals[primary_geometry],
+                            "duration_s": duration_s,
+                            "starting_composition_wt_pct": dict(
+                                starting_composition_wt_pct or {}
+                            ),
                             "area_uncertainty": cohort_spec.area_uncertainty,
                             "prediction_status": "refused",
                         },
