@@ -4,7 +4,6 @@ from decimal import Decimal
 from pathlib import Path
 
 import yaml
-import pytest
 
 from simulator.battery.enums import NoticeKind
 from simulator.battery.migrate import (
@@ -61,7 +60,8 @@ def test_sossi_and_doyle_real_rows_reach_bare_log_admission_with_pins() -> None:
     )
     assert sossi_decision.state.is_value
     assert sossi_decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert sossi_result.uncertainty_band_dex is not None
+    assert Decimal(str(sossi_result.log10_fO2)).quantize(Decimal("0.0001")) == Decimal("-7.8632")
+    assert Decimal(str(sossi_result.uncertainty_band_dex)).quantize(Decimal("0.0001")) == Decimal("0.0028")
 
     doyle = _source_doc("doyle-1989-tio2-feo-activity-magma.yaml")
     doyle_row = next(
@@ -79,13 +79,11 @@ def test_sossi_and_doyle_real_rows_reach_bare_log_admission_with_pins() -> None:
     )
     assert doyle_decision.state.is_value
     assert doyle_decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert doyle_result.uncertainty_band_dex is not None
+    assert Decimal(str(doyle_result.log10_fO2)).quantize(Decimal("0.0001")) == Decimal("-11.9189")
+    assert Decimal(str(doyle_result.uncertainty_band_dex)).quantize(Decimal("0.0001")) == Decimal("0.0004")
 
 
-@pytest.mark.parametrize("chunk_index", range(3))
-def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatch(
-    chunk_index: int,
-) -> None:
+def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatch() -> None:
     records: list[tuple[str, Decimal, Decimal, str]] = []
     sossi = _source_doc("sossi-2020-magma-ocean-redox.yaml")
     for experiment in sossi["experiments"]:
@@ -118,9 +116,9 @@ def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatc
             )
 
     assert len(records) == 15
-    decision_table = []
+    admitted = 0
+    refused = 0
     for record_id, printed, temperature, atmosphere in records:
-        result = _resolution(atmosphere, temperature)
         decision = _bare_log_frame_decision(
             printed,
             temperature,
@@ -129,24 +127,14 @@ def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatc
         )
         if decision.state.is_value:
             assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-            outcome = "admitted"
+            admitted += 1
         else:
             assert decision.state.is_unknown
             assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
             assert "mismatch=" in decision.state.reason
             assert "dex" in decision.state.reason
-            outcome = f"mismatch={printed - Decimal(str(result.log10_fO2)):+.4f} dex"
-        decision_table.append(
-            (
-                record_id,
-                str(printed),
-                f"{result.log10_fO2:+.4f}",
-                f"{result.uncertainty_band_dex:.4f}",
-                outcome,
-            )
-        )
-    start = chunk_index * 5
-    assert False, "\n".join(",".join(row) for row in decision_table[start : start + 5])
+            refused += 1
+    assert (admitted, refused) == (8, 7)
 
 
 def test_inert_n2_dilution_is_in_the_total_but_cancels_and_ratio_mutation_moves_fo2() -> None:
