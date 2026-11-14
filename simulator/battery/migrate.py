@@ -30385,6 +30385,14 @@ class Migrator:
                         pressure = State.unknown(
                             _PRESSURE_IDENTITY_UNKNOWN["total_pressure_Pa"]
                         )
+                    elif (
+                        isinstance(pressure_value, Value)
+                        and pressure_value.kind is ValueKind.POINT
+                        and pressure_value.approximate
+                    ):
+                        pressure = State.unknown(
+                            "printed as an order of magnitude; d-399 identity band pending the ApproxPressure owner"
+                        )
                     else:
                         pressure = (
                             State.of(pressure_value.point)

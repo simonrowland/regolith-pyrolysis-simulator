@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.identity import IdentityEqualKind, identity_equal
 from simulator.battery.migrate import Migrator
 from simulator.battery.score import _printed_uncertainty_band
 
@@ -289,6 +290,26 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     ]
     assert len(sc1_silica) == 1
     assert sc1_silica[0].experiment_id == sc1_experiment_id
+    sc1_residue_cells = [
+        row for row in observations
+        if row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and re.search(r"row=SC1(?!\d)", row.locator.note or "")
+    ]
+    assert len(sc1_residue_cells) == 27
+    pressure_reason = (
+        "printed as an order of magnitude; d-399 identity band pending the ApproxPressure owner"
+    )
+    assert all(
+        row.identity.total_pressure_Pa.is_unknown
+        and row.identity.total_pressure_Pa.reason == pressure_reason
+        for row in sc1_residue_cells
+    )
+    matching = [identity_equal(row.identity, row.identity) for row in sc1_residue_cells]
+    assert all(
+        outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        and "total_pressure_Pa" in outcome.fields
+        for outcome in matching
+    )
 
     expected_by_quantity = {
         Quantity.RESIDUE_COMPONENT_COMPOSITION: {
