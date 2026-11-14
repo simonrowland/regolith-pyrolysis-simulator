@@ -843,7 +843,18 @@ def test_bad_distribution_metadata_is_reported_without_aborting_engine_open(
     if failure == "decode":
         metadata_path.write_bytes(bytes([0xFF]))
     elif failure == "read":
-        metadata_path.mkdir()
+        metadata_path.write_text("metadata", encoding="utf-8")
+        original_read_text = Path.read_text
+        metadata_read_attempts = 0
+
+        def fail_metadata_read(path: Path, *args, **kwargs) -> str:
+            nonlocal metadata_read_attempts
+            if path == metadata_path:
+                metadata_read_attempts += 1
+                raise OSError("injected metadata I/O failure")
+            return original_read_text(path, *args, **kwargs)
+
+        monkeypatch.setattr(Path, "read_text", fail_metadata_read)
     elif failure == "parse":
         metadata_path.write_text("{", encoding="utf-8")
     else:
@@ -856,6 +867,8 @@ def test_bad_distribution_metadata_is_reported_without_aborting_engine_open(
 
     try:
         identity = engine_cache.runtime_identity(engine)
+        if failure == "read":
+            assert metadata_read_attempts == 1
         assert isinstance(identity, engine_cache.RuntimeIdentityUnknown)
         assert identity.engine_id == engine
         assert identity.reason == reason
