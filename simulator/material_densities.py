@@ -146,7 +146,11 @@ def _fe_si_source_molar_volume_m3_mol(
     x_si: float,
     temperature_K: float,
 ) -> float:
-    """Mizuno et al. Fe-Si molar volume using one consistent endpoint basis."""
+    """Mizuno et al. Fe-Si molar volume using one consistent endpoint basis.
+
+    The composition fit is calibrated at 1820 K; any future caller outside
+    that band must carry an out-of-band notice (SC-538 / d-406).
+    """
 
     row = material_density_data()["fe_si_excess_volume"]
     endpoints = row["endpoint_correlations"]
