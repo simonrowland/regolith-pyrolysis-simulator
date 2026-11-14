@@ -51,28 +51,50 @@ _CERTIFIED_COUNT_FIELD = re.compile(r'(?m)^[ \t]*"n_certified":\s*\d+,\n')
 
 
 def _without_certified_counts(text: str) -> str:
-    """Keep output byte pins independent of the changing certified-row count."""
+    """Keep prior byte pins focused on report content outside inserted tables."""
 
-    lines = _CERTIFIED_COUNT_FIELD.sub("", text).splitlines(keepends=True)
+    text = _CERTIFIED_COUNT_FIELD.sub("", text)
+    census_heading = "## Eligibility conjunct failure census"
+    if census_heading in text:
+        before, _separator, after = text.partition(census_heading)
+        next_headings = ("## Measured tier", "## Per rail × engine headline")
+        next_heading = min(
+            (heading for heading in next_headings if heading in after),
+            key=after.index,
+            default=None,
+        )
+        if next_heading is None:
+            text = before
+        else:
+            _census, _separator, remainder = after.partition(next_heading)
+            text = before + next_heading + remainder
+    lines = text.splitlines(keepends=True)
     output: list[str] = []
-    certified_column: int | None = None
+    removed_columns: set[int] = set()
     for line in lines:
         if not line.startswith("|"):
-            certified_column = None
+            removed_columns = set()
             output.append(line)
             continue
         cells = line.split("|")
-        if certified_column is None:
-            certified_column = next(
-                (
-                    index
-                    for index, cell in enumerate(cells)
-                    if cell.strip() == "n certified"
-                ),
-                None,
-            )
-        if certified_column is not None:
-            del cells[certified_column]
+        labels = {cell.strip(): index for index, cell in enumerate(cells)}
+        if "n certified" in labels:
+            removed_columns = {
+                labels[label]
+                for label in (
+                    "n certified",
+                    "numeric events",
+                    "unique observations",
+                    "unique source_ids",
+                    "flag classes",
+                    "top 3 flag classes",
+                )
+                if label in labels
+            }
+            if "numeric events" in labels:
+                cells[labels["numeric events"]] = " n "
+        if removed_columns:
+            cells = [cell for index, cell in enumerate(cells) if index not in removed_columns]
         output.append("|".join(cells))
     return "".join(output)
 

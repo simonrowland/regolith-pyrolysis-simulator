@@ -120,6 +120,91 @@ class Nasa9FitComparisonData(NamedTuple):
     refusals: tuple[tuple[str, str, str, str, int], ...]
 
 
+class EligibilityFailureCensus(NamedTuple):
+    """Numeric residual failures grouped by rail, engine, and conjunct."""
+
+    rows: tuple[tuple[str, str, str, int, int, int], ...]
+    engine_counts: tuple[tuple[str, str, int, int, int | None], ...]
+
+
+def eligibility_failure_census(
+    rows: Iterable[Mapping[str, object]],
+    *,
+    conjunct_names: Iterable[str],
+    observations: Mapping[str, Observation] | None = None,
+) -> EligibilityFailureCensus:
+    """Count failure events, observations, and first failure per report cell."""
+
+    names = tuple(conjunct_names)
+    event_counts: dict[tuple[str, str, str], int] = defaultdict(int)
+    observation_ids: dict[tuple[str, str, str], set[str]] = defaultdict(set)
+    numeric_events: dict[tuple[str, str], int] = defaultdict(int)
+    numeric_observations: dict[tuple[str, str], set[str]] = defaultdict(set)
+    numeric_sources: dict[tuple[str, str], set[str]] = defaultdict(set)
+    source_counts_available = observations is not None
+    first_counts: dict[tuple[str, str, str], int] = defaultdict(int)
+    for row in rows:
+        if not isinstance(row.get("numeric"), Mapping) or not row.get("rail"):
+            continue
+        rail = str(row["rail"])
+        request = row.get("candidate_request")
+        key = row.get("key")
+        engine = (
+            str(request.get("engine"))
+            if isinstance(request, Mapping) and request.get("engine")
+            else str(key).rsplit("::", 1)[-1]
+        )
+        reference = str(row.get("reference") or "")
+        observation = None if observations is None else observations.get(reference)
+        observation_id = (
+            observation.observation_id if observation is not None else reference
+        )
+        engine_cell = (rail, engine)
+        numeric_events[engine_cell] += 1
+        numeric_observations[engine_cell].add(observation_id)
+        if observation is not None and observation.source_id:
+            numeric_sources[engine_cell].add(observation.source_id)
+        exclusions = set(row.get("exclusions") or ())
+        first = next((name for name in names if name in exclusions), None)
+        if first is not None:
+            first_counts[(rail, engine, first)] += 1
+        for name in names:
+            if name not in exclusions:
+                continue
+            cell = (rail, engine, name)
+            event_counts[cell] += 1
+            observation_ids[cell].add(observation_id)
+
+    return EligibilityFailureCensus(
+        tuple(
+            (
+                rail,
+                engine,
+                name,
+                event_counts[(rail, engine, name)],
+                len(observation_ids[(rail, engine, name)]),
+                first_counts[(rail, engine, name)],
+            )
+            for rail, engine in sorted(numeric_events)
+            for name in names
+        ),
+        tuple(
+            (
+                rail,
+                engine,
+                numeric_events[(rail, engine)],
+                len(numeric_observations[(rail, engine)]),
+                (
+                    len(numeric_sources[(rail, engine)])
+                    if source_counts_available
+                    else None
+                ),
+            )
+            for rail, engine in sorted(numeric_events)
+        ),
+    )
+
+
 def nasa9_fit_comparison_report_data(
     comparisons: Iterable[Mapping[str, object]],
 ) -> Nasa9FitComparisonData:
