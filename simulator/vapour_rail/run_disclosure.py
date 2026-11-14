@@ -88,6 +88,46 @@ _DISCLOSURE_FIELDS = (
 )
 
 
+def resolve_law_id(
+    evaluator: Any = None,
+    *,
+    notice: Mapping[str, Any] | None = None,
+    species_id: str | None = None,
+    family: str | None = None,
+    fallback: str = "",
+) -> str:
+    """Resolve the canonical key for a law recorded by this registry.
+
+    Diagnostic notices name the executed base species, which can differ from
+    the carrier evaluator's species id.
+    """
+
+    if notice is None and evaluator is not None:
+        notices = getattr(evaluator, "diagnostic_admission_notice", None)
+        if isinstance(notices, Mapping) and notices:
+            notice = notices
+        elif isinstance(notices, (list, tuple)):
+            notice = next(
+                (
+                    item
+                    for item in notices
+                    if isinstance(item, Mapping) and item
+                ),
+                None,
+            )
+    species = str(
+        (notice.get("executed_species_id") if notice is not None else None)
+        or species_id
+        or getattr(evaluator, "species_id", "")
+        or ""
+    )
+    evaluator_family = str(
+        family or getattr(evaluator, "evaluator_family", "") or ""
+    )
+    law_id = f"{species}:{evaluator_family}" if evaluator_family else species
+    return law_id or fallback
+
+
 @dataclass
 class LawDisclosure:
     law_id: str
@@ -156,15 +196,9 @@ class RunDisclosure:
             )
 
     def _register_notice(self, evaluator: Any, notice: Mapping[str, Any]) -> None:
-        species = str(
-            notice.get("executed_species_id")
-            or getattr(evaluator, "species_id", "")
-            or ""
+        law_id = resolve_law_id(
+            evaluator, notice=notice, fallback="diagnostic_law"
         )
-        family = str(getattr(evaluator, "evaluator_family", "") or "")
-        law_id = f"{species}:{family}" if family else species
-        if not law_id:
-            law_id = "diagnostic_law"
         existing = self.entries.get(law_id)
         if existing is not None:
             existing.evaluation_count += 1
@@ -188,11 +222,7 @@ class RunDisclosure:
     ) -> None:
         """One out-of-band continuation. Authority is extrapolated, not diagnostic."""
 
-        species = str(getattr(evaluator, "species_id", "") or "")
-        family = str(getattr(evaluator, "evaluator_family", "") or "")
-        law_id = f"{species}:{family}" if family else species
-        if not law_id:
-            law_id = "extrapolated_law"
+        law_id = resolve_law_id(evaluator, fallback="extrapolated_law")
         existing = self.entries.get(law_id)
         if existing is not None:
             existing.evaluation_count += 1

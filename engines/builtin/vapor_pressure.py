@@ -538,17 +538,17 @@ def _temperature_band_executions(
 ) -> list[tuple[Any, Any]]:
     """Carrier notices, including the temperature map copied onto provenance."""
 
+    from simulator.vapour_rail.run_disclosure import resolve_law_id
+
     executions: list[tuple[Any, Any]] = []
     covered: set[str] = set()
 
     def already_registered(species: str) -> bool:
         evaluator = executed_compiled_laws.get(species)
         if evaluator is None:
-            law_id = f"{species}:antoine"
+            law_id = resolve_law_id(species_id=species, family="antoine")
         else:
-            law_species = str(getattr(evaluator, "species_id", "") or species)
-            family = str(getattr(evaluator, "evaluator_family", "") or "")
-            law_id = f"{law_species}:{family}" if family else law_species
+            law_id = resolve_law_id(evaluator)
         return law_id in registered_law_ids
 
     for species in vapor_pressures:
@@ -602,6 +602,7 @@ def _ellingham_fit_band_executions(
     """
 
     from types import SimpleNamespace
+    from simulator.vapour_rail.run_disclosure import resolve_law_id
 
     executions: list[tuple[Any, Any]] = []
     for species, record in ellingham_records.items():
@@ -609,7 +610,7 @@ def _ellingham_fit_band_executions(
             continue
         if record.get("authority_status") != "extrapolation_limited":
             continue
-        law_id = f"{species}:ellingham"
+        law_id = resolve_law_id(species_id=str(species), family="ellingham")
         if law_id in registered_law_ids:
             continue
         fit = record.get("fit_range_K")

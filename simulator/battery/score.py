@@ -11589,6 +11589,7 @@ def _predict_mass_loss_with_residue(
         ResidueInventoryRefusal,
         predict_mass_loss_fraction,
     )
+    from simulator.vapour_rail.run_disclosure import parse_stored_disclosure_field
 
     def omission_notices(payload: object) -> tuple[Notice, ...]:
         if not isinstance(payload, str) or not payload:
@@ -11634,6 +11635,12 @@ def _predict_mass_loss_with_residue(
             source_document=source_document,
             observation=observation,
         )
+        law_disclosures = parse_stored_disclosure_field(
+            result.engine_metadata.get("law_disclosures"),
+            present="law_disclosures" in result.engine_metadata,
+        )
+        if law_disclosures is None:
+            raise ResidueInventoryRefusal("law_disclosures_unknown", "incomplete")
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
         if reason in {
@@ -11716,15 +11723,6 @@ def _predict_mass_loss_with_residue(
         or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
     ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
-    law_disclosures_raw = result.engine_metadata.get("law_disclosures")
-    law_disclosures: tuple[Mapping[str, object], ...] = ()
-    if law_disclosures_raw is not None:
-        decoded_disclosures = json.loads(law_disclosures_raw)
-        if not isinstance(decoded_disclosures, list) or any(
-            not isinstance(item, Mapping) for item in decoded_disclosures
-        ):
-            raise ValueError("residue engine metadata law_disclosures is malformed")
-        law_disclosures = tuple(dict(item) for item in decoded_disclosures)
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -15841,6 +15839,7 @@ def _hashimoto_residue_prediction(
                 if is_retention
                 else primary_provenance
             ),
+            law_disclosures=tuple(primary_provenance.get("law_disclosures") or ()),
         )
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
@@ -16044,6 +16043,7 @@ def _knudsen_residue_prediction(
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
             notices=result["notices"], identity=reference.identity,
             refusal_detail=provenance,
+            law_disclosures=tuple(provenance.get("law_disclosures") or ()),
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         return EnginePrediction(
@@ -16381,6 +16381,7 @@ def _sossi_residue_prediction(
             identity=reference.identity,
             version=str(provenance.get("code_revision") or "unknown"),
             refusal_detail=provenance,
+            law_disclosures=tuple(provenance.get("law_disclosures") or ()),
         )
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
