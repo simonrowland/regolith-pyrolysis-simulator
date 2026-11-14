@@ -209,6 +209,9 @@ def evaluate_card(
     """
     candidates = candidates or {}
     frozen = review["frozen_run"]
+    selected_ids = {oid for group in frozen["outcomes"] for oid in group["observation_ids"]}
+    scope = {**scope, "observations": {oid: to_plain(observations[oid])
+                                      for oid in selected_ids if oid in observations}}
     causes = _review_causes(run, review, scope)
     group_ids = [group["group_id"] for group in frozen["outcomes"]]
     inventory_ids = {item["group_id"] for item in frozen["printed_inventory"] if item.get("required", True)}

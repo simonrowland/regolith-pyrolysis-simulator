@@ -8,9 +8,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import UncertaintyKind, ValueKind
-from simulator.battery.migrate import load_migrated_store
-from simulator.battery.records import Uncertainty, Value
+from simulator.battery.enums import NoticeKind, UncertaintyKind, ValueKind
+from simulator.battery.migrate import load_migrated_store, to_plain
+from simulator.battery.records import Notice, Uncertainty, Value
 from simulator.battery.reproduction_cards import (
     compare_point,
     evaluate_card,
@@ -148,13 +148,18 @@ def complete_contract(paper_point):
                          "independent": True, "blockers": []}],
            "printed_inventory": [{"group_id": "chemistry", "locator": {"page": 6}}]}
     scope = {"experiments": {obs.experiment_id: {"work_id": "work", "mass": "0.0001"}},
-             "observations": {oid: {"value": "22.74"}}}
+             "observations": {oid: to_plain(obs)}}
     entries = [{"ref": ["experiments", obs.experiment_id, "mass"],
                 "resolved": "0.0001", "status": "reviewed", "reviewer": "fixture",
                 "locator": {"page": 2}, "quote": "100.0 mg", "unit": "kg"},
-               {"ref": ["observations", oid, "value"], "resolved": "22.74",
-                "status": "reviewed", "reviewer": "fixture", "locator": {"page": 6},
+               {"ref": ["observations", oid, "value"], "resolved": to_plain(obs.value),
+                "status": "reviewed", "reviewer": "fixture", "locator": to_plain(obs.locator),
                 "quote": "22.74", "unit": "wt%"}]
+    for path in (["uncertainty"], ["notices"], ["identity"], ["evidence"], ["admission"]):
+        entries.append({"ref": ["observations", oid, *path],
+                        "resolved": resolve_path(scope, ["observations", oid, *path]),
+                        "status": "reviewed", "reviewer": "fixture",
+                        "locator": to_plain(obs.locator), "quote": "policy fixture", "unit": "as printed"})
     review = {"frozen_run": deepcopy(run), "entries": entries,
               "consumed_paths": [entry["ref"] for entry in entries]}
     manifest = {"work_id": "work", "source_ids": [obs.source_id],
@@ -170,6 +175,7 @@ def test_contract_can_pass_and_zero_width_rms_is_null(complete_contract):
     oid, obs = next(iter(args[4].items()))
     args[4][oid] = replace(obs, uncertainty=Uncertainty(
         kind=UncertaintyKind.PRINTED, verbatim={"value": "0 wt%"}))
+    next(entry for entry in args[2]["entries"] if entry["ref"][-1] == "uncertainty")["resolved"] = to_plain(args[4][oid].uncertainty)
     receipt = evaluate_card(*args)
     assert receipt["verdict"] == "PASS"
     assert receipt["rms_band"] is None
@@ -213,7 +219,27 @@ def test_setup_only_change_and_unrelated_row(complete_contract):
     receipt = evaluate_card(*args)
     assert receipt["verdict"] == "NOT_PASS"
     assert "review_stale" in {c["cause"] for c in receipt["causes"]}
-    assert args[3]["observations"][next(iter(args[4]))]["value"] == "22.74"
+    assert args[3]["observations"][next(iter(args[4]))]["value"]["point"] == "22.74"
+
+
+def test_stale_plain_scope_cannot_hide_a_widened_band_or_source_flag(complete_contract):
+    args = complete_contract
+    oid, obs = next(iter(args[4].items()))
+    args[5][oid] = Decimal("24.74")
+    assert evaluate_card(*args)["verdict"] == "NOT_PASS"
+    args[4][oid] = replace(obs, uncertainty=Uncertainty(
+        kind=UncertaintyKind.PRINTED, verbatim={"value": "3 wt%"}))
+    receipt = evaluate_card(*args)
+    assert receipt["verdict"] == "NOT_PASS"
+    assert receipt["review_current"] is False
+    notice = Notice(kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(obs.identity.quantity.value,),
+                    reason="domain extension", origin="fixture")
+    args[4][oid] = replace(obs, notices=(notice,))
+    args[5][oid] = Decimal("22.74")
+    receipt = evaluate_card(*args)
+    assert receipt["verdict"] == "NOT_PASS"
+    assert receipt["groups"][0]["coordinates"][0]["flags"]
 
 
 def test_setup_review_can_expire_while_existing_observation_certification_stays_green(
