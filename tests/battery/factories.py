@@ -175,10 +175,18 @@ def oxide_identity(
     p_std: Decimal | None = None,
     polymorph: str | None = None,
 ) -> Identity:
+    if phase is Phase.CR:
+        product_polymorph = (
+            State.of(polymorph)
+            if polymorph is not None
+            else State.unknown("test factory did not specify crystal polymorph")
+        )
+    else:
+        product_polymorph = State.not_applicable("not crystal")
     product = Species(
         formula,
         phase,
-        polymorph=State.of(polymorph) if phase is Phase.CR else State.not_applicable("not crystal"),
+        polymorph=product_polymorph,
     )
     metal = Species(metal_formula or formula.replace("O", "").replace("2", "").replace("3", "") or "M", metal_phase)
     if metal.formula == formula:

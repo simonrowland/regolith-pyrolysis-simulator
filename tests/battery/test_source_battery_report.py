@@ -25,6 +25,14 @@ from simulator.battery.score import ScoreContext, refusal_census
 from tests.battery import factories as F
 
 
+def test_oxide_identity_missing_crystal_polymorph_is_typed_unknown() -> None:
+    polymorph = F.oxide_identity("MgO", Phase.CR).species.polymorph
+
+    assert polymorph is not None
+    assert polymorph.is_unknown
+    assert polymorph.reason == "test factory did not specify crystal polymorph"
+
+
 def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
     tmp_path: Path, monkeypatch
 ) -> None:
