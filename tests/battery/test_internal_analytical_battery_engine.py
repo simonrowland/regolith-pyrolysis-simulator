@@ -602,6 +602,17 @@ def test_internal_analytical_carries_gamma_composition_domain_notice(
     assert composition_notice.band == "Table 2 composition domain"
     assert "constant_gamma_composition_out_of_domain" in composition_notice.reason
     assert "composition_domain=CMAS_BASICITY" in composition_notice.reason
+    fallback_notice = next(
+        notice for notice in prediction.notices if notice.kind is NoticeKind.FALLBACK
+    )
+    assert fallback_notice.authority is Authority.BRIDGE
+    assert fallback_notice.reason == "melt_oxide_activity has no certified evidence tier"
+    borrowed_fo2_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "fo2_ladder"
+    )
 
     # Mutation check: remove only the Table 2 composition metadata. The same
     # production activity remains, while the extrapolation notice disappears.
@@ -624,8 +635,13 @@ def test_internal_analytical_carries_gamma_composition_domain_notice(
     assert without_domain.execution.state is ExecutionState.PRODUCED
     assert without_domain.value == prediction.value
     assert without_domain.authority is not Authority.EXTRAPOLATED
+    assert borrowed_fo2_notice in without_domain.notices, [
+        (notice.kind.value, notice.reason, notice.band)
+        for notice in without_domain.notices
+    ]
     assert not any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and "constant_gamma_composition_out_of_domain" in notice.reason
         for notice in without_domain.notices
     )
 
