@@ -545,33 +545,37 @@ def corrosion_campaign_recurrence(
     coupled_signal: float | None = None
     if reactive is not None:
         reactive_deposit = branches["reactive_upper_bound"]["deposit_kg_by_species"]
-        lo, lo_deposit, lo_signal = _campaign_branch(
-            liner,
-            initial_deposit_kg_by_species,
-            reactive_deposit,
-            density_kg_m3=density_kg_m3,
-            area_m2=area_m2,
-            reacted_layer_depth_m=reacted_layer_depth_m,
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            margin_C=margin,
-            horizon=horizon,
-            sampler=sampler,
-        )
-        coupled, coupled_deposit, coupled_signal = _campaign_branch(
-            liner,
-            initial_deposit_kg_by_species,
-            branches["inert"],
-            density_kg_m3=density_kg_m3,
-            area_m2=area_m2,
-            reacted_layer_depth_m=reacted_layer_depth_m,
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            margin_C=margin,
-            horizon=horizon,
-            sampler=sampler,
-            feedback_deposit_kg_by_species=reactive_deposit,
-        )
+        try:
+            lo, lo_deposit, lo_signal = _campaign_branch(
+                liner,
+                initial_deposit_kg_by_species,
+                reactive_deposit,
+                density_kg_m3=density_kg_m3,
+                area_m2=area_m2,
+                reacted_layer_depth_m=reacted_layer_depth_m,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                margin_C=margin,
+                horizon=horizon,
+                sampler=sampler,
+            )
+        except LinerCorrosionRefusal as exc:
+            reactive_refusal = exc.as_dict()
+        else:
+            coupled, coupled_deposit, coupled_signal = _campaign_branch(
+                liner,
+                initial_deposit_kg_by_species,
+                branches["inert"],
+                density_kg_m3=density_kg_m3,
+                area_m2=area_m2,
+                reacted_layer_depth_m=reacted_layer_depth_m,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                margin_C=margin,
+                horizon=horizon,
+                sampler=sampler,
+                feedback_deposit_kg_by_species=reactive_deposit,
+            )
     flags = [
         DEPOSIT_OXIDATION_STATE_FLAG,
         REACTED_LAYER_DEPTH_FLAG,
@@ -620,6 +624,7 @@ def first_liquid_tier_a(
     """
 
     composition = validate_oxide_composition(composition_wt_pct)
+    _raise_tier_a_acquisition_gap(invariant_table, composition)
     rows = invariant_table.get("invariants") if isinstance(invariant_table, Mapping) else None
     if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)) or not rows:
         raise LinerCorrosionRefusal("liner_invariant_table_missing")
@@ -685,25 +690,29 @@ def first_liquid_tier_a(
                 )
             )
     if not matches:
-        gaps = invariant_table.get("acquisition_gaps", {})
-        if isinstance(gaps, Mapping) and {"FeO", "CaO", "Al2O3"}.issubset(
-            composition
-        ):
-            gap = next(
-                (
-                    (str(name), str(detail))
-                    for name, detail in gaps.items()
-                    if set(str(name).split("-")) == {"FeO", "CaO", "Al2O3"}
-                ),
-                None,
-            )
-            if gap is not None:
-                raise LinerCorrosionRefusal(
-                    "liner_tier_a_acquisition_gap",
-                    f"{gap[0]}: {gap[1]}",
-                )
         raise LinerCorrosionRefusal("tier_a_invariant_field_missing")
     return min(matches)
+
+
+def _raise_tier_a_acquisition_gap(
+    invariant_table: Any, composition: Mapping[str, float]
+) -> None:
+    if not isinstance(invariant_table, Mapping):
+        return
+    gaps = invariant_table.get("acquisition_gaps", {})
+    if isinstance(gaps, Mapping) and {"FeO", "CaO", "Al2O3"}.issubset(composition):
+        gap = next(
+            (
+                (str(name), str(detail))
+                for name, detail in gaps.items()
+                if set(str(name).split("-")) == {"FeO", "CaO", "Al2O3"}
+            ),
+            None,
+        )
+        if gap is not None:
+            raise LinerCorrosionRefusal(
+                "liner_tier_a_acquisition_gap", f"{gap[0]}: {gap[1]}"
+            )
 
 
 def tier_a_first_liquid_onset(
@@ -1817,6 +1826,7 @@ class MageminLinerSampler:
             return self._curve_cache[key]
 
         points: list[tuple[float, float]] = []
+        last_valid_fraction = 0.0
         for index in range(MAGEMIN_PHI_CURVE_INTERVALS + 1):
             deposit_fraction = index / MAGEMIN_PHI_CURVE_INTERVALS
             composition = _composition_at_fraction(liner, deposit, deposit_fraction)
@@ -1826,9 +1836,30 @@ class MageminLinerSampler:
                 # The table ends at the first domain boundary. No extrapolation
                 # or result from outside the MAGEMin gate is used.
                 if exc.reason == ENGINE_OUT_OF_DOMAIN_FLAG and points:
+                    from engines.magemin.domain import MAGEMinDomainGate
+
+                    invalid_fraction = deposit_fraction
+                    admissible_fraction = last_valid_fraction
+                    for _ in range(52):
+                        midpoint = (admissible_fraction + invalid_fraction) / 2.0
+                        candidate = _composition_at_fraction(liner, deposit, midpoint)
+                        valid, _, _ = MAGEMinDomainGate.validate_with_reason(candidate)
+                        if valid:
+                            admissible_fraction = midpoint
+                        else:
+                            invalid_fraction = midpoint
+                    if admissible_fraction > last_valid_fraction:
+                        boundary_composition = _composition_at_fraction(
+                            liner, deposit, admissible_fraction
+                        )
+                        boundary_fraction = self(
+                            boundary_composition, temperature, pressure
+                        )
+                        points.append((admissible_fraction, boundary_fraction))
                     break
                 raise
             points.append((deposit_fraction, liquid_fraction))
+            last_valid_fraction = deposit_fraction
         curve = TabulatedLiquidFractionCurve(
             liner_composition_wt_pct=liner,
             deposit_composition_wt_pct=deposit,
@@ -2197,7 +2228,6 @@ def _morey_context_records(document: Mapping[str, Any]) -> list[dict[str, Any]]:
             isinstance(table_number, int)
             and not isinstance(table_number, bool)
             and table_number in table_subsystems
-            and values.get("quantity") == "transition_temperature"
         )
         observation_id = context.get("observation_id")
         is_compound_transition = (
