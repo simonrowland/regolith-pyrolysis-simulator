@@ -411,21 +411,25 @@ def _zhang_k_case(tmp_path: Path, temperature: str):
     return context, reference
 
 
-def _assert_zhang_rb2o_refused(residual, reference) -> None:
-    # The old pin depended on a silent Rb2O drop; follow-up t-1183 adds a
-    # flagged projection so the row predicts with a notice.
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-    assert residual.refusal.detail["reason"] == "outside_supported_species"
-    assert residual.refusal.detail["engine_reason"] == "imcc_component_outside_domain"
+def _assert_zhang_rb2o_projection(residual, candidate, reference) -> None:
+    # OpenIMCC 9c includes Rb2O through a trace projection. Keep the row
+    # unscored and require the model caveat that identifies the projection.
+    assert candidate is not None
+    assert residual.refusal is None
+    assert residual.candidate == candidate.observation_id
+    assert residual.score_eligible is False
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason.startswith("trace_components_outside_melt_model {Rb2O:")
+        for notice in residual.notices
+    )
     weights = composition_wt_pct(reference.identity.composition.value)
     assert weights is not None
     assert weights["Rb2O"] == pytest.approx(1.86, abs=0.02)
 
 
 @pytest.mark.parametrize("temperature", ["1473.15", "1673.15"])
-def test_openimcc_zhang_implied_alpha_refuses_unsupported_rb2o(
+def test_openimcc_zhang_implied_alpha_projects_unsupported_rb2o_with_notice(
     tmp_path: Path,
     temperature: str,
 ) -> None:
@@ -440,8 +444,7 @@ def test_openimcc_zhang_implied_alpha_refuses_unsupported_rb2o(
         context=context,
         handles={"openimcc": handle},
     )
-    assert candidate is None
-    _assert_zhang_rb2o_refused(residual, reference)
+    _assert_zhang_rb2o_projection(residual, candidate, reference)
 
 
 @pytest.mark.parametrize(
