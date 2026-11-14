@@ -12084,8 +12084,13 @@ def map_quantity(
     if quantity_absent and obs_type in TYPE_QUANTITY:
         inferred = TYPE_QUANTITY[obs_type]
         if not _quantity_corroborated(inferred, values, units, row):
+            declared_gap = (
+                values.get("schema_gap") if isinstance(values, Mapping) else None
+            )
             reason = (
-                "row type is a curation label, not a statement of the observable"
+                declared_gap.strip()
+                if isinstance(declared_gap, str) and declared_gap.strip()
+                else "row type is a curation label, not a statement of the observable"
             )
             contradiction = _quantity_contradiction(
                 inferred, obs_type, values, units, row
@@ -17661,6 +17666,19 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    declared_schema_gap = payload.get("schema_gap")
+    if (
+        q_token is None
+        and isinstance(declared, State)
+        and declared.reason == declared_schema_gap
+        and isinstance(declared_schema_gap, str)
+        and declared_schema_gap.strip()
+    ):
+        return _unavailable_selection(
+            declared_schema_gap.strip(),
+            condition_ranges=condition_ranges,
+            unused_ancillary=unused,
+        )
     if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
         oxide_fields, invalid_fields = _residue_component_field_sets(payload)
         for field in ("residue_ppm", *oxide_fields):
@@ -27671,13 +27689,14 @@ class Migrator:
         # Residue fO2 is the printed-only promotion above. The generic
         # decision covers every other quantity, including a derived ratio
         # copied from the row point.
-        if (
+        oxygen_applied = (
             q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             and oxygen_state is not None
             and not _defaulted_row_derived_plante_oxygen(
                 admission, row_point_conditions
             )
-        ):
+        )
+        if oxygen_applied:
             ident_kwargs["fO2_Pa"] = oxygen_state
         identity_for_profile = (
             Identity(
@@ -29212,7 +29231,6 @@ class Migrator:
             q_token, ident_kwargs.get("subtype")
         )
         coord = None
-        val = None
         trail = "identity"
         extra_unc = None
         extra_unc_k: int | None = None
@@ -29550,7 +29568,6 @@ class Migrator:
                         "duplicate_of_observation_id"
                     ],
                 }
-            val = value_sel.amount
             trail = value_sel.unit_trail
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
@@ -32132,7 +32149,7 @@ class Migrator:
         count = self._count(rel)
         try:
             doc = load_json(path) if path.suffix == ".json" else load_yaml(path)
-        except (OSError, json.JSONDecodeError, yaml.YAMLError) as exc:
+        except (OSError, json.JSONDecodeError, yaml.YAMLError):
             count.metadata_in += 1
             return
         if not isinstance(doc, Mapping):

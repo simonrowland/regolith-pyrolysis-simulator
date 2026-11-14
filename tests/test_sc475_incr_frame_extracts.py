@@ -2713,6 +2713,16 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 continue
             assert all(not row.identity.quantity.is_value for row in migrated)
             assert all(row.value.kind.value == "unavailable" for row in migrated)
+            if reference == "formation from simple oxides":
+                declared_reason = values["schema_gap"]
+                assert all(
+                    row.value.unavailable_reason == declared_reason
+                    for row in migrated
+                ), observation_id
+                assert all(
+                    row.admission.status.value != "admitted"
+                    for row in migrated
+                ), observation_id
 
 
 def test_printed_reference_temperatures_are_recorded_only_for_verified_p1_rows():
