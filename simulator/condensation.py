@@ -110,6 +110,8 @@ from simulator.physical_constants import (
     AVOGADRO,
     BOLTZMANN,
     CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT_10SIG,
+    STANDARD_ATMOSPHERE_PA,
 )
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
@@ -220,7 +222,8 @@ DEFAULT_SHERWOOD_LAMINAR = 3.66
 # when pressure is absent/invalid or that computation fails, anchored to the
 # historical SiO/N2 operating point at 10 mbar and 1700 C.
 DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2
-GAS_CONSTANT_J_MOL_K = 8.314462618
+# 10-significant-figure R. Not the full CODATA leaf (relative −1.843e-11).
+GAS_CONSTANT_J_MOL_K = GAS_CONSTANT_10SIG
 
 
 def _finite_nonnegative_value(value: Any, *, label: str) -> float:
@@ -984,6 +987,27 @@ def _sticking_wall_product_class(species: str) -> str | None:
 
 def _reactive_product_backstop_authorized(species: str) -> bool:
     return _sticking_reactivity_class(species) == 'reactive'
+
+
+def reactive_product_backstop_enabled(
+    species: str,
+    wall_temperature_C: float,
+    condensation_temperature_C: float,
+) -> bool:
+    """Whether a reactive product may materialize on this wall.
+
+    Premise: SiO disproportionation is the reactive class, and the wall
+    model materializes that product only at or below the declared
+    condensation temperature. A hotter wall stays on reversible p_sat.
+    Algebra: authorized and wall_C <= T_cond_C. Unit check: both
+    temperatures are Celsius. Sanity: a reactive species above T_cond
+    returns False, and a non-reactive species returns False at any T.
+    """
+
+    return (
+        _reactive_product_backstop_authorized(species)
+        and float(wall_temperature_C) <= float(condensation_temperature_C)
+    )
 
 
 def _stable_condensation_product_backstop_authorized(species: str) -> bool:
@@ -1834,7 +1858,7 @@ def _chapman_enskog_d_ab_m2_s(
     M_ab_reduced = 2.0 / (1.0 / M_a + 1.0 / M_b)    # g/mol
     T_star = T_K / eps_ab
     omega_d = _neufeld_collision_integral_omega_d(T_star)
-    pressure_atm = pressure_pa / 101325.0
+    pressure_atm = pressure_pa / STANDARD_ATMOSPHERE_PA
     if pressure_atm <= 0.0:
         return 0.0
     # cm²/s by the reduced-mass BSL form, then convert to m²/s (1 cm² = 1e-4 m²)
@@ -2391,7 +2415,7 @@ class CondensationModel:
             ):
                 raise ValueError(f'{label} must be numeric')
             value = float(raw_temperature)
-            if not math.isfinite(value) or value <= -273.15:
+            if not math.isfinite(value) or value <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError(
                     f'{label} must be finite and above absolute zero'
                 )
@@ -2471,7 +2495,7 @@ class CondensationModel:
                 raw_temperature = float(raw_temperature)
                 if (
                     not math.isfinite(raw_temperature)
-                    or raw_temperature <= -273.15
+                    or raw_temperature <= -CELSIUS_TO_KELVIN_OFFSET
                 ):
                     raise ValueError(
                         f'{segment.name} wall temperature must be finite '
@@ -2480,7 +2504,7 @@ class CondensationModel:
 
         if wall_temperature_C is not None:
             wall_temperature = float(wall_temperature_C)
-            if not math.isfinite(wall_temperature) or wall_temperature <= -273.15:
+            if not math.isfinite(wall_temperature) or wall_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError('wall_temperature_C must be finite and above absolute zero')
             self.wall_temperature_C = wall_temperature
         if pipe_diameter_m is not None:
@@ -2492,7 +2516,7 @@ class CondensationModel:
             ]
         if gas_temperature_C is not None:
             gas_temperature = float(gas_temperature_C)
-            if not math.isfinite(gas_temperature) or gas_temperature <= -273.15:
+            if not math.isfinite(gas_temperature) or gas_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError('gas_temperature_C must be finite and above absolute zero')
             self.gas_temperature_C = gas_temperature
         elif wall_temperature_C is not None:
@@ -2954,7 +2978,7 @@ class CondensationModel:
             raw_temperature = float(temperatures_C.get(
                 segment.name, self.wall_temperature_C)
             )
-            if not math.isfinite(raw_temperature) or raw_temperature <= -273.15:
+            if not math.isfinite(raw_temperature) or raw_temperature <= -CELSIUS_TO_KELVIN_OFFSET:
                 raise ValueError(
                     f'{segment.name} wall temperature must be finite and above absolute zero'
                 )
@@ -4375,8 +4399,8 @@ class CondensationModel:
             diagnostic: dict[str, Any] = {}
             pressure_options = dict(
                 vapor_pressure_data=self.vapor_pressure_data,
-                reactive_product_backstop=(
-                    reactive_backstop_authorized and sample_T_C <= T_cond_C
+                reactive_product_backstop=reactive_product_backstop_enabled(
+                    species, sample_T_C, T_cond_C
                 ),
                 stable_condensation_product_backstop=(
                     stable_product_backstop_authorized

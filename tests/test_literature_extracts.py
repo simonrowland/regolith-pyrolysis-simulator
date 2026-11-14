@@ -309,6 +309,60 @@ def test_ohta_suito_1995_source_pins_reject_each_review_regression() -> None:
             _assert_ohta_suito_1995_review_pins(extract)
 
 
+def test_kume_2000_solid_reference_does_not_infer_unprinted_polymorph() -> None:
+    from simulator.battery.enums import Phase
+
+    source = EXTRACTS / "kume-2000-cao-activities.yaml"
+    extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+    targets = [
+        row
+        for formula in ("CaO", "MgO")
+        for row in extract["species"][formula]["observations"]
+        if row.get("type") == "activity_coefficient"
+        and "activity" in (row.get("values") or {})
+        and row["values"].get("method_class") == "measured_reduced"
+        and row["values"]["activity"] > 0
+    ]
+    # Includes 18 Table 4 kume_2000_table4_sample_* rows reclassified from
+    # quoted_attributed to measured_reduced with a derivation.
+    assert len(targets) == 144
+    for row in targets:
+        endmember = row["standard_state"]["state"]["value"]["endmember"]
+        assert endmember["phase"] == {"tag": "value", "value": "cr"}
+        assert endmember["polymorph"] == {
+            "tag": "unknown",
+            "reason": "polymorph_not_stated_in_paper",
+        }
+        assert "(s)" in row["locator"]["note"]
+
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT,
+        source,
+        index={
+            source.stem: {
+                **extract["source"],
+                "source_id": source.stem,
+            }
+        },
+        aliases={},
+    )
+    migrator.finalize()
+    assert migrator.result.validation is not None
+    assert not migrator.result.validation.hard_issues
+    migrated = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+    }
+    for row in targets:
+        reference_state = migrated[row["observation_id"]].identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        endmember = reference_state.value.endmember
+        assert endmember.phase.is_value
+        assert endmember.phase.value is Phase.CR
+        assert endmember.polymorph.is_unknown
+        assert endmember.polymorph.reason == "polymorph_not_stated_in_paper"
+
+
 def _assert_sato_1973_table_pins(extract: dict) -> None:
     bench = extract["benches"][0]
     assert bench["temperature_measurement"]["increments"]["state"]["value"] == (
@@ -2503,7 +2557,7 @@ def test_corpus_fidelity_gate_rejects_copied_unattested_values():
     doc["fidelity_samples"][0]["value"] = 0.9
     doc["species"]["Fe"]["observations"][0]["values"]["alpha"] = 0.9
 
-    errors = vle._check_fidelity_gate(doc, label="copied-pin")
+    errors = vle.certify_extract_source_fidelity(doc, label="copied-pin")
 
     assert any("reviewed_by is required" in error for error in errors), errors
 
@@ -2574,7 +2628,7 @@ def test_corpus_fidelity_gate_rejects_observation_id_as_evidence():
         }
     ]
 
-    errors = vle._check_fidelity_gate(doc, label="metadata-pin")
+    errors = vle.certify_extract_source_fidelity(doc, label="metadata-pin")
 
     assert any("fidelity sample coverage missing" in error for error in errors), errors
 
@@ -2602,9 +2656,18 @@ def test_refuses_absolute_provenance_path():
 
 
 def test_repo_extracts_validate_green():
-    """All pilot extracts in the tree must be validator-green."""
-    errors = vle.validate_all()
-    assert errors == [], "\n".join(errors[:20])
+    """Discovery and the committed extract set are the same partition.
+
+    The whole-corpus ``validate_all()`` call that used to live here omitted
+    fidelity matching, kept only the first 20 errors, and exceeded the 300 s
+    CPU budget, so a timeout replaced the invalid-extract list (b-539).
+    ``test_literature_extract_validation_gate`` owns that validator call.
+    """
+    import test_literature_extract_validation_gate as gate
+
+    committed = gate.committed_extract_paths()
+    assert set(vle.discover_extracts()) == set(committed)
+    assert {gate.family_of(path) for path in committed} == set(gate.FAMILIES)
 
 
 def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None:
@@ -3060,10 +3123,12 @@ def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
         "kems-053-stolyarova-1991.yaml",
         "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium",
     )
+    # d-342: Table Ib does not print an m/z 16 ion current corrected for
+    # O2 fragmentation. The column is calculated from equilibrium (1).
     assert atomic_source["values"]["method_class"] == "quoted_attributed"
     assert atomic_source["values"]["evidence_class"] == "quoted_attributed"
     assert atomic_source["values"]["attribution"] == (
-        "Stolyarova et al. (1991), Table Ib, Eq. [1]"
+        "Authors' atomic-oxygen pressure reduction from KEMS measurements using the printed equilibrium relation (1); WO2 and WO3 inputs are not tabulated."
     )
     assert atomic_source["reaction_as_printed"] == "(WO3)(g) = (WO2)(g) + (O)(g)"
     assert "reservoir" not in atomic_source
@@ -5170,10 +5235,15 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # samples (re-derived with vle.fidelity_source_warnings over every extract; no other extract moved).
 # So uncovered observations 48661 -> 48664, uncovered extracts 616 -> 617, unattested 3128 -> 3131.
 # Not a fidelity regression.
+# b261 landing: the main join adds 67 extracts (782 -> 849). Re-derived with
+# vle.fidelity_source_warnings over every extract on the regen tree cf19376f3:
+# uncovered observations 48664 -> 50791, uncovered extracts 617 -> 639,
+# unattested 3131 -> 3385; pilot pins unchanged at 57. New extracts, not a
+# fidelity regression in existing ones.
 # Each ceiling may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 48664
-_UNCOVERED_EXTRACTS_CEILING = 617
-_UNATTESTED_SAMPLES_CEILING = 3131
+_UNCOVERED_OBSERVATIONS_CEILING = 50791
+_UNCOVERED_EXTRACTS_CEILING = 639
+_UNATTESTED_SAMPLES_CEILING = 3385
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
@@ -5196,43 +5266,73 @@ _MISSING_OBSERVATION_IDS_CEILING = 0
 _NON_FINITE_EVIDENCE_CEILING = 0
 
 
-def test_fidelity_source_warning_ratchet():
+def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path):
     """Source-fidelity holes are an upper bound, not a green bill of health.
 
     ``auto_migrated_pilot_pin`` is the number of pilot samples. Counting
     affected extracts alone would miss another pilot pin in an extract that
     already has one.
     """
-    uncovered_obs = 0
-    uncovered_extracts = 0
-    unattested_samples = 0
-    pilot_extracts = 0
-    pilot_pins = 0
-    source_blind_pins = 0
-    ambiguous_ids = 0
-    missing_ids = 0
-    non_finite = 0
-    for path in vle.discover_extracts():
-        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
-        if not isinstance(doc, dict):
-            continue
-        if doc.get("schema_version") != vle.SCHEMA_VERSION:
-            continue
-        warnings = vle.fidelity_source_warnings(doc, label=path.stem)
-        by_kind = {warning.kind: warning.count for warning in warnings}
-        uncovered = by_kind.get("uncovered_observation", 0)
-        if uncovered:
-            uncovered_extracts += 1
-            uncovered_obs += uncovered
-        unattested_samples += by_kind.get("unattested_sample", 0)
-        source_blind_pins += by_kind.get("source_blind_pin", 0)
-        ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
-        missing_ids += by_kind.get("missing_observation_id", 0)
-        non_finite += by_kind.get("non_finite_evidence", 0)
-        pilot = by_kind.get("auto_migrated_pilot_pin", 0)
-        pilot_pins += pilot
-        if pilot:
-            pilot_extracts += 1
+
+    def counts():
+        uncovered_obs = 0
+        uncovered_extracts = 0
+        unattested_samples = 0
+        pilot_extracts = 0
+        pilot_pins = 0
+        source_blind_pins = 0
+        ambiguous_ids = 0
+        missing_ids = 0
+        non_finite = 0
+        for path in vle.discover_extracts():
+            doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+            if not isinstance(doc, dict):
+                continue
+            if doc.get("schema_version") != vle.SCHEMA_VERSION:
+                continue
+            warnings = vle.fidelity_source_warnings(doc, label=path.stem)
+            by_kind = {warning.kind: warning.count for warning in warnings}
+            uncovered = by_kind.get("uncovered_observation", 0)
+            if uncovered:
+                uncovered_extracts += 1
+                uncovered_obs += uncovered
+            unattested_samples += by_kind.get("unattested_sample", 0)
+            source_blind_pins += by_kind.get("source_blind_pin", 0)
+            ambiguous_ids += by_kind.get("ambiguous_observation_id", 0)
+            missing_ids += by_kind.get("missing_observation_id", 0)
+            non_finite += by_kind.get("non_finite_evidence", 0)
+            pilot = by_kind.get("auto_migrated_pilot_pin", 0)
+            pilot_pins += pilot
+            if pilot:
+                pilot_extracts += 1
+        return (
+            uncovered_obs,
+            uncovered_extracts,
+            unattested_samples,
+            pilot_pins,
+            pilot_extracts,
+            source_blind_pins,
+            ambiguous_ids,
+            missing_ids,
+            non_finite,
+        )
+
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+    unmounted = counts()
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+    mounted = counts()
+    assert mounted == unmounted
+    (
+        uncovered_obs,
+        uncovered_extracts,
+        unattested_samples,
+        pilot_pins,
+        pilot_extracts,
+        source_blind_pins,
+        ambiguous_ids,
+        missing_ids,
+        non_finite,
+    ) = unmounted
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
     assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
@@ -5299,6 +5399,612 @@ def _opened_payload_document(root: Path, *, structured: bool) -> dict:
         sample["reviewed_on"] = "2026-11-10"
         sample["locator"] = locator
     return doc
+
+
+def _corpus_pin_document(
+    root: Path,
+    *,
+    source_sha256: str | None = None,
+    source_path: str = "text/paper.txt",
+) -> dict:
+    doc = _opened_payload_document(root, structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator["source_path"] = source_path
+    if source_sha256 is not None:
+        locator["source_sha256"] = source_sha256
+    return doc
+
+
+def _source_blind_warning(doc: dict) -> vle.FidelityWarning:
+    warnings = vle.fidelity_source_warnings(doc, label="corpus-pin")
+    return next(warning for warning in warnings if warning.kind == "source_blind_pin")
+
+
+def _uncovered_observation_count(doc: dict, *, artifact_root: Path | None = None) -> int:
+    warnings = vle.fidelity_source_warnings(
+        doc, label="corpus-coverage", artifact_root=artifact_root
+    )
+    return sum(
+        warning.count
+        for warning in warnings
+        if warning.kind == "uncovered_observation"
+    )
+
+
+def _assert_refused_sample_still_covers_addressed_observation(
+    doc: dict, *, artifact_root: Path | None = None
+) -> None:
+    without_sample = copy.deepcopy(doc)
+    without_sample["fidelity_samples"] = []
+    unaddressed = _uncovered_observation_count(
+        without_sample, artifact_root=artifact_root
+    )
+    assert _uncovered_observation_count(
+        doc, artifact_root=artifact_root
+    ) == max(0, unaddressed - 1)
+
+
+_LOCATOR_KEY_SETS = (
+    ("source_path",),
+    ("quotes_path",),
+    ("source_path", "quotes_path"),
+    ("record",),
+    ("source_path", "record"),
+    ("quotes_path", "record"),
+)
+_TYPED_LOCATOR_REFUSALS = (
+    "corpus_root_unset",
+    "corpus_artifact_missing",
+    "corpus_path_outside_root",
+    "artifact_digest_missing",
+    "artifact_digest_mismatch",
+)
+_PER_KEY_OUTCOMES = (
+    "matched",
+    "repository_transcription",
+    *_TYPED_LOCATOR_REFUSALS,
+    "token_absent",
+    "digest_valid_token_absent",
+    "corpus_valid_token_present",
+)
+_CORPUS_FILE_OUTCOMES = {
+    "artifact_digest_missing",
+    "artifact_digest_mismatch",
+    "digest_valid_token_absent",
+    "corpus_valid_token_present",
+    "record_alternate_open",
+    "record_alternate_token_absent",
+}
+_LOCATOR_OUTCOME_CASES = []
+for _keys in _LOCATOR_KEY_SETS:
+    _outcomes_by_key = [
+        (
+            *_PER_KEY_OUTCOMES,
+            "record_alternate_open",
+            "record_alternate_token_absent",
+            "first_open_token_absent",
+        )
+        if key == "record"
+        else _PER_KEY_OUTCOMES
+        for key in _keys
+    ]
+    for _outcomes in itertools.product(*_outcomes_by_key):
+        # A locator has one global corpus mount and one source_sha256. Keep
+        # only combinations those shared settings can realize, and leave
+        # multiple corpus opens to their dedicated refusal test below.
+        if sum(outcome in _CORPUS_FILE_OUTCOMES for outcome in _outcomes) > 1:
+            continue
+        for _corpus_mounted in (False, True):
+            for _digest_token in (None, "0.24", "0.25"):
+                _mount_required = any(
+                    outcome
+                    in _CORPUS_FILE_OUTCOMES | {"corpus_artifact_missing"}
+                    for outcome in _outcomes
+                )
+                if _mount_required != _corpus_mounted:
+                    continue
+                if (
+                    "corpus_root_unset" in _outcomes
+                    and _corpus_mounted
+                ):
+                    continue
+                _realizable = True
+                for _outcome in _outcomes:
+                    if (
+                        _outcome == "artifact_digest_missing"
+                        and _digest_token is not None
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "artifact_digest_mismatch"
+                        and _digest_token is None
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "digest_valid_token_absent"
+                        and _digest_token != "0.25"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "corpus_valid_token_present"
+                        and _digest_token != "0.24"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "record_alternate_token_absent"
+                        and _digest_token != "0.25"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome
+                        in {"record_alternate_open", "corpus_valid_token_present"}
+                        and _digest_token != "0.24"
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome == "matched"
+                        and _digest_token not in {None, "0.24"}
+                    ):
+                        _realizable = False
+                    elif (
+                        _outcome
+                        in {
+                            "token_absent",
+                            "first_open_token_absent",
+                            "digest_valid_token_absent",
+                            "record_alternate_token_absent",
+                        }
+                        and _digest_token not in {None, "0.25"}
+                    ):
+                        _realizable = False
+                if _realizable:
+                    _LOCATOR_OUTCOME_CASES.append(
+                        (_keys, _outcomes, _corpus_mounted, _digest_token)
+                    )
+                    break
+            else:
+                continue
+            break
+_LOCATOR_OUTCOME_PARAMS = []
+for _keys, _outcomes, _corpus_mounted, _digest_token in _LOCATOR_OUTCOME_CASES:
+    _expected_source_blind_reason = (
+        "source_blind_pin"
+        if not all(
+            outcome
+            in {
+                "matched",
+                "repository_transcription",
+                "corpus_valid_token_present",
+                "record_alternate_open",
+            }
+            for outcome in _outcomes
+        )
+        else None
+    )
+    _LOCATOR_OUTCOME_PARAMS.append(
+        pytest.param(
+            _keys,
+            _outcomes,
+            _corpus_mounted,
+            _digest_token,
+            _expected_source_blind_reason,
+            id="+".join(
+                f"{key}={outcome}" for key, outcome in zip(_keys, _outcomes)
+            ),
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    (
+        "declared_keys",
+        "outcomes",
+        "corpus_mounted",
+        "digest_token",
+        "expected_source_blind_reason",
+    ),
+    _LOCATOR_OUTCOME_PARAMS,
+)
+def test_locator_source_blind_matrix_preserves_address_coverage(
+    declared_keys,
+    outcomes,
+    corpus_mounted,
+    digest_token,
+    expected_source_blind_reason,
+    tmp_path,
+    monkeypatch,
+):
+    """Each key has an independent file under one locator-wide root and digest."""
+    repository_root = tmp_path / "repository"
+    corpus_root = tmp_path / "corpus"
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator["page"] = 2
+    relative_paths = {
+        "source_path": "text/source.txt",
+        "quotes_path": "tables/quotes.txt",
+        "record": "text/record.txt annotation",
+    }
+
+    def artifact_text(token: str) -> str:
+        return f"line 1\nline 2\nline 3\nline 4\nalpha {token} measured\n"
+
+    def write_artifact(root: Path, path: str, token: str) -> Path:
+        artifact = root / path
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text(artifact_text(token), encoding="utf-8")
+        return artifact
+
+    def write_repository_transcription(path: str) -> Path:
+        artifact = repository_root / path
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text(
+            "repository transcription\nalpha 0.24 measured\n", encoding="utf-8"
+        )
+        return artifact
+
+    for key, outcome in zip(declared_keys, outcomes):
+        relative = relative_paths[key]
+        if outcome == "corpus_path_outside_root":
+            path = f"{relative.split('/')[0]}/../../outside-{key}.txt"
+        else:
+            path = relative
+        locator[key] = path
+
+        if outcome == "matched":
+            write_artifact(repository_root, path, "0.24")
+        elif outcome == "repository_transcription":
+            write_repository_transcription(path)
+        elif outcome == "token_absent":
+            write_artifact(repository_root, path, "0.25")
+        elif outcome == "artifact_digest_missing":
+            write_artifact(corpus_root, path, "0.25")
+        elif outcome == "digest_valid_token_absent":
+            write_artifact(corpus_root, path, "0.25")
+        elif outcome == "corpus_valid_token_present":
+            write_artifact(corpus_root, path, "0.24")
+        elif outcome == "artifact_digest_mismatch":
+            mismatch_token = "0.25" if digest_token == "0.24" else "0.24"
+            write_artifact(corpus_root, path, mismatch_token)
+        elif outcome == "corpus_root_unset":
+            pass
+        elif outcome == "corpus_artifact_missing":
+            pass
+        elif outcome == "corpus_path_outside_root":
+            pass
+        elif outcome == "record_alternate_open":
+            filename = relative.split()[0]
+            write_artifact(corpus_root, filename, "0.24")
+        elif outcome == "record_alternate_token_absent":
+            filename = relative.split()[0]
+            write_artifact(corpus_root, filename, "0.25")
+        elif outcome == "first_open_token_absent":
+            write_artifact(repository_root, relative, "0.25")
+            write_artifact(repository_root, relative.split()[0], "0.24")
+
+    if corpus_mounted:
+        monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+    else:
+        monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+    if digest_token is not None:
+        locator["source_sha256"] = hashlib.sha256(
+            artifact_text(digest_token).encode("utf-8")
+        ).hexdigest()
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="locator-key-matrix", artifact_root=repository_root
+    )
+    source_blind = next(
+        (warning for warning in warnings if warning.kind == "source_blind_pin"),
+        None,
+    )
+    assert (source_blind.kind if source_blind else None) == expected_source_blind_reason
+    if source_blind:
+        expected_reason_codes = set(outcomes) & set(_TYPED_LOCATOR_REFUSALS)
+        actual_reason_codes = {
+            reason
+            for reason in _TYPED_LOCATOR_REFUSALS
+            if reason in source_blind.detail
+        }
+        assert actual_reason_codes == expected_reason_codes
+        for key, outcome in zip(declared_keys, outcomes):
+            if outcome in _TYPED_LOCATOR_REFUSALS:
+                assert f"{outcome} ({locator[key]})" in source_blind.detail
+        token_absent = any(
+            outcome
+            in {
+                "token_absent",
+                "digest_valid_token_absent",
+                "record_alternate_token_absent",
+                "first_open_token_absent",
+            }
+            for outcome in outcomes
+        )
+        assert ("not in the cited text" in source_blind.detail) == token_absent
+
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+
+    if declared_keys == ("source_path", "quotes_path") and outcomes == (
+        "corpus_root_unset",
+        "matched",
+    ):
+        assert source_blind is not None
+        assert "corpus_root_unset" in source_blind.detail
+        refusals = vle.certify_extract_source_fidelity(
+            doc, label="locator-key-matrix", artifact_root=repository_root
+        )
+        assert any("corpus_root_unset" in refusal for refusal in refusals)
+def test_multiple_corpus_artifacts_refuse_and_keep_address_coverage(
+    tmp_path, monkeypatch
+):
+    repository_root = tmp_path / "repository"
+    corpus_root = tmp_path / "corpus"
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator.update(
+        {
+            "source_path": "text/source.txt",
+            "quotes_path": "tables/quotes.txt",
+            "page": 2,
+        }
+    )
+    source = corpus_root / "text" / "source.txt"
+    quotes = corpus_root / "tables" / "quotes.txt"
+    source.parent.mkdir(parents=True)
+    quotes.parent.mkdir(parents=True)
+    source.write_text("source line\nalpha 0.24 measured\n", encoding="utf-8")
+    quotes.write_text("quotes line\nalpha 0.24 measured\n", encoding="utf-8")
+    locator["source_sha256"] = hashlib.sha256(source.read_bytes()).hexdigest()
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="multiple-corpus-artifacts", artifact_root=repository_root
+    )
+    source_blind = next(
+        warning for warning in warnings if warning.kind == "source_blind_pin"
+    )
+    assert "multiple_corpus_artifacts" in source_blind.detail
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+    refusals = vle.certify_extract_source_fidelity(
+        doc, label="multiple-corpus-artifacts", artifact_root=repository_root
+    )
+    assert any("multiple_corpus_artifacts" in refusal for refusal in refusals)
+    assert not any("uncovered_observation" in refusal for refusal in refusals)
+
+
+@pytest.mark.parametrize(
+    ("malformed_key", "malformed_value"),
+    [("record", None), ("record", 123), ("quotes_path", "")],
+)
+def test_malformed_declared_locator_key_refuses_but_keeps_address_coverage(
+    malformed_key, malformed_value, tmp_path, monkeypatch
+):
+    repository_root = tmp_path / "repository"
+    artifact = repository_root / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_text(
+        "line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n",
+        encoding="utf-8",
+    )
+    doc = _opened_payload_document(tmp_path / "fixture", structured=False)
+    doc["fidelity_samples"][0]["locator"][malformed_key] = malformed_value
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="malformed-locator-key", artifact_root=repository_root
+    )
+    source_blind = next(
+        warning for warning in warnings if warning.kind == "source_blind_pin"
+    )
+    assert "locator_key_malformed" in source_blind.detail
+    assert malformed_key in source_blind.detail
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+    refusals = vle.certify_extract_source_fidelity(
+        doc, label="malformed-locator-key", artifact_root=repository_root
+    )
+    assert any("locator_key_malformed" in refusal for refusal in refusals)
+    assert not any("uncovered_observation" in refusal for refusal in refusals)
+
+
+def test_corpus_artifact_is_opened_and_digest_is_recorded(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(tmp_path)
+    artifact = tmp_path / "text" / "paper.txt"
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    doc["fidelity_samples"][0]["locator"]["source_sha256"] = digest
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert vle.fidelity_source_warnings(doc, label="corpus-pin") == []
+    assert vle.certify_extract_source_fidelity(doc, label="corpus-pin") == []
+    assert doc["fidelity_samples"][0]["locator"] == {
+        "source_path": "text/paper.txt",
+        "line_range": "5-5",
+        "page": 2,
+        "source_sha256": digest,
+    }
+
+
+def test_unset_corpus_root_is_typed_and_keeps_source_blind_count(
+    tmp_path, monkeypatch
+):
+    artifact = tmp_path / "text" / "paper.txt"
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text("line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n")
+    digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    doc = _corpus_pin_document(tmp_path, source_sha256=digest)
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    warning = _source_blind_warning(doc)
+    assert warning.count == 1
+    assert "corpus_root_unset" in warning.detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+    refusals = vle.certify_extract_source_fidelity(doc, label="corpus-pin")
+    assert any("corpus_root_unset" in refusal for refusal in refusals)
+
+
+def test_missing_corpus_artifact_is_typed(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(
+        tmp_path,
+        source_sha256="0" * 64,
+        source_path="text/missing.txt",
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "corpus_artifact_missing" in _source_blind_warning(doc).detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+def test_corpus_path_outside_root_is_typed(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(
+        tmp_path,
+        source_sha256="0" * 64,
+        source_path="../outside.txt",
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "corpus_path_outside_root" in _source_blind_warning(doc).detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+@pytest.mark.parametrize(
+    ("link_target", "expected_reason"),
+    [
+        ("../implementation.py", "artifact_not_source"),
+        ("../raw/implementation.py", "artifact_not_source"),
+        ("../../outside.txt", "corpus_path_outside_root"),
+    ],
+)
+def test_corpus_symlink_target_must_remain_eligible_source(
+    link_target, expected_reason, tmp_path, monkeypatch
+):
+    corpus_root = tmp_path / "corpus"
+    doc = _corpus_pin_document(corpus_root)
+    source_link = corpus_root / "text" / "paper.txt"
+    source_link.unlink()
+    target = (source_link.parent / link_target).resolve()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        "line 1\nline 2\nline 3\nline 4\nalpha 0.24 measured\n",
+        encoding="utf-8",
+    )
+    source_link.symlink_to(link_target)
+    doc["fidelity_samples"][0]["locator"]["source_sha256"] = hashlib.sha256(
+        target.read_bytes()
+    ).hexdigest()
+    repository_root = tmp_path / "repository"
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    warning = next(
+        warning
+        for warning in vle.fidelity_source_warnings(
+            doc, label="corpus-symlink", artifact_root=repository_root
+        )
+        if warning.kind == "source_blind_pin"
+    )
+    assert expected_reason in warning.detail
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+
+
+def test_corpus_artifact_requires_digest(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(tmp_path)
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "artifact_digest_missing" in _source_blind_warning(doc).detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+def test_corpus_artifact_digest_mismatch_is_typed(tmp_path, monkeypatch):
+    doc = _corpus_pin_document(tmp_path, source_sha256="0" * 64)
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tmp_path))
+
+    assert "artifact_digest_mismatch" in _source_blind_warning(doc).detail
+    _assert_refused_sample_still_covers_addressed_observation(doc)
+
+
+def test_repository_override_missing_artifact_refuses_without_corpus_root(
+    tmp_path, monkeypatch
+):
+    corpus_root = tmp_path / "corpus"
+    doc = _corpus_pin_document(corpus_root)
+    digest = hashlib.sha256(
+        (corpus_root / "text" / "paper.txt").read_bytes()
+    ).hexdigest()
+    doc["fidelity_samples"][0]["locator"]["source_sha256"] = digest
+    repository_root = tmp_path / "repository"
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    errors = _promotion_errors("index", doc, repository_root, monkeypatch)
+
+    assert errors
+    assert "corpus_root_unset" in "\n".join(errors)
+    _assert_refused_sample_still_covers_addressed_observation(
+        doc, artifact_root=repository_root
+    )
+
+
+def test_existing_repository_quotes_path_opens_without_corpus_root(
+    tmp_path, monkeypatch
+):
+    doc = _opened_payload_document(tmp_path, structured=False)
+    quotes = tmp_path / "tables" / "quotes.txt"
+    quotes.parent.mkdir(parents=True, exist_ok=True)
+    quotes.write_text("alpha 0.24 measured\n", encoding="utf-8")
+    doc["fidelity_samples"][0]["locator"] = {
+        "quotes_path": "tables/quotes.txt",
+        "page": 2,
+    }
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    assert vle.fidelity_source_warnings(doc, label="repo-quotes", artifact_root=tmp_path) == []
+    assert vle.certify_extract_source_fidelity(
+        doc, label="repo-quotes", artifact_root=tmp_path
+    ) == []
+
+
+@pytest.mark.parametrize(
+    ("locator_key", "relative_path"),
+    [("quotes_path", "tables/quotes.txt"), ("record", "text/paper.txt")],
+)
+def test_non_source_path_locators_resolve_from_mounted_corpus(
+    locator_key, relative_path, tmp_path, monkeypatch
+):
+    corpus_root = tmp_path / "corpus"
+    repository_root = tmp_path / "repository"
+    doc = _opened_payload_document(corpus_root, structured=False)
+    artifact = corpus_root / relative_path
+    if locator_key == "quotes_path":
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text("alpha 0.24 measured\n", encoding="utf-8")
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator.clear()
+    locator[locator_key] = relative_path
+    locator["page"] = 2
+    locator["source_sha256"] = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(corpus_root))
+
+    assert vle.fidelity_source_warnings(
+        doc, label=f"corpus-{locator_key}", artifact_root=repository_root
+    ) == []
+    assert vle.certify_extract_source_fidelity(
+        doc, label=f"corpus-{locator_key}", artifact_root=repository_root
+    ) == []
+
+
+@pytest.mark.parametrize("digest", ["A" * 64, "a" * 63, "g" * 64, 123])
+def test_source_sha256_locator_requires_lowercase_64_digit_hex(digest):
+    assert not vle._locator_ok(
+        {"source_path": "text/paper.txt", "source_sha256": digest}
+    )
+    assert not vle._locator_ok({"source_sha256": "a" * 64})
 
 
 def _source_locator(root: Path, text: str) -> dict:
@@ -9599,8 +10305,13 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
             assert condition["locator"]["pdf_page_index"] == 12
 
     context = {row["observation_id"]: row for row in cs["context"]}
-    fits = [key for key in context if "table_ii" in key]
-    assert len(fits) == 4
+    fits = {
+        "bennour_1996_table_ii_x_sio2_0p5_fit",
+        "bennour_1996_table_ii_x_sio2_0p667_fit",
+        "bennour_1996_table_ii_x_sio2_0p75_fit",
+        "bennour_1996_table_ii_x_sio2_0p85_fit",
+    }
+    assert {key for key in context if key in fits} == fits
     assert all(context[key]["type"] == "thermodynamic_example" for key in fits)
     assert all(context[key]["locator"]["pdf_page_index"] == 12 for key in fits)
     assert all(
@@ -9609,13 +10320,52 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
         for key in fits
     )
 
-    figures = [row for rows in (cs["observations"], doc["species"]["Na2O"]["observations"])
-               for row in rows if row["observation_id"].startswith("bennour_1996_fig7_")]
-    assert len(figures) == 4
+    figure_caption = (
+        "FIGURE 7 Variation of the activities of the components in: XSiO2 + (1 - X) "
+        "[(1 - x)Na2O + xCs2O] vs. the mole fraction xCs2O at 1573 K: "
+        "------ X = 0.85; - - - X = 0.5."
+    )
+    figures = [
+        row for row in cs["observations"]
+        if row["observation_id"].startswith("bennour_1996_fig7_cs2o_")
+    ]
+    assert len(figures) == 2
+    assert {row["type"] for row in figures} == {"activity_coefficient"}
     assert all(row["locator"]["pdf_page_index"] == 13 for row in figures)
-    assert {
-        row["values"]["section_as_published"] for row in figures
-    } == {"X = 0.85 (short-dashed curve)", "X = 0.5 (long-dashed curve)"}
+    assert all(row["values"]["quantity"] == "activity" for row in figures)
+    assert {row["values"]["section_as_published"] for row in figures} == {
+        "------ X = 0.85", "- - - X = 0.5"
+    }
+    for row in figures:
+        values = row["values"]
+        assert values["caption"] == figure_caption
+        assert values["component_as_published"] == "aCs2O"
+        section = "0p5" if "0p5" in row["observation_id"] else "0p85"
+        assert row["derived_from"] == [
+            f"bennour_1996_table_i_x_sio2_{section}_log_ion_ratio"
+        ]
+        assert len(values["points"]) == 13
+        for point in values["points"]:
+            assert point["activity"] == point["a_Cs2O_as_digitized"]
+            assert sum(Decimal(str(x)) for x in point["composition_mole_fraction"].values()) == 1
+            section = "0p5" if "0p5" in row["observation_id"] else "0p85"
+            assert point["derived_from"] == [
+                f"bennour_1996_table_i_x_sio2_{section}_log_ion_ratio"
+            ]
+        section = "0p5" if "0p5" in row["observation_id"] else "0p85"
+        assert f"bennour_1996_table_ii_x_sio2_{section}_fit" in values["note"]
+
+    na_figures = {
+        row["observation_id"]: row
+        for row in doc["species"]["Na2O"]["context"]
+        if row["observation_id"].startswith("bennour_1996_fig7_na2o_")
+    }
+    assert len(na_figures) == 2
+    assert not doc["species"]["Na2O"]["observations"]
+    assert all(row["values"]["caption"] == figure_caption for row in na_figures.values())
+    assert all(row["values"]["method_class"] == "figure_only" for row in na_figures.values())
+    assert all("second reference state" in row["standard_state"] for row in figures)
+    assert all("second reference state" in row["standard_state"] for row in na_figures.values())
 
     assert context["bennour_1996_experimental_apparatus"]["locator"]["pdf_page_index"] == 2
     assert context["bennour_1996_experimental_method"]["locator"]["pdf_page_index"] == 3
@@ -9660,6 +10410,33 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
         and row.point_conditions["composition"].state.is_value
         for row in migrated
     )
+    fig7 = [
+        row for row in migrator.result.observations.values()
+        if "bennour_1996_fig7_cs2o_" in row.observation_id
+    ]
+    assert len(fig7) == 26
+    assert all(row.identity.quantity.is_value for row in fig7)
+    assert all(row.identity.quantity.value.value == "activity" for row in fig7)
+    assert all(row.value.kind.value == "point" for row in fig7)
+    assert all(
+        row.identity.composition is not None and row.identity.composition.is_value
+        for row in fig7
+    )
+    assert all(
+        row.identity.reference_state is not None
+        and row.identity.reference_state.is_unknown
+        for row in fig7
+    )
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value.value == "l"
+        for row in fig7
+    )
+    assert all(
+        row.point_conditions["temperature_K"].state.value == Decimal("1573.00")
+        and row.point_conditions["composition"].state.is_value
+        for row in fig7
+    )
     # Table I gives no per-row uncertainty column, so the migration must not
     # manufacture an uncertainty width or turn the printed logarithm linear.
     assert all(row.uncertainty.kind.value == "none" for row in migrated)
@@ -9680,6 +10457,7 @@ def test_bennour_1996_table_i_measurements_keep_printed_ln_data_and_conditions(t
         and "bennour_1996_table_i_" in issue.path
         for issue in reverted.result.validation.hard_issues
     )
+    assert not migrator.result.validation.hard_issues
 
 def test_richet_bottinga_1986_review_fixes_migrate_and_pin_table4() -> None:
     """Keep the reviewed provenance, pressure, widths, and context in migration."""
@@ -11688,3 +12466,146 @@ def test_sanders_1977_table_cells_conditions_and_eq13_migrate_with_mutation_pin(
     )
     with pytest.raises(AssertionError):
         assert_migration(mutated)
+
+
+_SC456_SOURCE_IDS = (
+    "shornikov-2011-cao-mgo-alumina-melts",
+    "banya-hino-takezoe-1985-na-fe-silicate-redox",
+    "liu-2023-chromium-oxide-activity",
+    "visscher-fegley-2013-debris-disks",
+    "gca-366-210-berry-2024",
+    "shornikov-2023-cai-melt-evaporation",
+    "yakovlev-2024-cai-vaporization",
+    "matsuzaki-1997-feo-tio2-sio2-activities",
+    "yamaguchi-1984-na2o-activity-sodium-beta-alumina",
+    "no27-fegley-cameron-1987-epsl",
+    "johnston-1965-sodium-disilicate-redox",
+    "charnoz-2023-hydrogen-magma-ocean",
+    "shornikov-2023-mgo-phosphate-melts",
+    "mogul-2023-pioneer-venus-co2-icarus",
+    "kems-050-gorokhov-1977",
+    "centolanzi-1966-tektite-vapour-pressure",
+)
+
+
+@pytest.mark.parametrize("source_id", _SC456_SOURCE_IDS, ids=_SC456_SOURCE_IDS)
+def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> None:
+    """Keep each SC-456 source independently migratable after evidence relabels."""
+    source = EXTRACTS / f"{source_id}.yaml"
+    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
+
+
+@pytest.mark.parametrize(
+    "source_id",
+    [
+        pytest.param("shornikov-2016-cao-mgo-silicate", id="shornikov-2016-cao-mgo-silicate"),
+        pytest.param("fujisawa-1994-na-sn-carbonate-thermodynamics", id="fujisawa-1994-na-sn-carbonate-thermodynamics"),
+        pytest.param("kunisada-1986-na-silicate-dephosphorization", id="kunisada-1986-na-silicate-dephosphorization"),
+        pytest.param("shornikov-2025-ca-al-inclusion-thermodynamics", id="shornikov-2025-ca-al-inclusion-thermodynamics"),
+        pytest.param("beerkens-2003-sulfate-decomposition-na2o-activity", id="beerkens-2003-sulfate-decomposition-na2o-activity"),
+        pytest.param("shornikov-2017-spinel-evaporation", id="shornikov-2017-spinel-evaporation"),
+        pytest.param("willenborg-2006-alkali-removal-thermodynamics", id="willenborg-2006-alkali-removal-thermodynamics"),
+        pytest.param("majzlan-2021-magnesium-silicate-glass-cp", id="majzlan-2021-magnesium-silicate-glass-cp"),
+        pytest.param("wang-2017-sodium-stannate-formation-emf", id="wang-2017-sodium-stannate-formation-emf"),
+        pytest.param("nasa-tm-2024-simulant-guide", id="nasa-tm-2024-simulant-guide"),
+        pytest.param("jacquet-2026-alkali-recondensation", id="jacquet-2026-alkali-recondensation"),
+        pytest.param("cardiff-2007-vacuum-pyrolysis-gsfc", id="cardiff-2007-vacuum-pyrolysis-gsfc"),
+        pytest.param("shornikov-2023-calcium-phosphate", id="shornikov-2023-calcium-phosphate"),
+        pytest.param("masuda-tanaka-1979-vacuum-condensates", id="masuda-tanaka-1979-vacuum-condensates"),
+        pytest.param("kems-035-sauerborn-2005", id="kems-035-sauerborn-2005"),
+        pytest.param("baborak-2023-alkali-silicate-levitation-evaporation", id="baborak-2023-alkali-silicate-levitation-evaporation"),
+    ],
+)
+def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
+    extract_path = EXTRACTS / f"{source_id}.yaml"
+    document = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT, extract_path, index=None, aliases={}
+    )
+    migrator.finalize()
+
+    assert migrator.result.validation is not None
+    source_rows = {
+        row["observation_id"]
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+    }
+    migrated_rows = migrator.result.observations
+    for observation_id in source_rows:
+        base_id = f"{source_id}::{observation_id}"
+        migrated_ids = [
+            key
+            for key in migrated_rows
+                if key == base_id or key.startswith(f"{base_id}::")
+        ]
+        assert migrated_ids, observation_id
+
+    for species in document["species"].values():
+        for row in species.get("observations", []):
+            source_conditions = row.get("point_conditions") or {}
+            if not source_conditions:
+                continue
+            base_id = f"{source_id}::{row['observation_id']}"
+            migrated_id = next(
+                key
+                for key in migrated_rows
+                if key == base_id or key.startswith(f"{base_id}::")
+            )
+            observation = migrated_rows[migrated_id]
+            assert observation.point_conditions is not None
+            printed_temperature_c = row.get("values", {}).get("T_C")
+            if printed_temperature_c is not None:
+                assert observation.identity.temperature_K.is_value
+            for name, condition in source_conditions.items():
+                migrated_name = "temperature_K" if name == "temperature_C" else name
+                migrated_condition = observation.point_conditions.get(migrated_name)
+                if name in {"temperature_C", "temperature_K"}:
+                    assert migrated_condition is not None
+                    assert migrated_condition.locator is not None
+                elif condition.get("locator") and migrated_condition is not None:
+                    assert migrated_condition.locator is not None
+                if (
+                    condition.get("state")
+                    and migrated_condition is not None
+                    and name != "composition"
+                ):
+                    assert migrated_condition.state.tag.value == condition["state"]["tag"]
+    assert not migrator.result.registry_issues
+    assert not migrator.result.validation.hard_issues
+def test_kroger_fingas_1935_alkali_silicate_equilibria_method_and_temperatures():
+    from simulator.battery.enums import MethodToken
+
+    source = EXTRACTS / "kroger-fingas-1935-alkali-silicate-equilibria.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrator.finalize()
+    result = migrator.result
+
+    method_experiment_ids = {
+        "kroger_fingas_1935_manometric_reaction_pressures",
+        "kroger_fingas_1935_k2co3_vacuum_pressure",
+    }
+    pressure_rows = tuple(
+        observation
+        for observation in result.observations.values()
+        if observation.experiment_id.rsplit("::", 1)[-1] in method_experiment_ids
+    )
+    assert len(pressure_rows) == 189
+    assert result.validation.hard_issues == ()
+
+    for observation in pressure_rows:
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
+
+        assert observation.identity.temperature_K.is_value
+        conditions = observation.point_conditions
+        assert conditions is not None
+        for key in ("T_C", "temperature_K"):
+            condition = conditions[key]
+            assert condition.state.is_value
+            assert condition.locator is not None
+            assert condition.locator.table is not None

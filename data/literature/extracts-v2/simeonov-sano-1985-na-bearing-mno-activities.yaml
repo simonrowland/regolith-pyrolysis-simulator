@@ -50,8 +50,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity_coefficient does not use sweep_gas
@@ -205,6 +205,8 @@ observations:
         figure: '2'
         note: The underlying paired alloy assays are plotted, not tabulated.
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_t1_r2_lmn
   experiment_id: 8286374c3cdef054a4fc43881e01e4f4dff86e65d6b0499c9d416ea87af90c2b::experiment::simeonov-sano-1985-table1-mn-distribution
   identity:
@@ -254,7 +256,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_printed_for_these_distribution_runs
     sweep_gas:
       tag: not_applicable
       reason: profile distribution_ratio does not use sweep_gas
@@ -387,6 +389,8 @@ observations:
         table: '1'
         note: Per-row slag and metal assay values are not printed.
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_t1_r3_lmn
   experiment_id: 8286374c3cdef054a4fc43881e01e4f4dff86e65d6b0499c9d416ea87af90c2b::experiment::simeonov-sano-1985-table1-mn-distribution
   identity:
@@ -436,7 +440,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_printed_for_these_distribution_runs
     sweep_gas:
       tag: not_applicable
       reason: profile distribution_ratio does not use sweep_gas
@@ -569,6 +573,8 @@ observations:
         table: '1'
         note: Per-row slag and metal assay values are not printed.
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_t1_r4_lmn
   experiment_id: 8286374c3cdef054a4fc43881e01e4f4dff86e65d6b0499c9d416ea87af90c2b::experiment::simeonov-sano-1985-table1-mn-distribution
   identity:
@@ -618,7 +624,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_printed_for_these_distribution_runs
     sweep_gas:
       tag: not_applicable
       reason: profile distribution_ratio does not use sweep_gas
@@ -751,6 +757,8 @@ observations:
         table: '1'
         note: Per-row slag and metal assay values are not printed.
     references: []
+  provenance:
+    printed_phase: l
 - observation_id: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_t1_r5_lmn
   experiment_id: 8286374c3cdef054a4fc43881e01e4f4dff86e65d6b0499c9d416ea87af90c2b::experiment::simeonov-sano-1985-table1-mn-distribution
   identity:
@@ -800,7 +808,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_printed_for_these_distribution_runs
     sweep_gas:
       tag: not_applicable
       reason: profile distribution_ratio does not use sweep_gas
@@ -933,3 +941,5 @@ observations:
         table: '1'
         note: Per-row slag and metal assay values are not printed.
     references: []
+  provenance:
+    printed_phase: l

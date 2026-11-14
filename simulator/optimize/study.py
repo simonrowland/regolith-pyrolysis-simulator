@@ -30,10 +30,7 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
-from simulator.ceramic_classifier import (
-    CeramicMatch,
-    CeramicServiceTemperature,
-)
+from simulator.ceramic_classifier import CeramicMatch
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.cost_parameters import (
     RECIPE_COST_PARAMETERS_KEY,
@@ -67,6 +64,10 @@ from simulator.optimize.evalspec import (
     current_code_version,
 )
 from simulator.optimize.honesty import alpha_ceiling_species, optimizer_tier_label
+from simulator.optimize.result_trust import (
+    attach_producer_engine_stamp,
+    real_producer_stamp_pair,
+)
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     ObjectiveComputationError,
@@ -84,9 +85,13 @@ from simulator.optimize.objective import (
 from simulator.optimize.pool import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
     PoolEvaluationRequest,
+    _backend_name_for_fidelity,
     _evaluate_batch,
     evaluate_request_supervised,
     resolve_eval_timeout_seconds,
+)
+from simulator.optimize.payloads import (
+    _ceramic_service_temp_payload,
 )
 from simulator.optimize.profiles import (
     ProfileValidationError,
@@ -614,6 +619,9 @@ def run(
             config.profile,
             source="<stale-profile>",
         )
+    _backend_name_for_fidelity(
+        resolved_profile, config.fidelity, mode="optimizer_search"
+    )
     active_schema = _schema_with_pinned_paths(
         base_schema,
         resolved_profile,
@@ -1222,6 +1230,9 @@ def run_certify(
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
             raise
         resolved_profile = dict(config.profile)
+    _backend_name_for_fidelity(
+        resolved_profile, config.fidelity, mode="optimizer_search"
+    )
     active_schema = _schema_with_pinned_paths(
         base_schema,
         resolved_profile,
@@ -4374,6 +4385,7 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
                 for species in ceiling_species
             }
         _project_interpolation_ranked_drain_summary(trace, payload)
+        _project_producer_engine_stamp(trace, payload)
     return MappingProxyType(payload) if payload else None
 
 
@@ -4664,7 +4676,19 @@ def _light_backend_status_trace_for_reference(
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])
         _project_interpolation_ranked_drain_summary(reference.trace, payload)
+        _project_producer_engine_stamp(reference.trace, payload)
     return MappingProxyType(payload)
+
+
+def _project_producer_engine_stamp(trace: Any, payload: dict[str, Any]) -> None:
+    """Keep the adapter stamp when the heavy trace is reduced for the store.
+
+    The two light-trace allowlists stay separate. They already differ, and
+    folding them is a behaviour-preserving move that needs its own pin.
+    """
+    stamp = real_producer_stamp_pair(trace)
+    if stamp is not None:
+        attach_producer_engine_stamp(payload, stamp)
 
 
 def _objective_evidence_trace_summary(objectives: ObjectiveVector | None) -> Mapping[str, Any]:
@@ -5989,30 +6013,6 @@ def _ceramic_match_payload(match: CeramicMatch) -> Mapping[str, Any]:
     }
 
 
-def _ceramic_service_temp_payload(
-    service_temp: CeramicServiceTemperature,
-) -> Mapping[str, Any]:
-    usable = service_temp.usable_service_C
-    kind = service_temp.kind
-    if usable is not None:
-        display = f"Usable service: {usable:g} C"
-        usable_service = True
-    elif service_temp.value_C is not None:
-        display = f"{kind}: {service_temp.value_C:g} C; not a usable service rating"
-        usable_service = False
-    else:
-        display = f"{kind}; not a usable service rating"
-        usable_service = False
-    return {
-        "value_C": _round_or_none(service_temp.value_C),
-        "kind": kind,
-        "usable_service_C": _round_or_none(usable),
-        "usable_service": usable_service,
-        "display": display,
-        "note": service_temp.note,
-    }
-
-
 def _worst_wall_deposit_species(wall: Mapping[str, Any]) -> str | None:
     totals: dict[str, float] = {}
     for species_map in wall.values():
@@ -6045,12 +6045,6 @@ def _optional_float(value: Any) -> float | None:
     if not math.isfinite(number):
         return None
     return number
-
-
-def _round_or_none(value: float | None) -> float | None:
-    if value is None:
-        return None
-    return round(float(value), 3)
 
 
 _TAP_TRUNCATION_DURATION_PATHS: Mapping[str, tuple[str, ...]] = MappingProxyType(

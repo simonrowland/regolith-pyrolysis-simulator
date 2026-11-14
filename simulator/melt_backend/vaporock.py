@@ -151,6 +151,7 @@ from simulator.silent_zero import (
     note_dict,
 )
 from simulator.state import OXIDE_SPECIES
+from simulator.physical_constants import PA_PER_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -452,7 +453,7 @@ def vaporock_sum_pressure_bar(
             continue
         if math.isfinite(pressure) and pressure > 0.0:
             total_pa += pressure
-    return total_pa / 1e5
+    return total_pa / PA_PER_BAR
 
 
 def vaporock_sum_pressure_sane(
@@ -2073,7 +2074,7 @@ class VapoRockBackend(MeltBackend):
             else temperature_C
         )
         pressure_value = (
-            pressure_bar * 1e5
+            pressure_bar * PA_PER_BAR
             if self._pressure_units == 'Pa'
             else pressure_bar
         )
@@ -2719,7 +2720,7 @@ class VapoRockBackend(MeltBackend):
             return {}
 
         # Scale by the explicitly-declared output unit; never guess.
-        scale = 1e5 if self._vapor_pressure_units == 'bar' else 1.0
+        scale = PA_PER_BAR if self._vapor_pressure_units == 'bar' else 1.0
         pressures: Dict[str, float] = {}
         for species, value in raw.items():
             pressure = float(value) * scale
@@ -2843,7 +2844,7 @@ class VapoRockBackend(MeltBackend):
             except (TypeError, ValueError):
                 continue
             if math.isfinite(value):
-                pressure_pa = (10.0 ** value) * 1e5
+                pressure_pa = (10.0 ** value) * PA_PER_BAR
                 if pressure_pa > 0.0:
                     pressures[self._strip_gas_suffix(species)] = pressure_pa
             elif math.isinf(value) and value < 0.0:

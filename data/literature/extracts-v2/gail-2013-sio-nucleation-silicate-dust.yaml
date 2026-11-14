@@ -1,0 +1,807 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/gail-2013-sio-nucleation-silicate-dust.yaml
+observations:
+- observation_id: gail-2013-sio-nucleation-silicate-dust::gail_2013_ferguson_nuth_vapor_pressure_eq6
+  experiment_id: dff3c5671f19f9441e9b2c076157b162debb3f78d9e431f74c67fccaf4629009::gail-2013-sio-nucleation-silicate-dust
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, attribution, equation_form_as_printed,
+      coefficients_as_printed, pressure_species, reservoir'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ferguson & Nuth (2008), as reported by Gail et al. (2013), equation (6).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: gail-2013-sio-nucleation-silicate-dust
+  locator:
+    page: 4
+    published_page: 4
+    section: 3. Stability limits
+    equation: '6'
+  read_from: pdf:gail-2013-sio-nucleation-silicate-dust
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The quoted vapour-pressure relation is a function of T and gives no single point temperature.
+      locator:
+        page: 4
+        equation: '6'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is printed for the quoted Ferguson and Nuth vapour-pressure relation.
+      locator:
+        page: 4
+        equation: '6'
+  provenance:
+    printed_phase: gas
+- observation_id: gail-2013-sio-nucleation-silicate-dust::gail_2013_figure_2_vaporisation_coefficient
+  experiment_id: dff3c5671f19f9441e9b2c076157b162debb3f78d9e431f74c67fccaf4629009::gail-2013-sio-nucleation-silicate-dust
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: method_class, quantity, species,
+      condensed_phase_as_printed, temperature_as_printed, x_axis_as_printed, y_axis_as_printed, caption_as_printed, digitisation'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: gail-2013-sio-nucleation-silicate-dust
+  locator:
+    page: 3
+    published_page: 3
+    figure: '2'
+  read_from: pdf:gail-2013-sio-nucleation-silicate-dust
+  provenance:
+    printed_phase: gas
+- observation_id: gail-2013-sio-nucleation-silicate-dust::gail_2013_figure_3_vapor_pressure
+  experiment_id: dff3c5671f19f9441e9b2c076157b162debb3f78d9e431f74c67fccaf4629009::gail-2013-sio-nucleation-silicate-dust
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: method_class, quantity, species, condensed_phase_as_printed,
+      temperature_as_printed, x_axis_as_printed, y_axis_as_printed, caption_as_printed, digitisation'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: gail-2013-sio-nucleation-silicate-dust
+  locator:
+    page: 3
+    published_page: 3
+    figure: '3'
+  read_from: pdf:gail-2013-sio-nucleation-silicate-dust
+  provenance:
+    printed_phase: gas
+- observation_id: gail-2013-sio-nucleation-silicate-dust::gail_2013_nuth_donn_average_rate_as_printed
+  experiment_id: dff3c5671f19f9441e9b2c076157b162debb3f78d9e431f74c67fccaf4629009::gail-2013-sio-nucleation-silicate-dust
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'average_nucleation_rate_as_printed'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'average_nucleation_rate_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value_as_printed: 10^(9±1) particles cm−3 s−1
+      confidence_level: not_stated
+      notice: The printed ±1 is in the exponent; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Nuth & Donn (1982), as reported by Gail et al. (2013).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: gail-2013-sio-nucleation-silicate-dust
+  locator:
+    page: 5
+    published_page: 5
+    paragraph: Fixed average nucleation rate
+    section: 4.1 Re-evaluation of the Nuth & Donn data
+  read_from: pdf:gail-2013-sio-nucleation-silicate-dust
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The fixed average rate is not paired with a temperature in the prose.
+      locator:
+        page: 5
+        section: '4.1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is printed for the hydrogen-atmosphere experiment.
+      locator:
+        page: 5
+        section: '4.1'
+  provenance:
+    printed_phase: gas
+- observation_id: gail-2013-sio-nucleation-silicate-dust::gail_2013_nuth_donn_smoke_onset_rate_range
+  experiment_id: dff3c5671f19f9441e9b2c076157b162debb3f78d9e431f74c67fccaf4629009::gail-2013-sio-nucleation-silicate-dust
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'nucleation_rate_at_smoke_onset_as_printed'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'nucleation_rate_at_smoke_onset_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Nuth & Donn (1982), as reported by Gail et al. (2013).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: gail-2013-sio-nucleation-silicate-dust
+  locator:
+    page: 4
+    published_page: 4
+    paragraph: Smoke-onset criterion and rate estimate
+    section: 4.1 Re-evaluation of the Nuth & Donn data
+  read_from: pdf:gail-2013-sio-nucleation-silicate-dust
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The printed rate interval is not paired with a temperature in the prose.
+      locator:
+        page: 4
+        section: '4.1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is printed for the hydrogen-atmosphere experiment.
+      locator:
+        page: 4
+        section: '4.1'
+  provenance:
+    printed_phase: gas
+- observation_id: gail-2013-sio-nucleation-silicate-dust::gail_2013_schick_vapor_pressure_eq7
+  experiment_id: dff3c5671f19f9441e9b2c076157b162debb3f78d9e431f74c67fccaf4629009::gail-2013-sio-nucleation-silicate-dust
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, attribution, equation_as_printed,
+      pressure_species, reservoir'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Schick (1960), as reported by Gail et al. (2013), equation (7).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: gail-2013-sio-nucleation-silicate-dust
+  locator:
+    page: 4
+    published_page: 4
+    section: 3. Stability limits
+    equation: '7'
+  read_from: pdf:gail-2013-sio-nucleation-silicate-dust
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The quoted Schick vapour-pressure relation is a function of T and gives no single point temperature.
+      locator:
+        page: 4
+        equation: '7'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is printed for the quoted Schick vapour-pressure relation.
+      locator:
+        page: 4
+        equation: '7'
+  provenance:
+    printed_phase: gas
+- observation_id: gail-2013-sio-nucleation-silicate-dust::gail_2013_sio_nucleation_rate_fit_eq16
+  experiment_id: dff3c5671f19f9441e9b2c076157b162debb3f78d9e431f74c67fccaf4629009::gail-2013-sio-nucleation-silicate-dust
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'nucleation_rate_equation_as_printed'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'nucleation_rate_equation_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      coefficients_as_printed: a = (4.40 ± 0.61) × 10^12; b = 22.05 ± 3.14; exponent constant = 1.33 ± 3.1
+      confidence_level: not_stated
+      notice: Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Gail et al. (2013), equation (16), fitted to re-evaluated Nuth & Donn (1982) data.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: gail-2013-sio-nucleation-silicate-dust
+  locator:
+    page: 5
+    published_page: 5
+    section: 4.2 Fit for the nucleation rate
+    equation: '16'
+  read_from: pdf:gail-2013-sio-nucleation-silicate-dust
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Equation (16) is a function of T, S, and n1; no single point temperature is printed.
+      locator:
+        page: 5
+        equation: '16'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is printed for the hydrogen-atmosphere experiment.
+      locator:
+        page: 5
+        equation: '16'
+  provenance:
+    printed_phase: gas
+- observation_id: gail-2013-sio-nucleation-silicate-dust::gail_2013_sio_vapor_pressure_fit_eq4
+  experiment_id: dff3c5671f19f9441e9b2c076157b162debb3f78d9e431f74c67fccaf4629009::gail-2013-sio-nucleation-silicate-dust
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1275, 1525]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_sat field selected; source fields: quantity, method_class, equation_as_printed, coefficients_as_printed,
+      pressure_species, reservoir, fit_basis_as_printed, temperature_domain_as_printed, orifice_diameters_as_printed, measurement_method_as_printed,
+      reduction_as_printed'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      coefficients_as_printed: T_v = 49 520 ± 1 400 K; S_v = 32.52 ± 0.97
+      confidence_level: not_stated
+      notice: Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: gail-2013-sio-nucleation-silicate-dust
+  locator:
+    page: 3
+    published_page: 3
+    section: 2.3 Experimental results
+    equation: '4'
+  read_from: pdf:gail-2013-sio-nucleation-silicate-dust
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The fitted equation covers 1275 K to 1525 K and gives no single point temperature.
+      locator:
+        page: 3
+        equation: '4'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is printed for the Knudsen-cell measurements.
+      locator:
+        page: 3
+        equation: '4'
+  derivation:
+    relation: The authors reduced their Knudsen-cell mass-loss measurements using equations (1)–(3) and fitted the equilibrium
+      vapour pressure in equation (4).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        figure: '3'
+        note: Figure 3 plots the measured vapour-pressure points; numeric point values are not tabulated.
+    references: []
+  provenance:
+    printed_phase: gas
+- observation_id: gail-2013-sio-nucleation-silicate-dust::gail_2013_sio_vaporisation_coefficient_fit_eq3
+  experiment_id: dff3c5671f19f9441e9b2c076157b162debb3f78d9e431f74c67fccaf4629009::gail-2013-sio-nucleation-silicate-dust
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1275, 1525]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: No experimental total pressure is printed for the coefficient measurements.
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: quantity, method_class, equation_as_printed,
+      alpha0_as_printed, T0_as_printed, temperature_domain_as_printed, orifice_diameters_as_printed, measurement_method_as_printed'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      coefficients_as_printed: α0 = 0.521 ± 0.156; T0 = 3 686 ± 428
+      confidence_level: not_stated
+      notice: Confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: gail-2013-sio-nucleation-silicate-dust
+  locator:
+    page: 3
+    published_page: 3
+    section: 2.3 Experimental results
+    equation: '3'
+  read_from: pdf:gail-2013-sio-nucleation-silicate-dust
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Equation (3) is a fit over 1275 K to 1525 K and gives no single point temperature.
+      locator:
+        page: 3
+        equation: '3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No oxygen fugacity is printed for the Knudsen-cell coefficient measurements.
+      locator:
+        page: 3
+        equation: '3'
+  derivation:
+    relation: The vaporisation coefficient derived from the experimental mass-loss results is fitted by the Arrhenius form
+      in equation (3).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 3
+        figure: '2'
+        note: Figure 2 plots the measured vaporisation coefficient; numeric point values are not tabulated.
+    references: []
+  provenance:
+    printed_phase: gas

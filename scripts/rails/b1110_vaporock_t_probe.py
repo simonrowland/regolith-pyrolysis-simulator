@@ -17,6 +17,7 @@ from simulator.melt_backend.vaporock import (
     VapoRockBackend,
     vaporock_sum_pressure_bar,
 )
+from simulator.physical_constants import PA_PER_BAR
 from simulator.state import OXIDE_SPECIES
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -158,7 +159,7 @@ def _log10_pressure_bar(pressure_Pa: Any) -> float | None:
     if not math.isfinite(pressure) or pressure <= 0.0:
         return None
     # VapoRock returns Pa here; 1 bar is exactly 100000 Pa.
-    return math.log10(pressure / 100000.0)
+    return math.log10(pressure / PA_PER_BAR)
 
 
 def _notice_summary(notice: Any) -> dict[str, Any] | None:

@@ -1,0 +1,52 @@
+source_id: kassis-frischat-1981-mixed-alkali-vapor-pressures
+mapping_scope: manual table-to-observation crosswalk; no figure digitization
+shared_experiment_condition:
+  experiment_id: mixed_alkali_pressure_ratio_series
+  method: knudsen_effusion
+  pressure_environment:
+    printed_chamber_vacuum: '6,6 · 10^-4 Pa'
+    stored_as: 0.00066 Pa
+    locator: {pdf_page: 2, published_page: 90, section: 1.2.2}
+    identity_note: outside-cell background; not the calculated in-cell vapor total pressure
+tables:
+  - pdf_page: 7
+    published_page: 95
+    printed_table: '3'
+    mineru_draft_table: p007-t03
+    printed_row: 2
+    printed_row_label: p_gamma_Rb(0.3)/p_gamma_Rb(0.5)
+    mapped_observation_ids:
+      - kassis_frischat_1981_table3_rb_pressure_ratio_1150c
+      - kassis_frischat_1981_table3_rb_pressure_ratio_1200c
+      - kassis_frischat_1981_table3_rb_pressure_ratio_1250c
+      - kassis_frischat_1981_table3_rb_pressure_ratio_1300c
+    columns:
+      - {column: 1, role: temperature_header}
+      - {column: 2, temperature_C: '1150', printed_value: '0,44'}
+      - {column: 3, temperature_C: '1200', printed_value: '0,46'}
+      - {column: 4, temperature_C: '1250', printed_value: '0,48'}
+      - {column: 5, temperature_C: '1300', printed_value: '0,56'}
+  - pdf_page: 2
+    published_page: 90
+    printed_table: '1'
+    mineru_draft_table: p002-t01
+    role: supporting_conditions_for_table_3_ratio
+    rows:
+      - printed_row_label: Schmelze Nr. 11
+        draft_row: 4
+        mapped_side: numerator_gamma_Rb_0.3
+        columns:
+          - {column: 1, field: melt_number, printed_value: '11'}
+          - {column: 2, field: gamma_Rb, printed_value: '0,3'}
+          - {column: 3, field: Na2O_mol_percent, printed_value: '17,5'}
+          - {column: 4, field: Rb2O_mol_percent, printed_value: '7,5'}
+          - {column: 5, field: SiO2_mol_percent, printed_value: '75'}
+      - printed_row_label: Schmelze Nr. 3
+        draft_row: 5
+        mapped_side: denominator_gamma_Rb_0.5
+        columns:
+          - {column: 1, field: melt_number, printed_value: '3'}
+          - {column: 2, field: gamma_Rb, printed_value: '0,5'}
+          - {column: 3, field: Na2O_mol_percent, printed_value: '12,5'}
+          - {column: 4, field: Rb2O_mol_percent, printed_value: '12,5'}
+          - {column: 5, field: SiO2_mol_percent, printed_value: '75'}

@@ -210,6 +210,8 @@ observations:
     references:
     - 'Reference [36]: D. N. Rego, G. K. Sigworth and W. O. Philbrook, Proc. of Japan-United States Seminer, Kyoto (1983),
       p. 87 [ISIJ].'
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_1_p002_t01_r03_c05
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t1_co2_equilibrium
   identity:
@@ -480,6 +482,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row_label=1; table_row_number=3; table_column_number=5
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_2_p002_t01_r04_c05
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t1_co2_equilibrium
   identity:
@@ -750,6 +754,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row_label=2; table_row_number=4; table_column_number=5
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_3_p002_t01_r05_c05
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t1_co2_equilibrium
   identity:
@@ -1020,6 +1026,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row_label=3; table_row_number=5; table_column_number=5
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_4_p002_t01_r06_c05
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t1_co2_equilibrium
   identity:
@@ -1290,6 +1298,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row_label=4; table_row_number=6; table_column_number=5
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_5_p002_t01_r07_c05
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t1_co2_equilibrium
   identity:
@@ -1560,6 +1570,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row_label=5; table_row_number=7; table_column_number=5
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_6_p002_t01_r08_c05
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t1_co2_equilibrium
   identity:
@@ -1830,6 +1842,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row_label=6; table_row_number=8; table_column_number=5
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_7_p002_t01_r09_c05
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t1_co2_equilibrium
   identity:
@@ -2100,6 +2114,8 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row_label=7; table_row_number=9; table_column_number=5
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -2403,6 +2419,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=10; table_row_number=14; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -2498,8 +2516,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -2701,6 +2719,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=10; table_row_number=14; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -3004,6 +3043,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=11; table_row_number=15; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -3099,8 +3140,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -3302,6 +3343,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=11; table_row_number=15; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -3605,6 +3667,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=12; table_row_number=16; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -3700,8 +3764,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -3903,6 +3967,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=12; table_row_number=16; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -4206,6 +4291,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=13; table_row_number=19; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -4301,8 +4388,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -4504,6 +4591,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=13; table_row_number=19; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -4807,6 +4915,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=15; table_row_number=20; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -4902,8 +5012,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -5105,6 +5215,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=15; table_row_number=20; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -5408,6 +5539,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=16; table_row_number=21; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -5503,8 +5636,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -5706,6 +5839,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=16; table_row_number=21; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -6009,6 +6163,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=17; table_row_number=17; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -6104,8 +6260,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -6307,6 +6463,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=17; table_row_number=17; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -6610,6 +6787,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=18; table_row_number=12; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -6705,8 +6884,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -6908,6 +7087,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=18; table_row_number=12; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -7211,6 +7411,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=1; table_row_number=3; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -7306,8 +7508,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -7509,6 +7711,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=1; table_row_number=3; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -7812,6 +8035,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=20; table_row_number=18; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -7907,8 +8132,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -8110,6 +8335,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=20; table_row_number=18; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -8413,6 +8659,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=24; table_row_number=6; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -8508,8 +8756,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -8711,6 +8959,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=24; table_row_number=6; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -9014,6 +9283,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=25; table_row_number=7; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -9109,8 +9380,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -9312,6 +9583,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=25; table_row_number=7; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -9615,6 +9907,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=2; table_row_number=4; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -9710,8 +10004,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -9913,6 +10207,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=2; table_row_number=4; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -10216,6 +10531,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=3; table_row_number=5; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -10311,8 +10628,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -10514,6 +10831,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=3; table_row_number=5; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -10817,6 +11155,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=5; table_row_number=8; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -10912,8 +11252,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -11115,6 +11455,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=5; table_row_number=8; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -11418,6 +11779,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=6; table_row_number=9; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -11513,8 +11876,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -11716,6 +12079,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=6; table_row_number=9; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -12019,6 +12403,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=7; table_row_number=10; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -12114,8 +12500,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -12317,6 +12703,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=7; table_row_number=10; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -12620,6 +13027,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=8; table_row_number=11; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -12715,8 +13124,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -12918,6 +13327,27 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=8; table_row_number=11; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c07
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -13221,6 +13651,8 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=9; table_row_number=13; table_column_number=7
+  provenance:
+    printed_phase: glass
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c08
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t2_solid_iron_equilibrium
   identity:
@@ -13316,8 +13748,8 @@ observations:
   evidence:
     class:
       tag: value
-      value: quoted_attributed
-    original_method_class: quoted_attributed
+      value: measured_reduced
+    original_method_class: measured_reduced
     attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
   admission:
     status: admitted
@@ -13519,3 +13951,24 @@ observations:
         pdf_page_index: 1
         table: '2'
         note: row_label=9; table_row_number=13; table_column_number=8
+  derived_from:
+  - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c07
+  derivation:
+    relation: Activity calculated by Eq. (2) from the printed H2O/H2 ratio, composition, and the Table 3 K1 expression.
+    inputs:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c07
+    parameters: []
+    output_unit: as_published
+    method:
+      state:
+        tag: value
+        value: Eq. (2) activity reduction using P_H2O/P_H2 and K1
+      locator:
+        page: 3
+        published_page: 1767
+        pdf_page_index: 2
+        section: '3.2'
+        equation: '2'
+    references: []
+  provenance:
+    printed_phase: l

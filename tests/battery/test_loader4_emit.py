@@ -258,7 +258,7 @@ def test_real_rows_that_fail_series_admission_stay_as_parent_context(
             ("sauerborn_2005_table57_evidence_ranking_deep2",),
             4,
             74,
-            2,
+            0,
         ),
     )
 

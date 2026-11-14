@@ -1,0 +1,1924 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2475/001c.120516
+  citation: Greig, J. W. & Barth, T. F. W. (1938). The system Na2O·Al2O3·2SiO2 (nephelite, carnegieite)–Na2O·Al2O3·6SiO2 (albite).
+    American Journal of Science, 5th series, 35A, 93–112.
+  source_ids:
+  - greig-barth-1938-nepheline-albite
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:greig-barth-1938-nepheline-albite
+      role: pdf
+      path: raw/greig-barth-1938-nepheline-albite/greig-barth-1938-nepheline-albite.pdf
+      sha256:
+        tag: value
+        value: 6d1128fcea91dd56e98c9562b58c61255b772903cd5fe7c2bb76d12b06609f88
+    - asset_id: pdftotext:greig-barth-1938-nepheline-albite
+      role: pdftotext
+      path: text/greig-barth-1938-nepheline-albite
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:greig-barth-1938-nepheline-albite
+      role: table_csv
+      path: tables/greig-barth-1938-nepheline-albite
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:greig-barth-1938-nepheline-albite
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2475/001c.120516
+experiments:
+- experiment_id: 10.2475/001c.120516::experiment::greig_barth_1938_synthetic_binary_join_phase_equilibria
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2475/001c.120516
+  locator:
+    published_page: 98
+    pdf_page_index: 5
+    section: Table I and adjoining methods text
+context:
+- observation_id: greig_barth_1938_albite_melting_bracket
+  type: method
+  locator:
+    published_page: 98
+    pdf_page_index: 5
+    section: Table I
+  units: as printed
+  values:
+    quantity: albite_melting_point_bracket
+    lower_C: 1115
+    upper_C: 1120
+    authors_estimate_C: 1118
+    note: Table I says melting temperature lies between 1115° and 1120°, probably at 1118°.
+    first_run_bracket_lower_C: 1113
+    first_run_bracket_upper_C: 1122
+    first_run_bracket_as_printed: A bracket 1113°-1122° is established by these runs.
+    first_run_bracket_locator:
+      published_page: 98
+      pdf_page_index: 5
+      table: '1'
+      note: Printed inside Table I after the 1122° Crystals rows; the 1126°, 1115° and 1120° runs follow it.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_albite_melting_bracket
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_albite_persistence_context
+  type: method
+  locator:
+    published_page: 100
+    pdf_page_index: 7
+    section: Melting Temperature of Albite
+  units: as printed
+  values:
+    quantity: albite_crystal_history_and_persistence
+    merwin_change_as_printed: Merwin had, some years before, found that some change takes place in natural albite crystals,
+      when they are heated in the neighborhood of 900°, and that it takes place in a few hours.
+    merwin_change_temperature_C_approx: 900
+    merwin_change_duration_as_printed: a few hours
+    merwin_reference: 'Merwin, H. E.: J. Wash. Acad. Sci., 1, 59-60, 1911 (footnote 9).'
+    growth_temperature_test_as_printed: As the duration of our runs was always several times as great as this, we did not
+      expect any difference in the behavior of crystals grown at different temperatures. However, we tried crystals grown
+      at 800°, 930°, and 1000°, but found no differences in behavior.
+    crystal_growth_temperatures_tested_C:
+    - 800
+    - 930
+    - 1000
+    persistence_as_printed: It will be seen from the data of Table IV that crystals of albite in an albite liquid persist
+      for long periods of time at temperatures above the melting point. Thus after four days at 1126°, some crystal remnants
+      still persist.
+    foreign_liquid_as_printed: These crystals in contact with a liquid of their own composition behave exactly like the same
+      crystals in a somewhat different liquid when held just above the temperature of the liquidus, e.g. the albite crystals
+      in the 91.6 per cent liquid at 1115° (see Table I).
+    foreign_liquid_wt_pct_albite: '91.6'
+    foreign_liquid_temperature_C: 1115
+    foreign_liquid_table_row: Table II row 32 (91.6 wt% albite, 1115°, 19 hrs, Albite nearly all melted)
+    quartz_analogy_as_printed: It is of interest in this connection, that quartz, which, like albite, may persist far above
+      its melting temperature, likewise melts at the surface, at least over a considerable range of temperatures above the
+      melting temperature.
+    quartz_footnote_as_printed: This was reported by Ferguson and Merwin (This Journal, 46, 417-426, 1918) and has been repeatedly
+      observed by one of us. An extreme example may be cited. A particularly fine quartz crystal was heated to about 1800°
+      C. in an effort to melt it quickly. After cooling, it was found that the outer portion was silica glass but the inner
+      part was still crystalline quartz.
+    quartz_heating_temperature_C_approx: 1800
+    quartz_heating_temperature_approximate: true
+    quartz_footnote_locator:
+      published_page: 100
+      pdf_page_index: 7
+      footnote: '10'
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_albite_persistence_context
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_carnegieite_melting_context
+  type: method
+  locator:
+    published_page: 101
+    pdf_page_index: 8
+    section: Melting Temperature of Carnegieite
+  units: as printed
+  values:
+    quantity: carnegieite_melting_temperature_comparison
+    charge_mass_g_typical: '0.035'
+    platinum_foil_mass_g_approx: '0.06'
+    envelope_dimensions_mm: 6 × 8
+    prior_heating_curve_temperatures_C:
+    - 1525
+    - 1527
+    authors_melting_point_C: 1526
+    note: 'Direction (p. 101): carnegieite, heated just above its melting temperature, approaches equilibrium slowly enough
+      that it can be held there for an appreciable time without melting completely, but this is in marked contrast with albite:
+      carnegieite approaches equilibrium so rapidly (compared with albite) that Bowen could fix its melting point by heating
+      curves (1525° and 1527°, placed at 1526°, fn 12). Albite is the sluggish phase (crystals persist four days at 1126°,
+      p. 100).'
+    rate_comparison_as_printed: Although the rate of approach to equilibrium, when carnegieite is heated just above its melting
+      temperature, is slow enough so that it can be held there for an appreciable time without melting completely, it is in
+      marked contrast with the rate at which equilibrium is approached when albite is so treated. So rapid indeed is this
+      approach that Bowen was able to determine the melting point by making heating curves, and the temperature so determined
+      agrees with the temperature determined by the runs listed in Table I. No doubt this exact agreement is fortuitous, but
+      it serves to illustrate the remarkable difference in behavior of carnegieite and albite near their melting temperatures—a
+      difference very similar to that found by Day and Allen between the behaviors of anorthite and albite.
+    rate_comparison_locator:
+      published_page: 101
+      pdf_page_index: 8
+      section: Melting Temperature of Carnegieite
+    bowen_heating_curves_as_printed: 'Bowen, N. L.: This Journal, 33, 551-573, 1912. Two heating curves gave 1525° and 1527°
+      respectively; he therefore placed the melting point at 1526°.'
+    bowen_heating_curves_locator:
+      published_page: 101
+      pdf_page_index: 8
+      footnote: '12'
+    charge_and_envelope_as_printed: A typical charge might weigh 0.035 grams and be held in a flat envelope of platinum foil
+      weighing about 0.06 grams and measuring 6 x 8 mm.
+    charge_and_envelope_locator:
+      published_page: 101
+      pdf_page_index: 8
+      footnote: '11'
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_carnegieite_melting_context
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_composition_projection_qualification
+  type: method
+  locator:
+    published_page: 96
+    pdf_page_index: 3
+    section: Experimental work
+  units: as printed
+  values:
+    quantity: liquidus_projection_method_qualification
+    claims_as_printed:
+    - These perpendiculars are, in all cases, so short that no significant error could be introduced into the liquidus relationships
+      by the indicated departure of the composition from the binary system.
+    - The chief effect is likely to be the persistence of some residual liquid when an attempt is made to crystallize a mixture
+      completely.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_composition_projection_qualification
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_eutectic_estimate_context
+  type: method
+  locator:
+    published_page: 103
+    pdf_page_index: 10
+    section: The Eutectic
+  units: as printed
+  values:
+    quantity: eutectic_estimate
+    eutectic_composition_wt_pct_albite: 76
+    eutectic_temperature_C: 1068
+    uncertainty_C: 5
+    note: Authors place the eutectic by interpreting contrast between outcomes at 1063 °C and 1072 °C; they explicitly state
+      the runs did not demonstrate that 1063 °C lies below the eutectic.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_eutectic_estimate_context
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_experiment_facts
+  type: laboratory_conditions
+  experiment: greig_barth_1938_synthetic_binary_join_phase_equilibria
+  locator:
+    published_page: 98
+    pdf_page_index: 5
+    section: Methods and Table I footnote
+  units: as printed
+  values:
+    quantity: furnace_run_apparatus_and_measurement_facts
+    method_as_printed: Equilibrium furnace runs; quenched charges examined microscopically.
+    heating_apparatus_as_printed: Electric furnace.
+    temperature_measurement:
+      sensor:
+        state: Automatic temperature control and recording potentiometer.
+        locator:
+          published_page: 98
+          pdf_page_index: 5
+          footnote: '7'
+    temperature_calibration:
+      control:
+        state: White and Adams type regulator adapted by Roberts for alternating current; recording potentiometer built by
+          Leeds and Northrup.
+        locator:
+          published_page: 98
+          pdf_page_index: 5
+          footnote: '7'
+    temperature_scale_note: Temperatures are expressed on the Day and Sosman scale; in this temperature region International
+      Temperature Scale values are probably always slightly higher for the same temperatures.
+    run_pressure: null
+    cell_material:
+      state:
+        tag: not_applicable
+        reason: Furnace equilibrium runs; no reaction cell specified; some charges used a platinum-foil container.
+      locator:
+        published_page: 98
+        pdf_page_index: 5
+        section: Methods and Table I footnote
+    liner_and_orifice: null
+    intensity_to_pressure_calibration: null
+    sample_preparation: Synthetic powdered glass and crystalline nephelite/carnegieite/albite preparations; purified starting
+      materials, with sealed evacuated silica-glass tubes and water source for specified preparations.
+    composition: Na2O·Al2O3·2SiO2 to Na2O·Al2O3·6SiO2 join; run compositions are wt% albite in Tables II–V.
+    after_run_composition: Not reported as chemical analyses. Authors note soda volatilization during preparation of sodic
+      glasses and composition mismatch may leave residual liquid.
+    activity_ions_and_standard_states: No activities or activity standards measured; the work reports phase equilibria only.
+    numerical_uncertainties: Eutectic estimate 1068 °C ± 5 °C; albite melting bracket 1115–1120 °C, probably 1118 °C. No general
+      run-temperature uncertainty given.
+    background_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 98
+        pdf_page_index: 5
+        section: Methods and tables
+        note: No run chamber or background pressure stated.
+    liner:
+      state:
+        tag: not_applicable
+        reason: No cell liner specified; some charges wrapped in platinum foil
+      locator:
+        published_page: 98
+        pdf_page_index: 5
+        section: Preparation
+    orifice_diameter_and_channel_length:
+      state:
+        tag: not_applicable
+        reason: No effusion apparatus
+      locator:
+        published_page: 98
+        pdf_page_index: 5
+        section: Methods
+    pressure_calibration_and_mass_spectrometry:
+      state:
+        tag: not_applicable
+        reason: No mass-spectrometric or vapour-pressure measurements
+      locator:
+        published_page: 98
+        pdf_page_index: 5
+        section: Methods
+    activity_ions_and_reference_states:
+      state:
+        tag: not_applicable
+        reason: No activities were reported
+      locator:
+        published_page: 93
+        pdf_page_index: 0
+        section: Abstract
+    cell_material_as_printed: null
+    atmosphere:
+      state:
+        tag: value
+        value: Atmospheric pressure
+      locator:
+        published_page: 93
+        pdf_page_index: 0
+        section: Introduction
+    temperature_range_context:
+      state:
+        tag: value
+        value: about 500 °C over the range within which all melting phenomena occur
+      locator:
+        published_page: 93
+        pdf_page_index: 0
+        section: Introduction
+    temperature_scale_as_printed: Temperatures are expressed on the scale established by Day and Sosman using the Adams curve;
+      International Temperature Scale values are probably always slightly higher for the same temperatures in this region.
+    temperature_scale_locator:
+      published_page: 93
+      pdf_page_index: 0
+      footnote: '1'
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_experiment_facts
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_feldspar_system_comparison
+  type: method
+  locator:
+    published_page: 111
+    pdf_page_index: 18
+    section: Summary (comparison with nephelite, carnegieite—anorthite)
+  units: as printed
+  values:
+    quantity: directional_comparison_with_anorthite_system
+    jadeite_stability_as_printed: Although the composition of jadeite, Na2O.Al2O3.4SiO2, lies between that of nephelite and
+      albite, it is evidently unstable under the conditions represented in the diagram. This was to be expected, for it is
+      not known in the ordinary igneous rocks and has been considered by petrologists to be formed only at high pressures.
+    solid_solution_direction_as_printed: In both systems the compositions of the nephelite and the carnegieite vary within
+      limits from Na2O.Al2O3.2SiO2 toward the composition of the feldspar, anorthite, or albite, or, expressing this variation
+      in composition in other words, nephelite and carnegieite take a limited amount of feldspar into solid solution.
+    inversion_direction_as_printed: In both systems the temperature of the inversion nephelite-carnegieite rises with increased
+      feldspar content.
+    feldspar_end_solubility_as_printed: At the other end of each diagram, as drawn, some slight solubility of nephelite, carnegieite
+      in the feldspar is indicated.
+    feldspar_end_solubility_note: Nephelite and carnegieite dissolved in the feldspar (not feldspar dissolved in nephelite).
+    optical_sign_as_printed: Bowen found that with increasing anorthite content the birefringence of nephelite decreased,
+      became zero, then increased again, the crystals having become optically positive. The small size of the nephelite crystals,
+      that grew in the nephelite-albite liquids, prevented satisfactory measurements of the indices of refraction, but the
+      change to optically positive nephelite does not occur in this system. These nephelites are all optically negative, as
+      are the naturally occurring examples.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_feldspar_system_comparison
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_figures_only
+  type: method
+  locator:
+    published_page: 94
+    pdf_page_index: 1
+    section: Figure 1 and Figure 2
+  units: as printed
+  values:
+    quantity: equilibrium_diagrams_figure_only
+    method_class: figure_only
+    figures:
+    - '1'
+    - '2'
+    status: figure_only
+    note: Diagrams summarize phase fields and boundaries; not digitized. Figure 2 is described as hypothetical and based on
+      straight-line interpolation of three binary diagrams.
+    figure_locators:
+    - figure: '1'
+      published_page: 94
+      pdf_page_index: 1
+      caption_as_printed: Equilibrium diagram for the system, Na2O.Al2O3.2SiO2 (nephelite, carnegieite)—Na2O.Al2O3.6SiO2 (albite).
+        The circles indicate determination of points on the liquidus. For other data see tables.
+      printed_temperature_labels_C:
+      - 1526
+      - 1280
+      - 1254
+      - 1118
+      - 1068
+      printed_temperature_labels_note: Labels printed on the temperature axes of Fig. 1 (not digitized curve values). 1280
+        and 1254 mark the top and bottom of the carnegieite + nephelite field at the left (pure Na2O.Al2O3.2SiO2) axis and
+        are printed nowhere in the text or tables; 1526, 1118 and 1068 repeat the text values.
+    - figure: '2'
+      published_page: 110
+      pdf_page_index: 17
+      caption_as_printed: 'The equilibrium diagrams for the systems, nephelite, carnegieite—anorthite (Bowen, N. L.: This
+        Journal, 33, 551-573, 1912) and the binary system, albite—anorthite (Bowen, N. L.: This Journal, 35, 577-599, 1913),
+        are combined with the diagram of Fig 1. The ternary diagram (which is entirely hypothetical) has been drawn from these
+        three binary diagrams, points being located by straight line interpolation.'
+      construction_locator:
+        published_page: 112
+        pdf_page_index: 19
+        note: Ternary construction, tie lines, open circles (liquid) and filled circles (crystals) described pp. 111-112.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_figures_only
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_inversion_context
+  type: method
+  locator:
+    published_page: 108
+    pdf_page_index: 15
+    section: The Nephelite-Carnegieite Inversion
+  units: as printed
+  values:
+    quantity: inversion_temperature_and_comparison
+    pure_end_member_lower_C: 1249
+    pure_end_member_upper_C: 1259
+    Bowen_lower_C: 1245
+    Bowen_upper_C: 1252
+    note: With increase in silica content of solid solutions, inversion temperature rises; change occurs over a range rather
+      than at a single temperature. Authors say table data do not define width well.
+    pure_end_member_bracket_as_printed: The inversion temperature, in the pure end member, was found to lie between 1259°
+      and 1249°. Bowen found it to lie between 1245° and 1252°.
+    crystallized_samples_as_printed: To determine these temperatures we crystallized samples of the glasses (with the exception
+      of the 33.5 per cent glass) completely to carnegieite and to nephelite.
+    glass_not_completely_crystallized_wt_pct_albite: '33.5'
+    carnegieite_first_as_printed: No difficulty was experienced in obtaining materials completely carnegieite, but we found
+      that in the temperature region in which crystallization is fairly rapid, carnegieite formed first and that nephelite
+      was obtained only by inverting the carnegieite. To convert the carnegieite completely to nephelite was a slow process.
+      Instead of doing this, charges were crystallized to nephelite at low temperatures in sealed tubes.
+    directional_as_printed: With increase in the silica content of the solid solutions the temperature of the inversion rises.
+      The change does not then take place at a single temperature but over a range of temperatures, as indicated on the equilibrium
+      diagram by the field labelled carnegieite + nephelite. The data do not well define the width of this field.
+    bowen_inversion_rates_as_printed: It may be noted in passing that whereas our materials inverted very slowly indeed, Bowen
+      obtained almost complete conversion of nephelite to carnegieite in one hour at 1252°, and partial conversion of carnegieite
+      to nephelite in one hour at 1245°.
+    bowen_nephelite_to_carnegieite_C: 1252
+    bowen_nephelite_to_carnegieite_duration_h: 1
+    bowen_carnegieite_to_nephelite_C: 1245
+    bowen_carnegieite_to_nephelite_duration_h: 1
+    bowen_inversion_rates_locator:
+      published_page: 108
+      pdf_page_index: 15
+      footnote: '15'
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_inversion_context
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_jadeite_context
+  type: method
+  locator:
+    published_page: 109
+    pdf_page_index: 16
+    section: Jadeite
+  units: as printed
+  values:
+    quantity: jadeite_stability_and_indices
+    jadeite_formula_as_printed: Na2O·Al2O3·4SiO2
+    museum_number: 94303
+    beta_index: '1.657'
+    beta_total_variation_max: '0.002'
+    gamma_index_highest: '1.668'
+    alpha_index_lowest: '1.65'
+    decomposition_temperature_C_lowest_observed: 800
+    heating_temperature_C: 1015
+    note: No jadeite crystals were found in preparations. The authors conclude jadeite is unstable under conditions of the
+      equilibrium diagram. Decomposition was observed as low as 800 °C; after 1015 °C heating it converted to glass and large
+      nephelite crystals.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_jadeite_context
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_liquidus_preparations_context
+  type: method
+  locator:
+    published_page: 102
+    pdf_page_index: 9
+    section: Liquidus methods
+  units: as printed
+  values:
+    quantity: slow_crystallization_runs_and_composition_drift
+    slow_growth_composition_wt_pct:
+    - '74.3'
+    - '84.2'
+    - '91.6'
+    slow_growth_as_printed: With the exception of the preparations containing 74.3, 84.2, and 91.6 per cent albite, this presented
+      no difficulty. In these, however, the development of crystals was slow, and although we grew crystals in all these glasses
+      in the dry way, the material actually used to locate the liquidus at 91.6 per cent albite was prepared with the aid
+      of sealed tubes.
+    slow_growth_locator:
+      published_page: 102
+      pdf_page_index: 9
+      continued_page: 103
+      section: Liquidi of Albite, Nephelite, and Carnegieite
+    91_6_wt_pct_liquidus_material: prepared with sealed tubes
+    charge_drying_duration_h_range: 24–48
+    drying_temperature: in air close to melting temperature
+    charge_drying_as_printed: Before any of these materials were used for the equilibrium investigations, the finely powdered
+      materials were heated in air, close to the melting temperature, for 24 to 48 hours to make sure that they were dry.
+    charge_drying_locator:
+      published_page: 100
+      pdf_page_index: 7
+      section: Melting Temperature of Albite
+    note: Crystal growth was slow for the 74.3, 84.2, and 91.6 wt% albite materials (pp. 102–103); sealed tubes were used
+      for the 91.6 wt% liquidus determination (p. 103). The 24–48 h drying in air close to the melting temperature is printed
+      on p. 100 (charge_drying_locator).
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_liquidus_preparations_context
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_material_purity_and_preparation
+  type: method
+  locator:
+    published_page: 95
+    pdf_page_index: 2
+    section: Preparation
+  units: as printed
+  values:
+    quantity: starting_materials_purity_and_mass_change
+    quartz_HF_H2SO4_evaporation_residue_pct_max: <0.04
+    Na2CO3_SO3_pct_max: <0.001
+    Na2CO3_Cl_pct_max: <0.001
+    Na2CO3_SiO2_pct_max: <0.002
+    Na2CO3_Al2O3_plus_Fe2O3_pct: '0.003'
+    Na2CO3_CaO_pct: '0.008'
+    Na2CO3_MgO: none detected
+    batch_preparation_composition_as_printed: a preparation, containing about 35 per cent soda 65 per cent silica
+    batch_preparation_soda_pct_approx: 35
+    batch_preparation_silica_pct_approx: 65
+    batch_preparation_composition_approximate: true
+    batch_preparation_purpose_as_printed: was made up and used as a source of soda in preparing the ternary glasses, the purpose
+      being to avoid, as far as practicable, loss of soda during the melting of the glasses.
+    batch_preparation_analyses_as_printed: Several analyses were made on these materials, and they agreed with the compositions
+      as determined by synthesis. There was then no detectable loss of soda.
+    batch_preparation_gas_as_printed: At this temperature the liquid retains a good deal of gas. This was driven off by crystallizing
+      the material. Careful weighing showed that after the gas had been driven off, and before the charge was crushed, the
+      weight was that of the soda and silica originally put into the charge.
+    alumina_preparation_as_printed: Alumina, prepared from the distilled chloride by a double precipitation with hydrochloric
+      acid gas and ignition of the resulting aluminum chloride six hydrate.
+    soda_source_as_printed: Soda, weighed as the carbonate. The source was a particularly good sodium carbonate monohydrate.
+    soda_analysis_analyst_as_printed: E. G. Zies
+    soda_analysis_as_printed: 'An analysis by E. G. Zies gave: SO3 <0.001 per cent, Cl <0.001 per cent, SiO2 <0.002 per cent,
+      Al2O3 + Fe2O3 0.003 per cent, CaO 0.008 per cent, MgO none.'
+    furnace_temperature_C_max: 1050
+    heating_after_crushing_C: 900
+    albite_glass_test_mass_g: 10
+    albite_glass_test_duration_h: 3
+    albite_glass_test_temperature_C_range: 1650–1675
+    mass_loss_note: No loss observed for the 10 g albite-glass sample after 3 h at 1650–1675 °C. More sodic ternary glasses
+      volatilized soda during furnace preparation; loss was inferred from mass change and decreased as silica content increased.
+    moisture_uptake: Glasses take up some moisture from air during crushing; after crushing the charge was heated in air at
+      900 °C and loss was taken to be water.
+    higher_temperature_mass_loss_interpretation: Subsequent loss at higher temperatures was taken to be soda; with increase
+      in silica, loss during heating decreases.
+    composition_accuracy: Glass compositions do not lie exactly in the binary system; neglecting impurities, they are expressible
+      in terms of Na2O, Al2O3, and SiO2.
+    meker_burner_mass_change: This material increases in weight if heated over a Meker burner at 900–1000 °C, presumably by
+      dissolving gases from the flame.
+    meker_burner_mass_change_locator:
+      published_page: 95
+      pdf_page_index: 2
+      footnote: '3'
+    quartz_purity_and_conversion_as_printed: Silica, a crushed quartz, which after evaporation with hydrofluoric and sulphuric
+      acids leaves a residue of less than 0.04 per cent, was converted to cristobalite by firing it at a high temperature.
+    quartz_purity_and_conversion_locator:
+      published_page: 94
+      pdf_page_index: 1
+      section: Preparation of glasses
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_material_purity_and_preparation
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_sealed_tube_crystal_growth
+  type: method
+  locator:
+    published_page: 98
+    pdf_page_index: 5
+    continued_page: 100
+    section: Melting Temperature of Albite (preparation of crystalline albite)
+  units: as printed
+  values:
+    quantity: sealed_tube_crystal_growth_preparation
+    air_growth_as_printed: We grew crystals of albite in the powdered albite glass in air but did not use them for the final
+      work, for we found that by growing them under a small pressure of water vapor in sealed tubes of silica glass, we had
+      a much better choice of size and distribution of crystals. In the same way we also prepared crystalline albite free
+      from all but small traces of glass.
+    sealed_tube_as_printed: Powdered albite glass was placed in a crucible of platinum foil, and the platinum folded down
+      tightly over the charge, sealing it in. The charge, together with a source of water, was then sealed in an evacuated
+      tube of silica glass and heated in an electric furnace.
+    water_source_as_printed: As a source of water we used gibbsite in some cases, and a rhyolitic glass containing about 3
+      per cent of water in others.
+    water_sources:
+    - gibbsite
+    - rhyolitic glass
+    rhyolitic_glass_water_pct_approx: 3
+    rhyolitic_glass_water_pct_approximate: true
+    water_source_locator:
+      published_page: 98
+      pdf_page_index: 5
+      continued_page: 100
+      note: Sentence breaks across the page turn; p. 99 is the rotated Table II.
+    water_vapor_pressure:
+      state:
+        tag: unknown
+        reason: not_published
+      note: Printed only as "a small pressure of water vapor" (p. 98).
+    contamination_as_printed: Under these conditions some volatilization of silica from the walls of the tube occurs, but
+      there is no detectable contamination of the charge inside its platinum container.
+    contamination_locator:
+      published_page: 100
+      pdf_page_index: 7
+      footnote: '8'
+      note: 'Footnote 8 cites Greig, J. W., Merwin, H. E., and Shepherd, E. S.: This Journal, 25, 61-73, 1933.'
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_sealed_tube_crystal_growth
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_solid_solution_limit_context
+  type: method
+  locator:
+    published_page: 107
+    pdf_page_index: 14
+    section: Solid solution limit
+  units: as printed
+  values:
+    quantity: albite_nephelite_solid_solution_limit
+    preparation_temperature_C_approx: 1035
+    preparation_temperature_approximate: true
+    preparation_as_printed: glasses containing 90, 95, 97, 98, and 100 per cent of albite were prepared, then crystallized
+      by heating in sealed tubes, followed by two months in air at about 1035°.
+    preparation_locator:
+      published_page: 106
+      pdf_page_index: 13
+      continued_page: 107
+      section: Solidi (albite solid solution)
+    glass_series_wt_pct_albite:
+    - 90
+    - 95
+    - 97
+    - 98
+    - 100
+    aging_duration_months: 2
+    detection_limit_as_printed: The indices of refraction of nephelite and of albite are so nearly the same that small amounts
+      of nephelite would not be seen in these fine-grained preparations, and Doctor Posnjak found, on comparing the spectrograms
+      of albite and nephelite solid solutions, that the strong lines of each pattern were so nearly identical in position
+      that it would be impossible by this means to detect a few per cent of nephelite crystals mixed with albite.
+    xray_as_printed: Although the expectable change in spacing accompanying a small change in the silica content of albite
+      is very slight, Doctor Posnjak kindly made comparison X-ray powder spectrograms of these materials using molybdenum
+      Kα radiation. No differences were found.
+    xray_radiation: molybdenum Kα
+    heating_as_printed: The preparations were heated at 1072°-1075°, that is, just above the eutectic temperature, for three
+      days, after which some glass was present in the 90 and 95 per cent preparations. After a further eight days at this
+      temperature, examination showed more glass in the 90 per cent preparation but no apparent change in the 95 per cent.
+      No detectable change took place in the 97 or 98 per cent preparation. Other charges of the same materials were heated
+      for fifteen days at 1079° with the same results.
+    limit_as_printed: The evidence leaves much to be desired, but, on the basis of these experiments, we are of the opinion
+      that some solid solution does occur, and tentatively have placed the limit at 1075° between 95 and 97 per cent albite,
+      i.e. at 96 per cent albite.
+    heating_temperatures_C:
+    - 1072
+    - 1075
+    - 1079
+    heating_duration_days:
+    - 3
+    - 8
+    - 15
+    limit_estimate_wt_pct_albite: 96
+    note: Authors say evidence leaves much to be desired; tentative solid-solution limit is 96 wt% albite at 1075 °C, between
+      tested 95 and 97 wt%.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_solid_solution_limit_context
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_solid_solution_xrd_qualifications
+  type: method
+  locator:
+    published_page: 106
+    pdf_page_index: 13
+    section: Solidi (nephelite and albite solid solution extent)
+    note: Per-claim locators are in values.claims[].locator (pp. 106-107).
+  units: as printed
+  values:
+    quantity: X_ray_and_solid_solution_qualifications
+    claims:
+    - claim: At 1080 °C after three days, the 25.3 wt% albite material did not change; 33.5 and 40.2 wt% materials were largely
+        unchanged but developed local traces of glass.
+      locator:
+        published_page: 106
+        pdf_page_index: 13
+    - claim: X-ray patterns (Posnjak, X-ray powder spectrograms) showed a slight but definite difference between 33.5 and
+        25.3 wt% materials, while no difference was observed between 33.5 and 40.2 wt%.
+      locator:
+        published_page: 106
+        pdf_page_index: 13
+    - claim: This indicates solid solutions extend beyond 25 wt% at 1080 °C but does not fix the limit; the authors tentatively
+        drew the solidus through 33 wt% at 1080 °C.
+      locator:
+        published_page: 106
+        pdf_page_index: 13
+    - claim: X-ray comparison of glasses crystallized at 600 °C showed no difference in the extent of solid solution.
+      locator:
+        published_page: 106
+        pdf_page_index: 13
+    - claim: At 1072–1075 °C for three days, glass occurred in 90 and 95 wt% preparations; after a further eight days there
+        was more glass in the 90 wt% preparation but no apparent change in the 95 wt% preparation. No detectable change occurred
+        at 97 or 98 wt%; 15 days at 1079 °C gave the same results.
+      locator:
+        published_page: 107
+        pdf_page_index: 14
+    - claim: A few per cent of nephelite crystals mixed with albite cannot be detected by the X-ray spectrograms or by the
+        microscope (indices of refraction too nearly the same).
+      locator:
+        published_page: 107
+        pdf_page_index: 14
+    - claim: Molybdenum Kα X-ray powder spectrograms of the 90-100 wt% albite materials showed no differences.
+      locator:
+        published_page: 107
+        pdf_page_index: 14
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_solid_solution_xrd_qualifications
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_solidus_qualifications
+  type: method
+  locator:
+    published_page: 104
+    pdf_page_index: 11
+    section: Solidus
+  units: as printed
+  values:
+    quantity: crystallization_and_solidus_qualification
+    claims:
+    - Solidus curves are not located as well as corresponding liquidus curves.
+    - Non-occurrence of melting is used to decide temperature is not above solidus; with very viscous materials this alone
+      gives less certainty than a liquidus point.
+    - Glass may fail to crystallize completely if its composition differs from crystals that separate; possible causes include
+      impurities, differential material loss during glass preparation, and inhomogeneity.
+    - Nephelite glasses appeared free of visible glass after rapid spherulitic crystallization, but the authors suspected
+      partial crystallization. After several days voids were plentiful and refractive index increased; small amounts of glass
+      or carnegieite were not detectable by refractive index.
+    - At higher temperatures glass appeared, voids disappeared, and blocky nephelite crystals developed. Solidus is drawn
+      below temperatures at which this change occurred and above temperatures at which it did not.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_solidus_qualifications
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_source_internal_misreferences
+  type: method
+  locator:
+    published_page: 100
+    pdf_page_index: 7
+    section: Melting Temperature of Albite; Melting Temperature of Carnegieite
+  units: as printed
+  reason: 'source_internally_inconsistent: three printed table cross-references point to the wrong table (pp. 100-101); see
+    values.misreferences.'
+  values:
+    quantity: printed_table_cross_reference_errors
+    misreferences:
+    - note: 'source_internally_inconsistent: p. 100 cites "the data of Table IV" for albite crystals persisting four days
+        at 1126°; those runs are in Table I (p. 98, rows 9-13). Table IV is the carnegieite/nephelite solidus.'
+      locator:
+        published_page: 100
+        pdf_page_index: 7
+    - note: 'source_internally_inconsistent: p. 100 cites "(see Table I)" for the albite crystals in the 91.6 per cent liquid
+        at 1115°; that run is Table II row 32 (p. 99). Table I is pure albite only.'
+      locator:
+        published_page: 100
+        pdf_page_index: 7
+    - note: 'source_internally_inconsistent: p. 101 says Bowen''s carnegieite heating-curve temperature agrees with "the runs
+        listed in Table I"; the carnegieite runs are Table II rows 1-5 (p. 99, 1524°/1527°). Table I is albite.'
+      locator:
+        published_page: 101
+        pdf_page_index: 8
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_source_internal_misreferences
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_table_1_run_records
+  type: experiment_series
+  experiment: greig_barth_1938_synthetic_binary_join_phase_equilibria
+  locator:
+    published_page: 98
+    pdf_page_index: 5
+    table: '1'
+    note: Complete transcription of Table 1; individual run conditions and outcomes are in values.rows.
+  units: temperature °C, composition wt% albite, duration as printed, phase outcome as printed
+  values:
+    quantity: table_1_phase_equilibrium_run_records
+    method_class: measured_tabulated
+    table_number_as_printed: 1
+    rows:
+    - table: I
+      row: 1
+      temperature_C: 1113
+      original_condition: Crystals in glass
+      time_as_printed: 3 days
+      result_as_printed: Crystals have grown
+      duration_value: 3
+      duration_unit: days
+    - table: I
+      row: 2
+      temperature_C: 1113
+      original_condition: Crystals
+      time_as_printed: 3 days
+      result_as_printed: No change
+      duration_value: 3
+      duration_unit: days
+    - table: I
+      row: 3
+      temperature_C: 1116
+      original_condition: Crystals in glass
+      time_as_printed: 2 days
+      result_as_printed: Can see no change
+      duration_value: 2
+      duration_unit: days
+    - table: I
+      row: 4
+      temperature_C: 1122
+      original_condition: Crystals in glass from run at 1113 above
+      time_as_printed: 1 day
+      result_as_printed: Can see no change
+      duration_value: 1
+      duration_unit: days
+    - table: I
+      row: 5
+      temperature_C: 1122
+      original_condition: Crystals in glass from run at 1113 above
+      time_as_printed: 2 days
+      result_as_printed: Crystals are smaller
+      duration_value: 2
+      duration_unit: days
+    - table: I
+      row: 6
+      temperature_C: 1122
+      original_condition: Crystals in glass from run at 1113 above
+      time_as_printed: 3 days
+      result_as_printed: Nearly all glass
+      duration_value: 3
+      duration_unit: days
+    - table: I
+      row: 7
+      temperature_C: 1122
+      original_condition: Crystals
+      time_as_printed: 1 day
+      result_as_printed: A little interstitial glass
+      duration_value: 1
+      duration_unit: days
+    - table: I
+      row: 8
+      temperature_C: 1122
+      original_condition: Crystals
+      time_as_printed: 2 days
+      result_as_printed: Glass increasing
+      duration_value: 2
+      duration_unit: days
+    - table: I
+      row: 9
+      temperature_C: 1126
+      original_condition: Crystals in glass
+      time_as_printed: 1 day
+      result_as_printed: All glass
+      duration_value: 1
+      duration_unit: days
+    - table: I
+      row: 10
+      temperature_C: 1126
+      original_condition: Crystals
+      time_as_printed: 1 day
+      result_as_printed: Films of glass between the crystals throughout the charge
+      duration_value: 1
+      duration_unit: days
+    - table: I
+      row: 11
+      temperature_C: 1126
+      original_condition: Crystals
+      time_as_printed: 2 days
+      result_as_printed: Charge now contains only a few per cent of crystals. The smaller crystals have melted.
+      duration_value: 2
+      duration_unit: days
+    - table: I
+      row: 12
+      temperature_C: 1126
+      original_condition: Crystals
+      time_as_printed: 3 days
+      result_as_printed: Crystals have decreased
+      duration_value: 3
+      duration_unit: days
+    - table: I
+      row: 13
+      temperature_C: 1126
+      original_condition: Crystals
+      time_as_printed: 4 days
+      result_as_printed: Traces only of crystals
+      duration_value: 4
+      duration_unit: days
+    - table: I
+      row: 14
+      temperature_C: 1115
+      original_condition: Crystals in glass
+      time_as_printed: 7 days
+      result_as_printed: Crystals have grown
+      duration_value: 7
+      duration_unit: days
+    - table: I
+      row: 15
+      temperature_C: 1120
+      original_condition: Crystals in glass
+      time_as_printed: 7 days
+      result_as_printed: All glass
+      duration_value: 7
+      duration_unit: days
+    reason: The schema has no scored scalar for these tabulated run-by-run phase assemblages and growth/melting outcomes;
+      preserve full measured run rows as located experiment context.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_table_1_run_records
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_table_2_run_records
+  type: experiment_series
+  experiment: greig_barth_1938_synthetic_binary_join_phase_equilibria
+  locator:
+    published_page: 99
+    pdf_page_index: 6
+    table: '2'
+    note: Complete transcription of Table 2; individual run conditions and outcomes are in values.rows.
+  units: temperature °C, composition wt% albite, duration as printed, phase outcome as printed
+  values:
+    quantity: table_2_phase_equilibrium_run_records
+    method_class: measured_tabulated
+    table_number_as_printed: 2
+    rows:
+    - table: II
+      row: 1
+      albite_wt_pct: '0'
+      temperature_C: 1524
+      time_as_printed: 30 min
+      original_condition: Glass
+      result_as_printed: Glass + some carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1524'
+      duration_value: 30
+      duration_unit: minutes
+    - table: II
+      row: 2
+      albite_wt_pct: '0'
+      temperature_C: 1524
+      time_as_printed: 30 min
+      original_condition: Carnegieite
+      result_as_printed: Carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1524'
+      duration_value: 30
+      duration_unit: minutes
+    - table: II
+      row: 3
+      albite_wt_pct: '0'
+      temperature_C: 1527
+      time_as_printed: 30 min
+      original_condition: Glass
+      result_as_printed: Glass
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1527'
+      duration_value: 30
+      duration_unit: minutes
+    - table: II
+      row: 4
+      albite_wt_pct: '0'
+      temperature_C: 1527
+      time_as_printed: 30 min
+      original_condition: Carnegieite
+      result_as_printed: Glass with trace of carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1527'
+      duration_value: 30
+      duration_unit: minutes
+    - table: II
+      row: 5
+      albite_wt_pct: '0'
+      temperature_C: 1527
+      time_as_printed: 60 min
+      original_condition: Carnegieite
+      result_as_printed: Glass
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1527'
+      duration_value: 60
+      duration_unit: minutes
+    - table: II
+      row: 6
+      albite_wt_pct: '16'
+      temperature_C: 1476
+      time_as_printed: 60 min
+      original_condition: Glass
+      result_as_printed: Glass with carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1476'
+      duration_value: 60
+      duration_unit: minutes
+    - table: II
+      row: 7
+      albite_wt_pct: '16'
+      temperature_C: 1480
+      time_as_printed: 60 min
+      original_condition: Glass
+      result_as_printed: Glass
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1480'
+      duration_value: 60
+      duration_unit: minutes
+    - table: II
+      row: 8
+      albite_wt_pct: '16'
+      temperature_C: 1480
+      time_as_printed: 60 min
+      original_condition: Glass + carnegieite
+      result_as_printed: Glass
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1480'
+      duration_value: 60
+      duration_unit: minutes
+    - table: II
+      row: 9
+      albite_wt_pct: '33.5'
+      temperature_C: 1374
+      time_as_printed: 60 min
+      original_condition: Glass
+      result_as_printed: Glass + carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1374'
+      duration_value: 60
+      duration_unit: minutes
+    - table: II
+      row: 10
+      albite_wt_pct: '33.5'
+      temperature_C: 1374
+      time_as_printed: 60 min
+      original_condition: Glass + carnegieite
+      result_as_printed: Glass + carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1374'
+      duration_value: 60
+      duration_unit: minutes
+    - table: II
+      row: 11
+      albite_wt_pct: '33.5'
+      temperature_C: 1374
+      time_as_printed: 60 min
+      original_condition: Glass + carnegieite
+      result_as_printed: Glass
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1374'
+      duration_value: 60
+      duration_unit: minutes
+    - table: II
+      row: 12
+      albite_wt_pct: '40.2'
+      temperature_C: 1307
+      time_as_printed: 120 min
+      original_condition: Glass + carnegieite
+      result_as_printed: Glass + carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1307'
+      duration_value: 120
+      duration_unit: minutes
+    - table: II
+      row: 13
+      albite_wt_pct: '40.2'
+      temperature_C: 1307
+      time_as_printed: 120 min
+      original_condition: Glass
+      result_as_printed: Glass + carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1307'
+      duration_value: 120
+      duration_unit: minutes
+    - table: II
+      row: 14
+      albite_wt_pct: '40.2'
+      temperature_C: 1316
+      time_as_printed: 75 min
+      original_condition: Glass + carnegieite
+      result_as_printed: Glass
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1316'
+      duration_value: 75
+      duration_unit: minutes
+    - table: II
+      row: 15
+      albite_wt_pct: '40.2'
+      temperature_C: 1316
+      time_as_printed: 75 min
+      original_condition: Glass
+      result_as_printed: Glass
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1316'
+      duration_value: 75
+      duration_unit: minutes
+    - table: II
+      row: 16
+      albite_wt_pct: '41.7'
+      temperature_C: 1289
+      time_as_printed: 120 min
+      original_condition: Glass
+      result_as_printed: Glass + carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1289'
+      duration_value: 120
+      duration_unit: minutes
+    - table: II
+      row: 17
+      albite_wt_pct: '41.7'
+      temperature_C: 1297
+      time_as_printed: 120 min
+      original_condition: Glass
+      result_as_printed: Glass + trace carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1297'
+      duration_value: 120
+      duration_unit: minutes
+    - table: II
+      row: 18
+      albite_wt_pct: '41.7'
+      temperature_C: 1297
+      time_as_printed: 120 min
+      original_condition: Glass + nephelite
+      result_as_printed: Glass + trace carnegieite
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1297'
+      duration_value: 120
+      duration_unit: minutes
+    - table: II
+      row: 19
+      albite_wt_pct: '45.1'
+      temperature_C: 1256
+      time_as_printed: 150 min
+      original_condition: Glass + nephelite
+      result_as_printed: Nephelite crystals grown
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1256'
+      duration_value: 150
+      duration_unit: minutes
+    - table: II
+      row: 20
+      albite_wt_pct: '45.1'
+      temperature_C: 1260
+      time_as_printed: 150 min
+      original_condition: Glass + nephelite
+      result_as_printed: No definite change
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1260'
+      duration_value: 150
+      duration_unit: minutes
+    - table: II
+      row: 21
+      albite_wt_pct: '45.1'
+      temperature_C: 1264
+      time_as_printed: 150 min
+      original_condition: Glass + nephelite
+      result_as_printed: Glass
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1264'
+      duration_value: 150
+      duration_unit: minutes
+    - table: II
+      row: 22
+      albite_wt_pct: '56.4'
+      temperature_C: 1190
+      time_as_printed: 17 hrs
+      original_condition: Glass + nephelite
+      result_as_printed: Nephelite crystals grown larger
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1190'
+      duration_value: 17
+      duration_unit: hours
+    - table: II
+      row: 23
+      albite_wt_pct: '56.4'
+      temperature_C: 1190
+      time_as_printed: 5 hrs
+      original_condition: Glass + nephelite
+      result_as_printed: Nephelite almost all gone
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1190'
+      duration_value: 5
+      duration_unit: hours
+    - table: II
+      row: 24
+      albite_wt_pct: '74.3'
+      temperature_C: 1072
+      time_as_printed: 48 hrs
+      original_condition: Glass + nephelite
+      result_as_printed: Nephelite has grown
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1072'
+      duration_value: 48
+      duration_unit: hours
+    - table: II
+      row: 25
+      albite_wt_pct: '74.3'
+      temperature_C: 1080
+      time_as_printed: 48 hrs
+      original_condition: Glass + nephelite
+      result_as_printed: Can see no change
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1080'
+      duration_value: 48
+      duration_unit: hours
+    - table: II
+      row: 26
+      albite_wt_pct: '74.3'
+      temperature_C: 1089
+      time_as_printed: 24 hrs
+      original_condition: Glass + nephelite
+      result_as_printed: Nephelite all gone
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1089'
+      duration_value: 24
+      duration_unit: hours
+    - table: II
+      row: 27
+      albite_wt_pct: '84.2'
+      temperature_C: 1088
+      time_as_printed: 72 hrs
+      original_condition: Glass + albite
+      result_as_printed: Albite grown
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1088'
+      duration_value: 72
+      duration_unit: hours
+    - table: II
+      row: 28
+      albite_wt_pct: '84.2'
+      temperature_C: 1097
+      time_as_printed: 48 hrs
+      original_condition: Glass + albite
+      result_as_printed: Albite slightly smaller
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1097'
+      duration_value: 48
+      duration_unit: hours
+    - table: II
+      row: 29
+      albite_wt_pct: '84.2'
+      temperature_C: 1101
+      time_as_printed: 48 hrs
+      original_condition: Glass + albite
+      result_as_printed: All glass
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1101'
+      duration_value: 48
+      duration_unit: hours
+    - table: II
+      row: 30
+      albite_wt_pct: '91.6'
+      temperature_C: 1102
+      time_as_printed: 24 hrs
+      original_condition: Glass + albite
+      result_as_printed: Albite grown
+      temperature_mark_as_printed: ''
+      temperature_as_printed: 1102°
+      duration_value: 24
+      duration_unit: hours
+    - table: II
+      row: 31
+      albite_wt_pct: '91.6'
+      temperature_C: 1110
+      time_as_printed: 96 hrs
+      original_condition: Glass + albite
+      result_as_printed: No change seen
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1110'
+      duration_value: 96
+      duration_unit: hours
+    - table: II
+      row: 32
+      albite_wt_pct: '91.6'
+      temperature_C: 1115
+      time_as_printed: 19 hrs
+      original_condition: Glass + albite
+      result_as_printed: Albite nearly all melted
+      temperature_mark_as_printed: ''
+      temperature_as_printed: '1115'
+      duration_value: 19
+      duration_unit: hours
+    - table: II
+      row: 33
+      albite_wt_pct: '100'
+      temperature_C: 1115
+      time_as_printed: 168 hrs
+      original_condition: Glass + albite
+      result_as_printed: Albite crystals grew
+      temperature_mark_as_printed: +
+      temperature_as_printed: 1115+
+      duration_value: 168
+      duration_unit: hours
+    - table: II
+      row: 34
+      albite_wt_pct: '100'
+      temperature_C: 1120
+      time_as_printed: 168 hrs
+      original_condition: Glass + albite
+      result_as_printed: All glass
+      temperature_mark_as_printed: '-'
+      temperature_as_printed: 1120-
+      duration_value: 168
+      duration_unit: hours
+    reason: The schema has no scored scalar for these tabulated run-by-run phase assemblages and growth/melting outcomes;
+      preserve full measured run rows as located experiment context.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_table_2_run_records
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_table_3_run_records
+  type: experiment_series
+  experiment: greig_barth_1938_synthetic_binary_join_phase_equilibria
+  locator:
+    published_page: 103
+    pdf_page_index: 10
+    table: '3'
+    note: Complete transcription of Table 3; individual run conditions and outcomes are in values.rows.
+  units: temperature °C, composition wt% albite, duration as printed, phase outcome as printed
+  values:
+    quantity: table_3_phase_equilibrium_run_records
+    method_class: measured_tabulated
+    table_number_as_printed: 3
+    rows:
+    - table: III
+      row: 1
+      albite_wt_pct: '74.3'
+      temperature_C: 1063
+      time_as_printed: 48 hrs
+      original_condition: Crystalline
+      condition_after_runs: No sign of melting
+      duration_value: 48
+      duration_unit: hours
+    - table: III
+      row: 2
+      albite_wt_pct: '74.3'
+      temperature_C: 1072
+      time_as_printed: 24 hrs
+      original_condition: Crystalline
+      condition_after_runs: Mostly glass
+      duration_value: 24
+      duration_unit: hours
+    - table: III
+      row: 3
+      albite_wt_pct: '84.2'
+      temperature_C: 1063
+      time_as_printed: 48 hrs
+      original_condition: Crystalline
+      condition_after_runs: No sign of melting
+      duration_value: 48
+      duration_unit: hours
+    - table: III
+      row: 4
+      albite_wt_pct: '84.2'
+      temperature_C: 1072
+      time_as_printed: 24 hrs
+      original_condition: Crystalline
+      condition_after_runs: Good deal of glass
+      duration_value: 24
+      duration_unit: hours
+    reason: The schema has no scored scalar for these tabulated run-by-run phase assemblages and growth/melting outcomes;
+      preserve full measured run rows as located experiment context.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_table_3_run_records
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_table_4_run_records
+  type: experiment_series
+  experiment: greig_barth_1938_synthetic_binary_join_phase_equilibria
+  locator:
+    published_page: 104
+    pdf_page_index: 11
+    table: '4'
+    note: Complete transcription of Table 4; individual run conditions and outcomes are in values.rows.
+  units: temperature °C, composition wt% albite, duration as printed, phase outcome as printed
+  values:
+    quantity: table_4_phase_equilibrium_run_records
+    method_class: measured_tabulated
+    table_number_as_printed: 4
+    rows:
+    - table: IV
+      row: 1
+      albite_wt_pct: '5.2'
+      temperature_C: 1459
+      time_as_printed: 13 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite with a little interstitial glass
+      duration_value: 13
+      duration_unit: hours
+    - table: IV
+      row: 2
+      albite_wt_pct: '5.2'
+      temperature_C: 1447
+      time_as_printed: 21 hrs
+      original_condition: Glass
+      condition_after_runs: Carnegieite. No glass found
+      duration_value: 21
+      duration_unit: hours
+    - table: IV
+      row: 3
+      albite_wt_pct: '10.9'
+      temperature_C: 1439
+      time_as_printed: 9 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite with interstitial glass
+      duration_value: 9
+      duration_unit: hours
+    - table: IV
+      row: 4
+      albite_wt_pct: '15'
+      temperature_C: 1288
+      time_as_printed: 15 hrs
+      original_condition: Glass
+      condition_after_runs: Carnegieite with traces of glass
+      duration_value: 15
+      duration_unit: hours
+    - table: IV
+      row: 5
+      albite_wt_pct: '15.8'
+      temperature_C: 1317
+      time_as_printed: 16 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite with glass
+      duration_value: 16
+      duration_unit: hours
+    - table: IV
+      row: 6
+      albite_wt_pct: '17'
+      temperature_C: 1288
+      time_as_printed: 45 hrs
+      original_condition: Glass
+      condition_after_runs: Carnegieite with glass
+      duration_value: 45
+      duration_unit: hours
+    - table: IV
+      row: 7
+      albite_wt_pct: '17'
+      temperature_C: 1268
+      time_as_printed: 21 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + glass
+      duration_value: 21
+      duration_unit: hours
+    - table: IV
+      row: 8
+      albite_wt_pct: '17'
+      temperature_C: 1259
+      time_as_printed: 23 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + trace of glass in rare grains
+      duration_value: 23
+      duration_unit: hours
+    - table: IV
+      row: 9
+      albite_wt_pct: '17'
+      temperature_C: 1250
+      time_as_printed: 45 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite. No glass found
+      duration_value: 45
+      duration_unit: hours
+    - table: IV
+      row: 10
+      albite_wt_pct: '20'
+      temperature_C: 1268
+      time_as_printed: 21 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + glass
+      duration_value: 21
+      duration_unit: hours
+    - table: IV
+      row: 11
+      albite_wt_pct: '20'
+      temperature_C: 1259
+      time_as_printed: 23 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + glass
+      duration_value: 23
+      duration_unit: hours
+    - table: IV
+      row: 12
+      albite_wt_pct: '20'
+      temperature_C: 1250
+      time_as_printed: 45 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + glass
+      duration_value: 45
+      duration_unit: hours
+    - table: IV
+      row: 13
+      albite_wt_pct: '20'
+      temperature_C: 1226
+      time_as_printed: 42 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite. No glass found
+      duration_value: 42
+      duration_unit: hours
+    - table: IV
+      row: 14
+      albite_wt_pct: '25.3'
+      temperature_C: 1200
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + glass
+      duration_value: 24
+      duration_unit: hours
+    - table: IV
+      row: 15
+      albite_wt_pct: '25.3'
+      temperature_C: 1200
+      time_as_printed: 24 hrs
+      original_condition: Glass
+      condition_after_runs: Nephelite + glass
+      duration_value: 24
+      duration_unit: hours
+    - table: IV
+      row: 16
+      albite_wt_pct: '25.3'
+      temperature_C: 1160
+      time_as_printed: 48 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 48
+      duration_unit: hours
+    - table: IV
+      row: 17
+      albite_wt_pct: '25.3'
+      temperature_C: 1160
+      time_as_printed: 48 hrs
+      original_condition: Glass
+      condition_after_runs: Nephelite
+      duration_value: 48
+      duration_unit: hours
+    reason: The schema has no scored scalar for these tabulated run-by-run phase assemblages and growth/melting outcomes;
+      preserve full measured run rows as located experiment context.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_table_4_run_records
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_table_5_run_records
+  type: experiment_series
+  experiment: greig_barth_1938_synthetic_binary_join_phase_equilibria
+  locator:
+    published_page: 109
+    pdf_page_index: 16
+    table: '5'
+    note: Complete transcription of Table 5; individual run conditions and outcomes are in values.rows.
+  units: temperature °C, composition wt% albite, duration as printed, phase outcome as printed
+  values:
+    quantity: table_5_phase_equilibrium_run_records
+    method_class: measured_tabulated
+    table_number_as_printed: 5
+    rows:
+    - table: V
+      row: 1
+      albite_wt_pct: '0.3'
+      temperature_C: 1249
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 2
+      albite_wt_pct: '0.3'
+      temperature_C: 1249
+      time_as_printed: 24 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 3
+      albite_wt_pct: '0.3'
+      temperature_C: 1249
+      time_as_printed: 48 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 4
+      albite_wt_pct: '0.3'
+      temperature_C: 1249
+      time_as_printed: 48 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite with a little nephelite
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 5
+      albite_wt_pct: '0.3'
+      temperature_C: 1268
+      time_as_printed: 23 hrs
+      original_condition: Nephelite
+      condition_after_runs: Carnegieite
+      duration_value: 23
+      duration_unit: hours
+    - table: V
+      row: 6
+      albite_wt_pct: '0.3'
+      temperature_C: 1259
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 7
+      albite_wt_pct: '0.3'
+      temperature_C: 1259
+      time_as_printed: 48 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + carnegieite
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 8
+      albite_wt_pct: '5.2'
+      temperature_C: 1250
+      time_as_printed: 28 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 28
+      duration_unit: hours
+    - table: V
+      row: 9
+      albite_wt_pct: '5.2'
+      temperature_C: 1250
+      time_as_printed: 28 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite + a little nephelite
+      duration_value: 28
+      duration_unit: hours
+    - table: V
+      row: 10
+      albite_wt_pct: '5.2'
+      temperature_C: 1259
+      time_as_printed: 48 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 11
+      albite_wt_pct: '5.2'
+      temperature_C: 1259
+      time_as_printed: 48 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 12
+      albite_wt_pct: '5.2'
+      temperature_C: 1269
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 13
+      albite_wt_pct: '5.2'
+      temperature_C: 1269
+      time_as_printed: 24 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 14
+      albite_wt_pct: '5.2'
+      temperature_C: 1277
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 15
+      albite_wt_pct: '5.2'
+      temperature_C: 1277
+      time_as_printed: 24 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 16
+      albite_wt_pct: '5.2'
+      temperature_C: 1277
+      time_as_printed: 48 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + carnegieite
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 17
+      albite_wt_pct: '5.2'
+      temperature_C: 1285
+      time_as_printed: 4 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + carnegieite
+      duration_value: 4
+      duration_unit: hours
+    - table: V
+      row: 18
+      albite_wt_pct: '10.9'
+      temperature_C: 1269
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 19
+      albite_wt_pct: '10.9'
+      temperature_C: 1269
+      time_as_printed: 24 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite + rare nephelite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 20
+      albite_wt_pct: '10.9'
+      temperature_C: 1269
+      time_as_printed: 48 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite + increase in nephelite
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 21
+      albite_wt_pct: '10.9'
+      temperature_C: 1277
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 22
+      albite_wt_pct: '10.9'
+      temperature_C: 1277
+      time_as_printed: 48 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + carnegieite
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 23
+      albite_wt_pct: '15.8'
+      temperature_C: 1259
+      time_as_printed: 48 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + trace glass
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 24
+      albite_wt_pct: '15.8'
+      temperature_C: 1269
+      time_as_printed: 24 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite + rare nephelite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 25
+      albite_wt_pct: '15.8'
+      temperature_C: 1269
+      time_as_printed: 48 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite + increase in nephelite
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 26
+      albite_wt_pct: '15.8'
+      temperature_C: 1273
+      time_as_printed: 22 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite + rare nephelite + trace glass
+      duration_value: 22
+      duration_unit: hours
+    - table: V
+      row: 27
+      albite_wt_pct: '15.8'
+      temperature_C: 1277
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + trace glass
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 28
+      albite_wt_pct: '15.8'
+      temperature_C: 1277
+      time_as_printed: 24 hrs
+      original_condition: Carnegieite
+      condition_after_runs: Carnegieite + trace glass
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 29
+      albite_wt_pct: '15.8'
+      temperature_C: 1277
+      time_as_printed: 48 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + trace glass
+      duration_value: 48
+      duration_unit: hours
+    - table: V
+      row: 30
+      albite_wt_pct: '15.8'
+      temperature_C: 1285
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + glass + a little carnegieite
+      duration_value: 24
+      duration_unit: hours
+    - table: V
+      row: 31
+      albite_wt_pct: '33.5'
+      temperature_C: 1268
+      time_as_printed: 4 hrs
+      original_condition: Carnegieite + glass
+      condition_after_runs: Carnegieite + glass + nephelite
+      duration_value: 4
+      duration_unit: hours
+    - table: V
+      row: 32
+      albite_wt_pct: '33.5'
+      temperature_C: 1273
+      time_as_printed: 22 hrs
+      original_condition: Carnegieite + glass
+      condition_after_runs: Carnegieite + glass + nephelite
+      duration_value: 22
+      duration_unit: hours
+    - table: V
+      row: 33
+      albite_wt_pct: '33.5'
+      temperature_C: 1285
+      time_as_printed: 4 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + glass
+      duration_value: 4
+      duration_unit: hours
+    - table: V
+      row: 34
+      albite_wt_pct: '33.5'
+      temperature_C: 1285
+      time_as_printed: 24 hrs
+      original_condition: Nephelite
+      condition_after_runs: Nephelite + carnegieite + glass
+      duration_value: 24
+      duration_unit: hours
+    reason: The schema has no scored scalar for these tabulated run-by-run phase assemblages and growth/melting outcomes;
+      preserve full measured run rows as located experiment context.
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_table_5_run_records
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria
+- observation_id: greig_barth_1938_temperature_method_qualifications
+  type: method
+  locator:
+    published_page: 96
+    pdf_page_index: 3
+    section: Melting Temperature of Albite
+    note: Per-claim locators are in values.claims[].locator (pp. 96, 97, 100).
+  units: as printed
+  values:
+    quantity: temperature_bracketing_and_kinetic_qualifications
+    claims:
+    - claim: Prior Day and Allen trials on natural albite lasted one day; they reported traces of melting as low as 1100 °C
+        without establishing a melting temperature.
+      locator:
+        published_page: 96
+        pdf_page_index: 3
+        continued_page: 97
+    - claim: Bowen observed traces of glass after one hour at 1105 °C and no change after two hours at 1089 °C; he assigned
+        1100 °C ± 10 °C.
+      locator:
+        published_page: 97
+        pdf_page_index: 4
+    - claim: Greig and Barth report their synthetic albite melting point as 1118 °C, higher than Bowen’s 1100 °C, and suspect
+        Bowen’s material was inhomogeneous.
+      locator:
+        published_page: 97
+        pdf_page_index: 4
+    - claim: For viscous liquids, failure to obtain melting does not prove the temperature is below melting; crystal growth
+        proves the temperature is below melting.
+      locator:
+        published_page: 97
+        pdf_page_index: 4
+    - claim: Albite can persist for long periods above its melting point; after four days at 1126 °C crystal remnants persisted.
+        Melting occurs at crystal surfaces and crystals gradually become smaller.
+      locator:
+        published_page: 100
+        pdf_page_index: 7
+    - claim: At temperatures used, no experiments were made far above the melting point.
+      locator:
+        published_page: 100
+        pdf_page_index: 7
+  context_id: greig-barth-1938-nepheline-albite::context::greig_barth_1938_temperature_method_qualifications
+  work_id: 10.2475/001c.120516
+  source_id: greig-barth-1938-nepheline-albite
+  species: phase_equilibria

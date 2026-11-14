@@ -34,6 +34,7 @@ from scripts.grid_pregrind_writer import (  # noqa: E402
     utc_now,
 )
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.battery.enums import Engine, refuse_proprietary_engine_use  # noqa: E402
 from engines.alphamelts.domain import AlphaMELTSDomainGate  # noqa: E402
 from engines.alphamelts.thermoengine import (  # noqa: E402
     THERMOENGINE_HEALTH_TIMEOUT_S,
@@ -767,6 +768,7 @@ def alphamelts_queue_domain_reason(point: GridPoint) -> str | None:
 
 def backend_config(args: argparse.Namespace) -> dict[str, Any]:
     backend_name = str(getattr(args, "backend", "subprocess"))
+    refuse_proprietary_engine_use(backend_name, mode="grid_pregrind")
     config = {
         "grid_backend_name": backend_name,
         "mode": "subprocess" if backend_name == "subprocess" else "thermoengine",
@@ -1917,7 +1919,10 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--db", type=Path, default=DEFAULT_DB)
     result.add_argument(
         "--backend",
-        choices=tuple(item.value for item in CacheV2GridBackend),
+        choices=(
+            *(item.value for item in CacheV2GridBackend),
+            *(engine.value for engine in Engine if engine.proprietary),
+        ),
         default="subprocess",
         help=(
             "chemistry engine (default: subprocess). ThermoEngine is diagnostic-only "
@@ -2015,6 +2020,9 @@ def parser() -> argparse.ArgumentParser:
 
 
 def _validate_args(args: argparse.Namespace) -> None:
+    refuse_proprietary_engine_use(
+        str(getattr(args, "backend", "subprocess")), mode="grid_pregrind"
+    )
     if args.workers < 1:
         raise SystemExit("--workers must be >= 1")
     if args.limit is not None and args.limit < 0:

@@ -43,6 +43,17 @@ table:
     state: l
   title_as_published: Calcium (Ca)  |  Ca1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
+  fusion_transition:
+    temperature:
+      value: 1115
+      uncertainty: 2
+      unit: K
+      locator: "JANAF 4th ed. p. 706 (PDF p. 718), T_fus(β → l) = 1115 ± 2 K"
+    enthalpy:
+      value: 8.540
+      uncertainty: 0.10
+      unit: kJ mol^-1
+      locator: "JANAF 4th ed. p. 706 (PDF p. 718), Δ_fusH° = 8.540 ± 0.10 kJ mol^-1"
   units_as_published:
     temperature: K
     heat_capacity: J K^-1 mol^-1

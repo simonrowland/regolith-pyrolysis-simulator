@@ -815,11 +815,67 @@ def test_mo_pair_model_derived_without_lineage_is_refused():
     assert selected.reason is FallbackReason.UNTYPED_LINEAGE
 
 
-def test_mo_pair_quoted_attributed_atomic_oxygen_is_admitted():
-    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=EvidenceClass.QUOTED_ATTRIBUTED)
+@pytest.mark.parametrize("evidence", (
+    EvidenceClass.QUOTED_ATTRIBUTED,
+    EvidenceClass.MEASURED_REDUCED,
+    EvidenceClass.MEASURED_DIRECT,
+))
+def test_mo_pair_atomic_oxygen_is_admitted(evidence):
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=evidence)
     selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic), bench)
     assert isinstance(selected, SourceOxygenCondition)
     assert "mo-cell-oxygen" in selected.used_observations
+
+
+@pytest.mark.parametrize("source,calcium_series,oxygen_series", (
+    ("stolyarova-1995-cao-alumina-kems",
+     "stolyarova_1995_ca_partial_pressure_table2",
+     "stolyarova_1995_o_partial_pressure_eqn1_table2"),
+    ("shornikov-1997-cao-alumina-vapor",
+     "shornikov_1997_ca_pressure_table2_1933k",
+     "shornikov_1997_o_pressure_eq1_table2_1933k"),
+))
+def test_measured_cell_eqn1_commands_all_eight_ca_points(source, calcium_series, oxygen_series):
+    context = load_score_context(sources=(source,))
+    calcium = [row for row in context.observations.values()
+               if calcium_series in row.observation_id]
+    assert len(calcium) == 8
+    for row in calcium:
+        selected = _resolve(context, row)
+        assert isinstance(selected, SourceOxygenCondition), (row.observation_id, selected)
+        assert len(selected.used_observations) == 1
+        command = context.observations[next(iter(selected.used_observations))]
+        assert oxygen_series in command.observation_id
+        assert command.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert "cell-metal activity as assumed by the source" in selected.observation.derivation.relation
+
+
+@pytest.mark.parametrize("oxygen_reduction", (False, True))
+def test_unprinted_currents_do_not_imply_an_unidentified_oxygen_input(oxygen_reduction):
+    from simulator.battery.enums import RawInputStatus
+
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(
+        evidence=EvidenceClass.MEASURED_REDUCED,
+    )
+    molecular = _partial_pressure("measured-o2", "O2", Decimal("1e-12"))
+    molecular = replace(
+        molecular,
+        derived_from=(),
+        derivation=Derivation(
+            relation="printed reduction", inputs=(), parameters=(), output_unit="Pa",
+            raw_inputs=Located(State.of(RawInputStatus.NOT_PRINTED), locator=molecular.locator),
+        ),
+        identity=replace(molecular.identity, reaction=(
+            State.of(Reaction((
+                ReactionTerm(Species("O2", Phase.G), -1),
+                ReactionTerm(Species("O", Phase.G), 2),
+            ))) if oxygen_reduction else State.unknown("direct KEMS pressure reduction")
+        )),
+    )
+    selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic, molecular), bench)
+    assert isinstance(selected, SourceOxygenCondition)
+    expected = atomic if oxygen_reduction else molecular
+    assert selected.used_observations == frozenset({expected.observation_id})
 
 
 def test_mo_pair_atomic_oxygen_with_derived_from_is_admitted():

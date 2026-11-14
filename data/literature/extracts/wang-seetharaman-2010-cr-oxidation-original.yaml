@@ -1,0 +1,4665 @@
+schema_version: literature_extract.v1
+source_id: wang-seetharaman-2010-cr-oxidation-original
+source:
+  citation: Wang, L. and Seetharaman, S. (2010), Experimental studies on the oxidation states of chromium
+    oxides in slag systems, Metallurgical and Materials Transactions B 41, 946–954.
+  doi: 10.1007/s11663-010-9383-3
+  url: https://doi.org/10.1007/s11663-010-9383-3
+  year: 2010
+  corpus_asset: raw/wang-seetharaman-2010-cr-oxidation-original/wang-seetharaman-2010-cr-oxidation-original.pdf
+extraction:
+  method: Tables I–IV transcribed from MinerU content-list HTML and pdftotext-layout. The two machine
+    reads agree on all numeric body cells; row/column assignments were checked against rendered page layouts.
+    The full-cell ledger records per-cell confirmation and render checks.
+  date: '2026-11-02'
+  worker: w1103cw2-ws10
+  provenance_path: text/wang-seetharaman-2010-cr-oxidation-original/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- path: species.Cr.observations[wang2010_table3_08d_xcro_over_xcro15_xanes].values.value
+  value: '1.38'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 950
+    table: III
+    row_label: 08D
+    table_row_number: 3
+    table_column_number: 5
+    note: Table III value independently confirmed on the page 5 render.
+- path: species.Cr.observations[wang2010_table3_10c_xcro_over_xcro15_xanes].values.value
+  value: '9.00'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 950
+    table: III
+    row_label: 10C
+    table_row_number: 5
+    table_column_number: 5
+    note: Table III value independently confirmed on the page 5 render.
+- path: species.Cr.observations[wang2010_table3_21d_xcro_over_xcro15_xanes].values.value
+  value: '1.78'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 950
+    table: III
+    row_label: 21D
+    table_row_number: 11
+    table_column_number: 5
+    note: Table III value independently confirmed on the page 5 render.
+- path: species.CrO.observations[wang2010_table4_sample_1_cro_partial_pressure].values.pressure_Pa
+  value: '3.1e-2'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 950
+    table: IV
+    row_label: '1'
+    table_row_number: 3
+    table_column_number: 2
+    column_header: CrO
+    note: Table IV pressure independently confirmed on the page 5 render.
+- path: species.CrO2.observations[wang2010_table4_sample_1_cro2_partial_pressure].values.pressure_Pa
+  value: '6.4e-3'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 950
+    table: IV
+    row_label: '1'
+    table_row_number: 3
+    table_column_number: 3
+    column_header: CrO2
+    note: Table IV pressure independently confirmed on the page 5 render.
+experiments:
+- experiment_id: wang2010_high_temperature_kems
+  method: knudsen_effusion_mass_spectrometry
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 948
+    section: Technique II—Mass Spectrometry Method
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Tungsten effusion cells
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 948
+        section: Technique II—Mass Spectrometry Method
+    heating_method:
+      state:
+        tag: value
+        value: Electron bombardment heating
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 948
+        section: Technique II—Mass Spectrometry Method
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Ion-current comparison with solid Cr2O3 reference by Eq. (6); the apparatus was calibrated
+            using liquid-gold vapor pressure.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique II—Mass Spectrometry Method
+      reference_substance:
+        state:
+          tag: value
+          value: Solid Cr2O3 reference; liquid-gold vapor pressure for apparatus calibration
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique II—Mass Spectrometry Method
+species:
+  Cr:
+    observations:
+    - observation_id: wang2010_table3_08d_xcro_over_xcro15_xanes
+      T_K: '1873'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: III
+        table_row_number: 3
+        table_column_number: 5
+        row_label: 08D
+      phase: glass
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 3
+            table_column_number: 2
+            row_label: 08D
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2.83e-3'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 3
+            table_column_number: 3
+            row_label: 08D
+            note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and
+              SSUB3.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 3
+            row_label: 08D
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '45'
+              - - SiO2
+                - '45'
+              - - Cr2O3
+                - '10'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 6
+            row_label: D
+            note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+              dissolves into Pt
+        gas_mix:
+          state:
+            tag: value
+            value: Ar-CO-CO2 gas mixture; per-run component ratios are not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+            note: Quenching to a glass is stated; Cr-valence preservation or alteration during quench
+              is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Cr K-edge XANES end-member mixture fit
+        method_as_printed: Cr K-edge XANES was recorded at 5980–6050 eV. Two Cr(II)/Cr(III) standards
+          were selected from samples at the observed high and low Cr(II) ends; other spectra were fitted
+          as mixtures of those standards. The detailed quantifying procedure is referred to another publication.
+        value: '1.38'
+        valence_basis:
+          numerator_oxidation_states: &id001
+          - 2
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: 08D
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 6
+            row_label: D
+          quote: 'Table I: Compositions of the Starting Mixtures'
+          note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+            dissolves into Pt
+        composition_role_note: Table I is explicitly the starting mixture; the source describes chromium
+          dissolving into the Pt crucible during equilibration. The initial mixture is retained as an
+          initial-charge-only identity proxy.
+        derivation:
+          relation: The Cr(II)/Cr(III) ratio was reduced by fitting the measured Cr K-edge XANES spectrum
+            as a mixture of the selected end-member standards.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            section: XANES Analysis
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 949
+              section: XANES Analysis
+              note: Numerical spectra and the detailed quantifying procedure are not printed; the article
+                refers to an earlier publication.
+        basicity_as_printed: '1.0'
+        basicity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 950
+          table: III
+          table_row_number: 3
+          table_column_number: 4
+          row_label: 08D
+        source_printed_discrepancy: The abstract states an oxygen-pressure range of 10^-4 to 10^-5 Pa,
+          while Table III row 08D prints 2.83 × 10^-3 Pa. The Table III cell is retained as printed.
+      quench_statement:
+        text: After equilibrating, the samples were quenched by pulling them quickly to the cold end of
+          the reaction tube with argon gas replacing the gas mixture; they solidified into a glassy mass.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+    - observation_id: wang2010_table3_10b_xcro_over_xcro15_xanes
+      T_K: '1873'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: III
+        table_row_number: 4
+        table_column_number: 5
+        row_label: 10B
+      phase: glass
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 4
+            table_column_number: 2
+            row_label: 10B
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.79e-4'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 4
+            table_column_number: 3
+            row_label: 10B
+            note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and
+              SSUB3.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 4
+            row_label: 10B
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '38'
+              - - SiO2
+                - '54'
+              - - Cr2O3
+                - '8'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 4
+            row_label: B
+            note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+              dissolves into Pt
+        gas_mix:
+          state:
+            tag: value
+            value: Ar-CO-CO2 gas mixture; per-run component ratios are not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+            note: Quenching to a glass is stated; Cr-valence preservation or alteration during quench
+              is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Cr K-edge XANES end-member mixture fit
+        method_as_printed: Cr K-edge XANES was recorded at 5980–6050 eV. Two Cr(II)/Cr(III) standards
+          were selected from samples at the observed high and low Cr(II) ends; other spectra were fitted
+          as mixtures of those standards. The detailed quantifying procedure is referred to another publication.
+        value: '5.25'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: 10B
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 4
+            row_label: B
+          quote: 'Table I: Compositions of the Starting Mixtures'
+          note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+            dissolves into Pt
+        composition_role_note: Table I is explicitly the starting mixture; the source describes chromium
+          dissolving into the Pt crucible during equilibration. The initial mixture is retained as an
+          initial-charge-only identity proxy.
+        derivation:
+          relation: The Cr(II)/Cr(III) ratio was reduced by fitting the measured Cr K-edge XANES spectrum
+            as a mixture of the selected end-member standards.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            section: XANES Analysis
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 949
+              section: XANES Analysis
+              note: Numerical spectra and the detailed quantifying procedure are not printed; the article
+                refers to an earlier publication.
+        basicity_as_printed: '0.7'
+        basicity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 950
+          table: III
+          table_row_number: 4
+          table_column_number: 4
+          row_label: 10B
+      quench_statement:
+        text: After equilibrating, the samples were quenched by pulling them quickly to the cold end of
+          the reaction tube with argon gas replacing the gas mixture; they solidified into a glassy mass.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+    - observation_id: wang2010_table3_10c_xcro_over_xcro15_xanes
+      T_K: '1873'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: III
+        table_row_number: 5
+        table_column_number: 5
+        row_label: 10C
+      phase: glass
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 5
+            table_column_number: 2
+            row_label: 10C
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.79e-4'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 5
+            table_column_number: 3
+            row_label: 10C
+            note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and
+              SSUB3.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 5
+            row_label: 10C
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '30'
+              - - SiO2
+                - '60'
+              - - Cr2O3
+                - '10'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 5
+            row_label: C
+            note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+              dissolves into Pt
+        gas_mix:
+          state:
+            tag: value
+            value: Ar-CO-CO2 gas mixture; per-run component ratios are not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+            note: Quenching to a glass is stated; Cr-valence preservation or alteration during quench
+              is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Cr K-edge XANES end-member mixture fit
+        method_as_printed: Cr K-edge XANES was recorded at 5980–6050 eV. Two Cr(II)/Cr(III) standards
+          were selected from samples at the observed high and low Cr(II) ends; other spectra were fitted
+          as mixtures of those standards. The detailed quantifying procedure is referred to another publication.
+        value: '9.00'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: 10C
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 5
+            row_label: C
+          quote: 'Table I: Compositions of the Starting Mixtures'
+          note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+            dissolves into Pt
+        composition_role_note: Table I is explicitly the starting mixture; the source describes chromium
+          dissolving into the Pt crucible during equilibration. The initial mixture is retained as an
+          initial-charge-only identity proxy.
+        derivation:
+          relation: The Cr(II)/Cr(III) ratio was reduced by fitting the measured Cr K-edge XANES spectrum
+            as a mixture of the selected end-member standards.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            section: XANES Analysis
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 949
+              section: XANES Analysis
+              note: Numerical spectra and the detailed quantifying procedure are not printed; the article
+                refers to an earlier publication.
+        basicity_as_printed: '0.5'
+        basicity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 950
+          table: III
+          table_row_number: 5
+          table_column_number: 4
+          row_label: 10C
+      quench_statement:
+        text: After equilibrating, the samples were quenched by pulling them quickly to the cold end of
+          the reaction tube with argon gas replacing the gas mixture; they solidified into a glassy mass.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+    - observation_id: wang2010_table3_12a_xcro_over_xcro15_xanes
+      T_K: '1873'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: III
+        table_row_number: 6
+        table_column_number: 5
+        row_label: 12A
+      phase: glass
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 6
+            table_column_number: 2
+            row_label: 12A
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2.83e-5'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 6
+            table_column_number: 3
+            row_label: 12A
+            note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and
+              SSUB3.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 6
+            row_label: 12A
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '51'
+              - - SiO2
+                - '44'
+              - - Cr2O3
+                - '5'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 3
+            row_label: A
+            note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+              dissolves into Pt
+        gas_mix:
+          state:
+            tag: value
+            value: Ar-CO-CO2 gas mixture; per-run component ratios are not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+            note: Quenching to a glass is stated; Cr-valence preservation or alteration during quench
+              is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Cr K-edge XANES end-member mixture fit
+        method_as_printed: Cr K-edge XANES was recorded at 5980–6050 eV. Two Cr(II)/Cr(III) standards
+          were selected from samples at the observed high and low Cr(II) ends; other spectra were fitted
+          as mixtures of those standards. The detailed quantifying procedure is referred to another publication.
+        value: '1.56'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: 12A
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 3
+            row_label: A
+          quote: 'Table I: Compositions of the Starting Mixtures'
+          note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+            dissolves into Pt
+        composition_role_note: Table I is explicitly the starting mixture; the source describes chromium
+          dissolving into the Pt crucible during equilibration. The initial mixture is retained as an
+          initial-charge-only identity proxy.
+        derivation:
+          relation: The Cr(II)/Cr(III) ratio was reduced by fitting the measured Cr K-edge XANES spectrum
+            as a mixture of the selected end-member standards.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            section: XANES Analysis
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 949
+              section: XANES Analysis
+              note: Numerical spectra and the detailed quantifying procedure are not printed; the article
+                refers to an earlier publication.
+        basicity_as_printed: '1.16'
+        basicity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 950
+          table: III
+          table_row_number: 6
+          table_column_number: 4
+          row_label: 12A
+      quench_statement:
+        text: After equilibrating, the samples were quenched by pulling them quickly to the cold end of
+          the reaction tube with argon gas replacing the gas mixture; they solidified into a glassy mass.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+    - observation_id: wang2010_table3_12d_xcro_over_xcro15_xanes
+      T_K: '1873'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: III
+        table_row_number: 7
+        table_column_number: 5
+        row_label: 12D
+      phase: glass
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 7
+            table_column_number: 2
+            row_label: 12D
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2.83e-5'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 7
+            table_column_number: 3
+            row_label: 12D
+            note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and
+              SSUB3.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 7
+            row_label: 12D
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '45'
+              - - SiO2
+                - '45'
+              - - Cr2O3
+                - '10'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 6
+            row_label: D
+            note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+              dissolves into Pt
+        gas_mix:
+          state:
+            tag: value
+            value: Ar-CO-CO2 gas mixture; per-run component ratios are not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+            note: Quenching to a glass is stated; Cr-valence preservation or alteration during quench
+              is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Cr K-edge XANES end-member mixture fit
+        method_as_printed: Cr K-edge XANES was recorded at 5980–6050 eV. Two Cr(II)/Cr(III) standards
+          were selected from samples at the observed high and low Cr(II) ends; other spectra were fitted
+          as mixtures of those standards. The detailed quantifying procedure is referred to another publication.
+        value: '4.26'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: 12D
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 6
+            row_label: D
+          quote: 'Table I: Compositions of the Starting Mixtures'
+          note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+            dissolves into Pt
+        composition_role_note: Table I is explicitly the starting mixture; the source describes chromium
+          dissolving into the Pt crucible during equilibration. The initial mixture is retained as an
+          initial-charge-only identity proxy.
+        derivation:
+          relation: The Cr(II)/Cr(III) ratio was reduced by fitting the measured Cr K-edge XANES spectrum
+            as a mixture of the selected end-member standards.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            section: XANES Analysis
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 949
+              section: XANES Analysis
+              note: Numerical spectra and the detailed quantifying procedure are not printed; the article
+                refers to an earlier publication.
+        basicity_as_printed: '1.0'
+        basicity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 950
+          table: III
+          table_row_number: 7
+          table_column_number: 4
+          row_label: 12D
+      quench_statement:
+        text: After equilibrating, the samples were quenched by pulling them quickly to the cold end of
+          the reaction tube with argon gas replacing the gas mixture; they solidified into a glassy mass.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+    - observation_id: wang2010_table3_21a_xcro_over_xcro15_xanes
+      T_K: '1823'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: III
+        table_row_number: 8
+        table_column_number: 5
+        row_label: 21A
+      phase: glass
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1823'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 8
+            table_column_number: 2
+            row_label: 21A
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '6.63e-5'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 8
+            table_column_number: 3
+            row_label: 21A
+            note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and
+              SSUB3.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 8
+            row_label: 21A
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '51'
+              - - SiO2
+                - '44'
+              - - Cr2O3
+                - '5'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 3
+            row_label: A
+            note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+              dissolves into Pt
+        gas_mix:
+          state:
+            tag: value
+            value: Ar-CO-CO2 gas mixture; per-run component ratios are not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+            note: Quenching to a glass is stated; Cr-valence preservation or alteration during quench
+              is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Cr K-edge XANES end-member mixture fit
+        method_as_printed: Cr K-edge XANES was recorded at 5980–6050 eV. Two Cr(II)/Cr(III) standards
+          were selected from samples at the observed high and low Cr(II) ends; other spectra were fitted
+          as mixtures of those standards. The detailed quantifying procedure is referred to another publication.
+        value: '1.50'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: 21A
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 3
+            row_label: A
+          quote: 'Table I: Compositions of the Starting Mixtures'
+          note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+            dissolves into Pt
+        composition_role_note: Table I is explicitly the starting mixture; the source describes chromium
+          dissolving into the Pt crucible during equilibration. The initial mixture is retained as an
+          initial-charge-only identity proxy.
+        derivation:
+          relation: The Cr(II)/Cr(III) ratio was reduced by fitting the measured Cr K-edge XANES spectrum
+            as a mixture of the selected end-member standards.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            section: XANES Analysis
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 949
+              section: XANES Analysis
+              note: Numerical spectra and the detailed quantifying procedure are not printed; the article
+                refers to an earlier publication.
+        basicity_as_printed: '1.16'
+        basicity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 950
+          table: III
+          table_row_number: 8
+          table_column_number: 4
+          row_label: 21A
+      quench_statement:
+        text: After equilibrating, the samples were quenched by pulling them quickly to the cold end of
+          the reaction tube with argon gas replacing the gas mixture; they solidified into a glassy mass.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+    - observation_id: wang2010_table3_21b_xcro_over_xcro15_xanes
+      T_K: '1823'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: III
+        table_row_number: 9
+        table_column_number: 5
+        row_label: 21B
+      phase: glass
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1823'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 9
+            table_column_number: 2
+            row_label: 21B
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '6.63e-5'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 9
+            table_column_number: 3
+            row_label: 21B
+            note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and
+              SSUB3.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 9
+            row_label: 21B
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '38'
+              - - SiO2
+                - '54'
+              - - Cr2O3
+                - '8'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 4
+            row_label: B
+            note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+              dissolves into Pt
+        gas_mix:
+          state:
+            tag: value
+            value: Ar-CO-CO2 gas mixture; per-run component ratios are not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+            note: Quenching to a glass is stated; Cr-valence preservation or alteration during quench
+              is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Cr K-edge XANES end-member mixture fit
+        method_as_printed: Cr K-edge XANES was recorded at 5980–6050 eV. Two Cr(II)/Cr(III) standards
+          were selected from samples at the observed high and low Cr(II) ends; other spectra were fitted
+          as mixtures of those standards. The detailed quantifying procedure is referred to another publication.
+        value: '3.76'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: 21B
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 4
+            row_label: B
+          quote: 'Table I: Compositions of the Starting Mixtures'
+          note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+            dissolves into Pt
+        composition_role_note: Table I is explicitly the starting mixture; the source describes chromium
+          dissolving into the Pt crucible during equilibration. The initial mixture is retained as an
+          initial-charge-only identity proxy.
+        derivation:
+          relation: The Cr(II)/Cr(III) ratio was reduced by fitting the measured Cr K-edge XANES spectrum
+            as a mixture of the selected end-member standards.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            section: XANES Analysis
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 949
+              section: XANES Analysis
+              note: Numerical spectra and the detailed quantifying procedure are not printed; the article
+                refers to an earlier publication.
+        basicity_as_printed: '0.7'
+        basicity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 950
+          table: III
+          table_row_number: 9
+          table_column_number: 4
+          row_label: 21B
+      quench_statement:
+        text: After equilibrating, the samples were quenched by pulling them quickly to the cold end of
+          the reaction tube with argon gas replacing the gas mixture; they solidified into a glassy mass.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+    - observation_id: wang2010_table3_21c_xcro_over_xcro15_xanes
+      T_K: '1823'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: III
+        table_row_number: 10
+        table_column_number: 5
+        row_label: 21C
+      phase: glass
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1823'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 10
+            table_column_number: 2
+            row_label: 21C
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '6.63e-5'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 10
+            table_column_number: 3
+            row_label: 21C
+            note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and
+              SSUB3.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 10
+            row_label: 21C
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '30'
+              - - SiO2
+                - '60'
+              - - Cr2O3
+                - '10'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 5
+            row_label: C
+            note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+              dissolves into Pt
+        gas_mix:
+          state:
+            tag: value
+            value: Ar-CO-CO2 gas mixture; per-run component ratios are not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+            note: Quenching to a glass is stated; Cr-valence preservation or alteration during quench
+              is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Cr K-edge XANES end-member mixture fit
+        method_as_printed: Cr K-edge XANES was recorded at 5980–6050 eV. Two Cr(II)/Cr(III) standards
+          were selected from samples at the observed high and low Cr(II) ends; other spectra were fitted
+          as mixtures of those standards. The detailed quantifying procedure is referred to another publication.
+        value: '4.26'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: 21C
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 5
+            row_label: C
+          quote: 'Table I: Compositions of the Starting Mixtures'
+          note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+            dissolves into Pt
+        composition_role_note: Table I is explicitly the starting mixture; the source describes chromium
+          dissolving into the Pt crucible during equilibration. The initial mixture is retained as an
+          initial-charge-only identity proxy.
+        derivation:
+          relation: The Cr(II)/Cr(III) ratio was reduced by fitting the measured Cr K-edge XANES spectrum
+            as a mixture of the selected end-member standards.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            section: XANES Analysis
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 949
+              section: XANES Analysis
+              note: Numerical spectra and the detailed quantifying procedure are not printed; the article
+                refers to an earlier publication.
+        basicity_as_printed: '0.5'
+        basicity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 950
+          table: III
+          table_row_number: 10
+          table_column_number: 4
+          row_label: 21C
+      quench_statement:
+        text: After equilibrating, the samples were quenched by pulling them quickly to the cold end of
+          the reaction tube with argon gas replacing the gas mixture; they solidified into a glassy mass.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+    - observation_id: wang2010_table3_21d_xcro_over_xcro15_xanes
+      T_K: '1823'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: III
+        table_row_number: 11
+        table_column_number: 5
+        row_label: 21D
+      phase: glass
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1823'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 11
+            table_column_number: 2
+            row_label: 21D
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '6.63e-5'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 11
+            table_column_number: 3
+            row_label: 21D
+            note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and
+              SSUB3.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: III
+            table_row_number: 11
+            row_label: 21D
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mass_percent
+              components:
+              - - CaO
+                - '45'
+              - - SiO2
+                - '45'
+              - - Cr2O3
+                - '10'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 6
+            row_label: D
+            note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+              dissolves into Pt
+        gas_mix:
+          state:
+            tag: value
+            value: Ar-CO-CO2 gas mixture; per-run component ratios are not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+            note: Quenching to a glass is stated; Cr-valence preservation or alteration during quench
+              is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Cr K-edge XANES end-member mixture fit
+        method_as_printed: Cr K-edge XANES was recorded at 5980–6050 eV. Two Cr(II)/Cr(III) standards
+          were selected from samples at the observed high and low Cr(II) ends; other spectra were fitted
+          as mixtures of those standards. The detailed quantifying procedure is referred to another publication.
+        value: '1.78'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: 21D
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 947
+            table: I
+            table_row_number: 6
+            row_label: D
+          quote: 'Table I: Compositions of the Starting Mixtures'
+          note: Table I starting mixture; the equilibrated melt composition is not reported and chromium
+            dissolves into Pt
+        composition_role_note: Table I is explicitly the starting mixture; the source describes chromium
+          dissolving into the Pt crucible during equilibration. The initial mixture is retained as an
+          initial-charge-only identity proxy.
+        derivation:
+          relation: The Cr(II)/Cr(III) ratio was reduced by fitting the measured Cr K-edge XANES spectrum
+            as a mixture of the selected end-member standards.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            section: XANES Analysis
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 949
+              section: XANES Analysis
+              note: Numerical spectra and the detailed quantifying procedure are not printed; the article
+                refers to an earlier publication.
+        basicity_as_printed: '1.0'
+        basicity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 950
+          table: III
+          table_row_number: 11
+          table_column_number: 4
+          row_label: 21D
+      quench_statement:
+        text: After equilibrating, the samples were quenched by pulling them quickly to the cold end of
+          the reaction tube with argon gas replacing the gas mixture; they solidified into a glassy mass.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 948
+          section: Technique I—Classic Gas–Slag Equilibrium Technique Combined with XANES Analysis
+    - observation_id: wang2010_table4_sample_1_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '1'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '1'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0028'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '1'
+            table_row_number: 3
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '1'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.168'
+              - - Fe_nO
+                - '0.072'
+              - - MgO
+                - '0.055'
+              - - CaO
+                - '0.538'
+              - - Al2O3
+                - '0.009'
+              - - SiO2
+                - '0.159'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 3
+            row_label: '1'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '1.42'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '1'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 3
+            row_label: '1'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_1_cro_partial_pressure
+          - wang2010_table4_sample_1_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_1_cro_partial_pressure
+        - wang2010_table4_sample_1_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+    - observation_id: wang2010_table4_sample_2_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '2'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '2'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0014'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '2'
+            table_row_number: 4
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '2'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.149'
+              - - Fe_nO
+                - '0.045'
+              - - MgO
+                - '0.105'
+              - - CaO
+                - '0.540'
+              - - Al2O3
+                - '0.009'
+              - - SiO2
+                - '0.152'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 4
+            row_label: '2'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '3.75'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '2'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 4
+            row_label: '2'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_2_cro_partial_pressure
+          - wang2010_table4_sample_2_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_2_cro_partial_pressure
+        - wang2010_table4_sample_2_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+    - observation_id: wang2010_table4_sample_3_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '3'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '3'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0014'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '3'
+            table_row_number: 5
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '3'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.111'
+              - - Fe_nO
+                - '0.049'
+              - - MgO
+                - '0.057'
+              - - CaO
+                - '0.617'
+              - - Al2O3
+                - '0.013'
+              - - SiO2
+                - '0.153'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 5
+            row_label: '3'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '3.64'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '3'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 5
+            row_label: '3'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_3_cro_partial_pressure
+          - wang2010_table4_sample_3_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_3_cro_partial_pressure
+        - wang2010_table4_sample_3_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+    - observation_id: wang2010_table4_sample_4_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '4'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '4'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0025'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '4'
+            table_row_number: 6
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '4'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.080'
+              - - Fe_nO
+                - '0.045'
+              - - MgO
+                - '0.124'
+              - - CaO
+                - '0.583'
+              - - Al2O3
+                - '0.011'
+              - - SiO2
+                - '0.157'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 6
+            row_label: '4'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '1.64'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '4'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 6
+            row_label: '4'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_4_cro_partial_pressure
+          - wang2010_table4_sample_4_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_4_cro_partial_pressure
+        - wang2010_table4_sample_4_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+    - observation_id: wang2010_table4_sample_5_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '5'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '5'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '5'
+            table_row_number: 7
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '5'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.078'
+              - - Fe_nO
+                - '0.045'
+              - - MgO
+                - '0.135'
+              - - CaO
+                - '0.578'
+              - - Al2O3
+                - '0.012'
+              - - SiO2
+                - '0.153'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 7
+            row_label: '5'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '4.71'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '5'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 7
+            row_label: '5'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_5_cro_partial_pressure
+          - wang2010_table4_sample_5_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_5_cro_partial_pressure
+        - wang2010_table4_sample_5_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+    - observation_id: wang2010_table4_sample_6_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '6'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '6'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0033'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '6'
+            table_row_number: 8
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '6'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.076'
+              - - Fe_nO
+                - '0.051'
+              - - MgO
+                - '0.126'
+              - - CaO
+                - '0.592'
+              - - Al2O3
+                - '0.011'
+              - - SiO2
+                - '0.144'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 8
+            row_label: '6'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '1.02'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '6'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 8
+            row_label: '6'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_6_cro_partial_pressure
+          - wang2010_table4_sample_6_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_6_cro_partial_pressure
+        - wang2010_table4_sample_6_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+    - observation_id: wang2010_table4_sample_7_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '7'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '7'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0036'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '7'
+            table_row_number: 9
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '7'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.086'
+              - - Fe_nO
+                - '0.061'
+              - - MgO
+                - '0.125'
+              - - CaO
+                - '0.577'
+              - - Al2O3
+                - '0.011'
+              - - SiO2
+                - '0.141'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 9
+            row_label: '7'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '0.882'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '7'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 9
+            row_label: '7'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_7_cro_partial_pressure
+          - wang2010_table4_sample_7_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_7_cro_partial_pressure
+        - wang2010_table4_sample_7_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+    - observation_id: wang2010_table4_sample_8_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '8'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '8'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0024'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '8'
+            table_row_number: 10
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '8'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.132'
+              - - Fe_nO
+                - '0.044'
+              - - MgO
+                - '0.162'
+              - - CaO
+                - '0.519'
+              - - Al2O3
+                - '0.009'
+              - - SiO2
+                - '0.133'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 10
+            row_label: '8'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '1.85'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '8'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 10
+            row_label: '8'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_8_cro_partial_pressure
+          - wang2010_table4_sample_8_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_8_cro_partial_pressure
+        - wang2010_table4_sample_8_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+    - observation_id: wang2010_table4_sample_9_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '9'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '9'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0021'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '9'
+            table_row_number: 11
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '9'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.097'
+              - - Fe_nO
+                - '0.050'
+              - - MgO
+                - '0.082'
+              - - CaO
+                - '0.625'
+              - - Al2O3
+                - '0.010'
+              - - SiO2
+                - '0.137'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 11
+            row_label: '9'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '2.14'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '9'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 11
+            row_label: '9'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_9_cro_partial_pressure
+          - wang2010_table4_sample_9_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_9_cro_partial_pressure
+        - wang2010_table4_sample_9_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+    - observation_id: wang2010_table4_sample_10_xcro_over_xcro15_eq7
+      T_K: '2000'
+      type: equilibrium_phase_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        equation: '7'
+        row_label: '10'
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: No per-row uncertainty is printed.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '10'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0019'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '10'
+            table_row_number: 12
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No numeric total pressure is reported for this experiment.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+            row_label: '10'
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.091'
+              - - Fe_nO
+                - '0.063'
+              - - MgO
+                - '0.149'
+              - - CaO
+                - '0.552'
+              - - Al2O3
+                - '0.010'
+              - - SiO2
+                - '0.135'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 12
+            row_label: '10'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: valence_ratio
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)
+        method_as_printed: The CrO/CrO1.5 condensed-phase ratio was calculated from the measured CrO and
+          CrO2 partial pressures using Eq. (7).
+        value: '2.56'
+        valence_basis:
+          numerator_oxidation_states: *id001
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: ratio
+        sample_as_printed: '10'
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 12
+            row_label: '10'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+        composition_role_note: Table II reports weighed-in amounts. The source says iron oxides completely
+          evaporated before chromium-bearing vapor species appeared, so the initial charge is only a proxy
+          for the high-temperature melt composition.
+        derivation:
+          relation: XCrO/XCrO1.5 = [p(CrO) − 2p(CrO2)]/[2p(CrO2)]
+          inputs:
+          - wang2010_table4_sample_10_cro_partial_pressure
+          - wang2010_table4_sample_10_cro2_partial_pressure
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            equation: '7'
+        derived_from:
+        - wang2010_table4_sample_10_cro_partial_pressure
+        - wang2010_table4_sample_10_cro2_partial_pressure
+        composition_provenance_note: 'Initial-charge-only proxy: Table II gives weighed-in composition;
+          the source reports iron oxides evaporated before chromium species appeared.'
+  CrO:
+    observations:
+    - observation_id: wang2010_table4_sample_1_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '1'
+        table_row_number: 3
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id002
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '1'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0028'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '1'
+            table_row_number: 3
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.168'
+              - - Fe_nO
+                - '0.072'
+              - - MgO
+                - '0.055'
+              - - CaO
+                - '0.538'
+              - - Al2O3
+                - '0.009'
+              - - SiO2
+                - '0.159'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 3
+            row_label: '1'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '3.1e-2'
+        partial_pressure_as_printed: 3.1 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 3
+            row_label: '1'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_2_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '2'
+        table_row_number: 4
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id003
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '2'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0014'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '2'
+            table_row_number: 4
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.149'
+              - - Fe_nO
+                - '0.045'
+              - - MgO
+                - '0.105'
+              - - CaO
+                - '0.540'
+              - - Al2O3
+                - '0.009'
+              - - SiO2
+                - '0.152'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 4
+            row_label: '2'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '1.9e-2'
+        partial_pressure_as_printed: 1.9 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 4
+            row_label: '2'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_3_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '3'
+        table_row_number: 5
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id004
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '3'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0014'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '3'
+            table_row_number: 5
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.111'
+              - - Fe_nO
+                - '0.049'
+              - - MgO
+                - '0.057'
+              - - CaO
+                - '0.617'
+              - - Al2O3
+                - '0.013'
+              - - SiO2
+                - '0.153'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 5
+            row_label: '3'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '1.3e-2'
+        partial_pressure_as_printed: 1.3 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 5
+            row_label: '3'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_4_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '4'
+        table_row_number: 6
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id005
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '4'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0025'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '4'
+            table_row_number: 6
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.080'
+              - - Fe_nO
+                - '0.045'
+              - - MgO
+                - '0.124'
+              - - CaO
+                - '0.583'
+              - - Al2O3
+                - '0.011'
+              - - SiO2
+                - '0.157'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 6
+            row_label: '4'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '2.9e-2'
+        partial_pressure_as_printed: 2.9 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 6
+            row_label: '4'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_5_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '5'
+        table_row_number: 7
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id006
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '5'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0012'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '5'
+            table_row_number: 7
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.078'
+              - - Fe_nO
+                - '0.045'
+              - - MgO
+                - '0.135'
+              - - CaO
+                - '0.578'
+              - - Al2O3
+                - '0.012'
+              - - SiO2
+                - '0.153'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 7
+            row_label: '5'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '1.6e-2'
+        partial_pressure_as_printed: 1.6 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 7
+            row_label: '5'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_6_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '6'
+        table_row_number: 8
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id007
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '6'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0033'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '6'
+            table_row_number: 8
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.076'
+              - - Fe_nO
+                - '0.051'
+              - - MgO
+                - '0.126'
+              - - CaO
+                - '0.592'
+              - - Al2O3
+                - '0.011'
+              - - SiO2
+                - '0.144'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 8
+            row_label: '6'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '1.9e-2'
+        partial_pressure_as_printed: 1.9 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 8
+            row_label: '6'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_7_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '7'
+        table_row_number: 9
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id008
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '7'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0036'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '7'
+            table_row_number: 9
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.086'
+              - - Fe_nO
+                - '0.061'
+              - - MgO
+                - '0.125'
+              - - CaO
+                - '0.577'
+              - - Al2O3
+                - '0.011'
+              - - SiO2
+                - '0.141'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 9
+            row_label: '7'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '3.5e-2'
+        partial_pressure_as_printed: 3.5 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 9
+            row_label: '7'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_8_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '8'
+        table_row_number: 10
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id009
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '8'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0024'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '8'
+            table_row_number: 10
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.132'
+              - - Fe_nO
+                - '0.044'
+              - - MgO
+                - '0.162'
+              - - CaO
+                - '0.519'
+              - - Al2O3
+                - '0.009'
+              - - SiO2
+                - '0.133'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 10
+            row_label: '8'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '4.9e-2'
+        partial_pressure_as_printed: 4.9 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 10
+            row_label: '8'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_9_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '9'
+        table_row_number: 11
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id010
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '9'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0021'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '9'
+            table_row_number: 11
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.097'
+              - - Fe_nO
+                - '0.050'
+              - - MgO
+                - '0.082'
+              - - CaO
+                - '0.625'
+              - - Al2O3
+                - '0.010'
+              - - SiO2
+                - '0.137'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 11
+            row_label: '9'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '2.7e-2'
+        partial_pressure_as_printed: 2.7 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 11
+            row_label: '9'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_10_cro_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '10'
+        table_row_number: 12
+        table_column_number: 2
+        column_header: CrO
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: &id011
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            note: The Table IV caption states 2000 K (1727 °C).
+            row_label: '10'
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.0019'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            table: IV
+            row_label: '10'
+            table_row_number: 12
+            table_column_number: 4
+            note: Table IV oxygen pressure calculated using Eq. (10) and accounting for tungsten-crucible
+              interactions; not a separately imposed or measured fO2.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The KEMS chamber is described as under extreme vacuum, but no numeric total pressure
+              is reported.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 950
+            section: Discussion of Table IV oxygen-pressure calculation
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_starting_charge
+              amount_basis: mole_fraction
+              components:
+              - - Cr2O3
+                - '0.091'
+              - - Fe_nO
+                - '0.063'
+              - - MgO
+                - '0.149'
+              - - CaO
+                - '0.552'
+              - - Al2O3
+                - '0.010'
+              - - SiO2
+                - '0.135'
+              proxy_flag: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 12
+            row_label: '10'
+            note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: CrO(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '3.2e-2'
+        partial_pressure_as_printed: 3.2 × 10^-2 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 12
+            row_label: '10'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+  CrO2:
+    observations:
+    - observation_id: wang2010_table4_sample_1_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '1'
+        table_row_number: 3
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id002
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '6.4e-3'
+        partial_pressure_as_printed: 6.4 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 3
+            row_label: '1'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_2_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '2'
+        table_row_number: 4
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id003
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '2.0e-3'
+        partial_pressure_as_printed: 2.0 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 4
+            row_label: '2'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_3_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '3'
+        table_row_number: 5
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id004
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '1.4e-3'
+        partial_pressure_as_printed: 1.4 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 5
+            row_label: '3'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_4_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '4'
+        table_row_number: 6
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id005
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '5.5e-3'
+        partial_pressure_as_printed: 5.5 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 6
+            row_label: '4'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_5_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '5'
+        table_row_number: 7
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id006
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '1.4e-3'
+        partial_pressure_as_printed: 1.4 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 7
+            row_label: '5'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_6_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '6'
+        table_row_number: 8
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id007
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '4.7e-3'
+        partial_pressure_as_printed: 4.7 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 8
+            row_label: '6'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_7_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '7'
+        table_row_number: 9
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id008
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '9.3e-3'
+        partial_pressure_as_printed: 9.3 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 9
+            row_label: '7'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_8_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '8'
+        table_row_number: 10
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id009
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '8.6e-3'
+        partial_pressure_as_printed: 8.6 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 10
+            row_label: '8'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_9_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '9'
+        table_row_number: 11
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id010
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '4.3e-3'
+        partial_pressure_as_printed: 4.3 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 11
+            row_label: '9'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.
+    - observation_id: wang2010_table4_sample_10_cro2_partial_pressure
+      T_K: '2000'
+      experiment: wang2010_high_temperature_kems
+      type: partial_pressure
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 950
+        table: IV
+        row_label: '10'
+        table_row_number: 12
+        table_column_number: 3
+        column_header: CrO2
+      phase: gas
+      regime: kems_effusion
+      units: Pa
+      point_conditions: *id011
+      values:
+        quantity: partial_pressure
+        gas_species: CrO2(g)
+        method_class: measured_reduced
+        method: Knudsen-cell mass spectrometry
+        method_as_printed: Ion current intensities are directly proportional to partial pressures; Eq.
+          (6) compares the sample ion current with that over solid Cr2O3.
+        pressure_Pa: '4.5e-3'
+        partial_pressure_as_printed: 4.5 × 10^-3 Pa
+        derivation:
+          relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure:
+            p_i = (I_i/I0_i) p0_i.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 948
+            equation: '6'
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 948
+              equation: '6'
+              note: The row-specific sample and reference ion-current intensities are not tabulated.
+        composition_role:
+          value: initial_charge_only
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 949
+            table: II
+            table_row_number: 12
+            row_label: '10'
+          quote: 'Table II: Compositions of the Slags Under Investigation in the Present Study (weighed-in
+            amounts)'
+          note: Table II initial charge; iron oxides were reported to evaporate before chromium species.

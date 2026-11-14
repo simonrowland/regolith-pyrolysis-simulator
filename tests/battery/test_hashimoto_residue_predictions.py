@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+import hashlib
 import json
 import math
 from decimal import Decimal
@@ -32,6 +34,18 @@ def _no_pO2_balance_floor() -> dict[str, float | int | None]:
         "time_at_floor_s": 0.0,
         "pO2_bar": None,
     }
+
+
+def _hashimoto_prediction_tuple_digest(predictions) -> str:
+    records = []
+    for prediction in predictions:
+        record = copy.deepcopy(vars(prediction))
+        integration = record["provenance"]["integration"]
+        integration.pop("process_cpu_seconds", None)
+        integration.pop("process_cpu_seconds_by_geometry", None)
+        records.append(record)
+    encoded = json.dumps(records, sort_keys=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(encoded.encode()).hexdigest()
 
 
 pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
@@ -280,18 +294,30 @@ def _source_data():
     )
 
 
+# PROVISIONAL CPU budget from the historical pre-fixture gate14 cohort cost:
+# 665 CPU s on Mac-Studio-256-3 (s3, loaded). The checked-in gate14 JUnit is
+# fixture-era (291.403 call CPU s / 354.982 wall s) and excludes that setup
+# cost, so it is not comparable. Fresh samples: 0; spread unavailable. Three
+# whole-file cpu_budget(1) probes returned no receipt within 75 min. The cap
+# is ceil(665 * 1.5) = 998 CPU s. CPU sizes the budget; wall/CPU remains a
+# tripwire once an uncensored full-cohort run is available.
+@pytest.mark.nightly
+@pytest.mark.cpu_budget(998)
+@pytest.mark.xdist_group("hashimoto_real_cohort")
 def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
     pytest.importorskip("openimcc")
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
-
-    predictions = _predict_hashimoto_residue_cohort(
-        (experiments[0],),
+    cohort = _predict_hashimoto_residue_cohort(
+        experiments,
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
         code_revision="pre-mass-loss-pin",
         engine="openimcc",
-        _allow_partial_cohort_for_test=True,
+    )
+    predictions = copy.deepcopy(cohort)
+    assert _hashimoto_prediction_tuple_digest(predictions) == (
+        "32160db87343d79931fef2a3a862ddc570aacc770faf38cec6b2a5f5dbfbd635"
     )
     primary = next(
         row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
@@ -309,6 +335,31 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         "MgO": "0x1.f179bb173dc7fp+4",
         "CaO": "0x1.c5893f4ff0809p+1",
     }
+
+
+def test_hashimoto_residue_requires_24_distinct_physical_runs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import builtins
+
+    import simulator.battery.residue as residue
+
+    def reject_engine_import(name, *args, **kwargs):
+        if name == "openimcc" or name.startswith("openimcc."):
+            raise AssertionError("invalid cohort reached the engine import")
+        return original_import(name, *args, **kwargs)
+
+    original_import = builtins.__import__
+    monkeypatch.setattr(builtins, "__import__", reject_engine_import)
+    with pytest.raises(residue.ResidueInventoryRefusal) as exc_info:
+        residue._predict_hashimoto_residue_cohort(
+            ({"experiment_id": "hashimoto-single-run"},),
+            {},
+            preform_dimensions_mm={},
+            code_revision="invalid-cohort-test",
+        )
+
+    assert exc_info.value.reason == "hashimoto_cohort_invalid"
 
 
 def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
@@ -611,12 +662,11 @@ def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     predictions = _predict_hashimoto_residue_cohort(
-        [experiments[0]],
+        experiments,
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
         code_revision="test-revision",
         engine="internal-analytical",
-        _allow_partial_cohort_for_test=True,
     )
 
     provenance = predictions[0].provenance
@@ -663,12 +713,11 @@ def test_hashimoto_internal_probe_diagnostic_does_not_survive_channel_refusal(
 
     with pytest.raises(residue.ResidueInventoryRefusal) as exc_info:
         residue._predict_hashimoto_residue_cohort(
-            experiments[:1],
+            experiments,
             catalog,
             preform_dimensions_mm=preform_dimensions_mm,
             code_revision="floor-diagnostic-test",
             engine="internal-analytical",
-            _allow_partial_cohort_for_test=True,
         )
 
     assert exc_info.value.reason == "hashimoto_internal_analytical_channels_missing"
@@ -684,9 +733,15 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
     pytest.importorskip("openimcc")
     import simulator.battery.residue as residue
     from simulator.melt_backend import openimcc_bridge
+    from openimcc import load_gas_datapack
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+    from simulator.evaporation import _load_evaporation_alpha_by_species
 
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    legacy_catalog = vapor_pressure_legacy_view(catalog)
+    catalog_rows = residue._residue_catalog_rows(legacy_catalog)
+    alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
     activity_compositions: list[tuple[tuple[str, float], ...]] = []
     original_evaluate = openimcc_bridge.evaluate
 
@@ -700,21 +755,32 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
         lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
     )
     monkeypatch.setattr(openimcc_bridge, "evaluate", track_activities)
-    predictions = _predict_hashimoto_residue_cohort(
-        experiments[:1],
-        catalog,
-        preform_dimensions_mm=preform_dimensions_mm,
-        code_revision="single-vector-activity-refresh-test",
-        _allow_partial_cohort_for_test=True,
-    )
+    gas_pack = load_gas_datapack()
+    for experiment in experiments[:2]:
+        setup = residue._hashimoto_run_setup(
+            experiment,
+            gas_pack=gas_pack,
+            catalog_rows=catalog_rows,
+            alpha_specs=alpha_specs,
+            preform_dimensions_mm=preform_dimensions_mm,
+            engine="openimcc",
+            engine_metadata={},
+            reference_printed_wt_pct=(
+                experiments[0]["sample"]["printed_composition"]["state"]["value"]
+            ),
+        )
+        residue._hashimoto_integrate_geometry(
+            setup.initial_inventory_mol,
+            setup.common_channels,
+            setup.pressure_model,
+            temperature_K=setup.temperature_K,
+            duration_s=setup.duration_s,
+            steps=setup.steps,
+            geometry_policy_id=_HASHIMOTO_PRIMARY_GEOMETRY,
+            initial_area_m2=setup.geometry_areas[_HASHIMOTO_PRIMARY_GEOMETRY],
+        )
 
-    assert len(predictions) == 2
     assert len(set(activity_compositions)) > 1
-    assert all(
-        set(prediction.provenance["integration"]["refinement_status_by_geometry"])
-        == set(_HASHIMOTO_GEOMETRIES)
-        for prediction in predictions
-    )
 
 
 def test_hashimoto_refinement_flags_the_finest_run_at_the_step_cap(
@@ -889,7 +955,6 @@ def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
     from simulator.melt_backend import openimcc_bridge
 
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
-    experiment = experiments[0]
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
     monkeypatch.setitem(binary_pot_battery._ENGINE_OUTER_TIMEOUT_S, "openimcc", 0.02)
 
@@ -925,11 +990,10 @@ def test_hashimoto_openimcc_timeout_is_typed_and_cohort_continues(
         residue, "_hashimoto_integrate_geometry", integrate_with_engine_call
     )
     predictions = residue._predict_hashimoto_residue_cohort(
-        (experiment,),
+        experiments,
         catalog,
         preform_dimensions_mm=preform_dimensions_mm,
         code_revision="timeout-fixture",
-        _allow_partial_cohort_for_test=True,
     )
 
     assert {row.alpha_arm for row in predictions} == {

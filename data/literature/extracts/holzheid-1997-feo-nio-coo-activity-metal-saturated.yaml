@@ -38,6 +38,16 @@ source_tables:
   FeO_activity_row_total: 72
   activity_calculation:
     locator: {page: 30, equation: '9'}
+    method: &holzheid_activity_method
+      state:
+        tag: value
+        value: >-
+          Activity coefficients are calculated with Eq. (4) from the equilibrium
+          constant, oxide mole fraction and oxygen fugacity; the authors state
+          that the Co and Fe treatments are analogous to Ni.
+      locator: {page: 29, section: '3. Calculation of activity coefficients', equation: '4'}
+    references: &holzheid_activity_references
+    - "Holzheid, A., Palme, H. & Chakraborty, S. (1997), \"The activities of NiO, CoO and FeO in silicate melts\", Chemical Geology 139, 21-38, doi: 10.1016/S0009-2541(97)00030-2."
     reference_state_text: >-
       pure liquid Fe(1-x)O (the source's wüstite(l)); reference reaction Fe(s) + 1/2 O2(g) = "FeO"(l), corresponding Fe reaction in section 3;
       deltaG0 source O'Neill and Pownceby (1993) and Barin (1989)
@@ -2257,6 +2267,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo_1_1
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-69-1
       type: activity_coefficient
       locator:
@@ -2299,6 +2315,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo_1_2
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-ad-12-2
       type: activity_coefficient
       locator:
@@ -2341,6 +2363,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo_1_3
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-70-3
       type: activity_coefficient
       locator:
@@ -2383,6 +2411,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo_1_4
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-64-4
       type: activity_coefficient
       locator:
@@ -2425,6 +2459,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo_1_5
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-66-5
       type: activity_coefficient
       locator:
@@ -2467,6 +2507,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo_1_6
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-70-6
       type: activity_coefficient
       locator:
@@ -2509,6 +2555,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo_1_7
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-66-7
       type: activity_coefficient
       locator:
@@ -2551,6 +2603,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_co_variable_mgo_1_8
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-65-8
       type: activity_coefficient
       locator:
@@ -2593,6 +2651,12 @@ species:
     - observation_id: holzheid_1997_table3c_bk_co_variable_mgo_1
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-bk57-9
       type: activity_coefficient
       locator:
@@ -2641,6 +2705,12 @@ species:
     - observation_id: holzheid_1997_table3c_bk_co_variable_mgo_2
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-68-10
       type: activity_coefficient
       locator:
@@ -2689,6 +2759,12 @@ species:
     - observation_id: holzheid_1997_table3c_bk_co_variable_mgo_3
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-64-11
       type: activity_coefficient
       locator:
@@ -2737,6 +2813,12 @@ species:
     - observation_id: holzheid_1997_table3c_bk_co_variable_mgo_4
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-68-12
       type: activity_coefficient
       locator:
@@ -2787,6 +2869,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_1
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-69-13
       type: activity_coefficient
       locator:
@@ -2829,6 +2917,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_2
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-69-14
       type: activity_coefficient
       locator:
@@ -2871,6 +2965,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_3
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-ad-12-15
       type: activity_coefficient
       locator:
@@ -2913,6 +3013,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_4
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-70-16
       type: activity_coefficient
       locator:
@@ -2955,6 +3061,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_5
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-70-17
       type: activity_coefficient
       locator:
@@ -2997,6 +3109,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_6
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-64-18
       type: activity_coefficient
       locator:
@@ -3039,6 +3157,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_7
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-66-19
       type: activity_coefficient
       locator:
@@ -3081,6 +3205,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_8
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-70-20
       type: activity_coefficient
       locator:
@@ -3123,6 +3253,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_9
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-66-21
       type: activity_coefficient
       locator:
@@ -3165,6 +3301,12 @@ species:
     - observation_id: holzheid_1997_table3a_ad_ni_variable_mgo_1_10
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-65-22
       type: activity_coefficient
       locator:
@@ -3207,6 +3349,12 @@ species:
     - observation_id: holzheid_1997_table3d_bk_ni_variable_mgo_1
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-bk57-23
       type: activity_coefficient
       locator:
@@ -3255,6 +3403,12 @@ species:
     - observation_id: holzheid_1997_table3d_bk_ni_variable_mgo_2
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-68-24
       type: activity_coefficient
       locator:
@@ -3303,6 +3457,12 @@ species:
     - observation_id: holzheid_1997_table3d_bk_ni_variable_mgo_3
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-64-25
       type: activity_coefficient
       locator:
@@ -3351,6 +3511,12 @@ species:
     - observation_id: holzheid_1997_table3d_bk_ni_variable_mgo_4
       derived_from:
       - holzheid_1997_equilibrium_free_energy_fits
+      derivation:
+        relation: authors' activity-coefficient calculation from measured oxide composition and log fO2
+        inputs: [holzheid_1997_equilibrium_free_energy_fits]
+        output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-67-26
       type: activity_coefficient
       locator:
@@ -3406,6 +3572,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       phase: l
       standard_state:
         state:
@@ -5231,6 +5399,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       phase: l
       standard_state:
         state:
@@ -7007,6 +7177,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide mole fractions and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       phase: l
       standard_state:
         state:
@@ -7470,6 +7642,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       phase: l
       standard_state:
         state:
@@ -7676,6 +7850,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-69-27
       type: activity_coefficient
       locator:
@@ -7768,6 +7944,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-69-28
       type: activity_coefficient
       locator:
@@ -7860,6 +8038,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-ad-10-29
       type: activity_coefficient
       locator:
@@ -7952,6 +8132,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-64-30
       type: activity_coefficient
       locator:
@@ -8044,6 +8226,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-68-31
       type: activity_coefficient
       locator:
@@ -8136,6 +8320,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-66-32
       type: activity_coefficient
       locator:
@@ -8228,6 +8414,8 @@ species:
         relation: authors' equilibrium-constant calculation from measured oxide concentrations and log fO2
         inputs: [holzheid_1997_equilibrium_free_energy_fits]
         output_unit: dimensionless
+        method: *holzheid_activity_method
+        references: *holzheid_activity_references
       experiment: variable-mgo-v-66-33
       type: activity_coefficient
       locator:

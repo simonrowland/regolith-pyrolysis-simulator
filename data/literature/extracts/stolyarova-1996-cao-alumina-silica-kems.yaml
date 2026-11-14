@@ -1265,6 +1265,40 @@ species:
           pressure_atm: "0.000000018"
       uncertainty:
         note: No measurement uncertainty is printed for these Table 2 pressure cells.
+    context:
+    - observation_id: stolyarova_1996_experimental_apparatus_record
+      type: apparatus
+      experiment: stolyarova-1996-mi1201-1933k
+      locator:
+        page: 3
+        published_page: 17
+        pdf_page_index: 2
+        section: Experimental
+        note: Instrument description continues on published page 18.
+      units: as printed
+      values:
+        apparatus: >-
+          Magnetic mass spectrometer model MI 1201, modified for high-temperature
+          mass spectrometric studies by standard methods (64).
+        instrument: >-
+          Magnetic mass spectrometer model MI 1201, produced at the Electron
+          Microscope Plant, Sumy, Ukraine.
+        sample_preparation_as_printed: precursor method described previously (63)
+        series_temperature_range_as_printed: '1833–2033 K'
+        sample_holder_or_cell_material_as_printed: not stated
+        loop_wire_diameter_as_printed: not stated
+        cell_inner_dimensions_and_orifice_size_as_printed: not stated
+        sample_mass_as_printed: not stated
+        run_duration_at_temperature_as_printed: not stated
+        loop_Fe_presaturation_and_method_as_printed: not stated
+        post_run_bulk_analysis_of_total_Fe_alkalis_or_cell_material_pickup: not stated
+        cell_oxygen_condition_as_printed: not stated
+        method_quote_as_published: >-
+          Samples studied were prepared using the precursor method described
+          previously (63). The present study was carried out on a magnetic mass
+          spectrometer model MI 1201 (produced at the Electron Microscope Plant,
+          Sumy, Ukraine), which was modified for high-temperature mass
+          spectrometric studies by standard methods (64).
   Al:
     observations:
     - observation_id: stolyarova_1996_table2_pAl_1933k
@@ -4232,19 +4266,23 @@ species:
                 tag: value
                 value: cr
               polymorph:
-                tag: value
-                value: cristobalite_high
+                tag: unknown
+                reason: The paper does not state a SiO2 polymorph; solid SiO2 is the task's JANAF-based secondary evidence.
             component_basis: SiO2
         inferred: true
-        inference: >-
-          Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
+        note: >-
+          Table 3 column 5 is SiO2 activity. Equation (12), published p. 19, defines the activity by the ratio of SiO+
+          ion currents over the melt and the individual oxide samples. The paper does not identify the solid phase or
+          polymorph; solid SiO2 is the task's JANAF-based secondary evidence. No standard Gibbs function for this SiO2
+          reference is given; reference (66) supplies equilibrium data for deriving oxygen partial pressure, not a Gibbs
+          function for the SiO2 reference.
         locator:
           page: 5
           published_page: 19
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -8845,7 +8883,7 @@ species:
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -11202,7 +11240,7 @@ species:
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -12349,7 +12387,7 @@ species:
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -13731,7 +13769,7 @@ species:
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed

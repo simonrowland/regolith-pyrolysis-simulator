@@ -218,6 +218,34 @@ def test_kelley_printed_thermochemistry_rows_migrate_with_cells_and_conditions()
     assert entropy_increment.locator.table == "27"
 
     extract = yaml.safe_load(_EXTRACT.read_text(encoding="utf-8"))
+    source_rows = {
+        row["observation_id"]: row
+        for block in extract["species"].values()
+        for row in block["observations"]
+    }
+    sc456_names = ("albite", "jadeite", "nephelite", "adularia", "leucite", "kaliophilite")
+    sc456_ids = {
+        *(f"kelley_1953_table25_s298_minus_s51_measured_{name}" for name in sc456_names),
+        *(f"kelley_1953_table25_s51_extrapolated_{name}" for name in sc456_names),
+    }
+    migrated_by_id = {_source_observation_id(row): row for row in observations}
+    for observation_id in sc456_ids:
+        source_row = source_rows[observation_id]
+        assert source_row["values"]["method_class"] == "measured_reduced"
+        assert migrated_by_id[observation_id].evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        expected_inputs = [
+            f"kelley_1953_table{table}_cp"
+            for table in ("10", "12", "14", "16", "18", "20")
+        ]
+        if "s298_minus_s51" in observation_id:
+            species = observation_id.rsplit("_", 1)[-1]
+            own_table = {
+                "albite": "10", "jadeite": "12", "nephelite": "14",
+                "adularia": "16", "leucite": "18", "kaliophilite": "20",
+            }[species]
+            expected_inputs = [f"kelley_1953_table{own_table}_cp"]
+        assert source_row["derivation"]["inputs"] == expected_inputs
+
     table27_entropy = next(
         row
         for row in extract["species"]["NaAlSi3O8"]["observations"]
