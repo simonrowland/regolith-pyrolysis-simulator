@@ -546,13 +546,16 @@ def test_predict_flag_pareto_unavailable_keeps_extrapolation():
     assert entry["wall_saturation_pressure_extrapolations"]["wall"] == notice
 
 
-def test_predict_flag_wall_history_keeps_both_source_band_misses():
+@pytest.mark.parametrize("separate_executions", [False, True])
+def test_predict_flag_wall_history_keeps_both_source_band_misses(separate_executions):
     model = condensation.CondensationModel(CondensationTrain.create_default())
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0, species_partial_pressures_mbar={"Mg": 1.0},
         gas_temperature_C=1700.0, campaign_name="C0",
     )
-    for temperature in (500.0, 1500.0, 1000.0):
+    for index, temperature in enumerate((500.0, 1500.0, 1000.0)):
+        if separate_executions and index:
+            model.reset_run_sticking_authority(preserve_session=True)
         wall_deposit_candidate_for_surface_kg(
             model, species="Mg", rate_kg_hr=1.0, T_cond_C=1200.0,
             melt_temperature_C=1700.0, wall_temperature_C=temperature - 273.15,
@@ -562,6 +565,10 @@ def test_predict_flag_wall_history_keeps_both_source_band_misses():
         "wall_saturation_pressure_extrapolations_by_species"]["Mg"]
     assert {record["temperature_K"] for record in records.values()} == {500.0, 1500.0}
     assert all(record["authority_level"] == "extrapolated" for record in records.values())
+    if separate_executions:
+        assert model.execution_sticking_alpha_provenance_notice.get(
+            "wall_saturation_pressure_extrapolations_by_species", {}
+        ) == {}
 
 
 def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():

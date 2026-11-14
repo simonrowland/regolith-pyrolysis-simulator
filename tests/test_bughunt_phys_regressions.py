@@ -106,7 +106,10 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     sim.melt = SimpleNamespace(hour=4)
     sim.overhead = SimpleNamespace(pressure_mbar=2.0)
     sim.record = SimpleNamespace(snapshots=[])
-    sim._condensation_model = SimpleNamespace(last_sticking_alpha_provenance_notice={})
+    sim._condensation_model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
+    )
     schedule_backing = {"points": [{"temperature_C": 25.0}]}
     schedule = MappingProxyType(schedule_backing)
     schedule_backing["self"] = schedule
@@ -131,6 +134,12 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     sim._chem_kernel = object()
     sim._build_chemistry_kernel = lambda: object()
 
+    wall_refusal = {"CrO2": {"wall": {"status": "refused", "reason": "test"}}}
+    notice_fields = (
+        "last_sticking_alpha_provenance_notice",
+        "execution_sticking_alpha_provenance_notice",
+    )
+
     def refuse_after_commit() -> None:
         sim.atom_ledger._transitions.append(object())
         sim.melt.hour = 5
@@ -141,6 +150,10 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
         sim.runtime_state["slotted_holder"].schedule["points"][0][
             "temperature_C"
         ] = 675.0
+        for field in notice_fields:
+            getattr(sim.condensation_model, field)[
+                "wall_saturation_pressure_refusals_by_species"
+            ] = wall_refusal
         raise refusal
 
     sim._step_one_hour = refuse_after_commit
@@ -152,6 +165,10 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     assert sim.melt.hour == 4
     assert sim.overhead.pressure_mbar == pytest.approx(2.0)
     assert sim.record.snapshots == []
+    for field in notice_fields:
+        assert getattr(sim.condensation_model, field)[
+            "wall_saturation_pressure_refusals_by_species"
+        ] == wall_refusal
     schedule = sim.runtime_state["schedule"]
     schedule_backing = sim.runtime_state["schedule_backing"]
     assert isinstance(schedule, MappingProxyType)
@@ -475,6 +492,7 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     sim._condensation_model = SimpleNamespace(
         operating_history=[],
         last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.runtime_state = {
         "plain": {"value": 1},
@@ -586,6 +604,7 @@ def _terminal_refusal_writer_sim() -> PyrolysisSimulator:
     sim.record = SimpleNamespace(snapshots=[])
     sim._condensation_model = SimpleNamespace(
         last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.atom_ledger = FakeLedger()
     sim._build_chemistry_kernel = lambda: object()
@@ -710,6 +729,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
     sim.record = SimpleNamespace(snapshots=[])
     sim._condensation_model = SimpleNamespace(
         last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.backend = None
     sim._liquid_fraction_provider = "magemin"
@@ -772,6 +792,7 @@ def test_terminal_refusal_rolls_back_chemistry_registry_authority(
     sim.record = SimpleNamespace(snapshots=[])
     sim._condensation_model = SimpleNamespace(
         last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.backend = SimpleNamespace(backend_name=backend_name)
     sim._liquid_fraction_provider = "magemin"
@@ -830,6 +851,7 @@ def test_terminal_refusal_rolls_back_metal_phase_authority() -> None:
     sim.record = SimpleNamespace(snapshots=[])
     sim._condensation_model = SimpleNamespace(
         last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.backend = None
     sim._chem_registry = registry
@@ -880,6 +902,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
     sim.record = SimpleNamespace(snapshots=[])
     sim._condensation_model = SimpleNamespace(
         last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.backend = SimpleNamespace(backend_name="alphamelts")
     sim._liquid_fraction_provider = "magemin"
@@ -1031,6 +1054,7 @@ def _refusal_step_sim() -> PyrolysisSimulator:
     sim._condensation_model = SimpleNamespace(
         operating_history=[],
         last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.runtime_state = {"plain": {"value": 1}}
     sim.atom_ledger = FakeLedger()
@@ -1158,6 +1182,7 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     sim._condensation_model = SimpleNamespace(
         operating_history=[operating_prefix, operating_tail],
         last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.runtime_state = {"nested": {"temperature_C": 25.0}}
     sim.runtime_state["operating_tail"] = operating_tail
@@ -1220,6 +1245,7 @@ def _refusal_step_sim() -> PyrolysisSimulator:
     sim._condensation_model = SimpleNamespace(
         operating_history=[],
         last_sticking_alpha_provenance_notice={},
+        execution_sticking_alpha_provenance_notice={},
     )
     sim.runtime_state = {"plain": {"value": 1}}
     sim.atom_ledger = FakeLedger()
