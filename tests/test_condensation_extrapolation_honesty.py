@@ -113,6 +113,19 @@ def test_k_trap_area_admission_keeps_sio_route_authority(cartridge_area):
         assert pass_through["output_status"] == "status_bearing"
 
 
+def test_committed_zero_wall_oxygen_is_not_unknown():
+    model = _stage3_unavailable_psat_model()
+    model.retained_vapor_mol = {"O2": 0.0}
+    result = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+    assert not any(
+        record.get("reason") == "wall_pO2_unknown_pO2_free_route_used"
+        for record in result.antoine_extrapolations.values()
+    )
+
+
 @pytest.mark.parametrize("case", ["positive", "zero_flow", "zero_area"])
 def test_declared_non_sio_extension_preserves_physical_zeros(case):
     model = _stage3_unavailable_psat_model()
