@@ -166,7 +166,10 @@ def test_tier1_printed_log_is_bit_identical_on_every_engine() -> None:
 
 
 def test_scoring_modes_keep_distinct_keys_notices_and_store_outputs() -> None:
-    experiment, bench, observation = _feo_case(oxygen=Decimal("-9"))
+    experiment, bench, observation = _feo_case(
+        oxygen=Decimal("-9"),
+        pressure=Value.point_of(Decimal("0.001")),
+    )
     observation = replace(observation, source_id=experiment.work_id)
     context = ScoreContext(
         works={experiment.work_id: F.work(experiment.work_id)},
@@ -283,7 +286,7 @@ def test_tier2_printed_ferric_fraction_is_the_kress_inverse() -> None:
     changed = resolve_row_fo2(
         experiment,
         bench,
-        replace(observation, value=Value.point_of(observation.value.point * 1.7)),
+        replace(observation, value=Value.point_of(observation.value.point * Decimal("1.7"))),
     )
     assert _fo2_input(changed) == _fo2_input(resolved)
 
@@ -351,7 +354,7 @@ def test_basu_metal_saturation_activity_targets_are_refused() -> None:
         assert "target cannot supply its own fO2" in refusal_notice.reason
 
         changed = replace(
-            observation, value=Value.point_of(observation.value.point * 1.7)
+            observation, value=Value.point_of(observation.value.point * Decimal("1.7"))
         )
         assert resolve_row_fo2(experiment, bench, observation) is None
         assert resolve_row_fo2(experiment, bench, changed) is None
@@ -501,7 +504,7 @@ def test_tier4_borrowed_intrinsic_is_the_same_on_every_engine() -> None:
     changed = resolve_row_fo2(
         experiment,
         bench,
-        replace(observation, value=Value.point_of(observation.value.point * 1.7)),
+        replace(observation, value=Value.point_of(observation.value.point * Decimal("1.7"))),
     )
     assert _fo2_input(changed) == _fo2_input(resolved)
 
@@ -731,7 +734,7 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     assert printed.route == "identity_fO2_Pa"
     assert printed.po2_bar == float(printed_pa / Decimal("100000"))
     changed_target = replace(
-        observation, value=Value.point_of(observation.value.point * 1.7)
+        observation, value=Value.point_of(observation.value.point * Decimal("1.7"))
     )
     changed_printed = resolve_row_fo2(
         experiment,
@@ -871,7 +874,7 @@ def test_knudsen_missing_balance_input_refuses_before_vacuum_bound(missing) -> N
     )
     assert resolved is None
     changed_target = replace(
-        observation, value=Value.point_of(observation.value.point * 1.7)
+        observation, value=Value.point_of(observation.value.point * Decimal("1.7"))
     )
     changed = resolve_row_fo2(
         experiment,
@@ -947,7 +950,7 @@ def test_supported_engines_receive_the_same_effusion_condition(monkeypatch) -> N
     changed = engine_conditions(
         replace(
             observation,
-            value=Value.point_of(observation.value.point * 1.7),
+            value=Value.point_of(observation.value.point * Decimal("1.7")),
         )
     )
     assert original["openimcc"] == ("oxygen_balance_effusion", None, "Mo")

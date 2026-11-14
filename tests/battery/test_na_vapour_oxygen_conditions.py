@@ -215,7 +215,7 @@ def test_rys_na_without_independent_oxygen_closes_independently_of_target(
     changed = resolve_row_fo2(
         experiment,
         None,
-        replace(row, value=Value.point_of(row.value.point * 1.7)),
+        replace(row, value=Value.point_of(row.value.point * Decimal("1.7"))),
         quantity=Quantity.P_PARTIAL,
     )
 
@@ -251,7 +251,7 @@ def test_rys_measured_and_source_linked_oxygen_survive_target_mutation() -> None
         provenance={"oxygen_measurement_status": "measured_independent"},
     )
     changed_measured = replace(
-        measured, value=Value.point_of(measured.value.point * 1.7)
+        measured, value=Value.point_of(measured.value.point * Decimal("1.7"))
     )
     selected_measured = resolve_row_fo2(
         experiment, None, measured, quantity=Quantity.P_PARTIAL
@@ -277,7 +277,7 @@ def test_rys_measured_and_source_linked_oxygen_survive_target_mutation() -> None
         experiment,
         None,
         replace(
-            linked_row, value=Value.point_of(linked_row.value.point * 1.7)
+            linked_row, value=Value.point_of(linked_row.value.point * Decimal("1.7"))
         ),
         quantity=Quantity.P_PARTIAL,
         source_oxygen_bar=2.0e-8,
@@ -326,7 +326,8 @@ def test_rys_source_oxygen_requires_row_level_independence_evidence() -> None:
         sodium, (sodium, independent), None
     )
     assert isinstance(selected, SourceOxygenCondition)
-    assert selected.observation.observation_id == independent.observation_id
+    assert independent.observation_id in selected.used_observations
+    assert selected.observation.value.point == independent.value.point
 
     unknown = replace(
         oxygen,
@@ -361,7 +362,7 @@ def test_rego_na_oxygen_condition_is_independent_of_observed_target() -> None:
     changed = resolve_row_fo2(
         experiment,
         None,
-        replace(row, value=Value.point_of(row.value.point * 1.7)),
+        replace(row, value=Value.point_of(row.value.point * Decimal("1.7"))),
         quantity=Quantity.P_PARTIAL,
     )
     assert selected is not None and changed is not None
