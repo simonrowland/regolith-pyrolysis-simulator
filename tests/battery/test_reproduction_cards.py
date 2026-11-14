@@ -57,9 +57,10 @@ def test_shared_scalar_policy(paper_point, confidence, factor):
     # Widths are comparator fixtures, never assertions about Hashimoto's errors.
     obs = replace(paper_point, uncertainty=Uncertainty(
         kind=UncertaintyKind.PRINTED,
-        verbatim={"value": "1 wt%", "confidence_level": confidence},
+        verbatim={"value": "1", "unit": "wt%", "confidence_level": confidence},
     ))
     row = compare_point(obs, Decimal("23.74"))
+    assert row["band_refusal"] is None
     assert row["status"] == "MATCH"
     assert Decimal(row["band"]["value"]) == factor
     assert row["native_inside"] is True
@@ -74,7 +75,7 @@ def test_shared_scalar_policy(paper_point, confidence, factor):
 def test_range_uncertainty_and_no_band(paper_point):
     point = replace(paper_point, uncertainty=Uncertainty(
         kind=UncertaintyKind.PRINTED,
-        verbatim={"value": "[0, 2] wt%", "confidence_level": "range_half_width"},
+        verbatim={"value": ["0", "2"], "unit": "wt%", "confidence_level": "range_half_width"},
     ))
     assert compare_point(point, Decimal("23.74"))["status"] == "MATCH"
     point = replace(point, uncertainty=Uncertainty(kind=UncertaintyKind.NONE))
@@ -87,7 +88,7 @@ def test_range_uncertainty_and_no_band(paper_point):
 def test_zero_width_and_interval_are_not_manufactured_bands(paper_point):
     point = replace(paper_point, uncertainty=Uncertainty(
         kind=UncertaintyKind.PRINTED,
-        verbatim={"value": "0 wt%", "confidence_level": "two_sigma"},
+        verbatim={"value": "0", "unit": "wt%", "confidence_level": "two_sigma"},
     ))
     assert compare_point(point, Decimal("22.74"))["status"] == "MATCH"
     assert compare_point(point, Decimal("22.74000001"))["status"] == "MISMATCH"
@@ -152,7 +153,7 @@ def test_real_inventory_and_foreign_keys(store, source, count):
 def complete_contract(paper_point):
     obs = replace(paper_point, notices=(), uncertainty=Uncertainty(
         kind=UncertaintyKind.PRINTED,
-        verbatim={"value": "1 wt%", "confidence_level": "two_sigma"},
+        verbatim={"value": "1", "unit": "wt%", "confidence_level": "two_sigma"},
     ))
     oid = obs.observation_id
     run = {"card_id": "contract", "experiment_ids": [obs.experiment_id],
@@ -188,7 +189,7 @@ def test_contract_can_pass_and_zero_width_rms_is_null(complete_contract):
     assert receipt["rms_band"] == "0.00"
     oid, obs = next(iter(args[4].items()))
     args[4][oid] = replace(obs, uncertainty=Uncertainty(
-        kind=UncertaintyKind.PRINTED, verbatim={"value": "0 wt%"}))
+        kind=UncertaintyKind.PRINTED, verbatim={"value": "0", "unit": "wt%"}))
     next(entry for entry in args[2]["entries"] if entry["ref"][-1] == "uncertainty")["resolved"] = to_plain(args[4][oid].uncertainty)
     receipt = evaluate_card(*args)
     assert receipt["verdict"] == "PASS"
@@ -242,7 +243,7 @@ def test_stale_plain_scope_cannot_hide_a_widened_band_or_source_flag(complete_co
     args[5][oid] = Decimal("24.74")
     assert evaluate_card(*args)["verdict"] == "NOT_PASS"
     args[4][oid] = replace(obs, uncertainty=Uncertainty(
-        kind=UncertaintyKind.PRINTED, verbatim={"value": "3 wt%"}))
+        kind=UncertaintyKind.PRINTED, verbatim={"value": "3", "unit": "wt%"}))
     receipt = evaluate_card(*args)
     assert receipt["verdict"] == "NOT_PASS"
     assert receipt["review_current"] is False
@@ -279,7 +280,7 @@ def test_setup_review_can_expire_while_existing_observation_certification_stays_
         "fidelity_samples": [{
             "path": "species.Fe.observations[fe_alpha_1].values.alpha", "value": 0.24,
             "reviewed_by": "source reviewer", "reviewed_on": "2026-11-13",
-            "locator": {"artifact_path": "tables/printed.txt"},
+            "locator": {"page": 2, "source_path": "tables/printed.txt"},
         }],
     }
     assert certify_extract_source_fidelity(document, artifact_root=tmp_path) == []
