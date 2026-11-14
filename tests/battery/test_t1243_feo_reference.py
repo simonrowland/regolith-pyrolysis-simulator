@@ -537,9 +537,10 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
                 # Mutation: restoring an extra /N0 shifts these source-grounded
                 # green residuals even though JANAF already fixes the standard.
                 assert candidate is not None
+                assert candidate.value.point is not None
                 expected_residual = compute_metric(
                     MetricOperation.DEX,
-                    candidate.value,
+                    candidate.value.point,
                     expected_green_reference,
                 )
                 assert expected_residual is not None
