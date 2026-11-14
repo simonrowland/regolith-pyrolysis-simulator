@@ -556,11 +556,13 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
-    "openimcc-source-ref:DarkenGurry1946": ("darken-gurry-1946-iron-oxygen-ii",),
-    "openimcc-source-ref:FC87": ("sf04-magma-companion-workbook",),
+    "openimcc-source-ref:DarkenGurry1946": ("doi:10.1021/ja01209a030",),
+    "openimcc-source-ref:FC87": ("doi:10.1016/j.icarus.2003.08.023",),
     "openimcc-source-ref:Masson1965": ("doi:10.1098/rspa.1965.0176",),
-    "openimcc-source-ref:SF04": ("sf04-magma-companion-workbook",),
-    "openimcc-source-ref:Shornikov2017": ("shornikov-2017-spinel-thermodynamics",),
+    "openimcc-source-ref:SF04": ("doi:10.1016/j.icarus.2003.08.023",),
+    "openimcc-source-ref:Shornikov2017": (
+        "doi:10.1134/s0036024417020303",
+    ),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
