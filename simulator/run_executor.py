@@ -39,7 +39,7 @@ from simulator.session import (
     _at_stage0_exit as _session_at_stage0_exit,
     drive_session,
 )
-from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.scalar_boundary import coerce_nonnegative_hours as _coerce_nonnegative_hours
 from simulator.state import HourSnapshot
 from simulator.trace import PhysicsTrace
 from simulator.transport_regime import TransportRegimeRefusal
@@ -664,17 +664,6 @@ def _backend_from_worker_runtime(
     if config.reduced_real_cache is not None:
         return None
     return getattr(worker_runtime, "backend", None)
-
-
-def _coerce_nonnegative_hours(value: Any) -> int:
-    if not is_declared_real_scalar(value, allow_numeric_str=True):
-        raise TypeError(
-            f"hours must be int, float, or str, not {type(value).__name__}"
-        )
-    hours = int(value)
-    if hours < 0:
-        raise ValueError("hours must be non-negative")
-    return hours
 
 
 def _slice_trace(trace: PhysicsTrace, snapshot_start: int) -> PhysicsTrace:
