@@ -26,10 +26,12 @@ from simulator.optimize.canonical import canonical_json_dumps, normalize_canonic
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
+    _classify_refused_wall_supply_booking_kg,
     _coating_wall_quantity_unavailable,
     _coating_wall_refused_species,
     extraction_completeness_report,
     target_species_yield_report,
+    _wall_supply_bounds_per_campaign,
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.cost_energy import (
@@ -4463,10 +4465,9 @@ def _refused_vapour_supply_kg(
 
     if snapshots is None:
         snapshots = getattr(run_execution, "snapshots", ())
-    # campaigns_elapsed=1 keeps the snapshot sum. That sum is the run
-    # integral; dividing by the campaign count would shrink the bound.
-    # The catalog is the run's. The integral does not open the default
-    # vapour file.
+    # The supply integral stays in kg/run for cutoff classification and
+    # booking. The catalog is the run's; the integral does not open the
+    # default vapour file.
     return _optimizer_refused_flux_bounds(
         snapshots,
         refused_species,
@@ -4485,23 +4486,6 @@ def _drop_species_wall_deposit(
         if isinstance(key, tuple) and len(key) == 2 and str(key[1]) == species
     ]:
         del wall_deposit[key]
-
-
-def _refused_species_booked_kg(supply_kg: float, resolution_kg: float) -> float:
-    """Booked wall mass of one refused species.
-
-    ``deposit_wall,i <= supply_i``. At or below the mass-balance ledger
-    resolution the booked mass is an authorized zero. Above it the booked
-    mass is the supply, once. Measured kilograms of this species are the
-    same vapour and are not added to this mass. The feasibility gate and
-    ``_book_wall_deposits_at_vapour_supply`` both book through this
-    function, so a second sum of measured plus supply cannot survive in
-    one of them alone.
-    """
-
-    if supply_kg <= resolution_kg:
-        return 0.0
-    return supply_kg
 
 
 def _replace_species_deposit_with_supply(
@@ -4801,8 +4785,8 @@ def _book_wall_deposits_at_vapour_supply(
     """Book each refused species at its vapour-supply bound.
 
     Product summary, furnace lifespan, and the tap-hour projection all
-    read the map this function returns. No other path prices a refused
-    wall species. This function does not integrate.
+    read the map this function returns. The coating gate uses the same
+    physics-owned run-total classifier. This function does not integrate.
 
     - The interval invariant lives in ``_classify_wall_supply_interval``,
       which ``_optimizer_refused_flux_bounds`` is the only caller of.
@@ -4819,19 +4803,20 @@ def _book_wall_deposits_at_vapour_supply(
       the allocated bound and is flagged
       ``supply_interval_upper_bound_used``. A sibling that the integral
       did return is still booked.
-    - Supply at or below the mass-balance ledger resolution: authorized
-      physical zero (``below_wall_supply_upper_bound``), carrying the
-      bound. Existing entries of that species are removed, so a
-      measurement above the supply cannot stay priced.
+    - Run-total supply at or below the mass-balance ledger resolution:
+      authorized physical zero (``below_wall_supply_upper_bound``),
+      carrying the bound. Existing entries of that species are removed,
+      so a measurement above the supply cannot stay priced.
       ``deposit_wall,i`` is 0, which is <= ``supply_i``.
     - Supply above that resolution: the priced aggregate equals the
       supply, once (``wall_deposit_upper_bound_used``), on exactly one
       eligible segment. Partial measurements of that species are removed
       first. ``deposit_wall,i == supply_i``.
 
-    Readers of the map this function returns report that mass. They do
-    not apply a second absolute cutoff. Ledger resolution is the only
-    floor, and it is applied here.
+    Booked masses stay in kg/run here. The per-campaign authority is
+    normalized only when it is published under its per-campaign key.
+    The shared physics classifier applies the ledger cutoff to the same
+    run-total supply on both booking paths.
 
     The segments are chosen together, not one species at a time. The
     maximum segment load equals the closed form in
@@ -4883,11 +4868,16 @@ def _book_wall_deposits_at_vapour_supply(
         }
 
     resolution_kg = _mass_balance_ledger_resolution_kg(charge_kg)
+    campaigns_elapsed = _campaigns_elapsed(run_execution)
+    normalized_supply_kg = _wall_supply_bounds_per_campaign(
+        supply_kg,
+        campaigns_elapsed,
+    )
     notice_authority[
         "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
     ] = {
         species: float(bound)
-        for species, bound in sorted(supply_kg.items())
+        for species, bound in sorted(normalized_supply_kg.items())
     }
     raw_counts = getattr(supply_kg, SUPPLY_INTERVAL_UPPER_BOUND_USED, {})
     bound_counts = raw_counts if isinstance(raw_counts, Mapping) else {}
@@ -4920,25 +4910,28 @@ def _book_wall_deposits_at_vapour_supply(
     booked_deposit = dict(wall_deposit)
     bookings: list[dict[str, Any]] = []
     booked_species: set[str] = set()
-    classified: list[tuple[str, float, tuple[str, ...], bool]] = []
+    classified: list[tuple[str, float, tuple[str, ...], float]] = []
     for species in refused:
         if species not in supply_kg:
             continue
         supply = float(supply_kg[species])
         candidates = _refusal_candidate_segments(notice_authority, species)
-        # The booked mass is the shared identity. Zero means the
-        # authorized-zero branch; the raw supply stays on the notice.
-        booked_kg = _refused_species_booked_kg(supply, resolution_kg)
-        classified.append((species, supply, candidates, booked_kg == 0.0))
-    for species, _supply, _candidates, negligible in classified:
-        if negligible:
+        # Classify once on the run-total basis. Zero means the authorized-
+        # zero branch; the raw supply stays on the normalized notice.
+        booked_kg = _classify_refused_wall_supply_booking_kg(
+            supply,
+            resolution_kg,
+        )
+        classified.append((species, supply, candidates, booked_kg))
+    for species, _supply, _candidates, booked_kg in classified:
+        if booked_kg == 0.0:
             # Authorized physical zero. deposit_wall,i <= supply_i still
             # applies: a kept measurement would price mass above the
             # supply. Drop it before the closed form reads existing load.
             _drop_species_wall_deposit(booked_deposit, species)
     upper_species = {
-        species for species, _supply, _candidates, negligible in classified
-        if not negligible
+        species for species, _supply, _candidates, booked_kg in classified
+        if booked_kg > 0.0
     }
     assignment: dict[str, Any] | None = None
     if upper_species:
@@ -4946,13 +4939,13 @@ def _book_wall_deposits_at_vapour_supply(
             _positive_segment_loads_kg(booked_deposit, upper_species),
             {
                 species: supply
-                for species, supply, _candidates, negligible in classified
-                if not negligible
+                for species, supply, _candidates, booked_kg in classified
+                if booked_kg > 0.0
             },
             {
                 species: candidates
-                for species, _supply, candidates, negligible in classified
-                if not negligible
+                for species, _supply, candidates, booked_kg in classified
+                if booked_kg > 0.0
             },
         )
     placements = (
@@ -4960,8 +4953,8 @@ def _book_wall_deposits_at_vapour_supply(
         if assignment is None
         else assignment["segment_by_species"]
     )
-    for species, supply, candidates, negligible in classified:
-        if negligible:
+    for species, supply, candidates, booked_kg in classified:
+        if booked_kg == 0.0:
             refusal_reason = _refusal_reason(
                 notice_authority,
                 species,
@@ -4970,7 +4963,7 @@ def _book_wall_deposits_at_vapour_supply(
             bookings.append({
                 "species": species,
                 "reason": BELOW_WALL_SUPPLY_UPPER_BOUND,
-                "deposit_kg": _refused_species_booked_kg(supply, resolution_kg),
+                "deposit_kg": booked_kg,
                 "supply_upper_bound_kg": supply,
                 "ledger_resolution_kg": resolution_kg,
                 "refusal_reason": refusal_reason,
@@ -4983,7 +4976,6 @@ def _book_wall_deposits_at_vapour_supply(
         # measured + supply. The kilogram goes on the closed-form segment.
         segment = str(placements[species])
         refusal_reason = _refusal_reason(notice_authority, species, segment)
-        booked_kg = _refused_species_booked_kg(supply, resolution_kg)
         _replace_species_deposit_with_supply(
             booked_deposit,
             species,

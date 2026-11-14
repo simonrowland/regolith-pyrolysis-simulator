@@ -3867,16 +3867,21 @@ def test_parallel_composition_target_stub_study_completes(
                 for record in sio_refusals.values()
             )
             assert summary["wall_deposit_upper_bound_used"] is True
+            bookings = summary["wall_supply_bound_bookings"]
             bounds = summary[
                 "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
             ]
-            assert 0.0 < bounds["SiO"] < 0.5
+            # Product booking keeps the 24-hour run integral in kg/run.
+            # This fixture spans 24/35 campaign, so its published authority
+            # is that total divided by 24/35 (factor 35/24).
+            assert bounds["SiO"] == pytest.approx(
+                bookings[0]["supply_upper_bound_kg"] / (24.0 / 35.0)
+            )
             assert summary["wall_deposit_total_kg"] == pytest.approx(bounds["SiO"])
             assert summary["campaigns_to_resinter_worst_segment"].startswith(
                 "resinter_threshold_kg / "
             )
             assert summary["supply_interval_upper_bound_used"]["SiO"] > 0
-            bookings = summary["wall_supply_bound_bookings"]
             assert len(bookings) == 1
             assert bookings[0]["species"] == "SiO"
             assert bookings[0]["flag"] == "wall_deposit_upper_bound_used"

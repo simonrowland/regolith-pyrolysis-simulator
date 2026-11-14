@@ -42,6 +42,7 @@ from simulator.optimize.evaluate import (
     RunReference,
     ScoredResult,
     _run_reference,
+    _trace_with_optimizer_coating_report,
 )
 from simulator.optimize.physics import (
     COMPUTED_EXCEEDS_INVENTORY,
@@ -2048,6 +2049,103 @@ def _wall_bound_execution(case: Mapping[str, object]):
         ),
     )
     return execution, snapshots, deposit
+
+
+@pytest.mark.parametrize(
+    ("campaigns_elapsed", "expected_per_campaign_kg"),
+    ((24.0 / 35.0, 35.0 / 24.0), (2.0, 0.5)),
+)
+def test_refused_supply_authority_publishes_campaign_normalized_bound(
+    campaigns_elapsed: float,
+    expected_per_campaign_kg: float,
+) -> None:
+    """The authority key reports the run integral divided by campaigns.
+
+    For a 1 kg/run supply, 1 / (24/35) = 35/24 = 1.4583333333333333
+    kg/campaign. Across two campaigns, 1 / 2 = 0.5 kg/campaign.
+    """
+
+    execution, _snapshots, _deposit = _wall_bound_execution({
+        "deposit": (),
+        "flux": (),
+        "published_flux": (("SiO", 1.0),),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1000.0,
+    })
+    execution.campaigns_elapsed = campaigns_elapsed
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        {},
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+
+    bounds = booked["notice_authority"][
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+    ]
+    booking = booked["bookings"][0]
+    assert booking["supply_upper_bound_kg"] == pytest.approx(1.0)
+    assert bounds["SiO"] == pytest.approx(
+        booking["supply_upper_bound_kg"] / campaigns_elapsed
+    )
+    assert bounds["SiO"] == pytest.approx(expected_per_campaign_kg)
+
+    overlay = _trace_with_optimizer_coating_report(execution, None)
+    evaluate_bounds = overlay.wall_fouling_report[
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+    ]
+    assert evaluate_bounds["SiO"] == pytest.approx(
+        booking["supply_upper_bound_kg"] / campaigns_elapsed
+    )
+
+
+def test_product_booking_and_coating_gate_share_run_total_zero_classification() -> None:
+    """The ledger cutoff is 5e-11 kg on the run total, before normalization.
+
+    At 1000 kg charge, 1000 * 5e-12 / 100 = 5e-11 kg. The 7.5e-11 kg
+    run supply is booked; after two campaigns it publishes as 3.75e-11
+    kg/campaign. Comparing that normalized value to the run cutoff would
+    incorrectly turn the gate's deposit into zero.
+    """
+
+    execution, _snapshots, _deposit = _wall_bound_execution({
+        "deposit": (),
+        "flux": (),
+        "published_flux": (("SiO", 7.5e-11),),
+        "refused": (("SiO", "hot_wall"),),
+        "charge": 1000.0,
+    })
+    execution.campaigns_elapsed = 2.0
+    booked = objective_module._book_wall_deposits_at_vapour_supply(
+        {},
+        execution.trace.wall_deposit_sticking_authority,
+        execution,
+    )
+    product_booking = booked["bookings"][0]
+    assert product_booking["reason"] == "wall_deposit_upper_bound_used"
+    assert product_booking["deposit_kg"] == pytest.approx(7.5e-11)
+
+    overlay = _trace_with_optimizer_coating_report(execution, None)
+    report = overlay.wall_fouling_report
+    assert report[
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+    ]["SiO"] == pytest.approx(3.75e-11)
+    assert report.wall_supply_run_totals_kg == {"SiO": 7.5e-11}
+    assert report.wall_supply_campaigns_elapsed == 2.0
+    gate = physics_module._coating_from_upstream_deposit_fraction_report(
+        report=report,
+        authority={},
+        diagnostics={},
+        deposit_records=[],
+        output_status=str(report.get("output_status") or "status_bearing"),
+        status_reason=str(report.get("status_reason") or ""),
+    )
+    gate_deposit_per_campaign = (
+        float(gate.status_payload["upstream_wall_deposit_upper_bound_kg_per_campaign"])
+    )
+    assert gate_deposit_per_campaign == pytest.approx(3.75e-11)
+    assert gate_deposit_per_campaign * 2.0 == pytest.approx(
+        product_booking["deposit_kg"]
+    )
 
 
 def _wall_bound_refused_names(authority: Mapping[str, object]) -> set[str]:

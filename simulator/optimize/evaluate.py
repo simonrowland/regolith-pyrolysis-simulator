@@ -97,6 +97,7 @@ from simulator.fidelity_vocabulary import (
 from simulator.optimize.objective import (
     ObjectiveComputationError,
     ObjectiveVector,
+    _campaigns_elapsed,
     composition_target_eval_metadata,
     composition_target_infeasible_reason,
     composition_target_specs,
@@ -118,10 +119,12 @@ from simulator.optimize.physics import (
     ThresholdSpec,
     SUPPLY_INTERVAL_UPPER_BOUND_USED,
     SUPPLY_UNAVAILABLE,
+    _OptimizerCoatingReport,
     _coating_runtime_diagnostics,
     _coating_wall_refused_species,
     _execution_vapour_catalog,
     _optimizer_refused_flux_bounds,
+    _wall_supply_bounds_per_campaign,
     physics_constraints_digest,
 )
 from simulator.optimize.profiles import (
@@ -1819,15 +1822,11 @@ def _trace_with_optimizer_coating_report(
             "wall_deposit_by_segment_species_kg trace is missing or malformed"
         )
     try:
-        campaigns_elapsed = float(getattr(run_execution, "campaigns_elapsed", 1.0))
-    except (TypeError, ValueError) as exc:
-        raise CoatingFeasibilityReportError(
-            "campaigns_elapsed must be numeric"
-        ) from exc
-    if not math.isfinite(campaigns_elapsed) or campaigns_elapsed <= 0.0:
+        campaigns_elapsed = _campaigns_elapsed(run_execution)
+    except (ObjectiveComputationError, TypeError, ValueError) as exc:
         raise CoatingFeasibilityReportError(
             "campaigns_elapsed must be finite and positive"
-        )
+        ) from exc
     normalized_deposit: dict[tuple[str, str], float] = {}
     by_species: dict[str, float] = {}
     null_deposit_species: list[str] = []
@@ -1862,11 +1861,15 @@ def _trace_with_optimizer_coating_report(
         if isinstance(nested_authority, MappingABC):
             refusal_sources.append(nested_authority)
     refused_species = _coating_wall_refused_species(*refusal_sources)
-    refused_flux_bounds = _optimizer_refused_flux_bounds(
+    refused_flux_run_bounds = _optimizer_refused_flux_bounds(
         getattr(run_execution, "snapshots", ()),
         refused_species,
-        campaigns_elapsed=campaigns_elapsed,
+        campaigns_elapsed=1.0,
         catalog=_execution_vapour_catalog(run_execution),
+    )
+    refused_flux_bounds = _wall_supply_bounds_per_campaign(
+        refused_flux_run_bounds,
+        campaigns_elapsed,
     )
     from simulator.runner import _wall_fouling_report
 
@@ -2031,6 +2034,11 @@ def _trace_with_optimizer_coating_report(
             status="warning",
             verdict="non-authoritative",
         )
+    report = _OptimizerCoatingReport(
+        report,
+        run_supply_totals_kg=refused_flux_run_bounds,
+        campaigns_elapsed=campaigns_elapsed,
+    )
     return _TraceAttributeOverlay(trace, {"wall_fouling_report": report})
 
 
