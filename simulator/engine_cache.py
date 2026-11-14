@@ -283,6 +283,7 @@ def _file_sha256(path: Path) -> str:
 
 
 def _distribution_identity(
+    engine_id: str,
     names: tuple[str, ...],
 ) -> str | RuntimeIdentityUnknown:
     for name in names:
@@ -294,13 +295,13 @@ def _distribution_identity(
             record = distribution.read_text("RECORD")
         except (OSError, UnicodeDecodeError) as exc:
             return RuntimeIdentityUnknown(
-                name,
+                engine_id,
                 "distribution_metadata_unreadable",
                 f"RECORD: {exc}",
             )
         if record is not None and not isinstance(record, str):
             return RuntimeIdentityUnknown(
-                name,
+                engine_id,
                 "distribution_metadata_invalid",
                 "RECORD is not text",
             )
@@ -313,7 +314,7 @@ def _distribution_identity(
             version = distribution.version
         except (OSError, UnicodeDecodeError) as exc:
             return RuntimeIdentityUnknown(
-                name,
+                engine_id,
                 "distribution_metadata_unreadable",
                 f"version: {exc}",
             )
@@ -408,9 +409,11 @@ def _compute_runtime_identity(engine_id: str) -> str | RuntimeIdentityUnknown:
     if engine_id == "internal-analytical":
         return _internal_analytical_identity()
     if engine_id == "thermoengine":
-        return _distribution_identity(("ThermoEngine", "thermoengine"))
+        return _distribution_identity(
+            engine_id, ("ThermoEngine", "thermoengine")
+        )
     if engine_id == "vaporock":
-        return _distribution_identity(("VapoRock", "vaporock"))
+        return _distribution_identity(engine_id, ("VapoRock", "vaporock"))
     raise ValueError(f"unknown engine {engine_id!r}")
 
 
