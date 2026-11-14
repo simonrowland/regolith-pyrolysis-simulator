@@ -1218,6 +1218,59 @@ def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> No
     assert "total_submitted_amount_kg" not in key
 
 
+def test_magemin_freeze_gate_memo_key_separates_domain_boundary() -> None:
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+
+    sim = _build_pt0_sim(PT0DeterminismStore("capture"))
+    sim._liquid_fraction_provider = "magemin"
+    remainder = {
+        "Al2O3": 15.0,
+        "FeO": 10.0,
+        "MgO": 20.0,
+        "CaO": 20.0,
+        "Na2O": 5.0,
+    }
+
+    def key_for(sio2_wt_pct: float):
+        scale = (100.0 - sio2_wt_pct) / sum(remainder.values())
+        composition_wt_pct = {
+            "SiO2": sio2_wt_pct,
+            **{
+                species: amount * scale
+                for species, amount in remainder.items()
+            },
+        }
+        mol_by_species = {
+            species: amount
+            / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            "process.cleaned_melt",
+            mol_by_species,
+            source="b-1225 freeze-gate cache boundary pin",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        return sim._freeze_gate_cache_key(
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+        )
+
+    inside = key_for(30.0)
+    outside = key_for(29.99999)
+
+    assert inside.composition_mol_fractions == outside.composition_mol_fractions
+    assert inside.magemin_domain_reason is None
+    assert outside.magemin_domain_reason == "magemin_domain_sio2_below_min"
+    assert inside != outside
+
+
 def test_amount_is_present_only_for_extensive_alphamelts_composite() -> None:
     extensive = _alphamelts_silicate_equilibrium_key()
     intensive_magemin = _freeze_gate_key()

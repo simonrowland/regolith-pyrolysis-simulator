@@ -46,6 +46,7 @@ from simulator.fe_redox import (
     REDOX_STATE_REFERENCE_T_K,
     RedoxState,
 )
+from simulator.melt_backend.magemin import MAGEMinBackend
 
 
 # ----------------------------------------------------------------------
@@ -389,6 +390,40 @@ def test_liquidus_finder_forwards_normalized_redox_state():
     assert calls[0]['fO2_log'] == pytest.approx(
         state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
     )
+
+
+def test_freeze_gate_dispatch_preserves_domain_refusal_when_engine_unavailable(
+    monkeypatch,
+):
+    backend = MAGEMinBackend()
+    backend._available = False
+    backend._bridge = None
+    engine_calls = []
+    monkeypatch.setattr(
+        backend,
+        '_call_magemin',
+        lambda **kwargs: engine_calls.append(kwargs),
+    )
+    provider = MAGEMinShadowProvider(backend=backend)
+    request = IntentRequest(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        account_view=ProviderAccountView(
+            accounts={'process.cleaned_melt': {'Al2O3': 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostic['backend_status_reason'] == (
+        'magemin_domain_sio2_below_min'
+    )
+    assert any('SiO2 = 0.00 wt%' in warning for warning in result.warnings)
+    assert engine_calls == []
 
 
 def test_liquidus_finder_keyerror_propagates():

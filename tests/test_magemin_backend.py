@@ -2236,6 +2236,139 @@ def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
     assert any('mass deficit=0.33313' in warning for warning in result.warnings)
 
 
+def _basalt_like_bulk_at_sio2(sio2_wt_pct: float) -> dict[str, float]:
+    remainder = {
+        'Al2O3': 15.0,
+        'FeO': 10.0,
+        'MgO': 20.0,
+        'CaO': 20.0,
+        'Na2O': 5.0,
+    }
+    scale = (100.0 - sio2_wt_pct) / sum(remainder.values())
+    return {
+        'SiO2': sio2_wt_pct,
+        **{name: amount * scale for name, amount in remainder.items()},
+    }
+
+
+def _magemin_backend_with_spied_engine_call(monkeypatch):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    calls = []
+
+    def fake_call(**kwargs):
+        calls.append(kwargs)
+        return {'phases': {'liq': 1.0}}
+
+    monkeypatch.setattr(backend, '_call_magemin', fake_call)
+    return backend, calls
+
+
+@pytest.mark.parametrize(
+    ('composition', 'expected_reason', 'expected_warning'),
+    [
+        (
+            {'Al2O3': 100.0},
+            'magemin_domain_sio2_below_min',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+        (
+            {'MgO': 100.0},
+            'magemin_domain_sio2_below_min',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+        (
+            {'CaO': 60.0, 'Al2O3': 40.0},
+            'magemin_domain_sio2_below_min',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+        (
+            {'Al2O3': 95.0, 'Na2O': 5.0},
+            'magemin_domain_sio2_below_min',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(0.0),
+            'magemin_domain_sio2_below_min',
+            'MAGEMinDomainGate: SiO2 = 0.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(10.0),
+            'magemin_domain_sio2_below_min',
+            'MAGEMinDomainGate: SiO2 = 10.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(20.0),
+            'magemin_domain_sio2_below_min',
+            'MAGEMinDomainGate: SiO2 = 20.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(29.9),
+            'magemin_domain_sio2_below_min',
+            'MAGEMinDomainGate: SiO2 = 29.90 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+        (
+            {'Al2O3': 90.0, 'SiO2': 5.0, 'Na2O': 5.0},
+            'magemin_domain_sio2_below_min',
+            'MAGEMinDomainGate: SiO2 = 5.00 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+        (
+            _basalt_like_bulk_at_sio2(80.1),
+            'magemin_domain_sio2_above_max',
+            'MAGEMinDomainGate: SiO2 = 80.10 wt% outside MELTS calibration range [30.0, 80.0] wt%.',
+        ),
+    ],
+)
+def test_magemin_equilibrate_refuses_out_of_domain_silica(
+    monkeypatch, composition, expected_reason, expected_warning
+):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status'] == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == expected_reason
+    assert expected_warning in result.warnings
+    assert result.phases_present == []
+    assert result.phase_masses_kg == {}
+    assert engine_calls == []
+
+
+@pytest.mark.parametrize(
+    ('composition', 'expected_status', 'expected_reason'),
+    [
+        ({'SiO2': 30.0, 'Al2O3': 70.0}, 'ok', None),
+        ({'SiO2': 80.0, 'Al2O3': 20.0}, 'ok', None),
+        ({'SiO2': 30.0, 'Al2O3': 65.0}, 'out_of_domain', 'major_sum'),
+    ],
+)
+def test_magemin_equilibrate_domain_boundaries(
+    monkeypatch, composition, expected_status, expected_reason
+):
+    backend, engine_calls = _magemin_backend_with_spied_engine_call(monkeypatch)
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == expected_status
+    if expected_reason is None:
+        assert len(engine_calls) == 1
+    else:
+        assert result.diagnostics['backend_status_reason'] == expected_reason
+        assert engine_calls == []
+
+
 def test_magemin_plante_mode_vector_is_not_renormalized():
     with pytest.raises(RuntimeError, match='Mode vector must sum to 1.0'):
         MAGEMinBackend._parse_subprocess_stdout(
