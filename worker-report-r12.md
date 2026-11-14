@@ -12,7 +12,10 @@ No golden files changed. The owner APIs `oxygen_buffers`, `physical_constants`, 
 
 ## Verification
 
-The exact 11-path remote gate ran on `rpp-ctrl` before the final study expectation corrections: **4,064 passed, 6 failed, 1 skipped**. Its failing node IDs were:
+The request ledger is below. The two completed 11-path gates ran before the final study expectation corrections; the corrected-tree request did not execute tests.
+
+- `4d00544cafac44d0a3fb5805a0a11563`: initial invocation used the absent `/Users/simonrowland/.goal-flight/remote-ci.json`. The helper fell back to local host `SimonMaookProM5` and the command exited 4 during pytest setup (0 passed, 1 command failure, no test node IDs). This was a configuration error, not test evidence.
+- `759ef03e92aa4d70a58df41827438bb9`: exact 11-path gate on `rpp-ctrl`: **4,064 passed, 6 failed, 1 skipped**. Failing node IDs:
 
 - `tests/chemistry/test_builtin_evaporation_flux_provider.py::test_evaporation_caller_wiring_matches_shared_helper_across_short_run[lunar_mare_low_ti-None]@magemin_fullrun_a`
 - `tests/chemistry/test_builtin_evaporation_flux_provider.py::test_evaporation_caller_wiring_matches_shared_helper_across_short_run[mars_basalt-additives_kg1]@magemin_fullrun_a`
@@ -21,7 +24,11 @@ The exact 11-path remote gate ran on `rpp-ctrl` before the final study expectati
 - `tests/test_optimizer_study.py::test_parallel_composition_target_stub_study_completes`
 - `tests/test_optimizer_study.py::test_cli_help_unknowns_and_budget_one_stub_run`
 
-The two study failures were test expectation mismatches and were corrected. A subsequent exact gate request for the corrected tree, request ID `04e87ff977f0457da2175e255990582e`, did not return test results: the remote runner reported that `rpp-gate`’s lease address `192.168.2.56` differed from pinned peer `192.168.2.39`, then refused local execution because the request had already been submitted. The controller directed that laptop pytest must not be used and that this same request be monitored; its status remains `LOCAL_FALLBACK_REQUIRED`, with no test receipt. Final-tree test counts are therefore unavailable. The three evaporation parity cases failed on Na at step 3 (`625 C`); the freeze pin showed a curve mismatch. A green comparison was attempted for the evaporation and freeze-gate files, but Studio setup failed because `be76d28…` could not be fetched and verified; no baseline tests ran. Green-vs-candidate status for those four failures is therefore **not established**.
+- `9bc40f8827834cc18e711367071147f3`: attempted green pair for the evaporation and freeze-gate files; Studio setup could not fetch and verify `be76d28ad8b73d0563ee34fddf452ec77b3d6de5`, so no baseline tests ran.
+- `4d531062e5f0411ca11bff5415f8e808`: repeated exact 11-path gate on `rpp-ctrl`: **4,064 passed, 6 failed, 1 skipped**, with the same six node IDs listed above. The two study failures were test expectation mismatches and were corrected afterward.
+- `04e87ff977f0457da2175e255990582e`: exact 11-path gate for the corrected tree did not return test results. The remote runner reported that `rpp-gate`'s lease address `192.168.2.56` differed from pinned peer `192.168.2.39` and refused local fallback because the request had already been submitted (`LOCAL_FALLBACK_REQUIRED`). The controller directed that laptop pytest not be used and that it would gate the merge directly. Corrected-tree counts are unavailable.
+
+The three evaporation parity cases in both completed candidate runs failed on Na at step 3 (`625 C`); the freeze pin showed a curve mismatch. Green-vs-candidate status for these four failures is **not established** because the pair request failed during setup. The two study failures were not rerun at green, and their green status is also **not established**.
 
 Ruff is unavailable on reachable hosts and network access is disabled, per controller steer. The prescribed substitute passed: `py_compile` on all 27 Python files touched by the b-906 series; one `python3 -c` imported all 15 touched `simulator/` and `engines/` modules; grep confirmed the removed/renamed conflict names have no stale references. The separate `saturation_log10` match in `core.py` is an unrelated same-named local, not a reference to the removed objective local.
 
