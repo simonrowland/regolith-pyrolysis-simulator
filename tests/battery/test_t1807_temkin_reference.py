@@ -1,4 +1,4 @@
-"""Regression pins for Distin's iron-saturated activity reference frame."""
+"""Regression pins for Distin's typed Temkin reference frame."""
 
 from decimal import Decimal
 
@@ -10,11 +10,12 @@ from tests.battery.test_t1243_feo_reference import (
     _conversion_notice,
     _feo_rows,
     _independent_factor,
+    migration,
 )
 
 
 def test_distin_current_reference_conversion_and_band_are_pinned(migration) -> None:
-    """Pin t-1631's converter output before typing the convention as Temkin."""
+    """Pin t-1631's existing converter output before typing the frame."""
     rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
     assert len(rows) == 24
     row = next(
@@ -41,6 +42,4 @@ def test_distin_current_reference_conversion_and_band_are_pinned(migration) -> N
     assert saturation.n_fe2_plus == Decimal(
         "0.9861097841165973149618546920"
     )
-    assert saturation.band_dex == Decimal(
-        "0.007436620909554859980899190015"
-    )
+    assert saturation.band_dex == Decimal("0.007436620909554859980899190015")
