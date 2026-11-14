@@ -12,9 +12,17 @@ extraction:
     rendered at 600 dpi and every numeric cell was checked. The measured Na2O
     isoactivity compositions occur in figures only. Figs 3, 5 and 6 marker
     centres were read at 600 dpi. Figure 4 is curves only and was not
-    sampled. Figures 1, 2, 7 and 8 remain deferred. Table I and Table II values
-    are preserved in context, with printed logarithms unconverted and the
-    calculated Table II values kept distinct from measurements.
+    sampled. Figures 1, 2, 7 and 8 remain deferred. Table I is titled
+    "Activity of SiO2 as Function of Composition in the Terminal Binary
+    Melts" and its grouped column header is "log a_SiO2". The text specifies
+    pure liquid silica at 1400 C as the standard state; the dimensionless
+    common-log relation is a(SiO2) = 10^x. For example, the printed -0.057
+    gives 10^-0.057 = 0.877. All eight reduced activities are positive
+    (0.104 to 1.18). The three positive-log CaO-binary values exceed one, as
+    the source's extrapolated Table I values do; activity has no universal
+    upper bound of one. printed_form is kept on each typed-refused log input,
+    not its already-linear sibling, so migration does not exponentiate it
+    twice. Table II's calculated log C_Na remains distinct from activity.
   date: '2026-10-18'
   worker: w9-1018
 review_status: draft
@@ -38,6 +46,1350 @@ fidelity_samples:
       figure: '6'
       note: >-
         Figure 6 open square rego_1988_fig6_sq_01. Printed log a(Na2O) = -7.56.
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_activity].values.activity
+    value: '0.877'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_activity].values.value_as_printed
+    value: "-0.057"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_activity].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_activity].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_activity].values.composition_mol.CaO
+    value: '0.40'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_activity].values.composition_mol.SiO2
+    value: '0.60'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_activity].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_activity].point_conditions.composition.state.value.components
+    value:
+    - - CaO
+      - '0.40'
+    - - SiO2
+      - '0.60'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_printed_log_input].values.value_as_printed
+    value: "-0.057"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_printed_log_input].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_printed_log_input].values.printed_form
+    value: log10
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_printed_log_input].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_printed_log_input].values.composition_mol.CaO
+    value: '0.40'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_printed_log_input].values.composition_mol.SiO2
+    value: '0.60'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_printed_log_input].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x060_printed_log_input].point_conditions.composition.state.value.components
+    value:
+    - - CaO
+      - '0.40'
+    - - SiO2
+      - '0.60'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_activity].values.activity
+    value: '0.104'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_activity].values.value_as_printed
+    value: "-0.982"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_activity].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_activity].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_activity].values.composition_mol.Na2O
+    value: '0.40'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_activity].values.composition_mol.SiO2
+    value: '0.60'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_activity].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_activity].point_conditions.composition.state.value.components
+    value:
+    - - Na2O
+      - '0.40'
+    - - SiO2
+      - '0.60'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_printed_log_input].values.value_as_printed
+    value: "-0.982"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_printed_log_input].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_printed_log_input].values.printed_form
+    value: log10
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_printed_log_input].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_printed_log_input].values.composition_mol.Na2O
+    value: '0.40'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_printed_log_input].values.composition_mol.SiO2
+    value: '0.60'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_printed_log_input].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x060_printed_log_input].point_conditions.composition.state.value.components
+    value:
+    - - Na2O
+      - '0.40'
+    - - SiO2
+      - '0.60'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_activity].values.activity
+    value: '1.05'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_activity].values.value_as_printed
+    value: '0.023'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_activity].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_activity].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_activity].values.composition_mol.CaO
+    value: '0.35'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_activity].values.composition_mol.SiO2
+    value: '0.65'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_activity].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_activity].point_conditions.composition.state.value.components
+    value:
+    - - CaO
+      - '0.35'
+    - - SiO2
+      - '0.65'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_printed_log_input].values.value_as_printed
+    value: '0.023'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_printed_log_input].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_printed_log_input].values.printed_form
+    value: log10
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_printed_log_input].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_printed_log_input].values.composition_mol.CaO
+    value: '0.35'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_printed_log_input].values.composition_mol.SiO2
+    value: '0.65'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_printed_log_input].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x065_printed_log_input].point_conditions.composition.state.value.components
+    value:
+    - - CaO
+      - '0.35'
+    - - SiO2
+      - '0.65'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_activity].values.activity
+    value: '0.227'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_activity].values.value_as_printed
+    value: "-0.644"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_activity].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_activity].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_activity].values.composition_mol.Na2O
+    value: '0.35'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_activity].values.composition_mol.SiO2
+    value: '0.65'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_activity].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_activity].point_conditions.composition.state.value.components
+    value:
+    - - Na2O
+      - '0.35'
+    - - SiO2
+      - '0.65'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_printed_log_input].values.value_as_printed
+    value: "-0.644"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_printed_log_input].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_printed_log_input].values.printed_form
+    value: log10
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_printed_log_input].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_printed_log_input].values.composition_mol.Na2O
+    value: '0.35'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_printed_log_input].values.composition_mol.SiO2
+    value: '0.65'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_printed_log_input].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x065_printed_log_input].point_conditions.composition.state.value.components
+    value:
+    - - Na2O
+      - '0.35'
+    - - SiO2
+      - '0.65'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_activity].values.activity
+    value: '1.12'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_activity].values.value_as_printed
+    value: '0.050'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_activity].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_activity].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_activity].values.composition_mol.CaO
+    value: '0.30'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_activity].values.composition_mol.SiO2
+    value: '0.70'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_activity].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_activity].point_conditions.composition.state.value.components
+    value:
+    - - CaO
+      - '0.30'
+    - - SiO2
+      - '0.70'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_printed_log_input].values.value_as_printed
+    value: '0.050'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_printed_log_input].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_printed_log_input].values.printed_form
+    value: log10
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_printed_log_input].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_printed_log_input].values.composition_mol.CaO
+    value: '0.30'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_printed_log_input].values.composition_mol.SiO2
+    value: '0.70'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_printed_log_input].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x070_printed_log_input].point_conditions.composition.state.value.components
+    value:
+    - - CaO
+      - '0.30'
+    - - SiO2
+      - '0.70'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_activity].values.activity
+    value: '0.397'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_activity].values.value_as_printed
+    value: "-0.401"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_activity].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_activity].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_activity].values.composition_mol.Na2O
+    value: '0.30'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_activity].values.composition_mol.SiO2
+    value: '0.70'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_activity].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_activity].point_conditions.composition.state.value.components
+    value:
+    - - Na2O
+      - '0.30'
+    - - SiO2
+      - '0.70'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_printed_log_input].values.value_as_printed
+    value: "-0.401"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_printed_log_input].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_printed_log_input].values.printed_form
+    value: log10
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_printed_log_input].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_printed_log_input].values.composition_mol.Na2O
+    value: '0.30'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_printed_log_input].values.composition_mol.SiO2
+    value: '0.70'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_printed_log_input].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x070_printed_log_input].point_conditions.composition.state.value.components
+    value:
+    - - Na2O
+      - '0.30'
+    - - SiO2
+      - '0.70'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_activity].values.activity
+    value: '1.18'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_activity].values.value_as_printed
+    value: '0.072'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_activity].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_activity].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_activity].values.composition_mol.CaO
+    value: '0.25'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_activity].values.composition_mol.SiO2
+    value: '0.75'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_activity].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_activity].point_conditions.composition.state.value.components
+    value:
+    - - CaO
+      - '0.25'
+    - - SiO2
+      - '0.75'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_printed_log_input].values.value_as_printed
+    value: '0.072'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_printed_log_input].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_printed_log_input].values.printed_form
+    value: log10
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_printed_log_input].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_printed_log_input].values.composition_mol.CaO
+    value: '0.25'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_printed_log_input].values.composition_mol.SiO2
+    value: '0.75'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_printed_log_input].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_cao_sio2_x075_printed_log_input].point_conditions.composition.state.value.components
+    value:
+    - - CaO
+      - '0.25'
+    - - SiO2
+      - '0.75'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_activity].values.activity
+    value: '0.585'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_activity].values.value_as_printed
+    value: "-0.233"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_activity].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_activity].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_activity].values.composition_mol.Na2O
+    value: '0.25'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_activity].values.composition_mol.SiO2
+    value: '0.75'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_activity].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_activity].point_conditions.composition.state.value.components
+    value:
+    - - Na2O
+      - '0.25'
+    - - SiO2
+      - '0.75'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_printed_log_input].values.value_as_printed
+    value: "-0.233"
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_printed_log_input].values.printed_quantity
+    value: log a_SiO2(l)
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_printed_log_input].values.printed_form
+    value: log10
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_printed_log_input].values.T_C
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_printed_log_input].values.composition_mol.Na2O
+    value: '0.25'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_printed_log_input].values.composition_mol.SiO2
+    value: '0.75'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_printed_log_input].point_conditions.T_C.state.value
+    value: '1400'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
+  - path: species.SiO2.observations[rego_1988_table_i_na2o_sio2_x075_printed_log_input].point_conditions.composition.state.value.components
+    value:
+    - - Na2O
+      - '0.25'
+    - - SiO2
+      - '0.75'
+    reviewed_by: codex-resume-42709-1794656958
+    reviewed_on: '2026-11-14'
+    locator:
+      source_path: docs/references/rego-1988-silicate-na2o-table-i.md
+      page: 5
+      published_page: 659
+      pdf_page_index: 4
+      table: I
 species:
   Na2O:
     observations:
@@ -6104,7 +7456,243 @@ species:
               values_as_published: ['0.008', '0.018', '0.037']
           attribution: This work; calculated values from the paper's equations.
   SiO2:
-    observations: []
+    observations:
+    - observation_id: rego_1988_table_i_cao_sio2_x060_activity
+      type: activity_coefficient
+      phase: l
+      regime: gas_melt_equilibration
+      locator:
+        page: 5
+        published_page: 659
+        pdf_page_index: 4
+        table: 'I'
+        note: Table I row 1; CaO-(SiO2)y terminal binary; X_SiO2=0.60.
+      standard_state: pure liquid SiO2 at 1400 C
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: admitted
+        activity: '0.877'
+        value_as_printed: '-0.057'
+        printed_quantity: log a_SiO2(l)
+        attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF."
+        T_C: '1400'
+        composition_mol: {CaO: '0.40', SiO2: '0.60', basis: printed_mole_fraction}
+      point_conditions: &rego_table_i_cao_x060_conditions
+        T_C:
+          state: {tag: value, value: '1400'}
+          locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 1}
+        composition:
+          state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.40'], [SiO2, '0.60']]}}
+          locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 1}
+      derived_from: [rego_1988_table_i_cao_sio2_x060_printed_log_input]
+      derivation:
+        relation: a(SiO2) = 10^(log10 a(SiO2))
+        inputs: [rego_1988_table_i_cao_sio2_x060_printed_log_input]
+        output_unit: dimensionless activity
+        printed_precision:
+          log_decimal_places: 3
+          linear_significant_figures: 3
+    - observation_id: rego_1988_table_i_cao_sio2_x060_printed_log_input
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 659
+        pdf_page_index: 4
+        table: 'I'
+        note: Table I row 1; CaO-(SiO2)y terminal binary; X_SiO2=0.60.
+      units: printed log10 activity; no log-valued activity form
+      values:
+        quantity: activity
+        method_class: model_derived
+        admission_status: typed_refusal
+        value_as_printed: '-0.057'
+        printed_quantity: log a_SiO2(l)
+        printed_form: log10
+        attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF."
+        T_C: '1400'
+        composition_mol: {CaO: '0.40', SiO2: '0.60', basis: printed_mole_fraction}
+        schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.
+      point_conditions: *rego_table_i_cao_x060_conditions
+    - observation_id: rego_1988_table_i_na2o_sio2_x060_activity
+      type: activity_coefficient
+      phase: l
+      regime: gas_melt_equilibration
+      locator:
+        page: 5
+        published_page: 659
+        pdf_page_index: 4
+        table: 'I'
+        note: Table I row 1; Na2O-(SiO2)y terminal binary; X_SiO2=0.60.
+      standard_state: pure liquid SiO2 at 1400 C
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: admitted
+        activity: '0.104'
+        value_as_printed: '-0.982'
+        printed_quantity: log a_SiO2(l)
+        attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2]."
+        T_C: '1400'
+        composition_mol: {Na2O: '0.40', SiO2: '0.60', basis: printed_mole_fraction}
+      point_conditions: &rego_table_i_na2o_x060_conditions
+        T_C:
+          state: {tag: value, value: '1400'}
+          locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 1}
+        composition:
+          state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.40'], [SiO2, '0.60']]}}
+          locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 1}
+      derived_from: [rego_1988_table_i_na2o_sio2_x060_printed_log_input]
+      derivation:
+        relation: a(SiO2) = 10^(log10 a(SiO2))
+        inputs: [rego_1988_table_i_na2o_sio2_x060_printed_log_input]
+        output_unit: dimensionless activity
+        printed_precision:
+          log_decimal_places: 3
+          linear_significant_figures: 3
+    - observation_id: rego_1988_table_i_na2o_sio2_x060_printed_log_input
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 659
+        pdf_page_index: 4
+        table: 'I'
+        note: Table I row 1; Na2O-(SiO2)y terminal binary; X_SiO2=0.60.
+      units: printed log10 activity; no log-valued activity form
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        value_as_printed: '-0.982'
+        printed_quantity: log a_SiO2(l)
+        printed_form: log10
+        attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2]."
+        T_C: '1400'
+        composition_mol: {Na2O: '0.40', SiO2: '0.60', basis: printed_mole_fraction}
+        schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.
+      point_conditions: *rego_table_i_na2o_x060_conditions
+    - observation_id: rego_1988_table_i_cao_sio2_x065_activity
+      type: activity_coefficient
+      phase: l
+      regime: gas_melt_equilibration
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2; CaO-(SiO2)y terminal binary; X_SiO2=0.65.}
+      standard_state: pure liquid SiO2 at 1400 C
+      units: dimensionless activity
+      values: {quantity: activity, method_class: model_derived, evidence_class: model_derived, admission_status: admitted, activity: '1.05', value_as_printed: '0.023', printed_quantity: log a_SiO2(l), attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.35', SiO2: '0.65', basis: printed_mole_fraction}}
+      point_conditions: &rego_table_i_cao_x065_conditions
+        T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2}}
+        composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.35'], [SiO2, '0.65']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2}}
+      derived_from: [rego_1988_table_i_cao_sio2_x065_printed_log_input]
+      derivation: {relation: a(SiO2) = 10^(log10 a(SiO2)), inputs: [rego_1988_table_i_cao_sio2_x065_printed_log_input], output_unit: dimensionless activity, printed_precision: {log_decimal_places: 3, linear_significant_figures: 3}}
+    - observation_id: rego_1988_table_i_cao_sio2_x065_printed_log_input
+      type: activity_coefficient
+      phase: l
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2; CaO-(SiO2)y terminal binary; X_SiO2=0.65.}
+      units: printed log10 activity; no log-valued activity form
+      values: {quantity: activity, method_class: model_derived, admission_status: typed_refusal, value_as_printed: '0.023', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.35', SiO2: '0.65', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      point_conditions: *rego_table_i_cao_x065_conditions
+    - observation_id: rego_1988_table_i_na2o_sio2_x065_activity
+      type: activity_coefficient
+      phase: l
+      regime: gas_melt_equilibration
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2; Na2O-(SiO2)y terminal binary; X_SiO2=0.65.}
+      standard_state: pure liquid SiO2 at 1400 C
+      units: dimensionless activity
+      values: {quantity: activity, method_class: quoted_attributed, evidence_class: quoted_attributed, admission_status: admitted, activity: '0.227', value_as_printed: '-0.644', printed_quantity: log a_SiO2(l), attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.35', SiO2: '0.65', basis: printed_mole_fraction}}
+      point_conditions: &rego_table_i_na2o_x065_conditions
+        T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2}}
+        composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.35'], [SiO2, '0.65']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2}}
+      derived_from: [rego_1988_table_i_na2o_sio2_x065_printed_log_input]
+      derivation: {relation: a(SiO2) = 10^(log10 a(SiO2)), inputs: [rego_1988_table_i_na2o_sio2_x065_printed_log_input], output_unit: dimensionless activity, printed_precision: {log_decimal_places: 3, linear_significant_figures: 3}}
+    - observation_id: rego_1988_table_i_na2o_sio2_x065_printed_log_input
+      type: activity_coefficient
+      phase: l
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 2; Na2O-(SiO2)y terminal binary; X_SiO2=0.65.}
+      units: printed log10 activity; no log-valued activity form
+      values: {quantity: activity, method_class: quoted_attributed, admission_status: typed_refusal, value_as_printed: '-0.644', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.35', SiO2: '0.65', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      point_conditions: *rego_table_i_na2o_x065_conditions
+    - observation_id: rego_1988_table_i_cao_sio2_x070_activity
+      type: activity_coefficient
+      phase: l
+      regime: gas_melt_equilibration
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3; CaO-(SiO2)y terminal binary; X_SiO2=0.70.}
+      standard_state: pure liquid SiO2 at 1400 C
+      units: dimensionless activity
+      values: {quantity: activity, method_class: model_derived, evidence_class: model_derived, admission_status: admitted, activity: '1.12', value_as_printed: '0.050', printed_quantity: log a_SiO2(l), attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.30', SiO2: '0.70', basis: printed_mole_fraction}}
+      point_conditions: &rego_table_i_cao_x070_conditions
+        T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3}}
+        composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.30'], [SiO2, '0.70']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3}}
+      derived_from: [rego_1988_table_i_cao_sio2_x070_printed_log_input]
+      derivation: {relation: a(SiO2) = 10^(log10 a(SiO2)), inputs: [rego_1988_table_i_cao_sio2_x070_printed_log_input], output_unit: dimensionless activity, printed_precision: {log_decimal_places: 3, linear_significant_figures: 3}}
+    - observation_id: rego_1988_table_i_cao_sio2_x070_printed_log_input
+      type: activity_coefficient
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3; CaO-(SiO2)y terminal binary; X_SiO2=0.70.}
+      units: printed log10 activity; no log-valued activity form
+      values: {quantity: activity, method_class: model_derived, admission_status: typed_refusal, value_as_printed: '0.050', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.30', SiO2: '0.70', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      point_conditions: *rego_table_i_cao_x070_conditions
+    - observation_id: rego_1988_table_i_na2o_sio2_x070_activity
+      type: activity_coefficient
+      phase: l
+      regime: gas_melt_equilibration
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3; Na2O-(SiO2)y terminal binary; X_SiO2=0.70.}
+      standard_state: pure liquid SiO2 at 1400 C
+      units: dimensionless activity
+      values: {quantity: activity, method_class: quoted_attributed, evidence_class: quoted_attributed, admission_status: admitted, activity: '0.397', value_as_printed: '-0.401', printed_quantity: log a_SiO2(l), attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.30', SiO2: '0.70', basis: printed_mole_fraction}}
+      point_conditions: &rego_table_i_na2o_x070_conditions
+        T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3}}
+        composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.30'], [SiO2, '0.70']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3}}
+      derived_from: [rego_1988_table_i_na2o_sio2_x070_printed_log_input]
+      derivation: {relation: a(SiO2) = 10^(log10 a(SiO2)), inputs: [rego_1988_table_i_na2o_sio2_x070_printed_log_input], output_unit: dimensionless activity, printed_precision: {log_decimal_places: 3, linear_significant_figures: 3}}
+    - observation_id: rego_1988_table_i_na2o_sio2_x070_printed_log_input
+      type: activity_coefficient
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 3; Na2O-(SiO2)y terminal binary; X_SiO2=0.70.}
+      units: printed log10 activity; no log-valued activity form
+      values: {quantity: activity, method_class: quoted_attributed, admission_status: typed_refusal, value_as_printed: '-0.401', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.30', SiO2: '0.70', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      point_conditions: *rego_table_i_na2o_x070_conditions
+    - observation_id: rego_1988_table_i_cao_sio2_x075_activity
+      type: activity_coefficient
+      phase: l
+      regime: gas_melt_equilibration
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4; CaO-(SiO2)y terminal binary; X_SiO2=0.75.}
+      standard_state: pure liquid SiO2 at 1400 C
+      units: dimensionless activity
+      values: {quantity: activity, method_class: model_derived, evidence_class: model_derived, admission_status: admitted, activity: '1.18', value_as_printed: '0.072', printed_quantity: log a_SiO2(l), attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.25', SiO2: '0.75', basis: printed_mole_fraction}}
+      point_conditions: &rego_table_i_cao_x075_conditions
+        T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4}}
+        composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.25'], [SiO2, '0.75']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4}}
+      derived_from: [rego_1988_table_i_cao_sio2_x075_printed_log_input]
+      derivation: {relation: a(SiO2) = 10^(log10 a(SiO2)), inputs: [rego_1988_table_i_cao_sio2_x075_printed_log_input], output_unit: dimensionless activity, printed_precision: {log_decimal_places: 3, linear_significant_figures: 3}}
+    - observation_id: rego_1988_table_i_cao_sio2_x075_printed_log_input
+      type: activity_coefficient
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4; CaO-(SiO2)y terminal binary; X_SiO2=0.75.}
+      units: printed log10 activity; no log-valued activity form
+      values: {quantity: activity, method_class: model_derived, admission_status: typed_refusal, value_as_printed: '0.072', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with JANAF.", T_C: '1400', composition_mol: {CaO: '0.25', SiO2: '0.75', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      point_conditions: *rego_table_i_cao_x075_conditions
+    - observation_id: rego_1988_table_i_na2o_sio2_x075_activity
+      type: activity_coefficient
+      phase: l
+      regime: gas_melt_equilibration
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4; Na2O-(SiO2)y terminal binary; X_SiO2=0.75.}
+      standard_state: pure liquid SiO2 at 1400 C
+      units: dimensionless activity
+      values: {quantity: activity, method_class: quoted_attributed, evidence_class: quoted_attributed, admission_status: admitted, activity: '0.585', value_as_printed: '-0.233', printed_quantity: log a_SiO2(l), attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.25', SiO2: '0.75', basis: printed_mole_fraction}}
+      point_conditions: &rego_table_i_na2o_x075_conditions
+        T_C: {state: {tag: value, value: '1400'}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4}}
+        composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[Na2O, '0.25'], [SiO2, '0.75']]}}, locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4}}
+      derived_from: [rego_1988_table_i_na2o_sio2_x075_printed_log_input]
+      derivation: {relation: a(SiO2) = 10^(log10 a(SiO2)), inputs: [rego_1988_table_i_na2o_sio2_x075_printed_log_input], output_unit: dimensionless activity, printed_precision: {log_decimal_places: 3, linear_significant_figures: 3}}
+    - observation_id: rego_1988_table_i_na2o_sio2_x075_printed_log_input
+      type: activity_coefficient
+      locator: {page: 5, published_page: 659, pdf_page_index: 4, table: 'I', note: Table I row 4; Na2O-(SiO2)y terminal binary; X_SiO2=0.75.}
+      units: printed log10 activity; no log-valued activity form
+      values: {quantity: activity, method_class: quoted_attributed, admission_status: typed_refusal, value_as_printed: '-0.233', printed_quantity: log a_SiO2(l), printed_form: log10, attribution: "Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].", T_C: '1400', composition_mol: {Na2O: '0.25', SiO2: '0.75', basis: printed_mole_fraction}, schema_gap: No log-valued activity form; printed logarithm retained as a typed-refused input to its linear-activity sibling.}
+      point_conditions: *rego_table_i_na2o_x075_conditions
     context:
       - observation_id: rego_1988_fig4_sio2_isoactivity_model
         type: figure_record
