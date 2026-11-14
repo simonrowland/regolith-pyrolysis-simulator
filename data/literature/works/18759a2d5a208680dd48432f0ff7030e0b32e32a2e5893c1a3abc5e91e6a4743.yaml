@@ -44,7 +44,9 @@ experiments:
           point: '0.015'
           approximate: false
       locator:
-        page: 140
+        page: 1
+        published_page: 140
+        pdf_page_index: 0
         section: 2. Experimentals
         source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
       inference:
@@ -58,7 +60,9 @@ experiments:
               tag: value
               value: '0.015'
             locator:
-              page: 140
+              page: 1
+              published_page: 140
+              pdf_page_index: 0
               section: 2. Experimentals
               source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
         output_unit: kg
@@ -68,7 +72,9 @@ experiments:
         tag: value
         value: Fe-P alloy plus premelted synthetic slag, melted under flowing Ar
       locator:
-        page: 140
+        page: 1
+        published_page: 140
+        pdf_page_index: 0
         section: 2. Experimentals
         source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
     container:
@@ -76,7 +82,9 @@ experiments:
         tag: value
         value: crucible
       locator:
-        page: 140
+        page: 1
+        published_page: 140
+        pdf_page_index: 0
         section: 2. Experimentals
         source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
   conditions:
@@ -102,7 +110,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743
   locator:
-    page: 140
+    page: 1
+    published_page: 140
+    pdf_page_index: 0
     section: 2. Experimentals
     note: Abstract gives the full temperature range; the apparatus and run parameters are printed in section 2 on published
       page 140.
@@ -113,7 +123,9 @@ experiments:
         tag: value
         value: crucible materials were CaO, SiO2 or MgO; CaO crucible was stabilized with about 10 mass% FeO
       locator:
-        page: 141
+        page: 2
+        published_page: 141
+        pdf_page_index: 1
         section: 2. Experimentals
         source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
 benches:
@@ -131,7 +143,9 @@ benches:
           categorical: 0.42 x 0.52 x 1 m
           approximate: false
       locator:
-        page: 140
+        page: 1
+        published_page: 140
+        pdf_page_index: 0
         section: 2. Experimentals
         note: The experimental apparatus consists of the purification train of Ar, an alumina tube (0.42 x 0.52 x 1 m) as
           a reaction chamber.
@@ -147,7 +161,9 @@ benches:
           interval_high: '0.008'
           approximate: false
       locator:
-        page: 140
+        page: 1
+        published_page: 140
+        pdf_page_index: 0
         section: 2. Experimentals
         note: The premelted synthetic slag of (6-8) x 10^-3 kg was set in a crucible.
         source_path: corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
