@@ -251,6 +251,7 @@ def test_report_only_group_gate_sees_perturbation_under_incomplete_card(complete
     blocked = {"group_id": "isotopes", "observation_ids": [], "required_coordinates": 1,
                "independent": True, "comparator": "unsupported", "blockers": ["unsupported"]}
     args[1]["outcomes"].append(blocked)
+    args[1]["printed_inventory"].append({"group_id": "isotopes", "locator": {"page": 6}})
     args[2]["frozen_run"] = deepcopy(args[1])
     before = evaluate_card(*args)
     args[5][next(iter(args[5]))] = Decimal("24.74")
@@ -261,6 +262,8 @@ def test_report_only_group_gate_sees_perturbation_under_incomplete_card(complete
     assert gate["mode"] == "report_only"
     assert gate["accepted"] is False
     assert "chemistry" in str(gate["regressions"])
+    args[5][next(iter(args[5]))] = Decimal("22.74")
+    assert group_gate(before, evaluate_card(*args))["accepted"] is True
 
 
 @pytest.mark.parametrize("source, count", zip(SOURCES, (31, 44, 2, 51)))

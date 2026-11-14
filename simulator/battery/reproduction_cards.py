@@ -25,6 +25,7 @@ from simulator.battery.migrate import (
 from simulator.battery.records import Experiment, Observation, Work
 from simulator.battery.score import (
     _printed_uncertainty_band,
+    _rms,
     match_status,
     metric_operation_for_identity,
     populate_numeric,
@@ -187,10 +188,9 @@ def _review_causes(run: Document, review: Document, scope: Document) -> list[dic
     return causes
 
 
-def _rms(values: Sequence[Decimal]) -> str | None:
-    if not values:
-        return None
-    return str((sum((value * value for value in values), Decimal(0)) / len(values)).sqrt())
+def _rms_text(values: Sequence[Decimal]) -> str | None:
+    value = _rms(values)
+    return None if value is None else str(value)
 
 
 def evaluate_card(
@@ -210,6 +210,10 @@ def evaluate_card(
     candidates = candidates or {}
     frozen = review["frozen_run"]
     causes = _review_causes(run, review, scope)
+    group_ids = [group["group_id"] for group in frozen["outcomes"]]
+    inventory_ids = {item["group_id"] for item in frozen["printed_inventory"] if item.get("required", True)}
+    if len(set(group_ids)) != len(group_ids) or set(group_ids) != inventory_ids:
+        causes.append({"cause": "missing_input", "reason": "printed_inventory_membership"})
     for eid in frozen["experiment_ids"]:
         experiment = scope["experiments"].get(eid)
         if experiment is None or experiment.get("work_id") != manifest["work_id"]:
@@ -235,7 +239,7 @@ def evaluate_card(
             if obs.experiment_id not in frozen["experiment_ids"] or obs.source_id not in manifest["source_ids"]:
                 group_causes.append({"cause": "source_conflict", "reason": "observation_fk",
                                      "observation_id": oid})
-            if obs.admission.status.value != "admitted":
+            if obs.admission.status.value != "admitted" or not obs.evidence.class_.is_value:
                 group_causes.append({"cause": "source_unattested", "observation_id": oid})
             row = compare_point(obs, candidates.get(oid))
             rows.append(row)
@@ -254,11 +258,11 @@ def evaluate_card(
         band_values = [Decimal(row["band"]["value"]) for row in rows if row["band"]]
         rms_band = None
         if complete and all(width > 0 for width in band_values):
-            rms_band = _rms([Decimal(row["residual"]) / Decimal(row["band"]["value"]) for row in rows])
+            rms_band = _rms_text([Decimal(row["residual"]) / Decimal(row["band"]["value"]) for row in rows])
         # Diagnostic native RMS is separate for each output unit; ppm/dex and
         # wt% coordinates must never be averaged together.
         units = {row.get("native_unit") for row in rows if row["native_residual"] is not None}
-        native_rms = {unit: _rms([Decimal(row["native_residual"]) for row in rows
+        native_rms = {unit: _rms_text([Decimal(row["native_residual"]) for row in rows
                                  if row.get("native_unit") == unit and row["native_residual"] is not None])
                       for unit in units}
         reproduced = complete and not causes and not group_causes and all(
@@ -280,7 +284,7 @@ def evaluate_card(
     independent = [group for group in groups if group["independent"]]
     full_rms = None
     if groups and all(group["rms_band"] is not None for group in groups) and independent:
-        full_rms = _rms([Decimal(group["rms_band"]) for group in independent])
+        full_rms = _rms_text([Decimal(group["rms_band"]) for group in independent])
     return {
         "card_id": frozen["card_id"], "evidence_label": "development_validation",
         "verdict": "PASS" if passed else "NOT_PASS", "causes": all_causes,
