@@ -14,9 +14,14 @@ from typing import Any
 
 import yaml
 
-from simulator.battery.enums import SourceRelation, ValueKind
+from simulator.battery.enums import MetricOperation, SourceRelation, ValueKind
 from simulator.battery.identity import Identity
-from simulator.battery.migrate import load_migrated_store, to_plain
+from simulator.battery.migrate import (
+    load_migrated_benches,
+    load_migrated_context,
+    load_migrated_store,
+    to_plain,
+)
 from simulator.battery.records import Experiment, Observation, Work
 from simulator.battery.score import (
     _printed_uncertainty_band,
@@ -43,6 +48,7 @@ def compare_point(observation: Observation, candidate: Decimal | None) -> dict[s
         "observation_id": observation.observation_id,
         "status": "MISSING", "reason": None, "residual": None,
         "band": None, "native_band": None, "native_inside": None,
+        "native_residual": None,
         "uncertainty": to_plain(observation.uncertainty),
         "locator": to_plain(observation.locator),
         "flags": [to_plain(notice) for notice in observation.notices],
@@ -93,6 +99,16 @@ def compare_point(observation: Observation, candidate: Decimal | None) -> dict[s
                   residual=str(numeric.value), residual_unit=numeric.unit,
                   band=to_plain(numeric.decision_band), candidate=str(candidate),
                   reference=str(reference))
+    absolute, _, _ = populate_numeric(
+        quantity=quantity, candidate=candidate, reference=reference,
+        source_relation=SourceRelation.INDEPENDENT,
+        operation_override=MetricOperation.ABSOLUTE,
+    )
+    result["native_residual"] = None if absolute is None else str(absolute.value)
+    result["native_unit"] = (
+        observation.derivation.output_unit if observation.derivation is not None
+        else identity.subtype.value if identity.subtype.is_value else numeric.unit
+    )
     native_numeric, _, _ = populate_numeric(
         quantity=quantity, candidate=candidate, reference=reference,
         source_relation=SourceRelation.INDEPENDENT,
@@ -131,6 +147,10 @@ def load_review_scope(root: Path, manifest: Document, *, store: Store | None = N
         "experiments": {eid: to_plain(experiments[eid]) for eid in selected if eid in experiments},
         "observations": {oid: to_plain(observations[oid]) for oid in selected_obs if oid in observations},
         "works": {manifest["work_id"]: to_plain(works.get(manifest["work_id"]))},
+        "benches": {key: to_plain(value) for key, value in load_migrated_benches(root).items()
+                    if any(experiments[eid].bench_id == key for eid in selected if eid in experiments)},
+        "contexts": {key: value for key, value in load_migrated_context(root).items()
+                     if any(experiments[eid].equipment_context_id == key for eid in selected if eid in experiments)},
         "extracts": {sid: yaml.safe_load((root / "data/literature/extracts" / f"{sid}.yaml").read_text())
                      for sid in manifest["source_ids"]},
     }
@@ -151,6 +171,13 @@ def _review_causes(run: Document, review: Document, scope: Document) -> list[dic
             causes.append({"cause": "review_stale", "path": ref})
         if not all(entry.get(key) for key in ("reviewer", "locator", "quote", "unit")):
             causes.append({"cause": "source_unattested", "path": ref})
+        if ref[0] == "observations":
+            located = resolve_path(scope, [ref[0], ref[1], "locator"])
+            if isinstance(located, Mapping):
+                keys = ("page", "pdf_page_index", "published_page", "table", "paragraph")
+                if any(key in located and (entry.get("locator") or {}).get(key) != located[key]
+                       for key in keys):
+                    causes.append({"cause": "source_conflict", "reason": "locator_disagrees", "path": ref})
         status = entry["status"]
         if status == "reviewed_missing":
             causes.append({"cause": "missing_input", "path": ref, "evidence": entry["quote"]})
@@ -230,9 +257,9 @@ def evaluate_card(
             rms_band = _rms([Decimal(row["residual"]) / Decimal(row["band"]["value"]) for row in rows])
         # Diagnostic native RMS is separate for each output unit; ppm/dex and
         # wt% coordinates must never be averaged together.
-        units = {row.get("residual_unit") for row in rows if row["residual"] is not None}
-        native_rms = {unit: _rms([Decimal(row["residual"]) for row in rows
-                                 if row.get("residual_unit") == unit and row["residual"] is not None])
+        units = {row.get("native_unit") for row in rows if row["native_residual"] is not None}
+        native_rms = {unit: _rms([Decimal(row["native_residual"]) for row in rows
+                                 if row.get("native_unit") == unit and row["native_residual"] is not None])
                       for unit in units}
         reproduced = complete and not causes and not group_causes and all(
             row["status"] == "MATCH" for row in rows
@@ -289,6 +316,8 @@ def group_gate(before: Document, after: Document) -> dict[str, Any]:
         for name in ("n_numeric", "n_banded", "n_inside_band"):
             if current[name] < old[name]:
                 regressions.append(f"{gid}:{name}")
+        if old["reproduced"] and not current["reproduced"]:
+            regressions.append(f"{gid}:lost_reproduction")
         old_rows = {row["observation_id"]: row for row in old["coordinates"]}
         new_rows = {row["observation_id"]: row for row in current["coordinates"]}
         for oid, row in old_rows.items():
@@ -313,16 +342,28 @@ def group_gate(before: Document, after: Document) -> dict[str, Any]:
     return {"mode": "report_only", "accepted": not regressions, "regressions": regressions}
 
 
-def write_study(root: Path, manifest_path: Path, output_dir: Path, *, store: Store | None = None) -> dict[str, Any]:
+def write_study(
+    root: Path,
+    manifest_path: Path,
+    output_dir: Path | None = None,
+    *,
+    store: Store | None = None,
+) -> dict[str, Any]:
     """Write disposable derived JSON; never regenerate the battery store."""
     manifest = yaml.safe_load(manifest_path.read_text())
     review = yaml.safe_load((manifest_path.parent / manifest["review_ref"]).read_text())
     store = store or load_migrated_store(root, sources=manifest["source_ids"])
     scope = load_review_scope(root, manifest, store=store)
+    output_dir = output_dir or root / "data/battery/reproduction-cards"
     output_dir.mkdir(parents=True, exist_ok=True)
     receipts = []
     for run in manifest["runs"]:
         receipt = evaluate_card(manifest, run, review["runs"][run["card_id"]], scope, store[2])
+        receipt["reviewed_revision"] = review["reviewed_revision"]
+        receipt["source_asset"] = review["source_asset"]
+        receipt["resolved_setup_refs"] = run["experiment_ids"]
+        receipt["resolved_outcome_refs"] = [oid for group in run["outcomes"] for oid in group["observation_ids"]]
+        receipt["source_store_identity"] = scope["works"][manifest["work_id"]]["source_files"]
         (output_dir / f'{run["card_id"]}.json').write_text(json.dumps(receipt, indent=2, allow_nan=False) + "\n")
         receipts.append({key: receipt[key] for key in ("card_id", "verdict", "group_fraction", "rms_band")})
     summary = {"study_id": manifest["study_id"], "n_cards": len(receipts),

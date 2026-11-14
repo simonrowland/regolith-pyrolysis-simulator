@@ -22,7 +22,7 @@ runs:
     - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=ba4ded0ac42f
     - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=7ac9738c97c0
     - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=a6a6630cfab6
-    required_coordinates: 22
+    required_coordinates: 21
     comparator: battery_point
     independent: true
     blockers:
@@ -52,7 +52,7 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 2M-15-07-16c
-    printed_components: &id002
+    printed_components:
     - Li
     - Na
     - K
@@ -61,7 +61,6 @@ runs:
     - V
     - Cr
     - Mn
-    - Ni
     - Cu
     - Zn
     - Ga
@@ -75,6 +74,8 @@ runs:
     - Gd
     - Yb
     - Pb
+    absent_components:
+    - Ni
     typed_components:
     - Gd
     - La
@@ -89,7 +90,6 @@ runs:
     - Na
     - K
     - Cr
-    - Ni
     - Cu
     - Zn
     - Ga
@@ -157,7 +157,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 2M-15-07-16d
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -201,7 +224,7 @@ runs:
     - kems-012-sossi-2019::sossi_2019_v_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=2369e7102282
     - kems-012-sossi-2019::sossi_2019_yb_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=97446e9fa312
     - kems-012-sossi-2019::sossi_2019_zr_table1_2_nonvolatile_residue_quoted_20260906::T=1573.15:h=827dba70bddb
-    required_coordinates: 22
+    required_coordinates: 21
     comparator: battery_point
     independent: true
     blockers:
@@ -224,7 +247,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 2M-15-07-16g
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components:
+    - Ni
     typed_components:
     - Gd
     - La
@@ -239,7 +285,6 @@ runs:
     - Na
     - K
     - Cr
-    - Ni
     - Cu
     - Zn
     - Ga
@@ -291,7 +336,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 2M-15-07-16h
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -381,7 +449,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: P11-06-18a*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -448,7 +539,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-15-07-16a*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -515,7 +629,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-15-07-16b
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -582,7 +719,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-PS6
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -649,7 +809,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 3M-18-07-16b
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -716,7 +899,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 2M-18-07-16a
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -785,12 +991,35 @@ runs:
     - values
     - series
     - 10
-    locator: &id003
+    locator: &id002
       page: 54
       pdf_page_index: 53
       table: '2'
       paragraph: 2M-18-07-16c
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -830,7 +1059,7 @@ runs:
     - series
     - 10
     - locator
-    locator: *id003
+    locator: *id002
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -873,7 +1102,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-PS3
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -940,7 +1192,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-PS2
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1009,12 +1284,35 @@ runs:
     - values
     - series
     - 13
-    locator: &id004
+    locator: &id003
       page: 54
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-PS4
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1054,7 +1352,7 @@ runs:
     - series
     - 13
     - locator
-    locator: *id004
+    locator: *id003
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -1097,7 +1395,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: P09/06/18b*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1164,7 +1485,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: P09/06/18a*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1233,12 +1577,35 @@ runs:
     - values
     - series
     - 16
-    locator: &id005
+    locator: &id004
       page: 54
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-PS5
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1278,7 +1645,7 @@ runs:
     - series
     - 16
     - locator
-    locator: *id005
+    locator: *id004
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -1321,7 +1688,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: P08-02-17b*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1390,12 +1780,35 @@ runs:
     - values
     - series
     - 18
-    locator: &id006
+    locator: &id005
       page: 54
       pdf_page_index: 53
       table: '2'
       paragraph: 3M-29/2/16*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1435,7 +1848,7 @@ runs:
     - series
     - 18
     - locator
-    locator: *id006
+    locator: *id005
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -1478,7 +1891,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-2/3/16*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1545,7 +1981,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: C18/12/15*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1614,12 +2073,35 @@ runs:
     - values
     - series
     - 21
-    locator: &id007
+    locator: &id006
       page: 54
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-PS1*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1659,7 +2141,7 @@ runs:
     - series
     - 21
     - locator
-    locator: *id007
+    locator: *id006
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -1702,7 +2184,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: P09/06/18c*
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1769,7 +2274,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: C17/12/15a
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1838,12 +2366,35 @@ runs:
     - values
     - series
     - 24
-    locator: &id008
+    locator: &id007
       page: 54
       pdf_page_index: 53
       table: '2'
       paragraph: 1M-1/3/16
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1883,7 +2434,7 @@ runs:
     - series
     - 24
     - locator
-    locator: *id008
+    locator: *id007
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -1926,7 +2477,30 @@ runs:
       pdf_page_index: 53
       table: '2'
       paragraph: 3M-1/3/16
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -1993,7 +2567,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: C17/12/15b
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2062,12 +2659,35 @@ runs:
     - values
     - series
     - 27
-    locator: &id009
+    locator: &id008
       page: 55
       pdf_page_index: 54
       table: '2'
       paragraph: 1M-1/3/16b
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2107,7 +2727,7 @@ runs:
     - series
     - 27
     - locator
-    locator: *id009
+    locator: *id008
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -2150,7 +2770,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: 3M-29/2/16b
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2202,7 +2845,7 @@ runs:
     - NO_BAND
   - group_id: zoning-profile-or-wire-metal
     observation_ids: []
-    required_coordinates: 1
+    required_coordinates: 2
     comparator: unsupported
     independent: true
     blockers:
@@ -2219,12 +2862,35 @@ runs:
     - values
     - series
     - 29
-    locator: &id010
+    locator: &id009
       page: 55
       pdf_page_index: 54
       table: '2'
       paragraph: C17/12/15c
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2264,7 +2930,7 @@ runs:
     - series
     - 29
     - locator
-    locator: *id010
+    locator: *id009
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -2307,7 +2973,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-16-07-16e
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2374,7 +3063,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-16-07-16a
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2441,7 +3153,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-16-07-16b
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2510,12 +3245,35 @@ runs:
     - values
     - series
     - 33
-    locator: &id011
+    locator: &id010
       page: 55
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-16-07-16c
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2555,7 +3313,7 @@ runs:
     - series
     - 33
     - locator
-    locator: *id011
+    locator: *id010
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -2598,7 +3356,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: 3M-2/3/16
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2667,12 +3448,35 @@ runs:
     - values
     - series
     - 35
-    locator: &id012
+    locator: &id011
       page: 55
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-17-07-16a
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2712,7 +3516,7 @@ runs:
     - series
     - 35
     - locator
-    locator: *id012
+    locator: *id011
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -2757,12 +3561,35 @@ runs:
     - values
     - series
     - 36
-    locator: &id013
+    locator: &id012
       page: 55
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-17-07-16b
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2802,7 +3629,7 @@ runs:
     - series
     - 36
     - locator
-    locator: *id013
+    locator: *id012
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -2847,12 +3674,35 @@ runs:
     - values
     - series
     - 37
-    locator: &id014
+    locator: &id013
       page: 55
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-17-07-16c
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -2892,7 +3742,7 @@ runs:
     - series
     - 37
     - locator
-    locator: *id014
+    locator: *id013
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -2935,7 +3785,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-16-07-16f
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -3002,7 +3875,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-16-07-16g
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -3069,7 +3965,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: P11-06-18b
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -3121,7 +4040,7 @@ runs:
     - NO_BAND
   - group_id: zoning-profile-or-wire-metal
     observation_ids: []
-    required_coordinates: 1
+    required_coordinates: 2
     comparator: unsupported
     independent: true
     blockers:
@@ -3138,12 +4057,35 @@ runs:
     - values
     - series
     - 41
-    locator: &id015
+    locator: &id014
       page: 55
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-16-07-16h
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La
@@ -3183,7 +4125,7 @@ runs:
     - series
     - 41
     - locator
-    locator: *id015
+    locator: *id014
     blocker: unsupported
     note: 'Printed Y marker: profile and/or wire-metal analysis exists; no curve/collection comparator in Phase
       A.'
@@ -3226,7 +4168,30 @@ runs:
       pdf_page_index: 54
       table: '2'
       paragraph: 2M-16-07-16d
-    printed_components: *id002
+    printed_components:
+    - Li
+    - Na
+    - K
+    - Sc
+    - Ti
+    - V
+    - Cr
+    - Mn
+    - Ni
+    - Cu
+    - Zn
+    - Ga
+    - Ge
+    - Rb
+    - Zr
+    - Mo
+    - Ag
+    - Cd
+    - La
+    - Gd
+    - Yb
+    - Pb
+    absent_components: []
     typed_components:
     - Gd
     - La

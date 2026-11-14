@@ -16,6 +16,7 @@ from simulator.battery.reproduction_cards import (
     evaluate_card,
     group_gate,
     load_review_scope,
+    resolve_path,
     write_study,
 )
 from simulator.battery.score import NORMAL_95_TICKET_MULTIPLIER
@@ -117,6 +118,15 @@ def test_real_inventory_and_foreign_keys(store, source, count):
         ids = [oid for group in run["outcomes"] for oid in group["observation_ids"]]
         assert len(ids) == len(set(ids))
         assert all(oid in store[2] for oid in ids)
+        entries = frozen["entries"]
+        assert all(resolve_path(scope, entry["ref"]) == entry["resolved"] for entry in entries)
+        for eid in run["experiment_ids"]:
+            selected_paths = {tuple(entry["ref"][2:]) for entry in entries
+                              if entry["ref"][:2] == ["experiments", eid]}
+            assert {("sample", "initial_composition"), ("sample", "mass_kg"),
+                    ("sample", "form"), ("sample", "container"),
+                    ("sample", "surface_area_m2"), ("thermal_schedule",),
+                    ("pressure_environment",), ("apparatus",)} <= selected_paths
         receipt = evaluate_card(manifest, run, frozen, scope, store[2])
         assert receipt["verdict"] == "NOT_PASS"
         assert receipt["rms_band"] is None
@@ -206,6 +216,36 @@ def test_setup_only_change_and_unrelated_row(complete_contract):
     assert args[3]["observations"][next(iter(args[4]))]["value"] == "22.74"
 
 
+def test_setup_review_can_expire_while_existing_observation_certification_stays_green(
+    complete_contract, tmp_path,
+):
+    from tools.validate_literature_extracts import certify_extract_source_fidelity
+
+    artifact = tmp_path / "tables" / "printed.txt"
+    artifact.parent.mkdir()
+    artifact.write_text("Published alpha 0.24\n")
+    document = {
+        "experiments": [{"sample": {"mass": "0.0001"}}],
+        "species": {"Fe": {"observations": [{
+            "observation_id": "fe_alpha_1", "type": "alpha",
+            "phase": "silicate_melt", "regime": "langmuir_free_evaporation",
+            "units": "dimensionless", "locator": {"page": 2, "table": "1"},
+            "values": {"alpha": 0.24},
+        }]}},
+        "fidelity_samples": [{
+            "path": "species.Fe.observations[fe_alpha_1].values.alpha", "value": 0.24,
+            "reviewed_by": "source reviewer", "reviewed_on": "2026-11-13",
+            "locator": {"artifact_path": "tables/printed.txt"},
+        }],
+    }
+    assert certify_extract_source_fidelity(document, artifact_root=tmp_path) == []
+    document["experiments"][0]["sample"]["mass"] = "0.0002"
+    args = complete_contract
+    args[3]["experiments"][args[1]["setup_ref"]]["mass"] = "0.0002"
+    assert certify_extract_source_fidelity(document, artifact_root=tmp_path) == []
+    assert evaluate_card(*args)["review_current"] is False
+
+
 def test_report_only_group_gate_sees_perturbation_under_incomplete_card(complete_contract):
     args = complete_contract
     blocked = {"group_id": "isotopes", "observation_ids": [], "required_coordinates": 1,
@@ -223,9 +263,11 @@ def test_report_only_group_gate_sees_perturbation_under_incomplete_card(complete
     assert "chemistry" in str(gate["regressions"])
 
 
-def test_derived_receipts_and_summary(store, tmp_path):
-    manifest = ROOT / "data/literature/reproduction-cards" / f"{SOURCES[0]}.yaml"
-    summary = write_study(ROOT, manifest, tmp_path, store=store)
-    assert summary["n_cards"] == 31
+@pytest.mark.parametrize("source, count", zip(SOURCES, (31, 44, 2, 51)))
+def test_derived_receipts_and_summary(store, tmp_path, source, count):
+    manifest = ROOT / "data/literature/reproduction-cards" / f"{source}.yaml"
+    derived = tmp_path / "data/battery/reproduction-cards"
+    summary = write_study(ROOT, manifest, derived, store=store)
+    assert summary["n_cards"] == count
     assert summary["n_pass"] == 0
-    assert len(list(tmp_path.glob("*.json"))) == 32
+    assert len(list(derived.glob("*.json"))) == count + 1

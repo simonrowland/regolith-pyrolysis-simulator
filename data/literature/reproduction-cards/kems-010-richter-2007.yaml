@@ -45,20 +45,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id001
@@ -67,7 +53,7 @@ runs:
     - species
     - Mg
     - observations
-    - 60
+    - 9
     - values
     - series
     - 0
@@ -79,36 +65,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id001
     locator: *id002
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id001
     locator: *id002
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id001
     locator: *id002
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id001
     locator: *id002
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id001
     locator: *id002
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-10
   experiment_ids:
@@ -170,7 +168,7 @@ runs:
     - species
     - Mg
     - observations
-    - 61
+    - 10
     - values
     - series
     - 0
@@ -182,36 +180,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id003
     locator: *id004
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id003
     locator: *id004
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id003
     locator: *id004
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id003
     locator: *id004
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id003
     locator: *id004
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-11
   experiment_ids:
@@ -273,7 +283,7 @@ runs:
     - species
     - Mg
     - observations
-    - 62
+    - 11
     - values
     - series
     - 0
@@ -285,36 +295,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id005
     locator: *id006
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id005
     locator: *id006
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id005
     locator: *id006
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id005
     locator: *id006
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id005
     locator: *id006
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-8
   experiment_ids:
@@ -376,7 +398,7 @@ runs:
     - species
     - Mg
     - observations
-    - 78
+    - 28
     - values
     - series
     - 0
@@ -388,36 +410,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id007
     locator: *id008
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id007
     locator: *id008
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id007
     locator: *id008
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id007
     locator: *id008
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id007
     locator: *id008
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-9
   experiment_ids:
@@ -479,7 +513,7 @@ runs:
     - species
     - Mg
     - observations
-    - 79
+    - 29
     - values
     - series
     - 0
@@ -491,36 +525,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id009
     locator: *id010
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id009
     locator: *id010
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id009
     locator: *id010
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id009
     locator: *id010
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id009
     locator: *id010
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-11
   experiment_ids:
@@ -582,7 +628,7 @@ runs:
     - species
     - Mg
     - observations
-    - 80
+    - 30
     - values
     - series
     - 0
@@ -594,36 +640,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id011
     locator: *id012
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id011
     locator: *id012
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id011
     locator: *id012
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id011
     locator: *id012
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id011
     locator: *id012
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-4
   experiment_ids:
@@ -685,7 +743,7 @@ runs:
     - species
     - Mg
     - observations
-    - 81
+    - 31
     - values
     - series
     - 0
@@ -697,36 +755,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id013
     locator: *id014
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id013
     locator: *id014
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id013
     locator: *id014
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id013
     locator: *id014
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id013
     locator: *id014
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-16
   experiment_ids:
@@ -766,20 +836,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id015
@@ -788,7 +844,7 @@ runs:
     - species
     - Mg
     - observations
-    - 66
+    - 15
     - values
     - series
     - 0
@@ -800,36 +856,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id015
     locator: *id016
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id015
     locator: *id016
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id015
     locator: *id016
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id015
     locator: *id016
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id015
     locator: *id016
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-13
   experiment_ids:
@@ -876,13 +944,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id017
@@ -891,7 +952,7 @@ runs:
     - species
     - Mg
     - observations
-    - 63
+    - 12
     - values
     - series
     - 0
@@ -903,36 +964,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id017
     locator: *id018
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id017
     locator: *id018
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id017
     locator: *id018
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id017
     locator: *id018
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id017
     locator: *id018
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-15
   experiment_ids:
@@ -994,7 +1067,7 @@ runs:
     - species
     - Mg
     - observations
-    - 64
+    - 13
     - values
     - series
     - 0
@@ -1006,36 +1079,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id019
     locator: *id020
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id019
     locator: *id020
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id019
     locator: *id020
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id019
     locator: *id020
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id019
     locator: *id020
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-9
   experiment_ids:
@@ -1097,7 +1182,7 @@ runs:
     - species
     - Mg
     - observations
-    - 65
+    - 14
     - values
     - series
     - 0
@@ -1109,36 +1194,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id021
     locator: *id022
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id021
     locator: *id022
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id021
     locator: *id022
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id021
     locator: *id022
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id021
     locator: *id022
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-14
   experiment_ids:
@@ -1178,20 +1275,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id023
@@ -1200,7 +1283,7 @@ runs:
     - species
     - Mg
     - observations
-    - 67
+    - 16
     - values
     - series
     - 0
@@ -1212,36 +1295,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id023
     locator: *id024
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id023
     locator: *id024
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id023
     locator: *id024
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id023
     locator: *id024
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id023
     locator: *id024
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r-15
   experiment_ids:
@@ -1281,20 +1376,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id025
@@ -1303,7 +1384,7 @@ runs:
     - species
     - Mg
     - observations
-    - 68
+    - 17
     - values
     - series
     - 0
@@ -1315,36 +1396,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id025
     locator: *id026
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id025
     locator: *id026
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id025
     locator: *id026
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id025
     locator: *id026
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id025
     locator: *id026
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r-17
   experiment_ids:
@@ -1384,20 +1477,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id027
@@ -1406,7 +1485,7 @@ runs:
     - species
     - Mg
     - observations
-    - 69
+    - 18
     - values
     - series
     - 0
@@ -1418,36 +1497,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id027
     locator: *id028
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id027
     locator: *id028
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id027
     locator: *id028
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id027
     locator: *id028
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id027
     locator: *id028
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r-6
   experiment_ids:
@@ -1487,13 +1578,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
   - group_id: magnesium-isotope
     observation_ids: []
     required_coordinates: 1
@@ -1509,7 +1593,7 @@ runs:
     - species
     - Mg
     - observations
-    - 70
+    - 19
     - values
     - series
     - 0
@@ -1521,36 +1605,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id029
     locator: *id030
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id029
     locator: *id030
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id029
     locator: *id030
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id029
     locator: *id030
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id029
     locator: *id030
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-3
   experiment_ids:
@@ -1612,7 +1708,7 @@ runs:
     - species
     - Mg
     - observations
-    - 71
+    - 20
     - values
     - series
     - 0
@@ -1624,36 +1720,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id031
     locator: *id032
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id031
     locator: *id032
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id031
     locator: *id032
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id031
     locator: *id032
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id031
     locator: *id032
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-2
   experiment_ids:
@@ -1715,7 +1823,7 @@ runs:
     - species
     - Mg
     - observations
-    - 72
+    - 21
     - values
     - series
     - 0
@@ -1727,36 +1835,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id033
     locator: *id034
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id033
     locator: *id034
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id033
     locator: *id034
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id033
     locator: *id034
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id033
     locator: *id034
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-18
   experiment_ids:
@@ -1818,7 +1938,7 @@ runs:
     - species
     - Mg
     - observations
-    - 73
+    - 22
     - values
     - series
     - 0
@@ -1830,36 +1950,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id035
     locator: *id036
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id035
     locator: *id036
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id035
     locator: *id036
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id035
     locator: *id036
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id035
     locator: *id036
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-4
   experiment_ids:
@@ -1921,7 +2053,7 @@ runs:
     - species
     - Mg
     - observations
-    - 74
+    - 23
     - values
     - series
     - 0
@@ -1933,36 +2065,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id037
     locator: *id038
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id037
     locator: *id038
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id037
     locator: *id038
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id037
     locator: *id038
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id037
     locator: *id038
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-14
   experiment_ids:
@@ -2024,7 +2168,7 @@ runs:
     - species
     - Mg
     - observations
-    - 75
+    - 24
     - values
     - series
     - 0
@@ -2036,36 +2180,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id039
     locator: *id040
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id039
     locator: *id040
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id039
     locator: *id040
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id039
     locator: *id040
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id039
     locator: *id040
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-1
   experiment_ids:
@@ -2127,7 +2283,7 @@ runs:
     - species
     - Mg
     - observations
-    - 76
+    - 25
     - values
     - series
     - 0
@@ -2139,36 +2295,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id041
     locator: *id042
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id041
     locator: *id042
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id041
     locator: *id042
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id041
     locator: *id042
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id041
     locator: *id042
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-7
   experiment_ids:
@@ -2230,7 +2398,7 @@ runs:
     - species
     - Mg
     - observations
-    - 77
+    - 26
     - values
     - series
     - 0
@@ -2242,36 +2410,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id043
     locator: *id044
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id043
     locator: *id044
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id043
     locator: *id044
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id043
     locator: *id044
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id043
     locator: *id044
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r-13
   experiment_ids:
@@ -2289,35 +2469,6 @@ runs:
     independent: true
     blockers:
     - NO_BAND
-  - group_id: total-mass-loss
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - NO_BAND
-    - unsupported
-  - group_id: final-area
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
-  - group_id: magnesium-depletion
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
   - group_id: magnesium-isotope
     observation_ids: []
     required_coordinates: 1
@@ -2331,9 +2482,9 @@ runs:
     - extracts
     - kems-010-richter-2007
     - species
-    - SiO2
+    - Mg
     - observations
-    - 18
+    - 27
     - values
     - series
     - 0
@@ -2345,36 +2496,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id045
     locator: *id046
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 10
   - group_id: final-area
     context_ref: *id045
     locator: *id046
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id045
     locator: *id046
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id045
     locator: *id046
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id045
     locator: *id046
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-5
   experiment_ids:
@@ -2421,13 +2584,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id047
@@ -2436,7 +2592,7 @@ runs:
     - species
     - Mg
     - observations
-    - 82
+    - 32
     - values
     - series
     - 0
@@ -2448,36 +2604,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id047
     locator: *id048
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id047
     locator: *id048
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id047
     locator: *id048
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id047
     locator: *id048
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id047
     locator: *id048
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-21
   experiment_ids:
@@ -2517,13 +2685,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
   - group_id: magnesium-isotope
     observation_ids: []
     required_coordinates: 1
@@ -2539,7 +2700,7 @@ runs:
     - species
     - Mg
     - observations
-    - 83
+    - 33
     - values
     - series
     - 0
@@ -2551,36 +2712,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id049
     locator: *id050
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id049
     locator: *id050
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id049
     locator: *id050
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id049
     locator: *id050
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id049
     locator: *id050
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-20
   experiment_ids:
@@ -2620,13 +2793,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
   - group_id: magnesium-isotope
     observation_ids: []
     required_coordinates: 1
@@ -2642,7 +2808,7 @@ runs:
     - species
     - Mg
     - observations
-    - 84
+    - 34
     - values
     - series
     - 0
@@ -2654,36 +2820,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id051
     locator: *id052
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id051
     locator: *id052
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id051
     locator: *id052
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id051
     locator: *id052
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id051
     locator: *id052
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-18
   experiment_ids:
@@ -2723,13 +2901,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
   - group_id: magnesium-isotope
     observation_ids: []
     required_coordinates: 1
@@ -2745,7 +2916,7 @@ runs:
     - species
     - Mg
     - observations
-    - 85
+    - 35
     - values
     - series
     - 0
@@ -2757,36 +2928,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id053
     locator: *id054
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id053
     locator: *id054
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id053
     locator: *id054
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id053
     locator: *id054
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id053
     locator: *id054
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-19
   experiment_ids:
@@ -2826,20 +3009,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id055
@@ -2848,7 +3017,7 @@ runs:
     - species
     - Mg
     - observations
-    - 86
+    - 36
     - values
     - series
     - 0
@@ -2860,36 +3029,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id055
     locator: *id056
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id055
     locator: *id056
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id055
     locator: *id056
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id055
     locator: *id056
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id055
     locator: *id056
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-17
   experiment_ids:
@@ -2929,20 +3110,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id057
@@ -2951,7 +3118,7 @@ runs:
     - species
     - Mg
     - observations
-    - 87
+    - 37
     - values
     - series
     - 0
@@ -2963,36 +3130,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id057
     locator: *id058
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id057
     locator: *id058
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id057
     locator: *id058
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id057
     locator: *id058
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id057
     locator: *id058
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-7
   experiment_ids:
@@ -3032,20 +3211,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id059
@@ -3054,7 +3219,7 @@ runs:
     - species
     - Mg
     - observations
-    - 88
+    - 38
     - values
     - series
     - 0
@@ -3066,36 +3231,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id059
     locator: *id060
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id059
     locator: *id060
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id059
     locator: *id060
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id059
     locator: *id060
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id059
     locator: *id060
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-3
   experiment_ids:
@@ -3142,13 +3319,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id061
@@ -3157,7 +3327,7 @@ runs:
     - species
     - Mg
     - observations
-    - 89
+    - 39
     - values
     - series
     - 0
@@ -3169,36 +3339,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id061
     locator: *id062
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id061
     locator: *id062
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id061
     locator: *id062
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id061
     locator: *id062
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id061
     locator: *id062
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-10
   experiment_ids:
@@ -3260,7 +3442,7 @@ runs:
     - species
     - Mg
     - observations
-    - 90
+    - 40
     - values
     - series
     - 0
@@ -3272,36 +3454,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id063
     locator: *id064
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id063
     locator: *id064
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id063
     locator: *id064
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id063
     locator: *id064
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id063
     locator: *id064
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-16
   experiment_ids:
@@ -3363,7 +3557,7 @@ runs:
     - species
     - Mg
     - observations
-    - 91
+    - 41
     - values
     - series
     - 0
@@ -3375,36 +3569,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id065
     locator: *id066
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id065
     locator: *id066
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id065
     locator: *id066
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id065
     locator: *id066
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id065
     locator: *id066
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-11
   experiment_ids:
@@ -3466,7 +3672,7 @@ runs:
     - species
     - Mg
     - observations
-    - 92
+    - 42
     - values
     - series
     - 0
@@ -3478,36 +3684,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id067
     locator: *id068
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id067
     locator: *id068
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id067
     locator: *id068
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id067
     locator: *id068
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id067
     locator: *id068
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-12
   experiment_ids:
@@ -3569,7 +3787,7 @@ runs:
     - species
     - Mg
     - observations
-    - 93
+    - 43
     - values
     - series
     - 0
@@ -3581,36 +3799,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id069
     locator: *id070
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id069
     locator: *id070
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id069
     locator: *id070
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id069
     locator: *id070
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id069
     locator: *id070
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-2
   experiment_ids:
@@ -3657,13 +3887,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id071
@@ -3672,7 +3895,7 @@ runs:
     - species
     - Mg
     - observations
-    - 94
+    - 44
     - values
     - series
     - 0
@@ -3684,36 +3907,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id071
     locator: *id072
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id071
     locator: *id072
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id071
     locator: *id072
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id071
     locator: *id072
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id071
     locator: *id072
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-13
   experiment_ids:
@@ -3753,20 +3988,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id073
@@ -3775,7 +3996,7 @@ runs:
     - species
     - Mg
     - observations
-    - 95
+    - 45
     - values
     - series
     - 0
@@ -3787,36 +4008,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id073
     locator: *id074
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id073
     locator: *id074
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id073
     locator: *id074
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id073
     locator: *id074
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id073
     locator: *id074
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-15
   experiment_ids:
@@ -3856,20 +4089,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id075
@@ -3878,7 +4097,7 @@ runs:
     - species
     - Mg
     - observations
-    - 96
+    - 46
     - values
     - series
     - 0
@@ -3890,36 +4109,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id075
     locator: *id076
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id075
     locator: *id076
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id075
     locator: *id076
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id075
     locator: *id076
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id075
     locator: *id076
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-14
   experiment_ids:
@@ -3959,20 +4190,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id077
@@ -3981,7 +4198,7 @@ runs:
     - species
     - Mg
     - observations
-    - 97
+    - 47
     - values
     - series
     - 0
@@ -3993,36 +4210,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id077
     locator: *id078
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id077
     locator: *id078
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id077
     locator: *id078
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id077
     locator: *id078
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id077
     locator: *id078
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-9
   experiment_ids:
@@ -4062,20 +4291,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id079
@@ -4084,7 +4299,7 @@ runs:
     - species
     - Mg
     - observations
-    - 98
+    - 48
     - values
     - series
     - 0
@@ -4096,36 +4311,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id079
     locator: *id080
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id079
     locator: *id080
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id079
     locator: *id080
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id079
     locator: *id080
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id079
     locator: *id080
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r2-8
   experiment_ids:
@@ -4165,20 +4392,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id081
@@ -4187,7 +4400,7 @@ runs:
     - species
     - Mg
     - observations
-    - 99
+    - 49
     - values
     - series
     - 0
@@ -4199,36 +4412,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id081
     locator: *id082
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id081
     locator: *id082
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id081
     locator: *id082
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id081
     locator: *id082
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id081
     locator: *id082
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-2
   experiment_ids:
@@ -4268,13 +4493,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: reduced-magnesium-silicon-flux
-    observation_ids: []
-    required_coordinates: 2
-    comparator: unsupported
-    independent: false
-    blockers:
-    - unsupported
   - group_id: magnesium-isotope
     observation_ids: []
     required_coordinates: 1
@@ -4290,7 +4508,7 @@ runs:
     - species
     - Mg
     - observations
-    - 100
+    - 50
     - values
     - series
     - 0
@@ -4302,36 +4520,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id083
     locator: *id084
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id083
     locator: *id084
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id083
     locator: *id084
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id083
     locator: *id084
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id083
     locator: *id084
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-1
   experiment_ids:
@@ -4393,7 +4623,7 @@ runs:
     - species
     - Mg
     - observations
-    - 101
+    - 51
     - values
     - series
     - 0
@@ -4405,36 +4635,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id085
     locator: *id086
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id085
     locator: *id086
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id085
     locator: *id086
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id085
     locator: *id086
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id085
     locator: *id086
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-20
   experiment_ids:
@@ -4496,7 +4738,7 @@ runs:
     - species
     - Mg
     - observations
-    - 102
+    - 52
     - values
     - series
     - 0
@@ -4508,36 +4750,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id087
     locator: *id088
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id087
     locator: *id088
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id087
     locator: *id088
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id087
     locator: *id088
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id087
     locator: *id088
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-21
   experiment_ids:
@@ -4584,13 +4838,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id089
@@ -4599,7 +4846,7 @@ runs:
     - species
     - Mg
     - observations
-    - 103
+    - 53
     - values
     - series
     - 0
@@ -4611,36 +4858,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id089
     locator: *id090
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id089
     locator: *id090
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id089
     locator: *id090
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id089
     locator: *id090
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id089
     locator: *id090
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-4
   experiment_ids:
@@ -4702,7 +4961,7 @@ runs:
     - species
     - Mg
     - observations
-    - 104
+    - 54
     - values
     - series
     - 0
@@ -4714,36 +4973,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id091
     locator: *id092
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id091
     locator: *id092
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id091
     locator: *id092
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id091
     locator: *id092
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id091
     locator: *id092
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-7
   experiment_ids:
@@ -4790,13 +5061,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id093
@@ -4805,7 +5069,7 @@ runs:
     - species
     - Mg
     - observations
-    - 105
+    - 55
     - values
     - series
     - 0
@@ -4817,36 +5081,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id093
     locator: *id094
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id093
     locator: *id094
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id093
     locator: *id094
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id093
     locator: *id094
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id093
     locator: *id094
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-19
   experiment_ids:
@@ -4908,7 +5184,7 @@ runs:
     - species
     - Mg
     - observations
-    - 106
+    - 56
     - values
     - series
     - 0
@@ -4920,36 +5196,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id095
     locator: *id096
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id095
     locator: *id096
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id095
     locator: *id096
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id095
     locator: *id096
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id095
     locator: *id096
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-18
   experiment_ids:
@@ -5011,7 +5299,7 @@ runs:
     - species
     - Mg
     - observations
-    - 107
+    - 57
     - values
     - series
     - 0
@@ -5023,36 +5311,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id097
     locator: *id098
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id097
     locator: *id098
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id097
     locator: *id098
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id097
     locator: *id098
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id097
     locator: *id098
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-8
   experiment_ids:
@@ -5114,7 +5414,7 @@ runs:
     - species
     - Mg
     - observations
-    - 108
+    - 58
     - values
     - series
     - 0
@@ -5126,36 +5426,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id099
     locator: *id100
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id099
     locator: *id100
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id099
     locator: *id100
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id099
     locator: *id100
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id099
     locator: *id100
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 14
   assumptions: []
 - card_id: cai-r3-5
   experiment_ids:
@@ -5202,13 +5514,6 @@ runs:
     independent: false
     blockers:
     - unsupported
-  - group_id: magnesium-isotope
-    observation_ids: []
-    required_coordinates: 1
-    comparator: unsupported
-    independent: true
-    blockers:
-    - unsupported
   printed_inventory:
   - group_id: residue-oxide-vector
     context_ref: &id101
@@ -5217,7 +5522,7 @@ runs:
     - species
     - Mg
     - observations
-    - 109
+    - 59
     - values
     - series
     - 0
@@ -5229,36 +5534,48 @@ runs:
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 3
   - group_id: total-mass-loss
     context_ref: *id101
     locator: *id102
     blocker: NO_BAND
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 10
   - group_id: final-area
     context_ref: *id101
     locator: *id102
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 8
   - group_id: magnesium-depletion
     context_ref: *id101
     locator: *id102
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 11
   - group_id: reduced-magnesium-silicon-flux
     context_ref: *id101
     locator: *id102
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: true
+    source_column: 12
   - group_id: magnesium-isotope
     context_ref: *id101
     locator: *id102
     blocker: unsupported
     note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks,
       not extra independent RMS weights.
+    required: false
+    source_column: 14
   assumptions: []
 run_basis: One card per Table 1 physical sample (36 rows on p.6 and 15 on p.7). Zero high-T hold still includes
   heating/cooling; starting material row is not a run.
