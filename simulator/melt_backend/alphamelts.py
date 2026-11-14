@@ -130,6 +130,11 @@ from simulator.yaml_cache import load_cached_safe_yaml
 logger = logging.getLogger(__name__)
 
 
+def _ambient_calc_mode() -> str | None:
+    environment = os.environ
+    return environment.get("ALPHAMELTS_CALC_MODE")
+
+
 # Liquidus seed is a search start, not a domain gate.
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 # t-894: public alias of data/engine_commissioning.yaml
@@ -1242,7 +1247,7 @@ class _MELTSBackendSupport(MeltBackend):
             self._configure_subprocess_calc_mode(
                 config.get(
                     'ambient_calc_mode',
-                    os.environ.get('ALPHAMELTS_CALC_MODE'),
+                    _ambient_calc_mode(),
                 )
             )
         else:
@@ -3668,7 +3673,7 @@ class _MELTSBackendSupport(MeltBackend):
         """
         if not self._subprocess_calc_mode_configured:
             self._configure_subprocess_calc_mode(
-                os.environ.get('ALPHAMELTS_CALC_MODE')
+                _ambient_calc_mode()
             )
         if self._subprocess_model_error is not None:
             raise _alphamelts_backend_failure_error(

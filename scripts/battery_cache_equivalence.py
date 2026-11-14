@@ -31,6 +31,33 @@ from simulator.battery.score import (  # noqa: E402
 )
 
 
+_ENVIRONMENT_UNSET = object()
+
+
+def _environment_setting(name: str, value: object = _ENVIRONMENT_UNSET) -> str | None:
+    environment = os.environ
+    if value is _ENVIRONMENT_UNSET:
+        return environment.get(name)
+    if value is None:
+        environment.pop(name, None)
+        return None
+    rendered = str(value)
+    environment[name] = rendered
+    return rendered
+
+
+def _engine_cache_path(value: object = _ENVIRONMENT_UNSET) -> str | None:
+    return _environment_setting("REGOLITH_ENGINE_CACHE", value)
+
+
+def _studio_host() -> str | None:
+    return _environment_setting("REGOLITH_STUDIO_HOST")
+
+
+def _dispatch_scratch_directory() -> str | None:
+    return _environment_setting("TMPDIR")
+
+
 def _without_cache_counters(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {
@@ -84,11 +111,8 @@ def _run_slice(
     workers: int,
     cache_path: Path | None,
 ) -> tuple[list[str], dict[str, dict[str, Any]]]:
-    previous_cache_path = os.environ.get("REGOLITH_ENGINE_CACHE")
-    if cache_path is None:
-        os.environ.pop("REGOLITH_ENGINE_CACHE", None)
-    else:
-        os.environ["REGOLITH_ENGINE_CACHE"] = str(cache_path)
+    previous_cache_path = _engine_cache_path()
+    _engine_cache_path(cache_path)
     try:
         _row_count, metadata = _score_store_to_jsonl(
             context,
@@ -101,10 +125,7 @@ def _run_slice(
             workers=workers,
         )
     finally:
-        if previous_cache_path is None:
-            os.environ.pop("REGOLITH_ENGINE_CACHE", None)
-        else:
-            os.environ["REGOLITH_ENGINE_CACHE"] = previous_cache_path
+        _engine_cache_path(previous_cache_path)
     residuals_path = output_path.with_name(output_path.name + ".partial")
     return _canonical_rows(residuals_path), dict(metadata.engine_cache_counters or {})
 
@@ -140,7 +161,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("slice spec workers must be at least 1")
 
     context = load_score_context(root)
-    tmp_parent = os.environ.get("TMPDIR")
+    tmp_parent = _dispatch_scratch_directory()
     if not tmp_parent:
         parser.error("TMPDIR must name the dispatch scratch directory")
     with tempfile.TemporaryDirectory(prefix="battery-cache-equivalence-", dir=tmp_parent) as scratch:

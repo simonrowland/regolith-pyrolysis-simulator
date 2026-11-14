@@ -9,7 +9,6 @@ from functools import wraps
 import importlib.metadata
 import inspect
 import json
-import os
 from pathlib import Path
 import socket
 import subprocess
@@ -20,6 +19,8 @@ from unittest.mock import patch
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+from simulator.engine_cache import _without_engine_cache  # noqa: E402
 
 ENGINES = ("thermoengine", "vaporock")
 POT_ID = "mgo_sio2_40_60"
@@ -97,7 +98,7 @@ def _capture(handle: Any, pot: Any, po2_request: Any) -> dict[str, Any]:
     with patch.object(backend, "equilibrate", new=record_call):
         # Exercise the same cell-to-backend argument construction as the tests,
         # while ensuring the captured result came from a live uncached solve.
-        with patch.dict(os.environ, {"REGOLITH_ENGINE_CACHE": ""}):
+        with _without_engine_cache():
             cell = equilibrate_cell(
                 handle,
                 pot,
