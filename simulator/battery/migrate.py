@@ -202,6 +202,7 @@ from simulator.battery.records import (
     Annotations,
     Apparatus,
     ApparatusGeometry,
+    ApproxPressure,
     Bench,
     BenchFact,
     BenchIdentity,
@@ -239,7 +240,12 @@ from simulator.battery.records import (
     _bound_operator_semantics,
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
+    approx_pressure_from_mapping,
+    approximate_derived_total_reason,
     as_decimal,
+    identity_pressure_from_converted_point,
+    identity_pressure_state,
+    nominal_pressure_pa,
     phase_token,
 )
 from simulator.battery.enums import BenchIdentityBasis, CellMaterial
@@ -3112,6 +3118,19 @@ def _standard_state_from_extract_text(
     )
 
 
+def _identity_total_pressure_from_plain(value: object) -> Decimal | ApproxPressure:
+    """This axis only. A decimal stays a decimal. A band mapping reloads as a band.
+
+    Every other identity axis still uses ``as_decimal``. A mapping that is
+    not an approximate pressure refuses, so a point condition cannot land
+    on the identity as a bare point.
+    """
+
+    if isinstance(value, Mapping):
+        return approx_pressure_from_mapping(value)
+    return as_decimal(value)
+
+
 def _identity_from_plain(
     payload: object,
     *,
@@ -3175,7 +3194,7 @@ def _identity_from_plain(
         kwargs["fO2_Pa"] = _state_from_plain(payload["fO2_Pa"], as_decimal)
     if payload.get("total_pressure_Pa") is not None:
         kwargs["total_pressure_Pa"] = _state_from_plain(
-            payload["total_pressure_Pa"], as_decimal
+            payload["total_pressure_Pa"], _identity_total_pressure_from_plain
         )
     if payload.get("sweep_gas") is not None:
         kwargs["sweep_gas"] = _state_from_plain(
@@ -10512,7 +10531,7 @@ def _explicit_point_conditions(
 def _point_pressure_for_identity(
     identity: Identity | None,
     point_conditions: Mapping[str, Located[Any]] | None,
-) -> State[Decimal] | None:
+) -> State[Decimal | ApproxPressure] | None:
     if identity is None:
         return None
     if (
@@ -10526,10 +10545,12 @@ def _point_pressure_for_identity(
     state = located.state
     if not state.is_value:
         return state
-    pressure_pa = _printed_source_point_condition_pressure(located)
+    pressure_pa = _printed_source_point_condition_pressure(
+        located, include_approximate=True
+    )
     if pressure_pa is None:
         return None
-    return State.of(pressure_pa)
+    return identity_pressure_state(pressure_pa)
 
 
 def _located_explicit_point_composition(
@@ -14141,21 +14162,55 @@ def _pressure_reservoir_from_payload(
     return None
 
 
-def _pressure_numeric_with_unit(raw: object, units: object) -> tuple[Decimal, str] | None:
+def _pressure_numeric_with_unit(
+    raw: object, units: object
+) -> tuple[Decimal, str, bool] | None:
+    """One printed amount in pascals, its unit trail, and the approximate flag.
+
+    A bound or an interval is not a point, so it returns ``None``.
+    """
+
+    approximate = False
     if isinstance(raw, Mapping):
         if raw.get("tag") is not None:
             return None
+        approximate = raw.get("approximate") is True
         unit = raw.get("units") or raw.get("unit") or units
         raw = raw.get("value")
     else:
         unit = units
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        approximate = approximate or raw.approximate
+        raw = raw.point
+    elif isinstance(raw, Mapping):
+        kind = raw.get("kind")
+        if kind not in (None, "point"):
+            return None
+        if kind == "point" or "point" in raw:
+            approximate = approximate or raw.get("approximate") is True
+            raw = raw.get("point")
     amount = _as_dec_or_none(raw)
     if amount is None:
         return None
     converted, trail = convert_pressure_to_pa(amount, str(unit) if unit else None)
     if converted is None or trail is None:
         return None
-    return converted, trail
+    return converted, trail, approximate
+
+
+def _source_marked_approximate(raw: object) -> bool:
+    """True when the raw extract node carries ``approximate: true``."""
+
+    if isinstance(raw, Value):
+        return raw.approximate
+    if not isinstance(raw, Mapping):
+        return False
+    if raw.get("approximate") is True:
+        return True
+    value = raw.get("value")
+    return isinstance(value, Mapping) and value.get("approximate") is True
 
 
 def _pressure_total_from_extract(
@@ -14164,7 +14219,7 @@ def _pressure_total_from_extract(
     *,
     gas_formula: str | None,
     source_text: str,
-) -> tuple[State[Decimal] | None, str | None]:
+) -> tuple[State[Decimal | ApproxPressure] | None, str | None]:
     raw = _pressure_payload_value(obs, values, "total_pressure_Pa")
     if raw not in (None, "") and _pressure_extract_value_is_unprinted(
         obs, values, "total_pressure_Pa", raw
@@ -14180,6 +14235,19 @@ def _pressure_total_from_extract(
         and isinstance(raw, Mapping)
         and raw.get("tag") is not None
     ):
+        state_value = raw.get("value")
+        if (
+            isinstance(state_value, Mapping)
+            and state_value.get("kind") == "point"
+            and state_value.get("approximate") is True
+        ):
+            point = _as_dec_or_none(state_value.get("point"))
+            if point is None:
+                return State.unknown("source total_pressure_Pa is not decodable"), None
+            return (
+                identity_pressure_from_converted_point(point, approximate=True),
+                "identity.total_pressure_Pa=source state",
+            )
         try:
             return _state_from_plain(raw, as_decimal), "identity.total_pressure_Pa=source state"
         except (KeyError, TypeError, ValueError):
@@ -14192,8 +14260,11 @@ def _pressure_total_from_extract(
     ):
         converted = _pressure_numeric_with_unit(raw, "Pa")
         if converted is not None:
-            amount, trail = converted
-            return State.of(amount), f"identity.total_pressure_Pa=source row total; {trail}"
+            amount, trail, approximate = converted
+            return (
+                identity_pressure_from_converted_point(amount, approximate=approximate),
+                f"identity.total_pressure_Pa=source row total; {trail}",
+            )
     for name, units in _PRESSURE_TOTAL_KEYS:
         raw = _pressure_payload_value(obs, values, name)
         if raw in (None, "") or _pressure_value_is_model_calculation(
@@ -14202,8 +14273,11 @@ def _pressure_total_from_extract(
             continue
         converted = _pressure_numeric_with_unit(raw, units)
         if converted is not None:
-            amount, trail = converted
-            return State.of(amount), f"identity.total_pressure_Pa=source row {name}; {trail}"
+            amount, trail, approximate = converted
+            return (
+                identity_pressure_from_converted_point(amount, approximate=approximate),
+                f"identity.total_pressure_Pa=source row {name}; {trail}",
+            )
     for payload in (obs, values):
         for key in _PRESSURE_SUM_KEYS:
             raw = payload.get(key)
@@ -14211,6 +14285,11 @@ def _pressure_total_from_extract(
                 continue
             if _pressure_value_is_model_calculation(obs, values, key, raw):
                 continue
+            if any(_source_marked_approximate(item) for item in raw.values()):
+                return (
+                    State.unknown(approximate_derived_total_reason()),
+                    None,
+                )
             total = Decimal("0")
             trails: list[str] = []
             for item in raw.values():
@@ -14218,7 +14297,7 @@ def _pressure_total_from_extract(
                 if converted is None:
                     total = Decimal("-1")
                     break
-                amount, trail = converted
+                amount, trail, _approximate = converted
                 total += amount
                 trails.append(trail)
             if total >= 0:
@@ -14227,9 +14306,15 @@ def _pressure_total_from_extract(
                     f"significant partial pressures ({key}); " + ",".join(trails)
                 )
 
-    ratio = _printed_decimal(values.get("po2_over_pK_as_published"))
-    p_k = _printed_decimal(values.get("P_K_atm_as_published"))
+    ratio_raw = values.get("po2_over_pK_as_published")
+    p_k_raw = values.get("P_K_atm_as_published")
+    ratio = _printed_decimal(ratio_raw)
+    p_k = _printed_decimal(p_k_raw)
     congruent = bool(_PRESSURE_CONGRUENT_RE.search(source_text))
+    if congruent and (
+        _source_marked_approximate(ratio_raw) or _source_marked_approximate(p_k_raw)
+    ):
+        return State.unknown(approximate_derived_total_reason()), None
     if congruent and gas_formula is not None and ratio is not None and p_k is not None:
         p_k_pa, p_k_trail = convert_pressure_to_pa(p_k, "atm")
         if p_k_pa is not None and p_k_trail is not None and p_k_pa > 0:
@@ -14462,7 +14547,13 @@ def _partial_pressure_point_condition(
     total = identity_fields.get("total_pressure_Pa")
     if not isinstance(total, State) or not total.is_value or total.value is None:
         return None
-    return located_value(total.value, locator)
+    stored = total.value
+    if isinstance(stored, ApproxPressure):
+        # Point conditions stay printed points. The band lives on the identity.
+        stored = _value_from_plain(
+            {"kind": "point", "point": stored.point, "approximate": True}
+        )
+    return located_value(stored, locator)
 
 
 def _source_point_condition_total_pressure_pa(
@@ -14478,6 +14569,15 @@ def _source_point_condition_total_pressure_pa(
         located = _point_condition_from_plain(
             raw_pressure, key="total_pressure_Pa"
         )
+        raw_value = located.state.value if located.state.is_value else None
+        if (
+            isinstance(raw_value, Value)
+            and raw_value.kind is ValueKind.POINT
+            and raw_value.approximate
+            and raw_value.point is not None
+            and raw_value.point > 0
+        ):
+            return located
         amount = _point_condition_decimal(raw_pressure)
         if located.state.is_value and amount is not None and amount > 0:
             return replace(located, state=State.of(amount))
@@ -14486,8 +14586,16 @@ def _source_point_condition_total_pressure_pa(
 
 def _printed_source_point_condition_pressure(
     located: Located[Any] | None,
-) -> Decimal | None:
-    """Return only an exact point backed by a printed source locator."""
+    *,
+    include_approximate: bool = False,
+) -> Decimal | Value | None:
+    """Return a printed point backed by a source locator.
+
+    The default refuses an approximate point. Calibration keeps that
+    default. Identity passes ``include_approximate`` and receives the
+    ``Value`` so the band can be built. A stripped decimal would make
+    equality legal again.
+    """
 
     if (
         located is None
@@ -14498,8 +14606,12 @@ def _printed_source_point_condition_pressure(
         return None
     raw = located.state.value
     if isinstance(raw, Value):
-        if raw.kind is not ValueKind.POINT or raw.point is None or raw.approximate:
+        if raw.kind is not ValueKind.POINT or raw.point is None:
             return None
+        if raw.approximate:
+            if not include_approximate or raw.point <= 0:
+                return None
+            return raw
         raw = raw.point
     amount = _as_dec_or_none(raw)
     return amount if amount is not None and amount > 0 else None
@@ -20491,15 +20603,7 @@ def _printed_buffer_calibration(
 
 
 def _pressure_bar_from_identity(value: object) -> Decimal | None:
-    if isinstance(value, State):
-        if not value.is_value:
-            return None
-        value = value.value
-    if isinstance(value, Value):
-        if value.kind is not ValueKind.POINT or value.point is None:
-            return None
-        value = value.point
-    pressure_pa = _as_dec_or_none(value)
+    pressure_pa = nominal_pressure_pa(value)
     if pressure_pa is None or pressure_pa <= 0:
         return None
     return pressure_pa / _BAR_PA
@@ -20976,19 +21080,36 @@ def _offset_number(raw: object) -> tuple[Decimal, str] | None:
     return number, printed
 
 
+def _mpa_identity_pressure(value: object) -> State[Decimal | ApproxPressure] | None:
+    """Valence ``pressure_MPa`` as an identity pressure.
+
+    An exact decimal keeps today's conversion. An approximate point becomes
+    the band. An exact ``Value`` still does not convert: ``convert_pressure_to_pa``
+    refuses a ``Value``, and this landing does not start filling those rows.
+    """
+
+    if isinstance(value, Value) and value.approximate:
+        if value.kind is not ValueKind.POINT or value.point is None:
+            return None
+        converted, _trail = convert_pressure_to_pa(value.point, "MPa")
+        if converted is None:
+            return None
+        return identity_pressure_from_converted_point(converted, approximate=True)
+    converted, _trail = convert_pressure_to_pa(value, "MPa")
+    if converted is None:
+        return None
+    return State.of(converted)
+
+
 def _positive_pressure_pa(state: object) -> Decimal | None:
     if isinstance(state, Located):
         state = state.state
     if not isinstance(state, State) or not state.is_value:
         return None
-    raw = state.value
-    if isinstance(raw, Value):
-        if raw.kind is not ValueKind.POINT or raw.point is None:
-            return None
-        raw = raw.point
-    if isinstance(raw, Decimal) and raw.is_finite() and raw > 0:
-        return raw
-    return None
+    raw = nominal_pressure_pa(state.value)
+    if raw is None or not raw.is_finite() or raw <= 0:
+        return None
+    return raw
 
 
 def _point_total_pressure_pa(
@@ -26572,17 +26693,22 @@ class Migrator:
                         values, obs
                     )
                     printed_total = _printed_source_point_condition_pressure(
-                        source_total
+                        source_total, include_approximate=True
                     )
                     existing_total = ident_kwargs.get("total_pressure_Pa")
-                    if printed_total is not None and (
+                    printed_state = (
+                        identity_pressure_state(printed_total)
+                        if printed_total is not None
+                        else None
+                    )
+                    if printed_state is not None and (
                         existing_total is None
                         or (
                             isinstance(existing_total, State)
                             and existing_total.is_unknown
                         )
                     ):
-                        ident_kwargs["total_pressure_Pa"] = State.of(printed_total)
+                        ident_kwargs["total_pressure_Pa"] = printed_state
                     elif (
                         source_total is not None
                         and source_total.state.is_value
@@ -26724,10 +26850,13 @@ class Migrator:
             )
             if p_amt is None:
                 p_amt = _printed_source_point_condition_pressure(
-                    _source_point_condition_total_pressure_pa(values, obs)
+                    _source_point_condition_total_pressure_pa(values, obs),
+                    include_approximate=True,
                 )
             if p_amt is not None:
-                ident_kwargs["total_pressure_Pa"] = State.of(p_amt)
+                pressure_state = identity_pressure_state(p_amt)
+                if pressure_state is not None:
+                    ident_kwargs["total_pressure_Pa"] = pressure_state
             else:
                 textual = values.get("pressure_basis")
                 if textual not in (None, ""):
@@ -27637,11 +27766,10 @@ class Migrator:
                 isinstance(pressure_condition, Located)
                 and pressure_condition.state.is_value
             ):
-                pressure, _trail = convert_pressure_to_pa(
-                    pressure_condition.state.value, "MPa"
+                pressure_for_oxygen = _mpa_identity_pressure(
+                    pressure_condition.state.value
                 )
-                if pressure is not None:
-                    pressure_for_oxygen = State.of(pressure)
+                if pressure_for_oxygen is not None:
                     ident_kwargs["total_pressure_Pa"] = pressure_for_oxygen
         oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
             facts=oxygen_facts,
@@ -27739,16 +27867,10 @@ class Migrator:
                 isinstance(current_pressure, State) and current_pressure.is_unknown
             )
             if printed_point_pressure and pressure_missing:
-                point_value = point_pressure.state.value
-                if isinstance(point_value, Value):
-                    if point_value.kind is ValueKind.POINT and point_value.point is not None:
-                        ident_kwargs["total_pressure_Pa"] = State.of(point_value.point)
-                        pressure_missing = False
-                else:
-                    point_amount = _as_dec_or_none(point_value)
-                    if point_amount is not None:
-                        ident_kwargs["total_pressure_Pa"] = State.of(point_amount)
-                        pressure_missing = False
+                point_state = identity_pressure_state(point_pressure.state.value)
+                if point_state is not None:
+                    ident_kwargs["total_pressure_Pa"] = point_state
+                    pressure_missing = False
             if pressure_missing and not printed_point_pressure:
                 ambient_pressure_evidence = (
                     ambient_experiment.ambient_pressure_evidence
@@ -29613,10 +29735,13 @@ class Migrator:
             and isinstance(raw_item, Mapping)
         ):
             point_pressure = _printed_source_point_condition_pressure(
-                _source_point_condition_total_pressure_pa(raw_item, {})
+                _source_point_condition_total_pressure_pa(raw_item, {}),
+                include_approximate=True,
             )
             if point_pressure is not None:
-                ident_kwargs["total_pressure_Pa"] = State.of(point_pressure)
+                pressure_state = identity_pressure_state(point_pressure)
+                if pressure_state is not None:
+                    ident_kwargs["total_pressure_Pa"] = pressure_state
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
         else:
@@ -30357,15 +30482,11 @@ class Migrator:
                             _PRESSURE_IDENTITY_UNKNOWN["total_pressure_Pa"]
                         )
                     else:
-                        pressure = (
-                            State.of(pressure_value.point)
-                            if isinstance(pressure_value, Value)
-                            and pressure_value.kind is ValueKind.POINT
-                            and pressure_value.point is not None
-                            else State.unknown(
+                        pressure = identity_pressure_state(pressure_value)
+                        if pressure is None:
+                            pressure = State.unknown(
                                 "source has no located total pressure for this run"
                             )
-                        )
                     area_located = None
                     if (
                         run_experiment.apparatus is not None
@@ -30666,17 +30787,12 @@ class Migrator:
                 isinstance(total_pressure, Located)
                 and total_pressure.state.is_value
             ):
-                pressure_value = total_pressure.state.value
-                if isinstance(pressure_value, Value):
-                    pressure_value = (
-                        pressure_value.point
-                        if pressure_value.kind is ValueKind.POINT
-                        else None
-                    )
-                pressure_pa = _as_dec_or_none(pressure_value)
-                if pressure_pa is not None:
+                pressure_state = identity_pressure_state(
+                    total_pressure.state.value
+                )
+                if pressure_state is not None:
                     identity = replace(
-                        identity, total_pressure_Pa=State.of(pressure_pa)
+                        identity, total_pressure_Pa=pressure_state
                     )
         if point_composition_refusal:
             composition_reason = composition_unknown_reason(
@@ -30869,12 +30985,12 @@ class Migrator:
                 isinstance(pressure_condition, Located)
                 and pressure_condition.state.is_value
             ):
-                pressure, _trail = convert_pressure_to_pa(
-                    pressure_condition.state.value, "MPa"
+                pressure_state = _mpa_identity_pressure(
+                    pressure_condition.state.value
                 )
-                if pressure is not None:
+                if pressure_state is not None:
                     identity = replace(
-                        identity, total_pressure_Pa=State.of(pressure)
+                        identity, total_pressure_Pa=pressure_state
                     )
         refreshed_oxygen = _refresh_buffer_decision(
             oxygen_decision,

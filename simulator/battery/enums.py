@@ -344,6 +344,9 @@ class NoticeKind(StrEnum):
     VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
     APPROXIMATE_VALUE = "approximate_value"
+    # The identity pressure is a band. Distinct from APPROXIMATE_VALUE, which
+    # is the measured observable. An exact residue wt% must not take that stratum.
+    APPROXIMATE_PRESSURE = "approximate_pressure"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
     # Fe3+/sum Fe from measured oxygen, assigning every excess O atom to Fe.
     # The reason lists any other redox-variable element that was printed.
