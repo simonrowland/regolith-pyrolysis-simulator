@@ -729,8 +729,18 @@ def test_inventory_cap_records_actual_mixed_parent_debit_when_other_parent_is_ti
         bounds, corners = original_bounds(*args, **kwargs)
         # The same controlled mass envelope is supplied for each geometry
         # callback; the production cap then allocates it against each parent.
-        bounds["AlSiO"] = 2.0
-        bounds["SiO2"] = 2.0
+        # There are four point callbacks and two preheat callbacks, giving
+        # 0.12 kg AlSiO and 0.003 kg finite SiO2 overall. The inventory is
+        # 1 mol Al2O3 (~0.102 kg) and 0.1 mol SiO2 (~0.006 kg). AlSiO consumes
+        # 0.5 mol Al2O3 + 1 mol SiO2 per product mole; its normalized parent
+        # mass shares are about 0.459 and 0.541. Thus alumina demand is
+        # 0.12*0.459 ~= 0.055 kg < 0.102 kg (scale 1), while silica demand is
+        # 0.12*0.541 + 0.003 ~= 0.068 kg > 0.006 kg. Finite silica alone is
+        # below its ceiling, so the divergent scale is
+        # (0.006 - 0.003)/(0.12*0.541) ~= 0.046; AlSiO uses the tighter
+        # min(1, 0.046), keeping both parent scales positive and unequal.
+        bounds["AlSiO"] = 0.02
+        bounds["SiO2"] = 0.0005
         return bounds, corners
 
     monkeypatch.setattr(residue, "_mass_loss_corner_bounds", supply_controlled_bounds)
