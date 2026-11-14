@@ -5425,13 +5425,15 @@ def _resolve_source_relation_with_indexes(
         asset_ids=indexes.asset_ids,
         _cache=indexes.observation_lineages,
     )
-    candidate_lineage = _resolve_coefficient_sources(
-        coefficient_lineage_sources(coefficient_sources),
-        observations,
-        works,
-        experiments,
+    candidate_complete, candidate_lineage = _candidate_lineage_for_sources(
+        coefficient_sources,
+        works=works,
+        observations=observations,
+        experiments=experiments,
         _indexes=indexes,
     )
+    if not candidate_complete or candidate_lineage is None:
+        return SourceRelation.UNKNOWN
     return _source_relation_from_lineages(reference_lineage, candidate_lineage)
 
 
