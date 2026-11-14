@@ -100,6 +100,7 @@ from simulator.physical_constants import PA_PER_BAR
 from simulator.vapour_rail.nasa_cea import (
     Nasa9Segment,
     NasaCeaPolynomial,
+    R_J_PER_MOL_K as NASA_CEA_R_J_PER_MOL_K,
     reaction_equilibrium_constant,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -229,12 +230,172 @@ class OffgasFO2:
 
 
 @dataclass(frozen=True)
-class _DirectGasCoupleFO2:
+class _ElementBalanceFO2:
     log10_fO2: float
-    mix_precision_band_dex: float
-    thermo_spread_dex: float | None
-    band_dex: float
-    authority: str
+    equilibrium_partial_pressures_bar: dict[str, float]
+
+
+def _full_element_balance_fo2(
+    initial_mole_fractions: Mapping[str, float],
+    T_K: float,
+    formation_gibbs_J_per_mol: Mapping[str, float],
+    gas_constant_J_per_mol_K: float,
+    *,
+    initial_total_pressure_bar: float,
+) -> _ElementBalanceFO2:
+    """Equilibrate CO2/CO/O2 and H2O/H2/O2 at fixed T and volume."""
+
+    T = _coerce_T_K(T_K)
+    try:
+        pressure = float(initial_total_pressure_bar)
+        gas_constant = float(gas_constant_J_per_mol_K)
+        amounts = {str(name).upper(): float(value) for name, value in initial_mole_fractions.items()}
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise OffgasFO2Unavailable("full gas balance needs numeric composition, T, and pressure") from exc
+    allowed = {"CO2", "CO", "O2", "H2", "H2O", "N2", "AR"}
+    if set(amounts) - allowed:
+        raise OffgasFO2Unavailable("full gas balance received unsupported species")
+    if (
+        not math.isfinite(T)
+        or T <= 0.0
+        or not math.isfinite(pressure)
+        or pressure <= 0.0
+        or not math.isfinite(gas_constant)
+        or gas_constant <= 0.0
+        or not amounts
+        or any(not math.isfinite(value) or value < 0.0 for value in amounts.values())
+    ):
+        raise OffgasFO2Unavailable("full gas balance inputs must be finite and nonnegative")
+    fraction_total = sum(amounts.values())
+    if fraction_total <= 0.0:
+        raise OffgasFO2Unavailable("full gas balance has no initial gas")
+    # Mole fractions times the initial pressure give bar partial pressures;
+    # normalization preserves the printed ratios when rounded input sums drift.
+    initial = {name: value * pressure / fraction_total for name, value in amounts.items()}
+    required = ("CO", "CO2", "H2", "H2O", "O2")
+    if any(name not in formation_gibbs_J_per_mol for name in required):
+        raise OffgasFO2Unavailable("full gas balance lacks JANAF Gibbs data for CO-H-O species")
+
+    logK_co = _log10_K_from_formation_gibbs_J_per_mol(
+        (("CO", 1.0), ("O2", 0.5), ("CO2", -1.0)),
+        formation_gibbs_J_per_mol, T, gas_constant,
+    )
+    logK_h2 = _log10_K_from_formation_gibbs_J_per_mol(
+        (("H2", 1.0), ("O2", 0.5), ("H2O", -1.0)),
+        formation_gibbs_J_per_mol, T, gas_constant,
+    )
+    carbon = initial.get("CO2", 0.0) + initial.get("CO", 0.0)
+    hydrogen = initial.get("H2O", 0.0) + initial.get("H2", 0.0)
+    oxygen_atoms = (
+        2.0 * initial.get("CO2", 0.0)
+        + initial.get("CO", 0.0)
+        + initial.get("H2O", 0.0)
+        + 2.0 * initial.get("O2", 0.0)
+    )
+    if oxygen_atoms <= 0.0:
+        raise OffgasFO2Unavailable("gas elemental balance has no oxygen and imposes no finite fO2")
+
+    def species_at_log_p(log_p: float) -> dict[str, float]:
+        p_o2 = 10.0**log_p
+        log_ratio = -0.5 * log_p
+        co_ratio = 10.0 ** max(-300.0, min(300.0, logK_co + log_ratio))
+        h2_ratio = 10.0 ** max(-300.0, min(300.0, logK_h2 + log_ratio))
+        p_co = carbon * co_ratio / (1.0 + co_ratio) if carbon else 0.0
+        p_co2 = carbon - p_co
+        p_h2 = hydrogen * h2_ratio / (1.0 + h2_ratio) if hydrogen else 0.0
+        p_h2o = hydrogen - p_h2
+        result = {
+            "CO2": p_co2,
+            "CO": p_co,
+            "O2": p_o2,
+            "H2O": p_h2o,
+            "H2": p_h2,
+        }
+        result.update({name: value for name, value in initial.items() if name in {"N2", "AR"}})
+        return result
+
+    def oxygen_residual(log_p: float) -> float:
+        eq = species_at_log_p(log_p)
+        return (
+            2.0 * eq["CO2"] + eq["CO"] + eq["H2O"] + 2.0 * eq["O2"]
+            - oxygen_atoms
+        )
+
+    # Premise: the feed starts at fixed T and volume, then CO2 ⇌ CO + ½O2
+    # and H2O ⇌ H2 + ½O2 reach ideal-gas equilibrium. For each trial pO2,
+    # Kp_CO = (pCO/p°)*sqrt(pO2/p°)/(pCO2/p°), and likewise for H2O/H2;
+    # C: CO2+CO=C0 and H: H2+H2O=H0 determine each split. The root closes
+    # O: 2CO2+CO+H2O+2O2=O0. N: 2N2=N0 and Ar=Ar0 because both are inert.
+    # Unit check: mole fractions × bar give bar-equivalent partial pressures,
+    # so each elemental-balance term is bar; every Kp factor is p/p° with
+    # JANAF p°=1 bar and is dimensionless. At pure CO2, the CO2 dissociation
+    # and free-O2 terms both remain, recovering its oxidizing-limit fO2; added
+    # H2 cannot raise fO2 above that limit.
+    lo, hi = -300.0, math.log10(max(oxygen_atoms / 2.0, pressure))
+    if oxygen_residual(lo) >= 0.0 or oxygen_residual(hi) <= 0.0:
+        raise OffgasFO2Unavailable("full gas elemental oxygen balance has no positive pO2 root")
+    for _ in range(220):
+        mid = (lo + hi) / 2.0
+        if oxygen_residual(mid) > 0.0:
+            hi = mid
+        else:
+            lo = mid
+    log_p = (lo + hi) / 2.0
+    return _ElementBalanceFO2(log_p, species_at_log_p(log_p))
+
+
+def _full_balance_fo2_with_janaf_band(
+    initial_mole_fractions: Mapping[str, float],
+    T_K: float,
+    janaf_formation_gibbs_J_per_mol: Mapping[str, float],
+    janaf_gas_constant_J_per_mol_K: float,
+    polynomials: Mapping[str, NasaCeaPolynomial],
+    *,
+    initial_total_pressure_bar: float,
+    relative_precision: Mapping[str, float] | None = None,
+) -> tuple[_ElementBalanceFO2, float, float]:
+    """Return JANAF central fO2 and a full-balance source/mixture band."""
+
+    required = ("CO", "CO2", "H2", "H2O", "O2")
+    T = _coerce_T_K(T_K)
+    cea_gibbs = {name: polynomials[name].evaluate(T).g_J_per_mol for name in required}
+    cea_R = NASA_CEA_R_J_PER_MOL_K
+    janaf = _full_element_balance_fo2(
+        initial_mole_fractions, T, janaf_formation_gibbs_J_per_mol,
+        janaf_gas_constant_J_per_mol_K,
+        initial_total_pressure_bar=initial_total_pressure_bar,
+    )
+    cea = _full_element_balance_fo2(
+        initial_mole_fractions, T, cea_gibbs, cea_R,
+        initial_total_pressure_bar=initial_total_pressure_bar,
+    )
+    source_spread = abs(janaf.log10_fO2 - cea.log10_fO2)
+    precision_spread_sq = 0.0
+    for species, relative_error in (relative_precision or {}).items():
+        try:
+            relative_error = float(relative_error)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise OffgasFO2Unavailable("gas mixture precision must be numeric") from exc
+        if not math.isfinite(relative_error) or relative_error < 0.0:
+            raise OffgasFO2Unavailable("gas mixture precision must be finite and nonnegative")
+        if relative_error == 0.0 or species not in initial_mole_fractions:
+            continue
+        component = float(initial_mole_fractions[species])
+        variations = []
+        for factor in (1.0 - relative_error, 1.0 + relative_error):
+            varied = dict(initial_mole_fractions)
+            varied[species] = component * max(0.0, factor)
+            variations.append(
+                _full_element_balance_fo2(
+                    varied, T, janaf_formation_gibbs_J_per_mol,
+                    janaf_gas_constant_J_per_mol_K,
+                    initial_total_pressure_bar=initial_total_pressure_bar,
+                ).log10_fO2
+            )
+        component_spread = max(abs(value - janaf.log10_fO2) for value in variations)
+        precision_spread_sq += component_spread * component_spread
+    band = math.hypot(source_spread, math.sqrt(precision_spread_sq))
+    return janaf, cea.log10_fO2, band
 
 
 def load_buffer_polynomials(
@@ -698,90 +859,6 @@ def _log10_K_from_formation_gibbs_J_per_mol(
     # are both J/mol; ln(10) is dimensionless, leaving dimensionless log10(K).
     # Sanity limit: ΔG°=0 gives K=1 and log10(K)=0.
     return -delta_g / (gas_constant * T * math.log(10.0))
-
-
-def _direct_gas_couple_fo2(
-    species_mol: Mapping[str, float],
-    relative_precision: Mapping[str, float],
-    T_K: float,
-    *,
-    formation_gibbs_J_per_mol: Mapping[str, float] | None = None,
-    gas_constant_J_per_mol_K: float | None = None,
-    polynomials: Mapping[str, NasaCeaPolynomial] | None = None,
-) -> _DirectGasCoupleFO2:
-    """Resolve a printed direct couple and its prescribed consistency band.
-
-    For CO + 1/2 O2 ⇌ CO2, log10(fO2) = 2 log10(CO2/CO) - 2 log10 K;
-    the H2/H2O couple has the same form. From printed component-flow errors,
-    dlog10(ratio) = (dF_oxidised/F_oxidised + dF_reduced/F_reduced)/ln(10),
-    so the fO2 mix band is twice that term. Sanity at 1682.15 K for the printed
-    Jayasuriya CO2 51.0×200 / CO 5.1×10 SCCM mix: CEA gives -3.9080 and JANAF
-    gives -3.9107, a computed thermo spread of 0.0027 dex.
-    """
-
-    keys = set(species_mol)
-    if keys == {"CO", "CO2"}:
-        couple, oxidised, reduced = "CO", "CO2", "CO"
-    elif keys == {"H2", "H2O"}:
-        couple, oxidised, reduced = "H2", "H2O", "H2"
-    else:
-        raise OffgasFO2Unavailable(
-            "gas_mix_fo2_band_unavailable: only direct CO2/CO and H2O/H2 "
-            "couples have a sized consistency band"
-        )
-    try:
-        oxidised_mol = float(species_mol[oxidised])
-        reduced_mol = float(species_mol[reduced])
-        uncertainty = sum(float(relative_precision[name]) for name in (oxidised, reduced))
-        T = _coerce_T_K(T_K)
-    except (KeyError, TypeError, ValueError, OverflowError) as exc:
-        raise OffgasFO2Unavailable(
-            "direct gas couple needs finite flows and printed precision"
-        ) from exc
-    if (
-        not math.isfinite(oxidised_mol)
-        or not math.isfinite(reduced_mol)
-        or oxidised_mol <= 0.0
-        or reduced_mol <= 0.0
-        or not math.isfinite(uncertainty)
-        or uncertainty < 0.0
-        or T <= 0.0
-    ):
-        raise OffgasFO2Unavailable("direct gas couple inputs must be finite and positive")
-
-    polys = polynomials if polynomials is not None else load_buffer_polynomials()
-    lo, hi = _effective_domain_K(polys, _COUPLE_RECORDS[couple])
-    authority = "certified" if lo <= T <= hi else "extrapolated"
-    log10_K = _log10_K_couple(
-        polys, couple, T, allow_extrapolation=True
-    )
-    log10_fO2 = _couple_log10_fO2(oxidised_mol / reduced_mol, log10_K)
-    mix_band = 2.0 * uncertainty / math.log(10.0)
-    thermo_spread: float | None = None
-    if formation_gibbs_J_per_mol is not None and gas_constant_J_per_mol_K:
-        if all(name in formation_gibbs_J_per_mol for name in (oxidised, reduced, "O2")):
-            janaf_log10_K = _log10_K_from_formation_gibbs_J_per_mol(
-                (
-                    (oxidised, 1.0),
-                    (reduced, -1.0),
-                    ("O2", -0.5),
-                ),
-                formation_gibbs_J_per_mol,
-                T,
-                gas_constant_J_per_mol_K,
-            )
-            janaf_log10_fO2 = _couple_log10_fO2(
-                oxidised_mol / reduced_mol, janaf_log10_K
-            )
-            thermo_spread = abs(log10_fO2 - janaf_log10_fO2)
-    band = math.hypot(mix_band, thermo_spread or 0.0)
-    return _DirectGasCoupleFO2(
-        log10_fO2=log10_fO2,
-        mix_precision_band_dex=mix_band,
-        thermo_spread_dex=thermo_spread,
-        band_dex=band,
-        authority=authority,
-    )
 
 
 def water_gas_shift_log10_K(
