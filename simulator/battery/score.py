@@ -112,6 +112,8 @@ from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.battery.residue_cohorts import (
     HASHIMOTO_SOURCE_ID as _HASHIMOTO_SOURCE_ID,
     _LANGMUIR_RESIDUE_COHORTS,
+    langmuir_comparison_identity_updates,
+    langmuir_experiment_ids_by_source,
 )
 from simulator.battery.input_provenance import (
     ANALYSED_MELT_MINUS_SCORED,
@@ -8139,14 +8141,13 @@ def _comparison_identity(
         quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
         and comparison_method_cell_constant_cancels(reference.provenance)
     )
-    cohort_spec = _LANGMUIR_RESIDUE_COHORTS.get(reference.source_id or "")
-    vacuum_upper_bound_identity = (
-        cohort_spec is not None
-        and cohort_spec.vacuum_upper_bound_identity
-        and quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and prediction.refusal_detail.get("total_pressure_is_upper_bound")
-        and prediction.refusal_detail.get("total_pressure_Pa") is not None
+    langmuir_identity_updates = langmuir_comparison_identity_updates(
+        reference.source_id or "",
+        identity,
+        quantity_token(identity),
+        prediction.refusal_detail,
     )
+    vacuum_upper_bound_identity = bool(langmuir_identity_updates)
     knudsen_total_pressure = _knudsen_total_pressure_details(
         prediction.notices
     )
@@ -8180,15 +8181,7 @@ def _comparison_identity(
         and (identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value)
     ):
         updates["total_pressure_Pa"] = State.of(knudsen_total_pressure[0])
-    if vacuum_upper_bound_identity:
-        if identity.fO2_Pa is None or not identity.fO2_Pa.is_value:
-            updates["fO2_Pa"] = State.not_applicable(
-                "unbuffered vacuum has no commanded oxygen fugacity"
-            )
-        if identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value:
-            updates["total_pressure_Pa"] = State.of(
-                Decimal(str(prediction.refusal_detail["total_pressure_Pa"]))
-            )
+    updates.update(langmuir_identity_updates)
     if fusion_polymorph_flag:
         call_evidence = prediction.execution.call_evidence or ""
         fusion_pair = call_evidence.partition("janaf-fusion:")[2].partition(":")[0]
@@ -15646,32 +15639,6 @@ def _residue_prediction_cache_entry(
     return cache.get(key)
 
 
-def _hashimoto_engine_floor_inversion_notices(
-    engine: Engine, diagnostics: object
-) -> tuple[Notice, ...]:
-    if not isinstance(diagnostics, Sequence) or isinstance(diagnostics, (str, bytes)):
-        return ()
-    notices: list[Notice] = []
-    for row in diagnostics:
-        if not isinstance(row, Mapping) or row.get("kind") != "floor_inversion":
-            continue
-        original = row.get("original")
-        band = row.get("band")
-        if original is None or band is None:
-            continue
-        notices.append(
-            Notice(
-                kind=NoticeKind.FLOOR_INVERSION,
-                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                reason=f"{row.get('reason') or 'floor_inversion'}:{row.get('species')}",
-                origin=f"engine:{engine.value}",
-                original=as_decimal(original),
-                band=json.dumps(band, sort_keys=True, default=str),
-            )
-        )
-    return tuple(notices)
-
-
 def _langmuir_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -15687,8 +15654,17 @@ def _langmuir_residue_prediction(
     cohort_spec = _LANGMUIR_RESIDUE_COHORTS.get(source_id)
     if cohort_spec is None:
         raise ValueError(f"langmuir_cohort_not_registered:{source_id}")
+    cohort_label = "hashimoto" if source_id == _HASHIMOTO_SOURCE_ID else "langmuir"
+    call_label = "hashimoto" if source_id == _HASHIMOTO_SOURCE_ID else source_id
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    from simulator.battery.residue import (
+        ResidueInventoryRefusal,
+        _langmuir_cohort_notices,
+        _predict_langmuir_residue_rows,
+        _residue_engine_floor_inversion_notices,
+    )
+
     quantity = quantity_token(reference.identity)
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -15697,74 +15673,16 @@ def _langmuir_residue_prediction(
     )
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
-            raise ValueError(
-                "engine_not_supported_for_hashimoto_residue"
-                if source_id == _HASHIMOTO_SOURCE_ID
-                else "engine_not_supported_for_langmuir_residue"
-            )
+            raise ValueError(f"engine_not_supported_for_{cohort_label}_residue")
         if rows_by_key is None:
-            from simulator.battery.residue import (
-                ResidueInventoryRefusal,
-                _predict_langmuir_residue_cohort,
-                _predict_hashimoto_residue_cohort,
+            rows = _predict_langmuir_residue_rows(
+                context.observations.values(),
+                context.experiments,
+                source_id=source_id,
+                cohort_spec=cohort_spec,
+                engine=engine.value,
+                selected_experiment_ids=selected_experiment_ids,
             )
-
-            observations = [
-                row
-                for row in context.observations.values()
-                if row.source_id == source_id
-                and row.observation_id.startswith(source_id + "::")
-                and isinstance(row.identity, Identity)
-                and quantity_token(row.identity)
-                is Quantity.RESIDUE_COMPONENT_COMPOSITION
-            ]
-            experiments_by_id = {
-                row.experiment_id: context.experiments[row.experiment_id]
-                for row in observations
-                if row.experiment_id in context.experiments
-            }
-            source_path = REPO_ROOT / cohort_spec.extract_path
-            source = load_yaml(source_path)
-            geometry = None
-            if cohort_spec.geometry_source == "hashimoto_metadata_dimensions":
-                geometry = next(
-                    item
-                    for item in source.get("metadata", ())
-                    if item.get("observation_id")
-                    == cohort_spec.geometry_observation_id
-                )["values"]["starting_preform_mm"]
-            experiments = [
-                to_plain(experiments_by_id[experiment_id])
-                for experiment_id in sorted(experiments_by_id)
-            ]
-            revision = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
-            if source_id == _HASHIMOTO_SOURCE_ID:
-                rows = _predict_hashimoto_residue_cohort(
-                    experiments,
-                    load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
-                    preform_dimensions_mm=geometry,
-                    code_revision=revision,
-                    engine=engine.value,
-                    selected_experiment_ids=selected_experiment_ids,
-                )
-            else:
-                rows = _predict_langmuir_residue_cohort(
-                    experiments,
-                    load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
-                    cohort_spec=cohort_spec,
-                    source_id=source_id,
-                    source_document=source,
-                    preform_dimensions_mm=None,
-                    code_revision=revision,
-                    engine=engine.value,
-                    selected_experiment_ids=selected_experiment_ids,
-                )
             rows_by_key = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
             }
@@ -15784,11 +15702,7 @@ def _langmuir_residue_prediction(
         primary = rows_by_key.get(primary_key)
         production = rows_by_key.get(production_key)
         if primary is None or production is None:
-            raise ValueError(
-                "hashimoto_prediction_row_missing"
-                if source_id == _HASHIMOTO_SOURCE_ID
-                else "langmuir_prediction_row_missing"
-            )
+            raise ValueError(f"{cohort_label}_prediction_row_missing")
         primary_provenance = dict(primary.provenance)
         sources = (
             *sources,
@@ -15846,30 +15760,9 @@ def _langmuir_residue_prediction(
         )
 
         formula = reference.identity.species.formula
-        if (
-            cohort_spec.zero_time_rule == "refuse_if_residue_matches_charge"
-            and primary_provenance.get("duration_s") == 0.0
-        ):
-            starting_component = (
-                primary_provenance.get("starting_composition_wt_pct") or {}
-            ).get(formula)
-            measured_component = getattr(reference.value, "point", None)
-            if starting_component is None:
-                raise ResidueInventoryRefusal("starting_composition_not_stated")
-            if measured_component is not None and as_decimal(
-                measured_component
-            ) == as_decimal(starting_component):
-                raise ResidueInventoryRefusal("starting_bulk_not_residue")
         if run_refusal:
             raise ResidueInventoryRefusal(
-                str(
-                    run_refusal.get("reason")
-                    or (
-                        "hashimoto_run_refused"
-                        if source_id == _HASHIMOTO_SOURCE_ID
-                        else "langmuir_run_refused"
-                    )
-                ),
+                str(run_refusal.get("reason") or f"{cohort_label}_run_refused"),
                 json.dumps(run_refusal, sort_keys=True, default=str),
             )
         if is_retention:
@@ -15911,14 +15804,7 @@ def _langmuir_residue_prediction(
             value = primary.primary_oxide_wt_pct.get(formula)
             band = primary.sensitivity_band_wt_pct.get(formula)
         if value is None or (band is None and not is_retention):
-            raise ValueError(
-                (
-                    "hashimoto_oxide_prediction_missing:"
-                    if source_id == _HASHIMOTO_SOURCE_ID
-                    else "langmuir_oxide_prediction_missing:"
-                )
-                + formula
-            )
+            raise ValueError(f"{cohort_label}_oxide_prediction_missing:{formula}")
         if is_retention and value <= 0.0:
             raise ResidueInventoryRefusal(
                 "residue_metric_domain", f"no positive Hashimoto {formula} retention"
@@ -15934,35 +15820,16 @@ def _langmuir_residue_prediction(
                 )
             ]
         else:
-            notices = []
-            if cohort_spec.geometry_notice_reason:
-                notices.append(
-                    Notice(
-                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                        affected_quantities=(reported_quantity,),
-                        reason=cohort_spec.geometry_notice_reason,
-                        origin=f"{source_id}:langmuir-residue",
-                        band=(
-                            "printed initial area; constant and self-similar-shrinking "
-                            f"geometries; area uncertainty={cohort_spec.area_uncertainty}"
-                        ),
-                    )
+            notices = list(
+                _langmuir_cohort_notices(
+                    primary,
+                    source_id=source_id,
+                    cohort_spec=cohort_spec,
+                    quantity=reported_quantity,
                 )
-            if primary_provenance.get("total_pressure_is_upper_bound"):
-                notices.append(
-                    Notice(
-                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                        affected_quantities=(reported_quantity,),
-                        reason="total_pressure_upper_bound_used",
-                        origin=f"{source_id}:vacuum-pressure-bound",
-                        band=(
-                            "evaluated at the printed upper bound "
-                            f"{primary_provenance.get('total_pressure_Pa'):.17g} Pa"
-                        ),
-                    )
-                )
+            )
         notices.extend(
-            _hashimoto_engine_floor_inversion_notices(
+            _residue_engine_floor_inversion_notices(
                 engine,
                 primary_provenance.get("engine_floor_inversion_diagnostics"),
             )
@@ -16000,7 +15867,7 @@ def _langmuir_residue_prediction(
                     affected_quantities=(reported_quantity,),
                     reason="residue_time_refinement_unconverged; finest prediction retained",
                     origin=(
-                        "hashimoto-residue-r3"
+                        f"{call_label}-residue-r3"
                         if source_id == _HASHIMOTO_SOURCE_ID
                         else f"{source_id}:langmuir-residue-r3"
                     ),
@@ -16011,7 +15878,7 @@ def _langmuir_residue_prediction(
             _liquid_rows_below_floor_notices(
                 primary.provenance.get("liquid_rows_used"),
                 origin=(
-                    "hashimoto-residue-addendum-a"
+                    f"{call_label}-residue-addendum-a"
                     if source_id == _HASHIMOTO_SOURCE_ID
                     else f"{source_id}:langmuir-residue-addendum-a"
                 ),
@@ -16023,9 +15890,7 @@ def _langmuir_residue_prediction(
             execution=Execution(
                 state=ExecutionState.PRODUCED,
                 call_evidence=(
-                    f"{engine.value}:hashimoto:{reference.experiment_id}:alpha_common_unity_sensitivity"
-                    if source_id == _HASHIMOTO_SOURCE_ID
-                    else f"{engine.value}:{source_id}:{reference.experiment_id}:alpha_common_unity_sensitivity"
+                    f"{engine.value}:{call_label}:{reference.experiment_id}:alpha_common_unity_sensitivity"
                 ),
             ),
             value=Decimal(str(value)),
@@ -16082,7 +15947,7 @@ def _langmuir_residue_prediction(
                 engine_floor_diagnostics = refusal_detail.get(
                     "engine_floor_inversion_diagnostics", ()
                 )
-        notices = _hashimoto_engine_floor_inversion_notices(
+        notices = _residue_engine_floor_inversion_notices(
             engine, engine_floor_diagnostics
         )
         return EnginePrediction(
@@ -18718,17 +18583,7 @@ def _score_store_with_decisions(
     refs.sort(key=lambda o: o.observation_id)
     if limit is not None:
         refs = refs[: int(limit)]
-    langmuir_experiment_ids_by_source = {
-        source_id: frozenset(
-            obs.experiment_id
-            for obs in refs
-            if obs.source_id == source_id
-            and isinstance(obs.identity, Identity)
-            and quantity_token(obs.identity)
-            is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        )
-        for source_id in _LANGMUIR_RESIDUE_COHORTS
-    }
+    selected_langmuir_experiment_ids = langmuir_experiment_ids_by_source(refs)
     sossi_experiment_ids = frozenset(
         obs.experiment_id.rsplit("::", 1)[-1]
         for obs in refs
@@ -18912,26 +18767,17 @@ def _score_store_with_decisions(
                             and point.source_id in _LANGMUIR_RESIDUE_COHORTS
                             and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
                         ):
-                            selected_ids = langmuir_experiment_ids_by_source[
+                            selected_ids = selected_langmuir_experiment_ids[
                                 point.source_id
                             ]
-                            if point.source_id == _HASHIMOTO_SOURCE_ID:
-                                prediction = _hashimoto_residue_prediction(
-                                    context,
-                                    point,
-                                    engine,
-                                    residue_prediction_cache,
-                                    selected_experiment_ids=selected_ids,
-                                )
-                            else:
-                                prediction = _langmuir_residue_prediction(
-                                    context,
-                                    point,
-                                    engine,
-                                    residue_prediction_cache,
-                                    source_id=point.source_id,
-                                    selected_experiment_ids=selected_ids,
-                                )
+                            prediction = _langmuir_residue_prediction(
+                                context,
+                                point,
+                                engine,
+                                residue_prediction_cache,
+                                source_id=point.source_id,
+                                selected_experiment_ids=selected_ids,
+                            )
                         if (
                             duplicate_detail is None
                             and predict is None

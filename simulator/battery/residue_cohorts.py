@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from decimal import Decimal
 from types import MappingProxyType
 from typing import Literal
+
+from simulator.battery.enums import Quantity
+from simulator.battery.identity import Identity, quantity_token
+from simulator.battery.records import State
 
 
 HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
@@ -46,12 +51,6 @@ class LangmuirResidueCohortSpec:
     missing_mass_reason: str | None
     missing_area_reason: str | None
     vacuum_upper_bound_identity: bool
-    zero_time_rule: Literal[
-        "none",
-        "refuse_if_residue_matches_charge",
-        "retain_product",
-    ]
-    area_uncertainty: str | None
     geometry_notice_reason: str | None
 
 
@@ -68,8 +67,6 @@ _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
             missing_mass_reason=None,
             missing_area_reason=None,
             vacuum_upper_bound_identity=False,
-            zero_time_rule="none",
-            area_uncertainty=None,
             geometry_notice_reason=None,
         ),
         RICHTER_2007_SOURCE_ID: LangmuirResidueCohortSpec(
@@ -86,8 +83,6 @@ _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
             missing_mass_reason=None,
             missing_area_reason="initial_area_unreported",
             vacuum_upper_bound_identity=True,
-            zero_time_rule="refuse_if_residue_matches_charge",
-            area_uncertainty="printed_unstated",
             geometry_notice_reason="area_evolution_unreported",
         ),
         RICHTER_2011_SOURCE_ID: LangmuirResidueCohortSpec(
@@ -107,9 +102,52 @@ _LANGMUIR_RESIDUE_COHORTS = MappingProxyType(
             missing_mass_reason="initial_mass_unreported",
             missing_area_reason="initial_area_unreported",
             vacuum_upper_bound_identity=False,
-            zero_time_rule="retain_product",
-            area_uncertainty="printed_unstated",
             geometry_notice_reason="area_evolution_unreported",
         ),
     }
 )
+
+
+def langmuir_comparison_identity_updates(
+    source_id: str,
+    identity: Identity,
+    quantity: Quantity | None,
+    prediction_detail: object,
+) -> dict[str, State]:
+    """Resolve only a registered vacuum cohort's declared pressure ceiling."""
+    spec = _LANGMUIR_RESIDUE_COHORTS.get(source_id)
+    detail = prediction_detail if isinstance(prediction_detail, dict) else {}
+    if (
+        spec is None
+        or not spec.vacuum_upper_bound_identity
+        or quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+        or not detail.get("total_pressure_is_upper_bound")
+        or detail.get("total_pressure_Pa") is None
+    ):
+        return {}
+    updates: dict[str, State] = {}
+    if identity.fO2_Pa is None or not identity.fO2_Pa.is_value:
+        updates["fO2_Pa"] = State.not_applicable(
+            "unbuffered vacuum has no commanded oxygen fugacity"
+        )
+    if identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value:
+        updates["total_pressure_Pa"] = State.of(
+            Decimal(str(detail["total_pressure_Pa"]))
+        )
+    return updates
+
+
+def langmuir_experiment_ids_by_source(observations: object) -> dict[str, frozenset[str]]:
+    """Select run ids from the registered cohorts' actual residue rows."""
+    rows = observations.values() if isinstance(observations, dict) else observations
+    return {
+        source_id: frozenset(
+            row.experiment_id
+            for row in rows
+            if row.source_id == source_id
+            and isinstance(row.identity, Identity)
+            and quantity_token(row.identity)
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        )
+        for source_id in _LANGMUIR_RESIDUE_COHORTS
+    }

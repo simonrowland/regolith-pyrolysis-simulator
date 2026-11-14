@@ -580,6 +580,33 @@ def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:
     assert Decimal(exposed_area) == Decimal("0.0000913")
 
 
+def test_richter_table1_residue_points_use_the_separate_starting_material_row(
+    fresh_mass_loss_extracts,
+) -> None:
+    richter_result, _markova_result = fresh_mass_loss_extracts
+    residue_rows = [
+        row
+        for row in richter_result.observations.values()
+        if quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    expected = {
+        "MgO": "11.48",
+        "SiO2": "46",
+        "Al2O3": "19.39",
+        "CaO": "23.12",
+    }
+
+    assert len(residue_rows) == 204
+    assert len({row.experiment_id for row in residue_rows}) == 51
+    for row in residue_rows:
+        starting = row.point_conditions["starting_composition"]
+        assert starting.state.value == expected, row.experiment_id
+        assert starting.locator is not None
+        assert starting.locator.page == 6
+        assert starting.locator.published_page == 5549
+        assert starting.locator.table == "1"
+
+
 def test_richter_row_without_exposed_area_refuses(mass_loss_rows) -> None:
     richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
         mass_loss_rows

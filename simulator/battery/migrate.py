@@ -24931,7 +24931,7 @@ class Migrator:
 
     @staticmethod
     def _richter_table1_sample_inputs(doc: Mapping[str, Any]) -> Mapping[str, Any]:
-        """Lift Richter Table 1's run-specific mass and starting area to experiments."""
+        """Lift Richter Table 1 inputs and the shared starting charge to runs."""
         if doc.get("source_id") != "kems-010-richter-2007":
             return doc
         samples: dict[str, tuple[Decimal, Decimal, Mapping[str, Any]]] = {}
@@ -24983,6 +24983,24 @@ class Migrator:
         experiments = doc.get("experiments")
         if not isinstance(experiments, list):
             return doc
+        starting_material = next(
+            (
+                item.get("sample", {}).get("printed_composition")
+                for item in experiments
+                if isinstance(item, Mapping)
+                and item.get("experiment_id") == "type-b-cai-like-lab-melt"
+                and isinstance(item.get("sample"), Mapping)
+                and isinstance(
+                    item["sample"].get("printed_composition"), Mapping
+                )
+                and isinstance(
+                    item["sample"]["printed_composition"].get("locator"), Mapping
+                )
+                and item["sample"]["printed_composition"]["locator"].get("row")
+                == "Starting material"
+            ),
+            None,
+        )
         enriched = []
         for experiment in experiments:
             if not isinstance(experiment, Mapping):
@@ -24996,13 +25014,28 @@ class Migrator:
                 else None
             )
             measurement = samples.get(str(row_name))
+            is_table1_run = (
+                isinstance(experiment_locator, Mapping)
+                and experiment_locator.get("table") == "1"
+            )
+            sample = (
+                dict(experiment.get("sample") or {})
+                if is_table1_run
+                else None
+            )
+            if sample is not None and starting_material is not None:
+                # Table 1 residue compositions are measurements, not the
+                # shared starting charge. Correct every run, including rows
+                # without printed initial mass/area.
+                sample["printed_composition"] = starting_material
             if measurement is not None:
                 mass_mg, area_mm2, source_locator = measurement
                 source_locator = dict(source_locator)
                 # Exact SI conversions: 1 mg = 10^-6 kg; 1 mm^2 = 10^-6 m^2.
                 mass_kg = mass_mg * Decimal("0.000001")
                 area_m2 = area_mm2 * Decimal("0.000001")
-                sample = dict(experiment.get("sample") or {})
+                if sample is None:
+                    sample = dict(experiment.get("sample") or {})
                 sample["mass_kg"] = {
                     "state": {
                         "tag": "value",
@@ -25013,7 +25046,6 @@ class Migrator:
                         "note": "Table 1 initial_weight_mg; exact mg-to-kg conversion",
                     },
                 }
-                experiment["sample"] = sample
                 apparatus = dict(experiment.get("apparatus") or {})
                 geometry = dict(apparatus.get("geometry") or {})
                 geometry["exposed_area_m2"] = {
@@ -25031,6 +25063,8 @@ class Migrator:
                 }
                 apparatus["geometry"] = geometry
                 experiment["apparatus"] = apparatus
+            if sample is not None:
+                experiment["sample"] = sample
             enriched.append(experiment)
         return {**doc, "experiments": enriched}
 
