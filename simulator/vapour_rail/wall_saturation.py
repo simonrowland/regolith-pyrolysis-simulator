@@ -17,10 +17,10 @@ a temperature record. Skipping it leaves the covering interval's G unchanged.
 
 Rule. Among non-liquid records whose remaining interval contains ``T``, the
 lowest G wins. The liquid is used only when no solid contains ``T``. An exact
-G tie keeps the record declared first. A temperature outside every cited
-interval of a reaction drops that reaction. If none remain, the species
-refuses ``wall_condensation_thermo_out_of_interval``. It is not extrapolated
-and it is not given Psat = 0.
+G tie keeps the record declared first. Outside cited intervals, the nearest
+NASA segment or JANAF pair is continued and the resulting saturation is
+marked extrapolated (d-019). Missing or invalid records still refuse; no
+failure is converted to Psat = 0.
 
 A declaration with ``missing: wall_condensation_thermo_missing`` refuses with
 that reason. NiO, CoO and MnO are that case: the corpus has no condensed row
@@ -62,6 +62,8 @@ class ResolvedParticipant:
     species: str
     record_id: str
     g_over_RT: float
+    authority_level: str = "authoritative"
+    valid_range_K: tuple[float, float] | None = None
 
 
 @dataclass(frozen=True)
@@ -105,10 +107,10 @@ def nasa_record_g_over_rt(record_id: str, T_K: float) -> float:
     Degenerate intervals (``T_min >= T_max``) are dropped before the
     polynomial is built. The Gibbs ratio is the covering segment's value;
     dropping a collapsed interval does not change it. Outside every remaining
-    interval the reason is ``wall_condensation_thermo_out_of_interval``.
+    interval the nearest NASA segment is continued and marked extrapolated.
     """
 
-    g_over_rt, _phase = _nasa_record_state(record_id, T_K)
+    g_over_rt, _phase, _authority, _valid_range = _nasa_record_state(record_id, T_K)
     return g_over_rt
 
 
@@ -118,12 +120,12 @@ def janaf_record_g_over_rt(table_id: str, T_K: float) -> float:
     ``formation_gibbs_energy`` is kJ/mol. ``G/(R T) = (kJ/mol · 1000) / (R T)``
     with ``R`` in J/(mol·K) and ``T`` in kelvin, so the ratio is dimensionless
     in the JANAF 0.1 MPa standard state. The bracket is the nearest published
-    rows that carry a value. Outside that span the reason is
-    ``wall_condensation_thermo_out_of_interval``. This is not
+    rows that carry a value. Outside that span the nearest pair is linearly
+    continued and marked extrapolated. This is not
     ``janaf._interpolate_formation_gibbs``, which is tied to the fusion tables.
     """
 
-    g_over_rt, _phase = _janaf_record_state(table_id, T_K)
+    g_over_rt, _phase, _authority, _valid_range = _janaf_record_state(table_id, T_K)
     return g_over_rt
 
 
@@ -133,8 +135,10 @@ def admissible_wall_reactions(
     species_id: str,
     T_K: float,
 ) -> tuple[WallSaturationReaction, ...]:
-    """Balanced reactions whose every participant has a record at ``T_K``.
+    """Balanced reactions whose participants have resolvable records at ``T_K``.
 
+    Out-of-range participant records are continued from the nearest source
+    segment and their status is carried by the resolved operative result.
     Does not read pO2. The operative pressure is :func:`resolve_wall_saturation`.
     """
 
@@ -193,6 +197,7 @@ def resolve_wall_saturation(
     thermo = "nasa"
     if block is not None and block.get("thermo") is not None:
         thermo = str(block.get("thermo"))
+    notices = tuple(dict.fromkeys((*winner.notices, *chosen.notices)))
     return ResolvedWallSaturation(
         species_id=str(species_id),
         pressure_Pa=winner.pressure_Pa,
@@ -204,7 +209,7 @@ def resolve_wall_saturation(
         phase_note=note,
         thermo=thermo,
         participants=chosen.participants,
-        notices=winner.notices,
+        notices=notices,
     )
 
 
@@ -212,6 +217,7 @@ def resolve_wall_saturation(
 class _PreparedReaction:
     reaction: WallSaturationReaction
     participants: tuple[ResolvedParticipant, ...]
+    notices: tuple[str, ...] = ()
 
 
 def _prepare_reactions(
@@ -319,7 +325,7 @@ def _build_reaction(
     vapour_formula = _required_text(
         vapour.get("formula"), f"{species_id}.{reaction_id} vapour formula"
     )
-    vapour_g, vapour_record, vapour_phase = _one_record(
+    vapour_g, vapour_record, vapour_phase, vapour_authority, vapour_range = _one_record(
         thermo, vapour, T_K, what=f"{species_id}.{reaction_id} vapour"
     )
     if vapour_phase not in _GAS_PHASES:
@@ -327,9 +333,13 @@ def _build_reaction(
             "wall_reaction_declaration_invalid",
             f"{vapour_record} cited as {species_id} vapour has phase {vapour_phase}",
         )
-    participants = [
-        ResolvedParticipant("vapour", vapour_formula, vapour_record, vapour_g)
-    ]
+    participants = [ResolvedParticipant(
+        "vapour", vapour_formula, vapour_record, vapour_g,
+        vapour_authority, vapour_range,
+    )]
+    notices: list[str] = []
+    if vapour_authority == "extrapolated":
+        notices.append("wall_condensation_thermo_extrapolated")
     products_raw = reaction.get("products")
     if not isinstance(products_raw, Sequence) or isinstance(products_raw, (str, bytes)):
         raise WallSaturationLawRefusal(
@@ -351,7 +361,7 @@ def _build_reaction(
             product.get("stoichiometry"),
             f"{species_id}.{reaction_id}.{species} stoichiometry",
         )
-        g_over_rt, record_id, phase = _select_condensed(
+        g_over_rt, record_id, phase, authority, valid_range = _select_condensed(
             thermo,
             product,
             T_K,
@@ -363,7 +373,11 @@ def _build_reaction(
                 f"{record_id} cited as condensed {species} is a gas",
             )
         condensed.append(WallCondensedTerm(species, stoich, g_over_rt))
-        participants.append(ResolvedParticipant("product", species, record_id, g_over_rt))
+        participants.append(ResolvedParticipant(
+            "product", species, record_id, g_over_rt, authority, valid_range,
+        ))
+        if authority == "extrapolated":
+            notices.append("wall_condensation_thermo_extrapolated")
 
     g_oxygen: float | None = None
     if nu_O2 != 0.0:
@@ -372,7 +386,7 @@ def _build_reaction(
                 "wall_condensation_thermo_missing",
                 f"{species_id}.{reaction_id} needs an oxygen record",
             )
-        oxygen_g, oxygen_record, oxygen_phase = _one_record(
+        oxygen_g, oxygen_record, oxygen_phase, oxygen_authority, oxygen_range = _one_record(
             thermo, oxygen, T_K, what=f"{species_id}.{reaction_id} oxygen"
         )
         if oxygen_phase not in _GAS_PHASES:
@@ -381,7 +395,12 @@ def _build_reaction(
                 f"{oxygen_record} cited as oxygen has phase {oxygen_phase}",
             )
         g_oxygen = oxygen_g
-        participants.append(ResolvedParticipant("oxygen", "O2", oxygen_record, oxygen_g))
+        participants.append(ResolvedParticipant(
+            "oxygen", "O2", oxygen_record, oxygen_g,
+            oxygen_authority, oxygen_range,
+        ))
+        if oxygen_authority == "extrapolated":
+            notices.append("wall_condensation_thermo_extrapolated")
 
     built = WallSaturationReaction(
         reaction_id=reaction_id,
@@ -391,7 +410,9 @@ def _build_reaction(
         nu_O2=nu_O2,
         g_oxygen=g_oxygen,
     )
-    return _PreparedReaction(built, tuple(participants))
+    return _PreparedReaction(
+        built, tuple(participants), tuple(dict.fromkeys(notices)),
+    )
 
 
 def _select_condensed(
@@ -400,41 +421,48 @@ def _select_condensed(
     T_K: float,
     *,
     what: str,
-) -> tuple[float, str, str]:
-    """Lowest-G solid containing T, else the liquid if no solid does."""
+) -> tuple[float, str, str, str, tuple[float, float]]:
+    """Lowest-G solid at T, else the liquid if no solid is cited."""
 
     record_ids = _record_ids(thermo, citation, what=what)
-    solids: list[tuple[float, int, str, str]] = []
-    liquids: list[tuple[float, int, str, str]] = []
-    outside = 0
+    solids: list[tuple[float, int, str, str, str, tuple[float, float]]] = []
+    liquids: list[tuple[float, int, str, str, str, tuple[float, float]]] = []
+    extrapolated_solids: list[
+        tuple[float, int, str, str, str, tuple[float, float]]
+    ] = []
+    extrapolated_liquids: list[
+        tuple[float, int, str, str, str, tuple[float, float]]
+    ] = []
     for index, record_id in enumerate(record_ids):
         try:
-            g_over_rt, phase = _record_state(thermo, record_id, T_K)
-        except WallSaturationLawRefusal as exc:
-            if exc.reason == "wall_condensation_thermo_out_of_interval":
-                outside += 1
-                continue
+            g_over_rt, phase, authority, valid_range = _record_state(
+                thermo, record_id, T_K,
+            )
+        except WallSaturationLawRefusal:
             raise
         if phase in _GAS_PHASES:
             raise WallSaturationLawRefusal(
                 "wall_reaction_declaration_invalid",
                 f"{what}: {record_id} is a gas and cannot be the condensed product",
             )
-        bucket = liquids if phase in _LIQUID_PHASES else solids
-        bucket.append((g_over_rt, index, record_id, phase))
-    pool = solids if solids else liquids
+        if authority == "extrapolated":
+            bucket = extrapolated_liquids if phase in _LIQUID_PHASES else extrapolated_solids
+        else:
+            bucket = liquids if phase in _LIQUID_PHASES else solids
+        bucket.append((g_over_rt, index, record_id, phase, authority, valid_range))
+    # Use a cited phase whose interval covers T before extrapolating another
+    # candidate phase. Within the selected authority tier solids remain the
+    # standard state, with liquid as fallback only when no solid is available.
+    pool = solids or liquids or extrapolated_solids or extrapolated_liquids
     if not pool:
-        if outside:
-            raise WallSaturationLawRefusal(
-                "wall_condensation_thermo_out_of_interval",
-                f"{what} has no cited condensed record at {T_K} K",
-            )
         raise WallSaturationLawRefusal(
             "wall_condensation_thermo_missing",
             f"{what} has no usable condensed record",
         )
-    g_over_rt, _index, record_id, phase = min(pool, key=lambda item: (item[0], item[1]))
-    return g_over_rt, record_id, phase
+    g_over_rt, _index, record_id, phase, authority, valid_range = min(
+        pool, key=lambda item: (item[0], item[1]),
+    )
+    return g_over_rt, record_id, phase, authority, valid_range
 
 
 def _one_record(
@@ -443,7 +471,7 @@ def _one_record(
     T_K: float,
     *,
     what: str,
-) -> tuple[float, str, str]:
+) -> tuple[float, str, str, str, tuple[float, float]]:
     record_ids = _record_ids(thermo, citation, what=what)
     if len(record_ids) != 1:
         raise WallSaturationLawRefusal(
@@ -451,8 +479,8 @@ def _one_record(
             f"{what} must cite one record; got {record_ids!r}",
         )
     record_id = record_ids[0]
-    g_over_rt, phase = _record_state(thermo, record_id, T_K)
-    return g_over_rt, record_id, phase
+    g_over_rt, phase, authority, valid_range = _record_state(thermo, record_id, T_K)
+    return g_over_rt, record_id, phase, authority, valid_range
 
 
 def _record_ids(thermo: str, citation: Mapping[str, Any], *, what: str) -> tuple[str, ...]:
@@ -480,13 +508,17 @@ def _record_ids(thermo: str, citation: Mapping[str, Any], *, what: str) -> tuple
     return values
 
 
-def _record_state(thermo: str, record_id: str, T_K: float) -> tuple[float, str]:
+def _record_state(
+    thermo: str, record_id: str, T_K: float,
+) -> tuple[float, str, str, tuple[float, float]]:
     if thermo == "nasa":
         return _nasa_record_state(record_id, T_K)
     return _janaf_record_state(record_id, T_K)
 
 
-def _nasa_record_state(record_id: str, T_K: float) -> tuple[float, str]:
+def _nasa_record_state(
+    record_id: str, T_K: float,
+) -> tuple[float, str, str, tuple[float, float]]:
     path = COMPILATION_ROOT / "records" / f"{record_id}.json"
     if not path.is_file():
         raise WallSaturationLawRefusal(
@@ -546,29 +578,44 @@ def _nasa_record_state(record_id: str, T_K: float) -> tuple[float, str]:
         )
     except NasaCeaSegmentError:
         polynomial = None
-    if polynomial is not None:
-        try:
-            return polynomial.evaluate(T_K).g_over_RT, phase
-        except NasaCeaDomainError as exc:
-            raise WallSaturationLawRefusal(
-                "wall_condensation_thermo_out_of_interval",
-                str(exc),
-            ) from exc
     covering = [
         segment
         for segment in segments
         if segment.T_min_K <= T_K <= segment.T_max_K
     ]
-    if not covering:
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_out_of_interval",
-            f"{record_id} does not cover {T_K} K",
+    if covering:
+        # A gap elsewhere must not drop the interval that does contain T.
+        # The shared-endpoint rule assigns T to the higher segment.
+        covering.sort(key=lambda segment: segment.T_min_K)
+        segment = covering[-1]
+        if polynomial is not None:
+            try:
+                g_over_rt = polynomial.evaluate(T_K).g_over_RT
+            except NasaCeaDomainError:
+                _cp, _h, _s, g_over_rt = segment.evaluate_ratios(T_K)
+        else:
+            _cp, _h, _s, g_over_rt = segment.evaluate_ratios(T_K)
+        return (
+            g_over_rt, phase, "authoritative",
+            (segment.T_min_K, segment.T_max_K),
         )
-    # A gap elsewhere must not drop the interval that does contain T.
-    # The shared-endpoint rule assigns T to the higher segment.
-    covering.sort(key=lambda segment: segment.T_min_K)
-    _cp, _h, _s, g_over_rt = covering[-1].evaluate_ratios(T_K)
-    return g_over_rt, phase
+
+    # d-019: outside the published domain, continue the nearest NASA
+    # segment and mark it extrapolated. The segment equations define G/RT
+    # directly; temperature remains kelvin and the result is dimensionless.
+    # At a boundary this tends continuously to the published endpoint value.
+    # No claim of source validation is made beyond the selected interval.
+    segment = min(
+        segments,
+        key=lambda item: min(
+            abs(T_K - item.T_min_K), abs(T_K - item.T_max_K),
+        ),
+    )
+    _cp, _h, _s, g_over_rt = segment.evaluate_ratios(T_K)
+    return (
+        g_over_rt, phase, "extrapolated",
+        (segment.T_min_K, segment.T_max_K),
+    )
 
 
 def _nasa_standard_state(phase: str) -> str:
@@ -579,7 +626,9 @@ def _nasa_standard_state(phase: str) -> str:
     return "condensed_solid"
 
 
-def _janaf_record_state(table_id: str, T_K: float) -> tuple[float, str]:
+def _janaf_record_state(
+    table_id: str, T_K: float,
+) -> tuple[float, str, str, tuple[float, float]]:
     path = TABLES_DIR / f"{table_id}.yaml"
     if not path.is_file():
         raise WallSaturationLawRefusal(
@@ -621,15 +670,16 @@ def _janaf_record_state(table_id: str, T_K: float) -> tuple[float, str]:
             f"{table_id} has fewer than two formation-Gibbs rows",
         )
     points.sort()
-    if T_K < points[0][0] or T_K > points[-1][0]:
-        raise WallSaturationLawRefusal(
-            "wall_condensation_thermo_out_of_interval",
-            f"{table_id} formation Gibbs does not cover {T_K} K",
-        )
+    valid_range = (points[0][0], points[-1][0])
+    authority = (
+        "extrapolated"
+        if T_K < points[0][0] or T_K > points[-1][0]
+        else "authoritative"
+    )
     g_kJ = _linear_bracket(points, T_K, table_id)
     # kJ/mol → dimensionless G/(RT). 1000 J/kJ. R is J/(mol·K). T is K.
     g_over_rt = (g_kJ * 1000.0) / (R_J_PER_MOL_K * T_K)
-    return g_over_rt, phase
+    return g_over_rt, phase, authority, valid_range
 
 
 def _linear_bracket(
@@ -637,18 +687,32 @@ def _linear_bracket(
     temperature_K: float,
     table_id: str,
 ) -> float:
-    for (left_T, left_g), (right_T, right_g) in zip(points, points[1:]):
-        if left_T <= temperature_K <= right_T:
-            if right_T == left_T:
-                return left_g
-            # Linear in the published ΔfG, not in G/(RT). The design's CrO
-            # anchors are this interpolation of the bracketing rows.
-            return left_g + (right_g - left_g) * (temperature_K - left_T) / (
-                right_T - left_T
+    if temperature_K < points[0][0]:
+        left, right = points[0], points[1]
+    elif temperature_K > points[-1][0]:
+        left, right = points[-2], points[-1]
+    else:
+        bracket = next((
+            (left, right)
+            for left, right in zip(points, points[1:])
+            if left[0] <= temperature_K <= right[0]
+        ), None)
+        if bracket is None:
+            raise WallSaturationLawRefusal(
+                "wall_condensation_thermo_out_of_interval",
+                f"{table_id} formation Gibbs does not cover {temperature_K} K",
             )
-    raise WallSaturationLawRefusal(
-        "wall_condensation_thermo_out_of_interval",
-        f"{table_id} formation Gibbs does not cover {temperature_K} K",
+        left, right = bracket
+    left_T, left_g = left
+    right_T, right_g = right
+    if right_T == left_T:
+        return left_g
+    # Premise: adjacent published ΔfG rows supply the local slope. Algebra
+    # continues G(T)=G0+(G1-G0)(T-T0)/(T1-T0), in kJ/mol; the caller converts
+    # kJ/mol to dimensionless G/(RT). The temperature ratio is unitless. At
+    # T0 the result equals G0; outside the pair it is a flagged prediction.
+    return left_g + (right_g - left_g) * (temperature_K - left_T) / (
+        right_T - left_T
     )
 
 
