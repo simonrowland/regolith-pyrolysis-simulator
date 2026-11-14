@@ -1,10 +1,14 @@
 # Rego, Sigworth, and Philbrook (1988), Table I
 
 Transcription checked against the rendered PDF, physical page 5 (published
-page 659), Table I. The printed table gives mole fraction silica, `y`, and
-`log a(SiO2(l))` for the terminal binary melts at 1400 °C. Linear activities
-below are derived as `10^log` and rounded to three significant figures; they
-are not printed cells.
+page 659), Table I. The exact title is “Activity of SiO₂ as Function of
+Composition in the Terminal Binary Melts”; the grouped column header is
+`log a_SiO2`. The column has no separate units label. The adjacent text says
+these activities are referenced to pure liquid silica at 1400 °C, so the
+activity and its logarithm are dimensionless. The table's positive and
+negative log signs are literal: `log a = x` gives `a = 10^x` (common log).
+Linear activities below are derived and rounded to three significant
+figures; they are not printed cells.
 
 | Table I row | Binary | X(SiO2) | y | Printed log a(SiO2(l)) | Derived a(SiO2) |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -17,9 +21,19 @@ are not printed cells.
 | 4 | CaO-(SiO2)y | 0.75 | 3.00 | 0.072 | 1.18 |
 | 4 | Na2O-(SiO2)y | 0.75 | 3.00 | -0.233 | 0.585 |
 
-The printed header spelling used in the extract is `log a_SiO2(l)`; the
-stored `printed_form` token is `log10`. Table I's
-silica standard state is pure liquid SiO2 at 1400 °C. The listed composition
+The extract stores `printed_form: log10` on each typed-refused printed-log
+input. The reduced linear sibling has no `printed_form`, preventing the
+migrator from exponentiating its already-linear value again. For the worked
+cell, `log a_SiO2(l) = -0.057` gives `a_SiO2 = 10^-0.057 = 0.877`.
+
+All eight converted activities are positive and finite, ranging from 0.104
+to 1.18. Three CaO-binary log values are positive and therefore yield
+activities above one. These are the source's Table I values: the nearby text
+describes estimating the CaO–SiO₂ terminal-binary activities by extrapolation
+from the liquidus and Na₂O–SiO₂ data. Activity is positive but has no
+universal upper bound of one relative to a selected standard state.
+
+Table I's silica standard state is pure liquid SiO2 at 1400 °C. The listed composition
 is completed to the binary mole fractions: CaO is `1 - X(SiO2)` for the CaO
 rows and Na2O is `1 - X(SiO2)` for the Na2O rows. The source page gives the
 temperature context as 1400 °C and the table locator is page 5, folio 659,

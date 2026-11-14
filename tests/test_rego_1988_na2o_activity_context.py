@@ -471,8 +471,10 @@ def test_rego_table_i_log_activity_siblings_resolve_and_round_to_printed_precisi
         assert printed_log["values"]["value_as_printed"] == printed
         assert printed_log["values"]["quantity"] == "activity"
         assert printed_log["values"]["admission_status"] == "typed_refusal"
+        assert printed_log["values"]["printed_form"] == "log10"
         assert activity["values"]["value_as_printed"] == printed
         assert activity["values"]["activity"] == linear
+        assert "printed_form" not in activity["values"]
         assert activity["locator"]["page"] == printed_log["locator"]["page"] == 5
         assert activity["locator"]["published_page"] == printed_log["locator"]["published_page"] == 659
         assert activity["locator"]["table"] == printed_log["locator"]["table"] == "I"
@@ -482,10 +484,13 @@ def test_rego_table_i_log_activity_siblings_resolve_and_round_to_printed_precisi
             context.prec = 28
             exact_activity = Decimal(10) ** Decimal(printed)
             stored_activity = Decimal(linear)
+            assert stored_activity.is_finite() and stored_activity > 0
             half_unit_at_three_significant_figures = Decimal("0.5") * (
                 Decimal(10) ** (stored_activity.adjusted() - 2)
             )
             assert abs(stored_activity - exact_activity) <= half_unit_at_three_significant_figures
+
+    assert by_id["rego_1988_table_i_cao_sio2_x060_activity"]["values"]["activity"] == "0.877"
 
     # Mutation proof: the contract rejects an orphaned linear value if its
     # derived_from link is deleted.
