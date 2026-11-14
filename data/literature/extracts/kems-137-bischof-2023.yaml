@@ -284,7 +284,7 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-      locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}
+      locator: {page: 5, note: 'KC chamber about 10^-6 mbar; unit conversion only'}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
     regime: {regime_class: {tag: value, value: molecular}}
   fO2_control:
@@ -322,7 +322,7 @@ experiments:
         - sample.printed_composition
         output_unit: mole_fraction
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 5, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
     regime: {regime_class: {tag: value, value: molecular}}
   fO2_control:
@@ -360,7 +360,7 @@ experiments:
         - sample.printed_composition
         output_unit: mole_fraction
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
+    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 5, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
     regime: {regime_class: {tag: value, value: molecular}}
   fO2_control:
@@ -419,7 +419,7 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-      locator: {page: 4, note: KC chamber about 10^-6 mbar; unit conversion only}
+      locator: {page: 5, note: KC chamber about 10^-6 mbar; unit conversion only}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: *b137_apparatus
@@ -1709,7 +1709,7 @@ species:
         composition_derivation: "1_low start glass composition, printed in Table 6 (p. 15); trace additions excluded from oxide columns"
         composition_role: &bischof_table6_1_low_start
           value: initial_charge_only
-          locator: {published_page: 15, pdf_page_index: 15, table: '6', section: '4.1. EPMA'}
+          locator: {published_page: 15, pdf_page_index: 14, table: '6', section: '4.1. EPMA'}
           quote: 'Table 6 1_low Start SiO2 50.47 ± 0.09, Al2O3 15.38 ± 0.08, MgO 10.42 ± 0.04, CaO 23.63 ± 0.09, Total 99.90 ± 0.16'
         points:
         - T_K: 1586.4
@@ -1720,7 +1720,7 @@ species:
               locator: {page: 2, table: 'S1', row: 1}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 1}
@@ -1736,7 +1736,7 @@ species:
               locator: {page: 2, table: 'S1', row: 2}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 2}
@@ -1752,7 +1752,7 @@ species:
               locator: {page: 2, table: 'S1', row: 3}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 3}
@@ -1768,7 +1768,7 @@ species:
               locator: {page: 2, table: 'S1', row: 4}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 4}
@@ -1784,7 +1784,7 @@ species:
               locator: {page: 2, table: 'S1', row: 5}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 5}
@@ -1800,7 +1800,7 @@ species:
               locator: {page: 2, table: 'S1', row: 6}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 6}
@@ -1816,7 +1816,7 @@ species:
               locator: {page: 2, table: 'S1', row: 7}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 7}
@@ -1832,7 +1832,7 @@ species:
               locator: {page: 2, table: 'S1', row: 8}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 8}
@@ -1848,7 +1848,7 @@ species:
               locator: {page: 2, table: 'S1', row: 9}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 9}
@@ -1864,7 +1864,7 @@ species:
               locator: {page: 2, table: 'S1', row: 10}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 10}
@@ -1880,7 +1880,7 @@ species:
               locator: {page: 2, table: 'S1', row: 11}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 11}
@@ -3729,7 +3729,7 @@ species:
               locator: {page: 2, table: 'S1', row: 1}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.66; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 1}
@@ -3745,7 +3745,7 @@ species:
               locator: {page: 2, table: 'S1', row: 2}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.62; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 2}
@@ -3761,7 +3761,7 @@ species:
               locator: {page: 2, table: 'S1', row: 3}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.61; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 3}
@@ -3777,7 +3777,7 @@ species:
               locator: {page: 2, table: 'S1', row: 4}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 4}
@@ -3793,7 +3793,7 @@ species:
               locator: {page: 2, table: 'S1', row: 5}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 5}
@@ -3809,7 +3809,7 @@ species:
               locator: {page: 2, table: 'S1', row: 6}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.57; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 6}
@@ -3825,7 +3825,7 @@ species:
               locator: {page: 2, table: 'S1', row: 7}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 7}
@@ -3841,7 +3841,7 @@ species:
               locator: {page: 2, table: 'S1', row: 8}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 8}
@@ -3857,7 +3857,7 @@ species:
               locator: {page: 2, table: 'S1', row: 9}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.54; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 9}
@@ -3873,7 +3873,7 @@ species:
               locator: {page: 2, table: 'S1', row: 10}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 10}
@@ -3889,7 +3889,7 @@ species:
               locator: {page: 2, table: 'S1', row: 11}
             total_pressure_Pa:
               state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+              locator: {page: 5, section: '2.2.1 Knudsen Effusion Mass Spectrometry', note: 'KC chamber about 10^-6 mbar; unit conversion only'}
             fO2_control:
               state: {tag: value, value: "IW buffer-relative; printed ΔIW=1.53; O’Neill and Pownceby, 1993"}
               locator: {page: 2, table: 'S1', row: 11}
