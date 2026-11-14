@@ -459,6 +459,17 @@ class _ChannelTerms:
     oxide_per_product_kg: float
     o2_per_product_kg: float
 
+    @property
+    def neutral_pO2_exponent(self) -> float:
+        # Premise: each parent oxide supplies its oxygen congruently to the
+        # product's non-oxygen atoms. Algebra: pO2 power is
+        # (O_product - O_parent_demand)/2. Both terms are O atoms per product
+        # mole, so the exponent is dimensionless. AlSiO: (1 - 3.5)/2=-1.25;
+        # Si2O2 from SiO2: (2 - 4)/2=-1.0.
+        return (
+            self.atom_counts.get("O", 0.0) - self.parent_oxygen_demand
+        ) / 2.0
+
     def is_active(self, inventory: Mapping[str, float]) -> bool:
         """Parentless oxygen stays active, including the gas pack's '' token."""
         return (
@@ -738,17 +749,13 @@ def _atom_totals(
 def _residue_oxygen_channels(
     terms: Sequence[_ChannelTerms], inventory: Mapping[str, float],
 ) -> tuple[_VacuumOxygenChannel, ...]:
-    # Premise: equilibrium pO2 scaling follows O atoms in product minus the O
-    # supplied by its oxide reactants. Algebra: νpO2=(Oproduct−Oparent)/2;
-    # units are dimensionless per product formula. With the validated parent
-    # maps, AlSiO is (1−3.5)/2=−1.25 and Si2O2 is (2−4)/2=−1.0.
     return tuple(
         _VacuumOxygenChannel(
             species=term.source.species,
             molar_mass_kg_per_mol=term.molar_mass_kg_mol,
             oxygen_atoms=term.atom_counts.get("O", 0.0),
             parent_oxygen_demand=term.parent_oxygen_demand,
-            pO2_exponent=(term.atom_counts.get("O", 0.0) - term.parent_oxygen_demand) / 2.0,
+            pO2_exponent=term.neutral_pO2_exponent,
             alpha=float(term.source.alpha),
             alpha_source=term.source.alpha_source,
             active=term.is_active(inventory),
@@ -1552,15 +1559,25 @@ def _make_residue_pressure_model(
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
 ) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
     """Build the engine pressure closure shared by the residue cohorts."""
-    pressure_exponents = {
-        str(species): (
-            1.0
-            if str(species) == "O2"
-            else -float(reaction[2]) / float(reaction[1])
-        )
-        for species, reaction in gas_channels
-    }
+    pressure_exponents: dict[str, float] = {}
     if engine == "openimcc":
+        # OpenIMCC reaction tuples are normalized to a primary parent; for a
+        # mixed channel that parent coefficient is not the gas-product
+        # coefficient. Reuse the validated product-basis reactant map used by
+        # the residue debit and oxygen solver to get one exponent per product.
+        channels = tuple(
+            _openimcc_residue_channel(
+                str(species),
+                str(reaction[0]) if reaction[0] else None,
+                1.0,
+                "OpenIMCC residue pressure law",
+            )
+            for species, reaction in gas_channels
+        )
+        pressure_exponents = {
+            term.source.species: term.neutral_pO2_exponent
+            for term in _channel_terms(channels, require_oxygen_channels=False)
+        }
         from openimcc.kernel import ImccNonconvergenceError
 
         from simulator.diagnostic_helpers.binary_pot_battery import (
