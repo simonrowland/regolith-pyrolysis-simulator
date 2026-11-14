@@ -698,7 +698,8 @@ def test_sio_declared_capture_preserves_missing_carrier_certification():
     assert sum(condensed.values()) + overhead.get("SiO", 0.0) + wall_total == pytest.approx(100.0)
     assert authority["SiO"]["status"] == "missing"
     assert authority["SiO"]["authoritative_for_condensation"] is False
-    assert authority["SiO"]["authority_level"] == "extrapolated"
+    assert authority["SiO"]["authority_level"] == "status_bearing"
+    assert authority["SiO"]["reason"] == "wall_pO2_unknown_pO2_free_route_used"
 
 
 def test_step_drains_uncondensed_overhead_vapor_each_tick():
