@@ -8,6 +8,7 @@ import itertools
 import json
 import logging
 import math
+import os
 from pathlib import Path
 import sqlite3
 import subprocess
@@ -7326,6 +7327,46 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     assert "strategy: staged->StagedStrategy" in staged.stdout
 
     out_dir = tmp_path / "cli-run"
+    instrumentation_dir = tmp_path / "perf-instrumentation"
+    instrumentation_dir.mkdir()
+    event_log = tmp_path / "perf-events.tsv"
+    (instrumentation_dir / "sitecustomize.py").write_text(
+        """
+import os
+
+def _record_perf_event(event):
+    path = os.environ.get("REGOLITH_PERF_EVENT_LOG")
+    if not path:
+        return
+    fd = os.open(path, os.O_CREAT | os.O_APPEND | os.O_WRONLY, 0o600)
+    try:
+        os.write(fd, f"{os.getpid()}\\t{event}\\n".encode("utf-8"))
+    finally:
+        os.close(fd)
+
+from simulator.vapour_rail.catalog import VapourRailCatalog
+_legacy_view = VapourRailCatalog.legacy_view
+def _count_legacy_view(self):
+    _record_perf_event("legacy_view")
+    return _legacy_view(self)
+VapourRailCatalog.legacy_view = _count_legacy_view
+
+from simulator.engine_pool import WarmEngineWorker
+_own_launch = WarmEngineWorker._own_launch
+def _count_launch(self, launch):
+    _record_perf_event("engine_launch")
+    return _own_launch(self, launch)
+WarmEngineWorker._own_launch = _count_launch
+""",
+        encoding="utf-8",
+    )
+    instrumented_env = os.environ.copy()
+    instrumented_env["REGOLITH_PERF_EVENT_LOG"] = str(event_log)
+    repo_root = str(Path(__file__).resolve().parents[1])
+    pythonpath = [str(instrumentation_dir), repo_root]
+    if instrumented_env.get("PYTHONPATH"):
+        pythonpath.append(instrumented_env["PYTHONPATH"])
+    instrumented_env["PYTHONPATH"] = os.pathsep.join(pythonpath)
     good = subprocess.run(
         [
             sys.executable,
@@ -7350,8 +7391,25 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
         capture_output=True,
         check=False,
         timeout=120,
+        env=instrumented_env,
     )
     assert good.returncode == 0, good.stderr
+    events_by_pid: dict[int, dict[str, int]] = {}
+    for line in event_log.read_text(encoding="utf-8").splitlines():
+        raw_pid, event = line.split("\t", maxsplit=1)
+        events = events_by_pid.setdefault(int(raw_pid), {})
+        events[event] = events.get(event, 0) + 1
+    # Green's evaluator profile records six legacy_view calls: four from
+    # compatibility projections, one simulator initialization, and one
+    # legacy adapter lookup. Pin that work-unit count and its one engine
+    # launch; b-906 added 163 calls in _legacy_vapour_row before this fix.
+    evaluator_pids = [
+        pid
+        for pid, events in events_by_pid.items()
+        if events.get("legacy_view", 0) == 6
+    ]
+    assert len(evaluator_pids) == 1, events_by_pid
+    assert events_by_pid[evaluator_pids[0]].get("engine_launch", 0) == 1
     assert (out_dir / "pareto.json").exists()
     # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
     # 20 C. Seed 7's liner is now about 822 C; the same unit coordinate on

@@ -1303,12 +1303,18 @@ def _legacy_vapour_row(
 
     if catalog is None or not hasattr(catalog, "legacy_view"):
         return None
-    from simulator.vapour_rail.catalog import CatalogCompileError
+    # VapourRailCatalog already owns the compiled compatibility projection.
+    # Read its row directly: legacy_view() deep-copies the entire projection,
+    # which is unnecessary for this read-only supply lookup. Keep the legacy
+    # accessor fallback for catalog-shaped test doubles and older callers.
+    legacy = getattr(catalog, "_legacy_projection", None)
+    if not isinstance(legacy, MappingABC):
+        from simulator.vapour_rail.catalog import CatalogCompileError
 
-    try:
-        legacy = catalog.legacy_view()
-    except CatalogCompileError:
-        return None
+        try:
+            legacy = catalog.legacy_view()
+        except CatalogCompileError:
+            return None
     if not isinstance(legacy, MappingABC):
         return None
     for group in ("metals", "oxide_vapors"):
