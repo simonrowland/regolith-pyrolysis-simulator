@@ -20,6 +20,7 @@ from simulator.battery.enums import (
     Fo2Mode,
     MethodToken,
     NoticeKind,
+    PerBasis,
     Phase,
     Quantity,
     Rail,
@@ -170,7 +171,14 @@ def test_scoring_modes_keep_distinct_keys_notices_and_store_outputs() -> None:
         oxygen=Decimal("-9"),
         pressure=Value.point_of(Decimal("0.001")),
     )
-    observation = replace(observation, source_id=experiment.work_id)
+    observation = replace(
+        observation,
+        source_id=experiment.work_id,
+        identity=replace(
+            observation.identity,
+            per=State.of(PerBasis.DIMENSIONLESS),
+        ),
+    )
     context = ScoreContext(
         works={experiment.work_id: F.work(experiment.work_id)},
         experiments={experiment.experiment_id: experiment},
@@ -339,7 +347,7 @@ def test_basu_metal_saturation_activity_targets_are_refused() -> None:
         and observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.ACTIVITY
     ]
-    assert activity_targets
+    assert len(activity_targets) == 108
 
     by_id = migrator.result.observations
     for observation in activity_targets:
@@ -383,6 +391,12 @@ def test_basu_metal_saturation_activity_targets_are_refused() -> None:
             ]
             assert {item.readiness.engine for item in blocked} == set(_COMPARABLE)
             assert all(item.payload is None for item in blocked)
+            applicable = [
+                item
+                for item in blocked
+                if item.readiness.status is not ReadinessStatus.NOT_APPLICABLE
+            ]
+            assert applicable
             assert all(
                 any(
                     gap.waypoint == "metal_saturation_condition"
@@ -390,7 +404,7 @@ def test_basu_metal_saturation_activity_targets_are_refused() -> None:
                     and any("d-305" in detail for detail in gap.missing)
                     for gap in item.readiness.gaps
                 )
-                for item in blocked
+                for item in applicable
             )
 
         for fo2_mode in (Fo2Mode.SHARED_LADDER, Fo2Mode.ENGINE_INTRINSIC):

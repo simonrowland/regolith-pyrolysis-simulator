@@ -193,6 +193,11 @@ def derived_fo2_condition(observation: Observation) -> bool:
 def has_printed_fo2(observation: Observation, identity: Identity) -> bool:
     from simulator.battery.source_oxygen import printed_source_pressure
 
+    if _rys_oxygen_measurement_status(observation, None) not in {
+        None,
+        "measured_independent",
+    }:
+        return False
     if derived_fo2_condition(observation):
         return False
     fo2 = identity.fO2_Pa
