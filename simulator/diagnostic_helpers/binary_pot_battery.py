@@ -3452,6 +3452,7 @@ class _InternalAnalyticalBatteryBackend:
         core._last_high_t_melt_activity = {}
         core._last_high_t_melt_activity_temperature_K = None
         core._high_t_melt_activity_fallback_steps = []
+        core._high_t_melt_activity_table_fallback_ticks = {}
         if (
             po2_request is not None
             and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION

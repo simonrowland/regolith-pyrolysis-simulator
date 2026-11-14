@@ -1509,6 +1509,7 @@ class PyrolysisRun:
         _attach_rump_expectation_notice(run_metadata, sim)
         _attach_composition_projected_liquidus_notice(run_metadata, sim)
         _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
+        _attach_high_t_melt_activity_table_fallback_notice(run_metadata, sim)
         _attach_c0_exit_notice(run_metadata, sim)
         _attach_stage0_carbon_allocation_notice(run_metadata, sim)
         run_metadata.update(
@@ -3864,6 +3865,27 @@ def _attach_high_t_melt_activity_fallback_notice(
     )
 
 
+def _high_t_melt_activity_table_fallback_notice(
+    sim: Any,
+) -> dict[str, Any] | None:
+    reader = getattr(sim, "high_t_melt_activity_table_fallback_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    return dict(notice) if isinstance(notice, Mapping) and notice else None
+
+
+def _attach_high_t_melt_activity_table_fallback_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    _attach_run_metadata_report(
+        run_metadata,
+        "high_t_melt_activity_table_fallback_notice",
+        lambda: _high_t_melt_activity_table_fallback_notice(sim),
+    )
+
+
 def _stage0_carbon_allocation_notice(sim: Any) -> dict[str, Any] | None:
     if sim is None:
         return None
@@ -4034,6 +4056,18 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
     )
 
 
+def _high_t_melt_activity_table_fallback_sentence(
+    notice: Mapping[str, Any],
+) -> str:
+    parents = ", ".join(map(str, notice.get("affected_parent_oxides", ())))
+    ticks = int(notice.get("affected_tick_count", 0))
+    tick_word = "tick" if ticks == 1 else "ticks"
+    return (
+        f"OpenIMCC gave no usable activity for {parents} on {ticks} {tick_word}; "
+        "fallback activities came from the melt-oxide coefficient table."
+    )
+
+
 def _markdown_with_notice_sentences(
     markdown: str,
     sentences: list[str],
@@ -4087,6 +4121,14 @@ def _product_classification_report(
         )
         sentences.append(
             _high_t_melt_activity_fallback_sentence(high_t_activity_notice)
+        )
+    table_fallback_notice = _high_t_melt_activity_table_fallback_notice(sim)
+    if table_fallback_notice:
+        report["high_t_melt_activity_table_fallback_notice"] = _json_safe(
+            table_fallback_notice
+        )
+        sentences.append(
+            _high_t_melt_activity_table_fallback_sentence(table_fallback_notice)
         )
     diagnostic_notice = _diagnostic_gate_authority_notice(sim)
     if diagnostic_notice:
@@ -5926,6 +5968,7 @@ def _runner_failure_result(
     _attach_rump_expectation_notice(run_metadata, sim)
     _attach_composition_projected_liquidus_notice(run_metadata, sim)
     _attach_high_t_melt_activity_fallback_notice(run_metadata, sim)
+    _attach_high_t_melt_activity_table_fallback_notice(run_metadata, sim)
     _attach_c0_exit_notice(run_metadata, sim)
     _attach_stage0_carbon_allocation_notice(run_metadata, sim)
     final_state = (
