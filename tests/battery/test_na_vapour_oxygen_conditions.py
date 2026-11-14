@@ -10,7 +10,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import AmountBasis, NoticeKind, Phase, Quantity
+from simulator.battery.enums import (
+    AmountBasis,
+    EvidenceClass,
+    NoticeKind,
+    Phase,
+    Quantity,
+)
 from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 from simulator.battery.identity import Identity
 from simulator.battery.records import Composition, Notice, Species, State, Value
@@ -178,6 +184,7 @@ def test_rys_na_without_independent_oxygen_closes_independently_of_target(
             identity=replace(
                 row.identity, fO2_Pa=State.of(Decimal("0.00002"))
             ),
+            provenance={"oxygen_measurement_status": "calculated_from_pNa"},
             notices=(
                 Notice(
                     kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
@@ -189,6 +196,14 @@ def test_rys_na_without_independent_oxygen_closes_independently_of_target(
                     origin="rys_extract",
                 ),
             ),
+        )
+    else:
+        row = replace(
+            row,
+            identity=replace(
+                row.identity, fO2_Pa=State.of(Decimal("0.00002"))
+            ),
+            provenance={"oxygen_measurement_status": "unknown"},
         )
 
     selected = resolve_row_fo2(
@@ -233,6 +248,7 @@ def test_rys_measured_and_source_linked_oxygen_survive_target_mutation() -> None
     measured = replace(
         row,
         identity=replace(row.identity, fO2_Pa=State.of(Decimal("0.00002"))),
+        provenance={"oxygen_measurement_status": "measured_independent"},
     )
     changed_measured = replace(
         measured, value=Value.point_of(measured.value.point * 1.7)
@@ -247,17 +263,22 @@ def test_rys_measured_and_source_linked_oxygen_survive_target_mutation() -> None
     assert selected_measured.po2_bar == changed_selected_measured.po2_bar
     assert selected_measured.log10_fO2_bar == changed_selected_measured.log10_fO2_bar
 
+    linked_row = replace(
+        row, provenance={"oxygen_measurement_status": "source_linked"}
+    )
     selected_linked = resolve_row_fo2(
         experiment,
         None,
-        row,
+        linked_row,
         quantity=Quantity.P_PARTIAL,
         source_oxygen_bar=2.0e-8,
     )
     changed_selected_linked = resolve_row_fo2(
         experiment,
         None,
-        replace(row, value=Value.point_of(row.value.point * 1.7)),
+        replace(
+            linked_row, value=Value.point_of(linked_row.value.point * 1.7)
+        ),
         quantity=Quantity.P_PARTIAL,
         source_oxygen_bar=2.0e-8,
     )
@@ -265,6 +286,55 @@ def test_rys_measured_and_source_linked_oxygen_survive_target_mutation() -> None
     assert selected_linked.route == "source_linked_oxygen_condition"
     assert selected_linked.po2_bar == changed_selected_linked.po2_bar
     assert selected_linked.log10_fO2_bar == changed_selected_linked.log10_fO2_bar
+
+
+def test_rys_source_oxygen_requires_row_level_independence_evidence() -> None:
+    from simulator.battery.source_oxygen import (
+        SourceOxygenCondition,
+        SourceOxygenFallback,
+        SourceOxygenFallbackReason,
+        resolve_source_oxygen,
+    )
+
+    composition = Composition(
+        "oxides",
+        (("Na2O", Decimal("0.5")), ("SiO2", Decimal("0.5"))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.kems_experiment("rys-provenance-gate")
+    sodium = _na_partial_row(
+        source_id=RYS_SOURCE,
+        observation_id="rys-provenance-gate-pNa",
+        experiment_id=experiment.experiment_id,
+        temperature_K="1742.385",
+        pressure_Pa="0.01475",
+        composition=composition,
+    )
+    oxygen = F.observation(
+        "rys-provenance-gate-pO2",
+        experiment.experiment_id,
+        replace(sodium.identity, species=Species("O2", Phase.G)),
+        Decimal("0.00002"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=RYS_SOURCE,
+    )
+    independent = replace(
+        oxygen,
+        provenance={"oxygen_measurement_status": "measured_independent"},
+    )
+    selected = resolve_source_oxygen(
+        sodium, (sodium, independent), None
+    )
+    assert isinstance(selected, SourceOxygenCondition)
+    assert selected.observation.observation_id == independent.observation_id
+
+    unknown = replace(
+        oxygen,
+        provenance={"oxygen_measurement_status": "unknown"},
+    )
+    refused = resolve_source_oxygen(sodium, (sodium, unknown), None)
+    assert isinstance(refused, SourceOxygenFallback)
+    assert refused.reason is SourceOxygenFallbackReason.UNTYPED_LINEAGE
 
 
 @pytest.mark.xfail(
@@ -335,6 +405,39 @@ def test_rys_table10a_child_restores_nakalsi_1_row_8() -> None:
 
 
 def test_rys_na_extract_keeps_unclassified_row_oxygen_unknown() -> None:
+    legacy_path = (
+        ROOT
+        / "data/literature/extracts/rys-2007-alkali-oxide-thermodynamics.yaml"
+    )
+    legacy = yaml.safe_load(legacy_path.read_text(encoding="utf-8"))
+    legacy_groups = [
+        observation
+        for payload in legacy["species"].values()
+        for observation in payload.get("observations", ())
+        if observation["values"].get("quantity") == "partial_pressure"
+        and observation["values"].get("formula") in {"Na", "O2"}
+    ]
+    legacy_na = [
+        observation for observation in legacy_groups
+        if observation["values"]["formula"] == "Na"
+    ]
+    legacy_o2 = [
+        observation for observation in legacy_groups
+        if observation["values"]["formula"] == "O2"
+    ]
+    assert len(legacy_na) == 13
+    assert len(legacy_o2) == 3
+    assert all(
+        observation["values"]["provenance"]["oxygen_measurement_status"]
+        == "unknown"
+        for observation in legacy_groups
+    )
+    assert all(
+        "method_class" not in observation["values"]
+        and "evidence_class" not in observation["values"]
+        for observation in legacy_o2
+    )
+
     migrated_path = (
         ROOT
         / "data/literature/extracts-v2/rys-2007-alkali-oxide-thermodynamics.yaml"
@@ -354,6 +457,22 @@ def test_rys_na_extract_keeps_unclassified_row_oxygen_unknown() -> None:
     assert all(
         row["identity"]["fO2_Pa"]["reason"] == "no fO2_Pa mapped from source"
         for row in rows
+    )
+    assert all(
+        row["provenance"]["oxygen_measurement_status"] == "unknown"
+        for row in rows
+    )
+    oxygen_rows = [
+        row
+        for row in migrated["observations"]
+        if row["identity"]["species"]["formula"] == "O2"
+        and row["identity"]["quantity"]["value"] == "p_partial"
+    ]
+    assert len(oxygen_rows) == 31
+    assert all(
+        row["provenance"]["oxygen_measurement_status"] == "unknown"
+        and row["evidence"]["class"]["tag"] == "unknown"
+        for row in oxygen_rows
     )
 
 
@@ -387,6 +506,22 @@ def test_every_rys_na_source_row_has_target_independent_oxygen_input() -> None:
             else None
         )
         measured_link_count += isinstance(selected_source, SourceOxygenCondition)
+        changed_row = replace(
+            row,
+            value=Value.point_of(row.value.point * Decimal("1.7")),
+        )
+        changed_source_rows = tuple(
+            changed_row if sibling.observation_id == row.observation_id else sibling
+            for sibling in source_rows
+        )
+        selected_source_after = resolve_source_oxygen(
+            changed_row, changed_source_rows, bench
+        )
+        source_oxygen_bar_after = (
+            float(selected_source_after.observation.value.point) / PA_PER_BAR
+            if isinstance(selected_source_after, SourceOxygenCondition)
+            else None
+        )
         resolved = resolve_row_fo2(
             experiment,
             bench,
@@ -397,25 +532,20 @@ def test_every_rys_na_source_row_has_target_independent_oxygen_input() -> None:
         changed = resolve_row_fo2(
             experiment,
             bench,
-            replace(
-                row,
-                value=Value.point_of(row.value.point * Decimal("1.7")),
-            ),
+            changed_row,
             quantity=Quantity.P_PARTIAL,
-            source_oxygen_bar=source_oxygen_bar,
+            source_oxygen_bar=source_oxygen_bar_after,
         )
-        if isinstance(selected_source, SourceOxygenCondition):
-            assert resolved is not None
-            assert resolved.route == "source_linked_oxygen_condition"
-            assert resolved.closure is False
-        else:
-            assert resolved is not None and resolved.closure
-            assert resolved.po2_bar is None
-            assert resolved.route.endswith("rys_pO2_provenance_unknown")
-            assert fo2_tier_notice(Quantity.P_PARTIAL, resolved).kind is (
-                NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
-            )
-            closure_count += 1
+        assert not isinstance(selected_source, SourceOxygenCondition)
+        assert not isinstance(selected_source_after, SourceOxygenCondition)
+        assert source_oxygen_bar is None and source_oxygen_bar_after is None
+        assert resolved is not None and resolved.closure
+        assert resolved.po2_bar is None
+        assert resolved.route.endswith("rys_pO2_provenance_unknown")
+        assert fo2_tier_notice(Quantity.P_PARTIAL, resolved).kind is (
+            NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        )
+        closure_count += 1
         assert (
             None if resolved is None else (
                 resolved.route,
@@ -438,5 +568,5 @@ def test_every_rys_na_source_row_has_target_independent_oxygen_input() -> None:
             )
         )
     assert len(targets) == 330
-    assert measured_link_count == 25
-    assert closure_count == 305
+    assert measured_link_count == 0
+    assert closure_count == 330

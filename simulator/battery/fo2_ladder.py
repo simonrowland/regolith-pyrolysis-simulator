@@ -57,6 +57,7 @@ from simulator.battery.records import (
     Observation,
     Value,
 )
+from simulator.battery.source_oxygen import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
     Waypoint,
     WaypointAuthority,
@@ -232,7 +233,19 @@ def resolve_row_fo2(
         temperature = None
     routes = _oxygen_routes(experiment, bench, observation, oxygen)
     knudsen_vapour = _vapour_quantity(quantity) and _is_knudsen(experiment)
+    rys_row_oxygen_unverified = (
+        _rys_oxygen_measurement_status(observation, quantity)
+        not in {None, "measured_independent"}
+    )
     for route in routes:
+        if (
+            rys_row_oxygen_unverified
+            and route.route in {
+                "observation_fO2_log",
+                "observation_fO2_Pa_to_log_fO2",
+            }
+        ):
+            continue
         if _is_tier1(route, observation):
             log = _log_point(route.value)
             if log is not None:
@@ -240,7 +253,11 @@ def resolve_row_fo2(
                     log, 1, route.route, False,
                     physics_rung=1 if knudsen_vapour else None,
                 )
-    printed = _printed_identity_bar(observation, identity)
+    printed = (
+        None
+        if rys_row_oxygen_unverified
+        else _printed_identity_bar(observation, identity)
+    )
     if printed is not None:
         bar, log = printed
         return ResolvedFo2(
@@ -424,19 +441,34 @@ def metal_saturation_activity_refusal(
     )
 
 
-def _rys_pO2_provenance(
+def _rys_oxygen_measurement_status(
     observation: Observation | None, quantity: Quantity | None,
 ) -> str | None:
     identity = _identity(observation)
     if (
         observation is None
-        or observation.source_id != "rys-2007-alkali-oxide-thermodynamics"
+        or observation.source_id != RYS_SOURCE_ID
         or identity is None
         or getattr(identity.species, "formula", None) != "Na"
-        or quantity is not Quantity.P_PARTIAL
+        or (quantity or quantity_token(identity)) is not Quantity.P_PARTIAL
     ):
         return None
-    if derived_fo2_condition(observation):
+    status = (observation.provenance or {}).get(
+        "oxygen_measurement_status", "unknown"
+    )
+    return status if isinstance(status, str) else "unknown"
+
+
+def _rys_pO2_provenance(
+    observation: Observation | None, quantity: Quantity | None,
+) -> str | None:
+    status = _rys_oxygen_measurement_status(observation, quantity)
+    if status is None:
+        return None
+    if (
+        status == "calculated_from_pNa"
+        or derived_fo2_condition(observation)
+    ):
         return "rys_pO2_calculated_from_pNa_not_independent"
     return "rys_pO2_provenance_unknown"
 

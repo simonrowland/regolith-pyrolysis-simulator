@@ -22,6 +22,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
+    Rail,
     RefusalReason,
     ValueKind,
 )
@@ -40,6 +41,8 @@ from simulator.battery.score import (
     load_score_context,
     _predict_with_engine,
     predict_with_engine,
+    residual_to_plain,
+    score_store,
 )
 from simulator.battery.waypoints import (
     GapReason,
@@ -160,6 +163,75 @@ def test_tier1_printed_log_is_bit_identical_on_every_engine() -> None:
     assert payload["fO2_log"] == float(Decimal("-9"))
     assert payload["fO2_tier"] == 1
     assert payload["fO2_borrowed"] is False
+
+
+def test_scoring_modes_keep_distinct_keys_notices_and_store_outputs() -> None:
+    experiment, bench, observation = _feo_case(oxygen=Decimal("-9"))
+    observation = replace(observation, source_id=experiment.work_id)
+    context = ScoreContext(
+        works={experiment.work_id: F.work(experiment.work_id)},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={experiment.work_id: "reviewed"},
+        hostname="test",
+        benches={bench.id: bench},
+    )
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        isolated=False,
+    )
+    assert prediction.value is not None, prediction.refusal_detail
+    shared, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+    intrinsic, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+    )
+
+    assert shared.numeric is not None, shared.refusal
+    assert intrinsic.numeric is not None, intrinsic.refusal
+    assert shared.fo2_mode is Fo2Mode.SHARED_LADDER
+    assert intrinsic.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
+    assert shared.key != intrinsic.key
+    assert any(
+        notice.fo2_mode is Fo2Mode.SHARED_LADDER for notice in shared.notices
+    )
+    assert any(
+        notice.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
+        for notice in intrinsic.notices
+    )
+    assert residual_to_plain(shared)["fo2_mode"] == "shared_ladder"
+    assert residual_to_plain(intrinsic)["fo2_mode"] == "engine_intrinsic"
+    assert any(
+        notice.get("fo2_mode") == "shared_ladder"
+        for notice in residual_to_plain(shared)["notices"]
+    )
+    assert any(
+        notice.get("fo2_mode") == "engine_intrinsic"
+        for notice in residual_to_plain(intrinsic)["notices"]
+    )
+
+    scored, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    paired = [
+        item for item in scored if item.reference == observation.observation_id
+    ]
+    assert {item.fo2_mode for item in paired} == {
+        Fo2Mode.ENGINE_INTRINSIC,
+        Fo2Mode.SHARED_LADDER,
+    }
 
 
 def test_tier1_printed_identity_pascal_stays_pa_over_1e5() -> None:
