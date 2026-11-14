@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 from enum import StrEnum
+from types import MappingProxyType
 
 from simulator.backend_names import (
     PROPRIETARY_ENGINE_NAME,
@@ -568,8 +569,78 @@ class MethodToken(StrEnum):
     VACUUM_CHAMBER_PYROLYSIS = "vacuum_chamber_pyrolysis"
     EMF_CELL = "emf_cell"
     QUENCH_EQUILIBRATION = "quench_equilibration"
+    AERODYNAMIC_LEVITATION_LASER_HEATING = "aerodynamic_levitation_laser_heating"
+    ADIABATIC_CALORIMETRY = "adiabatic_calorimetry"
+    DROP_CALORIMETRY = "drop_calorimetry"
+    SOLUTION_CALORIMETRY = "solution_calorimetry"
+    PPMS_HEAT_CAPACITY = "ppms_heat_capacity"
+    MOSSBAUER_SPECTROSCOPY = "mossbauer_spectroscopy"
+    XANES_SPECTROSCOPY = "xanes_spectroscopy"
+    WET_CHEMICAL_ANALYSIS = "wet_chemical_analysis"
+    PISTON_CYLINDER = "piston_cylinder"
     TABULATION = "tabulation"
     ENGINE_EVALUATION = "engine_evaluation"
+
+
+# Source-written labels are resolved here so migration has one closed method
+# vocabulary. Canonical serialized values are included alongside legacy labels.
+METHOD_TOKEN_ALIASES = MappingProxyType(
+    {
+        **{token.value: token for token in MethodToken},
+        "static_capsule_vapor_pressure": MethodToken.STATIC_EQUILIBRIUM,
+        "kems_effusion": MethodToken.KNUDSEN_EFFUSION,
+        "kems_effusion_compiled_experiment": MethodToken.KNUDSEN_EFFUSION,
+        "kems_effusion_method_context": MethodToken.KNUDSEN_EFFUSION,
+        "kems_effusion_review_compilation": MethodToken.KNUDSEN_EFFUSION,
+        "kems_effusion_ion_comparison": MethodToken.KNUDSEN_EFFUSION,
+        "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
+        "Knudsen-cell mass-spectrometric ion currents converted to partial pressures using the thesis calibration.": MethodToken.KNUDSEN_EFFUSION,
+        "KEMS ion-current intensities converted to partial pressures using the thesis calibration (Eq. 2).": MethodToken.KNUDSEN_EFFUSION,
+        "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
+        "free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
+        "open_furnace_apparent": MethodToken.LANGMUIR_FREE_EVAPORATION,
+        "transpiration": MethodToken.TRANSPIRATION,
+        "dta_dsc": MethodToken.DTA_DSC,
+        "evolved_gas_ms": MethodToken.EVOLVED_GAS_MS,
+        "solar_furnace": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "solar_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "solar_vacuum_pyrolysis_free_evaporation": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "solar_fresnel_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "solar_fresnel_continuously_pumped_vacuum_pyrolysis": MethodToken.SOLAR_FURNACE_PYROLYSIS,
+        "melt_equilibration_quench": MethodToken.QUENCH_EQUILIBRATION,
+        "gas_standard_state_thermo": MethodToken.TABULATION,
+        "aerodynamic_levitation_laser_heating_then_quench": MethodToken.AERODYNAMIC_LEVITATION_LASER_HEATING,
+        "Cr K-edge XANES silicate glass redox": MethodToken.XANES_SPECTROSCOPY,
+        "Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench": MethodToken.XANES_SPECTROSCOPY,
+        "Cr K-edge XANES end-member mixture fit": MethodToken.XANES_SPECTROSCOPY,
+        "mossbauer_room_temperature": MethodToken.MOSSBAUER_SPECTROSCOPY,
+        "high_pressure_anhydrous_piston_cylinder": MethodToken.PISTON_CYLINDER,
+        "piston_cylinder_equilibration_quench": MethodToken.PISTON_CYLINDER,
+        "end_loaded_piston_cylinder_CCO_buffered": MethodToken.PISTON_CYLINDER,
+        "adiabatic_calorimetry": MethodToken.ADIABATIC_CALORIMETRY,
+        "Adiabatic calorimetry; experimental low-temperature heat capacities.": MethodToken.ADIABATIC_CALORIMETRY,
+        "drop_calorimetry": MethodToken.DROP_CALORIMETRY,
+        "Copper-block drop calorimetry; table marks pretransition and possible melting onset.": MethodToken.DROP_CALORIMETRY,
+        "Copper-block drop calorimetry; points above 753 K are marked as partial conversion of glass to crystal.": MethodToken.DROP_CALORIMETRY,
+        "Copper-block drop calorimetry above the melting point; enthalpy reference is the glass at 298.15 K.": MethodToken.DROP_CALORIMETRY,
+        "Copper-block drop calorimetry above 298.15 K; merged with Stull's low-temperature heat capacities for the smooth table.": MethodToken.DROP_CALORIMETRY,
+        "Copper-block drop calorimetry; Table 2 measured values.": MethodToken.DROP_CALORIMETRY,
+        "Copper-block drop calorimetry; Table 2 measured value not included in a printed equation": MethodToken.DROP_CALORIMETRY,
+        "Drop calorimetry": MethodToken.DROP_CALORIMETRY,
+        "solution_calorimetry_at_298_K": MethodToken.SOLUTION_CALORIMETRY,
+        "impurity_corrected_solution_calorimetry_at_298_K": MethodToken.SOLUTION_CALORIMETRY,
+        "HF solution calorimetry": MethodToken.SOLUTION_CALORIMETRY,
+        "HF/HNO3 solution calorimetry": MethodToken.SOLUTION_CALORIMETRY,
+        "solution calorimetry": MethodToken.SOLUTION_CALORIMETRY,
+        "PPMS heat capacity": MethodToken.PPMS_HEAT_CAPACITY,
+        "PPMS heat-capacity measurement": MethodToken.PPMS_HEAT_CAPACITY,
+        "Physical Properties Measurement System (PPMS) heat-capacity measurement": MethodToken.PPMS_HEAT_CAPACITY,
+        "57Fe Mössbauer spectroscopy; Fe3+/ΣFe is reduced from the relative areas of fitted ferric and ferrous doublets.": MethodToken.MOSSBAUER_SPECTROSCOPY,
+        "Mössbauer spectroscopy": MethodToken.MOSSBAUER_SPECTROSCOPY,
+        "XANES": MethodToken.XANES_SPECTROSCOPY,
+        "Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti": MethodToken.WET_CHEMICAL_ANALYSIS,
+    }
+)
 
 
 class ExperimentKind(StrEnum):
