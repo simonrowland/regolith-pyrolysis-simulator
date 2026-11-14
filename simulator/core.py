@@ -1253,6 +1253,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         self.backend = melt_backend
         self._step_dt_hr = 1.0
+        self._last_committed_step_dt_hr = 1.0
         self._last_backend_error = ''
         # Per-call outcome of EquilibriumResult evaluations
         # ('ok' / 'not_converged' / 'out_of_domain' / 'unavailable').
@@ -1545,6 +1546,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         #   Bakeout: K₂O(melt) → 2K(g) + ½O₂(g)
         #   Net:     FeO → Fe + ½O₂   (K recycled)
         self._last_committed_campaign_interval_start_h = 0.0
+        self._pending_shuttle_bakeout_cycle_increment = 0
         self.shuttle_K_inventory_kg = 0.0       # K available for injection
         self.shuttle_Na_inventory_kg = 0.0      # Na available for injection
         self.shuttle_cycle_K = 0                # Current K inject-bakeout cycle
@@ -1874,6 +1876,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.oxygen_cumulative_kg = 0.0
         self.O2_vented_cumulative_kg = 0.0
         self.O2_stored_cumulative_kg = 0.0
+        self._last_committed_campaign_interval_start_h = 0.0
+        self._last_committed_step_dt_hr = 1.0
+        self._pending_shuttle_bakeout_cycle_increment = 0
         self._mre_anode_O2_kg_this_hr = 0.0
         self._o2_bubbler_injected_kg = 0.0
         self._o2_bubbler_absorbed_kg = 0.0
@@ -13695,6 +13700,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.campaign = campaign
         self.melt.campaign_hour = 0
         self._last_committed_campaign_interval_start_h = 0.0
+        self._pending_shuttle_bakeout_cycle_increment = 0
         if campaign == CampaignPhase.C0:
             self.campaign_mgr.c0_exit_prediction = None
             self.campaign_mgr.last_c0_exit = None
@@ -16515,8 +16521,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.hour += clock_delta
         self.melt.campaign_hour += clock_delta
         self._stamp_redox_source_context_for_current_state(force=True)
-        snapshot = self._make_snapshot()
-        snapshot.duration_h = self._step_dt_hr
+        previous_committed_dt_hr = self._last_committed_step_dt_hr
+        self._last_committed_step_dt_hr = self._step_dt_hr
+        try:
+            snapshot = self._make_snapshot()
+        finally:
+            self._last_committed_step_dt_hr = previous_committed_dt_hr
         if getattr(self, "_imcc_activity_shadow_enabled", False):
             snapshot.imcc_activity_shadow = self._imcc_activity_shadow_for_hour(
                 snapshot
@@ -16561,12 +16571,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.energy_cumulative_breakdown_kWh)
         snapshot.oxygen_produced_kg = self._oxygen_total_kg()
         self.record.snapshots.append(snapshot)
+        self._last_committed_step_dt_hr = self._step_dt_hr
         self._last_committed_campaign_interval_start_h = (
             campaign_interval_start_h
         )
-        pending_shuttle_cycles = int(
-            getattr(self, '_pending_shuttle_bakeout_cycle_increment', 0) or 0
-        )
+        pending_shuttle_cycles = self._pending_shuttle_bakeout_cycle_increment
         if self.melt.campaign == CampaignPhase.C3_K:
             self.shuttle_cycle_K += pending_shuttle_cycles
         elif self.melt.campaign == CampaignPhase.C3_NA:
@@ -17068,7 +17077,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _make_snapshot(self) -> HourSnapshot:
         """Build an HourSnapshot from current state."""
-        duration_h = self._step_dt_hr
+        duration_h = self._last_committed_step_dt_hr
         oxygen_partition = self._oxygen_terminal_partition_kg()
         condensation_totals = self._condensation_totals_with_terminal_oxygen()
         self._stamp_redox_source_context_for_current_state()
@@ -17251,22 +17260,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             },
             shuttle_cycle=(
                 self.shuttle_cycle_K
-                + int(
-                    getattr(
-                        self,
-                        '_pending_shuttle_bakeout_cycle_increment',
-                        0,
-                    ) or 0
-                )
+                + self._pending_shuttle_bakeout_cycle_increment
                 if self.melt.campaign == CampaignPhase.C3_K
                 else self.shuttle_cycle_Na
-                + int(
-                    getattr(
-                        self,
-                        '_pending_shuttle_bakeout_cycle_increment',
-                        0,
-                    ) or 0
-                )
+                + self._pending_shuttle_bakeout_cycle_increment
             ),
             # MRE electrolysis
             mre_voltage_V=self._mre_voltage_V,

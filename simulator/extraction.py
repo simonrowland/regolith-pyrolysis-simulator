@@ -2775,11 +2775,7 @@ class ExtractionMixin:
         # differ (for example at a run stop or schedule breakpoint).
         interval_end_hour = float(self.melt.campaign_hour)
         interval_start_hour = float(
-            getattr(
-                self,
-                '_last_committed_campaign_interval_start_h',
-                interval_end_hour,
-            )
+            self._last_committed_campaign_interval_start_h
         )
         staged_cycle = (
             campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA)
