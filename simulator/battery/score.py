@@ -568,10 +568,27 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
     "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
+    "openimcc-v1.0.6-d066-v4": ("sf04-magma-companion-workbook",),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
 )
+
+
+def _unmapped_coefficient_source_aliases(
+    sources: Sequence[str],
+) -> tuple[str, ...]:
+    """Name known source-alias shapes whose store mapping is missing."""
+
+    return tuple(
+        source
+        for source in coefficient_lineage_sources(sources)
+        if source not in COEFFICIENT_SOURCE_STORE_IDS
+        and (
+            source in _ENGINE_SOURCE_ALIASES
+            or source.startswith("openimcc-v")
+        )
+    )
 
 # score_eligible conjuncts (v2.1 YAML score_eligible). Tests mutate each.
 SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
@@ -5295,12 +5312,11 @@ def _candidate_lineage_for_sources(
         if indexes is not None:
             indexes.candidate_lineages[source_key] = result
         return result
-    for src in lineage_sources:
-        if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
-            result = (False, None)
-            if indexes is not None:
-                indexes.candidate_lineages[source_key] = result
-            return result
+    if _unmapped_coefficient_source_aliases(lineage_sources):
+        result = (False, None)
+        if indexes is not None:
+            indexes.candidate_lineages[source_key] = result
+        return result
     expanded = expand_coefficient_sources(lineage_sources)
     if works is None or observations is None:
         return True, None
@@ -9694,7 +9710,7 @@ def _oxygen_input_request(
     temperature_K: float | None = None,
     composition_wt: Mapping[str, float] | None = None,
     source_oxygen_bar: float | None = None,
-) -> "Po2Request | EnginePrediction":
+) -> Any:
     """The scorer's one oxygen-input decision.
 
     A printed identity fO2 is commanded as float(fO2_Pa)/1e5, the same
@@ -9847,7 +9863,7 @@ def _borrow_internal_analytical_effusion(
     handles: Mapping[str, object] | None,
     isolated: bool | None,
     notices: list[Notice],
-) -> "Po2Request | EnginePrediction":
+) -> Any:
     """Command the internal-analytical closure for an engine that cannot solve it.
 
     The solver stays in the internal-analytical adapter. This function reads
@@ -17492,6 +17508,17 @@ def _compile_residual_with_lineage(
             (_pressure_independent_comparison_notice(quantity, prediction),),
         )
     prediction_sources = tuple(prediction.coefficient_sources)
+    unmapped_aliases = _unmapped_coefficient_source_aliases(prediction_sources)
+    if engine is Engine.OPENIMCC and unmapped_aliases:
+        return _refused(
+            RefusalReason.LINEAGE_UNKNOWN,
+            {
+                "reason": "openimcc_pack_coefficient_source_alias_missing",
+                "coefficient_source_aliases": unmapped_aliases,
+            },
+            execution=prediction.execution,
+            extra_notices=prediction.notices,
+        )
     expanded_sources = expand_coefficient_sources(prediction_sources)
     lineage_complete = (
         _candidate_lineage_for_sources(
