@@ -156,6 +156,18 @@ def _assert_source_pins(document: dict, table1_grid=TABLE1_RENDER_GRID) -> None:
         and "points" not in figure["values"]
         for figure in figures
     )
+    figure3 = contexts["he2017_figure3_order_parameter"]["values"]["series"]
+    assert figure3[3]["name"] == "Yang and Hazen 1998, annealed and quenched, open triangles"
+    assert figure3[3]["evidence_class"] == "quoted_attributed"
+    assert figure3[4]["name"] == "Brown and Navrotsky 1989, in-situ HT XRD, open squares"
+    assert figure3[4]["evidence_class"] == "quoted_attributed"
+    figure6 = contexts["he2017_figure6_raman_order_relation"]["values"]["series"]
+    assert figure6[1]["name"] == "Liermann et al. [36], open circles"
+    assert figure6[1]["evidence_class"] == "quoted_attributed"
+    figure10 = contexts["he2017_figure10_heat_capacity"]["values"]["series"]
+    assert figure10[3]["name"] == "Todd 1952 X unknown"
+    assert figure10[3]["marker"] == "open circles"
+    assert figure10[3]["evidence_class"] == "quoted_attributed"
     assert validate_extract_document(
         document,
         expected_source_id=SOURCE_ID,

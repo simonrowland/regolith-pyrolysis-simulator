@@ -8,6 +8,10 @@ from types import MappingProxyType
 from typing import Any, Mapping
 
 from simulator.accounting.queries import AccountingQueries, stage_purity
+from simulator.accounting.yield_disposition import (
+    build_yield_disposition,
+    ledger_snapshots_from_sim,
+)
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX, HourSnapshot
 
@@ -77,6 +81,8 @@ class PhysicsTrace:
     extraction_completeness_by_target: Mapping[str, Mapping[str, Any]] = field(
         default_factory=dict
     )
+    yield_disposition_fraction_table_rows: tuple[Mapping[str, Any], ...] = ()
+    yield_disposition_fraction_table_error: str = ""
 
     @classmethod
     def from_simulator(cls, sim: Any) -> "PhysicsTrace":
@@ -122,6 +128,24 @@ class PhysicsTrace:
             for target, entry in extraction_by_target.items()
             if isinstance(entry, Mapping)
         }
+        try:
+            yield_disposition = build_yield_disposition(
+                sim,
+                ledger_snapshots_from_sim(sim),
+            )
+            fraction_table = yield_disposition.get("fraction_table", {})
+            rows = fraction_table.get("rows", ())
+            if not isinstance(rows, (tuple, list)):
+                raise TypeError("yield-disposition fraction-table rows are malformed")
+            fraction_rows = tuple(
+                _freeze_value(row) for row in rows if isinstance(row, Mapping)
+            )
+            if len(fraction_rows) != len(rows):
+                raise TypeError("yield-disposition fraction-table row is malformed")
+            fraction_table_error = ""
+        except Exception as exc:  # noqa: BLE001 -- scoring fails closed below
+            fraction_rows = ()
+            fraction_table_error = str(exc)
         return cls(
             snapshots=snapshots,
             product_ledger_kg=_freeze_mapping(queries.product_ledger()),
@@ -156,6 +180,8 @@ class PhysicsTrace:
             extraction_completeness_by_target=_freeze_nested_mapping(
                 extraction_by_target
             ),
+            yield_disposition_fraction_table_rows=fraction_rows,
+            yield_disposition_fraction_table_error=fraction_table_error,
         )
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
@@ -176,6 +202,8 @@ class PhysicsTrace:
                 _thaw_value(self.wall_deposit_by_segment_species_delta),
                 _thaw_value(self.impurity_delta),
                 _thaw_value(self.extraction_completeness_by_target),
+                _thaw_value(self.yield_disposition_fraction_table_rows),
+                self.yield_disposition_fraction_table_error,
             ),
         )
 

@@ -62,6 +62,8 @@ observations:
         pdf_page_index: 4
         figure: '3'
         note: Belton-Fruehan integration curve Fe-V at 1600 C (Furukawa and Kato)
+  provenance:
+    printed_phase: Fe-V liquid; Al-added vs without Al
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig5_fe_p_p_p2_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -121,6 +123,8 @@ observations:
         pdf_page_index: 8
         figure: '5'
         note: Vapor pressures of P, P2 from Fe-P alloys (Yamamoto et al.)
+  provenance:
+    printed_phase: gas
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig6_fe_mo_ion_intensity_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -170,6 +174,8 @@ observations:
     figure: '6'
     note: log I_Fe T vs 1/T for Fe in low Mo (Ichise et al.)
   read_from: pdf:kems-049-kato-1993-ms-review
+  provenance:
+    printed_phase: gas
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig7_fe_ge_ion_ratio_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -220,6 +226,8 @@ observations:
     figure: '7'
     note: ln(I_Fe+/I_Ge+) vs 10^4/T for Fe-Ge (Nunoue and Kato)
   read_from: pdf:kems-049-kato-1993-ms-review
+  provenance:
+    printed_phase: Fe-Ge; homogeneous liquid and solid plus two-phase
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig8_fe_ge_phase_diagram_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -270,6 +278,8 @@ observations:
     figure: '8'
     note: Fe-Ge phase equilibria summary (Nunoue and Kato) with overlays
   read_from: pdf:kems-049-kato-1993-ms-review
+  provenance:
+    printed_phase: Fe-Ge liquid, alpha, epsilon, beta
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_p300_al2o3_cell_a_al_model_derived
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -330,6 +340,8 @@ observations:
         pdf_page_index: 4
         section: 2.3 Compatibility of cell material with samples
         note: calculated a_Al in Fe in equilibrium with Al2O3 at the Fe-V example pO2
+  provenance:
+    printed_phase: Al in iron vs Al2O3 cell; Fe-V example
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_al_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -432,6 +444,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Al vapor pressure at 1873 K = 1.8 × 10^{2} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_au_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -534,6 +548,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Au vapor pressure at 1873 K = 8.1 Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_co_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -636,6 +652,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Co vapor pressure at 1873 K = 3.7 Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_cr_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -738,6 +756,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Cr vapor pressure at 1873 K = 2.5 × 10^{1} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_cu_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -840,6 +860,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Cu vapor pressure at 1873 K = 1.2 × 10^{2} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_fe_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -942,6 +964,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Fe vapor pressure at 1873 K = 8.0 Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ge_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1044,6 +1068,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Ge vapor pressure at 1873 K = 4.6 × 10^{1} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_mn_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1146,6 +1172,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Mn vapor pressure at 1873 K = 5.2 × 10^{3} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_mo_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1248,6 +1276,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Mo vapor pressure at 1873 K = 2.1 × 10^{-6} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_nb_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1350,6 +1380,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Nb vapor pressure at 1873 K = 1.0 × 10^{-7} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ni_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1452,6 +1484,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Ni vapor pressure at 1873 K = 3.8 Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_p_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1554,6 +1588,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 P vapor pressure at 1873 K = 1.4 × 10^{-4} Pa (1 mass%)
+  provenance:
+    printed_phase: Fe-P at 1 mass% (not pure P)
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_pd_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1656,6 +1692,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Pd vapor pressure at 1873 K = 7.3 Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_s_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1758,6 +1796,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 S vapor pressure at 1873 K = 1.7 Pa (1 mass%)
+  provenance:
+    printed_phase: Fe-S at 1 mass% (not pure S)
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_si_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1860,6 +1900,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Si vapor pressure at 1873 K = 8.8 × 10^{-1} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_sn_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -1962,6 +2004,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Sn vapor pressure at 1873 K = 1.2 × 10^{2} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ta_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -2064,6 +2108,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Ta vapor pressure at 1873 K = 4.3 × 10^{-10} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ti_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -2166,6 +2212,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 Ti vapor pressure at 1873 K = 1.5 × 10^{-1} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_v_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -2268,6 +2316,8 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 V vapor pressure at 1873 K = 2.0 × 10^{-2} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_w_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -2370,3 +2420,5 @@ observations:
         pdf_page_index: 6
         table: '1'
         note: Table 1 W vapor pressure at 1873 K = 6.7 × 10^{-11} Pa
+  provenance:
+    printed_phase: pure_element_ranking_at_1873_K

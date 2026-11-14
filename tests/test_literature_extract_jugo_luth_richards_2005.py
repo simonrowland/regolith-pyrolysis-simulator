@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -199,7 +200,13 @@ def test_isolated_migration_keeps_printed_values_conditions_and_identity_axes() 
         assert row.point_conditions["total_pressure_Pa"].state.is_value
         assert row.point_conditions["composition"].state.is_value
         assert row.point_conditions["fO2_control"].locator.page in {7, 10}
-        assert row.identity.composition.value == row.point_conditions["composition"].state.value
+        identity_composition = row.identity.composition.value
+        condition_composition = row.point_conditions["composition"].state.value
+        assert identity_composition.basis == condition_composition.basis
+        assert identity_composition.components == condition_composition.components
+        assert identity_composition.amount_basis == condition_composition.amount_basis
+        assert identity_composition.input_provenance == PRINTED_STARTING_BULK
+        assert condition_composition.input_provenance is None
 
     # These rendered values are checked after the real migrator has parsed them.
     expected_values = {
@@ -253,5 +260,9 @@ def test_isolated_migration_keeps_printed_values_conditions_and_identity_axes() 
         for formula, amount in printed_30a["point_conditions"]["composition"]["state"]["value"]["components"]
     }
     expected_30a_composition = wt_pct_to_mole_fraction(printed_map)
-    assert run_30a_s.identity.composition.value == expected_30a_composition
+    migrated_30a_composition = run_30a_s.identity.composition.value
+    assert migrated_30a_composition.basis == expected_30a_composition.basis
+    assert migrated_30a_composition.components == expected_30a_composition.components
+    assert migrated_30a_composition.amount_basis == expected_30a_composition.amount_basis
+    assert migrated_30a_composition.input_provenance == PRINTED_STARTING_BULK
     assert "SO3" in dict(run_30a_s.identity.composition.value.components)

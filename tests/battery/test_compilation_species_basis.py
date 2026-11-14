@@ -140,7 +140,7 @@ def test_kelley_king_table_6_gas_row_uses_mol_species(migrated_compilations):
         migrated_compilations,
         "kelley-king-1961-usbm-b592",
         "kelley-king-1961-usbm-b592:table-006-0003:S:entropy_recommended",
-        "Al(g)",
+        "Al",
     )
 
 

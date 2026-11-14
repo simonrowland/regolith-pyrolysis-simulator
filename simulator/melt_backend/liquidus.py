@@ -423,6 +423,9 @@ def find_liquidus_solidus_by_fraction(
     liquid_threshold = 1.0 - liquid_epsilon_value
     samples: list[MeltFractionSample] = []
     raw_fraction_by_temperature: dict[float, float] = {}
+    # Mode-vector notices keyed by the sample temperature. The finder
+    # annotates them when that sample takes part in a threshold decision.
+    closure_notices: dict[float, dict] = {}
     smoothing_warnings: list[str] = []
     iterations = 0
     start_time = time.monotonic()
@@ -475,6 +478,7 @@ def find_liquidus_solidus_by_fraction(
                 raw = _invoke_sample_fraction(
                     sample_fraction,
                     temperature_C,
+                    closure_notices,
                 )
             except _LiquidusFinderBudgetExceeded:
                 raise
@@ -516,12 +520,26 @@ def find_liquidus_solidus_by_fraction(
                 and current.frac_M > solid_threshold
             ):
                 solidus_bracket = (previous, current)
+                _annotate_renormalised_threshold(
+                    (previous, current),
+                    previous,
+                    current,
+                    tolerance,
+                    closure_notices,
+                )
             if (
                 liquidus_bracket is None
                 and previous.frac_M < liquid_threshold
                 and current.frac_M >= liquid_threshold
             ):
                 liquidus_bracket = (previous, current)
+                _annotate_renormalised_threshold(
+                    (previous, current),
+                    previous,
+                    current,
+                    tolerance,
+                    closure_notices,
+                )
             previous = current
 
         missing = []
@@ -548,6 +566,7 @@ def find_liquidus_solidus_by_fraction(
             threshold=solid_threshold,
             tolerance_C=tolerance,
             max_iterations=max_bisection_iterations,
+            closure_notices=closure_notices,
         )
         iterations += solidus_iterations
         liquidus, liquidus_iterations = _bisect_liquidus(
@@ -557,6 +576,7 @@ def find_liquidus_solidus_by_fraction(
             threshold=liquid_threshold,
             tolerance_C=tolerance,
             max_iterations=max_bisection_iterations,
+            closure_notices=closure_notices,
         )
         iterations += liquidus_iterations
     except _LiquidusFinderBudgetExceeded as exc:
@@ -836,6 +856,7 @@ def _bisect_solidus(
     threshold: float,
     tolerance_C: float,
     max_iterations: int,
+    closure_notices: dict[float, dict] | None = None,
 ) -> tuple[MeltFractionSample, int]:
     iterations = 0
     while high.temperature_C - low.temperature_C > tolerance_C:
@@ -844,6 +865,13 @@ def _bisect_solidus(
                 'solidus bisection exceeded iteration bound'
             )
         mid = sample((low.temperature_C + high.temperature_C) / 2.0)
+        _annotate_renormalised_threshold(
+            (low, high, mid),
+            low,
+            high,
+            tolerance_C,
+            closure_notices or {},
+        )
         if mid.frac_M <= threshold:
             low = mid
         else:
@@ -860,6 +888,7 @@ def _bisect_liquidus(
     threshold: float,
     tolerance_C: float,
     max_iterations: int,
+    closure_notices: dict[float, dict] | None = None,
 ) -> tuple[MeltFractionSample, int]:
     iterations = 0
     while high.temperature_C - low.temperature_C > tolerance_C:
@@ -868,12 +897,90 @@ def _bisect_liquidus(
                 'liquidus bisection exceeded iteration bound'
             )
         mid = sample((low.temperature_C + high.temperature_C) / 2.0)
+        _annotate_renormalised_threshold(
+            (low, high, mid),
+            low,
+            high,
+            tolerance_C,
+            closure_notices or {},
+        )
         if mid.frac_M >= threshold:
             high = mid
         else:
             low = mid
         iterations += 1
     return high, iterations
+
+
+def _annotate_renormalised_threshold(
+    participants: tuple[MeltFractionSample, ...],
+    left: MeltFractionSample,
+    right: MeltFractionSample,
+    tolerance_C: float,
+    notices: Mapping[float, dict],
+) -> None:
+    """Attach ΔT_bound when a renormalised sample is in a threshold pair.
+
+    The 1e-3 excess cap is derived in ``magemin.py`` (premise, algebra,
+    unit check, sanity). This function evaluates that derivation's
+    temperature map for one bracket. ΔT_bound = δ / s with
+    s = |ΔF/ΔT| from the two bracketing samples and δ the sample's own
+    raw-sum excess. Unit: δ is dimensionless and s is 1/K, so
+    ΔT_bound is in K. A zero slope makes the shift unbounded. When
+    ΔT_bound is missing or greater than tolerance_C the notice sets
+    renormalisation_may_shift_bracket. The largest bound is kept. The
+    melt fraction is not changed (d-367).
+    """
+    if not notices:
+        return
+    temperature_span = abs(right.temperature_C - left.temperature_C)
+    fraction_span = abs(right.frac_M - left.frac_M)
+    if temperature_span > 0.0:
+        slope = fraction_span / temperature_span
+    else:
+        slope = 0.0
+    seen: set[float] = set()
+    for sample in participants:
+        temperature_C = sample.temperature_C
+        if temperature_C in seen:
+            continue
+        seen.add(temperature_C)
+        notice = notices.get(temperature_C)
+        if not isinstance(notice, dict):
+            continue
+        if notice.get('kind') != 'mode_vector_renormalised':
+            continue
+        try:
+            delta = float(notice.get('raw_sum')) - 1.0
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(delta) or delta <= 0.0:
+            continue
+        if slope <= 0.0 or not math.isfinite(slope):
+            bound = None
+        else:
+            bound = delta / slope
+        _store_renormalisation_bound(notice, bound, tolerance_C)
+
+
+def _store_renormalisation_bound(
+    notice: dict,
+    bound: float | None,
+    tolerance_C: float,
+) -> None:
+    """Keep the larger ΔT_bound. None means the bracket has no slope."""
+    if 'delta_T_bound' in notice and notice['delta_T_bound'] is None:
+        notice['renormalisation_may_shift_bracket'] = True
+        return
+    if bound is None:
+        notice['delta_T_bound'] = None
+        notice['renormalisation_may_shift_bracket'] = True
+        return
+    previous = notice.get('delta_T_bound')
+    if previous is None or float(bound) > float(previous):
+        notice['delta_T_bound'] = float(bound)
+    if bound > tolerance_C:
+        notice['renormalisation_may_shift_bracket'] = True
 
 
 def _monotone_point(
@@ -1114,12 +1221,31 @@ def _refused_input(message: str) -> LiquidusSolidusResult:
 
 
 def _invoke_sample_fraction(
-    sample_fraction: Callable[..., float],
+    sample_fraction: Callable[..., Any],
     temperature_C: float,
+    closure_notices: dict[float, dict] | None = None,
 ) -> float:
-    """Call one sample without coupling its timeout to wall elapsed."""
+    """Call one sample without coupling its timeout to wall elapsed.
+
+    A float return is the melt fraction. A ``(fraction, notice)`` pair
+    is the same fraction plus the mode-vector notice for a renormalised
+    row. The notice is recorded under the sample temperature so a later
+    threshold decision can attach ``delta_T_bound``.
+    """
     raw = sample_fraction(float(temperature_C))
-    return _declared_float(raw, 'frac_M')
+    notice = None
+    if isinstance(raw, tuple):
+        if len(raw) != 2:
+            raise TypeError(
+                'frac_M sample must be a fraction or (fraction, notice)'
+            )
+        raw, notice = raw
+        if notice is not None and not isinstance(notice, dict):
+            raise TypeError('mode closure notice must be a dict or None')
+    fraction = _declared_float(raw, 'frac_M')
+    if notice is not None and closure_notices is not None:
+        closure_notices[float(temperature_C)] = notice
+    return fraction
 
 
 def _declared_float(value: Any, name: str) -> float:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -15,6 +16,52 @@ ROOT = Path(__file__).resolve().parents[1]
 SID = "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SID}.yaml"
 SOURCE = f"{SID}::"
+
+# Each run prints ΔIW, T, and P, not an absolute log. O'Neill (1988) eq. 11
+# third segment is the 1-bar IW base for every run here (T > 1184 K):
+# μ° = -551159 + 269.404 T - 16.9484 T ln(T) J/mol, then μ°/(R T ln 10)
+# with R = 8.31446261815324. Frost (1991) Table 1 adds the IW molar-volume
+# term 0.055 (P_bar - 1) / T, P_bar = printed kbar × 1000. The absolute log
+# is that sum plus the printed ΔIW. All of these temperatures are above the
+# 1450 K EMF window (predict-and-flag). J/mol over R T is dimensionless.
+_MAVROGENES_LOG10_BAR = {
+    "MAV1": Decimal("-11.101141516"),
+    "MAV14": Decimal("-11.066780879"),
+    "MAV2": Decimal("-10.762420242"),
+    "MAV4": Decimal("-10.912420242"),
+    "MAV9": Decimal("-10.752420242"),
+    "MAV10": Decimal("-10.932420242"),
+    "MAV5": Decimal("-10.353698968"),
+    "MAV8": Decimal("-10.493698968"),
+    "MAV12": Decimal("-10.833698968"),
+    "MAV6": Decimal("-10.214977693"),
+    "MAV7": Decimal("-10.274977693"),
+    "MAV65": Decimal("-9.321141516"),
+    "MAV64": Decimal("-8.982420242"),
+    "MAV27": Decimal("-7.691141516"),
+    "MAV26": Decimal("-7.362420242"),
+    "MAV32": Decimal("-7.111408155"),
+    "MAV29": Decimal("-6.771225711"),
+    "MAV31": Decimal("-6.621043268"),
+    "MAV54": Decimal("-5.342743641"),
+    "MAV55": Decimal("-4.494204944"),
+    "MAV45": Decimal("-3.757721090"),
+    "MAV68": Decimal("-5.276853329"),
+    "MAV69": Decimal("-4.806259788"),
+    "MAV34": Decimal("-6.871408155"),
+    "MAV36": Decimal("-6.371225711"),
+    "MAV42": Decimal("-6.631225711"),
+    "MAV58A": Decimal("-4.910095255"),
+    "MAV52": Decimal("-4.454204944"),
+}
+
+
+def _assert_converted_delta_iw(identity, run_id: str) -> None:
+    oxygen = identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    assert abs(
+        oxygen.value.log10() - Decimal(5) - _MAVROGENES_LOG10_BAR[run_id]
+    ) < Decimal("5e-9")
 
 
 def _document():
@@ -224,7 +271,7 @@ def test_mavrogenes_1999_isolated_migration_binds_conditions_and_identity() -> N
         assert identity.composition is not None and identity.composition.is_value
         assert identity.total_pressure_Pa is not None and identity.total_pressure_Pa.is_value
         assert identity.temperature_K is not None and identity.temperature_K.is_value
-        assert identity.fO2_Pa is not None and identity.fO2_Pa.is_unknown
+        _assert_converted_delta_iw(identity, run_id)
         expected_starting = dict(starting[raw["values"]["starting_material_as_printed"]])
         expected_starting["FeOT"] = expected_starting.pop("FeO(t)")
         assert raw["values"]["starting_composition_wt_pct_as_printed"] == expected_starting
@@ -283,4 +330,4 @@ def test_mavrogenes_1999_isolated_migration_binds_conditions_and_identity() -> N
         identity = observation.identity
         assert str(identity.temperature_K.value) == expected_temperature
         assert str(identity.total_pressure_Pa.value) == expected_pressure
-        assert identity.fO2_Pa.is_unknown
+        _assert_converted_delta_iw(identity, run_id)

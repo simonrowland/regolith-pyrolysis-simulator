@@ -31123,7 +31123,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=eskolaite-$cr_{2}o_{3}$:v=fcc9294c93
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:S:shared:T=298.15:col=entropy_s298:name=eskolaite-$cr_{2}o_{3}$:v=fcc9294c93:poly=eskolaite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -31135,9 +31135,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'ESKOLAITE $Cr_{2}O_{3}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: eskolaite
       charge:
         tag: value
         value: 0
@@ -31200,8 +31199,20 @@ observations:
     original_method_class: split_merged_value_uncertainty_by_column_grain
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='81.171.25'; unit='J/mol·K' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); reconstructed=81.17 method_class=split_merged_value_uncertainty_by_column_grain;
+          evidence=merged value+uncertainty '81.171.25' splits uniquely at column printed grain 0.01 into 81.17 ± 1.25
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -93935,7 +93946,7 @@ observations:
           note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in J·mol-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=eskolaite-$cr_{2}o_{3}$:v=13ac3d0be4
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:delta_fG:from_the_elements:T=298.15:col=formation_gibbs_energy:name=eskolaite-$cr_{2}o_{3}$:v=13ac3d0be4:poly=eskolaite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -93947,9 +93958,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'ESKOLAITE $Cr_{2}O_{3}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: eskolaite
       charge:
         tag: value
         value: 0
@@ -93975,9 +93985,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'ESKOLAITE $Cr_{2}O_{3}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: eskolaite
             charge:
               tag: value
               value: 0
@@ -94072,8 +94081,21 @@ observations:
     original_method_class: split_merged_value_uncertainty_by_column_grain
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='-10530568400'; unit='J/mol' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements;
+          reconstructed=-1053056 method_class=split_merged_value_uncertainty_by_column_grain; evidence=merged value+uncertainty
+          '-10530568400' has several grain-1 cuts; log10_Kf identity uniquely selects -1053056 ± 8400
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -228710,7 +228732,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=eskolaite-$cr_{2}o_{3}$:v=3d5798928d
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:log10_Kf:from_the_elements:T=298.15:col=log_kf:name=eskolaite-$cr_{2}o_{3}$:v=3d5798928d:poly=eskolaite
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0003:tabulation
   identity:
     quantity:
@@ -228722,9 +228744,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'ESKOLAITE $Cr_{2}O_{3}$' is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: eskolaite
       charge:
         tag: value
         value: 0
@@ -228750,9 +228771,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'ESKOLAITE $Cr_{2}O_{3}$' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: eskolaite
             charge:
               tag: value
               value: 0
@@ -228847,8 +228867,21 @@ observations:
     original_method_class: split_merged_value_uncertainty_by_column_grain
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 12
+        pdf_page_index: 18
+        table: robie-hemingway-fisher-1978-usgs-b1452-0003
+        note: as_published='184.4921.472'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure); formation_basis=from_the_elements;
+          reconstructed=184.492 method_class=split_merged_value_uncertainty_by_column_grain; evidence=merged value+uncertainty
+          '184.4921.472' splits uniquely at column printed grain 0.001 into 184.492 ± 1.472
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0003
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:

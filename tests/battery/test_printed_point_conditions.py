@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, ValueKind
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from simulator.battery.identity import quantity_token
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -34,9 +34,9 @@ _TEMPERATURE_ROUTES = (
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_si_psat_1873k", "1873.0", "table", "1"),
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_w_psat_1873k", "1873.0", "table", "1"),
     # The locator prints 1300 C; the migrator applies its Celsius-to-Kelvin conversion once.
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=7be86db87718", "1573.15", "table", "3"),
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=0537dd72731f", "1573.15", "table", "3"),
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=7b2b66dd3504", "1573.15", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=90ea453f2e72", "1573.15", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=dd92bb9c709c", "1573.15", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::T=1573.15:h=3a0639d50db0", "1573.15", "table", "3"),
     ("kems-057-kambayashi-1985", "kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only", "1573.15", "figure", "2"),
     # Fig. 8 slope: "Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C".
     ("kems-057-kambayashi-1985", "kambayashi_1985_fe_sublimation_enthalpy_1370c", "1643.15", "figure", "8"),
@@ -94,7 +94,7 @@ def test_printed_point_temperature_routes(
         assert getattr(locator, locator_key) == locator_value
 
 
-def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
+def test_jacobson_table1_model_pressures_keep_printed_temperature_and_method(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(tmp_path, "kems-139-jacobson-2024")
@@ -113,25 +113,42 @@ def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
     ]
     assert len(points) == len(printed_species) == 21
     assert [obs.identity.species.formula for obs in points] == printed_species
-    for obs in points:
-        assert obs.identity.quantity.is_unknown
-        assert "predicted_partial_pressure" in obs.identity.quantity.reason
-        assert obs.value.kind is ValueKind.UNAVAILABLE
-        assert obs.evidence.class_.is_value
-        assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        assert obs.evidence.attribution == (
-            "Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)"
+    extract = load_cached_safe_yaml(
+        (_EXTRACTS / "kems-139-jacobson-2024.yaml").read_text(encoding="utf-8")
+    )
+    pressure_bar_by_species = {
+        point["species_as_printed"].removesuffix("(g)"): Decimal(
+            point["value_as_printed"]
         )
+        for row in extract["species"]["SiO"]["observations"]
+        if row["observation_id"] == "jacobson_2024_t1_factsage_2500k_predicted_psat"
+        for point in row["values"]["points"]
+    }
+    for obs in points:
+        assert quantity_token(obs.identity) is Quantity.P_PARTIAL
+        assert obs.value.kind is ValueKind.POINT
+        assert obs.value.point == (
+            pressure_bar_by_species[obs.identity.species.formula]
+            * Decimal("100000")
+        )
+        assert obs.evidence.class_.is_value
+        assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert obs.derivation is not None
+        assert obs.derivation.references == ("Bale et al. [115]", "Snyder et al. [117]")
+        assert obs.derivation.method is not None
+        assert obs.derivation.method.locator is not None
+        assert obs.derivation.method.locator.page == 19
+        assert obs.derivation.method.locator.equation is None
         assert rail_for_quantity(
             quantity_token(obs.identity),
             species_formula=obs.identity.species.formula,
-        ) is None
+        ) is not None
         temperature = (obs.point_conditions or {}).get("temperature_K")
         assert temperature is not None and temperature.state.is_value
         assert temperature.state.value == Decimal("2500.0")
         assert temperature.locator is not None
         assert temperature.locator.table == "1"
-    assert any(
+    assert not any(
         entry.observation_id in {obs.observation_id for obs in points}
         and "unsupported quantity 'predicted_partial_pressure'" in entry.why
         for entry in result.queue
@@ -147,6 +164,7 @@ def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
         if issue.reason.value == "conditional_field"
         and "kems-139-jacobson-2024::" in issue.path
         and issue.path.endswith((".derived_from", ".derivation"))
+        and parent_id not in issue.path
     ]
 
 

@@ -18,10 +18,12 @@ from engines.builtin.vapor_pressure import (
 )
 import simulator.optimize.evaluate as evaluate_module
 import simulator.optimize.objective as objective_module
+import simulator.optimize.study as study_module
 from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.engine_pool import EngineWorkerTimeout, EngineWorkerUnavailable
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.battery.enums import Engine, ProprietaryEngineRefusal
 from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -98,6 +100,7 @@ def test_optimizer_trace_preserves_high_t_melt_activity_notice() -> None:
     payload = evaluate_module._cache_trace_payload(execution, None)
 
     assert payload["high_t_melt_activity_fallback_notice"] == notice
+    assert "engine_version" not in payload
 
 
 PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
@@ -368,6 +371,80 @@ def test_raw_profile_mapping_unknown_key_raises_before_run() -> None:
             profile=bad_profile,
             executor=executor,
         )
+
+    assert executor.calls == 0
+
+
+def _proprietary_optimizer_profile() -> dict:
+    profile = copy.deepcopy(PROFILE)
+    profile["run"]["backend_name"] = Engine.PROPRIETARY_REMOTE.value
+    profile["fidelities"]["fast"]["backend_name"] = (
+        Engine.PROPRIETARY_REMOTE.value
+    )
+    return profile
+
+
+def test_proprietary_engine_is_refused_by_direct_evaluate_before_executor() -> None:
+    executor = FakeExecutor(
+        execution=_execution(backend_status="ok", backend_authoritative=True)
+    )
+
+    with pytest.raises(ProprietaryEngineRefusal):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=_proprietary_optimizer_profile(),
+            executor=executor,
+        )
+
+    assert executor.calls == 0
+
+
+def test_verify_imported_study_reaches_proprietary_evaluate_guard(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    from simulator.optimize import import_bundle as import_bundle_module
+
+    candidate = {
+        "cache_key": "cache-a",
+        "candidate_id": "candidate-a",
+        "patch_json": "{}",
+    }
+    monkeypatch.setattr(
+        import_bundle_module,
+        "verify_import_hashes",
+        lambda root: {"verdict": "confirmed"},
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_enforce_import_safety_caps",
+        lambda root: {"leaderboard": [], "rows_by_cache_key": {}},
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_selected_verification_candidates",
+        lambda root, *, top_n, leaderboard: [candidate],
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_load_profile",
+        lambda path: _proprietary_optimizer_profile(),
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_imported_claim",
+        lambda candidate, imported_row: {"identity": {"cost_parameters": None}},
+    )
+    monkeypatch.setattr(import_bundle_module, "_load_json_object", lambda path: {})
+    executor = FakeExecutor(
+        execution=_execution(backend_status="ok", backend_authoritative=True)
+    )
+    monkeypatch.setattr(evaluate_module, "RunExecutor", lambda: executor)
+
+    with pytest.raises(ProprietaryEngineRefusal):
+        import_bundle_module.verify_imported_study(tmp_path)
 
     assert executor.calls == 0
 
@@ -1265,6 +1342,10 @@ def test_zero_overhead_flow_knudsen_snapshot_is_not_applicable_pass(
         trace=trace,
         backend_status="ok",
         backend_authoritative=True,
+        backend_diagnostics={
+            "backend_name": "alphamelts",
+            "engine_version": "petthermotools 1.2.3",
+        },
     )
     execution.session._config = SimpleNamespace(backend_name="alphamelts")
 
@@ -1375,12 +1456,16 @@ def test_extraction_not_attempted_round_trips_through_result_store(tmp_path) -> 
     assert not result.feasible
     assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
     margins = result.feasibility_margins
-    for gate in ("delivered_stream_purity", "extraction_completeness"):
-        margin = margins[gate]
-        assert margin.status == "not-attempted"
-        assert margin.output_status == "not_attempted"
-        assert margin.status_reason == "not-attempted-no-volatilization"
-        assert margin.status_payload["predicate"] == "melt_never_reached_solidus"
+    purity_margin = margins["delivered_stream_purity"]
+    assert purity_margin.status == "not-attempted"
+    assert purity_margin.output_status == "not_attempted"
+    assert purity_margin.status_reason == "not-attempted-no-volatilization"
+    assert purity_margin.status_payload["diagnostic_only"] is True
+    assert purity_margin.status_payload["predicate"] == "melt_never_reached_solidus"
+    extraction_margin = margins["extraction_completeness"]
+    assert extraction_margin.status == "unavailable"
+    assert extraction_margin.observed is None
+    assert "SiO" in extraction_margin.detail
 
     assert result.eval_spec is not None
     assert result.run_reference is not None
@@ -1403,12 +1488,16 @@ def test_extraction_not_attempted_round_trips_through_result_store(tmp_path) -> 
     loaded = store.fetch(result.cache_key)
 
     assert loaded is not None
-    for gate in ("delivered_stream_purity", "extraction_completeness"):
-        margin = loaded.feasibility_margins[gate]
-        assert margin.status == "not-attempted"
-        assert margin.output_status == "not_attempted"
-        assert margin.status_reason == "not-attempted-no-volatilization"
-        assert margin.status_payload["predicate"] == "melt_never_reached_solidus"
+    loaded_purity = loaded.feasibility_margins["delivered_stream_purity"]
+    assert loaded_purity.status == "not-attempted"
+    assert loaded_purity.output_status == "not_attempted"
+    assert loaded_purity.status_reason == "not-attempted-no-volatilization"
+    assert loaded_purity.status_payload["diagnostic_only"] is True
+    assert loaded_purity.status_payload["predicate"] == "melt_never_reached_solidus"
+    loaded_extraction = loaded.feasibility_margins["extraction_completeness"]
+    assert loaded_extraction.status == "unavailable"
+    assert loaded_extraction.observed is None
+    assert "SiO" in loaded_extraction.detail
 
 
 def test_below_solidus_with_routed_flow_is_honest_infeasible() -> None:
@@ -1447,13 +1536,17 @@ def test_below_solidus_with_routed_flow_is_honest_infeasible() -> None:
 
     assert not result.feasible
     assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
-    for gate in ("delivered_stream_purity", "extraction_completeness"):
-        margin = result.feasibility_margins[gate]
-        assert not margin.feasible
-        assert margin.status != "not-attempted"
-        assert margin.output_status != "not_attempted"
-        assert margin.status_reason != "not-attempted-no-volatilization"
-        assert "not-attempted-no-volatilization" not in margin.detail
+    purity = result.feasibility_margins["delivered_stream_purity"]
+    assert purity.feasible
+    assert purity.margin < 0.0
+    assert purity.status == "warning"
+    assert purity.output_status == "provisional"
+    assert "not-attempted-no-volatilization" not in purity.detail
+    extraction = result.feasibility_margins["extraction_completeness"]
+    assert not extraction.feasible
+    assert extraction.status == "unavailable"
+    assert extraction.observed is None
+    assert "not-attempted-no-volatilization" not in extraction.detail
 
 
 @pytest.mark.parametrize(
@@ -1658,14 +1751,15 @@ def test_zero_input_extraction_completeness_is_named_and_serializable(tmp_path) 
     margin = result.feasibility_margins["extraction_completeness"]
     assert not margin.feasible
     assert margin.margin == -math.inf
-    assert margin.observed == math.inf
-    assert margin.detail == "not-applicable: zero input basis for CrO2"
+    assert margin.observed is None
+    assert margin.status == "unavailable"
+    assert "target element Cr" in margin.detail
     assert result.failing_gates == ("extraction_completeness",)
     target = result.run_reference.product_summary["extraction_completeness"][
         "targets"
     ]["CrO2"]
     assert target["status"] == "insufficient-evidence"
-    assert target["reason"] == "not-applicable: zero input basis for CrO2"
+    assert "target element Cr" in target["reason"]
 
     assert result.eval_spec is not None
     store = ResultStore(
@@ -1680,6 +1774,17 @@ def test_nonzero_extraction_completeness_margin_is_hand_pinned() -> None:
     constraints = PhysicsConstraintSet(active_gates=("extraction_completeness",))
     trace = _trace()
     trace.terminal_rump_by_species_kg = {"SiO2": 1.0}
+    trace.yield_disposition_fraction_table_rows = (
+        {
+            "element": "Si",
+            "destination_mol_atoms": {
+                "product_condensed": 2154.98,
+                "offgas_vented": 100.0,
+                "wall_deposit": 100.0,
+                "melt_retained": 16.6436,
+            },
+        },
+    )
     result = evaluate(
         RecipePatch({}),
         "lunar_mare_low_ti",
@@ -1692,12 +1797,155 @@ def test_nonzero_extraction_completeness_margin_is_hand_pinned() -> None:
     assert result.feasible
     margin = result.feasibility_margins["extraction_completeness"]
     assert margin.feasible
-    assert margin.observed == pytest.approx(0.9923358418656291)
-    assert margin.margin == pytest.approx(0.04233584186562911)
-    assert margin.detail == (
-        "SiO: product_target_equiv_mol=2154.98, "
-        "residual_target_equiv_mol=16.6436, "
-        "denominator_target_equiv_mol=2171.62"
+    expected_left_melt_fraction = 2354.98 / 2371.6236
+    assert margin.observed == pytest.approx(expected_left_melt_fraction)
+    assert margin.margin == pytest.approx(expected_left_melt_fraction - 0.95)
+    target = result.run_reference.product_summary["extraction_completeness"][
+        "targets"
+    ]["SiO"]
+    assert target["captured_basis_completeness_fraction"] == pytest.approx(
+        0.9923358418656291
+    )
+    assert target["terminal_offgas_target_equiv_mol"] == pytest.approx(100.0)
+    assert target["wall_deposit_target_equiv_mol"] == pytest.approx(100.0)
+
+
+def test_extraction_disposition_survives_study_cache_round_trip(tmp_path) -> None:
+    profile = {
+        **PROFILE,
+        "profile_id": "yield-disposition-cache-round-trip",
+        "constraints": {
+            "gates": ["extraction_completeness"],
+            "target_species": ["SiO"],
+        },
+    }
+    constraints = PhysicsConstraintSet(
+        active_gates=("extraction_completeness",),
+        target_species=("SiO",),
+    )
+    trace = _trace()
+    trace.yield_disposition_fraction_table_rows = (
+        {
+            "element": "Si",
+            "destination_mol_atoms": {
+                "product_condensed": 99.0,
+                "melt_retained": 1.0,
+            },
+            "unused_projection_detail": "not retained in study cache",
+        },
+    )
+    trace.extraction_completeness_by_target = {
+        "SiO": {"completeness_fraction": 0.01}
+    }
+    trace.backend_name = "internal-analytical"
+    trace.backend_status = "diagnostic_stub"
+    trace.backend_authoritative = False
+    trace.evidence_class = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    trace.certification_allowed = False
+    execution = _execution(
+        trace=trace,
+        backend_status="diagnostic_stub",
+        backend_authoritative=False,
+    )
+    execution.session._config = SimpleNamespace(backend_name="internal-analytical")
+
+    fresh = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        constraints=constraints,
+        executor=FakeExecutor(execution=execution),
+    )
+
+    assert fresh.feasible
+    assert fresh.eval_spec is not None
+    fresh_margin = fresh.feasibility_margins["extraction_completeness"]
+    assert fresh_margin.observed == pytest.approx(0.99)
+
+    assert fresh.run_reference is not None
+    closure = {"status": "closed", "mass_balance_error_pct": 0.0}
+    product_summary = dict(fresh.run_reference.product_summary)
+    product_yield_table = dict(product_summary.get("product_yield_table") or {})
+    product_yield_table["mass_closure"] = closure
+    product_summary["mass_closure"] = closure
+    product_summary["product_yield_table"] = product_yield_table
+    storable = replace(
+        fresh,
+        run_reference=replace(
+            fresh.run_reference,
+            product_summary=product_summary,
+        ),
+    )
+    light = study_module._strip_heavy_result(storable)
+    assert light.run_reference is not None
+    light_trace = light.run_reference.trace
+    assert light_trace["yield_disposition_fraction_table_rows"] == [
+        {
+            "element": "Si",
+            "destination_mol_atoms": {
+                "product_condensed": 99.0,
+                "melt_retained": 1.0,
+            },
+        }
+    ]
+    assert "extraction_completeness_by_target" not in light_trace
+
+    store = ResultStore(tmp_path / "cache.sqlite")
+    store.store(fresh.eval_spec, light, created_at="round-trip")
+    cached = store.lookup(fresh.eval_spec)
+
+    assert cached is not None
+    assert cached.run_reference is not None
+    rebound = constraints.extraction_completeness(
+        SimpleNamespace(**dict(cached.run_reference.trace))
+    )
+    assert rebound.observed == pytest.approx(fresh_margin.observed)
+    assert study_module._cached_extraction_completion_feasible(cached, constraints)
+    candidate = study_module.Candidate("round-trip", RecipePatch({}))
+    assert study_module._lookup_cached(
+        candidate,
+        profile,
+        "lunar_mare_low_ti",
+        "fast",
+        RecipeSchema(),
+        store,
+        constraints,
+    ) is not None
+    records = study_module._records_from_cache_sqlite(
+        tmp_path,
+        RecipeSchema(),
+        profile=profile,
+        feedstock="lunar_mare_low_ti",
+        fidelity="fast",
+        constraints=constraints,
+    )
+    assert len(records) == 1
+    assert records[0].cache_hit
+
+    errored_trace = {
+        **dict(light.run_reference.trace),
+        "yield_disposition_fraction_table_error": "projection unavailable",
+    }
+    errored = replace(
+        storable,
+        run_reference=replace(storable.run_reference, trace=errored_trace),
+    )
+    error_store = ResultStore(tmp_path / "error-cache.sqlite")
+    error_store.store(
+        fresh.eval_spec,
+        study_module._strip_heavy_result(errored),
+        created_at="error",
+    )
+    loaded_error = error_store.lookup(fresh.eval_spec)
+    assert loaded_error is not None
+    assert loaded_error.run_reference is not None
+    assert loaded_error.run_reference.trace["yield_disposition_fraction_table_error"] == (
+        "projection unavailable"
+    )
+    assert not study_module._cached_extraction_completion_feasible(
+        loaded_error,
+        constraints,
     )
 
 
@@ -2496,33 +2744,42 @@ def test_completed_infeasible_run_retains_derived_objectives() -> None:
     assert "missing recorded pO2-hold -> pN2 SiO-release switch" in notes
 
     mixed_stream_execution = _execution(trace=_trace(mixed_stream=True))
-    infeasible = evaluate(
+    enforced_purity = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
         profile=PROFILE,
         executor=FakeExecutor(mixed_stream_execution),
+        constraints=PhysicsConstraintSet(
+            active_gates=("delivered_stream_purity",),
+            enforce_delivered_stream_purity=True,
+        ),
     )
-    same_run_without_purity_gate = evaluate(
+    diagnostic_purity = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
         profile=PROFILE,
         executor=FakeExecutor(mixed_stream_execution),
-        constraints=PhysicsConstraintSet(active_gates=("knudsen_viscous",)),
+        constraints=PhysicsConstraintSet(
+            active_gates=("delivered_stream_purity",),
+        ),
     )
 
-    assert not infeasible.feasible
-    assert infeasible.failure_category is FailureCategory.INFEASIBLE_RECIPE
-    assert infeasible.objectives is not None
-    assert same_run_without_purity_gate.feasible
-    assert same_run_without_purity_gate.objectives is not None
+    assert not enforced_purity.feasible
+    assert enforced_purity.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert enforced_purity.objectives is not None
+    assert diagnostic_purity.feasible
+    assert diagnostic_purity.objectives is not None
     assert (
-        infeasible.objectives.as_mapping()
-        == same_run_without_purity_gate.objectives.as_mapping()
+        enforced_purity.objectives.as_mapping()
+        == diagnostic_purity.objectives.as_mapping()
     )
-    assert infeasible.failing_gates == ("delivered_stream_purity",)
-    assert infeasible.feasibility_margins["delivered_stream_purity"].margin < 0.0
+    assert enforced_purity.failing_gates == ("delivered_stream_purity",)
+    assert enforced_purity.feasibility_margins["delivered_stream_purity"].margin < 0.0
+    assert diagnostic_purity.feasibility_margins["delivered_stream_purity"].margin == (
+        enforced_purity.feasibility_margins["delivered_stream_purity"].margin
+    )
 
 
 def _authoritative_sio_carrier() -> dict[str, object]:
@@ -3200,17 +3457,24 @@ def test_diverted_stage3_bypass_wall_deposit_is_scored_as_upstream() -> None:
     assert record["segment"] == "stage_3_bypass_to_stage_4"
 
 
-def _measured_carrier_flux(species: str, kg_hr: float) -> EvaporationFlux:
-    """Computed rate that names its own parent oxide.
+def _measured_carrier_flux(
+    snapshot: HourSnapshot,
+    species: str,
+    kg_hr: float,
+) -> EvaporationFlux:
+    """Computed rate and inventory operands for one measured carrier.
 
     The coating overlay treats this kilogram as supply. A carrier with
     neither parent nor ratio is a typed conservation gap, so the fixture
-    names a private oxide and the published kilogram stays the rate.
+    names a private oxide. The recorded inventory map gives that parent a
+    nonbinding charge under the authoritative-map ruling.
     """
 
+    parent_oxide = f"_measured_{species}"
+    snapshot.inventory.melt_oxide_kg[parent_oxide] = 1.0
     flux = EvaporationFlux(species_kg_hr={species: kg_hr})
     flux.carrier_authority_by_species[species] = {
-        "parent_oxide": f"_measured_{species}",
+        "parent_oxide": parent_oxide,
         "stoich_oxide_per_vapor": 1.0,
     }
     return flux
@@ -3225,7 +3489,7 @@ def test_optimizer_overlay_bounds_refused_wall_species_from_snapshot_flux() -> N
     }
     snapshot = _snapshot()
     snapshot.duration_h = 2.0
-    snapshot.evap_flux = _measured_carrier_flux("CrO2", 2.0e-4)
+    snapshot.evap_flux = _measured_carrier_flux(snapshot, "CrO2", 2.0e-4)
     execution = _execution(trace=trace, snapshots=(snapshot,))
 
     overlay = evaluate_module._trace_with_optimizer_coating_report(
@@ -3276,7 +3540,7 @@ def test_optimizer_overlay_null_species_does_not_hide_behind_other_refusal() -> 
     }
     snapshot = _snapshot()
     snapshot.duration_h = 2.0
-    snapshot.evap_flux = _measured_carrier_flux("CrO2", 1.0e-4)
+    snapshot.evap_flux = _measured_carrier_flux(snapshot, "CrO2", 1.0e-4)
     execution = _execution(trace=trace, snapshots=(snapshot,))
     overlay = evaluate_module._trace_with_optimizer_coating_report(
         execution,
@@ -3370,7 +3634,7 @@ def test_optimizer_overlay_null_refused_species_stays_flux_bounded() -> None:
     }
     snapshot = _snapshot()
     snapshot.duration_h = 2.0
-    snapshot.evap_flux = _measured_carrier_flux("CrO2", 2.0e-4)
+    snapshot.evap_flux = _measured_carrier_flux(snapshot, "CrO2", 2.0e-4)
     execution = _execution(trace=trace, snapshots=(snapshot,))
     overlay = evaluate_module._trace_with_optimizer_coating_report(
         execution,
@@ -3586,6 +3850,10 @@ def test_parametric_runner_fouling_report_binds_no_unqualified_deposition(
     assert coating.authoritative is False
     report = result.feasibility_margins["coating"].status_payload
     assert report["campaigns_to_resinter"] == "resinter_threshold_kg / 0.5"
+    assert report["campaigns_to_resinter_worst_segment"] == (
+        "resinter_threshold_kg / 0.5"
+    )
+    assert report["campaigns_to_resinter_total"] == "resinter_threshold_kg / 0.5"
     assert report["resinter_threshold_basis"] == "parameter required"
     assert report["authoritative"] is False
     assert report["authoritative_for_resinter"] is False
@@ -3782,6 +4050,121 @@ def test_backend_unavailable_aborts_distinct_from_engine_bug() -> None:
         )
 
     assert raised.value.category is FailureCategory.BACKEND_UNAVAILABLE
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        ProposalRejected(
+            "partial withdrawal from mixed-origin process.overhead_gas.Na "
+            "requires an explicitly amalgamated pool"
+        ),
+        PoisonedHourError(
+            PoisonedHourState(
+                hour=160,
+                committed_transition_count=3,
+                aborting_exception_summary=(
+                    "ProposalRejected: partial withdrawal from mixed-origin "
+                    "process.overhead_gas.Na requires an explicitly "
+                    "amalgamated pool"
+                ),
+                aborting_exception_type=ProposalRejected,
+            )
+        ),
+    ],
+    ids=("proposal-rejected", "poisoned-hour"),
+)
+def test_candidate_simulator_failures_are_typed_and_keep_detail(
+    exc: Exception,
+) -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(exc=exc),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.failing_gates == ("physics_refusal",)
+    assert result.eval_spec is not None
+    assert result.cache_key == cache_key(result.eval_spec)
+    assert "process.overhead_gas.Na" in result.feasibility_margins[
+        "physics_refusal"
+    ].detail
+
+
+def test_unavailable_carrier_overrides_poisoned_candidate_failure() -> None:
+    error_message = (
+        "ProposalRejected: partial withdrawal from mixed-origin "
+        "process.overhead_gas.Na; PoisonedHourError: simulator hour 160 is poisoned"
+    )
+    execution = _execution(
+        status="failed",
+        error_message=error_message,
+        backend_status="unavailable",
+    )
+    execution.failure_exception = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary="ProposalRejected: partial withdrawal",
+            aborting_exception_type=ProposalRejected,
+        )
+    )
+
+    with pytest.raises(BackendUnavailableAbort):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(execution=execution),
+        )
+
+
+def test_poisoned_backend_outage_still_aborts_as_unavailable() -> None:
+    exc = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary="BackendUnavailableError: missing engine",
+            aborting_exception_type=BackendUnavailableError,
+        )
+    )
+
+    with pytest.raises(BackendUnavailableAbort):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(exc=exc),
+        )
+
+
+def test_direct_non_withdrawal_poison_aborts_as_engine_bug() -> None:
+    message = "projected conservation failed for element Fe"
+    exc = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary=f"ProposalRejected: {message}",
+            aborting_exception_type=ProposalRejected,
+        )
+    )
+
+    with pytest.raises(EngineBugAbort) as excinfo:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(exc=exc),
+        )
+
+    assert message in str(excinfo.value)
 
 
 def test_backend_unavailable_green_path_accepts_available_real_backend() -> None:
@@ -5484,6 +5867,85 @@ def test_cached_real_fidelity_inherits_run_level_cache_config(tmp_path) -> None:
     assert executor.config.reduced_real_cache == cache_config
 
 
+def test_cache_trace_payload_binds_adapter_engine_stamp() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={
+                "backend_name": "alphamelts",
+                "engine_version": "petthermotools 1.2.3",
+            }
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["backend_name"] == "alphamelts"
+    assert payload["engine_version"] == "petthermotools 1.2.3"
+    assert payload["diagnostics"]["backend_name"] == "alphamelts"
+    assert payload["diagnostics"]["engine_version"] == "petthermotools 1.2.3"
+
+
+def test_cache_trace_payload_does_not_bind_a_foreign_engine_version() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={
+                "backend_name": "magemin",
+                "engine_version": "MAGEMin 1.7.0",
+            }
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["backend_name"] == "alphamelts"
+    assert "engine_version" not in payload
+    assert payload["diagnostics"]["backend_name"] == "magemin"
+    assert payload["diagnostics"]["engine_version"] == "MAGEMin 1.7.0"
+
+
+def test_cache_trace_payload_keeps_a_sentinel_adapter_version_unbound() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={
+                "backend_name": "alphamelts",
+                "engine_version": "unavailable",
+            },
+            backend=SimpleNamespace(
+                backend_name="alphamelts",
+                get_engine_version=lambda: "petthermotools 9.9.9",
+            ),
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert "engine_version" not in payload
+    assert "diagnostics" not in payload
+
+
+def test_cache_trace_payload_falls_back_to_live_backend_when_unstamped() -> None:
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            _last_backend_diagnostics={"backend_status": "ok"},
+            backend=SimpleNamespace(
+                backend_name="unknown",
+                name="magemin",
+                get_engine_version=lambda: "MAGEMin 1.7.0",
+            ),
+        ),
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="magemin")),
+    )
+
+    payload = evaluate_module._cache_trace_payload(execution, None)
+
+    assert payload["backend_name"] == "magemin"
+    assert payload["engine_version"] == "MAGEMin 1.7.0"
+    assert payload["diagnostics"]["backend_name"] == "magemin"
+
+
 def test_run_reference_derives_real_engine_canonical_class() -> None:
     reference = evaluate_module.RunReference(
         status="ok",
@@ -5916,6 +6378,25 @@ def test_direct_proposal_rejected_that_is_not_an_overdraw_aborts_as_engine_bug()
         assert message in str(excinfo.value)
 
 
+def test_returned_non_overdraw_proposal_rejection_aborts_as_engine_bug() -> None:
+    message = "projected conservation failed for element Fe"
+    execution = _execution(
+        status="failed",
+        error_message=f"ProposalRejected: {message}",
+        backend_status="ok",
+    )
+    execution.failure_exception = ProposalRejected(message)
+
+    with pytest.raises(EngineBugAbort, match=message):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(execution=execution),
+        )
+
+
 def test_direct_genuine_overdraw_is_still_an_invalid_recipe() -> None:
     """b-285 companion: narrowing the branch must not cost the real overdraw.
 
@@ -5938,6 +6419,30 @@ def test_direct_genuine_overdraw_is_still_an_invalid_recipe() -> None:
     )
 
     assert result.feasible is False
+    assert result.failure_category is FailureCategory.INVALID_RECIPE
+    assert result.failing_gates == ("inventory_overdraw",)
+
+
+def test_returned_run_genuine_overdraw_keeps_inventory_overdraw_gate() -> None:
+    message = (
+        "insufficient available 'FeO' in normal account "
+        "'process.cleaned_melt': balance would be -0.125 kg"
+    )
+    execution = _execution(
+        status="failed",
+        error_message=f"ProposalRejected: {message}",
+        backend_status="ok",
+    )
+    execution.failure_exception = ProposalRejected(message)
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(execution=execution),
+    )
+
     assert result.failure_category is FailureCategory.INVALID_RECIPE
     assert result.failing_gates == ("inventory_overdraw",)
 

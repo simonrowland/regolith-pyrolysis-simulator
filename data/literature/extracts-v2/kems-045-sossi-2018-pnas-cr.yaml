@@ -45,6 +45,8 @@ observations:
     paragraph: Gas-phase equilibria among the four Cr oxide species (ref. 27 and SI Appendix, Fig. S2) show that CrO2(g) is
       stable for all fO2 > IW
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: CrO2_g
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bhvo2_measured
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -138,6 +140,8 @@ observations:
     paragraph: The resulting 2sp of +/-0.03 permil (k = 35) is identical to the 2SD of repeated analyses of the US Geological
       Survey geological reference material BHVO-2 (-0.104 +/- 0.03 permil; n = 4)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: USGS_BHVO2_reference_material
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bonnand_2016_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -182,6 +186,8 @@ observations:
     paragraph: A previous study found overlapping Cr isotope compositions in low- and high-Ti basalts, with an average of
       -0.22 +/- 0.10 permil (31)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: lunar_mare_basalts_literature
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bse_filtered_mean_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -230,6 +236,8 @@ observations:
       at the 95% confidence level using Grubbs' test, leaving 36 samples with d53Cr = -0.11 +/- 0.06 permil
     note: SI Appendix Table S9 holds the filtered list and is unseen
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: bulk_silicate_Earth_filtered_ultramafic_compilation
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_chromite_opx_fractionation_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -289,6 +297,8 @@ observations:
         paragraph: The Cr isotopic fractionation between Cr3+-bearing chromite and a lunar silicate melt (assuming it is equivalent
           to Cr2+-bearing forsterite) with Cr2+/Sigma Cr = 0.91 is +0.35 x 10^6/T^2 (39), or Delta53Crchromite-melt = +0.16
           permil at 1,200 C
+  provenance:
+    printed_phase: lunar_silicate_melt_chromite_and_orthopyroxene
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_costa2017_kems_T_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -336,6 +346,8 @@ observations:
       high temperature (1,827-1,970 K, olivine; ref. 47) or low temperature (1,396-1,499 K, lunar mare basalt 12002; ref.
       48) is evidenced by experimental Knudsen effusion mass spectrometry studies
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: forsterite_rich_olivine_kems
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_cr2plus_fraction_quoted_berry::T=1673.15:h=4eab844f8a3d
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -382,7 +394,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: buffer-relative fO2 (~1 log unit below IW) requires a temperature-dependent buffer model; no fO2_Pa assigned
+      reason: buffer-relative fO2 (~1 log unit below IW) is not a point offset; missing input; no fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -494,6 +506,8 @@ observations:
     parameters: []
     output_unit: dimensionless Cr2+/Sigma Cr; logK as printed
     references: []
+  provenance:
+    printed_phase: silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_cr2plus_fraction_quoted_berry::T=1673.15:h=c7ceb0d281bd
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -540,7 +554,7 @@ observations:
       reason: no composition mapped from source
     fO2_Pa:
       tag: unknown
-      reason: buffer-relative fO2 (near FMQ) requires a temperature-dependent buffer model; no fO2_Pa assigned
+      reason: buffer-relative fO2 (near FMQ) is not a point offset; missing input; no fO2_Pa assigned
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -652,6 +666,8 @@ observations:
     parameters: []
     output_unit: dimensionless Cr2+/Sigma Cr; logK as printed
     references: []
+  provenance:
+    printed_phase: silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_cr_abundance_moon_earth_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -699,6 +715,8 @@ observations:
     paragraph: An average of these estimates gives 2,125 +/- 110 ppm Cr in the Moon, which is therefore depleted with respect
       to the Earth's mantle (2,520 +/- 250 ppm) by 16 +/- 10%
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: bulk_silicate_Moon_vs_BSE
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_delta53Cr_moon_earth_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -748,6 +766,8 @@ observations:
     paragraph: the d53Cr of the Earth (-0.11 +/- 0.02 permil, 2SE, n = 36) and Moon (-0.21 +/- 0.03 permil, 2SE, n = 17) are
       clearly statistically resolvable at Delta53CrMoon-Earth = -0.10 +/- 0.04 permil
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: BSE_vs_bulk_silicate_Moon
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_demaria1971_kems_T_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -793,6 +813,8 @@ observations:
     pdf_page_index: 3
     paragraph: or low temperature (1,396-1,499 K, lunar mare basalt 12002; ref. 48)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: lunar_mare_basalt_12002_kems
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_eq3_fractionation_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -844,6 +866,8 @@ observations:
     equation: '3'
     note: Delta53Cr CrO(l)-CrO2(g) = -0.31 +/- 0.16 x 10^6/T^2 (permil)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: silicate_melt_CrO_l_in_equilibrium_with_CrO2_g
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_fig1_figure_only
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -890,6 +914,8 @@ observations:
     figure: '1'
     note: d53Cr vs Cr ppm (A) and vs MgO wt% (B); this-work points are Table 1; smaller circles are Bonnand et al. 2016
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: lunar_and_terrestrial_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_fig2_figure_only
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -940,6 +966,8 @@ observations:
     figure: '2'
     note: fCr vs Delta53Cr Moon-Earth; model curves at 1500-1800 K and DeltaFMQ-1/0/+1
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: BSE_like_silicate_melt_liquid_vapor_equilibrium
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_fig3_caption_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -991,6 +1019,8 @@ observations:
     figure: '3'
     note: Fig. 3 schematic; printed numbers are from the caption, not axis digitisation
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: protolunar_disk_and_accreting_Moon
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_gamma_CrO_quoted_berry
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1078,6 +1108,8 @@ observations:
     pdf_page_index: 3
     paragraph: assuming a CrO activity coefficient in silicate melts of ~3 (34)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: silicate_melt_BSE_like
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_lnbeta_CrO2_g_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1122,6 +1154,8 @@ observations:
     pdf_page_index: 4
     paragraph: giving 10^3 ln beta 53/52 Cr of 0.28, 0.57, and 0.89 x 10^6/T^2, respectively
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: CrO2_g
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_lnbeta_CrO3_g_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1166,6 +1200,8 @@ observations:
     pdf_page_index: 4
     paragraph: giving 10^3 ln beta 53/52 Cr of 0.28, 0.57, and 0.89 x 10^6/T^2, respectively
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: CrO3_g
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_lnbeta_CrO_g_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1211,6 +1247,8 @@ observations:
     paragraph: giving 10^3 ln beta 53/52 Cr of 0.28, 0.57, and 0.89 x 10^6/T^2, respectively (SI Appendix, Fig. S3 and Table
       S12)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: CrO_g
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_mcicpms_method
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1255,6 +1293,8 @@ observations:
     section: Materials and Methods
     note: Double-spike MC-ICP-MS method; not Knudsen-cell geometry
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: dissolved_rock_powder
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_moon_filtered_mean_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1302,6 +1342,8 @@ observations:
     paragraph: This exercise left 17 measurements of 15 lunar samples from ref. 31 and this study, with average d53Cr = -0.21
       +/- 0.06 permil and 2SE of +/-0.03 permil (SI Appendix, Table S11; no outliers were found)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: bulk_silicate_Moon_filtered_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_schoenberg_bse_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1344,6 +1386,8 @@ observations:
     pdf_page_index: 2
     paragraph: identical to the average of samples used to define bulk silicate Earth (BSE), -0.13 +/- 0.10 permil (30)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: bulk_silicate_Earth_literature
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=10003:h=e1650a7fe6d0
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1387,6 +1431,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=10057:h=e10872c8ee63
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1430,6 +1476,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=12002:h=77aa62f358e9
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1473,6 +1521,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=15426:h=d42787238e33
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1516,6 +1566,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=15445:h=74d3c4b608fd
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1559,6 +1611,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=15455:h=699a965a08c2
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1602,6 +1656,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=15555:h=1e60c9093be8
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1645,6 +1701,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=176/723:h=5bf8ffff1058
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1688,6 +1746,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=179/751:h=acbff477ae20
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1731,6 +1791,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=331/777a:h=461529071b56
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1774,6 +1836,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=331/779:h=4b86873455d4
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1817,6 +1881,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=331/783:h=c3ec27d5f0f2
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1860,6 +1926,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=331/790:h=cd4d8ee620ab
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1903,6 +1971,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=331/948:h=57f80c692b17
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1946,6 +2016,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=422/84:h=6c96ee103da0
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -1989,6 +2061,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=422/94:h=189b7372281e
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2032,6 +2106,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=422/95:h=9e16318dfd1c
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2075,6 +2151,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=422/96:h=5762ee074e3a
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2118,6 +2196,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=422/96a:h=ee2f193db4a1
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2161,6 +2241,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=49j:h=33fd7c83b179
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2204,6 +2286,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=70135:h=6db4ef7b79c7
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2247,6 +2331,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=72415:h=2eed59c94de0
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2290,6 +2376,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=76535:h=73653ec3179f
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2333,6 +2421,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=78235:h=fee6e3a73ed7
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2376,6 +2466,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=78328:h=8178c72a0563
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2419,6 +2511,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=b-r1:h=e199d753c1d8
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2462,6 +2556,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=dts-1:h=259710f6a29e
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2505,6 +2601,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=dts-1a:h=8f2f9010f547
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2548,6 +2646,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=pcc-1:h=fe85012f4a2f
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2591,6 +2691,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=rl-12-1:h=2ca0444234a0
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2634,6 +2736,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=sd5/354.5:h=57ee88e7bf4d
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2677,6 +2781,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured::points:row=sd6/400:h=ef6026586b08
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2720,6 +2826,8 @@ observations:
     table: '1'
     note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_and_lunar_samples
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_terrestrial_20sample_average_measured
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2811,6 +2919,8 @@ observations:
     paragraph: Twenty terrestrial ultramafic samples have d53Cr between -0.17 +/- 0.06 permil (sample 422/95) and -0.07 +/-
       0.04 permil (sample 49J), with an average of -0.11 +/- 0.05 permil (Table 1)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: terrestrial_ultramafic_rocks_this_study
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_vapor_delta_and_T_window_model
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2865,6 +2975,8 @@ observations:
       both thermodynamic and isotopic constraints converge at temperatures between 1,600 and 1,800 K and fO2 between FMQ and
       FMQ+1 (Fig. 2)
   read_from: pdf:kems-045-sossi-2018-pnas-cr
+  provenance:
+    printed_phase: BSE_like_silicate_melt_in_equilibrium_with_CrO2_bearing_vapor
 - observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_visscher_fegley_fO2_quoted
   experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
   identity:
@@ -2919,3 +3031,5 @@ observations:
         published_page: 10922
         pdf_page_index: 3
         paragraph: Vaporization of silicate material of a bulk lunar composition gives rise to fO2 of IW+2.5 at 1,800 K (13)
+  provenance:
+    printed_phase: impact_generated_silicate_melt_vapor

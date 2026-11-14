@@ -59,7 +59,7 @@ _FRESH_READS = (
     ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_04", "c", ("3130.5", "3463.5"), ("3130.81", "3464.55"), "activity", "0.189", "read_uncertainty_dex", "0.001506", "0.723187"),
     ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_05", "c", ("3290.5", "3388.0"), ("3290.91", "3388.72"), "activity", "0.277", "read_uncertainty_dex", "0.001383", "0.556929"),
     ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_06", "c", ("3482.5", "3332.5"), ("3483.02", "3332.84"), "activity", "0.368", "read_uncertainty_dex", "0.000783", "0.434562"),
-    ("CaO-MgO-Al2O3_melt", "shornikov_2011_fig1_d_allibert_marker_02", "d", ("2722.5", "5065.5"), ("2722.56", "5064.95"), "value", "-24.25", "read_uncertainty_kJ_mol", "0.00291", "24.250232"),
+    ("CaO-MgO-Al2O3_melt", "shornikov_2011_fig1_d_allibert_marker_02", "d", ("2722.5", "5065.5"), ("2722.56", "5064.95"), "value_as_printed", "-24.25", "read_uncertainty_kJ_mol", "0.00291", "24.250232"),
 )
 
 _UNCHANGED_MARKERS = (
@@ -70,6 +70,13 @@ _UNCHANGED_MARKERS = (
     "shornikov_2011_fig1_d_allibert_marker_03",
     "shornikov_2011_fig1_d_allibert_marker_04",
 )
+
+_OXIDE_FRAME_MARKERS = {
+    "shornikov_2011_fig1_d_allibert_marker_01": "-23.0",
+    "shornikov_2011_fig1_d_allibert_marker_02": "-24.25",
+    "shornikov_2011_fig1_d_allibert_marker_03": "-27.0",
+    "shornikov_2011_fig1_d_allibert_marker_04": "-30.0",
+}
 
 
 def _migrated() -> list:
@@ -114,17 +121,30 @@ def _render_pins(document: dict) -> None:
         document,
         "Al2O3",
         "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02",
-    )["values"]["value"] == "-1046.788"
+    )["values"]["value_as_printed"] == "-1046.788"
     assert _observation(
         document,
         "CaO",
         "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c02",
-    )["values"]["value"] == "-425.847"
+    )["values"]["value_as_printed"] == "-425.847"
     assert _observation(
         document,
         "O3",
         "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r16_c06",
-    )["values"]["value"] == "271.522"
+    )["values"]["value_as_printed"] == "271.522"
+    model_result = _observation(
+        document,
+        "Al2O3",
+        "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02",
+    )
+    assert model_result["values"]["method_class"] == "model_derived"
+    assert model_result["values"]["value"] == model_result["values"]["value_as_printed"]
+    assert model_result["values"]["method_as_printed"] == (
+        "ideal associated solutions theory with Gibbs energy minimization"
+    )
+    assert "Table 1 Gibbs energies" in model_result["values"]["method_description"]
+    assert model_result["derivation"]["method"]["locator"]["paragraph"]
+    assert model_result["derivation"]["references"]
 
     marker_pins = (
         ("CaO", "a", "0.497", "(1401.5, 3435.5)", "(1401.76, 3436.61)", "0.303870", "0.000961"),
@@ -154,8 +174,15 @@ def _render_pins(document: dict) -> None:
         "shornikov_2011_text_minimum_delta_fG1960_melt",
     )
     assert minimum["values"]["value_as_printed"] == "−31.5"
-    assert minimum["values"]["value"] == "-31.5"
-    assert minimum["values"]["method_class"] == "quoted_attributed"
+    assert minimum["values"]["method_class"] == "typed_refusal"
+    assert minimum["values"]["method_class_as_printed"] == "model_derived"
+    assert minimum["values"]["admission_status"] == "typed_refusal"
+    assert "composition is incomplete" in minimum["values"]["reason"]
+    assert minimum["values"]["method_as_printed"] == (
+        "ideal associated solutions theory with Gibbs energy minimization"
+    )
+    assert "minimum melt Gibbs energy" in minimum["values"]["method_description"]
+    assert "derivation" not in minimum
     assert minimum["values"]["composition_Al2O3_mole_pct_as_printed"] == "45"
     assert minimum["values"]["T_K"] == "1960"
     assert minimum["phase"] == "l"
@@ -190,6 +217,24 @@ def test_tables_and_figure_markers_match_the_render_pins() -> None:
     assert len(markers) == 19
     assert len(observations) == 60
     assert len(unavailable) == 8
+    oxide_frame_rows = {
+        row["observation_id"]: row
+        for row in markers
+        if row["observation_id"] in _OXIDE_FRAME_MARKERS
+    }
+    assert set(oxide_frame_rows) == set(_OXIDE_FRAME_MARKERS)
+    for observation_id, printed_value in _OXIDE_FRAME_MARKERS.items():
+        values = oxide_frame_rows[observation_id]["values"]
+        assert "quantity" not in values
+        assert "value" not in values
+        assert values["quantity_as_printed"] == (
+            "Fig. 1. The activities of oxides (a-c) and the Gibbs energy of "
+            "formation from oxides (d) of the CaO–MgO–Al2O3 system melt at "
+            "the temperature 1960 K"
+        )
+        assert values["reference_state_as_printed"] == "formation from simple oxides"
+        assert values["value_as_printed"] == printed_value
+        assert values["admission_status"] == "pending"
     fresh_ids = {spec[1] for spec in _FRESH_READS}
     assert fresh_ids.isdisjoint(_UNCHANGED_MARKERS)
     for row in markers:
@@ -227,8 +272,8 @@ def test_render_pins_fail_when_migrated_evidence_class_is_mutated() -> None:
     document = deepcopy(_document())
     row = _observation(
         document,
-        "Al2O3",
-        "shornikov_2011_fig1_c_allibert_marker_01",
+        "CaO-MgO-Al2O3_melt",
+        "shornikov_2011_text_minimum_delta_fG1960_melt",
     )
     row["values"]["method_class"] = "quoted_attributed"
     with pytest.raises(AssertionError):
@@ -263,7 +308,9 @@ def test_fresh_reads_lie_inside_the_printed_uncertainty_band() -> None:
             assert f"({second[0]}, {second[1]})" in row["locator"]["note"]
             assert ordinate in row["locator"]["note"]
             assert str(row["uncertainty"][key]) == width
-            if migrated[observation_id].value.kind is ValueKind.UNAVAILABLE:
+            if observation_id in _OXIDE_FRAME_MARKERS:
+                assert migrated[observation_id].value.kind is ValueKind.UNAVAILABLE
+                assert migrated[observation_id].admission.status.value == "pending"
                 continue
             _assert_printed_band_contains_both_reads(
                 migrated[observation_id],
@@ -304,6 +351,7 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
 
     assert len(observations) == 60
     assert sum(row.admission.status.value == "admitted" for row in observations) == 47
+    assert sum(row.admission.status.value == "pending" for row in observations) == 4
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 13
     assert result.validation is not None
     assert result.validation.hard_issues == ()
@@ -313,7 +361,7 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
         for row in observations
         if row.observation_id.endswith("::shornikov_2011_text_minimum_delta_fG1960_melt")
     )
-    assert minimum.admission.status.value == "pending"
+    assert minimum.admission.status.value == "rejected"
     assert minimum.value.kind is ValueKind.UNAVAILABLE
     assert minimum.identity.temperature_K is not None
     assert minimum.point_conditions["composition"].state.is_unknown
@@ -327,7 +375,7 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
             )
         )
         assert marker.value.kind is ValueKind.UNAVAILABLE
-        assert marker.admission.status is AdmissionStatus.REJECTED
+        assert marker.admission.status is AdmissionStatus.PENDING
     for row in observations:
         assert row.identity.temperature_K is not None
         assert row.identity.temperature_K.is_value

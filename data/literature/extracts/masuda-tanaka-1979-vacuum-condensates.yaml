@@ -627,14 +627,23 @@ species:
       units: dimensionless enrichment factor, as printed
       values:
         quantity: enrichment factors relative to starting material
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: The authors calculated the Table 2 enrichment factors relative to the starting-material composition in Table 1.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 5
+              pdf_page_index: 4
+              published_page: 17
+              table: '1'
+              note: The starting-material inputs in Table 1 are not stored as compatible observation rows; the factors are printed in Table 2.
         candidate_tokens:
         - distribution_ratio
         - condensate_composition
         reason: Table 2 reports author-calculated relative enrichment factors, not a phase distribution coefficient
           or a measured composition vector. Table 1/starting-reference inputs cannot be stored as compatible observation
-          records, and the paper gives no defining equation; retain as quoted attributed values without fabricating
-          derivation lineage.
+          records, so retain as a typed refusal without fabricating a distribution-ratio token.
         row_count_as_printed: 21
         column_order_as_printed:
         - row label

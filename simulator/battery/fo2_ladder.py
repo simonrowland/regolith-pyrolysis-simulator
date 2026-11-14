@@ -62,6 +62,9 @@ from simulator.battery.waypoints import (
     WaypointResult,
     oxygen_condition,
 )
+from simulator.chemistry.graphite_c_co import carbon_delta_g_co_kj_per_mol_o2
+from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
+from simulator.state import MOLAR_MASS
 
 _TIER1_DIRECT_ROUTES = frozenset({
     "oxygen_partial_pressure_to_log_fO2",
@@ -279,6 +282,90 @@ def resolve_row_fo2(
                 po2_bar=bar,
                 physics_rung=2,
             )
+    if (
+        observation is not None
+        and observation.source_id == "rego-1985-na2o-sio2-transpiration"
+        and identity is not None
+        and getattr(identity.species, "formula", None) == "Na"
+        and quantity is Quantity.P_PARTIAL
+        and temperature is not None
+        and math.isfinite(temperature)
+        and temperature > 0.0
+    ):
+        total_pressure = identity.total_pressure_Pa
+        p_na_bar = _pascal_point_to_bar(observation.value)
+        if (
+            total_pressure is not None
+            and total_pressure.is_value
+            and total_pressure.value is not None
+            and p_na_bar is not None
+        ):
+            try:
+                total_pressure_bar = float(total_pressure.value) / PA_PER_BAR
+            except (TypeError, ValueError, ArithmeticError):
+                total_pressure_bar = math.nan
+            p_co_bar = total_pressure_bar - p_na_bar
+            if math.isfinite(p_co_bar) and p_co_bar > 0.0:
+                # d-375 accepts the source condition as a flagged two-species
+                # approximation, not a condition fitted to residuals.
+                # Premise: Rego Table I reports graphite with flowing CO;
+                # treat pCO as total pressure less the measured Na pressure.
+                # Algebra: for 2 C + O2 -> 2 CO, K_CO = pCO/sqrt(fO2), so
+                # log10(fO2/bar) = 2*(log10(pCO/bar) - log10(K_CO));
+                # log10(K_CO) = -ΔG/(2 R T ln(10)).
+                # Units: pCO is converted Pa -> bar; ΔG is kJ/mol O2 -> J/mol;
+                # R is J/(mol K), T is K, and all log arguments are ratios.
+                # Sanity: Table I run 1 gives log10(fO2/bar) ≈ -16.6551;
+                # raising its total pressure raises pCO and fO2.
+                delta_g_j_per_mol = (
+                    carbon_delta_g_co_kj_per_mol_o2(temperature) * 1000.0
+                )
+                log10_k_co = -delta_g_j_per_mol / (
+                    2.0 * GAS_CONSTANT * temperature * math.log(10.0)
+                )
+                return ResolvedFo2(
+                    2.0 * (math.log10(p_co_bar) - log10_k_co),
+                    3,
+                    "rego_c_co_two_species_approximation",
+                    False,
+                    physics_rung=1,
+                )
+    if (
+        observation is not None
+        and observation.source_id == "rys-2007-alkali-oxide-thermodynamics"
+        and identity is not None
+        and getattr(identity.species, "formula", None) == "Na"
+        and quantity is Quantity.P_PARTIAL
+        and _is_knudsen(experiment)
+        and temperature is not None
+        and math.isfinite(temperature)
+        and temperature > 0.0
+    ):
+        p_na_bar = _pascal_point_to_bar(observation.value)
+        if p_na_bar is not None:
+            # d-367: predict the missing oxygen condition from congruent Na2O
+            # vaporisation; this route is explicitly flagged as predicted.
+            # Premise: Na2O -> 2 Na + 1/2 O2, so J_Na = 4 J_O2; Knudsen
+            # effusion has J_i proportional to p_i/sqrt(M_i).
+            # Algebra: p_Na/sqrt(M_Na) = 4*p_O2/sqrt(M_O2), hence
+            # p_O2 = (1/4)*p_Na*sqrt(M_O2/M_Na).
+            # Units: both pressures use bar and the molar-mass ratio is
+            # dimensionless (MOLAR_MASS is consistently g/mol).
+            # Sanity: row 8 p_Na=0.01475 Pa gives p_O2≈0.00435037 Pa,
+            # below p_Na; the factor 1/4 follows the 2:1/2 flux stoichiometry.
+            p_o2_bar = (
+                0.25
+                * p_na_bar
+                * math.sqrt(MOLAR_MASS["O2"] / MOLAR_MASS["Na"])
+            )
+            return ResolvedFo2(
+                math.log10(p_o2_bar),
+                3,
+                "rys_congruent_vaporization_predicted",
+                False,
+                po2_bar=p_o2_bar,
+                physics_rung=3,
+            )
     if knudsen_vapour and (temperature is None or not weights):
         return None
     closure = _effusion_closure(
@@ -470,7 +557,7 @@ def _printed_identity_bar(
     if state is None or not state.is_value or state.value is None:
         return None
     try:
-        bar = float(state.value) / 1.0e5
+        bar = float(state.value) / PA_PER_BAR
     except (TypeError, ValueError, ArithmeticError):
         return None
     if not math.isfinite(bar) or bar <= 0.0:
@@ -674,7 +761,7 @@ def _kress_pressure_bar(
             except (TypeError, ValueError):
                 pascal = -1.0
             if math.isfinite(pascal) and pascal > 0.0:
-                return pascal / 1.0e5, "identity.total_pressure_Pa"
+                return pascal / PA_PER_BAR, "identity.total_pressure_Pa"
     if experiment is not None and bench is not None:
         from simulator.battery.waypoints import (
             _prediction_pressure_waypoint,
@@ -698,7 +785,7 @@ def _pascal_point_to_bar(value: object) -> float | None:
     if value.point is None or value.point <= 0:
         return None
     try:
-        bar = float(value.point) / 1.0e5
+        bar = float(value.point) / PA_PER_BAR
     except (TypeError, ValueError, ArithmeticError):
         return None
     if not math.isfinite(bar) or bar <= 0.0:

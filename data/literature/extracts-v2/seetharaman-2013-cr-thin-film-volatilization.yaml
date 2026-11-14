@@ -1,0 +1,1690 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/seetharaman-2013-cr-thin-film-volatilization.yaml
+observations:
+- observation_id: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_24h_oxygen
+  experiment_id: 10.1007/s11663-013-9904-y::seetharaman-2013-cr-thin-film-volatilization
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.3208827883155085769793378806'
+        - - CaO
+          - '0.259304042692281857571262034'
+        - - SiO2
+          - '0.2420150924896408472204096756'
+        - - MgO
+          - '0.1443131480950286921749094337'
+        - - Cr2O3
+          - '0.03348492840754002605408097575'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: unavailable
+    unavailable_reason: printed field component_amount is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: Figure 9 prints 0,02 at.% Cr for 24 h in O2 at 1873 K. Under t-1600 the current migrator cannot scale at.% for
+      this quantity, so the migrated value remains unavailable and must not be read as 0,02 mole fraction.
+    decided_by:
+      worker: Codex
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        figure: '9'
+        note: 24h O2 bar label
+  notices: []
+  source_id: seetharaman-2013-cr-thin-film-volatilization
+  locator:
+    page: 6
+    figure: '9'
+    note: 24h O2 bar label
+  read_from: pdf:seetharaman-2013-cr-thin-film-volatilization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 6
+        figure: '9'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3208827883155085769793378806'
+          - - CaO
+            - '0.259304042692281857571262034'
+          - - SiO2
+            - '0.2420150924896408472204096756'
+          - - MgO
+            - '0.1443131480950286921749094337'
+          - - Cr2O3
+            - '0.03348492840754002605408097575'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              page: 3
+              table: II
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              table: II
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              page: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              table: II
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '7'
+            locator:
+              page: 3
+              table: II
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 3
+              table: II
+        output_unit: mole_fraction
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: O2
+      locator:
+        page: 6
+        figure: '9'
+        note: 24h O2 bar label
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+  provenance:
+    printed_phase: condensed_solid
+- observation_id: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_2h_argon
+  experiment_id: 10.1007/s11663-013-9904-y::seetharaman-2013-cr-thin-film-volatilization
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.3208827883155085769793378806'
+        - - CaO
+          - '0.259304042692281857571262034'
+        - - SiO2
+          - '0.2420150924896408472204096756'
+        - - MgO
+          - '0.1443131480950286921749094337'
+        - - Cr2O3
+          - '0.03348492840754002605408097575'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: unavailable
+    unavailable_reason: printed field component_amount is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: Figure 9 prints 1,62 at.% Cr for 2 h in Ar at 1873 K. Under t-1600 the current migrator cannot scale at.% for
+      this quantity, so the migrated value remains unavailable and must not be read as 1,62 mole fraction.
+    decided_by:
+      worker: Codex
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        figure: '9'
+        note: 2h Ar bar label
+  notices: []
+  source_id: seetharaman-2013-cr-thin-film-volatilization
+  locator:
+    page: 6
+    figure: '9'
+    note: 2h Ar bar label
+  read_from: pdf:seetharaman-2013-cr-thin-film-volatilization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 6
+        figure: '9'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3208827883155085769793378806'
+          - - CaO
+            - '0.259304042692281857571262034'
+          - - SiO2
+            - '0.2420150924896408472204096756'
+          - - MgO
+            - '0.1443131480950286921749094337'
+          - - Cr2O3
+            - '0.03348492840754002605408097575'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              page: 3
+              table: II
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              table: II
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              page: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              table: II
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '7'
+            locator:
+              page: 3
+              table: II
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 3
+              table: II
+        output_unit: mole_fraction
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: Ar
+      locator:
+        page: 6
+        figure: '9'
+        note: 2h Ar bar label
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+  provenance:
+    printed_phase: condensed_solid
+- observation_id: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_4h_air
+  experiment_id: 10.1007/s11663-013-9904-y::seetharaman-2013-cr-thin-film-volatilization
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.3208827883155085769793378806'
+        - - CaO
+          - '0.259304042692281857571262034'
+        - - SiO2
+          - '0.2420150924896408472204096756'
+        - - MgO
+          - '0.1443131480950286921749094337'
+        - - Cr2O3
+          - '0.03348492840754002605408097575'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: unavailable
+    unavailable_reason: printed field component_amount is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: Figure 9 prints 1,25 at.% Cr for 4 h in air at 1873 K. Under t-1600 the current migrator cannot scale at.% for
+      this quantity, so the migrated value remains unavailable and must not be read as 1,25 mole fraction.
+    decided_by:
+      worker: Codex
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        figure: '9'
+        note: 4h Air bar label
+  notices: []
+  source_id: seetharaman-2013-cr-thin-film-volatilization
+  locator:
+    page: 6
+    figure: '9'
+    note: 4h Air bar label
+  read_from: pdf:seetharaman-2013-cr-thin-film-volatilization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 6
+        figure: '9'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3208827883155085769793378806'
+          - - CaO
+            - '0.259304042692281857571262034'
+          - - SiO2
+            - '0.2420150924896408472204096756'
+          - - MgO
+            - '0.1443131480950286921749094337'
+          - - Cr2O3
+            - '0.03348492840754002605408097575'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              page: 3
+              table: II
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              table: II
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              page: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              table: II
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '7'
+            locator:
+              page: 3
+              table: II
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 3
+              table: II
+        output_unit: mole_fraction
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: Air
+      locator:
+        page: 6
+        figure: '9'
+        note: 4h Air bar label
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+  provenance:
+    printed_phase: condensed_solid
+- observation_id: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_6h_oxygen
+  experiment_id: 10.1007/s11663-013-9904-y::seetharaman-2013-cr-thin-film-volatilization
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.3208827883155085769793378806'
+        - - CaO
+          - '0.259304042692281857571262034'
+        - - SiO2
+          - '0.2420150924896408472204096756'
+        - - MgO
+          - '0.1443131480950286921749094337'
+        - - Cr2O3
+          - '0.03348492840754002605408097575'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: unavailable
+    unavailable_reason: printed field component_amount is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: Figure 9 prints 0.04 at.% Cr for 6 h in O2 at 1873 K. Under t-1600 the current migrator cannot scale at.% for
+      this quantity, so the migrated value remains unavailable and must not be read as 0.04 mole fraction.
+    decided_by:
+      worker: Codex
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        figure: '9'
+        note: 6h O2 bar label
+  notices: []
+  source_id: seetharaman-2013-cr-thin-film-volatilization
+  locator:
+    page: 6
+    figure: '9'
+    note: 6h O2 bar label
+  read_from: pdf:seetharaman-2013-cr-thin-film-volatilization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 6
+        figure: '9'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3208827883155085769793378806'
+          - - CaO
+            - '0.259304042692281857571262034'
+          - - SiO2
+            - '0.2420150924896408472204096756'
+          - - MgO
+            - '0.1443131480950286921749094337'
+          - - Cr2O3
+            - '0.03348492840754002605408097575'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              page: 3
+              table: II
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              table: II
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              page: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              table: II
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '7'
+            locator:
+              page: 3
+              table: II
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 3
+              table: II
+        output_unit: mole_fraction
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: O2
+      locator:
+        page: 6
+        figure: '9'
+        note: 6h O2 bar label
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+  provenance:
+    printed_phase: condensed_solid
+- observation_id: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_prose_cr_loss_2h_oxygen
+  experiment_id: 10.1007/s11663-013-9904-y::seetharaman-2013-cr-thin-film-volatilization
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.3208827883155085769793378806'
+        - - CaO
+          - '0.259304042692281857571262034'
+        - - SiO2
+          - '0.2420150924896408472204096756'
+        - - MgO
+          - '0.1443131480950286921749094337'
+        - - Cr2O3
+          - '0.03348492840754002605408097575'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: unavailable
+    unavailable_reason: printed field component_amount is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: Figure 9 prints 0.27 at.% Cr for the 2h O2 bar. Under t-1600 the current migrator cannot scale at.% for this quantity,
+      so the migrated value remains unavailable and must not be read as 0.27 mole fraction.
+    decided_by:
+      worker: Codex
+      date: '2026-11-03'
+      evidence:
+        page: 6
+        figure: '9'
+        note: 2h O2 bar label
+  notices: []
+  source_id: seetharaman-2013-cr-thin-film-volatilization
+  locator:
+    page: 6
+    figure: '9'
+    note: 2h O2 bar label
+  read_from: pdf:seetharaman-2013-cr-thin-film-volatilization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 6
+        figure: '9'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3208827883155085769793378806'
+          - - CaO
+            - '0.259304042692281857571262034'
+          - - SiO2
+            - '0.2420150924896408472204096756'
+          - - MgO
+            - '0.1443131480950286921749094337'
+          - - Cr2O3
+            - '0.03348492840754002605408097575'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              page: 3
+              table: II
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              table: II
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              page: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              table: II
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '7'
+            locator:
+              page: 3
+              table: II
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 3
+              table: II
+        output_unit: mole_fraction
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: O2
+      locator:
+        page: 6
+        figure: '9'
+        note: 2h O2 bar label
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        figure: '9'
+  provenance:
+    printed_phase: condensed_solid
+- observation_id: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_table4_matrix_cr
+  experiment_id: 10.1007/s11663-013-9904-y::seetharaman-2013-cr-thin-film-volatilization
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.3208827883155085769793378806'
+        - - CaO
+          - '0.259304042692281857571262034'
+        - - SiO2
+          - '0.2420150924896408472204096756'
+        - - MgO
+          - '0.1443131480950286921749094337'
+        - - Cr2O3
+          - '0.03348492840754002605408097575'
+        amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: glass
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: unavailable
+    unavailable_reason: printed field component_amount is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: The source prints 0.00 at.% Cr. Under t-1600 the current migrator cannot scale at.% for this quantity, so the
+      migrated value remains unavailable and must not be read as 0.00 mole fraction.
+    decided_by:
+      worker: Codex
+      date: '2026-11-03'
+      evidence:
+        page: 5
+        table: IV
+        note: row=Matrix; column=Cr
+  notices: []
+  source_id: seetharaman-2013-cr-thin-film-volatilization
+  locator:
+    page: 5
+    table: IV
+    note: row=Matrix; column=Cr
+  read_from: pdf:seetharaman-2013-cr-thin-film-volatilization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 5
+        table: IV
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3208827883155085769793378806'
+          - - CaO
+            - '0.259304042692281857571262034'
+          - - SiO2
+            - '0.2420150924896408472204096756'
+          - - MgO
+            - '0.1443131480950286921749094337'
+          - - Cr2O3
+            - '0.03348492840754002605408097575'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              page: 3
+              table: II
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              table: II
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              page: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              table: II
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '7'
+            locator:
+              page: 3
+              table: II
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 3
+              table: II
+        output_unit: mole_fraction
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: oxygen
+      locator:
+        page: 5
+        table: IV
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        table: IV
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        table: IV
+  provenance:
+    printed_phase: glass
+- observation_id: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_table4_spinel_cr
+  experiment_id: 10.1007/s11663-013-9904-y::seetharaman-2013-cr-thin-film-volatilization
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mole_fraction
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.3208827883155085769793378806'
+        - - CaO
+          - '0.259304042692281857571262034'
+        - - SiO2
+          - '0.2420150924896408472204096756'
+        - - MgO
+          - '0.1443131480950286921749094337'
+        - - Cr2O3
+          - '0.03348492840754002605408097575'
+        amount_basis: mole_fraction
+        input_provenance: printed_starting_bulk
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use counter_phase_role
+  value:
+    kind: unavailable
+    unavailable_reason: printed field component_amount is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: The source prints 0.03 at.% Cr. Under t-1600 the current migrator cannot scale at.% for this quantity, so the
+      migrated value remains unavailable and must not be read as 0.03 mole fraction.
+    decided_by:
+      worker: Codex
+      date: '2026-11-03'
+      evidence:
+        page: 5
+        table: IV
+        note: row=Spinel; column=Cr
+  notices: []
+  source_id: seetharaman-2013-cr-thin-film-volatilization
+  locator:
+    page: 5
+    table: IV
+    note: row=Spinel; column=Cr
+  read_from: pdf:seetharaman-2013-cr-thin-film-volatilization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 5
+        table: IV
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.3208827883155085769793378806'
+          - - CaO
+            - '0.259304042692281857571262034'
+          - - SiO2
+            - '0.2420150924896408472204096756'
+          - - MgO
+            - '0.1443131480950286921749094337'
+          - - Cr2O3
+            - '0.03348492840754002605408097575'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '45'
+            locator:
+              page: 3
+              table: II
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              table: II
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              page: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              table: II
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '7'
+            locator:
+              page: 3
+              table: II
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 3
+              table: II
+        output_unit: mole_fraction
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: oxygen
+      locator:
+        page: 5
+        table: IV
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        table: IV
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        table: IV
+  provenance:
+    printed_phase: condensed_solid

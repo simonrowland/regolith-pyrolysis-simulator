@@ -154,6 +154,7 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity,
     na_reductant_activity_shift_kj_per_mol_o2,
 )
+from simulator.chemistry.ellingham_graph import crossover_temperature_C
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -1836,40 +1837,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         reagent_metal: str,
         target_metal: str,
     ) -> float | None:
-        """Return the oxide-stability crossover temperature in Celsius.
-
-        V1c JANAF refit crossovers used by the alkali-shuttle diagnostic:
-        K/Fe = 836.25 C, Na/Fe = 1181.5 C. Above a pair's crossover, the
-        reagent oxide is less stable than the target oxide, so reduction is
-        thermodynamically disfavored; current recipe gates remain handled
-        outside this helper. Returns None when the algebraic root falls
-        outside the shared phase-valid JANAF fit segment.
-        """
-        for reagent_segment in ellingham_fit_segments(reagent_metal):
-            for target_segment in ellingham_fit_segments(target_metal):
-                low_K = max(
-                    reagent_segment.range_K[0],
-                    target_segment.range_K[0],
-                )
-                high_K = min(
-                    reagent_segment.range_K[1],
-                    target_segment.range_K[1],
-                )
-                if low_K > high_K:
-                    continue
-                dS_delta = (
-                    reagent_segment.dS_f_kJ_per_mol_K_per_mol_O2
-                    - target_segment.dS_f_kJ_per_mol_K_per_mol_O2
-                )
-                if abs(dS_delta) < 1e-15:
-                    continue
-                root_K = (
-                    reagent_segment.dH_f_kJ_per_mol_O2
-                    - target_segment.dH_f_kJ_per_mol_O2
-                ) / dS_delta
-                if low_K <= root_K <= high_K:
-                    return root_K - CELSIUS_TO_KELVIN_OFFSET
-        return None
+        """Delegate the crossover calculation to its chemistry owner."""
+        return crossover_temperature_C(reagent_metal, target_metal)
 
     @classmethod
     def _na_thermo_priority(

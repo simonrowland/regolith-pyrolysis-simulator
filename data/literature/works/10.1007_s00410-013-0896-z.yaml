@@ -1,0 +1,512 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s00410-013-0896-z
+  citation: 'Wood, B. J. & Wade, J. (2013), Activities and volatilities of trace components in silicate melts: a novel use
+    of metal-silicate partitioning data, Contributions to Mineralogy and Petrology 166, 911–921.'
+  source_ids:
+  - wood-wade-2013-trace-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+    files:
+    - asset_id: pdf:wood-wade-2013-trace-activities
+      role: pdf
+      path: raw/wood-wade-2013-trace-activities/wood-wade-2013-trace-activities.pdf
+      sha256:
+        tag: value
+        value: 7cf348318a729d5b77e930de04f5ede624bfea20d49817bc1c7fe160c138ea7d
+    - asset_id: pdftotext:wood-wade-2013-trace-activities
+      role: pdftotext
+      path: text/wood-wade-2013-trace-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:wood-wade-2013-trace-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s00410-013-0896-z
+experiments:
+- experiment_id: 10.1007/s00410-013-0896-z::experiment::wood_wade_2013_bw1102
+  kind: literature
+  method:
+    tag: unknown
+    reason: The source describes metal-silicate partitioning, but MethodToken has no exact metal-silicate-partitioning token.
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: The paper does not state the compositional basis for the starting recipe, so it cannot be mapped to an engine
+          composition.
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘starting silicate composition of Diopside28–Forsterite22–Anorthite50’; basis is not stated.'
+    printed_composition:
+      state:
+        tag: value
+        value: 'Initial bulk recipe: Diopside28–Forsterite22–Anorthite50'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘starting silicate composition of Diopside28–Forsterite22–Anorthite50’; basis and total are not
+          stated.'
+  conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1650'
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘1.5 GPa and 1,650 °C’.'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘1.5 GPa and 1,650 °C’; the BW1102 run description gives no fO2 control or value.'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1500000000'
+          approximate: false
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        table: '1'
+        note: 'Proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’.'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘1.5 GPa and 1,650 °C’; no sweep or carrier gas is stated for the BW1102 high-pressure run.'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The paper does not classify a gas-flow regime for the high-pressure partitioning experiment.
+  work_id: 10.1007/s00410-013-0896-z
+  locator:
+    page: 8
+    published_page: 918
+    pdf_page_index: 7
+    note: 'Proof string: ‘1.5 GPa and 1,650 °C’; this paragraph identifies the single experiment linked to Table 1 identifier
+      BW1102.'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: SiO2 glass
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘The capsule was made of SiO2 glass’.'
+- experiment_id: 10.1007/s00410-013-0896-z::wood-wade-2013-trace-activities
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-013-0896-z
+  locator:
+    page: 5
+    published_page: 915
+    pdf_page_index: 4
+    figure: '2'
+    note: row=gamma = 0.5; branch 1; digitized point 1
+context:
+- observation_id: wood_wade_2013_bw1102_table1_partitioning_inputs
+  type: typed_context
+  experiment: wood_wade_2013_bw1102
+  locator:
+    page: 8
+    published_page: 918
+    pdf_page_index: 7
+    table: '1'
+    note: 'Table 1, identifier BW1102; proof string: ‘Compositions of phases produced at 1.5 GPa/1,650 °C’. The numeric cell
+      text was checked against pdftotext; the PDF render confirms row/column placement.'
+  units: as printed
+  values:
+    method_class: method_only
+    experiment_id_as_printed: BW1102
+    phase_name_as_printed: Silicate and Metal
+    silicate_major_oxide_composition_role: analyzed silicate phase
+    silicate_major_oxide_composition_basis:
+      state: unknown
+      reason: No unit or basis is printed for the major-oxide values.
+    silicate_major_oxide_cells_as_printed:
+      SiO2:
+        value: '59.4'
+        value_as_published: 59.4 (0.4)
+        sigma: '0.4'
+      Al2O3:
+        value: '10.7'
+        value_as_published: 10.7 (0.4)
+        sigma: '0.4'
+      FeO:
+        value: '11.3'
+        value_as_published: 11.3 (0.2)
+        sigma: '0.2'
+      MgO:
+        value: '10.4'
+        value_as_published: 10.4 (0.2)
+        sigma: '0.2'
+      CaO:
+        value: '7.2'
+        value_as_published: 7.2 (0.5)
+        sigma: '0.5'
+    silicate_major_oxide_sum:
+      value: '99.0'
+      value_as_published: 99.0 (0.3)
+      sigma: '0.3'
+    silicate_major_oxide_components_not_listed_in_table: No other major-oxide components are listed under Silicate.
+    gamma_FeO_as_printed: '0.92'
+    gamma_FeO_note: Calculated from Eq. 4; this model-derived activity coefficient is an input to all three trace-component
+      activity derivations, not a trace-oxide output.
+    trace_concentrations:
+      units_as_printed: ppm
+      uncertainty_confidence_level: one_sigma
+      silicate:
+        Cu:
+          value: '51'
+          value_as_published: 51 (7)
+          sigma: '7'
+        Ag:
+          value: '31'
+          value_as_published: 31 (6)
+          sigma: '6'
+        In:
+          value: '91'
+          value_as_published: 91 (18)
+          sigma: '18'
+        Pb:
+          value: '139'
+          value_as_published: 139 (31)
+          sigma: '31'
+      metal:
+        Fe:
+          value: '99.7'
+          value_as_published: 99.7 (0.7)
+          sigma: '0.7'
+          units_as_printed: not stated
+        Cu:
+          value: '2270'
+          value_as_published: 2,270 (37)
+          sigma: '37'
+        Ag:
+          value: '289'
+          value_as_published: 289 (14)
+          sigma: '14'
+        In:
+          value: '250'
+          value_as_published: 250 (7)
+          sigma: '7'
+        Pb:
+          value: '200'
+          value_as_published: 200 (5)
+          sigma: '5'
+    table_footnote_as_printed: Value in brackets is 1 std dev.
+    table_input_uncertainty_confidence_level: one_sigma
+    metal_silicate_partition_coefficients_as_printed: The paper does not print numeric partition coefficients; the measured
+      phase concentrations above are the printed input cells.
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_bw1102_table1_partitioning_inputs
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: PbO
+- observation_id: wood_wade_2013_fig1_nio_digitization_context
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 913
+    pdf_page_index: 2
+    figure: '1'
+  units: dimensionless activity coefficient and ternary endmember mole fractions
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    evidence_class: model_derived
+    contour_fit_as_printed: NiO activity-coefficient contours fitted with Eq. (2) to 172 literature data for silicate melts
+      saturated with Ni metal at known oxygen fugacity.
+    axis_calibration:
+      method: affine barycentric calibration from the three printed ternary endmember vertices
+      panel_raster_pixels: 650 x 564
+      Diopside_vertex_pixel:
+      - 60
+      - 500
+      Anorthite_vertex_pixel:
+      - 330
+      - 30
+      Forsterite_vertex_pixel:
+      - 600
+      - 500
+      axis_composition_basis: mole fraction of printed endmember component
+    sampling:
+      method: resample contour polyline at no more than 0.05 ternary-composition arc-length per interval
+      min_points_per_labelled_contour: 6
+      endpoints_and_axis_intersections_included: true
+    read_uncertainty:
+      each_ternary_component_mole_fraction: ±0.02
+      gamma: half of last displayed contour-label digit; recorded per point
+    model_status: fitted/calculated contours, not measured point data
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_fig1_nio_digitization_context
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: NiO
+- observation_id: wood_wade_2013_fig2_feo_digitization_context
+  type: figure_record
+  locator:
+    page: 5
+    published_page: 915
+    pdf_page_index: 4
+    figure: '2'
+  units: dimensionless activity coefficient and ternary endmember mole fractions
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    evidence_class: model_derived
+    contour_fit_as_printed: FeO activity-coefficient contours fitted with Eq. (2) to 83 literature data for silicate melts
+      saturated with Fe metal at known oxygen fugacity.
+    axis_calibration:
+      method: affine barycentric calibration from the three printed ternary endmember vertices
+      panel_raster_pixels: 650 x 564
+      Diopside_vertex_pixel:
+      - 60
+      - 508
+      Anorthite_vertex_pixel:
+      - 330
+      - 30
+      Forsterite_vertex_pixel:
+      - 600
+      - 508
+      axis_composition_basis: mole fraction of printed endmember component
+    sampling:
+      method: resample contour polyline at no more than 0.05 ternary-composition arc-length per interval
+      min_points_per_labelled_contour: 6
+      endpoints_and_axis_intersections_included: true
+    read_uncertainty:
+      each_ternary_component_mole_fraction: ±0.02
+      gamma: half of last displayed contour-label digit; recorded per point
+    model_status: fitted/calculated contours, not measured point data
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_fig2_feo_digitization_context
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: FeO
+- observation_id: wood_wade_2013_fig3_moo2_digitization_context
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 916
+    pdf_page_index: 5
+    figure: '3'
+  units: dimensionless activity coefficient and ternary endmember mole fractions
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    evidence_class: model_derived
+    contour_fit_as_printed: MoO2 activity-coefficient contours fitted using literature data for silicate melts saturated with
+      Mo metal at known oxygen fugacity and measured Mo metal–silicate partition coefficients; the paper notes estimated MoO2
+      melting properties based on TiO2.
+    axis_calibration:
+      method: affine barycentric calibration from the three printed ternary endmember vertices
+      panel_raster_pixels: 650 x 564
+      Diopside_vertex_pixel:
+      - 60
+      - 500
+      Anorthite_vertex_pixel:
+      - 330
+      - 30
+      Forsterite_vertex_pixel:
+      - 600
+      - 500
+      axis_composition_basis: mole fraction of printed endmember component
+    sampling:
+      method: resample contour polyline at no more than 0.05 ternary-composition arc-length per interval
+      min_points_per_labelled_contour: 6
+      endpoints_and_axis_intersections_included: true
+    read_uncertainty:
+      each_ternary_component_mole_fraction: ±0.02
+      gamma: half of last displayed contour-label digit; recorded per point
+    model_status: fitted/calculated contours, not measured point data
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_fig3_moo2_digitization_context
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: MoO2
+- observation_id: wood_wade_2013_fig4_wo3_digitization_context
+  type: figure_record
+  locator:
+    page: 7
+    published_page: 917
+    pdf_page_index: 6
+    figure: '4'
+  units: dimensionless activity coefficient and ternary endmember mole fractions
+  values:
+    quantity: activity_coefficient
+    method_class: model_derived
+    evidence_class: model_derived
+    contour_fit_as_printed: WO3 activity-coefficient contours calculated from fitted metal–silicate partitioning and saturation
+      data using Eq. (9); the paper reports an RT ln KD standard error of 7.4 kJ and about factor 1.6 gamma uncertainty before
+      gamma_FeO cubed sensitivity.
+    axis_calibration:
+      method: affine barycentric calibration from the three printed ternary endmember vertices
+      panel_raster_pixels: 650 x 564
+      Diopside_vertex_pixel:
+      - 60
+      - 500
+      Anorthite_vertex_pixel:
+      - 330
+      - 30
+      Forsterite_vertex_pixel:
+      - 600
+      - 500
+      axis_composition_basis: mole fraction of printed endmember component
+    sampling:
+      method: resample contour polyline at no more than 0.05 ternary-composition arc-length per interval
+      min_points_per_labelled_contour: 6
+      endpoints_and_axis_intersections_included: true
+    read_uncertainty:
+      each_ternary_component_mole_fraction: ±0.02
+      gamma: half of last displayed contour-label digit; recorded per point
+    model_status: fitted/calculated contours, not measured point data
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_fig4_wo3_digitization_context
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: WO3
+- observation_id: wood_wade_2013_metal_silicate_method_and_constants
+  type: typed_context
+  experiment: wood_wade_2013_bw1102
+  locator:
+    page: 8
+    published_page: 918
+    pdf_page_index: 7
+    note: 'Proof string: ‘Thermodynamic data for metal–silicate exchange reactions were taken from Barin et al. (1989).’'
+  units: as printed
+  values:
+    method_class: method_only
+    method_as_printed: The paper derives the melt activity coefficients from high-pressure Fe-rich metal and silicate partitioning
+      data, using the exchange reactions and log K values printed on this page.
+    gamma_FeO_activity_calculation_as_printed: The activity coefficient of FeO in this experiment at 1,650 °C is calculated
+      to be 0.92 from Eq. (4).
+    gamma_FeO_activity_calculation_locator:
+      page: 8
+      published_page: 918
+      pdf_page_index: 7
+      note: 'Proof string: ‘calculated to be 0.92 from Eq. (4)’; Table 1 stores the resulting gamma_FeO value.'
+    gamma_FeO_model_fit_provenance:
+      melt_system_as_printed: anhydrous silicate melts at 1 atm pressure
+      literature_data_count_as_printed: 83 data from the literature
+      fit_description_as_printed: The best-fit equation, excluding terms which are not significant
+      fitted_composition_range_as_printed: 39 to 64 % SiO2, 0.3 to 30 % FeO and 0 to14.8 % Na2O
+      literature_sources_as_printed: Borisov et al. (2006); Borisov (2007); Holzheid et al. (1997); O’Neill and Eggins (2002)
+      locator:
+        page: 4
+        published_page: 914
+        pdf_page_index: 3
+        note: 'Proof string: ‘83 data from the literature’.'
+    exchange_reactions_and_logK_as_printed:
+      PbO: PbO + Fe = Pb + FeO; log K_Pb = 0.61 + 4144/T
+      CuO0.5: CuO0.5 + 0.5Fe = Cu + 0.5FeO; log K_Cu = -0.26 + 3490/T
+      InO1.5: InO1.5 + 1.5Fe = In + 1.5FeO; log K_In = 2.58 - 764/T
+    inO1.5_logK_melting_entropy_assumption:
+      purpose_as_printed: to derive the free energy and log K of the indium exchange reaction
+      assumption_as_printed: assume an entropy of melting of InO1.5 at the melting point of 2,183 K
+      value_as_printed: 26.25 J.K-1
+      analogues_as_printed: GaO1.5 (26.3) and VO1.5 (25.05)
+      locator:
+        page: 8
+        published_page: 918
+        pdf_page_index: 7
+        note: 'Proof string: ‘26.25 J.K-1’.'
+    thermodynamic_data_reference_as_printed: Barin et al. (1989)
+    standard_state_as_printed: with all components having standard state of pure liquid at 1 bar and the temperature of interest
+    pressure_effect_as_printed: The paper says pressure effects on the Pb–Fe, Cu–Fe and In–Fe exchange reactions are small
+      enough to be neglected.
+    oxygen_fugacity_as_printed: No fO2 control or value is printed for BW1102.
+    method_locator:
+      page: 8
+      published_page: 918
+      pdf_page_index: 7
+      note: 'Proof string: ‘experimental temperature of 1,650 °C’ and the exchange equations and thermodynamic standard-state
+        sentence on this page.'
+    pb_metal_activity_input_as_printed:
+      value: '1100'
+      basis: Author-selected value at 1,923 K for infinite dilution, from the reported saturation range 1,030 to 1,400 at
+        1,873 K.
+      attribution: Malhotra et al. (1998)
+    cu_metal_activity_input_as_printed:
+      value_at_1823_K: '11.0'
+      extrapolated_value_at_1923_K: '9.7'
+      method_as_printed: Extrapolated by assuming RTln gamma is constant.
+      attribution: Huh and Min (2000); the 9.7 value is also compared with Turchanin and Agraval (2001).
+    in_metal_activity_input_as_printed:
+      value_at_1923_K: '25.8'
+      method_as_printed: The authors assume highly dilute liquid Fe-In alloys behave as regular solutions, adopt W_In = 52
+        kJ mol-1, and calculate the infinite-dilution activity coefficient.
+      attribution: Okamoto (1990) is cited for the 3.4 atomic % maximum solubility and modelled consolute temperature.
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_metal_silicate_method_and_constants
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: PbO
+- observation_id: wood_wade_2013_volatility_figure_context
+  type: experiment_series
+  experiment: wood_wade_2013_bw1102
+  locator:
+    page: 9
+    published_page: 919
+    pdf_page_index: 8
+    figure: '5'
+    note: 'Proof string: ‘Volatilities of Pb, Cu and In from the silica-saturated melt’; the plotted curves are not digitized.'
+  units: as printed
+  values:
+    method_class: method_only
+    volatility_quantity_as_printed: Total partial pressure of all gas species containing element i divided by mole fraction
+      of oxide i in the melt, Pi(gas)/Xi(melt).
+    temperature_K_as_printed: '1600'
+    composition_link_as_printed: Silica-saturated melt of Table 1, BW1102.
+    calculation_conditions_as_printed: Completely dry, sulphur-free conditions; volatility is calculated as a function of
+      oxygen fugacity and temperature.
+    printed_numeric_volatility_table: none
+    not_extracted: Figure 5 is a plot; its numerical curve values are figure-only and are not transcribed.
+  context_id: wood-wade-2013-trace-activities::context::wood_wade_2013_volatility_figure_context
+  work_id: 10.1007/s00410-013-0896-z
+  source_id: wood-wade-2013-trace-activities
+  species: PbO

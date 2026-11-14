@@ -49,6 +49,8 @@ observations:
     section: Cu2O + CuO; equation 21
     source_path: corpus/raw/ammin-73-470/ammin-73-470.pdf
   read_from: pdf:ammin-73-470-oneill-1988
+  provenance:
+    printed_phase: Cu2O_plus_CuO
 - observation_id: ammin-73-470-oneill-1988::oneill_1988_cu2o_janaf_compilation_fit
   experiment_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad::ammin-73-470-oneill-1988
   identity:
@@ -96,6 +98,8 @@ observations:
     section: Cu + Cu2O; JANAF comparison and equation 7
     source_path: corpus/raw/ammin-73-470/ammin-73-470.pdf
   read_from: pdf:ammin-73-470-oneill-1988
+  provenance:
+    printed_phase: Cu2O_standard_state
 - observation_id: ammin-73-470-oneill-1988::oneill_1988_cu_cu2o_measured_relation
   experiment_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad::ammin-73-470-oneill-1988
   identity:
@@ -143,6 +147,8 @@ observations:
     section: Cu + Cu2O; equation 9
     source_path: corpus/raw/ammin-73-470/ammin-73-470.pdf
   read_from: pdf:ammin-73-470-oneill-1988
+  provenance:
+    printed_phase: pure_Cu_plus_Cu2O
 - observation_id: ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_measured_points_and_third_law
   experiment_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad::ammin-73-470-oneill-1988
   identity:
@@ -186,6 +192,8 @@ observations:
     section: Fe3O4 + Fe2O3; Table 7 and following analysis
     source_path: corpus/raw/ammin-73-470/ammin-73-470.pdf
   read_from: pdf:ammin-73-470-oneill-1988
+  provenance:
+    printed_phase: Fe3O4_plus_alpha_Fe2O3
 - observation_id: ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_third_law_enthalpy
   experiment_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad::ammin-73-470-oneill-1988
   identity:
@@ -231,6 +239,8 @@ observations:
     section: Fe3O4 + Fe2O3; third-law analysis below Figure 10
     source_path: corpus/raw/ammin-73-470/ammin-73-470.pdf
   read_from: pdf:ammin-73-470-oneill-1988
+  provenance:
+    printed_phase: Fe3O4_plus_alpha_Fe2O3
 - observation_id: ammin-73-470-oneill-1988::oneill_1988_fe_fe3o4_measured_relation
   experiment_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad::ammin-73-470-oneill-1988
   identity:
@@ -260,7 +270,7 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      mu_O2_J_per_mol: '197'
+      mu_O2_J_per_mol: '107'
       reported_status: printed abstract uncertainty; table includes flagged points above the invariant point as metastable
         Fe + Fe3O4
   evidence:
@@ -280,6 +290,8 @@ observations:
       Fe-Fe3O4 interval.
     source_path: corpus/raw/ammin-73-470/ammin-73-470.pdf
   read_from: pdf:ammin-73-470-oneill-1988
+  provenance:
+    printed_phase: pure_Fe_plus_Fe3O4
 - observation_id: ammin-73-470-oneill-1988::oneill_1988_fe_feo_measured_relation
   experiment_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad::ammin-73-470-oneill-1988
   identity:
@@ -324,6 +336,8 @@ observations:
     section: Fe + "FeO"; equation 11
     source_path: corpus/raw/ammin-73-470/ammin-73-470.pdf
   read_from: pdf:ammin-73-470-oneill-1988
+  provenance:
+    printed_phase: pure_Fe_plus_nonstoichiometric_FeO
 - observation_id: ammin-73-470-oneill-1988::oneill_1988_feo_fe3o4_measured_relation
   experiment_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad::ammin-73-470-oneill-1988
   identity:
@@ -370,6 +384,8 @@ observations:
     section: '"FeO" + Fe3O4; equation 16'
     source_path: corpus/raw/ammin-73-470/ammin-73-470.pdf
   read_from: pdf:ammin-73-470-oneill-1988
+  provenance:
+    printed_phase: nonstoichiometric_FeO_plus_Fe3O4
 - observation_id: ammin-73-470-oneill-1988::oneill_1988_shared_emf_cell_conditions
   experiment_id: da89ba0410871631b0b47ec0b6060a180a349d361c75da70cdef2558021fedad::ammin-73-470-oneill-1988
   identity:

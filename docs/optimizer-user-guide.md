@@ -192,6 +192,18 @@ There is no literal CLI flag named `cached-real` or `real-alphamelts` in the cur
 
 Real AlphaMELTS-backed work, when configured, is slow and backend-dependent. If the backend cannot resolve, treat the run as failed or diagnostic, not as a lower-fidelity success.
 
+## Feasibility And Diagnostic Checks
+
+Extraction completeness measures target yield at the melt boundary: captured and volatile
+products, tapped metal, wall deposits, and terminal offgas count as extracted. Material not
+charged, still in the melt, or retained in the redox buffer does not. The denominator is the
+target-equivalent amount in the melt at the start of the evaluated span. Cleanup-sequestered
+material is reported separately, and wall deposits still face the coating limit.
+
+Captured-basis recovery remains reported as a provisional diagnostic. The condenser capture
+model is being refined, so stream purity is reported as a provisional diagnostic; set
+`constraints.enforce_delivered_stream_purity: true` to enforce the 95% threshold.
+
 ## Read Results
 
 ### Leaderboard
@@ -223,7 +235,7 @@ winner, it also writes `winner.recipe.yaml`.
 Seed reruns are only a determinism check or a way to extend a study, not the
 save/replay mechanism.
 
-Winner selection is deterministic: choose the feasible Pareto point with the best primary profile objective, then compare remaining objectives in declared order, then `cache_key`, then `candidate_id`.
+Winner selection is deterministic: choose the feasible Pareto point with the best primary profile objective, then compare remaining objectives in declared order, then the ask ordinal (journal `ask_seq`, stored on the record as `ask_ordinal`). Exact ties do not follow `trial_number`, `candidate_id`, `cache_key`, or completion order. Returned Pareto lists, replay Pareto, and `pareto.json` rows are that same ask order. Records that predate `ask_ordinal` still break ties by `trial_number` when the strategy stored one, otherwise by `candidate_id`. The winner stays the rank-key choice when a later sample has the better objective.
 
 ### EvalSpec
 
@@ -259,10 +271,10 @@ matter, because they are the opposite of the intuitive answer:
   data YAML — or shipping a new code version — does not miss cache. Do not expect a
   release bump to invalidate stored optimizer results; it will not.
 
-`physics_constraints` (feasibility thresholds and active gates) *is* first-class key
-material, because a threshold change changes verdicts and must not be served from cache.
-The default `cost_parameters` serialize away, so runs at the defaults share one
-cache identity.
+`physics_constraints` (feasibility thresholds, active gates, and the purity enforcement
+setting) *is* first-class key material, because changes to these settings change
+verdicts and must not be served from cache. The default `cost_parameters` serialize
+away, so runs at the defaults share one cache identity.
 
 ### Backend Badge
 

@@ -1,0 +1,120 @@
+source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+source_reads:
+  primary: MinerU table blocks and markdown
+  second: Tesseract eng 300 dpi psm 6 layout; the PDF has no text layer
+  render_policy: Render checked flagged cells and each table's row and column layout
+tables:
+  III:
+    page: 14
+    draft_block: p014-t04.csv
+    caption: Comparison of the temperatures of the equilibrium cristobalite + two liquids
+    row_count: 11
+    columns:
+      - run number
+      - temperature_C
+      - duration_min
+      - CaO-SiO2 charge 15CaO 85SiO2 products
+      - CaO-SiO2 charge 5CaO 95SiO2 products
+      - MgO-SiO2 charge 15MgO 85SiO2 products
+      - SrO-SiO2 charge 15SrO 85SiO2 products
+    extraction:
+      - cells: CaO-SiO2 and MgO-SiO2 run products with printed run temperature duration and charge composition
+        destination: context phase_equilibrium_run_products
+        evidence_class: measured_tabulated
+      - cells: equilibrium temperature row
+        destination: transition_point T_C
+        systems: [CaO-SiO2, MgO-SiO2]
+        evidence_class: measured_tabulated
+    render_checks:
+      - row: 4
+        cell: temperature_C
+        tesseract: '1607'
+        mineru: '1697'
+        rendered: '1697'
+      - row: 13
+        cell: temperature_C
+        tesseract: '16096'
+        mineru: '1696'
+        rendered: '1696'
+  IV:
+    page: 17
+    draft_blocks: [p017-t05.csv, p017-t06.csv]
+    printed_subtables:
+      A:
+        system: MgO-SiO2
+        printed_run_count: 10
+        destination: context bracketing run rows
+      B:
+        system: CaO-SiO2
+        printed_run_count: 15
+        destination: context bracketing run rows
+    extracted_columns:
+      - charge composition_wt_pct
+      - temperature_C
+      - duration_min
+      - printed microscopic products
+    render_check: Full table row and column assignment checked against the page render; MinerU and Tesseract agree on the table's numeric cells.
+    discrepancy:
+      locator: page 18 prose and Table IV B on page 17
+      table_value: '26.5CaO 73.5SiO2 at 1700 C, 30 min: 2 glasses'
+      prose_value: '26.5CaO 73.5SiO2 at 1710 C: two liquids; at 1740 C: one homogeneous liquid'
+      disposition: Preserve both printed temperatures; do not resolve the discrepancy or fit a consolute point.
+  V:
+    page: 19
+    draft_block: p019-t08.csv
+    printed_row_count: 3
+    extracted_systems: [MgO-SiO2, CaO-SiO2]
+    extracted_cells:
+      - temperature_C 1710 and 1744
+      - refractive_index_sodium_light
+      - composition_by_interpolation at 1710 only
+      - reference_glass_refractive_index and attributed reference composition
+      - silica_glass_refractive_index 1.4584
+    render_checks:
+      - cell: MgO-SiO2 reference index
+        machine_read: '1.580¹'
+        rendered: '1.580¹'
+      - cell: CaO-SiO2 reference index
+        machine_read: '1.589²'
+        rendered: '1.589²'
+      - cell: CaO-SiO2 refractive index at 1710 C
+        machine_read: '1.460++'
+        rendered: '1.460+'
+      - cell: CaO-SiO2 refractive index at 1744 C
+        machine_read: '1.462−'
+        rendered: '1.462−'
+    destination: "Four scored equilibrium_phase_composition rows at 1710 C: MgO and SiO2 components for MgO-SiO2, and CaO and SiO2 components for CaO-SiO2. Each is measured_reduced and cites its located refractive-index and reference-glass context row as an input."
+prose:
+  - page: 16
+    cells: MgO-SiO2 and CaO-SiO2 more-siliceous liquid bound
+    printed: over 98 per cent SiO2
+    destination: context composition bound
+  - page: 18
+    cells: silica-content accuracy for Table V interpolations
+    printed: better than 0.5 per cent
+    destination: context uncertainty range with original wording retained
+  - page: 20
+    cells: 5CaO 95SiO2 ribbon charge
+    printed: two liquids; Figure 12 caption reports cristobalite formed during quenching
+    destination: initial_charge_only context with asserted_altered quench state
+  - page: 30
+    cells: binary equilibrium temperatures restated
+    printed: CaO-SiO2 1698 C; MgO-SiO2 1695 C
+    destination: corroborating context; scored rows retain the original Table III IDs
+  - page: 44
+    cells: approximate ribbon-droplet liquid composition and liquidus
+    printed: ribbon about 1725 C; about 27.5CaO 72.5SiO2; liquidus 1698 C
+    destination: analyzed liquid-phase composition retained in glass-phase context; not identified as a conjugate endpoint
+  - page: 44
+    cells: comparison quench charge
+    printed: 10 g, 37CaO 63SiO2; completely quenched by plunging under water
+    destination: context; 1700 C is a viscosity-comparison condition, not its quench setpoint
+figures_deferred:
+  - figure: 3
+    page: 15
+    system: MgO-SiO2
+    contents: Liquidus and immiscibility curves; curve-only limb coordinates and any curve-read consolute point are deferred.
+  - figure: 4
+    page: 18
+    system: CaO-SiO2
+    contents: Liquidus and immiscibility curves; curve-only limb coordinates and any curve-read consolute point are deferred.

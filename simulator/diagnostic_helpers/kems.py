@@ -18,6 +18,7 @@ from simulator.diagnostic_helpers.reproduction_compare import (
     ComparisonRecord,
     compare_values,
 )
+from simulator.physical_constants import PA_PER_BAR
 
 
 _CASE_KEYS = frozenset(
@@ -577,7 +578,7 @@ class KEMSAdapter:
                 species_formula_registry={},
             ),
             temperature_C=temperature_K - 273.15,
-            pressure_bar=max(exterior_pa / 100000.0, 1e-30),
+            pressure_bar=max(exterior_pa / PA_PER_BAR, 1e-30),
             fO2_log=math.log10(pO2_bar),
             control_inputs={"pO2_bar": pO2_bar, "pO2_admission": "observation"},
         )

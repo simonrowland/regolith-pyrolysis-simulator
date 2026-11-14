@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
     files:
     - asset_id: pdf:abdul-2023-cao-sio2-calphad
       role: pdf
@@ -631,6 +631,8 @@ context:
     reference_10: M. Hillert, B. Sundman & X. Wang, An assessment of the CaO-SiO2 system, Metallurgical Transactions B 21
       (1990) 303–312. doi:10.1007/BF02664198.
     evidence_class: quoted_attributed
+    attribution: M. Hillert, B. Sundman & X. Wang, An assessment of the CaO-SiO2 system, Metallurgical Transactions B 21 (1990)
+      303–312. doi:10.1007/BF02664198.
   context_id: abdul-2023-cao-sio2-calphad::context::abdul_2023_cao_reassessment_correction_context
   work_id: 10.1016/j.cemconres.2023.107309
   source_id: abdul-2023-cao-sio2-calphad
@@ -1584,11 +1586,15 @@ context:
       expression_as_printed: GC = GCaO,Liquid [6]
       method_class: quoted_attributed
       reference: '[6]'
+      attribution: G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan & A. Pisch, Thermodynamic
+        modelling of the Ca–O system including 3rd generation description of CaO and CaO2, Calphad 69 (2020) 101764. doi:10.1016/j.calphad.2020.101764.
       numeric_parameters: []
     - parameter: GS
       expression_as_printed: GS = GSiO2,Liquid [7]
       method_class: quoted_attributed
       reference: '[7]'
+      attribution: I. Bajenova, A. Khvan, A. Dinsdale & A. Kondratiev, Implementation of the extended Einstein and two-state
+        liquid models for thermodynamic description of pure SiO2 at 1 atm, Calphad 68 (2020) 101716. doi:10.1016/j.calphad.2019.101716.
       numeric_parameters: []
     - parameter: GC2S
       expression_as_printed: GC2S = 2GCaO,Liquid + GSiO2,Liquid − 185132.188472035 − 1.6*T

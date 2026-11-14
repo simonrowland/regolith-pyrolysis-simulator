@@ -47,9 +47,9 @@ observations:
   notices: []
   source_id: ts1985
   locator:
-    page: 4
+    page: 3
     published_page: 817
-    pdf_page_index: 3
+    pdf_page_index: 2
     table: '1'
     note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
       header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.
@@ -61,6 +61,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: Pb-Na_liquid_alloy
 - observation_id: ts1985::ts1985_na2o_prose_1200C_range
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -107,12 +109,12 @@ observations:
   notices: []
   source_id: ts1985
   locator:
-    page: 2
+    page: 1
     published_page: 815
-    pdf_page_index: 1
-    paragraph: English Synopsis + Japanese 結言 (2)
-    note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55). 5e-5
-      at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+    pdf_page_index: 0
+    paragraph: English Synopsis
+    note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55). 5e-5 at
+      60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
   read_from: pdf:ts1985
   point_conditions:
     temperature_K:
@@ -120,12 +122,12 @@ observations:
         tag: value
         value: '1473.15'
       locator:
-        page: 2
+        page: 1
         published_page: 815
-        pdf_page_index: 1
-        paragraph: English Synopsis + Japanese 結言 (2)
-        note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
-          5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+        pdf_page_index: 0
+        paragraph: English Synopsis
+        note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55). 5e-5
+          at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -137,23 +139,23 @@ observations:
               tag: value
               value: '1200'
             locator:
-              page: 2
+              page: 1
               published_page: 815
-              pdf_page_index: 1
-              paragraph: English Synopsis + Japanese 結言 (2)
-              note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at
-                X=0.55). 5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+              pdf_page_index: 0
+              paragraph: English Synopsis
+              note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55).
+                5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
         - - factor
           - state:
               tag: value
               value: '273.15'
             locator:
-              page: 2
+              page: 1
               published_page: 815
-              pdf_page_index: 1
-              paragraph: English Synopsis + Japanese 結言 (2)
-              note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at
-                X=0.55). 5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+              pdf_page_index: 0
+              paragraph: English Synopsis
+              note: English synopsis states the 1200 °C span; the 60 mol% endpoint is not in Table 2 (which stops at X=0.55).
+                5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
         output_unit: K
         references: []
   derivation:
@@ -163,6 +165,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: Na2O-SiO2_binary_melt
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1100
   identity:
@@ -335,6 +339,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1200
   identity:
@@ -507,6 +513,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1300
   identity:
@@ -679,6 +687,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1100
   identity:
@@ -851,6 +861,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1200
   identity:
@@ -1023,6 +1035,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1300
   identity:
@@ -1195,6 +1209,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1100
   identity:
@@ -1367,6 +1383,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1200
   identity:
@@ -1539,6 +1557,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1300
   identity:
@@ -1711,6 +1731,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1100
   identity:
@@ -1883,6 +1905,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1200
   identity:
@@ -2055,6 +2079,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1300
   identity:
@@ -2227,6 +2253,8 @@ observations:
     parameters: []
     output_unit: Pa
     references: []
+  provenance:
+    printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=09c92b1c7b22
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -2319,6 +2347,8 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
           0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
+  provenance:
+    printed_phase: Na2O-SiO2_binary_melt
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=43ade7a03480
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -2411,6 +2441,8 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
           0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
+  provenance:
+    printed_phase: Na2O-SiO2_binary_melt
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=a4ac252a7641
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -2503,6 +2535,8 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
           0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
+  provenance:
+    printed_phase: Na2O-SiO2_binary_melt
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=dad700d53e31
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -2595,6 +2629,8 @@ observations:
         equation: log a_Na2O = A/T + B
         note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
           0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
+  provenance:
+    printed_phase: Na2O-SiO2_binary_melt
 - observation_id: ts1985::ts1985_sio2_gibbs_duhem_1200C_X0500
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-table1-xna2o-0p50-t1200
   identity:
@@ -2749,9 +2785,21 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: identity.fO2_Pa=derived via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    relation: Gibbs-Duhem integration of Fig. 4 a_Na2O; identity.fO2_Pa=derived via oxygen_condition graphite_c_co_buffer;
+      not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
     inputs:
     - pdf:ts1985
     parameters: []
-    output_unit: Pa
-    references: []
+    output_unit: dimensionless
+    method:
+      state:
+        tag: value
+        value: Gibbs-Duhem integration of Fig. 4 a_Na2O
+      locator:
+        page: 7
+        paragraph: Gibbs-Duhem integration of Fig. 4 a_Na2O
+    references:
+    - Tsukihashi, F. & Sano, N. (1985), "Measurement of the Activity of Na2O in Na2O-SiO2 Melts by Chemical Equilibration
+      Method" / 「化学平衡法による Na2O-SiO2 系融体中の Na2O の活量の測定」, Tetsu-to-Hagane (鉄と鋼) 71(7), 815-822.
+  provenance:
+    printed_phase: Na2O-SiO2_binary_melt

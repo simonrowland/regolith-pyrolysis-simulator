@@ -1,0 +1,2880 @@
+schema_version: literature_extract.v1
+source_id: lpi-compendium-14163
+source:
+  citation: 'C. Meyer (2011), Lunar Sample Compendium: 14163 Bulk Soil Sample, Lunar and Planetary Institute, 11
+    pp.'
+  url: https://www.lpi.usra.edu/lunar/samples/atlas/compendium/14163.pdf
+  year: 2011
+extraction:
+  method: 'transcription from the PageMaker PDF text layer; Table 1a/1b major-element cells assigned to columns
+    from a 200 dpi render (pdftotext column alignment is ambiguous for the sparse columns); modal tables checked
+    on a 150 dpi render; fix round 2026-10-05: trace blocks, p. 7-9 tables and Figure 8/9 annotations transcribed
+    with pdftotext -bbox column x-coordinates and re-read on 300 dpi pdftoppm renders'
+  date: '2026-10-05'
+  worker: backlog30-lpi14163; fix-lpi14163
+  provenance_path: tables/lpi-compendium-14163/
+  scope: secondary compilation of Apollo 14 bulk-soil provenance, characterization and composition; no vaporization
+    experiment
+  apparatus_status: no vaporization apparatus, run conditions, pressure, temperature, crucible or calibration record
+    stated
+review_status: draft
+scope_assessment:
+  in_scope:
+  - Table 1a and 1b major elements (SiO2 % to S %), one context row per reference column
+  - modal tables (Simon et al. 1981; Carr and Meyer 1972)
+  - sample provenance, masses and processing
+  - maturity, grain size, C and N
+  - mixing model
+  - cosmogenic nuclides
+  - Table 1a/1b trace elements (Sc to U), one context row per reference column (t5, t6)
+  - p. 7 Table 2 coarse-fines compositions, one context row per printed column (t7)
+  - p. 8 processing-diagram allocation masses (t8)
+  - p. 9 Table 2 small rocks from 14422 (t9), Table 3 coarse fines (t10), Table 4 granitic coarse-fines 14161 (t11)
+  - Figure 8 and Figure 9 printed annotations and run conditions (quoted; curves not digitised)
+  out_of_scope:
+  - Figures 1-9 curves, point clouds and axis ticks (figure_only; not digitised)
+  - bibliographic page ranges and citation years in the reference list (pp. 9-11)
+  battery_relevance_note: 'A secondary compilation: the bulk composition of a standard Apollo 14 highland soil (KREEP-rich)
+    as reported by several labs, for feedstock definition. No experiment, so 0 observations, no bench and no experiment.
+    Precedent lpi-compendium-14240 put its Table 1 under observations as composition_series (a scored type); here
+    the composition rows are context type bulk_composition_compilation; main can promote them if it wants the 14240
+    pattern. Fix round (2026-10-05, review FIX-FIRST at 8f46fd06): every printed number is carried as a located
+    context row; no row moved to observations[] (observation-vs-context for 14163 is left to main).'
+fidelity_samples:
+- species: lunar_sample_14163
+  observation_id: lpi14163_t1a_rose72
+  field: SiO2
+  value: 47.97
+  locator:
+    page: 5
+    published_page: 5
+    table: 1a
+- species: lunar_sample_14163
+  observation_id: lpi14163_t1b_willis72
+  field: S
+  value: 0.1
+  locator:
+    page: 6
+    published_page: 6
+    table: 1b
+- species: lunar_sample_14163
+  observation_id: lpi14163_maturity_and_grain_size
+  field: Is_FeO
+  value: 57
+  locator:
+    page: 1
+    published_page: 1
+- species: lunar_sample_14163
+  observation_id: lpi14163_t1a_taylor72
+  field: MgO
+  value: 9.78
+  locator:
+    page: 5
+    published_page: 5
+    table: 1a
+- species: lunar_sample_14163
+  observation_id: lpi14163_t1a_trace_wanke72
+  field: In_ppb
+  value: 1010
+  locator:
+    page: 5
+    published_page: 5
+    table: 1a
+- species: lunar_sample_14163
+  observation_id: lpi14163_t1a_trace_masuda72_strasheim72
+  field: Eu_ppm
+  value: 2.655
+  locator:
+    page: 5
+    published_page: 5
+    table: 1a
+- species: lunar_sample_14163
+  observation_id: lpi14163_t1b_trace_morgan72_sub_column_1
+  field: Cs_ppm
+  value: 0.645
+  locator:
+    page: 6
+    published_page: 6
+    table: 1b
+- species: lunar_sample_14163
+  observation_id: lpi14163_t1b_trace_hubbard72
+  field: Ni_ppm
+  value: 322
+  locator:
+    page: 6
+    published_page: 6
+    table: 1b
+- species: lunar_sample_14163
+  observation_id: lpi14163_t2cf_hubbard72_weismann76_14161_35_breccia_sub5
+  field: Cr_ppm
+  value: 2095
+  locator:
+    page: 7
+    published_page: 7
+    table: '2'
+- species: lunar_sample_14163
+  observation_id: lpi14163_t4_granitic_14161_7373
+  field: Zr_ppm
+  value: 7150
+  locator:
+    page: 9
+    published_page: 9
+    table: '4'
+- species: lunar_sample_14163
+  observation_id: lpi14163_fig9_conditions
+  field: heating_rate_C_per_min
+  value: 6
+  locator:
+    page: 4
+    published_page: 4
+    figure: '9'
+- species: lunar_sample_14163
+  observation_id: lpi14163_fig8_annotation
+  field: sample_mass_g
+  value: 0.6
+  locator:
+    page: 4
+    published_page: 4
+    figure: '8'
+species:
+  lunar_sample_14163:
+    observations: []
+    context:
+    - observation_id: lpi14163_t1a_laul72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Laul72
+        technique_marker: a
+        technique_as_printed: INAA
+        unit: wt% oxide (S as wt% S)
+        TiO2: 1.9
+        Al2O3: 18.4
+        FeO: 10.4
+        MnO: 0.124
+        CaO: 11
+        Na2O: 0.711
+        K2O: 0.52
+    - observation_id: lpi14163_t1a_laul80
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Laul80 / Papike82
+        technique_marker: a
+        technique_as_printed: INAA
+        unit: wt% oxide (S as wt% S)
+        SiO2: 47.3
+        TiO2: 1.6
+        Al2O3: 17.8
+        FeO: 10.5
+        MnO: 0.135
+        MgO: 9.6
+        CaO: 11.4
+        Na2O: 0.7
+        K2O: 0.55
+        marker_note: SiO2 47.3 printed without a technique marker; other cells in the column carry (a).
+    - observation_id: lpi14163_t1a_lindstrom72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Lindstrom72
+        technique_marker: a
+        technique_as_printed: INAA
+        unit: wt% oxide (S as wt% S)
+        FeO: 10.7
+        Na2O: 0.75
+        K2O: 0.52
+    - observation_id: lpi14163_t1a_rose72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Rose72
+        technique_marker: c
+        technique_as_printed: microchemical
+        unit: wt% oxide (S as wt% S)
+        SiO2: 47.97
+        TiO2: 1.77
+        Al2O3: 17.57
+        FeO: 10.41
+        MnO: 0.14
+        MgO: 9.18
+        CaO: 11.15
+        Na2O: 0.7
+        K2O: 0.58
+        P2O5: 0.52
+    - observation_id: lpi14163_t1a_hubbard72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Hubbard72 / Weismanm75
+        technique_marker: b
+        technique_as_printed: IDMS
+        unit: wt% oxide (S as wt% S)
+        Na2O: 0.77
+        K2O: 0.58
+        header_note: '"Weismanm75" printed [sic].'
+    - observation_id: lpi14163_t1a_wanke72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Wanke72
+        technique_marker: d
+        technique_as_printed: various
+        unit: wt% oxide (S as wt% S)
+        SiO2: 48.35
+        TiO2: 1.46
+        Al2O3: 18.1
+        FeO: 10.4
+        MnO: 0.13
+        MgO: 9.28
+        CaO: 10.2
+        Na2O: 0.67
+        K2O: 0.53
+    - observation_id: lpi14163_t1a_taylor72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Taylor72
+        technique_marker: e
+        technique_as_printed: XRF
+        unit: wt% oxide (S as wt% S)
+        SiO2: 48.1
+        TiO2: 1.83
+        Al2O3: 17.6
+        FeO: 10.3
+        MnO: 0.18
+        MgO: 9.78
+        CaO: 10.4
+        Na2O: 0.62
+        K2O: 0.52
+    - observation_id: lpi14163_t1a_masuda72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Masuda72 / Strasheim72
+        technique_marker: d
+        technique_as_printed: various
+        unit: wt% oxide (S as wt% S)
+        SiO2: 47.3
+        TiO2: 1.84
+        Al2O3: 17.1
+        FeO: 10.15
+        MnO: 0.127
+        MgO: 9
+        CaO: 10.65
+        Na2O: 0.65
+        K2O: 0.53
+        P2O5: 0.5
+    - observation_id: lpi14163_t1a_keith72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Keith72
+        technique_marker: g
+        technique_as_printed: radiation counting
+        unit: wt% oxide (S as wt% S)
+        K2O: 0.57
+    - observation_id: lpi14163_t1b_willis72
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Willis72
+        technique_marker: e
+        technique_as_printed: XRF
+        unit: wt% oxide (S as wt% S)
+        SiO2: 47.25
+        TiO2: 1.79
+        Al2O3: 17.34
+        FeO: 10.32
+        MnO: 0.137
+        MgO: 9.36
+        CaO: 10.97
+        Na2O: 0.66
+        K2O: 0.56
+        P2O5: 0.49
+        S: 0.1
+        header_note: Header printed run together as "Willis72Hubbard72".
+    - observation_id: lpi14163_t1b_hubbard72
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Hubbard72
+        technique_marker: e
+        technique_as_printed: XRF
+        unit: wt% oxide (S as wt% S)
+        SiO2: 47.2
+        TiO2: 1.79
+        Al2O3: 17.2
+        FeO: 10.4
+        MnO: 0.14
+        MgO: 9.37
+        CaO: 11
+        Na2O: 0.66
+        K2O: 0.58
+        P2O5: 0.46
+        S: 0.08
+        header_note: Header printed run together as "Willis72Hubbard72".
+    - observation_id: lpi14163_t1b_brunfelt72_sub1
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Brunfelt72 (sub-column 1; "regolith fines" printed across both sub-columns)
+        technique_marker: a
+        technique_as_printed: INAA
+        unit: wt% oxide (S as wt% S)
+        TiO2: 1.5
+        Al2O3: 17.2
+        FeO: 10.4
+        MnO: 0.13
+        MgO: 9.1
+        CaO: 10
+        Na2O: 0.73
+        K2O: 0.49
+        marker_note: Single (a) printed after the second Brunfelt72 sub-column; applied to both.
+    - observation_id: lpi14163_t1b_brunfelt72_sub2
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Brunfelt72 (sub-column 2; "regolith fines" printed across both sub-columns)
+        technique_marker: a
+        technique_as_printed: INAA
+        unit: wt% oxide (S as wt% S)
+        TiO2: 1.85
+        Al2O3: 18.1
+        FeO: 10.5
+        MnO: 0.13
+        MgO: 11.1
+        CaO: 10.2
+        Na2O: 0.74
+        K2O: 0.4
+        marker_note: Single (a) printed after the second Brunfelt72 sub-column; applied to both.
+    - observation_id: lpi14163_t1b_quaide72
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: wt%
+      values:
+        quantity: bulk_chemical_composition_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Quaide72
+        technique_marker: i
+        technique_as_printed: radiation counting
+        unit: wt% oxide (S as wt% S)
+        K2O: 0.57
+    - observation_id: lpi14163_modal_simon1981
+      type: characterization
+      locator:
+        page: 1
+        published_page: 1
+        table: Modal content of soils 14163 (Simon et al. 1981)
+      units: modal %
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        attribution: Simon et al. 1981 (as compiled)
+        modal_percent_as_printed:
+          Agglutinates: '45.7'
+          Basalt: '2.8'
+          Breccia: '31'
+          Anorthosite: '2.9'
+          Norite: null
+          Gabbro: null
+          Plagioclase: '5.1'
+          Pyroxene: '2.6'
+          Olivine: null
+          Ilmenite: null
+          Glass other: '10'
+        blank_note: Norite, Gabbro, Olivine, Ilmenite print no value (null = blank, not zero).
+    - observation_id: lpi14163_modal_carr_meyer1972
+      type: characterization
+      locator:
+        page: 1
+        published_page: 1
+        table: Modal content of soils 14163 (Carr and Meyer 1972)
+      units: modal %
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        attribution: Carr and Meyer (1972) (as compiled)
+        glass_total: 61.1
+        glass_dark_cloudy: 41
+        glass_homogeneous: 20.1
+        breccia_total: 27.9
+        breccia_light_matrix: 17.9
+        breccia_dark_matrix: 10
+        minerals_total: 9.6
+        plagioclase: 5.1
+        pyroxene: 4.1
+        olivine: 0.4
+    - observation_id: lpi14163_sample_provenance
+      type: characterization
+      locator:
+        page: 1
+        published_page: 1
+        section: Introduction
+        note: pp. 1, 3, 8
+      units: as printed
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        mass_g_title_p1: 7,776 grams
+        mass_g_processing_diagram_p8: 7881 grams
+        mass_discrepancy_note: The p. 1 title prints 7,776 g; the p. 8 processing diagram prints 7881 g for the
+          14163 bulk sample. Both kept as printed; not reconciled.
+        collection_as_printed: 'End of EVA-1, Apollo 14; area about 15 m from the LM (Introduction); transcript:
+          scooped from a small (about 2 ft) crater with glass in the bottom, possibly secondary, "about 130 feet
+          from the LM" (p. 3 transcript).'
+        distance_note: The Introduction says about 15 meters from the LM; the transcript (CDR) says about 130 feet.
+          Kept as printed.
+        sieve_splits_p8_as_printed:
+          14163 (less than 1 mm): 4444 g
+          14162 (1-2 mm): 289 g
+          14161 (2-4 mm): 197 g
+          14160 (4-10 mm): 138 g
+          '14422': 2400 g
+        small_rocks: Twenty nine small rocks 14425-14453 (66 grams total on p. 8); reserve soil 14421 (<1 cm), 14422
+          and 14423 from the same bag (p. 1).
+        processing_as_printed: 'Placed in weigh bag #2 (number 1028), returned in D-ALSRC#1007; "it was processed
+          in N2 atmosphere"; processing of 14163/14422 not well documented; 285 g of 14422 used as the biopool (quarantine)
+          sample (p. 8).'
+    - observation_id: lpi14163_maturity_and_grain_size
+      type: characterization
+      locator:
+        page: 1
+        published_page: 1
+        section: Petrography
+        note: pp. 1-2
+      units: as printed
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        Is_FeO: 57
+        maturity_class_as_printed: submature
+        maturity_attribution: Morris (1978)
+        agglutinates_percent_as_printed: about 46 %
+        average_grain_size_um_King_data: 61
+        average_grain_size_um_McKay_data: 73
+        grain_size_attribution: Figures 2a/2b, from Graf 1993 (data from King; data from McKay)
+        reference_soil_note: Chosen as one of the reference soils for the lunar highlands suite (Labotka et al.
+          1980).
+    - observation_id: lpi14163_volatile_light_elements
+      type: characterization
+      locator:
+        page: 3
+        published_page: 3
+        section: Chemistry (continued)
+      units: ppm
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        carbon_ppm: 120
+        carbon_attribution: Moore et al. (1972) and Cadogen et al. (1972)
+        nitrogen_ppm: 80
+        nitrogen_attribution: Goel and Kothari (1972)
+    - observation_id: lpi14163_mixing_model
+      type: characterization
+      locator:
+        page: 2
+        published_page: 2
+        section: Chemistry
+      units: percent
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        attribution: Laul and Papike (1980); Papike et al. (1982)
+        statement_as_printed: 'chemical mixing model: 55-67% high-K KREEP, 6-15% exotic mare basalt and the rest
+          low-K Fra Mauro basalt'
+    - observation_id: lpi14163_cosmogenic_nuclides
+      type: characterization
+      locator:
+        page: 3
+        published_page: 3
+        section: Cosmogenic isotopes and exposure ages
+      units: dpm/kg
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        Keith1972:
+          22Na: 46
+          26Al: 79
+          46Sc: 0.7
+          54Mn: 4
+          56Co: 21
+        Begemann1972:
+          26Al: 86
+          36Cl: 25
+        QuaideWrigley1972:
+          22Na: 71
+          26Al: 88
+    - observation_id: lpi14163_figures_context
+      type: figure_only
+      locator:
+        page: 2
+        published_page: 2
+        figure: 2-9
+      units: figure-only context
+      values:
+        method_class: figure_only
+        evidence_class: figure_only
+        figures:
+        - 2a/2b grain size distributions (Graf 1993; King, McKay data) (p. 2)
+        - 3 mineral compositions (Labotka 1980; Papike 1982) (p. 3)
+        - 4 glass composition (Labotka 1980) (p. 3)
+        - 5 FeO vs Al2O3 of Apollo soils (p. 4)
+        - 6 REE pattern (Hubbard 1972 IDMS) (p. 4)
+        - 7 maturity vs C (p. 4)
+        - 8 water adsorption isotherm (Cadenhead et al. 1972) (p. 4)
+        - 9 gas evolution vs temperature (Gibson and Moore 1972) (p. 4)
+        digitization_status: Not digitised. Figure 9 (Gibson and Moore 1972 gas release vs temperature) is the most
+          battery-relevant; the primary paper is the better source.
+        annotations_note: The printed text inside Figures 8 and 9 (subsamples, sample masses, temperatures, heating
+          rate, vacuum, crucible, total weight loss) is carried in lpi14163_fig8_annotation and lpi14163_fig9_conditions.
+    - observation_id: lpi14163_t1a_trace_laul72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Laul72
+        Sc_ppm: 21
+        V_ppm: 57
+        Co_ppm: 38
+        Y_ppm: 204
+        Zr_ppm: 900
+        Ba_ppm: 730
+        La_ppm: 68
+        Ce_ppm: 200
+        Pr_ppm: 24.4
+        Nd_ppm: 103
+        Sm_ppm: 32.2
+        Eu_ppm: 2.78
+        Gd_ppm: 37
+        Tb_ppm: 6.4
+        Dy_ppm: 41
+        Ho_ppm: 10.2
+        Er_ppm: 24.5
+        Tm_ppm: 4.1
+        Yb_ppm: 24
+        Lu_ppm: 3.6
+        Hf_ppm: 20
+        Th_ppm: 13
+        technique_marker_by_field:
+          Sc_ppm: a
+          V_ppm: a
+          Co_ppm: a
+          Y_ppm: a
+          Zr_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Pr_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Gd_ppm: a
+          Tb_ppm: a
+          Dy_ppm: a
+          Ho_ppm: a
+          Er_ppm: a
+          Tm_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+          Hf_ppm: a
+          Th_ppm: a
+        technique_legend_as_printed:
+          a: INAA
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1a_trace_laul80_papike82
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Laul80 / Papike82
+        Sc_ppm: 21.7
+        V_ppm: 45
+        Cr_ppm: 1368
+        Co_ppm: 33
+        Ni_ppm: 350
+        Sr_ppm: 170
+        Ba_ppm: 800
+        La_ppm: 66.7
+        Ce_ppm: 170
+        Nd_ppm: 100
+        Sm_ppm: 29.1
+        Eu_ppm: 2.45
+        Tb_ppm: 5.9
+        Dy_ppm: 36
+        Ho_ppm: 8.6
+        Tm_ppm: 3.2
+        Yb_ppm: 21.2
+        Lu_ppm: 3
+        Hf_ppm: 22.5
+        Ta_ppm: 2.9
+        Th_ppm: 13.3
+        U_ppm: 3.5
+        technique_marker_by_field:
+          Sc_ppm: a
+          V_ppm: a
+          Cr_ppm: a
+          Co_ppm: a
+          Ni_ppm: a
+          Sr_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Tb_ppm: a
+          Dy_ppm: a
+          Ho_ppm: a
+          Tm_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+          Hf_ppm: a
+          Ta_ppm: a
+          Th_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: INAA
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1a_trace_lindstrom72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Lindstrom72
+        Sc_ppm: 21.4
+        Cr_ppm: 1280
+        Co_ppm: 36
+        Zr_ppm: 720
+        Cs_ppm: 0.78
+        Ba_ppm: 950
+        La_ppm: 67.3
+        Ce_ppm: 194
+        Nd_ppm: 100
+        Sm_ppm: 29.6
+        Eu_ppm: 2.75
+        Tb_ppm: 7.1
+        Yb_ppm: 22
+        Lu_ppm: 3.21
+        Hf_ppm: 25.3
+        Ta_ppm: 4.3
+        Th_ppm: 15.2
+        technique_marker_by_field:
+          Sc_ppm: a
+          Cr_ppm: a
+          Co_ppm: a
+          Zr_ppm: a
+          Cs_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Tb_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+          Hf_ppm: a
+          Ta_ppm: a
+          Th_ppm: a
+        technique_legend_as_printed:
+          a: INAA
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1a_trace_rose72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Rose72
+        Sc_ppm: 25
+        V_ppm: 57
+        Cr_ppm: 1780
+        Co_ppm: 36
+        Ni_ppm: 400
+        Cu_ppm: 17
+        Zn_ppm: 28
+        Ga_ppm: 5.5
+        Rb_ppm: 13
+        Sr_ppm: 140
+        Y_ppm: 290
+        Zr_ppm: 820
+        Nb_ppm: 70
+        Ba_ppm: 1100
+        La_ppm: 79
+        Yb_ppm: 28
+        technique_marker_by_field:
+          Sc_ppm: c
+          V_ppm: c
+          Cr_ppm: c
+          Co_ppm: c
+          Ni_ppm: c
+          Cu_ppm: c
+          Zn_ppm: c
+          Ga_ppm: c
+          Rb_ppm: c
+          Sr_ppm: c
+          Y_ppm: c
+          Zr_ppm: c
+          Nb_ppm: c
+          Ba_ppm: null
+          La_ppm: null
+          Yb_ppm: null
+        technique_legend_as_printed:
+          c: microchemical
+        marker_note: 'No technique marker printed on: Ba_ppm, La_ppm, Yb_ppm (left null, not inferred).'
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1a_trace_wanke72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Wanke72
+        Sc_ppm: 22.8
+        Cr_ppm: 1290
+        Co_ppm: 43
+        Ni_ppm: 400
+        Cu_ppm: 15.6
+        Ga_ppm: 8.3
+        As_ppm: 0.087
+        Rb_ppm: 23
+        Sr_ppm: 180
+        Pd_ppb: 28
+        In_ppb: 1010
+        Cs_ppm: 0.74
+        Ba_ppm: 775
+        La_ppm: 68
+        Ce_ppm: 180
+        Pr_ppm: 22
+        Nd_ppm: 130
+        Sm_ppm: 28
+        Eu_ppm: 2.45
+        Gd_ppm: 35
+        Tb_ppm: 6.6
+        Dy_ppm: 40
+        Ho_ppm: 6.6
+        Er_ppm: 28
+        Yb_ppm: 23.5
+        Lu_ppm: 2.7
+        Hf_ppm: 23
+        Ta_ppm: 3.2
+        W_ppb: 1950
+        Ir_ppb: 19
+        Au_ppb: 6.1
+        Th_ppm: 15.9
+        U_ppm: 4.07
+        technique_marker_by_field:
+          Sc_ppm: a, h
+          Cr_ppm: a, h
+          Co_ppm: a, h
+          Ni_ppm: a, h
+          Cu_ppm: a, h
+          Ga_ppm: a, h
+          As_ppm: a, h
+          Rb_ppm: a, h
+          Sr_ppm: a, h
+          Pd_ppb: a, h
+          In_ppb: a, h
+          Cs_ppm: a, h
+          Ba_ppm: a, h
+          La_ppm: a, h
+          Ce_ppm: a, h
+          Pr_ppm: a, h
+          Nd_ppm: a, h
+          Sm_ppm: a, h
+          Eu_ppm: a, h
+          Gd_ppm: a, h
+          Tb_ppm: a, h
+          Dy_ppm: a, h
+          Ho_ppm: a, h
+          Er_ppm: a, h
+          Yb_ppm: a, h
+          Lu_ppm: a, h
+          Hf_ppm: a, h
+          Ta_ppm: a, h
+          W_ppb: a, h
+          Ir_ppb: null
+          Au_ppb: a, h
+          Th_ppm: a, h
+          U_ppm: a, h
+        technique_legend_as_printed:
+          a: INAA
+          h: not defined in the printed technique line
+        marker_note: 'No technique marker printed on: Ir_ppb (left null, not inferred).'
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1a_trace_taylor72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Taylor72
+        Sc_ppm: 21
+        V_ppm: 49
+        Cr_ppm: 1400
+        Co_ppm: 34
+        Ni_ppm: 340
+        Cu_ppm: 8
+        Ga_ppm: 4.5
+        Rb_ppm: 13
+        Sr_ppm: 180
+        Y_ppm: 190
+        Zr_ppm: 850
+        Nb_ppm: 46
+        Cs_ppm: 0.7
+        Ba_ppm: 710
+        La_ppm: 64
+        Ce_ppm: 200
+        Pr_ppm: 26
+        Nd_ppm: 102
+        Sm_ppm: 29
+        Eu_ppm: 2.25
+        Gd_ppm: 33
+        Tb_ppm: 5
+        Dy_ppm: 32
+        Ho_ppm: 8
+        Er_ppm: 23
+        Tm_ppm: 3.5
+        Yb_ppm: 18.5
+        Hf_ppm: 19.5
+        W_ppb: 700
+        Th_ppm: 12
+        U_ppm: 3.2
+        technique_marker_by_field:
+          Sc_ppm: f
+          V_ppm: f
+          Cr_ppm: f
+          Co_ppm: f
+          Ni_ppm: f
+          Cu_ppm: f
+          Ga_ppm: f
+          Rb_ppm: f
+          Sr_ppm: f
+          Y_ppm: f
+          Zr_ppm: f
+          Nb_ppm: f
+          Cs_ppm: f
+          Ba_ppm: f
+          La_ppm: f
+          Ce_ppm: f
+          Pr_ppm: f
+          Nd_ppm: f
+          Sm_ppm: f
+          Eu_ppm: f
+          Gd_ppm: f
+          Tb_ppm: f
+          Dy_ppm: f
+          Ho_ppm: f
+          Er_ppm: f
+          Tm_ppm: f
+          Yb_ppm: f
+          Hf_ppm: f
+          W_ppb: f
+          Th_ppm: f
+          U_ppm: f
+        technique_legend_as_printed:
+          f: spark-source mass spec.
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1a_trace_masuda72_strasheim72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Masuda72 / Strasheim72
+        V_ppm: 42
+        Co_ppm: 33
+        Ni_ppm: 279
+        Cu_ppm: 14
+        Zn_ppm: 43
+        Rb_ppm: 12
+        Sr_ppm: 235
+        Y_ppm: 235
+        Zr_ppm: 766
+        Nb_ppm: 62
+        Ba_ppm: 1065
+        La_ppm: 66.6
+        Ce_ppm: 178
+        Nd_ppm: 106
+        Sm_ppm: 30.2
+        Eu_ppm: 2.655
+        Gd_ppm: 34.78
+        Dy_ppm: 40.6
+        Er_ppm: 24.23
+        Yb_ppm: 21.93
+        Lu_ppm: 3.17
+        technique_marker_by_field:
+          V_ppm: d
+          Co_ppm: d
+          Ni_ppm: d
+          Cu_ppm: d
+          Zn_ppm: d
+          Rb_ppm: d
+          Sr_ppm: d
+          Y_ppm: d
+          Zr_ppm: d
+          Nb_ppm: d
+          Ba_ppm: d
+          La_ppm: b
+          Ce_ppm: b
+          Nd_ppm: b
+          Sm_ppm: b
+          Eu_ppm: b
+          Gd_ppm: b
+          Dy_ppm: b
+          Er_ppm: b
+          Yb_ppm: b
+          Lu_ppm: b
+        technique_legend_as_printed:
+          b: IDMS
+          d: various
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1a_trace_hubbard72_weismanm75
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Hubbard72 / Weismanm75
+        Rb_ppm: 15.3
+        Sr_ppm: 186
+        Ba_ppm: 926
+        La_ppm: 68.2
+        Ce_ppm: 176
+        Nd_ppm: 103
+        Sm_ppm: 29
+        Eu_ppm: 2.54
+        Dy_ppm: 38.3
+        Er_ppm: 23.8
+        Yb_ppm: 20.9
+        technique_marker_by_field:
+          Rb_ppm: b
+          Sr_ppm: b
+          Ba_ppm: b
+          La_ppm: b
+          Ce_ppm: b
+          Nd_ppm: b
+          Sm_ppm: b
+          Eu_ppm: b
+          Dy_ppm: b
+          Er_ppm: b
+          Yb_ppm: b
+        technique_legend_as_printed:
+          b: IDMS
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1a_trace_keith72
+      type: bulk_composition_compilation
+      locator:
+        page: 5
+        published_page: 5
+        table: 1a
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Keith72
+        Th_ppm: 13.7
+        U_ppm: 3.9
+        technique_marker_by_field:
+          Th_ppm: g
+          U_ppm: g
+        technique_legend_as_printed:
+          g: radiation counting
+        unit_note: Field suffix gives the unit. Units printed on the row labels.
+    - observation_id: lpi14163_t1b_trace_brunfelt72_sub_column_1
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Brunfelt72 (sub-column 1)
+        Sc_ppm: 21
+        V_ppm: 48
+        Cr_ppm: 1370
+        Co_ppm: 34
+        Cu_ppm: 10.4
+        Zn_ppm: 33
+        Ga_ppm: 7.7
+        As_ppm: 20
+        Se_ppm: 290
+        Rb_ppm: 16
+        Sr_ppm: 185
+        Pd_ppb: 110
+        Sb_ppb: 3
+        Cs_ppm: 0.68
+        Ba_ppm: 748
+        La_ppm: 67
+        Ce_ppm: 203
+        Sm_ppm: 30
+        Eu_ppm: 2.5
+        Tb_ppm: 6.3
+        Yb_ppm: 21
+        Lu_ppm: 3.1
+        Hf_ppm: 19
+        Ta_ppm: 2.7
+        W_ppb: 1800
+        Th_ppm: 11.3
+        U_ppm: 3.4
+        technique_marker_by_field:
+          Sc_ppm: a
+          V_ppm: a
+          Cr_ppm: a
+          Co_ppm: a
+          Cu_ppm: a
+          Zn_ppm: a
+          Ga_ppm: a
+          As_ppm: a
+          Se_ppm: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Pd_ppb: a
+          Sb_ppb: a
+          Cs_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Tb_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+          Hf_ppm: a
+          Ta_ppm: a
+          W_ppb: a
+          Th_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: INAA
+        marker_scope_note: One technique marker is printed per row after the second sub-column; it is recorded on
+          both sub-columns of that row.
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1b_trace_brunfelt72_sub_column_2
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Brunfelt72 (sub-column 2)
+        Sc_ppm: 20.5
+        V_ppm: 45
+        Cr_ppm: 1430
+        Co_ppm: 34.7
+        Cu_ppm: 13.4
+        Zn_ppm: 40
+        Ga_ppm: 8.2
+        As_ppm: 100
+        Rb_ppm: 13
+        Sr_ppm: 170
+        Pd_ppb: 100
+        Sb_ppb: 10
+        Cs_ppm: 0.57
+        Ba_ppm: 740
+        La_ppm: 61
+        Pr_ppm: 26
+        Sm_ppm: 27.3
+        Eu_ppm: 2.8
+        Tb_ppm: 5.8
+        Dy_ppm: 33.5
+        Ho_ppm: 8.2
+        Er_ppm: 17.3
+        Yb_ppm: 15
+        Hf_ppm: 20.6
+        Ta_ppm: 2.9
+        W_ppb: 1400
+        Au_ppb: 2.3
+        Th_ppm: 10.6
+        U_ppm: 3.4
+        technique_marker_by_field:
+          Sc_ppm: a
+          V_ppm: a
+          Cr_ppm: a
+          Co_ppm: a
+          Cu_ppm: a
+          Zn_ppm: a
+          Ga_ppm: a
+          As_ppm: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Pd_ppb: a
+          Sb_ppb: a
+          Cs_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Pr_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Tb_ppm: a
+          Dy_ppm: a
+          Ho_ppm: a
+          Er_ppm: a
+          Yb_ppm: a
+          Hf_ppm: a
+          Ta_ppm: a
+          W_ppb: a
+          Au_ppb: a
+          Th_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: INAA
+        marker_scope_note: One technique marker is printed per row after the second sub-column; it is recorded on
+          both sub-columns of that row.
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1b_trace_helmke72
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Helmke72
+        Sc_ppm: 20.5
+        Cr_ppm: 1570
+        Co_ppm: 27
+        Ni_ppm: 331
+        Zn_ppm: 34
+        Ga_ppm: 7.5
+        La_ppm: 70.4
+        Ce_ppm: 157
+        Nd_ppm: 101
+        Sm_ppm: 30.8
+        Eu_ppm: 2.57
+        Gd_ppm: 36
+        Tb_ppm: 6.4
+        Dy_ppm: 44.8
+        Ho_ppm: 8.6
+        Er_ppm: 25
+        Yb_ppm: 24.6
+        Lu_ppm: 3.16
+        Hf_ppm: 22
+        technique_marker_by_field:
+          Sc_ppm: null
+          Cr_ppm: a
+          Co_ppm: a
+          Ni_ppm: a
+          Zn_ppm: a
+          Ga_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Gd_ppm: a
+          Tb_ppm: a
+          Dy_ppm: a
+          Ho_ppm: a
+          Er_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+          Hf_ppm: a
+        technique_legend_as_printed:
+          a: INAA
+        marker_note: 'No technique marker printed on: Sc_ppm (left null, not inferred).'
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1b_trace_willis72
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Willis72
+        Cr_ppm: 1684
+        Rb_ppm: 16
+        Sr_ppm: 177
+        Y_ppm: 209
+        Zr_ppm: 1022
+        Nb_ppm: 63.4
+        Ba_ppm: 855
+        technique_marker_by_field:
+          Cr_ppm: e
+          Rb_ppm: e
+          Sr_ppm: e
+          Y_ppm: e
+          Zr_ppm: e
+          Nb_ppm: e
+          Ba_ppm: e
+        technique_legend_as_printed:
+          e: XRF
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1b_trace_hubbard72
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Hubbard72
+        Cr_ppm: 1505
+        Ni_ppm: 322
+        Rb_ppm: 15
+        Sr_ppm: 186
+        Y_ppm: 213
+        Zr_ppm: 978
+        Nb_ppm: 65
+        Th_ppm: 13
+        technique_marker_by_field:
+          Cr_ppm: e
+          Ni_ppm: e
+          Rb_ppm: e
+          Sr_ppm: e
+          Y_ppm: e
+          Zr_ppm: e
+          Nb_ppm: e
+          Th_ppm: e
+        technique_legend_as_printed:
+          e: XRF
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1b_trace_baedecker72_wasson73
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Baedecker72 / Wasson73
+        Ni_ppm: 359
+        Zn_ppm: 37
+        Ga_ppm: 8.4
+        Ge_ppb: 670
+        Cd_ppb: 192
+        In_ppb: 120
+        Ir_ppb: 9.1
+        technique_marker_by_field:
+          Ni_ppm: h
+          Zn_ppm: h
+          Ga_ppm: h
+          Ge_ppb: h
+          Cd_ppb: h
+          In_ppb: h
+          Ir_ppb: h
+        technique_legend_as_printed:
+          h: RNAA
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1b_trace_morgan72_sub_column_1
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Morgan72 (sub-column 1)
+        Zn_ppm: 31
+        Rb_ppm: 15.8
+        Ag_ppb: 16.6
+        Cd_ppb: 140
+        Te_ppb: 70
+        Cs_ppm: 0.645
+        Re_ppb: 0.93
+        Ir_ppb: 13.6
+        Au_ppb: 5.4
+        technique_marker_by_field:
+          Zn_ppm: h
+          Rb_ppm: h
+          Ag_ppb: h
+          Cd_ppb: h
+          Te_ppb: h
+          Cs_ppm: h
+          Re_ppb: h
+          Ir_ppb: h
+          Au_ppb: h
+        technique_legend_as_printed:
+          h: RNAA
+        marker_scope_note: One technique marker is printed per row after the second sub-column; it is recorded on
+          both sub-columns of that row.
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1b_trace_morgan72_sub_column_2
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Morgan72 (sub-column 2)
+        Zn_ppm: 31
+        Rb_ppm: 16.1
+        Ag_ppb: 18.4
+        Cd_ppb: 139
+        Sb_ppb: 5.7
+        Te_ppb: 30
+        Cs_ppm: 0.73
+        Re_ppb: 1.07
+        Ir_ppb: 11.7
+        Au_ppb: 5.3
+        technique_marker_by_field:
+          Zn_ppm: h
+          Rb_ppm: h
+          Ag_ppb: h
+          Cd_ppb: h
+          Sb_ppb: h
+          Te_ppb: h
+          Cs_ppm: h
+          Re_ppb: h
+          Ir_ppb: h
+          Au_ppb: h
+        technique_legend_as_printed:
+          h: RNAA
+        marker_scope_note: One technique marker is printed per row after the second sub-column; it is recorded on
+          both sub-columns of that row.
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1b_trace_philpotts72_14421
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 reserve soil 14421 (column header prints 14421)
+        reference_column_as_printed: Philpotts72 (14421)
+        Rb_ppm: 13.9
+        Sr_ppm: 180
+        Zr_ppm: 858
+        Ba_ppm: 806
+        Ce_ppm: 170
+        Nd_ppm: 105
+        Sm_ppm: 29.7
+        Eu_ppm: 2.68
+        Dy_ppm: 38.8
+        Er_ppm: 23
+        Yb_ppm: 21.7
+        Lu_ppm: 3.27
+        Hf_ppm: 20.9
+        technique_marker_by_field:
+          Rb_ppm: b
+          Sr_ppm: b
+          Zr_ppm: b
+          Ba_ppm: b
+          Ce_ppm: b
+          Nd_ppm: b
+          Sm_ppm: b
+          Eu_ppm: b
+          Dy_ppm: b
+          Er_ppm: b
+          Yb_ppm: b
+          Lu_ppm: b
+          Hf_ppm: b
+        technique_legend_as_printed:
+          b: IDMS
+        unit_note: 'Field suffix gives the unit. Unlabelled rows (no unit printed on the row label) are read as
+          ppm: the unit is printed on the first trace row ("Sc ppm") and ppb is printed explicitly on every ppb
+          row.'
+    - observation_id: lpi14163_t1b_trace_quaide72
+      type: bulk_composition_compilation
+      locator:
+        page: 6
+        published_page: 6
+        table: 1b
+        section: Chemistry
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: trace_element_concentration_of_named_sample
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample: Apollo 14 bulk soil 14163
+        reference_column_as_printed: Quaide72
+        Th_ppm: 13.2
+        U_ppm: 3.75
+        technique_marker_by_field:
+          Th_ppm: i
+          U_ppm: i
+        technique_legend_as_printed:
+          i: radiation counting
+        unit_note: Field suffix gives the unit. Units printed on the row labels.
+    - observation_id: lpi14163_t2cf_mckay79_14160_sub1
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: '14160'
+        reference_as_printed: McKay 79
+        sub_column_as_numbered: 1
+        SiO2_wt_pct: 48.3
+        TiO2_wt_pct: 2.1
+        Al2O3_wt_pct: 16
+        FeO_wt_pct: 10
+        MnO_wt_pct: 0.12
+        MgO_wt_pct: 10.1
+        CaO_wt_pct: 10.1
+        K2O_wt_pct: 0.81
+        Cr_ppm: 1163
+        Sr_ppm: 187
+        Ba_ppm: 1039
+        La_ppm: 109
+        Ce_ppm: 276
+        Nd_ppm: 171
+        Sm_ppm: 48
+        Eu_ppm: 2.98
+        Gd_ppm: 55
+        Dy_ppm: 60.5
+        Er_ppm: 35.2
+        Yb_ppm: 29.6
+        Lu_ppm: 4.12
+        technique_marker_by_field:
+          SiO2_wt_pct: null
+          TiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MnO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          K2O_wt_pct: null
+          Cr_ppm: null
+          Sr_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Gd_ppm: a
+          Dy_ppm: a
+          Er_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        printed_without_value:
+          Rb_ppm: the value position prints "(a)" and no number; no value carried (typed absence)
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_mckay79_14160_79_sub2
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14160,79
+        reference_as_printed: McKay 79
+        sub_column_as_numbered: 2
+        SiO2_wt_pct: 47.8
+        TiO2_wt_pct: 1.66
+        Al2O3_wt_pct: 16.2
+        FeO_wt_pct: 10.2
+        MnO_wt_pct: 0.14
+        MgO_wt_pct: 10.7
+        CaO_wt_pct: 10.3
+        K2O_wt_pct: 0.62
+        Cr_ppm: 1300
+        Rb_ppm: 16.3
+        Sr_ppm: 182
+        Ba_ppm: 850
+        La_ppm: 77.2
+        Ce_ppm: 196
+        Nd_ppm: 119
+        Sm_ppm: 33.6
+        Eu_ppm: 2.74
+        Gd_ppm: 38.9
+        Dy_ppm: 44.1
+        Er_ppm: 26.3
+        Yb_ppm: 23.2
+        Lu_ppm: 3.35
+        technique_marker_by_field:
+          SiO2_wt_pct: null
+          TiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MnO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          K2O_wt_pct: null
+          Cr_ppm: null
+          Rb_ppm: a
+          Sr_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Gd_ppm: a
+          Dy_ppm: a
+          Er_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_mckay79_14160_sub3
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: '14160'
+        reference_as_printed: McKay 79
+        sub_column_as_numbered: 3
+        SiO2_wt_pct: 47.6
+        TiO2_wt_pct: 1.99
+        Al2O3_wt_pct: 15.4
+        FeO_wt_pct: 10.5
+        MnO_wt_pct: 0.12
+        MgO_wt_pct: 11.6
+        CaO_wt_pct: 9.67
+        K2O_wt_pct: 0.7
+        Cr_ppm: 1300
+        Rb_ppm: 18.4
+        Sr_ppm: 178
+        Ba_ppm: 976
+        La_ppm: 81.5
+        Ce_ppm: 208
+        Nd_ppm: 126
+        Sm_ppm: 35.4
+        Eu_ppm: 2.75
+        Gd_ppm: 41.5
+        Dy_ppm: 46.8
+        Er_ppm: 28.4
+        Yb_ppm: 25.1
+        Lu_ppm: 3.58
+        technique_marker_by_field:
+          SiO2_wt_pct: null
+          TiO2_wt_pct: null
+          Al2O3_wt_pct: null
+          FeO_wt_pct: null
+          MnO_wt_pct: null
+          MgO_wt_pct: null
+          CaO_wt_pct: null
+          K2O_wt_pct: null
+          Cr_ppm: null
+          Rb_ppm: a
+          Sr_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Gd_ppm: a
+          Dy_ppm: a
+          Er_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_hubbard72_weismann76_14161_35_breccia_sub1
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14161,35 breccias
+        reference_as_printed: Hubbard 72 / Weismann76
+        sub_column_as_numbered: 1
+        TiO2_wt_pct: 1.83
+        MgO_wt_pct: 12.4
+        CaO_wt_pct: 9.1
+        Na2O_wt_pct: 0.81
+        K2O_wt_pct: 0.57
+        Rb_ppm: 12.9
+        Sr_ppm: 171
+        Ba_ppm: 1022
+        La_ppm: 55.6
+        Ce_ppm: 252
+        Nd_ppm: 149
+        Sm_ppm: 42.8
+        Eu_ppm: 2.76
+        Gd_ppm: 49.1
+        Dy_ppm: 55.8
+        U_ppm: 5.03
+        technique_marker_by_field:
+          TiO2_wt_pct: a
+          MgO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          K2O_wt_pct: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Ba_ppm: a
+          La_ppm: null
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Gd_ppm: a
+          Dy_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        column_label_note: The five breccia sub-columns of "14161,35 breccias" print no individual labels; numbered left to right.
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_hubbard72_weismann76_14161_35_breccia_sub2
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14161,35 breccias
+        reference_as_printed: Hubbard 72 / Weismann76
+        sub_column_as_numbered: 2
+        TiO2_wt_pct: 1.57
+        MgO_wt_pct: 11.3
+        CaO_wt_pct: 9.8
+        Na2O_wt_pct: 0.78
+        K2O_wt_pct: 0.28
+        Rb_ppm: 3.34
+        Sr_ppm: 180
+        Ba_ppm: 775
+        Ce_ppm: 205
+        Nd_ppm: 122
+        Sm_ppm: 34.4
+        Eu_ppm: 2.74
+        Gd_ppm: 43
+        Dy_ppm: 45.6
+        Er_ppm: 31.2
+        Yb_ppm: 26.1
+        U_ppm: 4.08
+        technique_marker_by_field:
+          TiO2_wt_pct: a
+          MgO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          K2O_wt_pct: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Ba_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Gd_ppm: a
+          Dy_ppm: a
+          Er_ppm: a
+          Yb_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        column_label_note: The five breccia sub-columns of "14161,35 breccias" print no individual labels; numbered left to right.
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_hubbard72_weismann76_14161_35_breccia_sub3
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14161,35 breccias
+        reference_as_printed: Hubbard 72 / Weismann76
+        sub_column_as_numbered: 3
+        TiO2_wt_pct: 1.97
+        MgO_wt_pct: 9.8
+        CaO_wt_pct: 10.1
+        K2O_wt_pct: 0.62
+        Rb_ppm: 15.4
+        Sr_ppm: 197
+        Ba_ppm: 811
+        Ce_ppm: 266
+        Nd_ppm: 158
+        Sm_ppm: 44.3
+        Eu_ppm: 3.04
+        Dy_ppm: 56.8
+        Yb_ppm: 37.6
+        U_ppm: 4.71
+        technique_marker_by_field:
+          TiO2_wt_pct: a
+          MgO_wt_pct: a
+          CaO_wt_pct: a
+          K2O_wt_pct: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Ba_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Dy_ppm: a
+          Yb_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        column_label_note: The five breccia sub-columns of "14161,35 breccias" print no individual labels; numbered left to right.
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_hubbard72_weismann76_14161_35_breccia_sub4
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14161,35 breccias
+        reference_as_printed: Hubbard 72 / Weismann76
+        sub_column_as_numbered: 4
+        TiO2_wt_pct: 1.62
+        MgO_wt_pct: 12.2
+        CaO_wt_pct: 8.7
+        Na2O_wt_pct: 0.73
+        K2O_wt_pct: 0.57
+        Rb_ppm: 14.7
+        Sr_ppm: 170
+        Ba_ppm: 817
+        Ce_ppm: 165
+        Nd_ppm: 106
+        Sm_ppm: 29.7
+        Eu_ppm: 2.49
+        Gd_ppm: 34.9
+        Dy_ppm: 40.3
+        Er_ppm: 24.6
+        Yb_ppm: 23.4
+        U_ppm: 3.92
+        technique_marker_by_field:
+          TiO2_wt_pct: a
+          MgO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          K2O_wt_pct: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Ba_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Gd_ppm: a
+          Dy_ppm: a
+          Er_ppm: a
+          Yb_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        column_label_note: The five breccia sub-columns of "14161,35 breccias" print no individual labels; numbered left to right.
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_hubbard72_weismann76_14161_35_breccia_sub5
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14161,35 breccias
+        reference_as_printed: Hubbard 72 / Weismann76
+        sub_column_as_numbered: 5
+        TiO2_wt_pct: 1.6
+        MgO_wt_pct: 11.4
+        CaO_wt_pct: 9.4
+        Na2O_wt_pct: 0.75
+        K2O_wt_pct: 0.68
+        Cr_ppm: 2095
+        Rb_ppm: 16.9
+        Sr_ppm: 182
+        Ba_ppm: 916
+        Ce_ppm: 212
+        Nd_ppm: 132
+        Sm_ppm: 38.7
+        Eu_ppm: 2.76
+        Gd_ppm: 43.6
+        Dy_ppm: 49.3
+        Yb_ppm: 27.4
+        U_ppm: 4.61
+        technique_marker_by_field:
+          TiO2_wt_pct: a
+          MgO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          K2O_wt_pct: a
+          Cr_ppm: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Ba_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Gd_ppm: a
+          Dy_ppm: a
+          Yb_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        column_label_note: The five breccia sub-columns of "14161,35 breccias" print no individual labels; numbered left to right.
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_hubbard71_weismann76_14161_anor
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14161 anor.
+        reference_as_printed: Hubbard71 / Weismann76
+        MgO_wt_pct: 3.6
+        CaO_wt_pct: 17.8
+        Na2O_wt_pct: 0.39
+        K2O_wt_pct: 0.018
+        Rb_ppm: 0.32
+        Sr_ppm: 163
+        Ba_ppm: 16
+        Ce_ppm: 3.33
+        Nd_ppm: 1.87
+        Sm_ppm: 0.49
+        Eu_ppm: 0.756
+        Er_ppm: 0.34
+        Tm_ppm: 0.37
+        U_ppm: 0.058
+        technique_marker_by_field:
+          MgO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          K2O_wt_pct: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Ba_ppm: a
+          Ce_ppm: a
+          Nd_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Er_ppm: a
+          Tm_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_brunfelt72_14163_light_rx
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14163 light rx.
+        reference_as_printed: Brunfelt72
+        TiO2_wt_pct: 1.2
+        Al2O3_wt_pct: 19.3
+        FeO_wt_pct: 8.5
+        MnO_wt_pct: 0.11
+        MgO_wt_pct: 9.7
+        CaO_wt_pct: 12
+        Na2O_wt_pct: 0.81
+        Sc_ppm: 16.5
+        V_ppm: 18
+        Cr_ppm: 1160
+        Co_ppm: 19.8
+        Ni_ppm: 220
+        Rb_ppm: 18
+        Ba_ppm: 647
+        La_ppm: 64
+        Ce_ppm: 189
+        Sm_ppm: 30
+        Eu_ppm: 2.8
+        Tb_ppm: 5.8
+        Dy_ppm: 33.4
+        Yb_ppm: 19
+        Hf_ppm: 23.3
+        Ta_ppm: 2.7
+        Th_ppm: 10.9
+        U_ppm: 4
+        technique_marker_by_field:
+          TiO2_wt_pct: a
+          Al2O3_wt_pct: a
+          FeO_wt_pct: a
+          MnO_wt_pct: a
+          MgO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          Sc_ppm: a
+          V_ppm: a
+          Cr_ppm: a
+          Co_ppm: a
+          Ni_ppm: a
+          Rb_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Tb_ppm: a
+          Dy_ppm: a
+          Yb_ppm: a
+          Hf_ppm: a
+          Ta_ppm: a
+          Th_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t2cf_brunfelt72_14163_dark_rx
+      type: bulk_composition_compilation
+      locator:
+        page: 7
+        published_page: 7
+        table: '2'
+        section: Chemistry (coarse fines)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14163 dark rx.
+        reference_as_printed: Brunfelt72
+        TiO2_wt_pct: 1.4
+        Al2O3_wt_pct: 16.8
+        FeO_wt_pct: 10.2
+        MnO_wt_pct: 0.13
+        MgO_wt_pct: 12.2
+        CaO_wt_pct: 10.1
+        Na2O_wt_pct: 0.76
+        Sc_ppm: 19.7
+        V_ppm: 38
+        Cr_ppm: 1470
+        Co_ppm: 24.6
+        Ni_ppm: 230
+        Rb_ppm: 15
+        Ba_ppm: 753
+        La_ppm: 81
+        Ce_ppm: 214
+        Sm_ppm: 37.3
+        Eu_ppm: 2.8
+        Tb_ppm: 7.1
+        Dy_ppm: 41.5
+        Yb_ppm: 25
+        Ta_ppm: 3.6
+        Th_ppm: 13.6
+        U_ppm: 4.4
+        technique_marker_by_field:
+          TiO2_wt_pct: a
+          Al2O3_wt_pct: a
+          FeO_wt_pct: a
+          MnO_wt_pct: a
+          MgO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          Sc_ppm: a
+          V_ppm: a
+          Cr_ppm: a
+          Co_ppm: a
+          Ni_ppm: a
+          Rb_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Ce_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Tb_ppm: a
+          Dy_ppm: a
+          Yb_ppm: a
+          Ta_ppm: a
+          Th_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: IDMS
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "%" is printed on the SiO2 label and "ppm" on Sc, Th and
+          U; unlabelled oxide rows are read as wt% and unlabelled trace rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_p8_allocation_masses
+      type: characterization
+      locator:
+        page: 8
+        published_page: 8
+        section: Processing diagram
+        note: masses printed in the diagram boxes; csv t8
+      units: g
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        quantity: allocation_mass_of_named_split
+        allocations:
+        - parent_as_printed: 14163 4444 g (less than 1 mm)
+          split_as_printed: ',185'
+          mass_as_printed: 300 g
+          mass_g: 300
+        - parent_as_printed: 14163 4444 g (less than 1 mm)
+          split_as_printed: ',245'
+          mass_as_printed: 1194 g
+          mass_g: 1194
+        - parent_as_printed: ',234 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',234'
+          mass_as_printed: 312 g
+          mass_g: 312
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: ',234 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',638'
+          mass_as_printed: 273 g
+          mass_g: 273
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: ',234 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',639'
+          mass_as_printed: 301 g
+          mass_g: 301
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: ',234 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',640'
+          mass_as_printed: 281 g
+          mass_g: 281
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: ',234 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',641'
+          mass_as_printed: 150 g
+          mass_g: 150
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: ',239 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',239'
+          mass_as_printed: 270 g
+          mass_g: 270
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: ',239 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',643'
+          mass_as_printed: 229 g
+          mass_g: 229
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: ',239 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',644'
+          mass_as_printed: 269 g
+          mass_g: 269
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: ',239 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',645'
+          mass_as_printed: 291 g
+          mass_g: 291
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: ',239 (box prints no mass), under 14163 4444 g'
+          split_as_printed: ',646'
+          mass_as_printed: 291 g
+          mass_g: 291
+          diagram_note: remote storage (printed under this group)
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',3'
+          mass_as_printed: 10 g
+          mass_g: 10
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',4'
+          mass_as_printed: 10 g
+          mass_g: 10
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',5'
+          mass_as_printed: 5g
+          mass_g: 5
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',7'
+          mass_as_printed: 10 g
+          mass_g: 10
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',10'
+          mass_as_printed: 10 g
+          mass_g: 10
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',11'
+          mass_as_printed: 10 g
+          mass_g: 10
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',14'
+          mass_as_printed: 5g
+          mass_g: 5
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',15'
+          mass_as_printed: 5g
+          mass_g: 5
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',16'
+          mass_as_printed: 5g
+          mass_g: 5
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',17'
+          mass_as_printed: 5g
+          mass_g: 5
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',18'
+          mass_as_printed: 5g
+          mass_g: 5
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',54'
+          mass_as_printed: 663 g
+          mass_g: 663
+        - parent_as_printed: 14422 2400 g (part of Bulk Sample)
+          split_as_printed: ',55'
+          mass_as_printed: 277 g
+          mass_g: 277
+        - parent_as_printed: ',52 (box prints no mass), under 14422 2400 g'
+          split_as_printed: ',52'
+          mass_as_printed: 150 g
+          mass_g: 150
+        - parent_as_printed: ',52 (box prints no mass), under 14422 2400 g'
+          split_as_printed: ',59'
+          mass_as_printed: 150 g
+          mass_g: 150
+        - parent_as_printed: ',52 (box prints no mass), under 14422 2400 g'
+          split_as_printed: ',60'
+          mass_as_printed: 150 g
+          mass_g: 150
+        - parent_as_printed: ',52 (box prints no mass), under 14422 2400 g'
+          split_as_printed: ',61'
+          mass_as_printed: 140 g
+          mass_g: 140
+        - parent_as_printed: ',52 (box prints no mass), under 14422 2400 g'
+          split_as_printed: ',62'
+          mass_as_printed: 81 g
+          mass_g: 81
+        - parent_as_printed: ',53 (box prints no mass), under 14422 2400 g'
+          split_as_printed: ',53'
+          mass_as_printed: 155 g
+          mass_g: 155
+        - parent_as_printed: ',53 (box prints no mass), under 14422 2400 g'
+          split_as_printed: ',65'
+          mass_as_printed: 145 g
+          mass_g: 145
+        - parent_as_printed: ',53 (box prints no mass), under 14422 2400 g'
+          split_as_printed: ',66'
+          mass_as_printed: 151 g
+          mass_g: 151
+        - parent_as_printed: ',53 (box prints no mass), under 14422 2400 g'
+          split_as_printed: ',67'
+          mass_as_printed: 149 g
+          mass_g: 149
+        note: Group boxes ,234 and ,239 (under 14163 4444 g) and ,52 and ,53 (under 14422 2400 g) print no mass; each reappears
+          as a child box with a mass. The bulk, sieve-split, chips and biopool masses are carried in lpi14163_sample_provenance.
+    - observation_id: lpi14163_p9_small_rocks_14422
+      type: characterization
+      locator:
+        page: 9
+        published_page: 9
+        table: 2 (Small rocks from 14422)
+        section: Table 2 (p. 9)
+      units: g
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        quantity: mass_and_type_of_named_small_rock
+        title_as_printed: 'Table 2: Small rocks from 14422 - -'
+        rocks:
+        - sample_as_printed: '14425'
+          mass_g: 0.79
+          type_as_printed: glass sphere
+        - sample_as_printed: '14426'
+          mass_g: 1.59
+          type_as_printed: breccia
+        - sample_as_printed: '14427'
+          mass_g: 4.47
+          type_as_printed: breccia
+        - sample_as_printed: '14428'
+          mass_g: 1.47
+          type_as_printed: CMB
+        - sample_as_printed: '14429'
+          mass_g: 3.03
+          type_as_printed: CMB
+        - sample_as_printed: '14430'
+          mass_g: 4.81
+          type_as_printed: breccia
+        - sample_as_printed: '14431'
+          mass_g: 1.7
+          type_as_printed: melt rock
+        - sample_as_printed: '14432'
+          mass_g: 1.81
+          type_as_printed: null
+        - sample_as_printed: '14433'
+          mass_g: 1.23
+          type_as_printed: breccia
+        - sample_as_printed: '14434'
+          mass_g: 1.68
+          type_as_printed: CMB
+        - sample_as_printed: '14435'
+          mass_g: 0.92
+          type_as_printed: CMB
+        - sample_as_printed: '14436'
+          mass_g: 3.76
+          type_as_printed: basalt
+        - sample_as_printed: '14437'
+          mass_g: 2.65
+          type_as_printed: breccia
+        - sample_as_printed: '14438'
+          mass_g: 2.35
+          type_as_printed: breccia
+        - sample_as_printed: '14439'
+          mass_g: 1
+          type_as_printed: breccia
+        - sample_as_printed: '14440'
+          mass_g: 1.5
+          type_as_printed: basalt
+        - sample_as_printed: '14441'
+          mass_g: 1.23
+          type_as_printed: breccia
+        - sample_as_printed: '14442'
+          mass_g: 3.52
+          type_as_printed: breccia
+        - sample_as_printed: '14443'
+          mass_g: 2.54
+          type_as_printed: basalt
+        - sample_as_printed: '14444'
+          mass_g: 1.56
+          type_as_printed: basalt
+        - sample_as_printed: '14445'
+          mass_g: 9.22
+          type_as_printed: breccia
+        - sample_as_printed: '14446'
+          mass_g: 0.82
+          type_as_printed: basalt
+        - sample_as_printed: '14447'
+          mass_g: 0.91
+          type_as_printed: breccia
+        - sample_as_printed: '14448'
+          mass_g: 1.06
+          type_as_printed: breccia
+        - sample_as_printed: '14449'
+          mass_g: 1.7
+          type_as_printed: breccia
+        - sample_as_printed: '14450'
+          mass_g: 1.27
+          type_as_printed: breccia
+        - sample_as_printed: '14451'
+          mass_g: 2.1
+          type_as_printed: basalt
+        - sample_as_printed: '14452'
+          mass_g: 1.77
+          type_as_printed: breccia
+        - sample_as_printed: '14453'
+          mass_g: 6.03
+          type_as_printed: breccia
+        note: 14432 prints a mass (1.81) and no type (null = typed blank). The p. 8 diagram prints "66 grams total" for 14425-14453
+          (carried in lpi14163_sample_provenance); the 29 printed masses sum to 68.49 g (arithmetic check, not reconciled). This
+          is a second table numbered 2 in the document; the p. 7 Table 2 is the coarse-fines chemistry.
+    - observation_id: lpi14163_p9_coarse_fines_kramer_twedell1977
+      type: characterization
+      locator:
+        page: 9
+        published_page: 9
+        table: 3 (Coarse fines)
+        section: Table 3 (p. 9)
+      units: count; g
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        quantity: particle_count_and_weight_by_class
+        title_as_printed: 'Table 3: Coarse fines.'
+        attribution_as_printed: from Kramer and Twedell 1977
+        classes:
+        - class_as_printed: Soil breccia
+          number: 50
+          weight_g: 18
+          split_as_printed: ',87'
+        - class_as_printed: Anorthosite
+          number: 2
+          weight_g: 0.2
+          split_as_printed: ',88'
+        - class_as_printed: breccia, light matrix
+          number: 13
+          weight_g: 2
+          split_as_printed: ',89'
+        - class_as_printed: breccia, dark matrix
+          number: 14
+          weight_g: 3.5
+          split_as_printed: ',92'
+        - class_as_printed: fine grained basalt, light
+          number: 24
+          weight_g: 6.6
+          split_as_printed: ',90'
+        - class_as_printed: fine grained basalt, dark
+          number: 37
+          weight_g: 9.7
+          split_as_printed: ',91'
+        - class_as_printed: aphanitic basalt ?
+          number: 2
+          weight_g: 1.6
+          split_as_printed: ',93'
+        - class_as_printed: impact melt
+          number: 10
+          weight_g: 2.2
+          split_as_printed: ',94'
+        - class_as_printed: aphanite
+          number: 2
+          weight_g: 1.7
+          split_as_printed: ',95'
+        - class_as_printed: total
+          number: 154
+          weight_g: 45
+          split_as_printed: null
+        note: Total row as printed (154; 45 g); the nine class rows sum to 154 and 45.5 g (arithmetic check only, not reconciled).
+          The total row prints no split.
+    - observation_id: lpi14163_t4_granitic_14161_7069
+      type: bulk_composition_compilation
+      locator:
+        page: 9
+        published_page: 9
+        table: '4'
+        section: Table 4 (p. 9)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14161,7069
+        material_as_printed: granitic coarse-fines, 14161
+        reference_as_printed: Jolliff 1993
+        reference_year_note: The table header prints "Jolliff 1993"; the prose (p. 2) and the reference list (p. 10) print Jolliff
+          1991. Both kept as printed.
+        FeO_wt_pct: 14
+        CaO_wt_pct: 9
+        Na2O_wt_pct: 1.41
+        Sc_ppm: 30.2
+        Cr_ppm: 361
+        Ni_ppm: 110
+        Rb_ppm: 52
+        Sr_ppm: 160
+        Zr_ppm: 4240
+        Cs_ppm: 1.6
+        Ba_ppm: 2050
+        La_ppm: 228
+        Sm_ppm: 97
+        Eu_ppm: 3.35
+        Tb_ppm: 18.7
+        Yb_ppm: 73.6
+        Lu_ppm: 10.2
+        Hf_ppm: 100
+        Ta_ppm: 9.2
+        Th_ppm: 44
+        U_ppm: 12
+        technique_marker_by_field:
+          FeO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          Sc_ppm: a
+          Cr_ppm: a
+          Ni_ppm: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Zr_ppm: a
+          Cs_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Tb_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+          Hf_ppm: a
+          Ta_ppm: a
+          Th_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: INAA
+        blank_cells_as_printed:
+        - Ir ppb
+        - Au ppb
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "ppb" is printed on the Ir and Au labels; FeO, CaO and Na2O
+          are read as wt% and the other unlabelled rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t4_granitic_14161_7373
+      type: bulk_composition_compilation
+      locator:
+        page: 9
+        published_page: 9
+        table: '4'
+        section: Table 4 (p. 9)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14161,7373
+        material_as_printed: granitic coarse-fines, 14161
+        reference_as_printed: Jolliff 1993
+        reference_year_note: The table header prints "Jolliff 1993"; the prose (p. 2) and the reference list (p. 10) print Jolliff
+          1991. Both kept as printed.
+        FeO_wt_pct: 16
+        CaO_wt_pct: 11.3
+        Na2O_wt_pct: 0.75
+        Sc_ppm: 42.2
+        Cr_ppm: 982
+        Rb_ppm: 21
+        Sr_ppm: 207
+        Zr_ppm: 7150
+        Cs_ppm: 0.36
+        Ba_ppm: 740
+        La_ppm: 696
+        Sm_ppm: 326
+        Eu_ppm: 5.68
+        Tb_ppm: 62.2
+        Yb_ppm: 146
+        Lu_ppm: 18.7
+        Hf_ppm: 163
+        Ta_ppm: 4.3
+        Th_ppm: 37
+        U_ppm: 5.4
+        technique_marker_by_field:
+          FeO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          Sc_ppm: a
+          Cr_ppm: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Zr_ppm: a
+          Cs_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Tb_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+          Hf_ppm: a
+          Ta_ppm: a
+          Th_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: INAA
+        blank_cells_as_printed:
+        - Ni
+        - Ir ppb
+        - Au ppb
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "ppb" is printed on the Ir and Au labels; FeO, CaO and Na2O
+          are read as wt% and the other unlabelled rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_t4_granitic_14161_7269
+      type: bulk_composition_compilation
+      locator:
+        page: 9
+        published_page: 9
+        table: '4'
+        section: Table 4 (p. 9)
+      units: per field suffix (wt%, ppm, ppb)
+      values:
+        quantity: chemical_composition_of_named_coarse_fines_split
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        sample_as_printed: 14161,7269
+        material_as_printed: granitic coarse-fines, 14161
+        reference_as_printed: Jolliff 1993
+        reference_year_note: The table header prints "Jolliff 1993"; the prose (p. 2) and the reference list (p. 10) print Jolliff
+          1991. Both kept as printed.
+        FeO_wt_pct: 7.4
+        CaO_wt_pct: 7.5
+        Na2O_wt_pct: 0.71
+        Sc_ppm: 15.6
+        Cr_ppm: 680
+        Ni_ppm: 110
+        Rb_ppm: 107
+        Sr_ppm: 190
+        Zr_ppm: 1240
+        Cs_ppm: 5
+        Ba_ppm: 2290
+        La_ppm: 95.3
+        Sm_ppm: 35.6
+        Eu_ppm: 2.69
+        Tb_ppm: 7.95
+        Yb_ppm: 55.3
+        Lu_ppm: 7.93
+        Hf_ppm: 33
+        Ta_ppm: 11
+        Ir_ppb: 6
+        Au_ppb: 4
+        Th_ppm: 66
+        U_ppm: 20
+        technique_marker_by_field:
+          FeO_wt_pct: a
+          CaO_wt_pct: a
+          Na2O_wt_pct: a
+          Sc_ppm: a
+          Cr_ppm: a
+          Ni_ppm: a
+          Rb_ppm: a
+          Sr_ppm: a
+          Zr_ppm: a
+          Cs_ppm: a
+          Ba_ppm: a
+          La_ppm: a
+          Sm_ppm: a
+          Eu_ppm: a
+          Tb_ppm: a
+          Yb_ppm: a
+          Lu_ppm: a
+          Hf_ppm: a
+          Ta_ppm: a
+          Ir_ppb: a
+          Au_ppb: a
+          Th_ppm: a
+          U_ppm: a
+        technique_legend_as_printed:
+          a: INAA
+        unit_note: Field suffix gives the unit (wt_pct = wt% oxide). "ppb" is printed on the Ir and Au labels; FeO, CaO and Na2O
+          are read as wt% and the other unlabelled rows as ppm (header convention, as for t5/t6).
+    - observation_id: lpi14163_fig8_annotation
+      type: characterization
+      locator:
+        page: 4
+        published_page: 4
+        figure: '8'
+        section: Other Studies (Figure 8, Cadenhead et al. 1972)
+        note: text inside the figure bitmap, read from the 300 dpi render
+      units: as printed
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        quantity: water_vapour_adsorption_isotherm_conditions
+        annotation_as_printed:
+        - Adsorption of water vapor on Lunar fines 14163,111 at 15°C
+        - Weight of sample 0.6 grams
+        - Outgassed initially and after 2nd cycle at 140°C.
+        subsample_as_printed: 14163,111
+        adsorption_temperature_C: 15
+        sample_mass_g: 0.6
+        outgassing_temperature_C: 140
+        outgassing_note_as_printed: Outgassed initially and after 2nd cycle
+        digitization_status: Isotherm points and axis ticks not digitised (figure_only).
+    - observation_id: lpi14163_fig9_conditions
+      type: characterization
+      locator:
+        page: 4
+        published_page: 4
+        figure: '9'
+        section: Other Studies (Figure 9, Gibson and Moore 1972)
+        note: lower-panel condition block inside the figure bitmap, read from the 300 dpi render
+      units: as printed
+      values:
+        method_class: secondary_compilation
+        evidence_class: secondary_compilation
+        quantity: thermal_gas_release_run_conditions
+        annotation_as_printed:
+        - 216.8 mg. Sample
+        - Heating Rate 6 °C/min.
+        - 2 x 10^-6 torr Vacuum
+        - Alumina Crucible 16 mm. dia.
+        - 1.65 % Weight Loss (total)
+        - APOLLO 14 SOIL 14163,178
+        subsample_as_printed: 14163,178
+        sample_mass_mg: 216.8
+        heating_rate_C_per_min: 6
+        vacuum_torr: 2.0e-06
+        crucible_material_as_printed: Alumina
+        crucible_diameter_mm: 16
+        total_weight_loss_percent: 1.65
+        gas_labels_as_printed:
+        - H2O
+        - CO2
+        - CO, N2
+        - H2
+        - O2
+        - N2
+        legibility_note: Embedded bitmap at about 150 ppi. The condition block is legible; the "1" of 1.65 % is printed as a narrow
+          I-like glyph followed by a point. The run header along the top of the gas-release panel is not reliably legible at this
+          resolution and is not transcribed (typed absence, no digits carried). The "1 mg" scale bar is a plot scale, not a measurement.
+        digitization_status: Gas-release curves, weight-loss curve, spectrum-number and temperature axis ticks not digitised (figure_only).

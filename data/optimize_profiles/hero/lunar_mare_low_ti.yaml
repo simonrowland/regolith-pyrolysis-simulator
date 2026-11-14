@@ -1,0 +1,88 @@
+profile_id: lunar-mare-low-ti-hero-v1
+profile_schema_version: profile-schema-v1
+feedstock: lunar_mare_low_ti
+description: Canonical continuous C2A optimizer hero at the 2200 C zirconia wall ceiling.
+north_star_rationale: Use the canonical lunar mare Path A ramp over the same 225 hour horizon as the fixed hero run.
+objective_emphasis: Pyrolysis-only Fe, SiO, alkali, and Mg yield under the zirconia furnace ceiling.
+objectives:
+  - metric: oxygen_kg
+    sense: maximize
+    units: kg
+    weight: 0.168
+    rationale: main stored oxidizer product
+  - metric: metals_total_kg
+    sense: maximize
+    units: kg
+    weight: 0.168
+    rationale: Fe/Mg ingot proxy
+  - metric: pure_silica_glass_kg
+    sense: maximize
+    units: kg
+    weight: 0.168
+    rationale: Stage 3 glass product
+  - metric: industrial_mixed_glass_kg
+    sense: maximize
+    units: kg
+    weight: 0.168
+    rationale: early-tap bulk silicate product mass
+  - metric: sso2_pn2_fe_drain_silica
+    sense: maximize
+    units: score_0_1
+    weight: 0.168
+    rationale: owner SSO-2 Fe-drain and Stage 3 silica certification score
+  - metric: energy_electrical_plus_evaporation_kWh
+    sense: minimize
+    units: kWh
+    weight: 0.08
+    rationale: throughput cost
+  - metric: throughput_cost_owner_ratify_usd
+    sense: minimize
+    units: USD
+    weight: 0.03
+    rationale: carrier makeup/recycle energy, reagent loss, and run-local extraction cost
+  - metric: duration_h
+    sense: minimize
+    units: h
+    weight: 0.05
+    rationale: furnace occupancy
+constraints:
+  gates:
+    - delivered_stream_purity
+    - coating
+    - extraction_completeness
+    - knudsen_viscous
+    - furnace_temperature
+  stream_purity_min: 0.95
+early_tap_mode: false
+pinned_paths:
+  - furnace_max_T_C
+run:
+  campaign: C2A
+  hours: 225
+  mass_kg: 1.0
+  backend_name: internal-analytical
+fidelities:
+  internal-analytical:
+    backend_name: internal-analytical
+    hours: 225
+  fast:
+    backend_name: internal-analytical
+    hours: 225
+  high:
+    backend_name: internal-analytical
+    hours: 225
+  auto:
+    backend_name: internal-analytical
+    hours: 225
+seed_recipes:
+  - id: canonical-lunar-full-yield
+    source_campaign: C2A_continuous
+    rationale: Canonical continuous Path A seed with the 2200 C zirconia ceiling; inherited C2A ramp settings preserve the full 225 hour runner horizon.
+    patch:
+      furnace_max_T_C: 2200
+      campaigns:
+        C2A_continuous:
+          dT_dt_C_per_hr:
+            early_ramp_1050_1320C: [10, 20]
+          p_total_mbar: [5, 15]
+          p_total_mbar_default: 10.0

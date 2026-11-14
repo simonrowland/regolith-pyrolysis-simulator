@@ -28,6 +28,7 @@ from typing import Any
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
+    refuse_proprietary_engine_use,
 )
 from simulator.backends import requires_stage0_subprocess
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
@@ -38,13 +39,18 @@ from simulator.optimize.evaluate import (
     FailureCategory,
     RunReference,
     ScoredResult,
+    _build_eval_inputs_for_candidate,
+    _candidate_simulator_failure_detail,
+    _candidate_simulator_failure_result,
     evaluate,
+    _is_backend_unavailable,
     _is_stale_profile_refusal,
     _stale_profile_result,
 )
+from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
-from simulator.optimize.recipe import RecipePatch
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
 from simulator.optimize.worker_runtime import (
     clear_worker_runtime,
@@ -170,6 +176,13 @@ def _evaluate_batch(
     """
     if not requests:
         return (), engine_worker_pool if retain_engine_worker_pool else None
+    normalized_requests = tuple(_normalize_request(request) for request in requests)
+    for request in normalized_requests:
+        _backend_name_for_fidelity(
+            _request_profile(request, profile),
+            request.fidelity,
+            mode="optimizer_search",
+        )
     root = Path(output_root) if output_root is not None else Path(
         tempfile.mkdtemp(prefix="regolith-optimizer-pool-")
     )
@@ -180,7 +193,7 @@ def _evaluate_batch(
             constraints=constraints,
             schema=schema,
         )
-        for index, request in enumerate(requests)
+        for index, request in enumerate(normalized_requests)
     )
     timeout_seconds = resolve_eval_timeout_seconds(per_eval_timeout_seconds)
     if results_store is not None:
@@ -317,15 +330,20 @@ def evaluate_request_supervised(
 ) -> ScoredResult:
     """Evaluate one request in a killable child process with a wall deadline."""
 
+    normalized = _normalize_request(request)
+    active_profile = _request_profile(normalized, profile)
+    _backend_name_for_fidelity(
+        active_profile, normalized.fidelity, mode="optimizer_search"
+    )
     root = Path(output_root) if output_root is not None else Path(
         tempfile.mkdtemp(prefix="regolith-optimizer-supervised-")
     )
-    root.mkdir(parents=True, exist_ok=True)
     task = replace(
-        _task_from_request(0, request, profile=profile, output_root=root),
+        _task_from_request(0, normalized, profile=profile, output_root=root),
         constraints=constraints,
         schema=schema,
     )
+    root.mkdir(parents=True, exist_ok=True)
     timeout_seconds = resolve_eval_timeout_seconds(per_eval_timeout_seconds)
     outcome = _evaluate_task_supervised(
         task,
@@ -577,6 +595,22 @@ def _evaluate_tasks_in_engine_worker_pool(
                     )
                     continue
                 except BaseException as exc:
+                    if _is_backend_unavailable(exc):
+                        spec = _build_eval_spec_for_task(task)
+                        raise BackendUnavailableAbort(
+                            f"{type(exc).__name__}: {exc}",
+                            patch=task.patch,
+                            candidate_id=task.candidate_id,
+                            eval_spec=spec,
+                            cache_key_value=cache_key(spec),
+                        ) from exc
+                    candidate_failure = _candidate_simulator_failure_for_task(
+                        task,
+                        exc,
+                    )
+                    if candidate_failure is not None:
+                        results[task.index] = candidate_failure
+                        continue
                     raise RuntimeError(
                         f'engine worker evaluation failed for {_task_label(task)}'
                     ) from exc
@@ -603,6 +637,39 @@ def _evaluate_tasks_in_engine_worker_pool(
     if len(completed) != len(tasks):
         raise RuntimeError('engine worker pool ended without all results')
     return completed
+
+
+def _candidate_simulator_failure_for_task(
+    task: _PoolTask,
+    exc: BaseException,
+) -> ScoredResult | None:
+    detail = _candidate_simulator_failure_detail(exc)
+    if detail is None:
+        return None
+    spec = _build_eval_spec_for_task(task)
+    return _candidate_simulator_failure_result(
+        task.candidate_id,
+        spec,
+        cache_key(spec),
+        exc,
+        error_message=detail,
+        detail=detail,
+    )
+
+
+def _build_eval_spec_for_task(task: _PoolTask) -> EvalSpec:
+    evaluator_kwargs = dict(task.evaluator_kwargs or {})
+    _, spec, _ = _build_eval_inputs_for_candidate(
+        task.patch,
+        task.feedstock_id,
+        task.fidelity,
+        task.profile,
+        task.schema or RecipeSchema(),
+        constraints=task.constraints,
+        cost_parameters=evaluator_kwargs.get("cost_parameters"),
+        conditional_context=evaluator_kwargs.get("conditional_context"),
+    )
+    return spec
 
 
 def _evaluate_tasks_serial(
@@ -646,6 +713,7 @@ def _evaluate_task_supervised(
     warm_runtime_spec: _WarmRuntimeSpec | None,
     per_eval_timeout_seconds: float | None,
 ) -> dict[str, Any]:
+    _task_backend_name(task)
     output_dir = Path(task.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     result_path = output_dir / ".supervised-result.pickle"
@@ -697,11 +765,9 @@ def _supervised_process_context(
     evaluate_fn: Callable[..., ScoredResult],
     warm_runtime_spec: _WarmRuntimeSpec | None,
 ) -> mp.context.BaseContext:
-    try:
-        pickle.dumps((task, evaluate_fn, warm_runtime_spec))
-    except Exception:
-        if os.name != "nt":
-            return mp.get_context("fork")
+    _assert_picklable(task, "supervised pool task")
+    if not _is_picklable((evaluate_fn, warm_runtime_spec)) and os.name != "nt":
+        return mp.get_context("fork")
     return mp.get_context("spawn")
 
 
@@ -818,6 +884,24 @@ def _evaluate_pool_task(
             "kind": "result",
             "index": task.index,
             "result": _stale_profile_result(task.candidate_id, str(exc)),
+        }
+    except BaseException as exc:
+        if _is_backend_unavailable(exc):
+            spec = _build_eval_spec_for_task(task)
+            raise BackendUnavailableAbort(
+                f"{type(exc).__name__}: {exc}",
+                patch=task.patch,
+                candidate_id=task.candidate_id,
+                eval_spec=spec,
+                cache_key_value=cache_key(spec),
+            ) from exc
+        candidate_failure = _candidate_simulator_failure_for_task(task, exc)
+        if candidate_failure is None:
+            raise
+        return {
+            "kind": "result",
+            "index": task.index,
+            "result": candidate_failure,
         }
     finally:
         restore_child_pid_tracking()
@@ -952,24 +1036,34 @@ def _warm_runtime_spec(tasks: Sequence[_PoolTask]) -> _WarmRuntimeSpec | None:
     )
 
 
-def _task_backend_name(task: _PoolTask) -> str:
+def _backend_name_for_fidelity(
+    profile: Mapping[str, Any], fidelity: str, *, mode: str
+) -> str:
     merged: dict[str, Any] = {}
-    profile = task.profile
     run_options = profile.get("run", {}) if isinstance(profile, Mapping) else {}
     if isinstance(run_options, Mapping):
         merged.update(run_options)
     fidelities = profile.get("fidelities", {}) if isinstance(profile, Mapping) else {}
     if isinstance(fidelities, Mapping):
-        selected = fidelities.get(task.fidelity, {})
+        selected = fidelities.get(fidelity, {})
         if isinstance(selected, Mapping):
             merged.update(selected)
     # Fold legacy `stub` onto canonical `internal-analytical` when reading the
     # profile boundary; mirrors EvalSpec.backend_name canonicalization.
-    return canonical_backend_name(
+    backend_name = canonical_backend_name(
         str(
             merged.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN)
             or ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
         )
+    )
+    assert backend_name is not None
+    refuse_proprietary_engine_use(backend_name, mode=mode)
+    return backend_name
+
+
+def _task_backend_name(task: _PoolTask) -> str:
+    return _backend_name_for_fidelity(
+        task.profile, task.fidelity, mode="optimizer_search"
     )
 
 
@@ -990,9 +1084,7 @@ def _task_from_request(
     output_root: Path,
 ) -> _PoolTask:
     normalized = _normalize_request(request)
-    active_profile = normalized.profile if normalized.profile is not None else profile
-    if active_profile is None:
-        raise ValueError("pool evaluation requires a profile")
+    active_profile = _request_profile(normalized, profile)
     output_dir = (
         Path(normalized.output_dir)
         if normalized.output_dir is not None
@@ -1023,6 +1115,15 @@ def _normalize_request(request: PoolEvaluationRequest | tuple[Any, ...]) -> Pool
         patch, feedstock_id, fidelity, candidate_id = request
         return PoolEvaluationRequest(patch, feedstock_id, fidelity, candidate_id=candidate_id)
     raise ValueError("pool requests must be PoolEvaluationRequest or (patch, feedstock, fidelity)")
+
+
+def _request_profile(
+    request: PoolEvaluationRequest, profile: Mapping[str, Any] | None
+) -> Mapping[str, Any]:
+    active_profile = request.profile if request.profile is not None else profile
+    if active_profile is None:
+        raise ValueError("pool evaluation requires a profile")
+    return active_profile
 
 
 def _normalize_patch(patch: RecipePatch | Mapping[str, Any]) -> RecipePatch:

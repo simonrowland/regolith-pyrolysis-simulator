@@ -57,6 +57,11 @@ from simulator.chemistry.melt_activity import (
     melt_oxide_activity,
     melt_oxide_activity_coefficient,
 )
+from simulator.physical_constants import (
+    GAS_CONSTANT_10SIG,
+    PA_PER_BAR,
+    STANDARD_ATMOSPHERE_PA,
+)
 from simulator.state import MOLAR_MASS
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
 from simulator.diagnostic_helpers.reproduction_compare import (
@@ -88,10 +93,9 @@ TARGET_TYPES = frozenset(
     }
 )
 KEMS_SOURCE_PREFIX = "kems-"
-# Dual of tests/test_physics_ground_truth.py: P_sat(T_b) = 101325 Pa.
-STANDARD_ATMOSPHERE_PA = 101325.0
+# Dual of tests/test_physics_ground_truth.py: P_sat(T_b) = 1 atm.
 # JANAF construction boiling temperatures are 1-bar (fugacity = 1), not 1 atm.
-STANDARD_BAR_PA = 100000.0
+STANDARD_BAR_PA = PA_PER_BAR
 
 # Documented defaults when an observation carries no usable numeric uncertainty.
 # These are stated per-observation on the comparison record (defaulted=true).
@@ -735,7 +739,7 @@ def resolve_chamber_pressure_pa(obs: AdoptedObservation) -> tuple[float | None, 
         "pascal": 1.0,
         "mbar": 100.0,
         "millibar": 100.0,
-        "bar": 1.0e5,
+        "bar": PA_PER_BAR,
         "torr": 133.322368,
         "mmhg": 133.322368,
     }
@@ -846,7 +850,7 @@ def _antoine_fallback_pressure_scale_pa(source_form: str) -> float | None:
     if "mmhg" in tokens or {"mm", "hg"} <= tokens or "mm" in tokens:
         return 133.322368
     if "bar" in tokens:
-        return 1.0e5
+        return PA_PER_BAR
     return None
 
 
@@ -883,14 +887,14 @@ def _literature_pressure_points(
                 ("p_Pa", 1.0, "Pa"),
                 ("P_Pa", 1.0, "Pa"),
                 ("pressure_Pa", 1.0, "Pa"),
-                ("p_bar", 1.0e5, "Pa"),
-                ("P_bar", 1.0e5, "Pa"),
+                ("p_bar", PA_PER_BAR, "Pa"),
+                ("P_bar", PA_PER_BAR, "Pa"),
                 ("p_mmHg", 133.322368, "Pa"),
                 ("P_mmHg", 133.322368, "Pa"),
                 ("p_torr", 133.322368, "Pa"),
                 ("P_torr", 133.322368, "Pa"),
-                ("p_atm", 101325.0, "Pa"),
-                ("P_atm", 101325.0, "Pa"),
+                ("p_atm", STANDARD_ATMOSPHERE_PA, "Pa"),
+                ("P_atm", STANDARD_ATMOSPHERE_PA, "Pa"),
                 ("log10_P_Pa", None, "Pa"),
             ):
                 if key not in pt:
@@ -960,15 +964,31 @@ def _literature_pressure_points(
                     }
                 )
                 continue
-            out.append(
+            parsed_point = {
+                "T_K": T_f,
+                "P_Pa": P_f,
+                "units": units_hint,
+                "point_index": idx,
+                "note": pt.get("note"),
+            }
+            parsed_point.update(
                 {
-                    "T_K": T_f,
-                    "P_Pa": P_f,
-                    "units": units_hint,
-                    "point_index": idx,
-                    "note": pt.get("note"),
+                    key: pt[key]
+                    for key in (
+                        "composition_mol",
+                        "melt_composition_mol",
+                        "composition_wt_pct",
+                        "melt_composition_wt_pct",
+                        "sample_oxide_composition_wt_pct",
+                        "sample_Na2O_wt_pct",
+                        "sample_K2O_wt_pct",
+                        "composition_source_observation_id",
+                        "composition_source_gap",
+                    )
+                    if key in pt
                 }
             )
+            out.append(parsed_point)
         if out:
             return out, None, drops
         if drops:
@@ -1046,7 +1066,7 @@ def _literature_pressure_points(
             if use_pa or "A_Pa" in coefficient_values:
                 P = 10.0**log10_p
             elif use_bar:
-                P = (10.0**log10_p) * 1.0e5
+                P = (10.0**log10_p) * PA_PER_BAR
             elif use_mmhg:
                 P = (10.0**log10_p) * 133.322368
             else:
@@ -1057,7 +1077,7 @@ def _literature_pressure_points(
                     P = (10.0**log10_p) * scale_pa
                 else:
                     # Prefer Pa-like A magnitude (A~10) vs bar (A~4-6) heuristic.
-                    P = 10.0**log10_p if A >= 7.0 else (10.0**log10_p) * 1.0e5
+                    P = 10.0**log10_p if A >= 7.0 else (10.0**log10_p) * PA_PER_BAR
             if not (math.isfinite(P) and P > 0.0):
                 drops.append(
                     {
@@ -2462,7 +2482,7 @@ RAIL_NONMATCH_CONDENSED_FORMS = frozenset(
 CONDENSED_FORM_CORRECTIONS_PATH = (
     REPO_ROOT / "data" / "condensed_form_corrections.yaml"
 )
-_R_GAS_J_MOL_K = 8.314462618  # CODATA; used only in form-correction algebra
+_R_GAS_J_MOL_K = GAS_CONSTANT_10SIG  # 10-sig spelling; form-correction algebra only
 
 
 def observation_condensed_form(
@@ -3014,11 +3034,13 @@ def _evaluate_psat(
     assert points is not None
     candidates = _engine_species_candidates(obs)
     standard_state_kind = _pressure_standard_state_kind(obs)
-    melt_recipe, melt_recipe_source, melt_recipe_error = _melt_recipe_mol(obs)
     any_numeric = False
     last_refusal: str | None = None
     temperature_counts = Counter(float(point["T_K"]) for point in points)
     for pt in points:
+        melt_recipe, melt_recipe_source, melt_recipe_error = _melt_recipe_mol(
+            obs, point=pt
+        )
         T_K = float(pt["T_K"])
         expected = float(pt["P_Pa"])
         unc = resolve_uncertainty(obs, point=pt, kind_hint="psat")
@@ -3565,10 +3587,46 @@ def _evaluate_alpha(
 
 def _melt_recipe_mol(
     obs: AdoptedObservation,
+    *,
+    point: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, float] | None, str, str | None]:
-    """Resolve an extract recipe to oxide moles, including the production 12022 proxy."""
+    """Resolve an extract recipe to oxide moles, refusing declared composition gaps."""
 
-    values = obs.values
+    values = dict(obs.values)
+    if point is not None:
+        point_recipe_keys = (
+            "composition_mol",
+            "melt_composition_mol",
+            "composition_wt_pct",
+            "melt_composition_wt_pct",
+            "sample_oxide_composition_wt_pct",
+        )
+        if any(
+            isinstance(point.get(key), Mapping) and bool(point.get(key))
+            for key in point_recipe_keys
+        ):
+            # A measured row's own suite takes precedence over parent-level defaults.
+            for key in (
+                *point_recipe_keys,
+                "sample_Na2O_wt_pct",
+                "sample_K2O_wt_pct",
+                "composition_source_observation_id",
+                "composition_source_gap",
+            ):
+                values.pop(key, None)
+        values.update(
+            {
+                key: point[key]
+                for key in (
+                    *point_recipe_keys,
+                    "sample_Na2O_wt_pct",
+                    "sample_K2O_wt_pct",
+                    "composition_source_observation_id",
+                    "composition_source_gap",
+                )
+                if key in point
+            }
+        )
     for key in ("composition_mol", "melt_composition_mol"):
         raw = values.get(key)
         if isinstance(raw, Mapping) and raw:
@@ -3592,12 +3650,18 @@ def _melt_recipe_mol(
     if not isinstance(raw_wt, Mapping) and (
         "apollo_12" in material or "lunar_basalt_120" in material
     ):
+        if values.get("composition_source_gap"):
+            return (
+                None,
+                "extract composition_source_gap",
+                "missing_condition:melt_composition",
+            )
         feedstocks = load_cached_safe_yaml(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
         feedstock = feedstocks.get("lunar_mare_low_ti") or {}
         raw_wt = feedstock.get("composition_wt_pct")
         provenance = "data/feedstocks.yaml::lunar_mare_low_ti (Apollo 12 proxy)"
-    # Prefer sample_Na2O_wt_pct overlay on Apollo proxy when bulk suite absent
-    # (12022 text gives only alkali wt%; full suite is the production proxy).
+    # Prefer the printed alkali overlay when an extract gives it alongside a
+    # complete melt recipe.
     if isinstance(raw_wt, Mapping) and values.get("sample_Na2O_wt_pct") is not None:
         try:
             overlaid = dict(raw_wt)
@@ -3609,6 +3673,12 @@ def _melt_recipe_mol(
         except (TypeError, ValueError):
             pass
     if isinstance(raw_wt, Mapping) and raw_wt:
+        source_observation_id = values.get("composition_source_observation_id")
+        if (
+            source_observation_id
+            and provenance == "extract sample_oxide_composition_wt_pct"
+        ):
+            provenance = f"{provenance} ({source_observation_id})"
         try:
             mol = {
                 str(oxide): float(wt) / float(MOLAR_MASS[str(oxide)])
@@ -4313,32 +4383,14 @@ def _evaluate_ordering(
 
     melt_recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
     runtime["melt_recipe_source"] = recipe_source
+    # No feedstock proxy. A silicate-melt ordering that names no composition
+    # refuses, the same as _melt_recipe_mol on the psat path. lunar_mare_low_ti
+    # is not a stand-in for a solar-abundance FCMAS claim.
     if melt_recipe is None:
-        # Silicate-melt orderings are claims about a class of melts. Use the
-        # production lunar-mare proxy when the extract names a silicate melt
-        # but omits a numeric recipe, and record the composition that was
-        # actually checked.
-        system_class = observation_system_class(obs)
-        if system_class == "silicate_melt":
-            feedstocks = load_cached_safe_yaml(FEEDSTOCKS_PATH.read_text(encoding="utf-8")) or {}
-            feedstock = feedstocks.get("lunar_mare_low_ti") or {}
-            raw_wt = feedstock.get("composition_wt_pct")
-            if isinstance(raw_wt, Mapping) and raw_wt:
-                melt_recipe = {
-                    str(oxide): float(wt) / float(MOLAR_MASS[str(oxide)])
-                    for oxide, wt in raw_wt.items()
-                    if float(wt) > 0.0 and str(oxide) in MOLAR_MASS
-                }
-                recipe_source = (
-                    "data/feedstocks.yaml::lunar_mare_low_ti "
-                    "(silicate-melt ordering evaluation composition)"
-                )
-                runtime["melt_recipe_source"] = recipe_source
-        if melt_recipe is None:
-            return _emit(
-                verdict="not_evaluable",
-                reason=recipe_error or "missing_condition:melt_composition",
-            )
+        return _emit(
+            verdict="not_evaluable",
+            reason=recipe_error or "missing_condition:melt_composition",
+        )
 
     diagnostic_pO2 = float(pO2) if pO2 is not None else DEFAULT_PO2_BAR
     vp = vp_data or load_vapor_pressure_data()

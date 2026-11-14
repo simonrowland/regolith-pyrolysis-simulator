@@ -31,6 +31,7 @@ from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
+    refuse_proprietary_engine_use,
 )
 from simulator.backends import (
     BackendSelectionPolicy,
@@ -290,6 +291,9 @@ _TYPED_ABSENCE_EXCEPTION_CLASSES = (
     BackendUnavailableError,
     EngineWorkerUnavailable,
     ImportError,
+)
+_TYPED_ABSENCE_EXCEPTION_NAMES = frozenset(
+    exception_type.__name__ for exception_type in _TYPED_ABSENCE_EXCEPTION_CLASSES
 )
 
 
@@ -766,19 +770,13 @@ def evaluate(
         return _invalid_patch_result(candidate_id, str(exc))
 
     try:
-        active_constraints = _composition_target_constraints(
-            profile,
-            constraints,
-            recipe_patch=validated_patch,
-            campaign=str(_run_options(profile, fidelity)["campaign"]),
-        )
-        spec, run_config = _build_eval_inputs(
+        active_constraints, spec, run_config = _build_eval_inputs_for_candidate(
             validated_patch,
             feedstock_id,
             fidelity,
             profile,
             active_schema,
-            constraints=active_constraints,
+            constraints=constraints,
             cost_parameters=cost_parameters,
             conditional_context=conditional_context,
         )
@@ -811,6 +809,10 @@ def evaluate(
             patch=validated_patch,
             candidate_id=candidate_id,
         ) from exc
+    refuse_proprietary_engine_use(
+        run_config.backend_name,
+        mode="optimizer evaluation",
+    )
     key = cache_key(spec)
     objective_profile = _objective_profile_for_spec(profile, spec)
     domain_reason = real_backend_feedstock_domain_reason(
@@ -877,6 +879,38 @@ def evaluate(
             key,
             exc,
         )
+    except PoisonedHourError as exc:
+        if _is_backend_unavailable(exc):
+            raise BackendUnavailableAbort(
+                str(exc),
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
+        if _is_malformed_recipe_error(exc):
+            return _malformed_recipe_result(
+                candidate_id,
+                spec,
+                key,
+                str(exc),
+                profile=profile,
+            )
+        candidate_failure = _candidate_simulator_failure_result(
+            candidate_id,
+            spec,
+            key,
+            exc,
+        )
+        if candidate_failure is not None:
+            return candidate_failure
+        raise EngineBugAbort(
+            f"{type(exc).__name__}: {exc}",
+            patch=validated_patch,
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key_value=key,
+        ) from exc
     except RunnerError as exc:
         if _is_backend_unavailable(exc):
             raise BackendUnavailableAbort(
@@ -915,24 +949,26 @@ def evaluate(
             cache_key_value=key,
         ) from exc
     except (ProposalRejected, OverdraftError) as exc:
-        # b-285: discriminate here too. b-281 taught the RETURNED-RUN consumer
-        # below (:909-962) to stop reading the broad ProposalRejected class name
-        # as evidence of an overdraw, but this DIRECT-exception branch never
-        # consulted that discriminator at all -- it returned INVALID_RECIPE with
-        # failing_gates=("inventory_overdraw",) for anything the planner wrapped.
-        #
-        # The planner wraps arbitrary apply failures: account-policy violations,
-        # origin-resolution failures, projected-conservation failures, and plain
-        # implementation bugs. So identical underlying failures were getting
-        # OPPOSITE trust treatment depending only on which executor boundary
-        # carried them -- pruned as a bad recipe if the exception escaped
-        # directly, correctly aborted as an engine bug if it arrived as a failed
-        # RunExecution. Same failure, same run, different verdict.
-        #
-        # Fixing the discriminator was not enough because a consumer bypassed it.
-        # Trace every consumer of a predicate, not just the predicate.
+        # b-285 keeps broad ProposalRejected wrappers from becoming inventory
+        # overdraws. b-1154 scores mixed-origin overhead-gas withdrawals as candidates.
         message = f"{type(exc).__name__}: {exc}"
+        if _is_backend_unavailable(exc):
+            raise BackendUnavailableAbort(
+                message,
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
         if not _is_inventory_overdraw_message(message):
+            candidate_failure = _candidate_simulator_failure_result(
+                candidate_id,
+                spec,
+                key,
+                exc,
+            )
+            if candidate_failure is not None:
+                return candidate_failure
             raise EngineBugAbort(
                 message,
                 patch=validated_patch,
@@ -947,6 +983,14 @@ def evaluate(
             message,
         )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
+        if _is_backend_unavailable(exc):
+            raise BackendUnavailableAbort(
+                f"{type(exc).__name__}: {exc}",
+                patch=validated_patch,
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key_value=key,
+            ) from exc
         if _is_malformed_recipe_error(exc):
             return _malformed_recipe_result(
                 candidate_id,
@@ -1032,6 +1076,17 @@ def evaluate(
                 run_execution=run_execution,
                 profile=profile,
             )
+        candidate_failure = _candidate_simulator_failure_result(
+            candidate_id,
+            spec,
+            key,
+            failure_exc,
+            run_execution=run_execution,
+            profile=profile,
+            error_message=error_message,
+        )
+        if candidate_failure is not None:
+            return candidate_failure
         if isinstance(failure_exc, BaseException):
             honest = _result_from_honest_engine_exception(
                 candidate_id,
@@ -1339,6 +1394,45 @@ def _typed_physics_refusal_result(
         reason=reason,
         error_message=str(exc) or reason,
         diagnostic=getattr(exc, "diagnostic", None),
+    )
+
+
+def _candidate_simulator_failure_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    exc: BaseException | None,
+    *,
+    run_execution: Any | None = None,
+    profile: Mapping[str, Any] | None = None,
+    error_message: str | None = None,
+    detail: str | None = None,
+) -> ScoredResult | None:
+    detail = detail or _candidate_simulator_failure_detail(exc)
+    if detail is None:
+        return None
+    failure_kind = _candidate_simulator_failure_kind(exc)
+    reason = (
+        "poisoned_hour"
+        if failure_kind == "poisoned_hour"
+        else "proposal_rejected"
+    )
+    message = str(error_message or detail)
+    refused = _physics_refused_result(
+        candidate_id,
+        spec,
+        key,
+        reason=reason,
+        error_message=message,
+        run_execution=run_execution,
+        profile=profile,
+    )
+    margin = refused.feasibility_margins[PHYSICS_REFUSAL_GATE]
+    return replace(
+        refused,
+        feasibility_margins={
+            PHYSICS_REFUSAL_GATE: replace(margin, detail=message),
+        },
     )
 
 
@@ -1807,14 +1901,14 @@ def _trace_with_optimizer_coating_report(
         "resinter_threshold_kg / "
     ):
         threshold_parametric = True
-        campaigns = math.inf
+        # Keep an unqualified threshold symbolic so economics can refuse the
+        # lifetime instead of pricing it as infinite campaigns.
     if aggregate_campaigns == "infinite":
         aggregate_campaigns = math.inf
     elif isinstance(aggregate_campaigns, str) and aggregate_campaigns.startswith(
         "resinter_threshold_kg / "
     ):
         threshold_parametric = True
-        aggregate_campaigns = math.inf
     if threshold_parametric:
         authoritative = False
         output_status = "non-authoritative-threshold"
@@ -4636,11 +4730,20 @@ def _with_extraction_not_attempted_verdicts(
     feasibility: FeasibilityResult,
     trace: Any,
 ) -> FeasibilityResult:
-    gates = tuple(
-        gate
-        for gate in EXTRACTION_CLASS_GATES
-        if gate in feasibility.margins and not feasibility.margins[gate].feasible
-    )
+    gates: list[str] = []
+    for gate in EXTRACTION_CLASS_GATES:
+        margin = feasibility.margins.get(gate)
+        if margin is None:
+            continue
+        if gate == "extraction_completeness" and margin.status == "unavailable":
+            continue
+        diagnostic_purity = (
+            gate == "delivered_stream_purity"
+            and margin.status == "warning"
+            and margin.output_status == "provisional"
+        )
+        if not margin.feasible or diagnostic_purity:
+            gates.append(gate)
     if not gates:
         return feasibility
     evidence = _no_volatilization_evidence(trace)
@@ -4667,7 +4770,7 @@ def _not_attempted_extraction_margin(
         status="not-attempted",
         output_status="not_attempted",
         status_reason=EXTRACTION_NOT_ATTEMPTED_NO_VOLATILIZATION,
-        status_payload=evidence,
+        status_payload={**margin.status_payload, **evidence},
     )
 
 
@@ -4823,6 +4926,37 @@ def _build_eval_inputs(
         conditional_context=conditional_context,
         executed_prefix_stage_ids=None,
     )
+
+
+def _build_eval_inputs_for_candidate(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    profile: Mapping[str, Any],
+    schema: RecipeSchema,
+    *,
+    constraints: Any | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
+    conditional_context: ConditionalExecutionContext | None = None,
+) -> tuple[PhysicsConstraintSet | None, EvalSpec, Any]:
+    """Build the resolved spec and run config that ``evaluate`` uses."""
+    active_constraints = _composition_target_constraints(
+        profile,
+        constraints,
+        recipe_patch=patch,
+        campaign=str(_run_options(profile, fidelity)["campaign"]),
+    )
+    spec, run_config = _build_eval_inputs(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile,
+        schema,
+        constraints=active_constraints,
+        cost_parameters=cost_parameters,
+        conditional_context=conditional_context,
+    )
+    return active_constraints, spec, run_config
 
 
 @lru_cache(maxsize=32)
@@ -8228,6 +8362,17 @@ def _cache_trace_payload(
             decided_backend_status=decided_backend_status,
         )
     )
+    # Local import: result_trust is the owner of the stamp rule. Importing it
+    # at module top would couple evaluate's import graph to the store's trust
+    # collector for one transcription step.
+    from simulator.optimize.result_trust import (
+        attach_producer_engine_stamp,
+        producer_engine_stamp_from_execution,
+    )
+
+    producer_stamp = producer_engine_stamp_from_execution(run_execution)
+    if producer_stamp is not None:
+        attach_producer_engine_stamp(payload, producer_stamp)
 
     reduced_real_cache = getattr(run_execution, "reduced_real_cache", None)
     if isinstance(reduced_real_cache, Mapping) and reduced_real_cache:
@@ -8285,6 +8430,15 @@ def _cache_trace_payload(
         payload["high_t_melt_activity_fallback_notice"] = _compact_jsonable(
             high_t_activity_notice
         )
+    carbon_reader = getattr(
+        simulator, "stage0_carbon_allocation_run_notice", None
+    )
+    if callable(carbon_reader):
+        carbon_notice = carbon_reader()
+        if isinstance(carbon_notice, MappingABC) and carbon_notice:
+            payload["stage0_carbon_allocation_notice"] = _compact_jsonable(
+                dict(carbon_notice)
+            )
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",
@@ -8661,8 +8815,9 @@ def _is_backend_unavailable(
 
     The word "unavailable" in a message is not absence — it matches
     ``observable_unavailable``. Consumers key on
-    ``EngineWorkerUnavailable`` / ``BackendUnavailableError`` or on
-    ``reason_code`` / ``backend_status==unavailable``.
+    ``EngineWorkerUnavailable`` / ``BackendUnavailableError`` types or
+    transported type names, ``reason_code``, or
+    ``backend_status==unavailable``.
     """
     seen: set[int] = set()
     stack: list[BaseException | None] = [exc]
@@ -8672,6 +8827,18 @@ def _is_backend_unavailable(
             continue
         seen.add(id(current))
         if isinstance(current, _TYPED_ABSENCE_EXCEPTION_CLASSES):
+            return True
+        if getattr(current, "exc_name", None) in _TYPED_ABSENCE_EXCEPTION_NAMES:
+            return True
+        aborting_type = getattr(
+            getattr(current, "state", None),
+            "aborting_exception_type",
+            None,
+        )
+        if (
+            isinstance(aborting_type, type)
+            and issubclass(aborting_type, _TYPED_ABSENCE_EXCEPTION_CLASSES)
+        ):
             return True
         reason = getattr(current, "reason_code", None)
         if reason in _ABSENCE_REASON_CODES:
@@ -8689,6 +8856,65 @@ def _is_backend_unavailable(
         or getattr(carrier, "backend_failure_reason_code", None)
     )
     return carrier_reason in _ABSENCE_REASON_CODES
+
+
+def _candidate_simulator_failure_detail(
+    exc: BaseException | None,
+) -> str | None:
+    if _candidate_simulator_failure_kind(exc) is None:
+        return None
+    if exc is None:
+        return None
+    remote_name = getattr(exc, "exc_name", None)
+    if remote_name in {"ProposalRejected", "PoisonedHourError"}:
+        return f"{remote_name}: {getattr(exc, 'detail', str(exc))}"
+    return f"{type(exc).__name__}: {exc}"
+
+
+def _candidate_simulator_failure_kind(
+    exc: BaseException | None,
+) -> str | None:
+    if exc is None or _is_backend_unavailable(exc):
+        return None
+
+    if isinstance(exc, ProposalRejected):
+        return (
+            "proposal_rejected"
+            if _is_mixed_origin_overhead_withdrawal(str(exc))
+            else None
+        )
+    if isinstance(exc, PoisonedHourError):
+        state = exc.state
+        if (
+            state.aborting_exception_type is ProposalRejected
+            and _is_mixed_origin_overhead_withdrawal(
+                state.aborting_exception_summary
+            )
+        ):
+            return "poisoned_hour"
+        return None
+
+    remote_name = getattr(exc, "exc_name", None)
+    remote_detail = str(getattr(exc, "detail", str(exc)))
+    if remote_name == "ProposalRejected" and _is_mixed_origin_overhead_withdrawal(
+        remote_detail
+    ):
+        return "proposal_rejected"
+    if (
+        remote_name == "PoisonedHourError"
+        and "ProposalRejected:" in remote_detail
+        and _is_mixed_origin_overhead_withdrawal(remote_detail)
+    ):
+        return "poisoned_hour"
+    return None
+
+
+def _is_mixed_origin_overhead_withdrawal(message: str) -> bool:
+    return re.search(
+        r"partial withdrawal from mixed-origin process\.overhead_gas\."
+        r"[A-Za-z0-9_]+ requires an explicitly amalgamated pool",
+        message,
+    ) is not None
 
 
 def _is_non_finite_payload_message(message: str) -> bool:

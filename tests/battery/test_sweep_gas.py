@@ -177,7 +177,7 @@ def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
     assert gas.components is None and gas.alternatives is None
     assert experiment.pressure_environment.total_pressure_Pa.state.value.point == Decimal("101325")
     assert located.locator.published_page == 816
-    assert located.locator.pdf_page_index == 2
+    assert located.locator.pdf_page_index == 1
     assert located.locator.section == "2. Experimental principle"
     assert "printed P_CO = 1 atm" in located.locator.note
     activity = result.observations["ts1985::ts1985_na2o_table2_X0p40_T1100C"]
@@ -213,7 +213,7 @@ def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
     assert ar.partial_pressure_Pa == State.unknown("not_published")
     assert anchor_experiment.pressure_environment.total_pressure_Pa.state == State.unknown("not_published")
     assert anchor_located.locator.published_page == 817
-    assert anchor_located.locator.pdf_page_index == 3
+    assert anchor_located.locator.pdf_page_index == 2
     assert anchor_located.locator.table == "1"
     round_tripped = experiment_from_plain(to_plain(experiment))
     assert to_plain(round_tripped.pressure_environment.sweep_gas) == to_plain(located)
@@ -320,6 +320,15 @@ def test_model_row_total_pressure_is_not_a_partial_pressure_identity() -> None:
     )
     assert total is None
     assert provenance is None
+
+
+def test_locatorless_printed_pressure_wrapper_migrates_to_identity() -> None:
+    row = {"total_pressure_Pa": {"value": "0.001", "units": "kbar"}}
+    total, provenance = _pressure_total_from_extract(
+        row, row, gas_formula=None, source_text=""
+    )
+    assert total == State.of(Decimal("100000.000"))
+    assert provenance == "identity.total_pressure_Pa=source row total; kbar_to_Pa"
 
 
 def test_ueda_about_chamber_pressure_does_not_inherit_to_knudsen_points(tmp_path) -> None:

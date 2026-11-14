@@ -95,6 +95,7 @@ backpressure; the stored film still holds the complete vector.
 
 from __future__ import annotations
 
+import ast
 import functools
 import math
 from collections.abc import Mapping
@@ -4420,7 +4421,38 @@ def test_hertz_knudsen_sqrt_has_one_owner() -> None:
     owner = (root / "simulator/chemistry/langmuir_knudsen.py").read_text()
     assert "2.0 * math.pi" not in surface
     assert "2.0 * math.pi" not in publisher
-    assert owner.count("math.sqrt(") == 1
+    owner_tree = ast.parse(owner)
+    functions = {
+        node.name: node
+        for node in owner_tree.body
+        if isinstance(node, ast.FunctionDef)
+    }
+    coefficient = functions["hertz_knudsen_k_kg_s_m2_pa"]
+    coefficient_roots = [
+        node
+        for node in ast.walk(coefficient)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "math"
+        and node.func.attr == "sqrt"
+    ]
+    assert len(coefficient_roots) == 1
+    effusion = functions["knudsen_effusion_molar_flux"]
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "hertz_knudsen_k_kg_s_m2_pa"
+        for node in ast.walk(effusion)
+    )
+    assert not any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "math"
+        and node.func.attr == "sqrt"
+        for node in ast.walk(effusion)
+    )
     alpha = 0.37
     molar_mass = 0.055845
     temperature_K = 2100.0

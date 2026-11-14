@@ -35,8 +35,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from engines.builtin.cco_redox_buffer import CCO_SOURCE
-from simulator.chemistry.graphite_c_co import cco_log10_fO2_bar
+from simulator.chemistry.graphite_c_co import carbon_delta_g_co_kj_per_mol_o2
+from simulator.oxygen_buffers import CCO_SOURCE, cco_log10_fO2_bar
 from simulator.silent_zero import (
     CATEGORY_MARK,
     CATEGORY_PROVEN_ZERO,
@@ -44,10 +44,12 @@ from simulator.silent_zero import (
     ZeroBecause,
     make_note,
 )
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET as CELSIUS_TO_KELVIN,
+    GAS_CONSTANT_6SIG as GAS_CONSTANT_J_PER_MOL_K,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
-GAS_CONSTANT_J_PER_MOL_K = 8.31446
-CELSIUS_TO_KELVIN = 273.15
 _PARAMS_PATH = (
     Path(__file__).resolve().parents[2] / "data" / "organics_pyrolysis.yaml"
 )
@@ -57,17 +59,14 @@ REDUCING_SPECIES = ("H2", "CO", "CH4", "H2S")
 CHAR_SPECIES = "C"
 TAR_SPECIES = "organic_tar"
 
-# JANAF-style linear Ellingham intercepts for the two carbon oxidation
-# lines, per mol O2. Used only to query a_C(pO2, T); Boudouard Kp is
-# the sourced Voropaev relation, not these intercepts.
+# JANAF-style linear Ellingham intercepts for carbon oxidation to CO2,
+# per mol O2. Used only to query a_C(pO2, T); Boudouard Kp is the sourced
+# Voropaev relation, not these intercepts. The graphite-to-CO line is owned
+# by graphite_c_co.py.
 #
 # Premise: Chase 1998 NIST-JANAF formation values at 298 K,
 #   ΔHf(CO) = -110.527 kJ/mol, ΔGf(CO) = -137.163 kJ/mol,
 #   ΔHf(CO2) = -393.522 kJ/mol, ΔGf(CO2) = -394.389 kJ/mol.
-# Algebra, 2 C + O2 -> 2 CO (per mol O2):
-#   ΔH = 2*(-110.527) = -221.054 kJ
-#   ΔG_298 = 2*(-137.163) = -274.326 kJ
-#   ΔS = (ΔH - ΔG)/T = 178.77 J/K  =>  0.17877 kJ/K
 # Algebra, C + O2 -> CO2 (per mol O2):
 #   ΔH = -393.522 kJ
 #   ΔG_298 = -394.389 kJ
@@ -76,8 +75,6 @@ TAR_SPECIES = "organic_tar"
 # Sanity: 2C+O2=2CO dG falls with T (unique more-gas-moles line);
 #   at 1000 K, dG_CO ≈ -221.054 - 1000*0.17877 = -399.8 kJ/mol O2
 #   (Richardson–Jeffes ~ -399 kJ). C+O2=CO2 is nearly flat.
-_C_TO_CO_DH_KJ_PER_MOL_O2 = -221.054
-_C_TO_CO_DS_KJ_PER_K_PER_MOL_O2 = 0.17877
 _C_TO_CO2_DH_KJ_PER_MOL_O2 = -393.522
 _C_TO_CO2_DS_KJ_PER_K_PER_MOL_O2 = 0.00291
 
@@ -290,15 +287,6 @@ def boudouard_crossover_K(params: Mapping[str, Any] | None = None) -> float:
     a = abs(_finite(cfg.get("lg_Kp_A"), -9001.0))
     b = _finite(cfg.get("lg_Kp_B"), 9.28)
     return a / b
-
-
-def carbon_delta_g_co_kj_per_mol_o2(temperature_K: float) -> float:
-    """ΔG(2 C + O2 -> 2 CO) per mol O2. Falls with T."""
-    temperature_K = _require_finite(temperature_K, name="temperature_K")
-    return (
-        _C_TO_CO_DH_KJ_PER_MOL_O2
-        - temperature_K * _C_TO_CO_DS_KJ_PER_K_PER_MOL_O2
-    )
 
 
 def carbon_delta_g_co2_kj_per_mol_o2(temperature_K: float) -> float:

@@ -39,8 +39,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -61,7 +61,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -76,18 +76,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -147,6 +146,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p2
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -184,8 +185,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -206,7 +207,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -221,18 +222,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -292,6 +292,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p3
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -329,8 +331,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -351,7 +353,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -366,18 +368,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -437,6 +438,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p4
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -474,8 +477,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -496,7 +499,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -511,18 +514,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -582,6 +584,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p6
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -619,8 +623,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -641,7 +645,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -656,18 +660,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -727,6 +730,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_0p8
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -764,8 +769,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -786,7 +791,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -801,18 +806,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -872,6 +876,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_15_al2o3_na2o_1p0
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -909,8 +915,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -931,7 +937,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -946,18 +952,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -1017,6 +1022,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p4
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -1054,8 +1061,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1076,7 +1083,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1091,18 +1098,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -1162,6 +1168,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p6
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -1199,8 +1207,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1221,7 +1229,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1236,18 +1244,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -1307,6 +1314,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_0p8
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -1344,8 +1353,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1366,7 +1375,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1381,18 +1390,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -1452,6 +1460,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_2_al2o3_na2o_1p0
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -1489,8 +1499,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1511,7 +1521,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1526,18 +1536,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -1597,6 +1606,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -1634,8 +1645,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1656,7 +1667,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1671,18 +1682,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -1742,6 +1752,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p2
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -1779,8 +1791,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1801,7 +1813,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1816,18 +1828,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -1887,6 +1898,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p4
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -1924,8 +1937,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1946,7 +1959,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1961,18 +1974,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -2032,6 +2044,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p5
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -2069,8 +2083,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2091,7 +2105,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2106,18 +2120,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -2177,6 +2190,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p6
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -2214,8 +2229,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2236,7 +2251,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2251,18 +2266,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -2322,6 +2336,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p8
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -2359,8 +2375,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2381,7 +2397,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2396,18 +2412,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -2467,6 +2482,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_0p9
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -2504,8 +2521,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2526,7 +2543,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2541,18 +2558,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -2612,6 +2628,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_3_al2o3_na2o_1p0
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -2649,8 +2667,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2671,7 +2689,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2686,18 +2704,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -2757,6 +2774,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -2794,8 +2813,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2816,7 +2835,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2831,18 +2850,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -2902,6 +2920,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p25
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -2939,8 +2959,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2961,7 +2981,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2976,18 +2996,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -3047,6 +3066,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p375
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -3084,8 +3105,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3106,7 +3127,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3121,18 +3142,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -3192,6 +3212,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p5
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -3229,8 +3251,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3251,7 +3273,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3266,18 +3288,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -3337,6 +3358,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p7
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -3374,8 +3397,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3396,7 +3419,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3411,18 +3434,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -3482,6 +3504,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_0p9
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -3519,8 +3543,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3541,7 +3565,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3556,18 +3580,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -3627,6 +3650,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_4_al2o3_na2o_1p0
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -3664,8 +3689,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3686,7 +3711,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3701,18 +3726,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -3772,6 +3796,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -3809,8 +3835,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3831,7 +3857,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3846,18 +3872,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -3917,6 +3942,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p2
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -3954,8 +3981,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3976,7 +4003,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -3991,18 +4018,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -4062,6 +4088,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p4
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -4099,8 +4127,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4121,7 +4149,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4136,18 +4164,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -4207,6 +4234,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p6
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -4244,8 +4273,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4266,7 +4295,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4281,18 +4310,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -4352,6 +4380,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_0p8
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -4389,8 +4419,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4411,7 +4441,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4426,18 +4456,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -4497,6 +4526,8 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l
 - observation_id: asai-yokokawa-maekawa-1982-na-borate-activity::asai_1982_table_2_b2o3_na2o_9_al2o3_na2o_1p0
   experiment_id: 71cabbce6d4f791f16d0bc7ec184fc99ec3c3cdcf5f8bd284d910de40e3d5150::asai-yokokawa-maekawa-1982-na-borate-activity
   identity:
@@ -4534,8 +4565,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Na2O·2B2O3 reference melt; Table 2 relative partial molar quantities referred
-        to this melt'
+      reason: The printed standard is Na2O in a composition-specific Na2O·2B2O3 reference melt; no typed convention represents
+        a reference melt.
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4556,7 +4587,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: not_published
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -4571,18 +4602,17 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, admission_status, reason, schema_gap,
-      candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
-      uncertainty_confidence, reference_state_as_printed, composition_formula_amounts_as_printed, method_as_printed, method_locator,
-      note'
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason,
+      schema_gap, candidate_quantity_as_printed, composition_mol_basis, composition_mol, relative_delta_G_Na2O_kJ_mol, relative_delta_G_uncertainty_kJ_mol,
+      uncertainty_confidence, composition_formula_amounts_as_printed, method_as_printed, method_locator, note'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'emf_concentration_cell'
-    original_method_class: emf_concentration_cell
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
   admission:
     status: rejected
     reason: reference-melt absolute activity not printed
@@ -4642,3 +4672,5 @@ observations:
         published_page: 1008
         pdf_page_index: 3
         table: '2'
+  provenance:
+    printed_phase: l

@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity
+from simulator.battery.enums import EvidenceClass, Phase, PhaseRole, Quantity
 from simulator.battery.migrate import (
     Migrator,
     fe3_fe2_ratio_from_oxide_wt_pct,
@@ -26,6 +26,36 @@ EXTRACT = ROOT / (
     "kress-carmichael-1991-iron-redox-calibration.yaml"
 )
 SOURCE_ID = "kress-carmichael-1991-iron-redox-calibration"
+TABLE3_QUENCH_TEXT = (
+    "Melts were sampled at high temperature with a Pt loop quenched into ice-water "
+    "before, and after each set."
+)
+TABLE3_QUENCH_CRYSTALS_TEXT = (
+    "Micron-scale quench crystals in many of the Pt-loop samples reduced the precision "
+    "of bulk-composition analyses to about 0.7 wt% absolute."
+)
+TABLE4_METHOD_TEXT = (
+    "In order to account for the effect of Al2O3 contamination in the NAFS and CAFS experiments, and the high iron "
+    "contents considered in the natural compositions, 33 additional Pt-loop drop-quench experiments were "
+    "performed on compositions and conditions spanning those explored in the ultrasonic experiments."
+)
+TABLE4_COMPOSITION_UNKNOWN_REASON = (
+    'Table 4 caption: "Temperatures and compositions for quench experiments (wt%)"; '
+    "no starting/bulk composition is printed for run Q01."
+)
+TABLE4_COMPOSITION_UNKNOWN_NOTE = (
+    'The Table 4 caption states "Temperatures and compositions for quench experiments (wt%)"; '
+    "it does not report a starting/bulk composition for the run."
+)
+TABLE5_COMPOSITION_UNKNOWN_REASON = (
+    'Table 5 caption: "Re-analysis of experiments from Kress and Carmichael (1988) (wt%)"; '
+    "no starting/bulk composition is printed for run B27."
+)
+TABLE5_COMPOSITION_UNKNOWN_NOTE = (
+    'The Table 5 caption states "Re-analysis of experiments from Kress and Carmichael (1988) (wt%)"; '
+    "it does not report a starting/bulk composition for the run."
+)
+TABLE5_QUENCH_UNKNOWN_REASON = "no_run_specific_quench_statement_printed"
 TABLE3_OXIDES = (
     "SiO2",
     "TiO2",
@@ -222,6 +252,218 @@ def _migrated() -> tuple[dict, Migrator]:
     return document, migrator
 
 
+def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
+    target = {
+        observation["observation_id"]: (formula, observation)
+        for formula, body in document["species"].items()
+        for observation in body.get("observations", [])
+        if observation.get("values", {}).get("quantity")
+        == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+        and observation["observation_id"].startswith(("kc91_t3_", "kc91_t4_", "kc91_t5_"))
+    }
+    assert len(target) == 835
+
+    composition_count = 0
+    fo2_count = 0
+    migrated_composition_count = 0
+    migrated_fo2_count = 0
+    migrated_temperature_count = 0
+    for observation_id, (_formula, observation) in target.items():
+        values = observation["values"]
+        assert values["phase_label"] == "melt"
+        assert values["basis"] == "wt_percent"
+        temperature = values["T_C"]
+        if isinstance(temperature, dict):
+            assert temperature.get("value") not in (None, "")
+            assert temperature.get("units") == "°C"
+            assert temperature.get("locator", {}).get("table") == "2"
+        else:
+            assert temperature not in (None, "")
+
+        conditions = observation["point_conditions"]
+        assert "composition" in conditions
+        assert "state" in conditions["composition"]
+        assert conditions["composition"].get("locator")
+        assert "fO2_log" in conditions
+        assert "state" in conditions["fO2_log"]
+        assert conditions["fO2_log"].get("locator")
+        composition_count += conditions["composition"]["state"]["tag"] == "value"
+        fo2_count += conditions["fO2_log"]["state"]["tag"] == "value"
+
+        record = records[f"{SOURCE_ID}::{observation_id}"]
+        assert record.identity.phase_role.is_value
+        assert record.identity.phase_role.value is PhaseRole.MELT
+        assert record.identity.species.phase.is_value
+        assert record.identity.species.phase.value is Phase.L
+        assert record.identity.temperature_K.is_value
+        migrated_temperature_count += record.identity.temperature_K.is_value
+        assert record.point_conditions is not None
+        assert all(condition.locator is not None for condition in record.point_conditions.values())
+        assert record.point_conditions["temperature_K"].state.is_value
+        assert record.point_conditions["composition"].state.is_unknown
+        assert record.point_conditions["fO2_log"].state.is_value or record.point_conditions["fO2_log"].state.is_unknown
+        assert record.identity.composition is None or record.identity.composition.is_unknown
+        migrated_composition_count += bool(
+            record.identity.composition and record.identity.composition.is_value
+        )
+        fo2_state = record.point_conditions["fO2_log"].state
+        assert fo2_state.is_value or fo2_state.is_unknown
+        migrated_fo2_count += fo2_state.is_value
+
+    assert composition_count == 0
+    assert fo2_count == 130
+    assert migrated_composition_count == 0
+    assert migrated_fo2_count == 130
+    assert migrated_temperature_count == 835
+
+    observations = {
+        observation["observation_id"]: observation
+        for _formula, body in document["species"].items()
+        for observation in body.get("observations", [])
+    }
+    initial = observations["kc91_t3_0011_0014_initial_SiO2"]
+    final = observations["kc91_t3_0011_0014_final_SiO2"]
+    assert initial["phase_as_published"] == "glass"
+    assert final["phase_as_published"] == "glass"
+    assert initial["quench_statement"]["text"] == TABLE3_QUENCH_TEXT
+    assert initial["quench_statement"]["locator"]["page"] == 2
+    assert initial["quench_statement"]["locator"]["pdf_page_index"] == 1
+    assert initial["quench_statement"]["locator"]["published_page"] == 83
+    assert initial["quench_statement"]["locator"]["section"] == "Ultrasonic measurements"
+    assert initial["point_conditions"]["composition"]["state"]["tag"] == "unknown"
+    assert "not reused as run composition" in initial["point_conditions"]["composition"]["state"]["reason"]
+    assert initial["point_conditions"]["fO2_log"]["state"]["reason"] == (
+        "fo2_set_by_in_air_not_printed_numerically"
+    )
+    assert initial["point_conditions"]["method_detail_as_printed"]["state"]["value"] == (
+        "Measurements were performed in air, between 945 and 1530 °C, "
+        "at frequencies between 2 and 10 mHz."
+    )
+    air_method_locator = initial["point_conditions"]["method_detail_as_printed"]["locator"]
+    assert air_method_locator["page"] == 2
+    assert air_method_locator["pdf_page_index"] == 1
+    assert air_method_locator["published_page"] == 83
+    assert initial["values"]["T_C"]["value"] == "1260"
+    assert initial["values"]["T_C"]["locator"]["row"] == "0012"
+    assert final["values"]["T_C"]["value"] == "1260"
+    assert final["values"]["T_C"]["locator"]["row"] == "0014"
+
+    expected_table3 = _expected_table3()
+    assert initial["values"]["value_as_published"] == expected_table3[("0011-0014 initial", "SiO2")]
+    assert final["values"]["value_as_published"] == expected_table3[("0011-0014 final", "SiO2")]
+    final_run_composition = final["point_conditions"]["composition"]
+    assert final_run_composition["state"] == {
+        "tag": "unknown",
+        "reason": "input_is_same_run_analysed_melt",
+    }
+    assert final_run_composition["locator"]["row"] == "0011-0014 initial"
+    final_record = records[f"{SOURCE_ID}::kc91_t3_0011_0014_final_SiO2"]
+    assert final_record.identity.composition.is_unknown
+
+    na_final = observations["kc91_t3_171_174_final_MnO"]
+    assert na_final["point_conditions"]["composition"]["state"]["tag"] == "unknown"
+    assert na_final["point_conditions"]["composition"]["state"]["reason"] == (
+        "input_is_same_run_analysed_melt"
+    )
+
+    table4 = observations["kc91_t4_Q01_SiO2"]["point_conditions"]
+    assert table4["composition"]["state"]["tag"] == "unknown"
+    assert table4["composition"]["state"]["reason"] == TABLE4_COMPOSITION_UNKNOWN_REASON
+    assert table4["composition"]["locator"]["note"] == TABLE4_COMPOSITION_UNKNOWN_NOTE
+    assert table4["fO2_log"]["state"]["tag"] == "unknown"
+    assert "neither a numeric fO2 nor a method" in table4["fO2_log"]["state"]["reason"]
+    assert "air" not in table4["fO2_log"]["state"]["reason"].casefold()
+    table4_observation = observations["kc91_t4_Q01_SiO2"]
+    assert table4_observation["quench_statement"]["text"] == TABLE4_METHOD_TEXT
+    assert table4_observation["quench_statement"]["locator"]["page"] == 3
+    assert table4_observation["quench_statement"]["locator"]["pdf_page_index"] == 2
+    assert table4_observation["quench_statement"]["locator"]["published_page"] == 84
+
+    table5_observation = observations["kc91_t5_B27_SiO2"]
+    table5_quench = table5_observation["quench_statement"]
+    assert table5_quench["state"] == {
+        "tag": "unknown",
+        "reason": TABLE5_QUENCH_UNKNOWN_REASON,
+    }
+    assert table5_quench["locator"]["page"] == 4
+    assert table5_quench["locator"]["pdf_page_index"] == 3
+    assert table5_quench["locator"]["published_page"] == 85
+    table5 = table5_observation["point_conditions"]
+    assert table5["composition"]["state"]["tag"] == "unknown"
+    assert table5["composition"]["state"]["reason"] == TABLE5_COMPOSITION_UNKNOWN_REASON
+    assert table5["composition"]["locator"]["note"] == TABLE5_COMPOSITION_UNKNOWN_NOTE
+    assert table5["fO2_log"]["state"]["tag"] == "value"
+    assert table5["fO2_log"]["state"]["value"] == "-0.68"
+    assert table5["fO2_log"]["locator"]["table"] == "5"
+    assert table5["fO2_log"]["locator"]["row"] == "B27"
+    assert records[f"{SOURCE_ID}::kc91_t5_B27_SiO2"].identity.fO2_Pa.is_value
+
+    assemblage_notes = [
+        row
+        for row in document["species"]["SiO2"]["context"]
+        if row.get("type") == "phase_assemblage_evidence"
+    ]
+    assert len(assemblage_notes) == 19
+    assert {row["experiment"] for row in assemblage_notes} == {
+        f"kc91_t3_{run_id}"
+        for run_id in (
+            "0011_0014",
+            "0021_0025",
+            "021_023",
+            "031_036",
+            "041",
+            "051_056",
+            "081_086",
+            "091_0910",
+            "101_107",
+            "111_117",
+            "121_126",
+            "131_137",
+            "141_147",
+            "151_157",
+            "161_167",
+            "171_174",
+            "181_182",
+            "201_206",
+            "211_213",
+        )
+    }
+    for note in assemblage_notes:
+        assert note["values"]["evidence_type"] == "sampled-from-liquid"
+        assert note["values"]["run_products_as_printed"] == TABLE3_QUENCH_CRYSTALS_TEXT
+        assert note["locator"]["page"] == 2
+        assert note["locator"]["pdf_page_index"] == 1
+        assert note["locator"]["published_page"] == 83
+        assert note["locator"]["section"] == "Ultrasonic measurements"
+    assert all(note["experiment"].startswith("kc91_t3_") for note in assemblage_notes)
+
+
+def test_phase_scoring_input_deletions_fail_the_focused_pins() -> None:
+    document = _document()
+    _, migrator = _migrated()
+    records = migrator.result.observations
+    _assert_phase_scoring_inputs(document, records)
+
+    mutations = (
+        lambda doc: doc["species"]["SiO2"]["observations"][0]["values"].pop("phase_label"),
+        lambda doc: doc["species"]["SiO2"]["observations"][1]["point_conditions"].pop("composition"),
+        lambda doc: doc["species"]["SiO2"]["observations"][0]["point_conditions"]["fO2_log"]["state"].pop("reason"),
+        lambda doc: doc["species"]["SiO2"]["observations"][0]["values"]["T_C"].pop("value"),
+        lambda doc: doc["species"]["SiO2"]["context"].pop(
+            next(
+                index
+                for index, row in enumerate(doc["species"]["SiO2"]["context"])
+                if row.get("type") == "phase_assemblage_evidence"
+            )
+        ),
+    )
+    for mutate in mutations:
+        changed = deepcopy(document)
+        mutate(changed)
+        with pytest.raises((AssertionError, KeyError)):
+            _assert_phase_scoring_inputs(changed, records)
+
+
 def test_extract_validates_and_table3_matches_independent_render_grid() -> None:
     document = _document()
     assert validate_extract_document(
@@ -360,19 +602,31 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         if not migrated:
             continue
         if "T_C" in values:
-            expected_temperature = Decimal(values["T_C"]) + Decimal("273.15")
+            raw_temperature = values["T_C"]
+            if isinstance(raw_temperature, dict):
+                expected_temperature = Decimal(raw_temperature["value"]) + Decimal("273.15")
+                assert raw_temperature["locator"]["table"] == "2"
+            else:
+                expected_temperature = Decimal(raw_temperature) + Decimal("273.15")
             assert all(record.identity.temperature_K.value == expected_temperature for record in migrated)
         elif observation.get("locator", {}).get("table") == "3":
-            assert all(record.identity.temperature_K.is_unknown for record in migrated)
+            assert all(record.identity.temperature_K.is_value for record in migrated)
             assert all(
-                record.point_conditions["temperature_K"].state.is_unknown
-                and record.point_conditions["temperature_K"].locator.page == 4
+                record.point_conditions["temperature_K"].state.is_value
+                and record.point_conditions["temperature_K"].locator.page == 3
                 for record in migrated
             )
             assert all(record.identity.total_pressure_Pa.is_not_applicable for record in migrated)
 
         if "quench_statement" in observation:
-            assert observation["quench_statement"]["preservation"] == "not_stated"
+            statement = observation["quench_statement"]
+            if "state" in statement:
+                assert statement["state"] == {
+                    "tag": "unknown",
+                    "reason": TABLE5_QUENCH_UNKNOWN_REASON,
+                }
+            else:
+                assert statement["preservation"] == "not_stated"
 
     quantities = Counter(
         record.identity.quantity.value for record in records.values()
@@ -381,6 +635,7 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION: 835,
         Quantity.FE3_FE2_RATIO: 46,
     }
+    _assert_phase_scoring_inputs(document, records)
     reduced = [
         record
         for key, record in records.items()

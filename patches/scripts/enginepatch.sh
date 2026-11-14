@@ -69,7 +69,7 @@ engine_fallback() {
     # it as the tree loaded by an interpreter that cannot import SulfLiq.
     sulfliq)      echo "$HOME/Repos/sulfliq" ;;
     # MAGEMin is a compiled binary, never importable: check the sibling source
-    # checkout. The live binary is built from a separate tree (see STATUS).
+    # checkout. Studio runtime builds use install-engines.py and the engine lock.
     magemin)      echo "$(dirname "${COMMON_REPO_ROOT:-$REPO_ROOT}")/MAGEMin" ;;
     *)            echo "" ;;
   esac

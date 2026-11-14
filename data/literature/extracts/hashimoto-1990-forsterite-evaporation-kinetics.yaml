@@ -1,0 +1,738 @@
+schema_version: literature_extract.v1
+source_id: hashimoto-1990-forsterite-evaporation-kinetics
+source:
+  citation: >-
+    Hashimoto, A. (1990). Evaporation kinetics of forsterite and implications for
+    the early solar nebula. Nature 347, 53–55.
+  doi: 10.1038/347053a0
+  url: https://doi.org/10.1038/347053a0
+  year: 1990
+extraction:
+  method: >-
+    Transcribed from the independent MinerU and Tesseract machine reads, then
+    checked against 300 dpi renders of PDF pages 1–3. No figure values were
+    digitized. The source has no printed data tables.
+  date: '2026-11-03'
+  worker: w1103cw4-hs90
+review_status: draft
+fidelity_samples:
+  - species: MgO
+    observable: alpha
+    observation_id: hashimoto_1990_mgo_solid_alpha
+    field: alpha_range
+    value: ['0.12', '0.22']
+    locator:
+      page: 1
+      published_page: 53
+      note: Printed solid MgO alpha range; checked against the page render.
+  - species: SiO2
+    observable: alpha
+    observation_id: hashimoto_1990_sio2_solid_alpha
+    field: alpha_range
+    value: ['0.011', '0.015']
+    locator:
+      page: 2
+      published_page: 54
+      note: Printed solid high-cristobalite alpha range; checked against the page render.
+  - species: SiO2
+    observable: alpha
+    observation_id: hashimoto_1990_sio2_liquid_alpha
+    field: alpha_range
+    value: ['0.038', '0.048']
+    locator:
+      page: 2
+      published_page: 54
+      note: Printed liquid silica alpha range; checked against the page render.
+  - species: Mg2SiO4
+    observable: alpha
+    observation_id: hashimoto_1990_forsterite_solid_alpha
+    field: alpha_range
+    value: ['0.09', '0.16']
+    locator:
+      page: 3
+      published_page: 55
+      note: Printed solid-forsterite alpha range; checked against the page render.
+  - species: Mg2SiO4
+    observable: alpha
+    observation_id: hashimoto_1990_forsterite_solid_sio2_mg_o_alpha
+    field: alpha_range
+    value: ['0.4', '0.6']
+    locator:
+      page: 3
+      published_page: 55
+      note: Alternate-vapour-species solid-forsterite alpha range; checked against the page render.
+  - path: species.SiO2.observations[hashimoto_1990_forsterite_residue_glass_sio2].values.points[0].SiO2_wt_pct
+    value: '65'
+    locator:
+      page: 3
+      published_page: 55
+      note: Printed approximate SiO2 content of the residue glass; checked against the page render.
+  - species: MgO
+    observation_id: hashimoto_1990_mgo_fig1_fluxes
+    field: series_as_printed
+    value:
+      - 'J_v,s: free evaporation rate from solid MgO'
+      - 'J_e,s: theoretical maximum rate for Mg species'
+      - 'J_e-,s: theoretical rate for the specific MgO gas mechanism'
+    locator:
+      page: 2
+      published_page: 54
+      figure: '1'
+      note: Figure 1 caption and panel labels; no plotted values digitized.
+  - species: SiO2
+    observation_id: hashimoto_1990_sio2_fig1_fluxes
+    field: series_as_printed
+    value:
+      - 'J_v,s: free evaporation rate from solid silica'
+      - 'J_v,l: free evaporation rate from liquid silica'
+      - 'J_e,s and J_e,l: theoretical maximum rates for Si-bearing gases'
+      - 'J_e-,s and J_e-,l: rates for the specific SiO2(g) mechanism'
+    locator:
+      page: 2
+      published_page: 54
+      figure: '1'
+      note: Figure 1 caption and panel labels; no plotted values digitized.
+  - species: Mg2SiO4
+    observation_id: hashimoto_1990_forsterite_fig1_fluxes
+    field: series_as_printed
+    value:
+      - 'J_v,s and J_v,l: free evaporation rates from solid and liquid forsterite'
+      - 'J_e,s and J_e,l: theoretical maximum rates for equilibrium vapour species'
+      - 'J_e-,s and J_e-,l: rates for the specified MgO and SiO2 vapour mechanism'
+    locator:
+      page: 2
+      published_page: 54
+      figure: '1'
+      note: Figure 1 caption and panel labels; no plotted values digitized.
+species:
+  MgO:
+    observations:
+      - observation_id: hashimoto_1990_mgo_solid_alpha
+        type: alpha
+        phase: cr
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['1873.15', '2173.15']
+        locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 53
+          section: Results and discussion
+          note: Alpha for solid MgO at the printed 1600–1900 °C range.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_direct
+          alpha_range: ['0.12', '0.22']
+          alpha_range_as_printed: '0.12–0.22'
+          T_range_C_as_printed: ['1600', '1900']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          composition_as_printed: MgO (periclase)
+          oxygen_fugacity_note: >-
+            The source says oxygen fugacity is not experimentally controllable
+            for this non-equilibrium evaporation process.
+          note: Hashimoto's directly reported solid-MgO experimental alpha range.
+    context:
+      - observation_id: hashimoto_1990_mgo_fig1_fluxes
+        type: figure_record
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 54
+          figure: '1'
+          panel: b
+        units: mol Mg gram-atom cm^-2 s^-1; inverse temperature K^-1
+        values:
+          quantity: evaporation_rate
+          method_class: figure_only
+          species_as_printed: MgO
+          axes_as_printed:
+            x: 1/T (K) × 10^4
+            y: log10 J (Mg gram-atom cm^-2 s^-1)
+          series_as_printed:
+            - 'J_v,s: free evaporation rate from solid MgO'
+            - 'J_e,s: theoretical maximum rate for Mg species'
+            - 'J_e-,s: theoretical rate for the specific MgO gas mechanism'
+          digitisation: deferred; no values read from the figure
+  SiO2:
+    observations:
+      - observation_id: hashimoto_1990_sio2_solid_alpha
+        type: alpha
+        phase: cr
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['1833.15', '1958.15']
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 54
+          section: Results and discussion
+          note: Alpha for solid high cristobalite at the printed 1560–1685 °C range.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_direct
+          alpha_range: ['0.011', '0.015']
+          alpha_range_as_printed: '0.011–0.015'
+          T_range_C_as_printed: ['1560', '1685']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          composition_as_printed: SiO2 (high cristobalite)
+          oxygen_fugacity_note: >-
+            The source says oxygen fugacity is not experimentally controllable
+            for this non-equilibrium evaporation process.
+          note: Hashimoto's directly reported solid-SiO2 experimental alpha range.
+      - observation_id: hashimoto_1990_sio2_liquid_alpha
+        type: alpha
+        phase: l
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['2173.15', '2373.15']
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 54
+          section: Results and discussion
+          note: Alpha for liquid SiO2 at the printed 1900–2100 °C range.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_direct
+          alpha_range: ['0.038', '0.048']
+          alpha_range_as_printed: '0.038–0.048'
+          T_range_C_as_printed: ['1900', '2100']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          composition_as_printed: liquid SiO2
+          oxygen_fugacity_note: >-
+            The source says oxygen fugacity is not experimentally controllable
+            for this non-equilibrium evaporation process.
+          note: Hashimoto's directly reported liquid-SiO2 experimental alpha range.
+      - observation_id: hashimoto_1990_sio2_previous_effusion_alpha
+        type: alpha
+        phase: cr
+        regime: knudsen_effusion
+        per: mol_atom
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 54
+          section: Results and discussion
+          note: Earlier solid-SiO2 effusion-cell coefficient quoted by Hashimoto.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: quoted_attributed
+          attribution: Firsova, L. P. & Nesmeyanov (1960), and Nagai et al. (1973), references 11 and 12 as cited by Hashimoto.
+          alpha: '0.01'
+          approximate: true
+          alpha_as_printed: 'approximately 0.01'
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          note: The cited values have a large uncertainty; temperature is not stated.
+      - observation_id: hashimoto_1990_sio2_solid_alternate_gas_alpha
+        type: alpha
+        phase: cr
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['1833.15', '1958.15']
+        T_range_locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 54
+          note: >-
+            Temperature span printed for the same solid-SiO2 experimental
+            series; the alternate Je calculation is reported on published page 55.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: >-
+            Alternate Je based on pure SiO2(g); same solid-SiO2 experiment and
+            temperature span as the coefficient reported on published page 54.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+          alpha_range: ['0.7', '0.9']
+          alpha_range_as_printed: '0.7–0.9'
+          T_range_C_as_printed: ['1560', '1685']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          assumed_vapour_species: SiO2(g)
+          note: >-
+            This is the alternate reaction (3) calculation, not the primary
+            coefficient based on equilibrium vapour proportions.
+      - observation_id: hashimoto_1990_sio2_liquid_alternate_gas_alpha
+        type: alpha
+        phase: l
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['2173.15', '2373.15']
+        T_range_locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 54
+          note: >-
+            Temperature span printed for the same liquid-SiO2 experimental
+            series; the alternate Je calculation is reported on published page 55.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: >-
+            Alternate Je based on pure SiO2(g); same liquid-SiO2 experiment
+            and temperature span as the coefficient reported on published page 54.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_reduced
+          status: typed_refusal
+          admission_status: typed_refusal
+          reason: >-
+            Source caveat on page 55: “impossible, according to the definition
+            of alpha_v”; Hashimoto says the over-unity value may reflect
+            underestimation of the experimental surface area.
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+          alpha: '1.2'
+          alpha_as_printed: '1.2'
+          T_range_C_as_printed: ['1900', '2100']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          assumed_vapour_species: SiO2(g)
+          note: >-
+            Hashimoto notes that alpha above unity conflicts with its stated
+            definition and may reflect underestimated surface area.
+      - observation_id: hashimoto_1990_forsterite_residue_glass_sio2
+        type: composition_series
+        phase: glass
+        regime: langmuir_free_evaporation
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Approximate SiO2 mass percent of glass in the most highly evaporated residues.
+        units: wt%
+        point_conditions:
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              page: 1
+              pdf_page_index: 0
+              published_page: 53
+              note: >-
+                The source says the residual charge cooled quickly by radiation,
+                but does not state that the glass phase was preserved or altered
+                on quench.
+        values:
+          quantity: residue_component_composition
+          method_class: measured_direct
+          components_as_printed: SiO2-rich glass in forsterite residue
+          note: Approximately 65 wt% SiO2 as printed; no specific run temperature is stated.
+          points:
+            - sample: most_highly_evaporated_residues
+              SiO2_wt_pct: '65'
+              approximate: true
+              locator:
+                page: 3
+                pdf_page_index: 2
+                published_page: 55
+                note: Approximately 65 wt% SiO2 in the most highly evaporated residues.
+    context:
+      - observation_id: hashimoto_1990_sio2_fig1_fluxes
+        type: figure_record
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 54
+          figure: '1'
+          panel: a
+        units: mol Si gram-atom cm^-2 s^-1; inverse temperature K^-1
+        values:
+          quantity: evaporation_rate
+          method_class: figure_only
+          species_as_printed: SiO2
+          axes_as_printed:
+            x: 1/T (K) × 10^4
+            y: log10 J (Si gram-atom cm^-2 s^-1)
+          series_as_printed:
+            - 'J_v,s: free evaporation rate from solid silica'
+            - 'J_v,l: free evaporation rate from liquid silica'
+            - 'J_e,s and J_e,l: theoretical maximum rates for Si-bearing gases'
+            - 'J_e-,s and J_e-,l: rates for the specific SiO2(g) mechanism'
+          digitisation: deferred; no values read from the figure
+  Mg2SiO4:
+    observations:
+      - observation_id: hashimoto_1990_forsterite_solid_alpha
+        type: alpha
+        phase: cr
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['1873.15', '2163.15']
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Alpha beneath the melting point at the printed 1600–1890 °C range.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_direct
+          alpha_range: ['0.09', '0.16']
+          alpha_range_as_printed: '0.09–0.16'
+          T_range_C_as_printed: ['1600', '1890']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          components_as_printed: MgO and SiO2 components; equal by stoichiometric evaporation
+          composition_as_printed: Mg2SiO4 (forsterite)
+          note: Hashimoto's directly reported solid-forsterite experimental alpha range, retained in its own family.
+      - observation_id: hashimoto_1990_forsterite_liquid_alpha
+        type: alpha
+        phase: l
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['2163.15', '2323.15']
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Alpha above the melting point at the printed 1890–2050 °C range.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_direct
+          alpha_range: ['0.20', '0.21']
+          alpha_range_as_printed: '0.20–0.21'
+          T_range_C_as_printed: ['1890', '2050']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          components_as_printed: MgO and SiO2 components; equal by almost-stoichiometric evaporation
+          composition_as_printed: Mg2SiO4 (forsterite)
+          note: Hashimoto's directly reported liquid-forsterite experimental alpha range, retained in its own family.
+      - observation_id: hashimoto_1990_forsterite_solid_sio2_mg_o_alpha
+        type: alpha
+        phase: cr
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['1873.15', '2163.15']
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Alternate-vapour-species calculation for solid forsterite, printed over the same temperature range as the primary coefficient.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+          alpha_range: ['0.4', '0.6']
+          alpha_range_as_printed: '0.4–0.6'
+          T_range_C_as_printed: ['1600', '1890']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          assumed_vapour_species: SiO2(g), Mg(g), and O(g)
+          composition_as_printed: Mg2SiO4 (forsterite)
+      - observation_id: hashimoto_1990_forsterite_solid_sio2_mg_o2_alpha
+        type: alpha
+        phase: cr
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['1873.15', '2163.15']
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Alternate-vapour-species calculation using O2(g) for the solid-forsterite runs.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+          alpha_range: ['0.3', '0.5']
+          alpha_range_as_printed: '0.3–0.5'
+          T_range_C_as_printed: ['1600', '1890']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          assumed_vapour_species: SiO2(g), Mg(g), and O2(g)
+          composition_as_printed: Mg2SiO4 (forsterite)
+      - observation_id: hashimoto_1990_forsterite_liquid_sio2_mg_o_alpha
+        type: alpha
+        phase: l
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['2163.15', '2323.15']
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Alternate-vapour-species calculation for liquid forsterite, printed over the same temperature range as the primary coefficient.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+          alpha: '0.8'
+          alpha_as_printed: '0.8'
+          T_range_C_as_printed: ['1890', '2050']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          assumed_vapour_species: SiO2(g), Mg(g), and O(g)
+          composition_as_printed: Mg2SiO4 (forsterite)
+      - observation_id: hashimoto_1990_forsterite_liquid_sio2_mg_o2_alpha
+        type: alpha
+        phase: l
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_range_K: ['2163.15', '2323.15']
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Alternate-vapour-species calculation using O2(g) for the liquid-forsterite runs.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
+          alpha: '0.6'
+          alpha_as_printed: '0.6'
+          T_range_C_as_printed: ['1890', '2050']
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          assumed_vapour_species: SiO2(g), Mg(g), and O2(g)
+          composition_as_printed: Mg2SiO4 (forsterite)
+      - observation_id: hashimoto_1990_forsterite_alpha_1700c_extrapolated
+        type: alpha
+        phase: cr
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_C: '1700'
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Author extrapolation printed at 1700 °C.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series and fitted values used for the extrapolation are not printed numerically.
+          alpha: '0.12'
+          approximate: true
+          alpha_as_printed: approximately 0.12
+          approximation_as_printed: '~'
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          composition_as_printed: Mg2SiO4 (forsterite)
+      - observation_id: hashimoto_1990_forsterite_alpha_1400c_extrapolated
+        type: alpha
+        phase: cr
+        regime: langmuir_free_evaporation
+        per: mol_atom
+        T_C: '1400'
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Author extrapolation printed at 1400 °C.
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series and fitted values used for the extrapolation are not printed numerically.
+          alpha: '0.04'
+          approximate: true
+          alpha_as_printed: approximately 0.04
+          approximation_as_printed: '~'
+          coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
+          composition_as_printed: Mg2SiO4 (forsterite)
+      - observation_id: hashimoto_1990_forsterite_residue_glass_volume_fraction
+        type: composition_series
+        phase: glass
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Approximate glass abundance in the most highly evaporated forsterite residues.
+        units: vol%
+        point_conditions:
+          quench_state:
+            state:
+              tag: value
+              value: not_stated
+            locator:
+              page: 1
+              pdf_page_index: 0
+              published_page: 53
+              note: >-
+                The source says the residual charge cooled quickly by radiation,
+                but does not state that the glass phase was preserved or altered
+                on quench.
+        values:
+          quantity: forsterite_residue_glass_volume_fraction
+          status: typed_refusal
+          admission_status: typed_refusal
+          reason: schema_gap_phase_volume_fraction
+          method_class: measured_direct
+          schema_gap: >-
+            Printed residue amount is approximately 5 vol% glass, a phase volume
+            fraction. No exact quantity token represents this measurement:
+            simulator/battery/enums.py::Quantity has no phase volume fraction;
+            tools/validate_literature_extracts.py::OBSERVATION_TYPES has no
+            phase-volume-fraction observation type;
+            simulator/battery/migrate.py::QUANTITY_ALIASES and
+            simulator/battery/migrate.py::TYPE_QUANTITY provide no exact mapping.
+            simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+            describes an oxide component's composition, not a phase abundance.
+            simulator/battery/enums.py::PHASE_BASIS_TOKENS has no volume-fraction
+            basis; simulator/battery/enums.py::PhaseRole.GLASS names the glass
+            role but does not type a phase amount.
+          candidate_tokens:
+            - residue_component_composition
+            - mass_loss_fraction
+            - yield_fraction
+          value_as_printed: '~5 vol%'
+          approximation_as_printed: '~'
+          phase_as_printed: SiO2-rich glass in the forsterite residue
+          quench_state_as_printed: not_stated
+    context:
+      - observation_id: hashimoto_1990_forsterite_residue_stoichiometry
+        type: characterization
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 55
+          section: Results and discussion
+          note: Source reports the residue stoichiometry by condensed-phase state.
+        units: composition as described by the source
+        values:
+          quantity: residue_stoichiometry_as_printed
+          solid_state_as_printed: stoichiometric evaporation at experimental temperatures
+          solid_T_range_C_as_printed: ['1600', '1800']
+          molten_state_as_printed: almost stoichiometric evaporation
+          molten_temperature_as_printed: not stated with this residue-composition statement
+          note: >-
+            The author separately describes the most highly evaporated residues
+            as containing approximately 5 vol% SiO2-rich glass with approximately
+            65 wt% SiO2; those numeric composition statements are stored as
+            observations.
+      - observation_id: hashimoto_1990_forsterite_fig1_fluxes
+        type: figure_record
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 54
+          figure: '1'
+          panel: c
+        units: mol Si gram-atom cm^-2 s^-1; inverse temperature K^-1
+        values:
+          quantity: evaporation_rate
+          method_class: figure_only
+          species_as_printed: Mg2SiO4
+          axes_as_printed:
+            x: 1/T (K) × 10^4
+            y: log10 J (Si gram-atom cm^-2 s^-1)
+          series_as_printed:
+            - 'J_v,s and J_v,l: free evaporation rates from solid and liquid forsterite'
+            - 'J_e,s and J_e,l: theoretical maximum rates for equilibrium vapour species'
+            - 'J_e-,s and J_e-,l: rates for the specified MgO and SiO2 vapour mechanism'
+          digitisation: deferred; no values read from the figure

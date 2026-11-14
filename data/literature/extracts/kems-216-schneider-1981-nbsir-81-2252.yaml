@@ -1,0 +1,1586 @@
+schema_version: literature_extract.v1
+source_id: kems-216-schneider-1981-nbsir-81-2252
+source:
+  citation: Schneider, S. J. (project manager) (1981), MHD Materials—Seed/Slag Interactions and Effects,
+    Quarterly Progress Report, October 1–December 31, 1980, NBSIR 81-2252 (KCAS-VP-4).
+  year: 1981
+  corpus_asset: raw/kems-216-schneider-1981-nbsir-81-2252/kems-216-schneider-1981-nbsir-81-2252.pdf
+  sha256: 4287a212782666a8b827307c19de6d2311dda611ba8480b5df07895adfaaff68
+extraction:
+  method: All 26 pages originally rendered at 250 dpi; fix round 1 independently rechecked every page using fresh 220 dpi renders. Tables 1–3 and the conductivity
+    Table I were manually transcribed from page images; all printed numerical cells checked digit by digit.
+    Figures were not digitized.
+  date: '2026-10-05'
+  worker: codex
+  review_status: draft
+fidelity_samples:
+- species: K
+  observation_id: schneider_1980_table1_transcription
+  field: sample_row
+  value:
+    sample_id_as_printed: KCAS-VP-4
+    starting_K2O_wt_pct: 19.9
+    starting_CaO_wt_pct: 21.6
+    starting_Al2O3_wt_pct: 21.6
+    starting_SiO2_wt_pct: 37.0
+    final_K2O_wt_pct: 7.1
+    final_CaO_wt_pct: 25.0
+    final_Al2O3_wt_pct: 25.0
+    final_SiO2_wt_pct: 42.9
+  locator:
+    page: 7
+    published_page: 3
+    pdf_page_index: 6
+    section: Vaporization Studies
+    table: '1'
+    note: KCAS-VP-4 starting oxide composition row
+- species: K
+  observation_id: schneider_1980_table2_transcription
+  field: sample_row
+  value:
+    component_as_printed: SiO2
+    rosebud_ash_wt_pct: 40.34
+    simplified_composition_wt_pct: 34.32
+    KAlSiO4_66.9_Ca2SiO4_33.1_wt_pct: 36.96
+  locator:
+    page: 8
+    published_page: 4
+    pdf_page_index: 7
+    section: Vaporization Studies
+    table: '2'
+    note: SiO2 row, Rosebud Ash column
+- species: K
+  observation_id: schneider_1980_table3_transcription
+  field: sample_row
+  value:
+    reaction_number_as_printed: 1
+    starting_materials_as_printed: γ-C2S, CA6, (Lc)
+    run_temperature_C: 1250
+    duration_hr: 64
+    products_as_printed: β-C2S, Ge, CA6
+  locator:
+    page: 11
+    published_page: 7
+    pdf_page_index: 10
+    section: Phase Equilibrium Studies
+    table: '3'
+    note: Tie-line reaction 1, second listed temperature
+- species: K
+  observation_id: schneider_1980_table4_transcription
+  field: sample_row
+  value:
+    element_as_printed: Si
+    mass_fraction_wt_pct: 20.3
+  locator:
+    page: 15
+    published_page: 11
+    pdf_page_index: 14
+    section: Electrical Conductivity and Polarization
+    table: I
+    note: Si content, Rosebud slag
+benches:
+- id: schneider-1980-plante-kcas-kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion, modulated beam mass spectrometric method
+    locator:
+      page: 6
+      published_page: 2
+      pdf_page_index: 5
+      section: Vaporization Studies
+      note: All vapor pressure measurements are described as using this method.
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 6
+      published_page: 2
+      pdf_page_index: 5
+      section: Vaporization Studies
+      note: The method is named; cell material and liner are not stated in this report.
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: Ionization energy is not stated in the KEMS description or fit discussion.
+    ionization_cross_sections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: Ionization cross sections are not stated in this report.
+    cross_section_source:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: No source for ionization cross sections is stated.
+    multiplier_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: Multiplier correction is not stated.
+    isotope_correction:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: Isotope correction is not stated.
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: The temperature sensor is not identified in this report.
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: Temperature measurement uncertainty is not stated.
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: Temperature calibration method is not stated.
+    uncertainty:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: Temperature calibration uncertainty is not stated.
+experiments:
+- experiment_id: schneider-1980-kcas-vaporization-series
+  bench_id: schneider-1980-plante-kcas-kems
+  method: knudsen_effusion
+  locator:
+    page: 6
+    published_page: 2
+    pdf_page_index: 5
+    section: Vaporization Studies
+    note: Vapor-pressure measurements on KCAS-VP-1 through KCAS-VP-4 used Knudsen-effusion, modulated-beam
+      mass spectrometry.
+  sample:
+    pretreatment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: No additional preparation protocol or purity stated; Table 1 gives starting mineral mixtures
+          and starting/final oxide compositions.
+    characterization:
+      state:
+        tag: value
+        value: K2O-CaO-Al2O3-SiO2 mixtures; Table 1 gives four starting mineral assemblages and starting
+          and final oxide wt% compositions.
+      locator:
+        page: 7
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Multiple temperatures are plotted in Figure 1; numerical values are not tabulated and were not digitized.
+      locator:
+        page: 13
+        published_page: 9
+        pdf_page_index: 12
+        section: Vaporization Studies
+        figure: '1'
+        note: Figure-only temperature-dependent vapor-pressure curve; no single experiment temperature is printed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: Background chamber pressure is not reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: No sweep gas stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: The method is named, but no flow-regime classification is stated.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 6
+          published_page: 2
+          pdf_page_index: 5
+          section: Vaporization Studies
+          note: Orifice diameter is not stated in this report.
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 6
+          published_page: 2
+          pdf_page_index: 5
+          section: Vaporization Studies
+          note: Orifice channel length is not stated in this report.
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 6
+          published_page: 2
+          pdf_page_index: 5
+          section: Vaporization Studies
+          note: The report names Knudsen-effusion modulated-beam mass spectrometry but gives no calibration
+            or intensity-to-pressure conversion procedure.
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 6
+          published_page: 2
+          pdf_page_index: 5
+          section: Vaporization Studies
+          note: No calibration substance is identified in this report.
+      intensity_to_pressure_relation:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 6
+          published_page: 2
+          pdf_page_index: 5
+          section: Vaporization Studies
+          note: No equation or calibration relation converting intensities to pressures is given in this
+            report.
+- experiment_id: schneider-1980-subsolidus-tie-line-series
+  method: quench_equilibration
+  locator:
+    page: 9
+    published_page: 5
+    pdf_page_index: 8
+    section: Phase Equilibrium Studies
+    note: Equal weights of four solids were sealed in Pt capsules, heated, quenched, examined by X-ray,
+      reground, resealed and reheated.
+  sample:
+    composition:
+      state:
+        tag: value
+        value: equal weights of four solid starting materials per proposed four-phase volume in the 1000-hour equilibration series
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: 1000-Hour Subsolidus Equilibrations
+    pretreatment:
+      state:
+        tag: value
+        value: sealed Pt capsules; quenched, examined by X-ray, reground, resealed, reheated
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: 1000-Hour Subsolidus Equilibrations
+  other_facts:
+  - name: atmosphere
+    unit: as printed
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: 1000-Hour Subsolidus Equilibrations
+        note: No atmosphere stated.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: platinum capsules
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: 1000-Hour Subsolidus Equilibrations
+        note: The source says equal weights of the four solids were sealed in Pt capsules, heated, quenched,
+          X-rayed, reground and reheated.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: table 3 assigns two temperatures/durations per reaction and no single series temperature
+      locator:
+        page: 11
+        published_page: 7
+        pdf_page_index: 10
+        section: Solid-State Tie Line Reactions
+        table: '3'
+        note: Run temperatures and durations by reaction are retained as table 3 context rows.
+species:
+  K:
+    context:
+    - observation_id: schneider_1980_table1_transcription
+      type: table_transcription
+      locator:
+        page: 7
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        table: '1'
+      units: as printed
+      values:
+        section: Thermochemistry of Seed and Slag — Vaporization Studies
+        table_number: '1'
+        title_as_printed: Mineral Constituents and Composition of Vaporization Samples
+        table_path: tables/kems-216-schneider-1981-nbsir-81-2252/t1.csv
+        provenance_path: tables/kems-216-schneider-1981-nbsir-81-2252/t1.provenance.yaml
+        row_count: 4
+        numeric_cells: 44
+        sample_row:
+          sample_id_as_printed: KCAS-VP-4
+          starting_K2O_wt_pct: 19.9
+          starting_CaO_wt_pct: 21.6
+          starting_Al2O3_wt_pct: 21.6
+          starting_SiO2_wt_pct: 37.0
+          final_K2O_wt_pct: 7.1
+          final_CaO_wt_pct: 25.0
+          final_Al2O3_wt_pct: 25.0
+          final_SiO2_wt_pct: 42.9
+        evidence_by_column:
+          mineral_constituents: starting mineral mixture recipe, this report
+          starting_oxide_composition: initial composition of the constructed mineral mixtures, this report
+          final_oxide_composition:
+            method_class: measured_tabulated
+            attribution: final experimental composition, this report
+    - observation_id: schneider_1980_table2_transcription
+      type: table_transcription
+      locator:
+        page: 8
+        published_page: 4
+        pdf_page_index: 7
+        section: Vaporization Studies
+        table: '2'
+      units: as printed
+      values:
+        section: Thermochemistry of Seed and Slag — Vaporization Studies
+        table_number: '2'
+        title_as_printed: Synthetic Composition Approximating Rosebud Ash with 20 wt% K2O
+        table_path: tables/kems-216-schneider-1981-nbsir-81-2252/t2.csv
+        provenance_path: tables/kems-216-schneider-1981-nbsir-81-2252/t2.provenance.yaml
+        row_count: 8
+        numeric_cells: 16
+        sample_row:
+          component_as_printed: SiO2
+          rosebud_ash_wt_pct: 40.34
+          simplified_composition_wt_pct: 34.32
+          KAlSiO4_66.9_Ca2SiO4_33.1_wt_pct: 36.96
+        evidence_by_column:
+          rosebud_ash_wt_pct:
+            method_class: quoted_attributed
+            attribution: R. Pollina and R. Larsen, ANL-77-21 (1977), Table 2 footnote (a)
+          simplified_composition_wt_pct: constructed/computed composition, this report
+          KAlSiO4_66.9_Ca2SiO4_33.1_wt_pct: constructed/computed mineral-mixture composition, this report
+    - observation_id: schneider_1980_table3_transcription
+      type: table_transcription
+      locator:
+        page: 11
+        published_page: 7
+        pdf_page_index: 10
+        section: Phase Equilibrium Studies
+        table: '3'
+      units: as printed
+      values:
+        section: Phase Equilibrium Studies — Solid-State Tie Line Reactions Using Unstable Combinations of
+          Phases
+        table_number: '3'
+        title_as_printed: Tie Line Reactions
+        table_path: tables/kems-216-schneider-1981-nbsir-81-2252/t3.csv
+        provenance_path: tables/kems-216-schneider-1981-nbsir-81-2252/t3.provenance.yaml
+        row_count: 18
+        numeric_cells: 36
+        sample_row:
+          reaction_number_as_printed: 1
+          starting_materials_as_printed: γ-C2S, CA6, (Lc)
+          run_temperature_C: 1250
+          duration_hr: 64
+          products_as_printed: β-C2S, Ge, CA6
+        method_class: measured_tabulated
+        abbreviations_as_printed:
+          C2S: Ca2SiO4
+          Lc: KAlSi2O6
+          CA6: CaAl12O19
+          Ge: Ca2Al2SiO7
+          Cor: Al2O3
+          Ksp: KAlSi3O8
+          Kls: KAlSiO4
+          Ra: Ca3Si2O7 = C3S2
+          Mu: 3Al2O3·2SiO2
+          An: CaAl2Si2O8
+          Wo: CaSiO3
+        parentheses_as_printed: phase barely detectable by x-ray diffraction
+    - observation_id: schneider_1980_table4_transcription
+      type: table_transcription
+      locator:
+        page: 15
+        published_page: 11
+        pdf_page_index: 14
+        section: Slag Conductivity
+        table: I
+      units: as printed
+      values:
+        section: Electrical Conductivity and Polarization — Slag Conductivity
+        table_number: I
+        title_as_printed: Analysis of Rosebud slag (independent laboratory)
+        table_path: tables/kems-216-schneider-1981-nbsir-81-2252/t4.csv
+        provenance_path: tables/kems-216-schneider-1981-nbsir-81-2252/t4.provenance.yaml
+        row_count: 7
+        numeric_cells: 7
+        sample_row:
+          element_as_printed: Si
+          mass_fraction_wt_pct: 20.3
+        attribution: independent laboratory; named laboratory not printed
+        method_class: quoted_attributed
+    - observation_id: schneider_1980_k-pressure-fit
+      type: model_context
+      locator:
+        page: 7
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+      units: as printed
+      values:
+        quantity: potassium partial-pressure regression relation
+        equation_as_printed: log P_K = 3.492 - 16153/T + .0903(wt% K2O) + .0351(wt% CaO)
+        method_class: model_derived
+        model_scope: fit to measurements in KCAS-VP-2 and KCAS-VP-3 at fixed temperature
+        stated_fit_standard_deviation_percent: 30
+        stated_maximum_individual_deviation_percent: 100
+        predicted_pressure_change_percent_per_1_wt_pct_K2O: 20
+        predicted_pressure_change_percent_per_1_wt_pct_CaO: 8
+    - observation_id: schneider_1980_figure1_k_pressure
+      type: figure_only
+      locator:
+        page: 13
+        published_page: 9
+        pdf_page_index: 12
+        section: Vaporization Studies
+        figure: '1'
+      units: as printed
+      values:
+        quantity: selected potassium vapor pressures above KCAS-VP-4 versus 10^4/T; line from KCAS-VP-1 data
+        figure_only: true
+        method_class: figure_only
+        digitized: false
+        axes_as_printed: potassium pressure (atm) versus 10^4/T (K^-1); printed x-axis numerical labels 6.0
+          and 7.0, y-axis labels 10^-6, 10^-5 and 10^-4 atm; no points digitized
+        legend_as_printed:
+        - K2O 17.8–16.5 wt%
+        - K2O 14.9–13.8 wt%
+        - K2O 10.0–7.1 wt%
+        - KCAS-VP-1 reference line at 14.8–12.4 wt% K2O
+        directional_note: The printed curve declines in potassium pressure with increasing 10^4/T; no points
+          digitized.
+        point_ticks_as_printed: Upward or downward ticks on points indicate whether temperatures were increased
+          or decreased during the experimental sequence.
+    - observation_id: schneider_1980_figure2_equilibrium_diagram
+      type: figure_only
+      locator:
+        page: 14
+        published_page: 10
+        pdf_page_index: 13
+        section: Phase Equilibrium Studies
+        figure: '2'
+      units: as printed
+      values:
+        quantity: proposed CaO-K2O-Al2O3-SiO2 phase relations
+        figure_only: true
+        method_class: figure_only
+        digitized: false
+        figure_caption_as_printed: Subsolidus relations for synthetic CaO-K2O-Al2O3-SiO2 slags, as previously
+          postulated in the April–June (1978) Quarterly Report; refer to Table 3 for abbreviations.
+        composition_basis_as_printed: MOL%
+    - observation_id: schneider_1980_conductivity_figure1
+      type: figure_only
+      locator:
+        page: 19
+        published_page: 15
+        pdf_page_index: 18
+        section: Electrical Conductivity and Polarization
+        figure: '1'
+      units: as printed
+      values:
+        quantity: electrical conductivity versus temperature for slags with differing iron contents
+        figure_only: true
+        method_class: figure_only
+        digitized: false
+        axes_as_printed: conductivity (ohm-cm)^-1 versus 10^4/T (K); four labeled curves A–D; no points digitized
+        legend_as_printed: 'A, B, C: Eastern Bow, NH slags with 29, 20 and 14 wt% Fe and no added K; D: Western
+          Rosebud slag, 4% Fe, with 20% K2SO4 added.'
+        measurement_as_printed: four-probe DC or AC (40 Hz) conductivity in air
+        base_composition_reference_as_printed: 'Eastern slags: QR April–June 1979, page 33; Western slag:
+          Table 1, this report'
+    - observation_id: schneider_1980_conductivity_figure2
+      type: figure_only
+      locator:
+        page: 20
+        published_page: 16
+        pdf_page_index: 19
+        section: Electrical Conductivity and Polarization
+        figure: '2'
+      units: as printed
+      values:
+        quantity: DC and 40 Hz AC conductivity of yttria-stabilized zirconia in air versus temperature
+        figure_only: true
+        method_class: figure_only
+        digitized: false
+        axes_as_printed: Conductivity (ohm-cm)^-1 against 10^4/T(K); printed temperature labels span 727–1727
+          °C; no points digitized.
+        figure_caption_as_printed: Four-probe DC and AC (40 Hz) conductivity versus temperature of high-density
+          yttria-stabilized zirconia measured in air.
+        temperature_labels_C_as_printed:
+        - 1727
+        - 1545
+        - 1393
+        - 1265
+        - 1155
+        - 1060
+        - 977
+        - 903
+        - 838
+        - 779
+        - 727
+    - observation_id: schneider_1980_conductivity_figure3
+      type: figure_only
+      locator:
+        page: 21
+        published_page: 17
+        pdf_page_index: 20
+        section: Electrical Conductivity and Polarization
+        figure: '3'
+      units: as printed
+      values:
+        quantity: current-contact polarization comparison for yttria-stabilized zirconia at low oxygen pressure
+          versus temperature
+        figure_only: true
+        method_class: figure_only
+        digitized: false
+        axes_as_printed: f12(V) plotted against TEMP (°C); no points digitized.
+        figure_caption_as_printed: Plot showing polarization effect on current-carrying electrodes in yttria-stabilized
+          zirconia when an electric field is applied in an atmosphere of 1.2 ppm O2 in N2; this conflicts
+          with the prose value 1.2 × 10^-5 ppm.
+        equation_as_printed: f12(V) = (V12/d12)/(V23/d23) − 1
+        definition_as_printed: V12 and V23 are voltages measured between probes 1 and 2 and between probes
+          2 and 3 respectively; d12 and d23 are the distances between those probes.
+    - observation_id: schneider_1980_corrosion_figures
+      type: figure_only
+      locator:
+        page: 25
+        published_page: 21
+        pdf_page_index: 24
+        section: Corrosion of Downstream MHD Components
+        figure: 1–2
+        note: Figures 1 and 2 are on published page 21; Figure 3 is on published page 22.
+      units: as printed
+      values:
+        quantity: 316 stainless-steel sections and SEM micrograph after seeded hot-gas exposure
+        figure_only: true
+        method_class: figure_only
+        digitized: false
+        figures_as_printed:
+        - 'Fig. 1: Type 316 tubing after oxygen-rich seeded hot gas exposure; wall 500 °C; 6×.'
+        - 'Fig. 2: Type 316 tubing after fuel-rich seeded hot gas exposure; wall 500 °C; 6×.'
+    - observation_id: schneider_1980_summary_pressure_trend
+      type: statement
+      locator:
+        page: 5
+        published_page: 1
+        pdf_page_index: 4
+        section: Summary of Progress to Date
+      units: as printed
+      values:
+        printed_qualification: New K pressure data on a Western-type slag initially containing 20 wt%
+          K2O are presented. The decrease in K pressure with decreasing K2O composition is less than in
+          previous measurements. Analysis of previous data shows a decrease in K pressure of 20 percent
+          for unit decrease in wt% K2O and an increase in K pressure of 8 percent for unit increase in
+          wt% CaO.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_activity_trend
+      type: statement
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+      units: as printed
+      values:
+        printed_qualification: Previous measurements have shown within the limited composition ranges
+          studied that the K2O activity as determined from measurements of the K and O2 pressures is insensitive
+          to the individual Al2O3 and SiO2 concentrations, but is decreased as the sum of the Al2O3 and
+          SiO2 concentrations is increased, increased by an increasing CaO concentration and increased
+          by an increasing K2O concentration.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_vp4_comparison
+      type: statement
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+      units: as printed
+      values:
+        printed_qualification: Qualitatively, the agreement is satisfactory but the decrease in K pressure
+          with K2O composition is not as great as was observed in the KCAS-VP-1 experiments. Thus, K pressures
+          shown with a K2O concentration in the 7–10 wt% range are about a factor of 2 greater than those
+          from the KCAS-VP-1 experiment when the condensed phase contains 14.8–12.4 wt% K2O. It does not
+          appear likely that this difference is due to variations in the concentrations of the other constituents
+          in the melt because the CaO concentration is actually greater for the KCAS-VP-1 melt by a few
+          percent while the Al2O3 and SiO2 concentrations vary by only a few percent.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_vp23_fit_comparison
+      type: statement
+      locator:
+        page: 7
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+      units: as printed
+      values:
+        printed_qualification: In the previous report, it was noted that measurements in the KCAS-VP-2
+          and KCAS-VP-3 series appeared to be consistent with each other if the K pressure was dependent
+          at fixed temperature, only on the K2O and CaO concentration.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_subsolidus_limit
+      type: statement
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: Phase Equilibrium Studies
+      units: as printed
+      values:
+        printed_qualification: Unfortunately, 1200–1250 °C appears to be the limit for comprehensive subsolidus
+          studies, and so kinetic factors must be considered in the experimental approach.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_equilibration_progress
+      type: statement
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: 1000-Hour Subsolidus Equilibrations
+      units: as printed
+      values:
+        printed_qualification: So far no shifts have been detected after 764 hours. However, evidence
+          has been found for potassium-deficient KAlSi2O6 (ss) showing no change in unit cell parameters.
+          The 1000-hour equilibrations are approximately 90 percent complete at the time of writing.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_tieline_qualifications
+      type: statement
+      locator:
+        page: 12
+        published_page: 8
+        pdf_page_index: 11
+        section: Solid-State Tie Line Reactions
+      units: as printed
+      values:
+        printed_qualification: Reactions 1, 2, 3, 4, 6 and 7 have unquestionably gone to the right. The
+          existence of extra phases among the products of reactions 1, 6 and 7 is probably a matter of
+          incomplete reaction. In the case of reaction 5, the mullite peak detectable in the starting
+          material disappears with concomitant increase in intensity of the leucite lines. This observation
+          has been made in numerous other experiments, and all results taken together constitute very
+          strong evidence for extension of a leucite (ss) field toward potassium-deficient compositions.
+          However, the long-term equilibrations discussed above indicate that the Kls + An tie line is
+          probably stable; therefore, the existence of Lc (ss) + Ge at the expense of Kls + An in tie
+          line reaction 5 is possibly a kinetic phenomenon. Alternatively, there may be a Kls (ss) field
+          such that Kls coexisting with An is potassium deficient.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_tieline_exclusions
+      type: statement
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions
+      units: as printed
+      values:
+        printed_qualification: Tie line reactions 8 and 9 were not investigated because of the current unavailability
+          of KAlSi3O8 starting materials. Study of tie line reactions 10 and 11 was not successful due to
+          the low-melting nature of these compositions.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_rosebud_comparison
+      type: statement
+      locator:
+        page: 16
+        published_page: 12
+        pdf_page_index: 15
+        section: Slag Conductivity
+      units: as printed
+      values:
+        printed_qualification: This slag is considerably lower in iron content than the Eastern slag measured
+          previously, but has a larger amount of calcium. 20 w/o K2SO4 has been added to the base slag. Phase
+          separation during potassium addition rejects some potassium, so final material contains less potassium
+          than the amount of K2SO4 added would indicate. Rejection is enhanced with slags containing large
+          amounts of calcium. Final potassium analysis is planned.
+        method_class: quoted_unattributed
+        attribution: this report
+        previous_reports_as_printed: QR July–Sept. and October, 1973
+    - observation_id: schneider_1980_conductivity_temperature_dependence
+      type: statement
+      locator:
+        page: 16
+        published_page: 12
+        pdf_page_index: 15
+        section: Slag Conductivity
+      units: as printed
+      values:
+        printed_qualification: The dividing line in this material below which an equilibrated value (Δσ/Δt
+          < 50 ppm/hour) of conductivity cannot be obtained easily is near 1000 °C. Therefore, it seems
+          prudent to discuss only the data above 1000 °C as characteristic of the material at a given
+          temperature. Data at lower temperatures is dependent on the past treatment and cannot be treated
+          as characteristic of the material without qualifications.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_eastern_rosebud_comparison
+      type: statement
+      locator:
+        page: 16
+        published_page: 12
+        pdf_page_index: 15
+        section: Slag Conductivity
+      units: as printed
+      values:
+        printed_qualification: The slope at the highest temperatures gives an activation energy of approximately
+          1.8 eV while the steeper slope at lower temperatures varies giving an apparent activation energy
+          up to near 4.0 eV. ... In the Rosebud slag, the high temperature slope again appears to be the
+          same as that for the Eastern slag but the magnitude of the conductivity in that temperature
+          range is reduced by approximately a factor of three.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_zro2_air_low_po2
+      type: statement
+      locator:
+        page: 17
+        published_page: 13
+        pdf_page_index: 16
+        section: ZrO2 Conductivity
+        note: Prose value; Figure 3 caption gives a conflicting 1.2 ppm.
+      units: as printed
+      values:
+        printed_qualification: The curves are identical as expected and furthermore, the conductivity
+          versus frequency (40 Hz to 40 kHz) plots show no conductivity change with frequency. Similar
+          measurements were made in an atmosphere of 1.2 × 10^-5 ppm O2 in N2 and the bulk conductivity
+          did not change.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_zro2_polarization
+      type: statement
+      locator:
+        page: 18
+        published_page: 14
+        pdf_page_index: 17
+        section: ZrO2 Conductivity
+      units: as printed
+      values:
+        printed_qualification: Oxidation is a less rapid process than reduction in ZrO2 under an ambient partial
+          pressure of oxygen of near one part per million. This causes a polarization effect near the current
+          contacts as the data shows in Figure 3 for the DC measurement. No such effect was observed for those
+          measurements in air.
+        method_class: quoted_unattributed
+        attribution: this report
+        reason: 'source_internally_inconsistent: the earlier prose gives 1.2 × 10^-5 ppm O2 in N2; Figure
+          3 caption gives 1.2 ppm O2 in N2; this discussion says near one part per million.'
+    - observation_id: schneider_1980_corrosion_comparison
+      type: statement
+      locator:
+        page: 22
+        published_page: 18
+        pdf_page_index: 21
+        section: SEM/EDX Analysis of the Metal-Salt Interface
+      units: as printed
+      values:
+        printed_qualification: The surface facing the gas stream was thinner than the deposit on the side
+          portion of the tube (drip zone), and a thin fume deposit was found on the underside of the tube.
+          ... the surface salt deposit is thinner as the wall temperature increases. Also that under fuel
+          rich conditions the deposit is thinner than in the oxygen rich environment.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_corrosion_composition
+      type: statement
+      locator:
+        page: 23
+        published_page: 19
+        pdf_page_index: 22
+        section: SEM/EDX Analysis of the Metal-Salt Interface
+      units: as printed
+      values:
+        printed_qualification: 'However, the bulk of the coating is generally high in potassium (K) with moderate
+          amounts of sulfur (S) found. The corrosion process exhibited in both specimens seem to follow the
+          same general corrosion mechanism as found previously. The cations are found in a general order of
+          mobility where: a) bulk stainless steel, b) higher nickel-high chromium-iron, c) chromium-iron-nickel-potassium,
+          d) chromium-higher iron-potassium, e) iron-potassium, f) high potassium.'
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_corrosion_temperature_comparison
+      type: statement
+      locator:
+        page: 23
+        published_page: 19
+        pdf_page_index: 22
+        section: SEM/EDX Analysis of the Metal-Salt Interface
+      units: as printed
+      values:
+        printed_qualification: At the lower wall temperature of 500 °C, the corrosion process is not as vivid
+          as samples examined at 590 °C (8-6, 9-6) however, the process was observed and noted to be similar
+          in nature as described above.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_corrosion_conclusion
+      type: statement
+      locator:
+        page: 23
+        published_page: 19
+        pdf_page_index: 22
+        section: Conclusion
+      units: as printed
+      values:
+        printed_qualification: As stated previously the variance between fuel rich and oxygen rich environments
+          in the presence of K2CO3 and K2SO4 are minimal. Corrosion of type 316 stainless steel seems to occur
+          readily in both instances. In general, therefore, both systems indicate the same metal cation movement
+          from the bulk stainless steel into the salt deposit.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_numeric_context
+      type: statement
+      locator:
+        page: 5
+        published_page: 1
+        pdf_page_index: 4
+        section: Summary of Progress to Date
+      units: as printed
+      values:
+        numeric_context_as_printed:
+        - 20 wt% K2O initial composition; approx. 4 w/o iron in Rosebud slag compared with approx. 12–16%
+          in typical Eastern slag.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_numeric_context_tie_lines
+      type: statement
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: Phase Equilibrium Studies
+      units: as printed
+      values:
+        numeric_context_as_printed:
+        - 12 crystalline solids and 13 four-phase volumes; 1200 °C for 9 of 13 four-phase volumes and lower
+          temperatures for assemblages containing KAlSi3O8; 1000-hour equilibrations; no shifts after 764
+          hours; approximately 90 percent complete.
+        - Eleven tie lines can be investigated using alternative solid assemblages; the tie line believed
+          stable is on the right of the printed equations.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_numeric_context_conductivity
+      type: statement
+      locator:
+        page: 16
+        published_page: 12
+        pdf_page_index: 15
+        section: Slag Conductivity
+      units: as printed
+      values:
+        numeric_context_as_printed:
+        - 'Rosebud slag: 20 w/o K2SO4 added; electrical properties intended over 500–1500 °C; one week is
+          an example finite measurement-set time; equilibration threshold Δσ/Δt < 50 ppm/hour near 1000 °C;
+          interpret above 1000 °C as characteristic; lower-temperature data depend on prior treatment.'
+        - The Seventh International Conference on MHD Electrical Power Generation was held at MIT, Cambridge,
+          Massachusetts, June 16–20, 1980, session 07. Eastern slag curves with no added potassium show two
+          slopes above 1100 °C; Bow, NH slag as received had 14 w/o iron and added-iron slags also show two-slope
+          regions. The highest-temperature slope gives approximately 1.8 eV activation energy; the steeper
+          lower-temperature slope reaches near 4.0 eV and depends strongly on equilibration time. Rosebud’s
+          high-temperature slope appears the same as Eastern slag but the conductivity magnitude there is
+          reduced by about a factor of three. The report says activation energy is independent of iron content
+          while conductivity magnitude depends on iron content.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_numeric_context_corrosion
+      type: statement
+      locator:
+        page: 22
+        published_page: 18
+        pdf_page_index: 21
+        section: Corrosion of Downstream MHD Components
+      units: as printed
+      values:
+        numeric_context_as_printed:
+        - wall 500 °C; gas 1300 °C; two 316 stainless steel tubes, diameter 12.5 mm, length 250 mm, wall 0.8
+          mm; exposure 4 h excluding heat-up and cool-down; seeding for first 25 min at 10 g/min; seed 20
+          wt% K2SO4 and 80 wt% K2CO3; sample cooled to approximately 40 °C; section sampled 10 mm from tube
+          midpoint.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_numeric_context_coatings
+      type: statement
+      locator:
+        page: 23
+        published_page: 19
+        pdf_page_index: 22
+        section: Clad Materials for Application in Downstream MHD Components
+      units: as printed
+      values:
+        numeric_context_as_printed:
+        - Three arc-plasma-sprayed coatings, NiCrAlY, MgAl2O4 (spinel), and MgO-doped ZrO2, on mild-steel
+          tube AISI 1015; average coating thickness 0.5 mm; short specimens 75 mm long and 0.9 mm wall thickness;
+          long specimens 0.25 m with embedded midpoint Pt/Pt–10%Rh thermocouples for corrosion tests.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_conductivity_method_context
+      type: experiment_context
+      locator:
+        page: 15
+        published_page: 11
+        pdf_page_index: 14
+        section: Slag Conductivity
+      units: as printed
+      values:
+        specimen_as_printed: slag derived from Rosebud-seam coal, Montana
+        method_as_printed: four-probe AC and DC electrical conductivity
+        method_class: measured_direct
+    - observation_id: schneider_1980_corrosion_method_context
+      type: experiment_context
+      locator:
+        page: 22
+        published_page: 18
+        pdf_page_index: 21
+        section: Corrosion of Downstream MHD Components
+      units: as printed
+      values:
+        method_as_printed: 316 stainless steel hot-gas corrosion exposure followed by SEM/EDX
+        specimen_material: Type 316 stainless steel
+        oxygen_rich_and_fuel_rich_runs: true
+        method_class: measured_direct
+        specimen_ids_and_environment_as_printed:
+          7-6: oxygen rich
+          10-6: fuel rich
+        environment_control_as_printed: oxygen-propane gas ratio
+        gas_temperature_sensor_as_printed: Pt/Pt–10%Rh thermocouple close to the center of the sample tubes
+        wall_temperature_sensor_as_printed: Pt/Pt–10%Rh thermocouple welded into the tube wall at midpoint
+        wall_temperature_control_as_printed: cooling air
+        exposure_as_printed: four hours, excluding heat-up and cool-down
+        preparation_as_printed: cooled to approximately 40 °C, immediately epoxy-encapsulated; sections 10
+          mm from tube midpoint, ground and polished with standard metallographic techniques using a nonaqueous
+          medium; stored in a vacuum desiccator to minimize hydration and contamination
+    - observation_id: schneider_1980_activity_standard_state
+      type: statement
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+        note: Activity claim is explicitly attributed to previous measurements.
+      units: located context
+      values:
+        activity: K2O activity
+        reference_standard_state:
+          tag: unknown
+          reason: not_published
+        reported_activity_values: none in this report
+        printed_context: Previous measurements state that K2O activity was determined from K and O2 pressures.
+        method_class: quoted_unattributed
+        attribution: previous measurements, report not identified
+        activity_defining_pressure_species_as_printed:
+        - K
+        - O2
+    - observation_id: schneider_1980_summary_phase_status
+      type: statement
+      locator:
+        page: 5
+        published_page: 1
+        pdf_page_index: 4
+        section: Summary of Progress to Date
+      units: located context
+      values:
+        printed_qualification: A series of 3 types of experiments for conclusive test of subsolidus equilibria
+          involving 12 compounds in the system K2O-CaO-Al2O3-SiO2 has been devised and is nearly complete.
+          Initial indications are that the previously postulated equilibrium diagram is essentially correct.
+          However, an important modification must be made to allow for the presence of potassium-deficient
+          KAlSi2O6 (ss). Existence of this previously unreported solid solution may have significant effect
+          on the thermodynamics of K2O vaporization or absorption involving this phase.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_summary_conductivity_range
+      type: statement
+      locator:
+        page: 5
+        published_page: 1
+        pdf_page_index: 4
+        section: Summary of Progress to Date
+      units: located context
+      values:
+        printed_qualification: Both AC and DC conductivity measurements have been initiated on a Western
+          slag derived from coal from the Rosebud seam in Montana. These measurements are designed to
+          investigate the conductivity mechanism in this slag which contains a minimal amount of iron
+          (approximately 4 w/o) compared to a typical Eastern slag (approximately 12–16%). In this report,
+          primary emphasis is placed on measurements in the temperature range between 1200 and 1500 °C.
+          Measurements were made on a sample of yttria stabilized zirconia in an effort to verify the
+          measurement technique on a purely ionic conductor of a given single phase composition.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_summary_corrosion
+      type: statement
+      locator:
+        page: 5
+        published_page: 1
+        pdf_page_index: 4
+        section: Summary of Progress to Date
+      units: located context
+      values:
+        printed_qualification: Optical and SEM and EDX analysis were undertaken on sections of Type 316
+          stainless steel tubing exposed to fuel rich and oxygen rich hot gas streams seeded with 80%
+          by weight K2CO3 and 20% by weight K2SO4. Analysis revealed only slight differences as a result
+          of the hot gas stream state. Distribution of species, Fe, Ni and Cr in the reaction zone (stainless
+          steel–deposit interface) paralleled observations made on Type 304 stainless steel and detailed
+          in previous reports.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_phase_model_scope
+      type: statement
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: Phase Equilibrium Studies
+      units: located context
+      values:
+        printed_qualification: The portion of the system under consideration (Fig. 2) involves 12 crystalline
+          solids and 13 four-phase volumes. The first melt to appear upon heating each of the four-phase
+          combinations bears a definite relationship to thermodynamic properties of the solids involved,
+          allowing calculation of an equilibrium pK2O. This forms the basis for a quantitative four-component
+          model to calculate potassium activities as a function of composition for K2O-CaO-Al2O3-SiO2
+          melts simulating Western slags. The phase-equilibrium-derived model supplements models based
+          on direct measurements of potassium pressures.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_phase_experiment_details
+      type: statement
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: 1000-Hour Subsolidus Equilibrations
+      units: located context
+      values:
+        printed_qualification: These experiments are conducted at 1200 °C for 9 of the 13 four-phase volumes
+          and at lower temperatures for assemblages containing KAlSi3O8. The procedure is to seal carefully
+          mixed equal weights of four solids thought to be in equilibrium in Pt capsules, heat them, quench,
+          examine by X-ray, regrind, reseal and reheat. Thermodynamically important solid solutions can
+          be detected by subtle shifts in X-ray parameters.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_glass_crystallization
+      type: statement
+      locator:
+        page: 12
+        published_page: 8
+        pdf_page_index: 11
+        section: Glass Crystallization Experiments
+      units: located context
+      values:
+        printed_qualification: A third type of experiment designed to test phase relations proposed in
+          Fig. 2 involves melting mixtures from postulated four-phase volumes, quenching to a glass, crushing
+          and crystallizing. Previously, this type of experiment was not successful owing to incomplete
+          crystallization. Periodic grinding and slight hydration may prove beneficial. These experiments
+          are not yet complete and results will be discussed in the next quarterly report.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_subsolidus_plans
+      type: statement
+      locator:
+        page: 12
+        published_page: 8
+        pdf_page_index: 11
+        section: Plans
+      units: located context
+      values:
+        printed_qualification: Finalize subsolidus equilibria in (Si, Al)-rich K2O-CaO-Al2O3-SiO2 and
+          prepare results for publication. Determine accurately the composition of 13 minimum melts in
+          the quaternary system. Continue modeling quaternary liquidus surfaces and subsolidus equilibria
+          in the K2O-rich portion involving K2CaSiO4 and K2Si2O5.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_conduction_mechanism
+      type: statement
+      locator:
+        page: 17
+        published_page: 13
+        pdf_page_index: 16
+        section: Electrical Conductivity and Polarization
+      units: located context
+      values:
+        printed_qualification: The QR July–Sept. 1972 from this laboratory discussed slag conduction in relation
+          to iron content and semiconducting electron exchange between Fe+2 and Fe+3 ions. The activation
+          energies displayed by the high-temperature data in these slag samples are higher than would be expected
+          from a semiconducting transition involving iron. Since σ = neμ, with carrier concentration n nearly
+          constant with T and carrier mobility μ, mobility may be the predominant activated process and would
+          then depend on phase composition in a given temperature range. The phase composition of these slags
+          must be studied in correlation with the temperature ranges where the data show activated processes.
+          Careful attention must also be paid to slag viscosity above the melting point and its possible effect
+          on conductivity.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_zro2_assessment
+      type: statement
+      locator:
+        page: 18
+        published_page: 14
+        pdf_page_index: 17
+        section: ZrO2 Conductivity
+      units: located context
+      values:
+        printed_qualification: The yttria-stabilized zirconia was not well suited to demonstrate the viability
+          of the analytical technique because electrode reversibility to the transported oxygen ion is
+          not zero and oxygen is a component in the atmosphere, so exchange can occur in near-electrode
+          areas and eliminate polarization in air. Another ionically conducting material should be used
+          where the conducting ion does not react with the electrode and does not readily exchange with
+          ambient atmosphere up to approximately 1500 °C.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_vp4_recipe
+      type: statement
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+      units: as printed
+      values:
+        printed_qualification: To approximate Rosebud ash with a possible final K2O content up to 20 wt%,
+          minor constituents of the ash were neglected. MgO and Fe2O3 were replaced by equal weights of CaO
+          and Al2O3 respectively. The simplified composition was then approximated by a mixture of 66.9 wt%
+          KAlSiO4 and 33.1 wt% Ca2SiO4. Table 2 compares the compositions; these are recipe choices, not measured
+          final vaporization values.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_tieline_equation_1
+      type: model_context
+      locator:
+        page: 9
+        published_page: 5
+        pdf_page_index: 8
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '1'
+      units: as printed
+      values:
+        equation_number_as_printed: 1
+        equation_as_printed: 11Ca2SiO4 + 1KAlSi2O6 + 2CaAl12O19 → 1KAlSiO4 + 12Ca2Al2SiO7
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_2
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '2'
+      units: as printed
+      values:
+        equation_number_as_printed: 2
+        equation_as_printed: 2CaO + 1KAlSi2O6 → 1KAlSiO4 + 1Ca2SiO4
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_3
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '3'
+      units: as printed
+      values:
+        equation_number_as_printed: 3
+        equation_as_printed: 3Ca2SiO4 + 1KAlSi2O6 → 1KAlSiO4 + 2Ca3Si2O7
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_4
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '4'
+      units: as printed
+      values:
+        equation_number_as_printed: 4
+        equation_as_printed: 1Ca3Si2O7 + 1KAlSi2O6 → 1KAlSiO4 + 3CaSiO3
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_5
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '5'
+      units: as printed
+      values:
+        equation_number_as_printed: 5
+        equation_as_printed: 3Ca2Al2SiO7 + 1(3Al2O3·2SiO2) + 7KAlSi2O6 → 7KAlSiO4 + 6CaAl2Si2O8
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_6
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '6'
+      units: as printed
+      values:
+        equation_number_as_printed: 6
+        equation_as_printed: 3Ca2Al2SiO7 + 11(3Al2O3·2SiO2) + 25KAlO2 → 25KAlSiO4 + 6CaAl12O19
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_7
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '7'
+      units: as printed
+      values:
+        equation_number_as_printed: 7
+        equation_as_printed: 2KAlSiO4 + 1CaAl2Si2O8 + CaSiO3 → 2KAlSi2O6 + 1Ca2Al2SiO7
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_8
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '8'
+      units: as printed
+      values:
+        equation_number_as_printed: 8
+        equation_as_printed: 3Ca2Al2SiO7 + 1(3Al2O3·2SiO2) + 7KAlSi3O8 → 7KAlSi2O6 + 6CaAl2Si2O8
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_9
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '9'
+      units: as printed
+      values:
+        equation_number_as_printed: 9
+        equation_as_printed: 2Ca3Si2O7 + 2KAlSi3O8 → 2KAlSi2O6 + 6CaSiO3
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_10
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '10'
+      units: as printed
+      values:
+        equation_number_as_printed: 10
+        equation_as_printed: 5K2Si2O5 + CaAl12O19 + 22SiO2 → 10KAlSi3O8 + 1CaAl2Si2O8
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_tieline_equation_11
+      type: model_context
+      locator:
+        page: 10
+        published_page: 6
+        pdf_page_index: 9
+        section: Solid-State Tie Line Reactions Using Unstable Combinations of Phases
+        equation: '11'
+      units: as printed
+      values:
+        equation_number_as_printed: 11
+        equation_as_printed: 6K2Si2O5 + 1CaAl12O19 + 25SiO2 → 12KAlSi3O8 + 1CaSiO3
+        status_as_printed: proposed tie line believed stable on the right; coefficients and direction transcribed
+          without balancing corrections
+        method_class: model_derived
+        qualification: experimental results and limitations are retained in Table 3, tieline_exclusions and
+          tieline_qualifications
+    - observation_id: schneider_1980_vaporization_series_progress
+      type: statement
+      locator:
+        page: 6
+        published_page: 2
+        pdf_page_index: 5
+        section: Vaporization Studies
+      units: as printed
+      values:
+        printed_qualification: The current K-pressure series had measurements completed on 3 compositions
+          and in progress on a fourth; KCAS-VP-4 was designed around a possible final K2O content up to 20
+          wt%.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_conductivity_prior_work
+      type: statement
+      locator:
+        page: 15
+        published_page: 11
+        pdf_page_index: 14
+        section: Electrical Conductivity and Polarization — Introduction
+      units: as printed
+      values:
+        printed_qualification: Earlier four-probe AC and DC data on Bow, NH coal-plant slag agreed quite well
+          with some differences near 1100 °C. Measurements supported the previous suggestion that above 1385
+          °C ionic conductivity is predominant in this slag containing approximately 14% iron.
+        method_class: quoted_attributed
+        attribution: July–September 1980 quarterly report, as cited here
+    - observation_id: schneider_1980_rosebud_iron_content
+      type: statement
+      locator:
+        page: 15
+        published_page: 11
+        pdf_page_index: 14
+        section: Electrical Conductivity and Polarization — Introduction
+      units: as printed
+      values:
+        printed_qualification: Current Rosebud-seam slag contains 3–4% iron, less than slags previously studied.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_zirconia_method_context
+      type: experiment_context
+      locator:
+        page: 17
+        published_page: 13
+        pdf_page_index: 16
+        section: ZrO2 Conductivity
+      units: as printed
+      values:
+        specimen_as_printed: yttria-stabilized zirconia, cut from a very-high-density oxygen-sensor ZrO2 tube
+        method_as_printed: four-probe AC and DC electrical conductivity comparison
+        frequency_Hz_as_printed: 40
+        frequency_sweep_Hz_as_printed: 40 Hz to 40 kHz
+        atmospheres_as_printed:
+        - air
+        - 1.2 × 10^-5 ppm O2 in N2, body prose
+        electrode_material_as_printed: platinum; contacts do not appear porous
+        lead_attachment_reference_as_printed: April–June 1980 quarterly report
+        method_class: measured_direct
+        reason: 'source_internally_inconsistent: body prose gives 1.2 × 10^-5 ppm O2 in N2, Figure 3 gives
+          1.2 ppm O2 in N2, subsequent prose says near one part per million; no value selected'
+    - observation_id: schneider_1980_zro2_polarization_probes
+      type: statement
+      locator:
+        page: 17
+        published_page: 13
+        pdf_page_index: 16
+        section: ZrO2 Conductivity
+      units: as printed
+      values:
+        printed_qualification: For those measurements done at the low oxygen pressure, the DC measurements
+          did show some slight polarization (increase in V12 and V34) compared to the AC data on the same
+          probes at 40 Hz.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_zro2_darkening
+      type: statement
+      locator:
+        page: 17
+        published_page: 13
+        pdf_page_index: 16
+        section: ZrO2 Conductivity
+      units: as printed
+      values:
+        printed_qualification: After removal from the holder, a darkened area was evident symmetrically around
+          current probes 1 and 4. In reduced oxygen pressure, oxide reduction to zirconium apparently can
+          occur rapidly at the cathode under an applied electric field of 1–2 V/cm. The elevated-temperature
+          qualification continues on the next printed page.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_zro2_reduction_and_reversal
+      type: statement
+      locator:
+        page: 18
+        published_page: 14
+        pdf_page_index: 17
+        section: ZrO2 Conductivity
+      units: as printed
+      values:
+        printed_qualification: Reduction under the applied field occurs particularly at elevated temperatures
+          above 1200 °C. During each DC data acquisition at each temperature point, current was left on for
+          approximately 60 seconds and reversed for the same time. No net reduction should then appear at
+          a particular probe; the observed reduction is attributed to insufficient oxygen for reoxidation
+          when that probe becomes an anode.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_coating_cycles_and_plans
+      type: statement
+      locator:
+        page: 24
+        published_page: 20
+        pdf_page_index: 23
+        section: Clad Materials for Application in Downstream MHD Components
+      units: as printed
+      values:
+        printed_qualification: Identical specimens cycled from 18 °C ↔ 700 °C in air and in forming gas (5%
+          H2, 95% N2). Plans include continued SEM/EDX analysis and initiation of exposure studies on 2 1/4
+          – 1 Mo. Croloy tubing.
+        method_class: quoted_unattributed
+        attribution: this report
+    - observation_id: schneider_1980_corrosion_figure3
+      type: figure_only
+      locator:
+        page: 26
+        published_page: 22
+        pdf_page_index: 25
+        section: Corrosion of Downstream MHD Components
+        figure: '3'
+      units: as printed
+      values:
+        quantity: 'Fig. 3: SEM micrograph, 425×, of steel/salt deposit reaction zone.'
+        figure_only: true
+        method_class: figure_only
+        digitized: false
+        specimen_as_printed: specimen shown in Figure 1
+    - observation_id: schneider_1980_vp4_comparison_continuation
+      type: statement
+      locator:
+        page: 7
+        published_page: 3
+        pdf_page_index: 6
+        section: Vaporization Studies
+        note: Sentence continues from the bottom of published page 2.
+      units: as printed
+      values:
+        printed_qualification: Other differences in the experimental measurements are responsible for
+          the increase in pressure and its slower decrease in K pressure with decreasing K2O content.
+          Additional study of this problem is required.
+        method_class: quoted_unattributed
+        attribution: this report
+    observations: []
+review_status: draft

@@ -22,8 +22,9 @@ from engines.antoine import (
 )
 from engines.yaml_loader import YAML12SafeLoader
 
-GAS_CONSTANT_J_PER_MOL_K = 8.314462618
-PA_PER_BAR = 100_000.0
+from simulator.physical_constants import GAS_CONSTANT_10SIG, PA_PER_BAR
+
+GAS_CONSTANT_J_PER_MOL_K = GAS_CONSTANT_10SIG
 UNGROUNDABLE_PROCESS_EXTENT = "UNGROUNDABLE_PROCESS_EXTENT"
 NOT_SPECIFIED = "not_speciated"
 _NUMERICAL_PO2_GUARD_BAR = 1.0e-15
@@ -360,6 +361,121 @@ def _parse_dg_points(dg_row: Mapping[str, Any]) -> list[tuple[float, float]]:
         parsed.append((float(point["T_K"]), float(point["dG_kJ_per_mol"])))
     _validate_dg_points(parsed)
     return parsed
+
+
+def _reactant_coefficient(reaction: str, species: str) -> float:
+    left, arrow, _right = reaction.partition("->")
+    if not arrow or not left.strip():
+        raise ValueError(f"dG row reaction must contain one '->': {reaction!r}")
+    for term in left.split("+"):
+        tokens = term.strip().split()
+        if not tokens or tokens[-1] != species:
+            continue
+        if len(tokens) == 1:
+            return 1.0
+        if len(tokens) != 2:
+            raise ValueError(
+                f"invalid reactant term {term.strip()!r} in reaction {reaction!r}"
+            )
+        try:
+            coefficient = Fraction(tokens[0])
+        except (ValueError, ZeroDivisionError) as exc:
+            raise ValueError(
+                f"invalid coefficient in dG row reaction {reaction!r}"
+            ) from exc
+        if coefficient <= 0:
+            raise ValueError(
+                f"reactant coefficient must be positive: {reaction!r}"
+            )
+        return float(coefficient)
+    raise ValueError(f"reaction {reaction!r} has no reactant {species!r}")
+
+
+def _interpolated_dg_kJ(
+    dg_points: Sequence[tuple[float, float]],
+    temperature_K: float,
+) -> tuple[float, str]:
+    """Linear dG(T). Outside the tabulated span, extend the end segment."""
+    _validate_dg_points(dg_points)
+    if not math.isfinite(temperature_K):
+        raise ValueError("temperature_K must be finite")
+    ordered = sorted(dg_points, key=lambda row: row[0])
+    low_K = ordered[0][0]
+    high_K = ordered[-1][0]
+    if temperature_K < low_K:
+        (t0, g0), (t1, g1) = ordered[0], ordered[1]
+        confidence = "out_of_domain"
+    elif temperature_K > high_K:
+        (t0, g0), (t1, g1) = ordered[-2], ordered[-1]
+        confidence = "out_of_domain"
+    else:
+        confidence = "in_domain"
+        (t0, g0), (t1, g1) = ordered[0], ordered[1]
+        for (lo_t, lo_g), (hi_t, hi_g) in zip(ordered, ordered[1:]):
+            if lo_t <= temperature_K <= hi_t:
+                t0, g0, t1, g1 = lo_t, lo_g, hi_t, hi_g
+                break
+    if math.isclose(t1, t0):
+        raise ValueError("degenerate dG temperature spacing")
+    # dG(T) = g0 + (g1-g0) * (T-t0) / (t1-t0). Endpoints stay on the
+    # tabulated value; one kelvin outside either end is out_of_domain.
+    dg = g0 + (g1 - g0) * (temperature_K - t0) / (t1 - t0)
+    return dg, confidence
+
+
+class FoulantCarbonRankingRefusal(ValueError):
+    """The tabulated thermal dG is not this cleanup's dG per mol carbon."""
+
+    def __init__(self, species: str, reaction: str, detail: str) -> None:
+        self.species = species
+        self.reaction = reaction
+        self.detail = detail
+        super().__init__(
+            f"cation sulfate {species!r} has no reaction-specific dG per mol C "
+            f"({detail}; table reaction {reaction!r})"
+        )
+
+
+def foulant_dg_kJ_per_mol_carbon(
+    dg_row: Mapping[str, Any],
+    temperature_K: float,
+    *,
+    species: str,
+    carbon_per_mol_feed: float,
+) -> tuple[float, str, bool]:
+    """Oxide-decomposition dG per mol C, only when the oxygen couple holds.
+
+    The carbothermal cleanup is the tabulated decomposition plus
+    ``C + 1/2 O2 -> CO``. ``n_C`` is the feed coefficient in the table
+    times ``carbon_per_mol_feed``. That CO term is common, and drops out
+    of the greedy order, only when the table releases 1/2 O2 per mol C
+    (``2 * nu_O2 == n_C``). MgSO4 -> MgO + SO3, and an oxide table
+    divided by a sulfide carbon demand, are different reactions. Those
+    quotients are not ranking inputs.
+    """
+    if not isinstance(dg_row, Mapping):
+        raise ValueError("dG row must be a mapping")
+    c_per_feed = float(carbon_per_mol_feed)
+    if not math.isfinite(c_per_feed) or c_per_feed <= 0.0:
+        raise ValueError("carbon_per_mol_feed must be finite and positive")
+    reaction = dg_row.get("reaction")
+    if not isinstance(reaction, str):
+        raise ValueError("dG row reaction must be a string")
+    feed_coeff = _reactant_coefficient(reaction, species)
+    n_carbon = feed_coeff * c_per_feed
+    nu_o2 = _product_o2_stoich(reaction)
+    oxygen_couple = math.isclose(2.0 * nu_o2, n_carbon, rel_tol=0.0, abs_tol=1e-9)
+    if not oxygen_couple:
+        raise FoulantCarbonRankingRefusal(
+            species,
+            reaction,
+            "oxygen couple does not match carbon demand; "
+            "the shared C + 1/2 O2 -> CO term does not cancel",
+        )
+    dg_reaction, confidence = _interpolated_dg_kJ(
+        _parse_dg_points(dg_row), temperature_K
+    )
+    return dg_reaction / n_carbon, confidence, True
 
 
 def _product_o2_stoich(reaction: object) -> float:

@@ -8,26 +8,23 @@ from typing import Literal
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.feedstock_composition import (
+    _TOTAL_IRON_AS_FEO_KEYS,
     feot_equivalent_wt_pct,
     iron_oxide_values,
 )
+from simulator.oxygen_buffers import (
+    FE_FEO_BUFFER_STANDARD,
+    Kress91InvalidControls,
+    delta_iw_log10,
+    feo_iw_log10_fO2_bar,
+    legacy_iw_log10_fO2_bar,
+)
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    GAS_CONSTANT,
+    PA_PER_BAR,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
-
-
-class Kress91InvalidControls(ValueError):
-    """Invalid finite-control input for the Kress91 Fe-redox relation."""
-
-
-def legacy_iw_log10_fO2_bar(
-    temperature_K: float,
-    *,
-    vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
-) -> float:
-    """Return the legacy IW line, flooring T unless it is strictly positive."""
-    temperature = float(temperature_K)
-    if not (temperature > 0.0):
-        return math.log10(vacuum_floor_bar)
-    return -27215.0 / temperature + 6.57
 
 
 def intrinsic_melt_fO2(
@@ -235,7 +232,7 @@ def _kress91_temperature_pressure_term(
             'Kress91 invalid control pressure_bar: expected finite positive '
             f'value or None, got {pressure_bar!r}'
         )
-    p_pa = max(p_bar, 1.0e-9) * 100000.0
+    p_pa = max(p_bar, 1.0e-9) * PA_PER_BAR
     return (
         term
         + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / float(T_K))
@@ -255,9 +252,9 @@ def kress91_referenced_log_fO2(
 ) -> float:
     redox_fO2_log = float(fO2_log)
     redox_target_T_K = float(target_T_K)
-    # 273.15 K is the exact Celsius-to-kelvin offset, so this is the
-    # documented 1200 C liquid-calibration floor expressed in kelvin.
-    calibration_min_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15
+    # CELSIUS_TO_KELVIN_OFFSET is the exact Celsius-to-kelvin offset, so
+    # this is the documented 1200 C liquid-calibration floor in kelvin.
+    calibration_min_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + CELSIUS_TO_KELVIN_OFFSET
     if redox_target_T_K < calibration_min_T_K:
         raise Kress91InvalidControls(
             f'Kress91 invalid control target_T_K: {redox_target_T_K!r} K is '
@@ -300,7 +297,7 @@ def _kress91_gate_key_referenced_log_fO2(
     if reference_T_K is None:
         return redox_fO2_log
     redox_reference_T_K = float(reference_T_K)
-    if redox_reference_T_K <= 273.15:
+    if redox_reference_T_K <= CELSIUS_TO_KELVIN_OFFSET:
         return redox_fO2_log
     return kress91_referenced_log_fO2(
         redox_fO2_log,
@@ -318,12 +315,6 @@ HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C = (
     (1400.0, 1.94),
     (1600.0, 1.66),
 )
-
-# Holzheid et al. 1997, DOI 10.1016/S0009-2541(97)00030-2:
-# Delta G("FeO"_l) = -244118 + 115.559*T - 8.474*T*ln(T) J/mol.
-HOLZHEID_FEO_LIQUID_DG_A_J_MOL = -244118.0
-HOLZHEID_FEO_LIQUID_DG_B_J_MOL_K = 115.559
-HOLZHEID_FEO_LIQUID_DG_C_J_MOL_K = -8.474
 
 # Ban-ya 1993, ISIJ Int. 33:2-11, DOI not present in local OCR:
 # clean OCR alpha_ij values in J from docs-private/.../ocr-extracted-params.md.
@@ -484,7 +475,7 @@ def _linear_interpolate_or_clamp(
 
 
 def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
-    T_C = float(T_K) - 273.15
+    T_C = float(T_K) - CELSIUS_TO_KELVIN_OFFSET
     multiplier, status = _linear_interpolate_or_clamp(
         HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
         T_C,
@@ -507,35 +498,6 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
     }
 
 
-def holzheid_feo_liquid_delta_g_j_mol(T_K: float) -> float:
-    T = float(T_K)
-    if T <= 0.0 or not math.isfinite(T):
-        raise Kress91InvalidControls(
-            f'FeO liquid DeltaG invalid control T_K: expected finite positive '
-            f'value, got {T_K!r}'
-        )
-    return (
-        HOLZHEID_FEO_LIQUID_DG_A_J_MOL
-        + HOLZHEID_FEO_LIQUID_DG_B_J_MOL_K * T
-        + HOLZHEID_FEO_LIQUID_DG_C_J_MOL_K * T * math.log(T)
-    )
-
-
-def feo_iw_log10_fO2_bar(T_K: float, *, a_feo: float = 1.0) -> float:
-    activity = max(float(a_feo), 1.0e-300)
-    R = 8.31446261815324
-    ln_fO2 = 2.0 * (
-        math.log(activity)
-        + holzheid_feo_liquid_delta_g_j_mol(T_K) / (R * float(T_K))
-    )
-    return ln_fO2 / math.log(10.0)
-
-
-# This identifier follows the coded line's wustite-liquid standard. Holzheid
-# et al. (1997), Eq. 9, constructed it from O'Neill and Pownceby (1993) and
-# Barin (1989); the paper states no uncertainty for the line, and this code
-# states no validity range.
-FE_FEO_BUFFER_STANDARD = 'wustite_FeO_l_holzheid1997_eq9'
 REDOX_BUFFER_LINES: Mapping[str, Callable[[float], float]] = MappingProxyType(
     {
         FE_FEO_BUFFER_STANDARD: lambda T_K: feo_iw_log10_fO2_bar(
@@ -810,8 +772,7 @@ def ban_ya_quadratic_gamma_feo(
                 alpha_fe_a + alpha_fe_b - alpha_ab
             ) * candidate[cation_a] * candidate[cation_b]
 
-    R = 8.31446261815324
-    ln_gamma = rt_ln_gamma / (R * float(T_K))
+    ln_gamma = rt_ln_gamma / (GAS_CONSTANT * float(T_K))
     gamma = math.exp(max(-745.0, min(709.0, ln_gamma)))
     return {
         'status': 'ok' if not missing else 'ok_with_ocr_gaps',
@@ -892,7 +853,14 @@ def kress91_dropped_components(
 ) -> tuple[tuple[str, ...], float | None]:
     """Report positive composition mass excluded by the KC91 oxide basis."""
 
-    supported = {*KRESS91_MOL_FRACTION_OXIDES, 'FeO', 'Fe2O3'}
+    # Total-iron keys are supported so a FeO_T-only map is not reported as
+    # dropped. iron_oxide_values reads them only when the split is absent.
+    supported = {
+        *KRESS91_MOL_FRACTION_OXIDES,
+        'FeO',
+        'Fe2O3',
+        *_TOTAL_IRON_AS_FEO_KEYS,
+    }
     values = {name: float(amount) for name, amount in comp_wt.items()}
     dropped = tuple(
         sorted(name for name, amount in values.items() if name not in supported and amount > 0.0)
@@ -927,7 +895,7 @@ def _kress91_ln_ratio(
         # math.log(0.0) raises (BUG-159). This product is the canonical term.
         fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
-    p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
+    p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
     return (
         fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
@@ -1225,7 +1193,7 @@ def _calphad_feo_activity_components(
         else None
     )
     pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
-    delta_iw_pure_feo = float(fO2_log) - pure_feo_iw
+    delta_iw_pure_feo = delta_iw_log10(float(fO2_log), pure_feo_iw)
     calphad_weight = _calphad_authority_weight(delta_iw_pure_feo)
     kress91_weight = 1.0 - calphad_weight
     authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity
@@ -1392,7 +1360,7 @@ def kress91_split(
     fe3 = 2.0 * ratio / (2.0 * ratio + 1.0)
     x_fe2o3 = ratio * mol_fractions['FeOt'] / (2.0 * ratio + 1.0)
     x_feo = max(0.0, mol_fractions['FeOt'] - 2.0 * x_fe2o3)
-    temperature_band = kress91_temperature_band_case(float(T_K) - 273.15)
+    temperature_band = kress91_temperature_band_case(float(T_K) - CELSIUS_TO_KELVIN_OFFSET)
     return {
         'fe3': fe3,
         'ratio': ratio,

@@ -3,6 +3,7 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import Phase, ReferenceStateConvention
 from simulator.battery.migrate import Migrator
 
 
@@ -11,6 +12,7 @@ EXTRACT = (
     ROOT
     / "data/literature/extracts/zaitsev-2000-sodium-silicate-thermodynamics.yaml"
 )
+PRIMARY_EXTRACT = ROOT / "data/literature/extracts/zaitsev-1999-na2o-sio2-pccp.yaml"
 
 
 def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
@@ -62,6 +64,24 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
     assert all(
         len(observation.derived_from or ()) == 29 for observation in reduced_silica_rows
     )
+    na2o_rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if (
+            "::zaitsev_2000_table4_na2o_experimental_activity::"
+            in observation.observation_id
+        )
+    ]
+    assert len(na2o_rows) == 29
+    assert all(
+        observation.identity.reference_state.is_value
+        and observation.identity.reference_state.value.convention
+        is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        and observation.identity.reference_state.value.endmember.formula == "Na2O"
+        and observation.identity.reference_state.value.endmember.phase.value
+        is Phase.L
+        for observation in na2o_rows
+    )
 
     species = document["species"]
     table5 = {
@@ -96,6 +116,12 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
     assert (sio2[0]["activity"], sio2[0]["locator"]["page"]) == ("0.860", 7)
     assert (sio2[-1]["activity"], sio2[-1]["locator"]["page"]) == ("3.77e-6", 7)
     assert (na2o[0]["activity"], na2o[0]["locator"]["page"]) == ("7.19e-10", 7)
+    model_activities = next(
+        item
+        for item in document["species"]["SiO2"]["context"]
+        if item["observation_id"] == "zaitsev_2000_table4_calculated_activities"
+    )
+    assert model_activities["values"]["method_class"] == "model_derived"
 
     own_enthalpy = next(
         row
@@ -116,3 +142,69 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
         printed_minus_delta_h = point["printed_minus_delta_H_kJ_per_mol"]
         assert observation.value.point == -Decimal(printed_minus_delta_h)
         assert observation.locator.page == 9
+
+
+def test_zaitsev_2000_reprint_links_72_admitted_1999_activity_cells():
+    from simulator.battery.enums import AdmissionStatus, Quantity
+
+    documents = {
+        path.stem: yaml.safe_load(path.read_text(encoding="utf-8"))
+        for path in (PRIMARY_EXTRACT, EXTRACT)
+    }
+    migrator = Migrator(
+        root=ROOT,
+        index={
+            source_id: dict(document["source"])
+            for source_id, document in documents.items()
+        },
+        aliases={},
+    )
+    for path in (PRIMARY_EXTRACT, EXTRACT):
+        migrator._migrate_extract(path)
+    migrator.finalize()
+
+    observations = migrator.result.observations
+    primary_ids = {
+        observation_id
+        for observation_id, observation in observations.items()
+        if observation.source_id == PRIMARY_EXTRACT.stem
+        and observation.admission.status is AdmissionStatus.ADMITTED
+    }
+    linked = {
+        observation.observation_id: observation.provenance[
+            "duplicate_of_observation_id"
+        ]
+        for observation in observations.values()
+        if (
+            observation.source_id == EXTRACT.stem
+            and isinstance(observation.provenance, dict)
+            and "duplicate_of_observation_id" in observation.provenance
+        )
+    }
+
+    assert len(linked) == 72
+    assert set(linked.values()) <= primary_ids
+    assert all(
+        observations[observation_id].identity.quantity.value is Quantity.ACTIVITY
+        for observation_id in linked
+    )
+    assert all(
+        observations[observation_id].admission.status is AdmissionStatus.ADMITTED
+        for observation_id in linked
+    )
+    assert all(
+        not point.get("duplicate_of_observation_id")
+        for observation in documents[EXTRACT.stem]["species"]["Na2O"][
+            "observations"
+        ]
+        if observation["observation_id"]
+        == "zaitsev_2000_table4_na2o_experimental_activity"
+        for point in observation["values"]["points"]
+        if point["row_as_printed"] in {"26", "27", "28", "29"}
+    )
+    assert all(
+        "duplicate_of_observation_id" not in (observation.provenance or {})
+        for observation in observations.values()
+        if observation.source_id == EXTRACT.stem
+        and observation.identity.quantity.value is not Quantity.ACTIVITY
+    )

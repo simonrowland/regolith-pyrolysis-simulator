@@ -1,4 +1,4 @@
-"""Keep t-1333 source coordinates tied to the corpus files they cite."""
+"""Keep every top-level extract locator tied to the corpus files it cites."""
 
 from __future__ import annotations
 
@@ -6,25 +6,30 @@ from decimal import Decimal
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 import yaml
+from simulator.battery.extract_gate import _as_decimal
+from simulator.battery.migrate import discover_extracts
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-MERGE_BASE = "6f90106c6"
+EXTRACTS_DIR = REPO_ROOT / "data" / "literature" / "extracts"
 DEFAULT_CORPUS_ROOT = Path.home() / "Repos" / "regolith-corpus"
 LEGACY_CORPUS_ROOT = Path.home() / "Repos" / ".regolith-main-review" / "corpus-main"
 
 
-def _changed_extracts() -> list[Path]:
-    names = subprocess.check_output(
-        ["git", "diff", "--name-only", f"{MERGE_BASE}...HEAD", "--", "data/literature/extracts"],
-        cwd=REPO_ROOT,
-        text=True,
-    ).splitlines()
-    return [REPO_ROOT / name for name in names]
+def _all_extracts() -> list[Path]:
+    # Keep discovery exclusions identical to migrate.discover_extracts.
+    return sorted(
+        path
+        for path in EXTRACTS_DIR.glob("*.yaml")
+        if path.is_file()
+        and not path.name.startswith("_")
+        and not path.name.upper().startswith("SCHEMA")
+    )
 
 
 def _walk(value, ancestors=()):
@@ -87,14 +92,13 @@ def _line_ranges(value: str) -> list[tuple[int, int]]:
 
 
 def _source_file(source_path: str, roots: list[Path], source_id: str | None = None) -> Path | None:
-    relative_paths = [source_path]
+    relative_path = Path(source_path)
     if source_path.startswith("corpus/"):
-        relative_paths.append(source_path.removeprefix("corpus/"))
+        relative_path = Path(source_path.removeprefix("corpus/"))
     for root in roots:
-        for relative_path in relative_paths:
-            candidate = root / relative_path
-            if candidate.is_file():
-                return candidate
+        candidate = root / relative_path
+        if candidate.is_file():
+            return candidate
         if source_id and source_path.startswith("docs/references/pdfs/"):
             raw_dir = root / "raw" / source_id
             for filename in (Path(source_path).name, f"{source_id}.pdf"):
@@ -218,17 +222,17 @@ def _pdf_page_count(path: Path, cache: dict[Path, int]) -> int:
     return cache[path]
 
 
+@pytest.fixture(scope="module")
+def pdf_page_counts() -> dict[Path, int]:
+    return {}
+
+
 def _pdf_page_numbers(page, extract: Path, locator: dict) -> list[int]:
-    if isinstance(page, str):
-        page = re.sub(r"^\s*(?:PDF\s*)?p(?:age)?\.?\s*", "", page, flags=re.I)
-        pages = [item.strip() for item in re.split(r"[,;]", page) if item.strip()]
-        page_numbers = [int(item) for item in pages if item.isdigit()]
-        assert len(page_numbers) == len(pages) and page_numbers, (
-            f"{extract.name}: PDF page is not numeric: {locator}"
-        )
-        return page_numbers
-    assert isinstance(page, int), f"{extract.name}: PDF page is not numeric: {locator}"
-    return [page]
+    numeric_page = _as_decimal(page)
+    assert numeric_page is not None and numeric_page == numeric_page.to_integral_value(), (
+        f"{extract.name}: PDF page is not one numeric integer: {locator}"
+    )
+    return [int(numeric_page)]
 
 
 def _record_demaria_table_8_pin() -> None:
@@ -259,6 +263,43 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
     assert _citation_matches(richter_locator, unrelated_richter_range, [[2.5, 6.0]]) is False
 
 
+def test_extract_discovery_matches_migrator() -> None:
+    extracts = _all_extracts()
+    assert len(extracts) == 849  # b261: main join adds 67 extracts
+    assert extracts == discover_extracts(EXTRACTS_DIR)
+
+
+@pytest.mark.parametrize("page", ["23, 24", "22, 6", "23; 24", "1-7", "1–7"])
+def test_pdf_page_is_one_numeric_token(page: str) -> None:
+    with pytest.raises(AssertionError, match="one numeric integer"):
+        _pdf_page_numbers(page, Path("extract.yaml"), {"page": page})
+
+
+def test_tables_only_root_does_not_resolve_raw_locator(tmp_path: Path, monkeypatch) -> None:
+    tables_root = tmp_path / "tables-only"
+    raw_locator = "corpus/raw/example/example.pdf"
+    decoy = tables_root / "tables" / "example.pdf"
+    decoy.parent.mkdir(parents=True)
+    decoy.touch()
+    monkeypatch.setattr(sys.modules[__name__], "LEGACY_CORPUS_ROOT", tmp_path / "absent-legacy")
+    monkeypatch.setenv("REGOLITH_CORPUS_ROOT", str(tables_root))
+    extract = tmp_path / "example.yaml"
+    extract.write_text(
+        yaml.safe_dump(
+            {
+                "source_id": "example",
+                "locator": {"source_path": raw_locator, "page": 1},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert _source_file(raw_locator, [tables_root], "example") is None
+    assert _source_file("tables/example.pdf", [tables_root]) == decoy
+    with pytest.raises(pytest.skip.Exception, match="example.yaml: cited corpus source absent"):
+        test_extract_locators_resolve_to_corpus_sources(extract, {})
+
+
 def _record_lamoreaux_page_pins() -> None:
     extract = REPO_ROOT / "data/literature/extracts/lamoreaux-hildenbrand-1984.yaml"
     document = yaml.safe_load(extract.read_text(encoding="utf-8"))
@@ -281,78 +322,120 @@ def _record_lamoreaux_page_pins() -> None:
         assert expected.casefold() in text.casefold(), f"Lamoreaux PDF page {page} lacks {expected!r}"
 
 
-def test_changed_extract_locators_resolve_to_corpus_sources() -> None:
+@pytest.mark.parametrize("extract", _all_extracts(), ids=lambda path: path.name)
+def test_extract_locators_resolve_to_corpus_sources(
+    extract: Path, pdf_page_counts: dict[Path, int]
+) -> None:
     configured_root = Path(os.environ.get("REGOLITH_CORPUS_ROOT", DEFAULT_CORPUS_ROOT))
-    if not configured_root.is_dir() and not LEGACY_CORPUS_ROOT.is_dir():
-        pytest.skip(f"corpus absent: checked {configured_root} and {LEGACY_CORPUS_ROOT}")
-
     roots = [configured_root, LEGACY_CORPUS_ROOT]
     missing_sources: dict[str, int] = {}
-    missing_citation_anchors = 0
-    checked_lines = checked_pdfs = 0
-    pdf_pages: dict[Path, int] = {}
+    failures: list[tuple[str, str, str]] = []
 
-    extracts = _changed_extracts()
-    assert extracts, f"no changed extracts found from {MERGE_BASE}"
-    for extract in extracts:
+    try:
         document = yaml.safe_load(extract.read_text(encoding="utf-8"))
-        assert isinstance(document, (dict, list)), f"unexpected YAML root in {extract}"
-        for locator, ancestors in _walk(document):
-            source_path = locator.get("source_path")
-            if not isinstance(source_path, str):
-                continue
-            source = _source_file(source_path, roots, document.get("source_id"))
-            if source is None:
-                missing_sources[source_path] = missing_sources.get(source_path, 0) + 1
-                continue
+    except (OSError, yaml.YAMLError) as exc:
+        pytest.fail(f"other | {extract.name} | YAML could not be read: {exc}", pytrace=False)
+    if not isinstance(document, (dict, list)):
+        pytest.fail(f"other | {extract.name} | unexpected YAML root: {type(document).__name__}", pytrace=False)
+    source_id = document.get("source_id") if isinstance(document, dict) else None
 
-            if "line_range" in locator and source.suffix.lower() in {".md", ".txt"}:
+    for locator, ancestors in _walk(document):
+        source_path = locator.get("source_path")
+        if not isinstance(source_path, str):
+            continue
+        source = _source_file(source_path, roots, source_id)
+        if source is None:
+            missing_sources[source_path] = missing_sources.get(source_path, 0) + 1
+            continue
+
+        if "line_range" in locator and source.suffix.lower() in {".md", ".txt"}:
+            try:
                 ranges = _line_ranges(locator["line_range"])
                 lines = source.read_text(encoding="utf-8").splitlines()
-                for start, end in ranges:
-                    assert end <= len(lines), f"{extract.name}: {source_path}:{start}-{end} exceeds {len(lines)} lines"
-                cited_text = "\n".join("\n".join(lines[start - 1 : end]) for start, end in ranges)
-                cited_values = [
-                    ancestor[key]
-                    for ancestor in ancestors
-                    for key in ("value", "quote")
-                    if key in ancestor and ancestor is not locator
-                ]
-                citation_matches = _citation_matches(locator, cited_text, cited_values)
-                assert citation_matches is not False, (
-                    f"{extract.name}: {source_path}:{locator['line_range']} contains no cited table/figure, "
-                    f"quote, paragraph, or note value; locator={locator}"
-                )
-                if citation_matches is None:
-                    missing_citation_anchors += 1
-                checked_lines += 1
+            except (AssertionError, OSError, UnicodeError) as exc:
+                failures.append(("other", repr(locator), str(exc)))
+            else:
+                out_of_range = [(start, end) for start, end in ranges if end > len(lines)]
+                if out_of_range:
+                    failures.append((
+                        "line locator out of range",
+                        repr(locator),
+                        f"{source_path}: {out_of_range} exceeds {len(lines)} lines",
+                    ))
+                else:
+                    cited_text = "\n".join("\n".join(lines[start - 1 : end]) for start, end in ranges)
+                    cited_values = [
+                        ancestor[key]
+                        for ancestor in ancestors
+                        for key in ("value", "quote")
+                        if key in ancestor and ancestor is not locator
+                    ]
+                    if _citation_matches(locator, cited_text, cited_values) is False:
+                        failures.append((
+                            "missing citation anchor",
+                            repr(locator),
+                            f"{source_path}:{locator['line_range']} contains no cited table/figure, quote, paragraph, or note value",
+                        ))
 
-            if source.suffix.lower() == ".pdf" and ("page" in locator or "pdf_page_index" in locator):
-                page = locator.get("page")
-                index = locator.get("pdf_page_index")
-                if page is None:
-                    assert isinstance(index, int), f"{extract.name}: PDF locator has no numeric page: {locator}"
-                    page = index + 1
+        if source.suffix.lower() == ".pdf" and ("page" in locator or "pdf_page_index" in locator):
+            page = locator.get("page")
+            index = locator.get("pdf_page_index")
+            if page is None:
+                if type(index) is not int:
+                    failures.append(("page range or non-numeric page", repr(locator), "PDF locator has no numeric page"))
+                    continue
+                page = index + 1
+            try:
                 pages = _pdf_page_numbers(page, extract, locator)
-                count = _pdf_page_count(source, pdf_pages)
-                assert all(1 <= page <= count for page in pages), (
-                    f"{extract.name}: PDF page(s) {pages} outside 1..{count}: {source_path}"
-                )
-                if index is not None:
-                    assert isinstance(index, int) and pages == [index + 1], (
-                        f"{extract.name}: page(s) {pages} != pdf_page_index {index} + 1: {source_path}"
-                    )
-                checked_pdfs += 1
+            except AssertionError as exc:
+                failures.append(("page range or non-numeric page", repr(locator), str(exc)))
+                continue
+            try:
+                count = _pdf_page_count(source, pdf_page_counts)
+            except (OSError, subprocess.CalledProcessError, AssertionError) as exc:
+                failures.append(("other", repr(locator), f"could not read PDF page count: {exc}"))
+                continue
+            if not all(1 <= page_number <= count for page_number in pages):
+                failures.append((
+                    "physical page beyond PDF page count",
+                    repr(locator),
+                    f"PDF page(s) {pages} outside 1..{count}: {source_path}",
+                ))
+            if index is not None and (type(index) is not int or pages != [index + 1]):
+                failures.append((
+                    "other",
+                    repr(locator),
+                    f"page(s) {pages} do not match pdf_page_index {index!r} + 1: {source_path}",
+                ))
 
-    _record_demaria_table_8_pin()
-    _record_lamoreaux_page_pins()
     if missing_sources:
-        print(
-            f"Skipped {sum(missing_sources.values())} locators with unavailable sources "
-            f"across {len(missing_sources)} distinct paths."
+        missing_count = sum(missing_sources.values())
+        reason = (
+            f"{extract.name}: cited corpus source absent from configured roots "
+            f"({missing_count} locator(s), {len(missing_sources)} path(s)); "
+            f"checked {configured_root} and {LEGACY_CORPUS_ROOT}"
         )
-    print(
-        f"Checked {len(extracts)} changed extracts: {checked_lines} markdown/text line locators, "
-        f"{checked_pdfs} PDF page locators; {sum(missing_sources.values())} source locators unavailable, "
-        f"{missing_citation_anchors} line locators have no explicit table/figure/value anchor to match."
-    )
+    else:
+        reason = ""
+    if failures:
+        failure_counts: dict[str, int] = {}
+        for kind, _, _ in failures:
+            failure_counts[kind] = failure_counts.get(kind, 0) + 1
+        details = "\n".join(
+            f"{kind} | {extract.name} | {locator} | {detail}"
+            for kind, locator, detail in failures
+        )
+        summary = ", ".join(f"{kind}: {count}" for kind, count in sorted(failure_counts.items()))
+        if reason:
+            details = f"{details}\n{reason}"
+        pytest.fail(f"{len(failures)} locator failure(s) ({summary}):\n{details}", pytrace=False)
+    if reason:
+        pytest.skip(reason)
+
+
+def test_demaria_table_8_locator_pin() -> None:
+    _record_demaria_table_8_pin()
+
+
+def test_lamoreaux_page_pins() -> None:
+    _record_lamoreaux_page_pins()

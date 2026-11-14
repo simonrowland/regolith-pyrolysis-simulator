@@ -4,6 +4,7 @@ import copy
 import csv
 from dataclasses import is_dataclass, fields, replace
 import hashlib
+import itertools
 import json
 import logging
 import math
@@ -24,6 +25,8 @@ from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
 from engines.builtin.vapor_pressure import VaporPressureRangeError
 import scripts.make_recipe_db_profile as generator
 from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.chemistry.kernel import ProposalRejected
+from simulator.core import PoisonedHourError, PoisonedHourState
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -142,6 +145,45 @@ def _run_reference(**kwargs: Any) -> RunReference:
     if authoritative is True and kwargs.get("backend_name") is None:
         kwargs["backend_name"] = "alphamelts"
         kwargs.setdefault("evidence_class", "melts")
+    evidence_class = kwargs.get("evidence_class")
+    backend_name = kwargs.get("backend_name")
+    status = kwargs.get("backend_status")
+    trace = kwargs.get("trace")
+    if status is None and isinstance(trace, Mapping):
+        status = trace.get("backend_status")
+    if (
+        authoritative is True
+        and status in (None, "ok")
+        and evidence_class in {"melts", "magemin"}
+        and isinstance(backend_name, str)
+        and backend_name
+        and isinstance(trace, dict)
+        and trace.get("backend_name") in (None, backend_name)
+    ):
+        diagnostics = trace.get("diagnostics")
+        if not isinstance(diagnostics, dict):
+            diagnostics = {}
+        diagnostics.setdefault("backend_name", backend_name)
+        diagnostics.setdefault("engine_version", "petthermotools 1.2.3")
+        trace["diagnostics"] = diagnostics
+        trace.setdefault("backend_name", backend_name)
+        trace.setdefault("engine_version", "petthermotools 1.2.3")
+    elif (
+        authoritative is True
+        and status in (None, "ok")
+        and evidence_class in {"melts", "magemin"}
+        and isinstance(backend_name, str)
+        and backend_name
+        and trace is None
+    ):
+        kwargs["trace"] = {
+            "backend_name": backend_name,
+            "engine_version": "petthermotools 1.2.3",
+            "diagnostics": {
+                "backend_name": backend_name,
+                "engine_version": "petthermotools 1.2.3",
+            },
+        }
     return RunReference(product_summary=product_summary, **kwargs)
 
 
@@ -3743,72 +3785,95 @@ def test_parallel_composition_target_stub_study_completes(
     pareto_path = tmp_path / "study" / "pareto.json"
     assert pareto_path.exists()
     payload = json.loads(pareto_path.read_text())
-    # Each Morris point books SiO at the activity-1 supply bound. The
-    # coating gate is feasible: the certain deposit is 0 kg and the flagged
-    # bound stays under the 0.5 kg limit. resinter_threshold_kg is null, so
-    # furnace amortization stays resinter_threshold_ungrounded. That gap is
-    # the furnace penalty only. The physical scores stay, and a feasible
-    # point is the priced winner (d-401). No campaign count is invented.
+    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to the
+    # 20 C collector band. The Morris base (seed 0, level 1/3) now places the
+    # upstream walls at 746.67 C. The same unit coordinate on the old
+    # 1400-2200 C map was about 1667 C, which is the SiO wall-fit hole:
+    # Psat is refused at 1773.15 K, inside the published 1400-2273.15 K
+    # numeric range but outside the finite positive-denominator branch. At
+    # 746.67 C the three base points are no longer SiO-refused and remain the
+    # priced Pareto. The thermo step s003 still sits on the
+    # 2200 C ceiling and still refuses SiO at 1773.15 K on
+    # stage_0_to_stage_1 and stage_1_to_stage_2. t-1368 still owns that
+    # rail; s003 stays feasible, unpriced, and off the Pareto.
+    priced_ids = {
+        "morris-screen-0-t0000-s000",
+        "morris-screen-0-t0000-s001",
+        "morris-screen-0-t0000-s002",
+    }
+    hot_id = "morris-screen-0-t0000-s003"
     assert result.status == "completed"
     assert result.winner is not None
-    assert result.pareto
+    assert result.winner.candidate_id == "morris-screen-0-t0000-s000"
+    assert {record.candidate_id for record in result.pareto} == priced_ids
     assert payload["status"] == "completed"
-    assert payload["winner_candidate_id"] == result.winner.candidate_id
-    assert payload["pareto"]
-    assert result.records
-    assert result.leaderboard
+    assert payload["winner_candidate_id"] == "morris-screen-0-t0000-s000"
+    assert {row["candidate_id"] for row in payload["pareto"]} == priced_ids
+    assert (tmp_path / "study" / "winner.recipe.yaml").is_file()
+    assert {record.candidate_id for record in result.records} == priced_ids | {hot_id}
     assert all(record.feasible for record in result.records)
-    definitions = objective_definitions(profile)
+
     for candidate in result.records:
-        assert list(candidate.failing_gates) == []
-        coating = candidate.feasibility_margins["coating"]
-        assert coating["status"] == "warning"
-        assert coating["margin"] == pytest.approx(5.0e-4)
-        assert math.isfinite(float(coating["margin"]))
-        payload_margin = coating["status_payload"]
-        assert payload_margin["certain_upstream_deposit_kg_per_campaign"] == 0.0
-        assert payload_margin[
-            "upstream_wall_deposit_limit_kg_per_campaign"
-        ] == pytest.approx(0.5)
-        assert list(
-            payload_margin["wall_saturation_pressure_refused_species"]
-        ) == ["SiO"]
-        bounds = payload_margin[
-            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
-        ]
-        assert set(bounds) == {"SiO"}
-        assert bounds["SiO"] > 0.0
-        assert bounds["SiO"] < 0.5
-        scores = study._record_objective_scores(candidate, definitions)
-        assert scores
-        assert all(score is not None and math.isfinite(score) for score in scores)
         summary = candidate.product_summary
-        assert "coating_unavailable_reason" not in summary
-        assert summary["coating_status"] == "warning"
-        assert summary["furnace_amortization_status"] == (
-            "resinter_threshold_ungrounded"
-        )
-        assert summary["wall_deposit_upper_bound_used"] is True
-        assert summary["wall_deposit_total_kg"] == pytest.approx(bounds["SiO"])
-        assert summary["supply_interval_upper_bound_used"]["SiO"] > 0
-        bookings = summary["wall_supply_bound_bookings"]
-        assert len(bookings) == 1
-        assert bookings[0]["species"] == "SiO"
-        assert bookings[0]["flag"] == "wall_deposit_upper_bound_used"
-        assert bookings[0]["deposit_kg"] == pytest.approx(
-            bookings[0]["supply_upper_bound_kg"]
-        )
-        assert bookings[0]["deposit_kg"] > 0.0
-        assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
-            bookings[0]["deposit_kg"]
-        )
+        if candidate.candidate_id in priced_ids:
+            assert summary["furnace_amortization_status"] in {
+                "available",
+                "resinter_threshold_ungrounded",
+            }
+            refusal = summary.get("wall_deposit_refusal") or {}
+            authority = refusal.get("authority") or {}
+            refused = authority.get("wall_saturation_pressure_refused_species") or []
+            assert "SiO" not in refused
+        else:
+            assert candidate.candidate_id == hot_id
+            assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
+            refusal = summary["wall_deposit_refusal"]
+            authority = refusal["authority"]
+            assert "wall_deposit_saturation_pressure_refused" in authority["codes"]
+            assert authority["wall_saturation_pressure_refused_species"] == ["SiO"]
+            sio_refusals = authority["wall_saturation_pressure_refusals_by_species"][
+                "SiO"
+            ]
+            assert set(sio_refusals) == {
+                "stage_0_to_stage_1",
+                "stage_1_to_stage_2",
+            }
+            assert all(
+                record["status"] == "refused"
+                and record["temperature_K"] == pytest.approx(1773.15)
+                for record in sio_refusals.values()
+            )
+
         wall_authority = summary["wall_deposit_sticking_authority"]
         refused = wall_authority.get("wall_saturation_pressure_refused_species") or []
-        assert "SiO" in list(refused)
+        if candidate.candidate_id == hot_id:
+            assert "SiO" in list(refused)
+            assert summary["wall_deposit_upper_bound_used"] is True
+            bounds = summary[
+                "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+            ]
+            assert 0.0 < bounds["SiO"] < 0.5
+            assert summary["wall_deposit_total_kg"] == pytest.approx(bounds["SiO"])
+            assert summary["supply_interval_upper_bound_used"]["SiO"] > 0
+            bookings = summary["wall_supply_bound_bookings"]
+            assert len(bookings) == 1
+            assert bookings[0]["species"] == "SiO"
+            assert bookings[0]["flag"] == "wall_deposit_upper_bound_used"
+            assert bookings[0]["deposit_kg"] == pytest.approx(
+                bookings[0]["supply_upper_bound_kg"]
+            )
+            assert bookings[0]["deposit_kg"] > 0.0
+            assert summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
+                bookings[0]["deposit_kg"]
+            )
+        else:
+            assert "SiO" not in list(refused)
         fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
-        # The shipped Stage-1 wall is 1150 C = 1423.15 K, just below the
-        # Tachibana fit's 1443 K lower bound, so this path predicts and flags
-        # the Arrhenius flank instead of using the retired 0.02 scalar.
+        # The shipped Stage-1 condenser wall stays 1150 C = 1423.15 K. That
+        # is the train's fixed Fe stage, not a searched overhead dew point,
+        # and it remains just below the Tachibana fit's 1443 K lower bound.
+        # This pins the Arrhenius domain of the sticking coefficient. It does
+        # not pin an Fe dew point or an Fe Psat number (d-383 owns Psat).
         assert any(
             record.get("alpha_s_form") == "arrhenius"
             and record.get("citation_status") == "CITED"
@@ -3816,6 +3881,430 @@ def test_parallel_composition_target_stub_study_completes(
             and record.get("alpha_s_temperature_K") == pytest.approx(1423.15)
             for record in fe_records
         )
+
+
+def test_parallel_composition_target_winner_ignores_completion_order(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Exact objective ties keep the earliest sample even if results arrive reversed.
+
+    s000/s001/s002 share one priced objective vector (deposit 0, batch cost 0).
+    Serial ask order is the reference winner. Reversing each evaluation batch
+    is the completion-order perturbation: the winner, Pareto id order, and
+    pareto.json bytes stay on that reference.
+    """
+
+    monkeypatch.setattr(generator, "_runtime_engine_identity", lambda: ("stub-engine", "test"))
+    profile_path = tmp_path / "lunar_mare_low_ti__pc-glass-retain-na-k-c3.real.yaml"
+    assert (
+        generator.main(
+            [
+                "lunar_mare_low_ti",
+                "--target",
+                "pc-glass-retain-na-k-c3",
+                "--campaign",
+                "C3",
+                "--hours",
+                "24",
+                "--gate",
+                "physics",
+                "--db",
+                str(tmp_path / "profile.db"),
+                "--out",
+                str(profile_path),
+            ]
+        )
+        == 0
+    )
+    profile = yaml.safe_load(profile_path.read_text())
+    run_kwargs = dict(
+        feedstock="lunar_mare_low_ti",
+        strategy="screen",
+        fidelity="internal-analytical",
+        parallel=2,
+        budget=4,
+        seed=0,
+    )
+    reference = study.run(profile, out_dir=tmp_path / "reference", **run_kwargs)
+    original = study._evaluate_candidates
+
+    def reversed_completion(*args: Any, **kwargs: Any):
+        completed, prefix_evals, pool = original(*args, **kwargs)
+        return tuple(reversed(completed)), prefix_evals, pool
+
+    monkeypatch.setattr(study, "_evaluate_candidates", reversed_completion)
+    reversed_result = study.run(profile, out_dir=tmp_path / "reversed", **run_kwargs)
+
+    priced_order = [
+        "morris-screen-0-t0000-s000",
+        "morris-screen-0-t0000-s001",
+        "morris-screen-0-t0000-s002",
+    ]
+    record_order = priced_order + ["morris-screen-0-t0000-s003"]
+    assert reference.winner is not None
+    assert reference.winner.candidate_id == "morris-screen-0-t0000-s000"
+    assert reversed_result.winner is not None
+    assert reversed_result.winner.candidate_id == reference.winner.candidate_id
+    assert [record.candidate_id for record in reference.pareto] == priced_order
+    assert [record.candidate_id for record in reversed_result.pareto] == priced_order
+    assert [record.candidate_id for record in reference.records] == record_order
+    assert [record.candidate_id for record in reversed_result.records] == record_order
+    assert (tmp_path / "reference" / "pareto.json").read_bytes() == (
+        tmp_path / "reversed" / "pareto.json"
+    ).read_bytes()
+
+
+# Non-tied fronts. Rank order and sampling order disagree, so a tie-only
+# regression cannot see a Pareto list that is still sorted by `_rank_key`.
+# `ask_ordinal`, when set, is the whole sampling key even if `trial_number`
+# and the candidate id sort the other way. With no ordinal, `trial` is the
+# index when the strategy stored one; candidate id is then the remainder.
+# Dominated and infeasible rows must stay off the front.
+_PARETO_PUBLICATION_CASES = {
+    "reviewer_non_tied": {
+        "rows": (
+            ("s000", 10.0, 1.0, None, True),
+            ("s001", 20.0, 5.0, None, True),
+            ("s002", 1.0, 50.0, None, True),
+            ("s-bad", 100.0, 0.0, None, False),
+        ),
+        "published": ("s000", "s001"),
+        "ranked": ("s001", "s000"),
+        "winner": "s001",
+    },
+    "trial_before_candidate_id": {
+        "rows": (
+            ("z-first", 10.0, 1.0, 0, True),
+            ("a-second", 30.0, 9.0, 1, True),
+            ("m-third", 20.0, 4.0, 2, True),
+            ("q-dominated", 5.0, 40.0, 3, True),
+            ("b-infeasible", 80.0, 0.1, 4, False),
+        ),
+        "published": ("z-first", "a-second", "m-third"),
+        "ranked": ("a-second", "m-third", "z-first"),
+        "winner": "a-second",
+    },
+    # Ask order is z then a. Trial order and lexical id order are a then z.
+    # Dropping ask_ordinal publishes the trial/id order.
+    "ask_ordinal_beats_trial_and_candidate_id": {
+        "rows": (
+            ("z-asked-first", 10.0, 1.0, 5, True, 1),
+            ("a-asked-second", 20.0, 5.0, 0, True, 2),
+            ("m-dominated", 1.0, 50.0, 1, True, 3),
+            ("b-infeasible", 80.0, 0.1, 4, False, 4),
+        ),
+        "published": ("z-asked-first", "a-asked-second"),
+        "ranked": ("a-asked-second", "z-asked-first"),
+        "winner": "a-asked-second",
+    },
+}
+
+
+def _pareto_publication_record(
+    candidate_id: str,
+    oxygen: float,
+    energy: float,
+    trial: int | None,
+    feasible: bool,
+    ask_ordinal: int | None = None,
+) -> study.StudyRecord:
+    provenance: dict[str, Any] = {}
+    if trial is not None:
+        provenance["trial_number"] = trial
+    if ask_ordinal is not None:
+        provenance["ask_ordinal"] = ask_ordinal
+    return study.StudyRecord(
+        candidate_id=candidate_id,
+        patch=RecipePatch({}),
+        feasible=feasible,
+        status="ok" if feasible else "infeasible",
+        objectives={
+            "oxygen_kg": oxygen,
+            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: energy,
+        },
+        feasibility_margins={},
+        cache_key=f"cache-{candidate_id}",
+        product_summary={
+            "furnace_amortization_status": "available",
+            "furnace_amortization_batch_cost_equivalents": 0.0,
+        },
+        search_provenance=provenance,
+    )
+
+
+def _pareto_publication_case(
+    case_name: str,
+) -> tuple[tuple[study.StudyRecord, ...], tuple[str, ...], tuple[str, ...], str]:
+    case = _PARETO_PUBLICATION_CASES[case_name]
+    records = tuple(_pareto_publication_record(*row) for row in case["rows"])
+    return records, case["published"], case["ranked"], case["winner"]
+
+
+def _published_ids_for_sink(
+    sink: str,
+    records: tuple[study.StudyRecord, ...],
+    *,
+    definitions: list[study.ObjectiveDefinition],
+    out: Path,
+) -> list[str]:
+    """One publication boundary. File sinks receive whatever order `records` has."""
+
+    if sink == "select_pareto":
+        return [
+            record.candidate_id
+            for record in study._select_pareto(records, definitions).published
+        ]
+    if sink == "pareto_payload":
+        payload = study._pareto_payload(
+            PROFILE,
+            FEEDSTOCK,
+            "internal-analytical",
+            definitions,
+            records,
+            None,
+            RecipeSchema(),
+        )
+        return [row["candidate_id"] for row in payload["pareto"]]
+    if sink == "study_result":
+        result = study.StudyResult(
+            out_dir=out,
+            store_path=out / "cache.sqlite",
+            artifacts={},
+            records=records,
+            leaderboard=records,
+            pareto=records,
+            winner=None,
+        )
+        return [record.candidate_id for record in result.pareto]
+    if sink == "replay_result":
+        replay = study.StudyReplayResult(
+            run_dir=out,
+            manifest={},
+            strategy=_FixedCandidateStrategy(()),
+            records=records,
+            leaderboard=records,
+            pareto=records,
+        )
+        return [record.candidate_id for record in replay.pareto]
+    if sink == "write_artifacts":
+        out.mkdir(parents=True, exist_ok=True)
+        study._write_artifacts(
+            out,
+            profile=PROFILE,
+            feedstock=FEEDSTOCK,
+            fidelity="internal-analytical",
+            definitions=definitions,
+            pareto=records,
+            leaderboard=records,
+            winner=None,
+            schema=RecipeSchema(),
+            failure_counts={},
+            strategy_name="fixed",
+        )
+        payload = json.loads((out / "pareto.json").read_text(encoding="utf-8"))
+        return [row["candidate_id"] for row in payload["pareto"]]
+    if sink == "aborted_cache":
+        out.mkdir(parents=True, exist_ok=True)
+        wrote = study._write_aborted_artifacts_from_cache(
+            out,
+            profile=PROFILE,
+            feedstock=FEEDSTOCK,
+            fidelity="internal-analytical",
+            definitions=definitions,
+            fallback_records=records,
+            schema=RecipeSchema(),
+            failure_counts={},
+            strategy_name="fixed",
+        )
+        assert wrote is True
+        payload = json.loads((out / "pareto.json").read_text(encoding="utf-8"))
+        return [row["candidate_id"] for row in payload["pareto"]]
+    raise AssertionError(f"unknown Pareto publication sink {sink}")
+
+
+@pytest.mark.parametrize("case_name", tuple(_PARETO_PUBLICATION_CASES))
+@pytest.mark.parametrize(
+    "sink",
+    (
+        "select_pareto",
+        "pareto_payload",
+        "study_result",
+        "replay_result",
+        "write_artifacts",
+        "aborted_cache",
+    ),
+)
+def test_pareto_publication_is_sampling_order_on_every_path(
+    case_name: str,
+    sink: str,
+    tmp_path: Path,
+) -> None:
+    """Published Pareto order is sampling order on every sink.
+
+    The winner stays the `_rank_key` minimum. Arrival order, including the
+    objective-rank order a caller might hand a sink, must not leak out.
+    `select_pareto` and the aborted-cache writer also drop dominated and
+    infeasible rows. The other sinks publish the set they are given; those
+    calls pass only the front, in every arrival permutation and in rank order.
+    """
+
+    records, published, ranked, winner = _pareto_publication_case(case_name)
+    assert published != ranked
+    definitions = study.objective_definitions(PROFILE)
+    by_id = {record.candidate_id: record for record in records}
+    front = tuple(by_id[candidate_id] for candidate_id in published)
+    rank_ordered_front = tuple(by_id[candidate_id] for candidate_id in ranked)
+    filters_membership = sink in {"select_pareto", "aborted_cache"}
+    if sink == "select_pareto":
+        # Every arrival order of the full batch, including dominated and
+        # infeasible rows. This is the chokepoint the other sinks publish.
+        arrivals = tuple(itertools.permutations(records))
+    elif sink == "aborted_cache":
+        # Same selector as select_pareto, then pareto.json. The distinguishing
+        # arrivals are the reverse batch, objective rank, and rank-then-rest.
+        rest = tuple(record for record in records if record.candidate_id not in published)
+        arrivals = (
+            tuple(reversed(records)),
+            tuple(sorted(records, key=lambda row: study._rank_key(row, definitions))),
+            rank_ordered_front + rest,
+        )
+    else:
+        arrivals = tuple(itertools.permutations(front))
+    checked_rank_order = False
+    for index, arrival in enumerate(arrivals):
+        ids = _published_ids_for_sink(
+            sink,
+            arrival,
+            definitions=definitions,
+            out=tmp_path / f"{case_name}-{sink}-{index}",
+        )
+        assert ids == list(published)
+        if arrival == rank_ordered_front:
+            checked_rank_order = True
+    if not filters_membership:
+        assert checked_rank_order
+        # The reviewer's counterexample, handed over already sorted by objective.
+        ids = _published_ids_for_sink(
+            sink,
+            rank_ordered_front,
+            definitions=definitions,
+            out=tmp_path / f"{case_name}-{sink}-ranked",
+        )
+        assert ids == list(published)
+        assert ids != list(ranked)
+    else:
+        selection = study._select_pareto(rank_ordered_front, definitions)
+        assert selection.winner is not None
+        assert selection.winner.candidate_id == winner
+        assert [record.candidate_id for record in selection.ranked] == list(ranked)
+        assert [record.candidate_id for record in selection.published] == list(published)
+
+
+def _non_tied_front_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    """s000 oxygen 10 energy 1, s001 oxygen 20 energy 5, s002 dominated."""
+
+    oxygen, energy = {
+        0: (10.0, 1.0),
+        1: (20.0, 5.0),
+        2: (1.0, 50.0),
+    }[_sequence(candidate_id)]
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", oxygen, "kg", ordinal=0),
+                ObjectiveValue("energy_kWh", "minimize", energy, "kWh", ordinal=1),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=_run_reference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+            product_summary={
+                "oxygen_kg": oxygen,
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                },
+            },
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+
+
+def test_non_tied_pareto_publication_ignores_completion_order(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """A better later sample wins, and the front is still published in ask order.
+
+    Serial ask order is the reference. Reversing each evaluation batch is the
+    completion-order perturbation. Two-phase certification and journal replay
+    publish that same id order. Objective rank would emit the winner first.
+    """
+
+    run_kwargs = dict(
+        feedstock=FEEDSTOCK,
+        strategy="random",
+        fidelity="internal-analytical",
+        parallel=2,
+        budget=3,
+        seed=7,
+        evaluator=_non_tied_front_evaluator,
+    )
+    reference = study.run(PROFILE, out_dir=tmp_path / "reference", **run_kwargs)
+    original = study._evaluate_candidates
+
+    def reversed_completion(*args: Any, **kwargs: Any):
+        completed, prefix_evals, pool = original(*args, **kwargs)
+        return tuple(reversed(completed)), prefix_evals, pool
+
+    monkeypatch.setattr(study, "_evaluate_candidates", reversed_completion)
+    reversed_result = study.run(PROFILE, out_dir=tmp_path / "reversed", **run_kwargs)
+    monkeypatch.setattr(study, "_evaluate_candidates", original)
+    certified = study.run(
+        PROFILE,
+        out_dir=tmp_path / "certified",
+        two_phase_certify={"enabled": True, "top_k": 1},
+        **run_kwargs,
+    )
+    replay = study.replay_study(tmp_path / "reference")
+
+    sampling_order = ["random-7-000000", "random-7-000001"]
+    rank_order = ["random-7-000001", "random-7-000000"]
+    assert sampling_order != rank_order
+    assert reference.winner is not None
+    assert reference.winner.candidate_id == "random-7-000001"
+    assert [record.candidate_id for record in reference.leaderboard[:2]] == rank_order
+    for result in (reference, reversed_result, certified):
+        assert result.winner is not None
+        assert result.winner.candidate_id == reference.winner.candidate_id
+        assert [record.candidate_id for record in result.pareto] == sampling_order
+        payload = json.loads((result.out_dir / "pareto.json").read_text(encoding="utf-8"))
+        assert [row["candidate_id"] for row in payload["pareto"]] == sampling_order
+        assert payload["winner_candidate_id"] == "random-7-000001"
+    assert [record.candidate_id for record in replay.pareto] == sampling_order
+    assert (tmp_path / "reference" / "pareto.json").read_bytes() == (
+        tmp_path / "reversed" / "pareto.json"
+    ).read_bytes()
 
 
 def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path) -> None:
@@ -5139,7 +5628,9 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
     assert all(key not in trace for key in primary_captures)
     bound_margin = constraints.extraction_completeness(SimpleNamespace(**trace))
     assert not bound_margin.feasible
-    assert "trace missing product_ledger_kg" in bound_margin.detail
+    assert bound_margin.status == "unavailable"
+    assert bound_margin.observed is None
+    assert "yield-disposition fraction table unavailable" in bound_margin.detail
 
     threshold = ThresholdSpec(
         id="extraction_completeness_min",
@@ -5243,7 +5734,9 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
             }
         )
     )
-    assert math.isfinite(bound.observed)
+    assert bound.status == "unavailable"
+    assert bound.observed is None
+    assert "yield-disposition fraction table unavailable" in bound.detail
     assert not bound.feasible
 
     stored = store.lookup(spec)
@@ -5666,7 +6159,10 @@ def _all_slow_evaluator(
 
 
 @pytest.mark.cpu_budget(25)
-@pytest.mark.timeout(25)
+# 6x the CPU budget, the project wall guard. An explicit 25s mark fires while
+# the eval-timeout process pool is still waiting on a loaded studio. Two 30s
+# sleeps still cannot pass: the rows must record timeout, not ok.
+@pytest.mark.timeout(150)
 def test_parallel_all_timeouts_is_a_designed_no_winner_outcome(tmp_path) -> None:
     """Every candidate timing out is a DESIGNED outcome, not a crash.
 
@@ -5855,44 +6351,50 @@ def test_single_feasible_point_is_winner(tmp_path) -> None:
     assert [row["candidate_id"] for row in pareto_payload["pareto"]] == ["random-7-000001"]
 
 
-def test_winner_tie_determinism_uses_cache_key_then_candidate_id(tmp_path) -> None:
-    def tied(
-        patch: RecipePatch,
-        feedstock: str,
-        fidelity: str,
-        *,
-        profile: Mapping[str, Any],
-        candidate_id: str | None = None,
-        **_: Any,
-    ) -> ScoredResult:
-        spec = _spec(patch, feedstock, fidelity, profile)
-        return ScoredResult(
+def test_winner_tie_determinism_uses_sampling_order_not_cache_key() -> None:
+    """Exact ties follow sampling order even when cache_key sorts the other way.
+
+    Records arrive last-sample-first, which is what a reversed completion
+    batch looks like. ``cache_key`` is not part of the rank key: a smaller
+    hash on the later sample must not win, and dropping the sampling-order
+    component makes a stable sort keep that arrival order.
+    """
+
+    definitions = study.objective_definitions(PROFILE)
+
+    def record(candidate_id: str, cache: str) -> study.StudyRecord:
+        return study.StudyRecord(
             candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key=cache_key(spec),
+            patch=RecipePatch({}),
             feasible=True,
-            objectives=ObjectiveVector(
-                (
-                    ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),
-                    ObjectiveValue("energy_kWh", "minimize", 5.0, "kWh", ordinal=1),
-                )
-            ),
-            feasibility_margins={"delivered_stream_purity": _margin()},
-            run_reference=_run_reference(
-                status="ok",
-                trace={"backend_status": "diagnostic_stub"},
-            ),
+            status="ok",
+            objectives={
+                "oxygen_kg": 10.0,
+                ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: 5.0,
+            },
+            feasibility_margins={},
+            cache_key=cache,
+            product_summary={
+                "furnace_amortization_status": "available",
+                "furnace_amortization_batch_cost_equivalents": 0.0,
+            },
         )
 
-    first = study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, tmp_path / "first", seed=7, evaluator=tied)
-    second = study.run(PROFILE, FEEDSTOCK, "random", "internal-analytical", 1, 3, tmp_path / "second", seed=7, evaluator=tied)
-
-    expected = min(first.pareto, key=lambda record: (record.cache_key or "", record.candidate_id))
-    assert first.winner.candidate_id == expected.candidate_id
-    assert second.winner.candidate_id == expected.candidate_id
-    assert [record.candidate_id for record in first.pareto] == [
-        record.candidate_id for record in second.pareto
+    # Arrival order is the reverse of sampling order. Later samples also
+    # carry the lexicographically smaller cache key.
+    records = (
+        record("random-7-000002", "reverse-000000"),
+        record("random-7-000001", "reverse-000001"),
+        record("random-7-000000", "reverse-000002"),
+    )
+    ranked = sorted(records, key=lambda row: study._rank_key(row, definitions))
+    assert [row.candidate_id for row in ranked] == [
+        "random-7-000000",
+        "random-7-000001",
+        "random-7-000002",
     ]
+    by_cache = sorted(records, key=lambda row: (row.cache_key or "", row.candidate_id))
+    assert by_cache[0].candidate_id == "random-7-000002"
 
 
 def test_completed_rerun_preserves_provenance_without_duplicating_rows(tmp_path) -> None:
@@ -6271,6 +6773,83 @@ def test_typed_physics_refusals_are_stored_and_study_continues(tmp_path) -> None
         assert expected_reason in row["notes"]
         assert row["feasibility_margins"]["physics_refusal"]["detail"] == expected_reason
         assert row["trace_summary"]["refusal_reason"] == expected_reason
+
+
+def test_poisoned_candidate_is_recorded_and_study_evaluates_healthy_candidate(
+    tmp_path,
+) -> None:
+    poisoned = PoisonedHourError(
+        PoisonedHourState(
+            hour=160,
+            committed_transition_count=3,
+            aborting_exception_summary=(
+                "ProposalRejected: partial withdrawal from mixed-origin "
+                "process.overhead_gas.Na requires an explicitly amalgamated pool"
+            ),
+            aborting_exception_type=ProposalRejected,
+        )
+    )
+    healthy_evaluator = _evaluator()
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        if _sequence(candidate_id) == 0:
+            return evaluate(
+                patch,
+                feedstock,
+                fidelity,
+                profile=profile,
+                candidate_id=candidate_id,
+                executor=_StudyFakeExecutor(exc=poisoned),
+                schema=kwargs.get("schema") or RecipeSchema(),
+                constraints=kwargs.get("constraints"),
+            )
+        return healthy_evaluator(
+            patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            **kwargs,
+        )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        1,
+        2,
+        tmp_path / "poisoned-candidate-study",
+        seed=7,
+        evaluator=evaluator,
+    )
+
+    assert result.status == study.COMPLETED_STATUS
+    assert len(result.records) == 2
+    poisoned_record = next(
+        record for record in result.records if record.candidate_id.endswith("000000")
+    )
+    healthy_record = next(
+        record for record in result.records if record.candidate_id.endswith("000001")
+    )
+    assert poisoned_record.failure_category == FailureCategory.PHYSICS_REFUSED.value
+    assert poisoned_record.failing_gates == ("physics_refusal",)
+    assert "process.overhead_gas.Na" in poisoned_record.feasibility_margins[
+        "physics_refusal"
+    ]["detail"]
+    assert healthy_record.feasible
+    summary = json.loads(
+        (tmp_path / "poisoned-candidate-study" / "pareto.json").read_text()
+    )
+    assert summary["failure_counts"] == {"physics_refused": 1}
 
 
 def test_all_invalid_recipe_results_fail_loud_with_counts(tmp_path) -> None:
@@ -6748,30 +7327,36 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     )
     assert good.returncode == 0, good.stderr
     assert (out_dir / "pareto.json").exists()
-    # This stub is where the congruent surface balance ADDS a CrO2 wall
-    # saturation-pressure refusal. The supply is below the mass-balance
-    # ledger resolution, so the wall entry is an authorized physical zero
-    # and the candidate still wins. The constrained-max 1-hour C0 smoke
-    # below is a different scenario: it does not remove this refusal.
+    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
+    # 20 C. Seed 7's liner is now about 822 C; the same unit coordinate on
+    # the old 1400-2200 C map was about 1694 C. The CrO2 saturation pressure
+    # is still refused. d-401 supplies the bounded estimate; this case falls
+    # below ledger resolution and books an authorized zero, so the candidate
+    # remains priced. Furnace amortization remains available at zero cost.
     assert (out_dir / "winner.recipe.yaml").exists()
-    # The analytical smoke reports backend status unavailable, so the result
-    # store rejects the sqlite row. The scored summary is the pareto artifact.
-    pareto_payload = json.loads((out_dir / "pareto.json").read_text())
-    winner_id = pareto_payload["winner_candidate_id"]
+    status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
+    assert status["status"] == "SUCCEEDED"
+    assert status["study_status"] == "completed"
+    assert status["success"] is True
+    winner_id = status["winner_candidate_id"]
+    pareto = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
+    assert pareto["status"] == "completed"
+    assert pareto["winner_candidate_id"] == winner_id
     winner_rows = [
-        row
-        for row in pareto_payload["pareto"]
-        if row.get("candidate_id") == winner_id
+        row for row in pareto["pareto"] if row.get("candidate_id") == winner_id
     ]
-    assert winner_rows, pareto_payload["pareto"]
-    cro2_booked = []
-    for row in winner_rows:
-        summary = row.get("product_summary") or {}
-        for booking in summary.get("wall_supply_bound_bookings") or []:
-            if booking.get("species") == "CrO2":
-                cro2_booked.append((summary, booking))
-    assert cro2_booked, winner_rows
-    summary, cro2 = cro2_booked[0]
+    assert winner_rows
+    booked = [
+        (row.get("product_summary") or {}, booking)
+        for row in winner_rows
+        for booking in (row.get("product_summary") or {}).get(
+            "wall_supply_bound_bookings",
+            (),
+        )
+        if booking.get("species") == "CrO2"
+    ]
+    assert len(booked) == 1
+    summary, cro2 = booked[0]
     assert summary["furnace_amortization_status"] == "available"
     assert cro2["reason"] == "below_wall_supply_upper_bound"
     assert cro2["deposit_kg"] == 0.0
@@ -6783,12 +7368,12 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
         summary.get("wall_deposit_sticking_authority") or {}
     ).get("wall_saturation_pressure_refused_species") or []
     assert "CrO2" in list(refused)
-    status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
-    assert status["status"] == "SUCCEEDED"
-    assert status["success"] is True
-    assert status["winner_candidate_id"]
-
-
+    provenance = _read_provenance(out_dir)
+    assert len(provenance) == 1
+    assert provenance[0]["feasible"] is True
+    assert provenance[0]["failing_gates"] == []
+    provenance_summary = provenance[0]["product_summary"]
+    assert provenance_summary["furnace_amortization_status"] == "available"
 def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> None:
     captured: dict[str, Any] = {}
 
@@ -6948,13 +7533,23 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    # This 1-hour C0 smoke is not the stub above. The stub
-    # (test_cli_help_unknowns_and_budget_one_stub_run) is where the congruent
-    # surface balance ADDS a CrO2 wall saturation-pressure refusal, booked as
-    # an authorized zero. Here resinter_threshold_kg is null, so
-    # lifespan_cost_status stays threshold_unavailable and the consumed
-    # fraction stays empty. The winner is still written.
+    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
+    # 20 C. Seed 0's pipe default is now about 782 C; the same unit
+    # coordinate on the old 1400-2200 C map was about 1680 C. Saturation at
+    # the colder wall is no longer a refusal: wall_deposit_total_kg is a
+    # measured 0, so lifespan status is threshold_unavailable because
+    # resinter_threshold_kg is still null. The consumed fraction stays
+    # empty and the row remains rank 1.
     assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
+    provenance = _read_provenance(out_dir)
+    assert len(provenance) == 1
+    summary = provenance[0]["product_summary"]
+    assert summary["lifespan_cost_status"] == "threshold_unavailable"
+    assert "resinter_threshold_kg is null" in summary["lifespan_cost_status_reason"]
+    assert summary["wall_deposit_total_kg"] == 0.0
+    assert summary["resinter_threshold_kg"] is None
+    assert summary["has_positive_qualified_fouling"] is False
+    assert summary["furnace_amortization_status"] == "available"
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(

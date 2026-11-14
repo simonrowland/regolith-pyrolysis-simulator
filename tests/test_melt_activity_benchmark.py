@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
 from types import SimpleNamespace
 
 import csv
@@ -36,6 +37,43 @@ class _FakeActivityEngine:
             status="ok",
             details={"observable_family": "activity"},
         )
+
+
+def test_published_mole_fraction_drives_engine_boundary_verdict():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    point = next(
+        row
+        for row in fixture["points"]
+        if isinstance(row.get("published_mole_fraction"), dict)
+    )
+    point = {
+        **point,
+        "composition_wt_pct": {"SiO2": 90.0, "Na2O": 10.0},
+    }
+    from simulator.accounting.formulas import project_oxide_composition
+
+    expected_wt_pct = project_oxide_composition(
+        {
+            oxide: amount
+            for oxide, amount in point["published_mole_fraction"].items()
+        },
+        source_basis="moles",
+    )
+    expected_wt_pct = {
+        oxide: 100.0 * amount for oxide, amount in expected_wt_pct.items()
+    }
+    received = {}
+
+    class _CaptureEngine(_FakeActivityEngine):
+        def evaluate(self, composition_wt_pct, temperature_K, fO2_bar):
+            received["composition_wt_pct"] = composition_wt_pct
+            return super().evaluate(composition_wt_pct, temperature_K, fO2_bar)
+
+    benchmark.run_points(
+        {**fixture, "points": [point]}, [_CaptureEngine()]
+    )
+
+    assert received["composition_wt_pct"] == pytest.approx(expected_wt_pct)
 
 
 def test_harness_runs_end_to_end_on_tiny_fixture(tmp_path, monkeypatch):
@@ -181,6 +219,157 @@ def test_pure_solid_activity_rows_score_after_battery_conversion(oxide):
     )
 
     assert rows[0]["residual_dex"] == pytest.approx(0.0, abs=1e-12)
+
+
+# b-205. Independently specified solid-to-liquid pins. Each DeltaG_fus is
+# G_liquid - G_crystal from linear interpolation of the JANAF formation-Gibbs
+# nodes below. Fraction f = (T - 1800) / 100 on the 1800 K / 1900 K nodes.
+# R = 8.31441 J mol^-1 K^-1.
+# a_liquid = a_solid * exp(-DeltaG_fus * 1000 / (R T)).
+#
+# Al2O3 corundum Al-096 / liquid Al-100. Span G_s = 32.415, G_l = 28.910.
+#   1823 K, f=0.23: G_s = -1098.841 + 0.23*32.415 = -1091.38555
+#                   G_l = -1077.235 + 0.23*28.910 = -1070.58570
+#                   ΔG = 20.79985
+#   gamma Al-098 span 31.295: G(1823 K) = -1091.274 + 0.23*31.295 = -1084.07615
+#   1873 K, f=0.73: G_s = -1098.841 + 0.73*32.415 = -1075.17805
+#                   G_l = -1077.235 + 0.73*28.910 = -1056.13070
+#                   ΔG = 19.04735
+#   gamma: G(1873 K) = -1091.274 + 0.73*31.295 = -1068.42865
+# CaO lime Ca-027 / liquid Ca-028, the only eligible crystal. Span 19.379 / 16.969.
+#   1823 K: G_s = -440.375 + 0.23*19.379 = -435.91783
+#           G_l = -406.017 + 0.23*16.969 = -402.11413
+#           ΔG = 33.80370
+#   1873 K: G_s = -440.375 + 0.73*19.379 = -426.22833
+#           G_l = -406.017 + 0.73*16.969 = -393.62963
+#           ΔG = 32.59870
+# MgO periclase Mg-008 / liquid Mg-009. Span 20.456 / 18.313.
+#   1873 K: G_s = -360.851 + 0.73*20.456 = -345.91812
+#           G_l = -330.816 + 0.73*18.313 = -317.44751
+#           ΔG = 28.47061
+# SiO2 cristobalite O-035 / liquid O-038. Span 19.773 / 19.381.
+#   1823 K: G_s = -590.378 + 0.23*19.773 = -585.83021
+#           G_l = -589.559 + 0.23*19.381 = -585.10137
+#           ΔG = 0.72884
+#   quartz O-037 span 19.913: G(1823 K) = -589.059 + 0.23*19.913 = -584.47901
+#   1873 K: G_s = -590.378 + 0.73*19.773 = -575.94371
+#           G_l = -589.559 + 0.73*19.381 = -575.41087
+#           ΔG = 0.53284
+#   quartz: G(1873 K) = -589.059 + 0.73*19.913 = -574.52251
+#
+# Where a second crystal is eligible, bound_dex = |G_alt - G_stable| * 1000 / (R T ln 10).
+_JANAF_R_J_PER_MOL_K = Decimal("8.31441")
+# (oxide, T) -> ΔG_fus kJ/mol, JANAF tables, chosen polymorph or None,
+# stable G kJ/mol, alternative G kJ/mol.
+_SOLID_TO_LIQUID_PINS = {
+    ("Al2O3", Decimal("1823")): (
+        "20.79985",
+        "Al-096/Al-100",
+        "corundum",
+        Decimal("-1091.38555"),
+        Decimal("-1084.07615"),
+    ),
+    ("Al2O3", Decimal("1873")): (
+        "19.04735",
+        "Al-096/Al-100",
+        "corundum",
+        Decimal("-1075.17805"),
+        Decimal("-1068.42865"),
+    ),
+    ("CaO", Decimal("1823")): ("33.80370", "Ca-027/Ca-028", None, None, None),
+    ("CaO", Decimal("1873")): ("32.59870", "Ca-027/Ca-028", None, None, None),
+    ("MgO", Decimal("1873")): ("28.47061", "Mg-008/Mg-009", None, None, None),
+    ("SiO2", Decimal("1823")): (
+        "0.72884",
+        "O-035/O-038",
+        "cristobalite_high",
+        Decimal("-585.83021"),
+        Decimal("-584.47901"),
+    ),
+    ("SiO2", Decimal("1873")): (
+        "0.53284",
+        "O-035/O-038",
+        "cristobalite_high",
+        Decimal("-575.94371"),
+        Decimal("-574.52251"),
+    ),
+}
+
+
+def _independent_solid_to_liquid(pin, temperature_K: Decimal):
+    """Activity factor and conversion record from the pinned JANAF nodes."""
+
+    delta_g, tables, chosen, stable_g, alternative_g = pin
+    factor = (
+        -Decimal(delta_g)
+        * Decimal(1000)
+        / (_JANAF_R_J_PER_MOL_K * temperature_K)
+    ).exp()
+    if chosen is None:
+        inference = "polymorph_inference_flag=not_emitted_by_battery_scorer"
+    else:
+        # Equal chemical potential: changing the pure-solid standard shifts
+        # log10(a) by DeltaG / (R T ln 10). DeltaG here is kJ/mol.
+        bound_dex = (
+            abs(alternative_g - stable_g)
+            * Decimal(1000)
+            / (_JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln())
+        )
+        inference = (
+            "polymorph_inference_flag=true; "
+            f"chosen_polymorph={chosen}; "
+            f"stability_bound_dex={bound_dex}"
+        )
+    record_prefix = (
+        "solid_to_liquid_reference_conversion: "
+        f"DeltaG_fus={delta_g} kJ/mol; factor="
+    )
+    record_suffix = f"; JANAF_tables={tables}; {inference}"
+    return factor, record_prefix, record_suffix
+
+
+def test_saved_pure_solid_activity_rows_record_each_conversion():
+    """Saved Kume rows carry the JANAF solid-to-liquid activity from the node pins.
+
+    Expected DeltaG, tables, and polymorph bound are the literals above.
+    A regenerated CSV whose conversion disagrees with those literals fails.
+    """
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    solid_points = {
+        point["id"]: point
+        for point in fixture["points"]
+        if point["observable"] == "activity"
+        and benchmark.measured_activity_basis(point) == "pure_solid"
+    }
+    results_path = benchmark.DEFAULT_OUTPUT_DIR / "benchmark-results.csv"
+    with results_path.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+
+    solid_rows = [row for row in rows if row["point_id"] in solid_points]
+    assert solid_rows
+    assert len(solid_rows) == len(solid_points) * len(benchmark.DEFAULT_ENGINES)
+    assert len(solid_rows) == 1752
+    for point_id, point in solid_points.items():
+        temperature_K = Decimal(str(point["temperature_K"]))
+        pin = _SOLID_TO_LIQUID_PINS[(str(point["parent_oxide"]), temperature_K)]
+        factor, record_prefix, record_suffix = _independent_solid_to_liquid(
+            pin, temperature_K
+        )
+        expected_measured = float(Decimal(str(point["measured"])) * factor)
+        point_rows = [row for row in solid_rows if row["point_id"] == point_id]
+        assert len(point_rows) == len(benchmark.DEFAULT_ENGINES)
+        for row in point_rows:
+            reason = row["reason"]
+            assert record_prefix in reason, point_id
+            assert record_suffix in reason, point_id
+            start = reason.index(record_prefix) + len(record_prefix)
+            end = reason.index(record_suffix, start)
+            # liquid/solid under Decimal context 28 can differ from exp(-DeltaG/RT)
+            # by one unit in the last place. That is spelling of the same factor.
+            parsed_factor = Decimal(reason[start:end])
+            assert abs(parsed_factor - factor) <= Decimal("1e-27"), point_id
+            assert float(row["measured"]) == expected_measured, point_id
 
 
 def test_regeneration_without_live_check_refuses_to_drop_anchor_csv(

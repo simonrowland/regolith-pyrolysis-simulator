@@ -1,0 +1,165 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 0023d68cd025dac5bba21cdb9e2358370eabd2ae17c7cb1ea9240b13263c4335
+  citation: Dai, W., Seetharaman, S. & Staffansson, L.-I. (1984). A thermodynamic study of the system Fe-Na-O. Scandinavian
+    Journal of Metallurgy 13(1), 32-38.
+  source_ids:
+  - dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
+    files:
+    - asset_id: pdf:dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+      role: pdf
+      path: raw/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry.pdf
+      sha256:
+        tag: value
+        value: b33b89dd8a837717816dac2dbe85b0e68e5c8c48dee326c2ebac8cf8029aeb55
+    - asset_id: pdftotext:dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+      role: pdftotext
+      path: text/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 0023d68cd025dac5bba21cdb9e2358370eabd2ae17c7cb1ea9240b13263c4335::dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 0023d68cd025dac5bba21cdb9e2358370eabd2ae17c7cb1ea9240b13263c4335
+  locator:
+    page: 3
+    published_page: 34
+    pdf_page_index: 2
+    table: I
+    note: row=1
+context:
+- observation_id: dai_1984_emf_measurement_fit_context
+  type: measurement_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 34
+    section: EMF measurements
+    equation: '7'
+    figure: '4'
+  units: mV; T in K as printed
+  values:
+    quantity_as_printed: electromotive force (EMF)
+    method_class: measured_reduced
+    schema_gap: There is no electrochemical measurement observation type or EMF quantity token. MethodToken.EMF_CELL identifies
+      the apparatus, not the measured quantity; the fitted relation is retained as typed-refused context.
+    schema_gap_symbols:
+    - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+    - simulator/battery/enums.py::Quantity
+    - simulator/battery/enums.py::MethodToken.EMF_CELL
+    admission_status: typed_refusal
+    equation_as_printed: E (mV) = 461.98 (±0.11) + 0.1264 (±0.00011)T; 923 < T,K < 1023
+    uncertainty_as_printed: ±0.11 mV; ±0.00011 mV/K
+    confidence_level: not_stated
+    temperature_range_K_as_printed:
+    - '923'
+    - '1023'
+    cell_as_printed: Pt, Na2Fe2O4(s), Fe2O3(s), O2(air) || Na+ (Na beta-alumina) || (0.45 Na2O-0.55 WO3), O2(air), Pt
+    oxygen_environment_as_printed: Commercial-grade air was circulated to maintain a constant oxygen partial pressure; no
+      numeric oxygen pressure or total pressure is stated.
+    raw_data_note: Individual EMF data are figure-only in Figure 4 and were not digitized.
+  point_conditions:
+    phase_assemblage:
+      state:
+        tag: value
+        value: Na2Fe2O4(s), Fe2O3(s), O2(air); Na+ beta-alumina; Na2O-WO3 reference melt
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        equation: '7'
+        figure: '4'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Multiple temperatures are plotted; the equation is reported over 923<T,K<1023.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        equation: '7'
+        figure: '4'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Air is stated but no numeric oxygen pressure/reference pressure is stated.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        equation: '7'
+        figure: '4'
+    atmosphere:
+      state:
+        tag: value
+        value: Commercial-grade air circulated to maintain a constant oxygen partial pressure; gas ratio not stated.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        section: EMF measurements
+        equation: '7'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: No total pressure is stated.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        equation: '7'
+        figure: '4'
+    reference_melt_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '0.45'
+          WO3: '0.55'
+          basis_as_printed: mole fraction
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 32
+        section: Principle
+        note: Cell notation prints 0.45 Na2O-0.55 WO3.
+  context_id: dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry::context::dai_1984_emf_measurement_fit_context
+  work_id: 0023d68cd025dac5bba21cdb9e2358370eabd2ae17c7cb1ea9240b13263c4335
+  source_id: dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+  species: Na2Fe2O4

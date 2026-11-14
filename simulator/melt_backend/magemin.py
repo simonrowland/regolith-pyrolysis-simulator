@@ -96,6 +96,7 @@ from __future__ import annotations
 import builtins
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
+from decimal import Decimal, InvalidOperation
 import fcntl
 import json
 import math
@@ -103,7 +104,9 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
+import threading
 import time
 import warnings
 from dataclasses import dataclass
@@ -111,8 +114,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
-from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
 from simulator.fe_redox import RedoxState, normalize_redox_state
+from simulator.oxygen_buffers import oneill_qfm_log10_fO2_bar
 from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
@@ -175,52 +178,78 @@ _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS = 64
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS = 128
 _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
-    tempfile.gettempdir(),
+    # TMPDIR differs between dispatches and xdist workers; slots must not.
+    '/tmp',
     'regolith-pyrolysis-simulator',
 )
 _MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
     f'magemin-subprocess-{os.getuid()}.lock'
 )
+_MAGEMIN_ENGINE_VERSION_CACHE: Dict[Tuple[str, int, int, int], str] = {}
+_MAGEMIN_ENGINE_VERSION_CACHE_LOCK = threading.Lock()
 
 
 def _magemin_subprocess_slot_count() -> int:
-    """Bounded machine-wide MAGEMin binary concurrency (K slots).
-
-    Each MAGEMin CLI call runs in a private TemporaryDirectory — there is
-    no shared mutable state between invocations, so the old exclusive lock
-    (K=1) was a CPU-contention bound, not a correctness requirement (t-385
-    lock audit, 2026-07-22). K>1 lets independent heavy tests overlap
-    instead of paying each other's wall-clock. Determinism under bounded K
-    is verified by the split_path concurrent A/B against sequential pins
-    (rel=1e-12). Override with REGOLITH_MAGEMIN_SLOTS; K=1 restores strict
-    serialization.
-    """
-    raw = os.environ.get('REGOLITH_MAGEMIN_SLOTS', '')
+    """Host-wide launch limit; retain the existing SLOTS override as an alias."""
+    raw = os.environ.get(
+        'REGOLITH_MAGEMIN_MAX_CONCURRENCY',
+        os.environ.get('REGOLITH_MAGEMIN_SLOTS', ''),
+    )
     try:
         value = int(raw)
     except (TypeError, ValueError):
         value = 0
     if value >= 1:
         return value
-    cores = os.cpu_count() or 4
-    return max(1, min(3, cores // 6))
+    return 2
+
+
+def _magemin_subprocess_env() -> Dict[str, str]:
+    """Single-rank CLI policy: no TCP BTL or GPU/GUI topology discovery."""
+    env = os.environ.copy()
+    loopback = 'lo0' if sys.platform == 'darwin' else 'lo'
+    env.update({
+        # Open MPI 5: self suffices for one rank; ob1 owns BTL selection.
+        'OMPI_MCA_btl': 'self',
+        'OMPI_MCA_pml': 'ob1',
+        # Runtime control traffic is separate from the MPI data BTL.
+        'PMIX_MCA_ptl_base_if_include': loopback,
+        'PRTE_MCA_prte_if_include': loopback,
+        # The installed hwloc 2.13 build offers opencl, but no other GPU plugin.
+        'HWLOC_COMPONENTS': '-opencl',
+        'MPLBACKEND': 'Agg',
+    })
+    env.pop('DISPLAY', None)
+    return env
 
 
 @contextmanager
 def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
     """Acquire one of K machine-wide MAGEMin launch slots (see above)."""
     deadline = time.monotonic() + max(0.001, float(timeout_s))
-    _MAGEMIN_SUBPROCESS_LOCK_DIR.mkdir(parents=True, exist_ok=True)
-    slots = _magemin_subprocess_slot_count()
     lock_files = []
     acquired_index = -1
     try:
-        for index in range(slots):
-            path = (
-                _MAGEMIN_SUBPROCESS_LOCK if index == 0
-                else _MAGEMIN_SUBPROCESS_LOCK.with_suffix(f'.slot{index}')
-            )
-            lock_files.append(path.open('a+b'))
+        try:
+            _MAGEMIN_SUBPROCESS_LOCK_DIR.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            raise _MAGEMinEngineLifecycleError(
+                'MAGEMinSubprocessSlotUnavailable',
+                f'MAGEMin subprocess slot is unavailable: {exc}',
+            ) from exc
+        slots = _magemin_subprocess_slot_count()
+        try:
+            for index in range(slots):
+                path = (
+                    _MAGEMIN_SUBPROCESS_LOCK if index == 0
+                    else _MAGEMIN_SUBPROCESS_LOCK.with_suffix(f'.slot{index}')
+                )
+                lock_files.append(path.open('a+b'))
+        except OSError as exc:
+            raise _MAGEMinEngineLifecycleError(
+                'MAGEMinSubprocessSlotUnavailable',
+                f'MAGEMin subprocess slot is unavailable: {exc}',
+            ) from exc
         while True:
             for index, lock_file in enumerate(lock_files):
                 try:
@@ -231,13 +260,19 @@ def _magemin_subprocess_slot(timeout_s: float) -> Iterator[None]:
                     break
                 except BlockingIOError:
                     continue
+                except OSError as exc:
+                    raise _MAGEMinEngineLifecycleError(
+                        'MAGEMinSubprocessSlotUnavailable',
+                        f'MAGEMin subprocess slot is unavailable: {exc}',
+                    ) from exc
             if acquired_index >= 0:
                 break
             remaining = deadline - time.monotonic()
             if remaining <= 0.0:
                 raise _MAGEMinEngineLifecycleError(
                     'MAGEMinSubprocessSlotTimeout',
-                    f'MAGEMin subprocess slot timed out after {timeout_s:g}s',
+                    f'MAGEMin subprocess slot timed out after '
+                    f'{timeout_s:g}s',
                 )
             time.sleep(min(0.01, remaining))
         yield
@@ -887,6 +922,213 @@ _MAGEMIN_STATUS_RE = re.compile(
     r'^\s*Status\s+:\s+(-?\d+)(?:\s+\[([^\]]+)\])?\s*$',
     re.MULTILINE,
 )
+# PrintOutput writes this whenever verbose is not -1, including --Verb=0.
+# Example: "Mass residual      : +5.34576e-06" (non-negative BR_norm).
+_MAGEMIN_MASS_RESIDUAL_RE = re.compile(
+    r'^\s*Mass residual\s*:\s*'
+    r'([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)',
+    re.MULTILINE,
+)
+# Green's closure at 16c8dabfa: math.isclose(sum, 1, abs_tol=1e-4) with
+# every token in [0, 1]. Those rows stay the raw floats, byte-identical
+# to green.
+_MODE_GREEN_CLOSURE_ABS = 1.0e-4
+# d-367: "we can't refuse pedantically when it provides an unphysical 0
+# result" and "we want to flag bugs but let's fix it with a warning in
+# the meantime". Physics re-ruling 2026-11-10 overrides the ticket text
+# that still refused a lone 1.0002. A sum or token excess up to 1e-3 is
+# renormalised onto a mode_vector_renormalised notice carrying the raw
+# tokens, the raw sum, and the Mass residual. Above 1e-3 the typed
+# refusal stays. The solver residual is recorded and is not the bound.
+# Deficits outside the green closure stay typed refusals; the ruling
+# covers sum excess only.
+#
+# Premise. The finder decides on F (liquid fraction) at two thresholds
+# (liquidus.py): solid θ_s = solid_epsilon = 1e-3 (F > θ_s), and liquid
+# θ_l = 1 - liquid_epsilon = 0.999 (F >= θ_l). Renormalising a mode
+# vector with sum S = 1 + δ, 0 < δ <= 1e-3, gives F' = F/S.
+# Algebra. F - F' = F·δ/(1+δ) < δ. A decision can flip only if F lies
+# within δ of a threshold:
+# - liquidus: θ_l <= F < θ_l·S;
+# - solidus: the analogous window.
+# Example: the printed "1.00003 0.00008" gives
+# F' = 1.00003/1.00011 = 0.99992 >= 0.999, so it does not flip.
+# Map to temperature. A flip moves the bracket by ΔT <= δ / |dF/dT|
+# at the crossing. The finder's tolerance_C (2 K) is unaffected iff
+# |dF/dT| >= δ / tolerance_C = 1e-3 / 2 K = 5e-4 per K.
+# Units: δ is dimensionless and |dF/dT| is 1/K, so ΔT is in K.
+# Sanity: a basalt melting interval of ~200 K averages dF/dT ~ 5e-3
+# per K, 10x the requirement, and the curve is steeper near the
+# liquidus. Do not rely on that average. When a renormalised sample
+# takes part in a threshold decision, the finder computes the local
+# slope from the two bracketing samples, s = |ΔF/ΔT|, attaches
+# ΔT_bound = δ/s to the notice, and sets
+# renormalisation_may_shift_bracket when ΔT_bound > tolerance_C.
+# The result is kept (d-367). Raw F > 1 is unphysical; F' removes it,
+# and the computed ΔT_bound states what remains.
+_MODE_RENORMALISE_CAP = Decimal('0.001')
+
+
+def _close_printed_mode_vector(
+    names: Sequence[str],
+    values: Sequence[str],
+) -> tuple[
+    str,
+    list[tuple[str, float]],
+    list[tuple[str, Decimal, str, float]],
+    Decimal,
+]:
+    """Classify one printed MAGEMin mode vector. The only closure decision.
+
+    Invariant: every printed vector is exactly one of
+    - raw floats, when it is inside green's 1e-4 closure and every token
+      is in [0, 1], or the printed decimal sum is already 1;
+    - a renormalisation, when the raw sum exceeds 1 by at most 1e-3 and
+      every token is in [0, 1+1e-3]. Stored fractions are the raw tokens
+      divided by the raw sum, and the closure residual is written onto
+      the largest component so a positive quotient is not replaced by 0.
+      A lone 1.0002 and hour 156 are this class;
+    - a typed refusal: a token outside [0, 1+1e-3] (including 1.0011), a
+      mass deficit outside the green closure, or a sum excess above 1e-3.
+
+    No branch stores a silent un-normalised success, and no branch turns a
+    positive token into 0. The Mass residual is not an input: it cannot
+    move a vector between these classes. Duplicate phase names are summed
+    only after this decision.
+    """
+    raw_rows: list[tuple[str, Decimal, str, float]] = []
+    for name, raw in zip(names, values):
+        try:
+            token = Decimal(raw)
+        except InvalidOperation as exc:
+            _raise_magemin_output_invalid(
+                f'MAGEMin Mode token for {name!r} is not numeric: {raw!r}',
+                exc,
+            )
+        if (
+            not token.is_finite()
+            or token < 0
+            or token > Decimal(1) + _MODE_RENORMALISE_CAP
+        ):
+            _raise_magemin_output_invalid(
+                f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
+            )
+        # float(raw), not float(Decimal), so a raw row matches green.
+        raw_rows.append((name, token, raw, float(raw)))
+    float_modes = [
+        (name, fraction) for name, _token, _raw, fraction in raw_rows
+    ]
+    float_sum = sum(fraction for _name, fraction in float_modes)
+    green_closed = (
+        all(0.0 <= fraction <= 1.0 for _name, fraction in float_modes)
+        and math.isclose(
+            float_sum, 1.0, rel_tol=0.0, abs_tol=_MODE_GREEN_CLOSURE_ABS,
+        )
+    )
+    raw_sum = sum(
+        (token for _name, token, _raw, _fraction in raw_rows),
+        Decimal(0),
+    )
+    excess = raw_sum - Decimal(1)
+    if green_closed or excess == 0:
+        return 'raw', float_modes, raw_rows, raw_sum
+    # Deficits outside green's closure stay typed refusals. A token
+    # above 1 cannot make a deficit while every other token is
+    # non-negative, so this is the in-range deficit path the ruling
+    # left unchanged.
+    token_above_one = any(
+        token > Decimal(1) for _name, token, _raw, _fraction in raw_rows
+    )
+    if not token_above_one and float_sum < 1.0:
+        raise _MAGEMinModeVectorMassDeficit(
+            mode_sum=float(raw_sum),
+            parsed_modes=float_modes,
+        )
+    # Sum or token excess up to 1e-3: divide the whole vector by the
+    # raw sum. The cap is _MODE_RENORMALISE_CAP, not the Mass residual.
+    if Decimal(0) < excess <= _MODE_RENORMALISE_CAP:
+        scaled = [
+            float(token / raw_sum)
+            for _name, token, _raw, _fraction in raw_rows
+        ]
+        # The closure residual goes to the largest component. Writing it
+        # onto the last token erases a positive trace: Mode 1.0002 1e-20
+        # rounds liquid to 1, then 1 - 1 = 0 and the olivine is dropped.
+        # d-367 forbids that silent zero (controller ruling 2026-11-10).
+        # A tie keeps the later index, which is the old last-token
+        # assignment when that token is one of the largest. For a finite
+        # sum of the others, largest + (1 - that sum) is 1.
+        largest = max(
+            range(len(scaled)),
+            key=lambda index: (scaled[index], index),
+        )
+        scaled[largest] = 1.0 - sum(
+            value for index, value in enumerate(scaled) if index != largest
+        )
+        parsed_modes = [
+            (name, value)
+            for (name, _token, _raw, _fraction), value in zip(
+                raw_rows, scaled,
+            )
+        ]
+        return 'renormalised', parsed_modes, raw_rows, raw_sum
+    _raise_magemin_output_invalid(
+        'MAGEMin Mode vector must sum to 1.0; '
+        f'got {float(raw_sum):.9g}'
+    )
+
+
+def _record_mode_bracket_notices(
+    diagnostics: dict,
+    warnings_out: list,
+    notices: list[dict],
+    tolerance_C: float,
+) -> None:
+    """Copy finder-annotated mode notices onto the liquidus result.
+
+    The finder writes ``delta_T_bound`` and, when that bound exceeds
+    ``tolerance_C``, ``renormalisation_may_shift_bracket`` onto the same
+    dict the sample returned. This only surfaces that decision.
+    """
+    if not notices:
+        return
+    diagnostics['magemin_mode_token_notices'] = [
+        dict(notice) for notice in notices
+    ]
+    for notice in notices:
+        if notice.get('renormalisation_may_shift_bracket') is not True:
+            continue
+        bound = notice.get('delta_T_bound')
+        if isinstance(bound, (int, float)) and math.isfinite(float(bound)):
+            bound_text = f'{float(bound):.6g} K'
+        else:
+            bound_text = 'unbounded'
+        warnings_out.append(
+            'MAGEMin mode renormalisation may shift a bracket '
+            f'(delta_T_bound {bound_text}; '
+            f'tolerance_C {float(tolerance_C):g} K; '
+            f'raw sum {notice.get("raw_sum")})'
+        )
+
+
+def _parse_magemin_mass_residual(stdout: str) -> Optional[Decimal]:
+    """Last ``Mass residual`` magnitude, or None when that line is absent.
+
+    ``--Verb=0`` prints the line. The value is stored on a
+    ``mode_vector_renormalised`` notice. It does not set the closure
+    bound: see ``_MODE_RENORMALISE_CAP``. A missing or negative token
+    is not a residual norm, so the notice records none.
+    """
+    matches = _MAGEMIN_MASS_RESIDUAL_RE.findall(stdout)
+    if not matches:
+        return None
+    try:
+        value = Decimal(matches[-1])
+    except InvalidOperation:
+        return None
+    if not value.is_finite() or value < 0:
+        return None
+    return value
 
 
 @dataclass(frozen=True)
@@ -1698,6 +1940,21 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         result_status = 'ok'
         result_fO2_log = fO2_log
         result_diagnostics = dict(result_diagnostics)
+        mode_token_notices = (
+            raw.get('mode_token_notices')
+            if isinstance(raw, Mapping)
+            else None
+        )
+        if isinstance(mode_token_notices, (list, tuple)):
+            typed_notices = [
+                dict(notice)
+                for notice in mode_token_notices
+                if isinstance(notice, Mapping)
+            ]
+            if typed_notices:
+                result_diagnostics['magemin_mode_token_notices'] = (
+                    typed_notices
+                )
         converged = (
             raw.get('converged')
             if isinstance(raw, Mapping)
@@ -1901,6 +2158,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         sample_warnings: list[str] = []
+        renormalised_notices: list[dict] = []
 
         # MAGEMin uses a finite hang guard; sample count, not wall time,
         # bounds the search work. A per-call engine timeout remains separate.
@@ -1990,7 +2248,24 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     continue
                 if warning not in sample_warnings:
                     sample_warnings.append(warning)
-            return float(result.liquid_fraction)
+            fraction = float(result.liquid_fraction)
+            # The finder annotates this same dict when the sample takes
+            # part in a threshold decision. One notice per mode vector.
+            mode_notices = ()
+            if isinstance(result.diagnostics, Mapping):
+                raw_notices = result.diagnostics.get(
+                    'magemin_mode_token_notices',
+                )
+                if isinstance(raw_notices, (list, tuple)):
+                    mode_notices = raw_notices
+            for notice in mode_notices:
+                if (
+                    isinstance(notice, dict)
+                    and notice.get('kind') == 'mode_vector_renormalised'
+                ):
+                    renormalised_notices.append(notice)
+                    return fraction, notice
+            return fraction
 
         result = find_liquidus_solidus_by_fraction(
             sample_fraction,
@@ -2002,6 +2277,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         diagnostics = dict(result.diagnostics or {})
+        _record_mode_bracket_notices(
+            diagnostics,
+            warnings_out,
+            renormalised_notices,
+            tolerance_C,
+        )
         # An ig-order drop is a refusal of the requested bulk (status stays
         # out_of_domain — not ok). The freeze gate is allowed to predict on
         # the projected bulk, so the search for that different bulk is
@@ -2154,26 +2435,54 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             return 'unavailable'
         resolved_binary_path = binary_path.resolve()
         try:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                result = subprocess.run(
-                    [
-                        str(resolved_binary_path),
-                        '--version',
-                        '--db',
-                        self._database,
-                    ],
-                    cwd=tmpdir,
-                    capture_output=True,
-                    text=True,
-                    timeout=5,
-                )
-            lines = (result.stdout or result.stderr).strip().splitlines()
-            if result.returncode == 0 and lines:
-                legacy = lines[0].strip()
-            else:
-                legacy = f'MAGEMin subprocess ({resolved_binary_path})'
-        except (OSError, subprocess.TimeoutExpired):
-            legacy = f'MAGEMin subprocess ({resolved_binary_path})'
+            binary_stat = resolved_binary_path.stat()
+        except OSError:
+            version_key = None
+        else:
+            version_key = (
+                str(resolved_binary_path),
+                binary_stat.st_ino,
+                binary_stat.st_size,
+                binary_stat.st_mtime_ns,
+            )
+        with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
+            legacy = (
+                _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
+                if version_key is not None
+                else None
+            )
+            if legacy is None:
+                try:
+                    with (
+                        _magemin_subprocess_slot(5),
+                        tempfile.TemporaryDirectory() as tmpdir,
+                    ):
+                        result = subprocess.run(
+                            [
+                                str(resolved_binary_path),
+                                '--version',
+                                '--db',
+                                self._database,
+                            ],
+                            cwd=tmpdir,
+                            capture_output=True,
+                            text=True,
+                            timeout=5,
+                            env=_magemin_subprocess_env(),
+                        )
+                    lines = (result.stdout or result.stderr).strip().splitlines()
+                    if result.returncode == 0 and lines:
+                        legacy = lines[0].strip()
+                        if version_key is not None:
+                            _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = legacy
+                    else:
+                        legacy = f'MAGEMin subprocess ({resolved_binary_path})'
+                except (
+                    _MAGEMinEngineLifecycleError,
+                    OSError,
+                    subprocess.TimeoutExpired,
+                ):
+                    legacy = f'MAGEMin subprocess ({resolved_binary_path})'
         warn_legacy_once(
             'magemin',
             'engines.local.toml absent; using legacy MAGEMin '
@@ -2987,8 +3296,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         temperature_C: float,
         pressure_kbar: float,
         fO2_log: float,
+        capture_native_activities: bool = False,
     ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
-        """Build the canonical MAGEMin argv and resolved buffer values."""
+        """Build MAGEMin argv, optionally requesting native activities."""
         if self._binary_path is None:
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
         binary_path = self._binary_path.resolve()
@@ -3009,6 +3319,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             f'--buffer={buffer_name}',
             f'--buffer_n={buffer_n:.6f}',
         ]
+        if capture_native_activities:
+            args = [
+                '--Verb=1' if item == '--Verb=0' else item
+                for item in args
+            ]
+            args.append('--out_matlab=1')
         return args, buffer_name, buffer_n, tuple(buffer_warnings)
 
     def _call_magemin_subprocess(
@@ -3049,6 +3365,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
+                capture_native_activities=capture_native_activities,
             )
         )
         solved_fO2_log: Optional[float]
@@ -3081,14 +3398,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'backend_status_reason': 'clamped_operating_point',
             })
 
-        if capture_native_activities:
-            # Same argv owner as the Verb=0 golden. Native activities only
-            # raise verbosity and request the matlab dump the parser reads.
-            args = [
-                '--Verb=1' if item == '--Verb=0' else item
-                for item in args
-            ]
-            args.append('--out_matlab=1')
         configured_timeout_s = float(self._config.get('timeout_s', 60.0))
         if call_timeout_s is None:
             timeout_s = configured_timeout_s
@@ -3122,6 +3431,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         text=True,
                         timeout=remaining_timeout_s,
                         check=False,
+                        env=_magemin_subprocess_env(),
                     )
                 except subprocess.TimeoutExpired as exc:
                     raise _MAGEMinEngineCallError(
@@ -3159,12 +3469,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         stdout_metadata: Dict[str, Any] = {}
         try:
-            if capture_native_activities:
-                phases = self._parse_subprocess_stdout(
-                    completed.stdout or '', metadata=stdout_metadata
-                )
-            else:
-                phases = self._parse_subprocess_stdout(completed.stdout or '')
+            phases = self._parse_subprocess_stdout(
+                completed.stdout or '', metadata=stdout_metadata
+            )
         except _MAGEMinModeVectorMassDeficit as exc:
             return {
                 'mode_vector_mass_deficit': {
@@ -3178,7 +3485,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         for name, fraction in exc.parsed_modes
                     ],
                 },
-                'buffer_warnings': buffer_warnings,
+                'mode_token_notices': tuple(
+                    stdout_metadata.get('mode_token_notices', ())
+                ),
+                'buffer_warnings': (
+                    *buffer_warnings,
+                    *stdout_metadata.get('mode_token_diagnostics', ()),
+                ),
                 'operating_point_diagnostics': operating_point_diagnostics,
             }
         if not phases:
@@ -3187,7 +3500,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
         result = {
             'phases': phases,
-            'buffer_warnings': buffer_warnings,
+            'mode_token_notices': tuple(
+                stdout_metadata.get('mode_token_notices', ())
+            ),
+            'buffer_warnings': (
+                *buffer_warnings,
+                *stdout_metadata.get('mode_token_diagnostics', ()),
+            ),
             'operating_point_diagnostics': operating_point_diagnostics,
         }
         if capture_native_activities:
@@ -3244,7 +3563,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         allowed = set(self._MAGEMIN_INPUT_BASIS)
         source: Dict[str, float] = {}
         unknown: List[str] = []
-        feo, fe2o3 = iron_oxide_values(composition_wt_pct)
+        # FeOt is already MAGEMin's total-iron slot and is folded from
+        # ``source`` below. Keep that engine key out of the feedstock alias
+        # resolver, where FeOt means total iron expressed as FeO.
+        iron_oxide_input = composition_wt_pct
+        if 'FeOt' in composition_wt_pct:
+            iron_oxide_input = {
+                name: amount
+                for name, amount in composition_wt_pct.items()
+                if name != 'FeOt'
+            }
+        feo, fe2o3 = iron_oxide_values(iron_oxide_input)
         for component, raw_value in composition_wt_pct.items():
             name = str(component)
             if name in ('FeO', 'Fe2O3'):
@@ -3262,7 +3591,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 + ', '.join(sorted(unknown))
             )
 
-        feot = source.pop('FeOt', 0.0) + total_fe(composition_wt_pct)
+        feot = source.pop('FeOt', 0.0) + total_fe(iron_oxide_input)
         excess_o = source.pop('O', 0.0)
         merged: List[str] = []
         if feo > 0.0:
@@ -3436,10 +3765,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         Mode values are mass fractions of the system.  The buffer
         pseudo-phase (any name in ``_BUFFER_CHOICES``) is dropped — it is
-        a control row, not a material phase.  Returns
-        ``{phase: {'mass_kg': fraction}}`` on a unit-mass basis (the
-        adapter only needs relative masses for ``liquid_fraction`` and
-        modal parity).
+        a control row, not a material phase.  Closure is decided only by
+        ``_close_printed_mode_vector``: green's 1e-4 rows stay raw, a
+        sum or token excess up to 1e-3 is renormalised onto a
+        ``mode_vector_renormalised`` notice, and a wider token or sum
+        is a typed refusal.  See ``_MODE_RENORMALISE_CAP``.
+        Returns ``{phase: {'mass_kg': fraction}}`` on a unit-mass basis
+        (the adapter only needs relative masses for ``liquid_fraction``
+        and modal parity).
         """
         phase_line: Optional[str] = None
         mode_line: Optional[str] = None
@@ -3459,38 +3792,52 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if not names or len(names) != len(values):
             return {}
 
+        # Closure has one decision, in ``_close_printed_mode_vector``.
+        # The Mass residual is parsed so a renormalised row can record it.
+        # It is not passed into that decision.
+        mass_residual = _parse_magemin_mass_residual(stdout)
+        kind, parsed_modes, raw_rows, raw_sum = _close_printed_mode_vector(
+            names, values,
+        )
+        renormalise = kind == 'renormalised'
         if metadata is not None:
             metadata['phase_names'] = tuple(names)
             metadata['solver_status'] = _parse_magemin_solver_status(stdout)
-            metadata['mode_fractions'] = {
-                name: float(raw) for name, raw in zip(names, values)
-            }
-
-        parsed_modes: list[tuple[str, float]] = []
-        for name, raw in zip(names, values):
-            try:
-                fraction = float(raw)
-            except ValueError as exc:
-                _raise_magemin_output_invalid(
-                    f'MAGEMin Mode token for {name!r} is not numeric: {raw!r}',
-                    exc,
+            mode_fractions: Dict[str, float] = {}
+            for name, fraction in parsed_modes:
+                mode_fractions[name] = fraction
+            metadata['mode_fractions'] = mode_fractions
+            if renormalise:
+                raw_tokens = [
+                    {'phase': name, 'raw_token': raw}
+                    for name, _token, raw, _fraction in raw_rows
+                ]
+                token_text = ', '.join(
+                    f'{name}={raw!r}'
+                    for name, _token, raw, _fraction in raw_rows
                 )
-            if not math.isfinite(fraction) or not 0.0 <= fraction <= 1.0:
-                _raise_magemin_output_invalid(
-                    f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
+                if mass_residual is None:
+                    residual_note = 'Mass residual not printed'
+                else:
+                    residual_note = (
+                        f'Mass residual {float(mass_residual):.6g}'
+                    )
+                metadata['mode_token_notices'] = ({
+                    'type': 'typed_notice',
+                    'kind': 'mode_vector_renormalised',
+                    'raw_tokens': raw_tokens,
+                    'raw_sum': float(raw_sum),
+                    'bound': float(_MODE_RENORMALISE_CAP),
+                    'mass_residual': (
+                        None if mass_residual is None else float(mass_residual)
+                    ),
+                },)
+                metadata['mode_token_diagnostics'] = (
+                    'MAGEMin Mode vector was renormalised to 1 '
+                    f'within abs tolerance {float(_MODE_RENORMALISE_CAP):.6g} '
+                    f'(raw sum {float(raw_sum):.9g}; {residual_note}; '
+                    f'raw tokens: {token_text})',
                 )
-            parsed_modes.append((name, fraction))
-        mode_total = sum(fraction for _, fraction in parsed_modes)
-        if not math.isclose(mode_total, 1.0, rel_tol=0.0, abs_tol=1.0e-4):
-            if mode_total < 1.0:
-                raise _MAGEMinModeVectorMassDeficit(
-                    mode_sum=mode_total,
-                    parsed_modes=parsed_modes,
-                )
-            _raise_magemin_output_invalid(
-                'MAGEMin Mode vector must sum to 1.0; '
-                f'got {mode_total:.9g}'
-            )
 
         phases: Dict[str, Dict[str, float]] = {}
         for name, fraction in parsed_modes:
@@ -3715,6 +4062,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         text=True,
                         timeout=timeout_s,
                         check=False,
+                        env=_magemin_subprocess_env(),
                     )
                     matlab_path = (
                         Path(tmpdir) / 'output' / '_matlab_output.txt'

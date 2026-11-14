@@ -32,11 +32,24 @@ from simulator.optimize.physics import (
     target_species_yield_report,
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
-from simulator.cost_energy import is_unavailable_quantity, unavailable_reason_of
+from simulator.cost_energy import (
+    carrier_gas_run_cost,
+    is_unavailable_quantity,
+    unavailable_quantity,
+    unavailable_reason_of,
+)
 from simulator.core import read_high_t_melt_activity_fallback_notice
 from simulator.wall_deposit_availability import (
     WALL_SATURATION_PRESSURE_REFUSED_CODE,
     wall_deposit_figure_availability,
+)
+from simulator.physical_constants import GAS_CONSTANT
+from simulator.thermal_train import (
+    OXYGEN_MOLAR_MASS_KG_PER_MOL,
+    OXYGEN_NORMAL_BOILING_POINT_K,
+    OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL,
+    oxygen_cp_shomate_j_per_mol_k,
+    thermal_train_parameters_from_mapping,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.three_product_report import classify_products
@@ -58,6 +71,29 @@ _MISSING = object()
 BELOW_WALL_SUPPLY_UPPER_BOUND = "below_wall_supply_upper_bound"
 WALL_DEPOSIT_UPPER_BOUND_USED = "wall_deposit_upper_bound_used"
 FURNACE_INSTANT_DEATH_FACTOR = 10.0
+# NIST Chemistry WebBook SRD 69 gas data and phase-change rows. N2 uses
+# Cp=7/2 R at 300 K; monatomic Ar and Kr use Cp=5/2 R. O2 phase constants
+# and its NIST Shomate Cp are reused from the thermal-train owner. For CO2,
+# NIST gives 25.2 kJ/mol sublimation enthalpy at 195 K and molecular weight
+# 44.0095 g/mol; its Antoine range gives 194.7 K at 1 atm. Its 300 K Cp from
+# the Chase Shomate coefficients is
+# A + B*t + C*t^2 + D*t^3 + E/t^2 = 37.217621149 J/(mol K), t = 0.300.
+# The helper holds this Cp constant down to 194.7 K; the NIST Shomate fit
+# starts at 298 K, so that low-temperature sensible term is approximate.
+# Phase-change data: https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Mask=4
+# Gas Cp: https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Mask=1
+_CARRIER_CONDENSATION_PROPERTIES = {
+    "Ar": (87.28, 6469.7192, 2.5 * GAS_CONSTANT, 0.039948),
+    "Kr": (119.73, 9080.0, 2.5 * GAS_CONSTANT, 0.083798),
+    "N2": (77.34, 5600.0, 3.5 * GAS_CONSTANT, 0.0280134),
+    "O2": (
+        OXYGEN_NORMAL_BOILING_POINT_K,
+        OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL,
+        oxygen_cp_shomate_j_per_mol_k(300.0),
+        OXYGEN_MOLAR_MASS_KG_PER_MOL,
+    ),
+    "CO2": (194.7, 25_200.0, 37.217621149, 0.0440095),
+}
 # Economics resolution: one millionth of the coating model's smallest
 # operational lifetime observation (one completed campaign). The model's
 # EPSILON_KG is mass-space and cannot dimensionally define a campaign floor.
@@ -1482,6 +1518,16 @@ def compute_objectives(
                 constraints=_extraction_constraints_from_profile(profile),
             )
             evidence[definition.metric] = reader_evidence
+        elif definition.metric in THROUGHPUT_OWNER_COST_METRICS:
+            marginal_summary = _marginal_extraction_cost_summary(
+                sim,
+                product_ledger,
+                run_execution=run_execution,
+                cost_parameters=active_cost_parameters,
+                profile=profile,
+            )
+            value = marginal_summary["marginal_cost_usd"]
+            evidence[definition.metric] = _plain_payload(marginal_summary)
         else:
             value = _metric_value(
                 definition.metric,
@@ -1490,6 +1536,7 @@ def compute_objectives(
                 product_classes,
                 run_execution=run_execution,
                 cost_parameters=active_cost_parameters,
+                profile=profile,
             )
             if definition.metric == "pure_silica_glass_kg":
                 evidence[definition.metric] = _silica_objective_evidence(
@@ -1501,15 +1548,6 @@ def compute_objectives(
                     _product_class_objective_evidence(
                         definition.metric,
                         product_classes,
-                    )
-                )
-            if definition.metric in THROUGHPUT_OWNER_COST_METRICS:
-                evidence[definition.metric] = _plain_payload(
-                    _marginal_extraction_cost_summary(
-                        sim,
-                        product_ledger,
-                        run_execution=run_execution,
-                        cost_parameters=active_cost_parameters,
                     )
                 )
             if definition.metric in FURNACE_LIFESPAN_COST_METRICS:
@@ -3664,6 +3702,11 @@ def product_summary(
     high_t_activity = read_high_t_melt_activity_fallback_notice(sim)
     if high_t_activity:
         summary["high_t_melt_activity_fallback_notice"] = high_t_activity
+    carbon_reader = getattr(sim, "stage0_carbon_allocation_run_notice", None)
+    if callable(carbon_reader):
+        carbon_notice = carbon_reader()
+        if isinstance(carbon_notice, Mapping) and carbon_notice:
+            summary["stage0_carbon_allocation_notice"] = dict(carbon_notice)
     summary.update(
         _coating_product_summary(
             run_execution,
@@ -3838,7 +3881,11 @@ def _furnace_amortization_summary(
     ):
         return MappingProxyType({
             "furnace_amortization_status": FURNACE_AMORTIZATION_STATUS_UNGROUNDED,
-            "furnace_amortization_batch_cost_equivalents": 0.0,
+            "furnace_amortization_status_reason": (
+                "resinter_threshold_kg is not qualified"
+            ),
+            "furnace_amortization_cost_per_run_usd": None,
+            "furnace_amortization_batch_cost_equivalents": None,
             "campaigns_to_resinter": campaigns_to_resinter,
         })
     amortization = furnace_amortization_cost_per_run(
@@ -3871,6 +3918,10 @@ def _extraction_constraints_from_profile(profile: Mapping[str, Any]) -> PhysicsC
 
     base = PhysicsConstraintSet()
     updates: dict[str, Any] = {}
+    if "enforce_delivered_stream_purity" in raw_constraints:
+        updates["enforce_delivered_stream_purity"] = (
+            raw_constraints["enforce_delivered_stream_purity"]
+        )
     if "target_species" in raw_constraints:
         raw_targets = raw_constraints["target_species"]
         if not isinstance(raw_targets, (list, tuple)) or not raw_targets:
@@ -5439,6 +5490,7 @@ def _metric_value(
     *,
     run_execution: Any | None = None,
     cost_parameters: CostParameters | None = None,
+    profile: Mapping[str, Any] | None = None,
 ) -> float | None:
     if metric == "pure_silica_glass_kg":
         return _silica_product_objective_value(product_classes)
@@ -5500,6 +5552,7 @@ def _metric_value(
             product_ledger,
             run_execution=run_execution,
             cost_parameters=cost_parameters or cost_parameters_from_mapping(),
+            profile=profile,
         )["marginal_cost_usd"]
     if metric in FURNACE_LIFESPAN_COST_METRICS:
         return _furnace_lifespan_consumed_fraction(run_execution, sim)
@@ -5538,12 +5591,272 @@ def _product_class_mass_value(
     return value
 
 
+def _carrier_gas_cost_summary(
+    sim: Any,
+    run_execution: Any | None,
+    *,
+    profile: Mapping[str, Any] | None,
+    cost_parameters: CostParameters,
+) -> Mapping[str, Any]:
+    melt = getattr(sim, "melt", None)
+    species = str(getattr(melt, "background_gas_species", "") or "").strip()
+    if not species:
+        return MappingProxyType({
+            "status": "not_configured",
+            "carrier_species": None,
+            "carrier_mass_used_kg": 0.0,
+            "refrigeration_recycle_energy_kWh": 0.0,
+            "recycle_electricity_cost_usd": 0.0,
+            "makeup_cost_usd": 0.0,
+            "carrier_cost_usd": 0.0,
+            "typed_todo": None,
+        })
+
+    pressure_mbar = _carrier_pressure_mbar(sim)
+    run_profile = profile.get("run", {}) if isinstance(profile, Mapping) else {}
+    raw_mass_kg = (
+        run_profile.get("mass_kg")
+        if isinstance(run_profile, Mapping)
+        else None
+    )
+    if raw_mass_kg is None:
+        raw_mass_kg = getattr(melt, "initial_mass_kg", None)
+    raw_duration_h: Any = None
+    try:
+        raw_duration_h = _duration_hours(sim)
+    except ObjectiveComputationError:
+        if isinstance(run_profile, Mapping):
+            raw_duration_h = run_profile.get("hours")
+
+    unavailable_reason: str | None = None
+    unavailable_code: str | None = None
+    try:
+        mass_kg = _finite_float(raw_mass_kg, "carrier cost feed mass")
+        duration_h = _finite_float(raw_duration_h, "carrier cost run duration")
+        pressure = _finite_float(pressure_mbar, "carrier cost partial pressure")
+    except ObjectiveComputationError as exc:
+        unavailable_reason = f"carrier_cost_inputs_unavailable: {exc}"
+        unavailable_code = "carrier_cost_inputs_missing"
+    else:
+        if mass_kg < 0.0 or duration_h < 0.0 or pressure < 0.0:
+            unavailable_reason = "carrier_cost_inputs_must_be_non_negative"
+            unavailable_code = "carrier_cost_inputs_invalid"
+    if unavailable_reason is not None:
+        return MappingProxyType({
+            "status": "unavailable",
+            "carrier_species": species,
+            "carrier_mass_used_kg": unavailable_quantity(
+                reason=unavailable_reason,
+                units="kg",
+            ),
+            "refrigeration_recycle_energy_kWh": unavailable_quantity(
+                reason=unavailable_reason,
+                units="kWh",
+            ),
+            "recycle_electricity_cost_usd": unavailable_quantity(
+                reason=unavailable_reason,
+                units="USD",
+            ),
+            "makeup_cost_usd": unavailable_quantity(
+                reason=unavailable_reason,
+                units="USD",
+            ),
+            "carrier_cost_usd": unavailable_quantity(
+                reason=unavailable_reason,
+                units="USD",
+            ),
+            "typed_todo": {
+                "code": unavailable_code,
+                "detail": unavailable_reason,
+            },
+        })
+
+    # No carrier flow ledger exists yet. Premise: the owner supplied a 44 kg
+    # carrier use for the 1 kg, 150 h hero; the configured C2A total-pressure
+    # basis is 10 mbar. Estimate used mass as 44 kg * (feed kg / 1 kg) * (run h / 150 h)
+    # * (carrier mbar / 10 mbar). Units reduce to kg, the hero limit returns
+    # exactly 44 kg, and zero feed, duration, or carrier pressure returns zero.
+    carrier_mass_used_kg = (
+        44.0
+        * mass_kg
+        * (duration_h / 150.0)
+        * (pressure / 10.0)
+    )
+    loss_fraction = cost_parameters.carrier_makeup_loss_fraction_per_run
+    recirculated_mass_kg = carrier_mass_used_kg * (1.0 - loss_fraction)
+    condensation_properties = _CARRIER_CONDENSATION_PROPERTIES.get(species)
+    refrigeration_basis_available = condensation_properties is not None
+    if refrigeration_basis_available:
+        refrigeration_kWh_per_kg = _carrier_refrigeration_kWh_per_kg(species)
+        refrigeration_kWh = recirculated_mass_kg * refrigeration_kWh_per_kg
+        refrigeration_unavailable_reason = None
+    else:
+        refrigeration_kWh_per_kg = None
+        refrigeration_kWh = None
+        refrigeration_unavailable_reason = (
+            "carrier_recycle_basis_unavailable: no condensation properties "
+            f"for {species!r}"
+        )
+
+    carrier_prices = cost_parameters.carrier_gas_earth_price_per_kg
+    if not refrigeration_basis_available:
+        # carrier_gas_run_cost owns makeup pricing. Its required recycle-energy
+        # input is a temporary zero only; both recycle outputs are replaced by
+        # typed unavailable values below, leaving the numeric makeup charge as
+        # the optimizer's flagged import lower bound.
+        carrier_prices = {**carrier_prices, species: 0.0}
+    cost = carrier_gas_run_cost(
+        carrier_mass_used_kg=carrier_mass_used_kg,
+        carrier_species=species,
+        carrier_body=str(getattr(melt, "body", "") or ""),
+        refrigeration_recycle_energy_kWh=(
+            refrigeration_kWh if refrigeration_basis_available else 0.0
+        ),
+        carrier_gas_earth_price_per_kg=carrier_prices,
+        import_delivery_cost_per_kg=cost_parameters.import_delivery_cost_per_kg,
+        makeup_loss_fraction_per_run=loss_fraction,
+        electricity_cost_per_kWh=cost_parameters.electricity_cost_per_kWh,
+    )
+    if not refrigeration_basis_available:
+        unavailable_reason = refrigeration_unavailable_reason or "unavailable"
+        cost = {
+            **cost,
+            "status": "unavailable",
+            "pricing_status": "unavailable",
+            "refrigeration_recycle_energy_kWh": unavailable_quantity(
+                reason=unavailable_reason,
+                units="kWh",
+            ),
+            "recycle_electricity_cost_usd": unavailable_quantity(
+                reason=unavailable_reason,
+                units="USD",
+            ),
+            "refrigeration_kWh_per_kg": unavailable_quantity(
+                reason=unavailable_reason,
+                units="kWh/kg",
+            ),
+            "earth_price_per_kg": 0.0,
+            "earth_price_pending": True,
+            "earth_price_source_tag": (
+                f"FLAGGED: Earth carrier-gas price pending for {species}; "
+                "makeup uses delivery cost only"
+            ),
+            "typed_todo": {
+                "code": "carrier_recycle_basis_unavailable",
+                "species": species,
+                "detail": (
+                    "TODO: establish a recycle-separation basis for this carrier; "
+                    "makeup remains priced as an import"
+                ),
+            },
+            "evidence_flags": list(dict.fromkeys(
+                [
+                    *cost["evidence_flags"],
+                    "carrier_recycle_basis_unavailable",
+                    "carrier_recycle_energy_unavailable",
+                    "carrier_earth_price_pending",
+                ]
+            )),
+        }
+    elif species == "CO2":
+        cost = {
+            **cost,
+            "evidence_flags": list(dict.fromkeys([
+                *cost["evidence_flags"],
+                "carrier_co2_cp_held_at_300K_below_shomate_range",
+            ])),
+        }
+    return MappingProxyType({
+        **cost,
+        "status": (
+            "estimated" if refrigeration_basis_available else "unavailable"
+        ),
+        "carrier_mass_basis": "scaled_reference_estimate",
+        "carrier_mass_scale": {
+            "reference_carrier_mass_kg": 44.0,
+            "reference_feed_mass_kg": 1.0,
+            "feed_mass_scale": mass_kg,
+            "reference_duration_h": 150.0,
+            "duration_scale": duration_h / 150.0,
+            "reference_pressure_mbar": 10.0,
+            "pressure_scale": pressure / 10.0,
+            "total_scale": mass_kg * (duration_h / 150.0) * (pressure / 10.0),
+        },
+        "refrigeration_basis": (
+            "carrier vapor sensible cooling from 300 K using constant Cp to its "
+            "1-atm condensation "
+            "or sublimation point plus phase-change enthalpy; Carnot lift to "
+            "reject temperature at train eta_2ndlaw; NIST Chemistry WebBook SRD 69 "
+            "species data, with "
+            "argon latent heat from NIST NBS NSRDS 27 Table 11"
+        ),
+        "refrigeration_kWh_per_kg": (
+            refrigeration_kWh_per_kg
+            if refrigeration_basis_available
+            else unavailable_quantity(
+                reason=refrigeration_unavailable_reason or "unavailable",
+                units="kWh/kg",
+            )
+        ),
+    })
+
+
+def _carrier_pressure_mbar(sim: Any) -> Any:
+    melt = getattr(sim, "melt", None)
+    return getattr(melt, "p_total_mbar", None)
+
+
+def _carrier_refrigeration_kWh_per_kg(species: str) -> float:
+    """Estimate sensible-plus-phase-change duty and its Carnot lift."""
+
+    properties = _CARRIER_CONDENSATION_PROPERTIES.get(str(species))
+    if properties is None:
+        raise ObjectiveComputationError(
+            f"carrier refrigeration properties are unavailable for {species!r}"
+        )
+    (
+        phase_change_K,
+        phase_change_enthalpy_J_per_mol,
+        cp_J_per_mol_K,
+        molar_mass_kg_per_mol,
+    ) = properties
+    params = thermal_train_parameters_from_mapping()
+    reject_K = params.T_reject_K
+    efficiency = params.eta_2ndlaw
+    # Premise: one kg of ideal carrier vapor enters at 300 K, cools to its 1-atm
+    # phase-change temperature at constant Cp, then condenses or sublimes there;
+    # the whole cold load is lifted to the train's reject temperature. Algebra:
+    # q_cold = [Cp*(300 K - T_phase) + DeltaH_phase] / M gives J/kg; W =
+    # q_cold * (T_reject/T_phase - 1) / eta_2ndlaw, then kWh/kg = W / 3.6e6.
+    # Units: (J/mol)/(kg/mol) = J/kg and both lift factors are dimensionless.
+    # At T_reject == T_phase work tends to zero; eta_2ndlaw == 1 gives Carnot work.
+    # Constants: NIST Chemistry WebBook SRD 69, Kr C7439909, N2 C7727379, and
+    # Ar C7440371 (https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439909&Mask=4,
+    # https://webbook.nist.gov/cgi/cbook.cgi?ID=C7727379&Mask=4, and
+    # https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440371&Mask=4). Argon's
+    # 1546.3 cal/mol latent heat is NIST NBS NSRDS 27 Table 11
+    # (https://nvlpubs.nist.gov/nistpubs/Legacy/NSRDS/nbsnsrds27.pdf), converted
+    # by 1546.3 cal/mol * 4.184 J/cal = 6469.7 J/mol. Kr uses 119.73 K, within
+    # the WebBook's reported 119.78 +/- 0.05 K.
+    cold_load_J_per_kg = (
+        cp_J_per_mol_K * (300.0 - phase_change_K)
+        + phase_change_enthalpy_J_per_mol
+    ) / molar_mass_kg_per_mol
+    return (
+        cold_load_J_per_kg
+        * (reject_K / phase_change_K - 1.0)
+        / efficiency
+        / 3.6e6
+    )
+
+
 def _marginal_extraction_cost_summary(
     sim: Any,
     product_ledger: Mapping[str, float],
     *,
     run_execution: Any | None,
     cost_parameters: CostParameters,
+    profile: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
     electrical_kWh = _energy_component_value(
         sim,
@@ -5562,6 +5875,17 @@ def _marginal_extraction_cost_summary(
         solar_heat_kWh * cost_parameters.solar_heat_cost_per_kWh
     )
     energy_cost_usd = electrical_cost_usd + solar_heat_cost_usd
+    carrier = _carrier_gas_cost_summary(
+        sim,
+        run_execution,
+        profile=profile,
+        cost_parameters=cost_parameters,
+    )
+    carrier_cost_usd = carrier.get("carrier_cost_usd")
+    carrier_cost_available = (
+        carrier_cost_usd is not None
+        and not is_unavailable_quantity(carrier_cost_usd)
+    )
     reagent = _reagent_consumption_cost_summary(
         sim,
         product_ledger,
@@ -5578,9 +5902,11 @@ def _marginal_extraction_cost_summary(
     depreciation_usd = depreciation["depreciation_expense_per_run_usd"]
     total = (
         None
-        if depreciation_usd is None
+        if depreciation_usd is None or not carrier_cost_available
         else (
-            energy_cost_usd
+            electrical_cost_usd
+            + solar_heat_cost_usd
+            + float(carrier_cost_usd)
             + float(reagent["reagent_cost_usd"])
             + float(depreciation_usd)
         )
@@ -5588,8 +5914,8 @@ def _marginal_extraction_cost_summary(
     return MappingProxyType({
         "schema_version": "optimizer-marginal-cost-v1",
         "accounting_principle": (
-            "marginal extraction cost: variable energy + reagent consumption "
-            "+ per-run depreciation"
+            "marginal extraction cost: variable energy + carrier makeup/recycle "
+            "+ reagent consumption + per-run depreciation"
         ),
         "marginal_cost_usd": total,
         "energy_electrical_kWh": electrical_kWh,
@@ -5599,6 +5925,8 @@ def _marginal_extraction_cost_summary(
         "electrical_cost_usd": electrical_cost_usd,
         "solar_heat_cost_usd": solar_heat_cost_usd,
         "energy_cost_usd": energy_cost_usd,
+        "carrier_gas": carrier,
+        "carrier_cost_usd": carrier_cost_usd,
         "reagent": reagent,
         "depreciation": depreciation,
     })

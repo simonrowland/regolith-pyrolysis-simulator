@@ -754,6 +754,29 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
         run_execution=run_execution,
         cost_parameters=cost_parameters,
     ) == pytest.approx(42.5)
+    sim.melt = SimpleNamespace(
+        background_gas_species="Kr",
+        initial_mass_kg=1.0,
+        p_total_mbar=10.0,
+    )
+    sim.overhead = SimpleNamespace(composition={"Kr": 10.0})
+    sim.record.total_hours = 150.0
+    carrier_profile = {"run": {"mass_kg": 1.0, "hours": 150}}
+    carrier_cost = objective_module._carrier_gas_cost_summary(
+        sim,
+        run_execution,
+        profile=carrier_profile,
+        cost_parameters=cost_parameters,
+    )
+    assert _metric_value(
+        "throughput_cost_owner_ratify_usd",
+        sim,
+        {"consumed_Fe_reagent": 2.0},
+        product_classes,
+        run_execution=run_execution,
+        cost_parameters=cost_parameters,
+        profile=carrier_profile,
+    ) == pytest.approx(42.5 + carrier_cost["carrier_cost_usd"])
     assert _metric_value(
         "furnace_lifespan_consumed_fraction",
         sim,
@@ -761,6 +784,102 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
         product_classes,
         run_execution=run_execution,
     ) == pytest.approx(0.125)
+
+    monkeypatch.setattr(
+        objective_module,
+        "classify_products",
+        lambda *_args, **_kwargs: product_classes,
+    )
+    monkeypatch.setattr(
+        objective_module,
+        "_product_ledger",
+        lambda _sim: {"consumed_Fe_reagent": 2.0},
+    )
+    objective_profile = {
+        "run": {"mass_kg": 1.0, "hours": 150},
+        "objectives": [
+            {
+                "metric": "throughput_cost_owner_ratify_usd",
+                "sense": "minimize",
+                "units": "USD",
+                "weight": 1.0,
+                "rationale": "carrier and run-local extraction costs",
+            }
+        ],
+    }
+    computed = compute_objectives(objective_profile, run_execution)
+    evidence = computed.evidence["throughput_cost_owner_ratify_usd"]
+    assert evidence["energy_cost_usd"] == pytest.approx(
+        evidence["electrical_cost_usd"] + evidence["solar_heat_cost_usd"]
+    )
+    assert evidence["energy_cost_usd"] == pytest.approx(1.5)
+    assert evidence["carrier_gas"]["carrier_mass_used_kg"] == pytest.approx(44.0)
+    assert evidence["carrier_gas"]["earth_price_source_tag"].startswith(
+        "FLAGGED dated estimate 2026-11-11"
+    )
+    assert evidence["carrier_gas"]["makeup_loss_source_tag"] == (
+        "FLAGGED: controller assumption pending owner number (d-389)"
+    )
+    assert evidence["carrier_gas"]["carrier_mass_basis"] == (
+        "scaled_reference_estimate"
+    )
+    assert evidence["carrier_gas"]["carrier_mass_scale"]["total_scale"] == pytest.approx(
+        1.0
+    )
+    assert computed.as_mapping()["throughput_cost_owner_ratify_usd"] == pytest.approx(
+        evidence["marginal_cost_usd"]
+    )
+
+    sim.melt.background_gas_species = "He"
+    sim.overhead.composition = {"He": 10.0}
+    helium_computed = compute_objectives(objective_profile, run_execution)
+    helium_evidence = helium_computed.evidence["throughput_cost_owner_ratify_usd"]
+    helium_score = helium_computed.as_mapping()["throughput_cost_owner_ratify_usd"]
+
+    assert isinstance(helium_score, float)
+    assert math.isfinite(helium_score)
+    assert helium_evidence["carrier_gas"]["pricing_status"] == "unavailable"
+    assert helium_evidence["carrier_gas"]["typed_todo"]["code"] == (
+        "carrier_recycle_basis_unavailable"
+    )
+    assert helium_evidence["carrier_gas"]["refrigeration_recycle_energy_kWh"][
+        "status"
+    ] == "unavailable"
+    assert helium_evidence["carrier_gas"]["earth_price_pending"] is True
+    assert "carrier_recycle_energy_unavailable" in helium_evidence["carrier_gas"][
+        "evidence_flags"
+    ]
+    assert helium_evidence["carrier_gas"]["makeup_cost_usd"] == pytest.approx(
+        0.44 * cost_parameters.import_delivery_cost_per_kg
+    )
+    assert helium_score == pytest.approx(helium_evidence["marginal_cost_usd"])
+
+    helium_candidates = (
+        {
+            "id": "more-expensive-carrier-candidate",
+            "objectives": {
+                "throughput_cost_owner_ratify_usd": helium_score + 1.0,
+            },
+        },
+        {
+            "id": "helium-carrier-candidate",
+            "objectives": {
+                "throughput_cost_owner_ratify_usd": helium_score,
+            },
+        },
+    )
+    helium_front = pareto_front(
+        helium_candidates,
+        (
+            ObjectiveDefinition(
+                "throughput_cost_owner_ratify_usd",
+                "minimize",
+                "USD",
+            ),
+        ),
+        objective_getter=lambda item: item["objectives"],
+    )
+    assert [item["id"] for item in helium_front] == ["helium-carrier-candidate"]
 
 
 def test_lifespan_cost_metric_is_not_costed_when_threshold_is_unavailable(monkeypatch) -> None:
@@ -1275,17 +1394,22 @@ def test_refused_empty_wall_deposit_is_unavailable_for_pricing_and_ranking() -> 
             product_summary=summary,
         )
 
+    # StudyRecord.search_provenance is a dataclass field. __post_init__ always
+    # materializes it, and _to_record always sets it. _rank_key reads that
+    # attribute. These stand-ins are StudyRecord substitutes, so they carry it.
     refused_record = SimpleNamespace(
         candidate_id="refused",
         cache_key="refused",
         objectives={"oxygen_kg": 10.0, "energy_kWh": 1.0},
         product_summary=summary,
+        search_provenance={},
     )
     clean_record = SimpleNamespace(
         candidate_id="clean",
         cache_key="clean",
         objectives={"oxygen_kg": 1.0, "energy_kWh": 1.0},
         product_summary=_available_furnace_summary(0.0),
+        search_provenance={},
     )
     assert study._record_objective_scores(refused_record, DEFINITIONS) == (
         None,
@@ -10225,7 +10349,12 @@ def test_ungrounded_resinter_lifetime_returns_typed_amortization_status(
     )
 
     assert summary["furnace_amortization_status"] == "resinter_threshold_ungrounded"
-    assert summary["furnace_amortization_batch_cost_equivalents"] == 0.0
+    assert summary["furnace_amortization_batch_cost_equivalents"] is None
+    assert "furnace_amortization_cost_per_run_usd" in summary
+    assert summary["furnace_amortization_status_reason"] == (
+        "resinter_threshold_kg is not qualified"
+    )
+    assert summary["furnace_amortization_cost_per_run_usd"] is None
     assert summary["campaigns_to_resinter"] == campaigns_to_resinter
 
 
