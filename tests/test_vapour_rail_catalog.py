@@ -338,7 +338,23 @@ def test_t609_tabulated_h2o_knots_and_interval_change_are_sampled(
         temperature_K: proof._evaluation_or_exception(evaluator, temperature_K, 1.0)
         for _label, temperature_K in grid
     }
-    assert baseline[140.0] != changed[140.0]
+    # The catalog knots are (100 K, 1.0857020504839495e-14 Pa),
+    # (180 K, 0.005394352570928808 Pa), and (273.16 K, 611.6577 Pa).
+    # _interpolate_log_pressure is linear in log10(P) versus T, so at 140 K
+    # the interpolation fraction is (140 - 100) / (180 - 100) = 0.5:
+    # log10(P) = log10(1.0857020504839495e-14) + 0.5 * (
+    #     log10(0.005394352570928808) - log10(1.0857020504839495e-14)
+    # ) = -8.116175006869273, giving P = 7.652881579699751e-9 Pa.
+    # The mutation adds 1 dex in that interval, giving 10 * P =
+    # 7.652881579699752e-8 Pa.
+    assert baseline[140.0]["kind"] == "evaluation"
+    assert baseline[140.0]["value"]["fields"]["pressure_pa"] == {
+        "__float_hex__": "0x1.06f37550b904ep-27"
+    }
+    assert changed[140.0]["kind"] == "evaluation"
+    assert changed[140.0]["value"]["fields"]["pressure_pa"] == {
+        "__float_hex__": "0x1.48b052a4e7462p-24"
+    }
     assert baseline[100.0] == changed[100.0]
     assert baseline[180.0] == changed[180.0]
     assert baseline[226.58] == changed[226.58]
