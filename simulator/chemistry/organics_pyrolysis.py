@@ -209,7 +209,9 @@ def voropaev_release_fraction(
             {
                 "reason": "release_below_lowest_knot",
                 "band_C": (temps[0], run_end),
-                "authority_level": str(cfg.get("status") or "unknown"),
+                "authority_level": "extrapolated",
+                "source_authority_level": str(cfg.get("status") or "unknown"),
+                "source": cfg.get("source"),
             }
             if below_lowest_knot
             else None
@@ -263,6 +265,7 @@ def organic_co2_release_fraction(
         "adsorbed": "proven_zero",
         "carbonate": "not_speciated",
         "source": organic.get("source"),
+        "release_below_lowest_knot": raw.get("release_below_lowest_knot"),
     }
 
 
@@ -512,13 +515,35 @@ def primary_pyrolysis(
     y_co2 = _yield("CO2_organic", 0.20)
     y_cos = _yield("COS", 0.002)
 
-    r_ch4 = float(voropaev_release_fraction("CH4", temperature_C, payload)["fraction"] or 0.0)
-    r_co2 = float(organic_co2_release_fraction(temperature_C, payload)["fraction"] or 0.0)
-    r_cos = float(voropaev_release_fraction("COS", temperature_C, payload)["fraction"] or 0.0)
-    r_h2 = float(voropaev_release_fraction("H2", temperature_C, payload)["fraction"] or 0.0)
-    r_h2o = float(voropaev_release_fraction("H2O", temperature_C, payload)["fraction"] or 0.0)
-    r_n2 = float(voropaev_release_fraction("N2", temperature_C, payload)["fraction"] or 0.0)
-    r_h2s = float(voropaev_release_fraction("H2S", temperature_C, payload)["fraction"] or 0.0)
+    release_by_species = {
+        "CH4": voropaev_release_fraction("CH4", temperature_C, payload),
+        "CO2": organic_co2_release_fraction(temperature_C, payload),
+        "COS": voropaev_release_fraction("COS", temperature_C, payload),
+        "H2": voropaev_release_fraction("H2", temperature_C, payload),
+        "H2O": voropaev_release_fraction("H2O", temperature_C, payload),
+        "N2": voropaev_release_fraction("N2", temperature_C, payload),
+        "H2S": voropaev_release_fraction("H2S", temperature_C, payload),
+    }
+    for species, release_row in release_by_species.items():
+        release_notice = release_row.get("release_below_lowest_knot")
+        if release_notice is not None:
+            notes.append(
+                {
+                    **release_notice,
+                    "site": "organics_pyrolysis.primary.release",
+                    "species": species,
+                    "source": release_notice.get("source")
+                    or release_row.get("source"),
+                }
+            )
+
+    r_ch4 = float(release_by_species["CH4"]["fraction"] or 0.0)
+    r_co2 = float(release_by_species["CO2"]["fraction"] or 0.0)
+    r_cos = float(release_by_species["COS"]["fraction"] or 0.0)
+    r_h2 = float(release_by_species["H2"]["fraction"] or 0.0)
+    r_h2o = float(release_by_species["H2O"]["fraction"] or 0.0)
+    r_n2 = float(release_by_species["N2"]["fraction"] or 0.0)
+    r_h2s = float(release_by_species["H2S"]["fraction"] or 0.0)
 
     n_ch4 = min(y_ch4 * mob_c * r_ch4, available["H"] / 4.0)
     n_co2 = min(y_co2 * mob_c * r_co2, available["O"] / 2.0)

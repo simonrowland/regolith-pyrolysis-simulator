@@ -135,11 +135,70 @@ def test_voropaev_below_lowest_knot_is_flagged_without_moving_fraction() -> None
     assert below["release_below_lowest_knot"] == {
         "reason": "release_below_lowest_knot",
         "band_C": (low_C, high_C),
-        "authority_level": curve["status"],
+        "authority_level": "extrapolated",
+        "source_authority_level": curve["status"],
+        "source": curve["source"],
     }
     assert at_low_edge["release_below_lowest_knot"] is None
     assert inside["release_below_lowest_knot"] is None
     assert at_high_edge["release_below_lowest_knot"] is None
+
+
+def test_primary_pyrolysis_carries_below_knot_notices_to_runtime_records(
+    monkeypatch,
+) -> None:
+    params = load_organics_pyrolysis_params()
+    curve = params["voropaev_2023_release"]
+    low_C = curve["temperature_C"][0]
+    first_ch4_fraction = curve["cumulative_pct"]["CH4"][0] / 100.0
+
+    result = primary_pyrolysis(
+        {"C": 100.0, "H": 75.0, "O": 15.0, "N": 3.5, "S": 2.0},
+        low_C - 0.1,
+        params,
+    )
+    release_notices = [
+        note
+        for note in result.notes
+        if note.get("reason") == "release_below_lowest_knot"
+    ]
+
+    assert {note["species"] for note in release_notices} == {
+        "CH4", "CO2", "COS", "H2", "H2O", "N2", "H2S",
+    }
+    assert all(
+        note["band_C"] == (low_C, curve["run_end_C"])
+        for note in release_notices
+    )
+    assert all(
+        note["authority_level"] == "extrapolated"
+        for note in release_notices
+    )
+    assert all(
+        note["source_authority_level"] == curve["status"]
+        for note in release_notices
+    )
+    assert result.evolved_gas.notes == result.notes
+
+    from simulator.chemistry import organics_pyrolysis
+
+    original_release = organics_pyrolysis.voropaev_release_fraction
+
+    def without_notice(species, temperature_C, payload):
+        row = original_release(species, temperature_C, payload)
+        row["release_below_lowest_knot"] = None
+        return row
+
+    monkeypatch.setattr(
+        organics_pyrolysis, "voropaev_release_fraction", without_notice
+    )
+    unflagged = primary_pyrolysis(
+        {"C": 100.0, "H": 75.0, "O": 15.0, "N": 3.5, "S": 2.0},
+        low_C - 0.1,
+        params,
+    )
+    assert result.gas_mol == unflagged.gas_mol
+    assert first_ch4_fraction == pytest.approx(0.124)
 
 
 def test_primary_pyrolysis_has_no_co_and_emits_h2() -> None:
