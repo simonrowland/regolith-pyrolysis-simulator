@@ -22,6 +22,7 @@ from simulator.battery.enums import AdmissionStatus, Engine, ResidualStatus  # n
 from simulator.battery.migrate import migrate, write_outputs  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
+    _short_refusal_token,
     comparison_candidates,
     load_score_context,
     refusal_census,
@@ -99,12 +100,17 @@ def _hard_issue_rows(validation: Any) -> tuple[int, list[dict[str, object]]]:
 
 def _score_rows(residuals: Sequence[Any]) -> dict[str, object]:
     by_rail: dict[str, list[Any]] = defaultdict(list)
-    refusal_examples: dict[str, set[str]] = defaultdict(set)
+    refusal_examples: dict[tuple[str, str | None], set[str]] = defaultdict(set)
     for residual in residuals:
         rail = "unassigned" if residual.rail is None else residual.rail.value
         by_rail[rail].append(residual)
         if residual.status is ResidualStatus.REFUSED and residual.refusal is not None:
-            refusal_examples[residual.refusal.reason.value].add(residual.reference)
+            detail_reason = _short_refusal_token(
+                residual.refusal.detail.get("reason")
+            )
+            refusal_examples[(residual.refusal.reason.value, detail_reason)].add(
+                residual.reference
+            )
 
     def stage_rows(rows: Sequence[Any]) -> dict[str, object]:
         return {
@@ -131,15 +137,46 @@ def _score_rows(residuals: Sequence[Any]) -> dict[str, object]:
         )
 
     refusal_counts: Counter[str] = Counter()
+    detail_counts: dict[str, Counter[str | None]] = defaultdict(Counter)
     for key, count in refusal_census(residuals).items():
-        reason = key.partition(":")[0]
+        reason, separator, detail_reason = key.partition(":")
         refusal_counts[reason] += count
+        detail_counts[reason][detail_reason if separator else None] += count
     refusal_rows = [
         {
             "reason": reason,
-            "distinct_observations": len(refusal_examples[reason]),
+            "distinct_observations": len(
+                {
+                    observation_id
+                    for (refusal_reason, _detail_reason), observation_ids
+                    in refusal_examples.items()
+                    if refusal_reason == reason
+                    for observation_id in observation_ids
+                }
+            ),
             "engine_observation_events": refusal_counts[reason],
-            "example_observation_ids": sorted(refusal_examples[reason])[:3],
+            "example_observation_ids": sorted(
+                {
+                    observation_id
+                    for (refusal_reason, _detail_reason), observation_ids
+                    in refusal_examples.items()
+                    if refusal_reason == reason
+                    for observation_id in observation_ids
+                }
+            )[:3],
+            "detail_reasons": [
+                {
+                    "reason": detail_reason,
+                    "engine_observation_events": count,
+                    "example_observation_ids": sorted(
+                        refusal_examples[(reason, detail_reason)]
+                    )[:3],
+                }
+                for detail_reason, count in sorted(
+                    detail_counts[reason].items(),
+                    key=lambda row: "" if row[0] is None else row[0],
+                )
+            ],
         }
         for reason in sorted(refusal_counts)
     ]
@@ -201,13 +238,15 @@ def build_source_report(
     hard_issue_count, hard_issues_by_reason = _hard_issue_rows(result.validation)
     extract_key = f"data/literature/extracts/{source_id}.yaml"
     extract_rows = result.source_counts.get(extract_key)
+    extract_row_count = 0 if extract_rows is None else extract_rows.rows_in
     return {
         "source_id": source_id,
         "scratch_out_dir": str(out_root),
         "engines": [
             engine.value for engine in (SCORE_ENGINE_SET if engines is None else engines)
         ],
-        "extract_rows": 0 if extract_rows is None else extract_rows.rows_in,
+        "extract_rows": extract_row_count,
+        "extract_has_rows": extract_row_count > 0,
         "migrated_observations": len(result.observations),
         "hard_issue_count": hard_issue_count,
         "hard_issues_by_reason": hard_issues_by_reason,
@@ -231,7 +270,8 @@ def _markdown(report: dict[str, object]) -> str:
         "",
         "| Stage | Rail / reason | Distinct observations | Count | Details |",
         "|---|---|---:|---:|---|",
-        f"| Extract rows | — | — | {report['extract_rows']} | source extract rows |",
+        f"| Extract rows | — | — | {report['extract_rows']} | "
+        f"{'source extract rows' if report['extract_has_rows'] else 'extract has no rows'} |",
         f"| Migrated observations | — | {report['migrated_observations']} | — | distinct observations |",
     ]
     hard_issues = report["hard_issues_by_reason"]
@@ -276,10 +316,15 @@ def _markdown(report: dict[str, object]) -> str:
 
     for row in scoring["refusals_by_reason"]:
         examples = ", ".join(row["example_observation_ids"])
+        details = "; ".join(
+            f"{detail['reason'] or 'detail.reason not reported'}: "
+            f"{detail['engine_observation_events']}"
+            for detail in row["detail_reasons"]
+        )
         lines.append(
             f"| Typed refusals | {row['reason']} | "
             f"{row['distinct_observations']} | {row['engine_observation_events']} | "
-            f"{examples} |"
+            f"{details}; examples: {examples} |"
         )
     return "\n".join(lines)
 
