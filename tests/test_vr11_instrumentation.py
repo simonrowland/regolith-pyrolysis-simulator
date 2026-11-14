@@ -1454,12 +1454,14 @@ def test_runner_goldens_pin_the_al_ti_audit_and_capture_threshold_label() -> Non
 
 
 def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
-    """Incidental Al/Ti/AlO/TiO vapour is accounted, not dropped.
+    """Incidental Al/Ti/AlO/TiO atoms are accounted, not dropped.
 
     These species have no designated condenser stage. Injected flux must
     still appear in a real ledger account (overhead, wall, terminal
     offgas, or a colder stage the existing capture law already visits)
-    and the per-element balance must close.
+    and the per-element balance must close. d-402 can re-speciate AlO on a
+    solid wall: the elemental-Al account rises by 0.00980406 kg above the
+    0.05 kg Al-only input, while the combined Al atom inventory stays fixed.
     """
 
     from simulator.condensation_routing import (
@@ -1467,6 +1469,7 @@ def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
         METAL_PHASE_DESTINATIONS,
     )
     from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+    from simulator.accounting.formulas import resolve_species_formula
     from simulator.config import load_config_bundle
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -1503,6 +1506,19 @@ def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
     )
     sim.load_batch("lunar_mare_low_ti", mass_kg=100.0)
     sim.melt.temperature_C = 1600.0
+    sinks = {
+        "process.overhead_gas",
+        "process.condensation_train",
+        "process.condensation_retained_holdup",
+        "process.wall_deposit",
+        "terminal.offgas",
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+    }
+    before_sink_atoms = {
+        account: sim.atom_ledger.atom_moles_by_account(account)
+        for account in sinks
+    }
     before = sim.atom_ledger.element_atom_drift_report()[
         "whole_run_boundary_residual_mol_atoms"
     ]
@@ -1524,24 +1540,26 @@ def test_al_ti_vapour_flux_lands_in_an_account_and_closes_atoms() -> None:
             apply_evaporative_redox_source_terms=False,
         )
 
-    sinks = {
-        "process.overhead_gas",
-        "process.condensation_train",
-        "process.condensation_retained_holdup",
-        "process.wall_deposit",
-        "terminal.offgas",
-        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
-        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+    after_sink_atoms = {
+        account: sim.atom_ledger.atom_moles_by_account(account)
+        for account in sinks
     }
-    by_account = sim.atom_ledger.account_species_kg()
+    expected_atoms = {"Al": 0.0, "Ti": 0.0}
     for species in species_ids:
-        held = sum(
-            float(species_kg.get(species, 0.0))
-            for account, species_kg in by_account.items()
-            if account in sinks
+        formula = resolve_species_formula(species, sim.species_formula_registry)
+        injected_moles = injected_kg / formula.molar_mass_kg_per_mol()
+        for element in expected_atoms:
+            expected_atoms[element] += (
+                injected_moles * formula.elements.get(element, 0.0)
+            )
+    for element, expected_moles in expected_atoms.items():
+        held_moles = sum(
+            after_sink_atoms[account].get(element, 0.0)
+            - before_sink_atoms[account].get(element, 0.0)
+            for account in sinks
         )
-        assert held == pytest.approx(injected_kg), (species, held)
-        assert held > 0.0
+        assert held_moles == pytest.approx(expected_moles, rel=1e-12, abs=1e-12)
+        assert held_moles > 0.0
     after = sim.atom_ledger.element_atom_drift_report()[
         "whole_run_boundary_residual_mol_atoms"
     ]
