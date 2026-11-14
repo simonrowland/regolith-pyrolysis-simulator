@@ -138,7 +138,9 @@ def _evaluation_or_exception(
     return {"kind": "evaluation", "value": _canonical(result)}
 
 
-def _evaluator_segment_ranges(evaluator: Any) -> tuple[tuple[float, float], ...]:
+def _evaluator_interval_ranges(evaluator: Any) -> tuple[tuple[float, float], ...]:
+    """Find intervals encoded by thermo segments or tabulated point knots."""
+
     ranges: set[tuple[float, float]] = set()
     pending = [evaluator]
     seen: set[int] = set()
@@ -168,6 +170,10 @@ def _evaluator_segment_ranges(evaluator: Any) -> tuple[tuple[float, float], ...]
                     (float(segment.T_min_K), float(segment.T_max_K))
                     for segment in segments
                 )
+            points = getattr(value, "points", None)
+            if points is not None:
+                knot_temperatures = tuple(float(point[0]) for point in points)
+                ranges.update(zip(knot_temperatures, knot_temperatures[1:]))
             pending.extend(getattr(value, field.name) for field in fields(value))
         elif isinstance(value, Mapping):
             pending.extend(value.values())
@@ -177,16 +183,24 @@ def _evaluator_segment_ranges(evaluator: Any) -> tuple[tuple[float, float], ...]
 
 
 def _evaluation_temperatures(evaluator: Any) -> tuple[tuple[str, float], ...]:
-    """Build the per-species temperature grid from every evaluator segment.
+    """Build a per-species grid from every evaluator interval and its bounds.
 
-    Each distinct segment contributes both endpoints and its midpoint; shared
-    endpoints are sampled once. For segments [200, 1000] and [1000, 2000] K,
-    the grid is 200, 600, 1000, 1500, and 2000 K. When an evaluator has no
-    polynomial segments, retain its valid-range low, midpoint, and high.
-    Thermo polynomials are captured by the compiled evaluator's pressure
-    callable, so their dataclass and callable closure values are inspected.
+    The catalog's ``nasa_cea_7``, ``nasa_cea_9``, and ``shomate`` families
+    store interval bounds on captured thermo-polynomial ``segments``.
+    ``tabulated_equilibrium`` stores its knots in ``reference_model.points``;
+    every adjacent knot pair is an interval. ``standard_reaction_term`` gets
+    breakpoints from its reference model: Antoine references have none, while
+    tabulated references expose knots in ``points``. ``antoine`` has no
+    breakpoints, so it uses the valid-range edges and midpoint. Any other
+    family with no discovered breakpoints uses that same fallback. Shared
+    endpoints are sampled once. For intervals [200,
+    1000] and [1000, 2000] K, the grid is 200, 600, 1000, 1500, and 2000 K.
+    For tabulated H2O knots at 100, 180, and 273.16 K, it is 100, 140, 180,
+    226.58, and 273.16 K. Thermo polynomials are captured by the compiled
+    evaluator's pressure callable, so their dataclass and closure values are
+    inspected.
     """
-    ranges = _evaluator_segment_ranges(evaluator)
+    ranges = _evaluator_interval_ranges(evaluator)
     if not ranges:
         low, high = evaluator.valid_temperature_K
         return (("low", low), ("mid", 0.5 * (low + high)), ("high", high))
@@ -198,7 +212,7 @@ def _evaluation_temperatures(evaluator: Any) -> tuple[tuple[str, float], ...]:
     )
     points = [(edge, f"edge-{index}") for index, edge in enumerate(edges)]
     points.extend(
-        (0.5 * (low + high), f"segment-{index}-mid")
+        (0.5 * (low + high), f"interval-{index}-mid")
         for index, (low, high) in enumerate(ranges)
     )
     by_temperature: dict[float, str] = {}
@@ -518,9 +532,9 @@ def _generate_evidence(
             "compiler_common_mode": False,
             "source_activity": 1.0,
             "temperature_positions": [
-                "all evaluator segment edges",
-                "each evaluator segment midpoint",
-                "valid-range low/mid/high when no segments",
+                "all evaluator interval endpoints (thermo segments or table knots)",
+                "each evaluator interval midpoint",
+                "valid-range low/mid/high when the family has no breakpoints",
             ],
             "pO2_grid_bar": list(PO2_GRID_BAR),
             "comparison": (

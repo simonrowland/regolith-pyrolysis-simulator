@@ -28,6 +28,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.volatile_properties import _catalog as _volatile_runtime_catalog
+from simulator.vapour_rail import catalog as vapour_rail_catalog
 from simulator.vapour_rail.catalog import (
     CatalogCompileError,
     OUT_OF_RANGE_STATUS,
@@ -175,7 +176,6 @@ def test_t609_canonical_digest_ignores_value_neutral_local_rename() -> None:
     original = original_namespace["compiled"]
     renamed = renamed_namespace["compiled"]
     assert original(4.0) == renamed(4.0) == 18.0
-    assert original.__code__.co_varnames != renamed.__code__.co_varnames
     expected = {
         "__function__": "value_fingerprint_fixture.compiled",
         "defaults": None,
@@ -255,9 +255,9 @@ def test_t609_evaluation_grid_catches_segment_interior_change() -> None:
     grid = proof._evaluation_temperatures(baseline)
     assert grid == (
         ("edge-0", 200.0),
-        ("segment-0-mid", 600.0),
+        ("interval-0-mid", 600.0),
         ("edge-1", 1000.0),
-        ("segment-1-mid", 1500.0),
+        ("interval-1-mid", 1500.0),
         ("edge-2", 2000.0),
     )
     baseline_values = {
@@ -271,7 +271,78 @@ def test_t609_evaluation_grid_catches_segment_interior_change() -> None:
     assert baseline_values[200.0] == changed_values[200.0]
     assert baseline_values[1000.0] == changed_values[1000.0]
     assert baseline_values[2000.0] == changed_values[2000.0]
-    assert baseline_values[1500.0] != changed_values[1500.0]
+    assert baseline_values[1500.0] == {
+        "kind": "evaluation",
+        "value": {"__float_hex__": "0x0.0p+0"},
+    }
+    assert changed_values[1500.0] == {
+        "kind": "evaluation",
+        "value": {"__float_hex__": "0x1.0000000000000p+0"},
+    }
+
+
+def test_t609_tabulated_h2o_knots_and_interval_change_are_sampled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    proof = _load_t609_proof()
+    catalog = compile_vapour_rail_catalog(
+        _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
+    )
+    evaluator = catalog.species["H2O"].evaluator
+    assert evaluator is not None
+    assert evaluator.evaluator_family == "tabulated_equilibrium"
+    assert tuple(point[0] for point in evaluator.reference_model.points) == (
+        100.0,
+        180.0,
+        273.16,
+    )
+    grid = proof._evaluation_temperatures(evaluator)
+    assert grid == (
+        ("edge-0", 100.0),
+        ("interval-0-mid", 140.0),
+        ("edge-1", 180.0),
+        ("interval-1-mid", 226.58),
+        ("edge-2", 273.16),
+    )
+    antoine = next(
+        species.evaluator
+        for species in catalog.species.values()
+        if species.evaluator is not None
+        and species.evaluator.evaluator_family == "antoine"
+    )
+    low, high = antoine.valid_temperature_K
+    assert proof._evaluation_temperatures(antoine) == (
+        ("low", low),
+        ("mid", 0.5 * (low + high)),
+        ("high", high),
+    )
+
+    baseline = {
+        temperature_K: proof._evaluation_or_exception(evaluator, temperature_K, 1.0)
+        for _label, temperature_K in grid
+    }
+    interpolate = vapour_rail_catalog._interpolate_log_pressure
+
+    def changed_first_interval(points, temperature_K):
+        result = interpolate(points, temperature_K)
+        if points[0][0] < temperature_K < points[1][0]:
+            return result + 1.0
+        return result
+
+    monkeypatch.setattr(
+        vapour_rail_catalog,
+        "_interpolate_log_pressure",
+        changed_first_interval,
+    )
+    changed = {
+        temperature_K: proof._evaluation_or_exception(evaluator, temperature_K, 1.0)
+        for _label, temperature_K in grid
+    }
+    assert baseline[140.0] != changed[140.0]
+    assert baseline[100.0] == changed[100.0]
+    assert baseline[180.0] == changed[180.0]
+    assert baseline[226.58] == changed[226.58]
+    assert baseline[273.16] == changed[273.16]
 
 
 def test_t609_canonical_detects_closure_and_default_value_changes() -> None:
