@@ -3877,6 +3877,7 @@ class EvaporationMixin:
                 or self.melt.temperature_C + CELSIUS_TO_KELVIN_OFFSET
             ),
             'carrier_gas': carrier_gas,
+            'composition_family': getattr(self, '_batch_feedstock_key', None),
             'evaporation_series_resistance': dict(
                 kernel_config.get('evaporation_series_resistance', {}) or {}
             ),

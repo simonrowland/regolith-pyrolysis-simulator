@@ -1235,6 +1235,7 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
 
     class _Host(EvaporationMixin):
         def __init__(self) -> None:
+            self._batch_feedstock_key = "lunar_mare_low_ti"
             self.vapor_pressures = {"metals": {}, "oxide_vapors": {}}
             self.setpoints = {}
             self.melt = SimpleNamespace(
@@ -1268,6 +1269,7 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
     )
     assert controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 5.0}
     # Reporting keeps live; the typed seam supplied the already batch-gated key.
+    assert controls["composition_family"] == "lunar_mare_low_ti"
     assert controls["vapor_pressures_Pa"] == {"Na": 5.0}
     assert controls["vapour_batch_flux_shadow_equal"] is True
     assert controls["vapour_batch_flux_shadow_outcome"] == SHADOW_PROVED

@@ -235,10 +235,11 @@ def _evaluate_alpha_control(
     species: str,
     T_K: float,
     alpha_spec: Any,
+    regime_context: Mapping[str, Any] | None = None,
 ) -> tuple[float, dict[str, Any]]:
     from simulator.condensation import alpha_s
 
-    context: dict[str, Any] = {'coefficient_spec': alpha_spec}
+    context: dict[str, Any] = {**(regime_context or {}), 'coefficient_spec': alpha_spec}
     value = alpha_s(species, T_K, context)
     evaluation = dict(context.get('alpha_s_evaluation', {}))
     if (
@@ -1421,6 +1422,11 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         )
         gas_temperature_K = _finite_float(controls.get("gas_temperature_K"), T_K)
         carrier_gas = str(controls.get("carrier_gas") or "N2")
+        alpha_regime_context = {
+            "carrier_gas": controls.get("carrier_gas"),
+            "pressure_bar": overhead_pressure_pa / PA_PER_BAR,
+            "composition_family": controls.get("composition_family"),
+        }
         cold_skull_envelope = controls.get("cold_skull_envelope")
         melt_resistance_enabled = bool(
             series_config.get(
@@ -1491,6 +1497,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     species,
                     T_K,
                     alpha_spec,
+                    alpha_regime_context,
                 )
                 if alpha <= 0.0:
                     continue
@@ -1735,6 +1742,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 species,
                 T_K,
                 alpha_spec,
+                alpha_regime_context,
             )
             if alpha_evaluation:
                 alpha_evaluations_by_species[species] = alpha_evaluation
@@ -1985,6 +1993,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 "Bernoulli continuum threshold"
             )
 
+        warning_messages.extend(
+            evaluation["alpha_s_extrapolation_warning"]
+            for evaluation in alpha_evaluations_by_species.values()
+            if evaluation.get("alpha_s_calibrated_regime")
+            and evaluation.get("alpha_s_extrapolation_warning")
+        )
         return IntentResult(
             intent=ChemistryIntent.EVAPORATION_FLUX,
             status="ok",

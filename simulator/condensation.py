@@ -86,6 +86,7 @@ from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
     AlphaSpecError,
+    evaluate_calibrated_alpha_regime,
     parse_alpha_value,
 )
 from simulator.backend_names import (
@@ -1248,6 +1249,7 @@ def _alpha_s_scalar_evaluation(
     species: str,
     T_K: float,
     spec: Mapping[str, Any],
+    context: Mapping[str, Any] | None = None,
 ) -> tuple[float, dict[str, Any]]:
     try:
         value = float(spec.get('value'))
@@ -1272,6 +1274,9 @@ def _alpha_s_scalar_evaluation(
         result[ALPHA_AUTHORITY_STATUS_FIELD] = (
             ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
         )
+    if "calibrated_regime" in spec:
+        result.update(evaluate_calibrated_alpha_regime(species, T_K, spec, context))
+        return value, result
     if valid_range is not None:
         valid_low, valid_high = valid_range
         extrapolated = not (valid_low <= T_K <= valid_high)
@@ -1384,6 +1389,7 @@ def _alpha_s_evaluation(
     species: str,
     T_K: float,
     spec: Any,
+    context: Mapping[str, Any] | None = None,
 ) -> tuple[float, dict[str, Any]]:
     try:
         T_K = float(T_K)
@@ -1405,7 +1411,7 @@ def _alpha_s_evaluation(
     if isinstance(spec, Mapping):
         form = spec.get('form')
         if form == 'scalar':
-            return _alpha_s_scalar_evaluation(species, T_K, spec)
+            return _alpha_s_scalar_evaluation(species, T_K, spec, context)
         if form != 'arrhenius':
             raise ValueError(f'alpha_s({species}): malformed coefficient spec')
         required_fields = (
@@ -1572,7 +1578,7 @@ def alpha_s(
             species_name,
             _sticking_species_entry(species_name),
         )
-    value, evaluation = _alpha_s_evaluation(species_name, T_K, spec)
+    value, evaluation = _alpha_s_evaluation(species_name, T_K, spec, context)
     if isinstance(context, MutableMapping):
         context['alpha_s_evaluation'] = dict(evaluation)
     return value
