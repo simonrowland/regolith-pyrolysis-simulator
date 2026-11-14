@@ -197,6 +197,82 @@ def test_pressure_range_encloses_both_sides_of_cco_fit_boundary() -> None:
     assert CCO_OUT_OF_BAND_NOTICE in interval.reason
 
 
+@pytest.mark.parametrize("high_pressure_bar", (30_000.0, 20_001.0))
+def test_pressure_range_starting_at_upper_fit_boundary_encloses_right_limit(
+    high_pressure_bar: float,
+) -> None:
+    boundary_bar = CCO_PRESSURE_RANGE_BAR[1]
+    right_limit = cco_buffered_fO2(
+        1473.15,
+        math.nextafter(boundary_bar, math.inf),
+        reference_buffer=None,
+    )
+    interval = cco_log10_fO2_interval_for_pressure_range(
+        1473.15, (boundary_bar, high_pressure_bar)
+    )
+
+    assert right_limit.log10_fO2_bar == pytest.approx(-9.854774095834, abs=1e-12)
+    assert interval.low_log10_fO2_bar <= right_limit.log10_fO2_bar
+    assert right_limit.log10_fO2_bar <= interval.high_log10_fO2_bar
+    assert "mixed branches" in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE in interval.reason
+
+
+def test_pressure_range_starting_at_lower_fit_boundary_uses_fit_side_only() -> None:
+    boundary_bar = CCO_PRESSURE_RANGE_BAR[0]
+    right_limit = cco_buffered_fO2(
+        1473.15,
+        math.nextafter(boundary_bar, math.inf),
+        reference_buffer=None,
+    )
+    interval = cco_log10_fO2_interval_for_pressure_range(
+        1473.15, (boundary_bar, 8_000.0)
+    )
+
+    assert interval.low_log10_fO2_bar <= right_limit.log10_fO2_bar
+    assert right_limit.log10_fO2_bar <= interval.high_log10_fO2_bar
+    assert "inside_cco_jakobsson_oskarsson_calibration" in interval.reason
+    assert "mixed branches" not in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE not in interval.reason
+
+
+def test_pressure_range_ending_at_lower_fit_boundary_encloses_left_limit() -> None:
+    boundary_bar = CCO_PRESSURE_RANGE_BAR[0]
+    left_limit = cco_buffered_fO2(
+        1473.15,
+        math.nextafter(boundary_bar, -math.inf),
+        reference_buffer=None,
+    )
+    interval = cco_log10_fO2_interval_for_pressure_range(
+        1473.15, (7_000.0, boundary_bar)
+    )
+
+    assert left_limit.log10_fO2_bar == pytest.approx(-10.346546872339, abs=1e-12)
+    assert interval.low_log10_fO2_bar <= left_limit.log10_fO2_bar
+    assert left_limit.log10_fO2_bar <= interval.high_log10_fO2_bar
+    assert "mixed branches" in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE in interval.reason
+
+
+def test_degenerate_pressure_interval_contains_only_its_point_value() -> None:
+    point = cco_buffered_fO2(1473.15, 15_000.0, reference_buffer=None)
+    interval = cco_log10_fO2_interval_for_pressure_range(1473.15, (15_000.0, 15_000.0))
+
+    assert interval.low_log10_fO2_bar == point.log10_fO2_bar
+    assert interval.high_log10_fO2_bar == point.log10_fO2_bar
+    assert "inside_cco_jakobsson_oskarsson_calibration" in interval.reason
+    assert "mixed branches" not in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE not in interval.reason
+
+
+def test_wholly_calibrated_pressure_interval_reports_only_fit_branch() -> None:
+    interval = cco_log10_fO2_interval_for_pressure_range(1473.15, (9_000.0, 12_000.0))
+
+    assert "inside_cco_jakobsson_oskarsson_calibration" in interval.reason
+    assert "mixed branches" not in interval.reason
+    assert CCO_OUT_OF_BAND_NOTICE not in interval.reason
+
+
 def test_emog_emod_uncertainty_is_interval_only() -> None:
     interval = stagno_frost_emog_emod_log10_fO2_interval(-9.2, -8.7)
 
