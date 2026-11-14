@@ -262,6 +262,85 @@ def test_o2_consuming_vapors_share_overhead_o2_reactant(
     assert required_o2_kg == pytest.approx(expected_o2_draw_kg, rel=1e-12)
 
 
+def _oxygen_consuming_stoich(sim):
+    return {
+        species: sim._evaporation_stoich(species, row)
+        for family in ("metals", "oxide_vapors")
+        for species, row in sim.vapor_pressures.get(family, {}).items()
+        if float(row.get("stoich_O2_per_vapor", 0.0)) < 0
+    }
+
+
+def test_subhour_oxygen_consumers_retain_abundant_reactant_rates_and_close_atoms(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    stoich = _oxygen_consuming_stoich(sim)
+    assert {"AlO2", "CrO2", "CrO3"} <= stoich.keys()
+    raw = {species: 1e-6 for species in stoich}
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"O2": 1.0},
+        source="subhour oxygen reactant", material_origin="feedstock",
+    )
+    parents = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    dt = 0.25
+    actual = sim._apply_analytic_evaporation_depletion(_flux(raw), dt_hr=dt)
+    # For x >= 0, (1-exp(-x))/x lies between 1-x/2 and 1.
+    # Parent plus oxygen exposure bounds the relative limiter deficit;
+    # roundoff adds eight unit ulps. This is an abundant-reactant limit,
+    # independent of any fitted rate or copied depletion implementation.
+    oxygen_exposure = sum(raw[s] * abs(row["O2_per_product_kg"]) * dt
+                          for s, row in stoich.items())
+    for species, row in stoich.items():
+        parent_exposure = sum(
+            raw[s] * item["oxide_per_product_kg"] * dt
+            for s, item in stoich.items() if item["parent_oxide"] == row["parent_oxide"]
+        ) / parents[row["parent_oxide"]]
+        assert actual.species_kg_hr[species] == pytest.approx(
+            raw[species], rel=parent_exposure + oxygen_exposure + 8 * math.ulp(1.0),
+        )
+    sim._step_dt_hr = dt
+    oxygen_before = sim.atom_ledger.kg_by_account("process.overhead_gas")["O2"]
+    for species, rate in actual.species_kg_hr.items():
+        _, transition = sim._credit_evaporation_transition(
+            species, rate, rate, _species_data(sim, species),
+            apply_evaporative_redox_source_terms=False, return_transition=True,
+        )
+        assert transition is not None
+    oxygen_after = sim.atom_ledger.kg_by_account("process.overhead_gas")["O2"]
+    assert oxygen_before - oxygen_after == pytest.approx(
+        sum(actual.species_kg_hr[s] * abs(row["O2_per_product_kg"]) * dt
+            for s, row in stoich.items()), rel=1e-8,
+    )
+    assert sim.atom_ledger.assert_balanced()
+
+
+def test_oxygen_consumer_refinement_approaches_stoichiometric_rate_limit(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_sim("lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data)
+    stoich = _oxygen_consuming_stoich(sim)
+    raw = {species: 1e-3 for species in stoich}
+    # Constant imposed rates with abundant parents/O2 have the independent
+    # limiting oxygen draw sum(rate * stoichiometric kg/kg) over one hour.
+    expected = sum(raw[s] * abs(row["O2_per_product_kg"]) for s, row in stoich.items())
+    errors = []
+    for dt in (0.25, 0.125, 0.0625):
+        parents = {row["parent_oxide"]: 1e9 for row in stoich.values()}
+        oxygen = 1.0
+        for _ in range(round(1.0 / dt)):
+            rates = sim._analytic_evaporation_depletion_rates(
+                raw, dt_hr=dt, phase_scalar=1.0,
+                cleaned_melt_kg=parents, available_o2_kg=oxygen,
+            )
+            oxygen -= sum(rates[s] * abs(row["O2_per_product_kg"]) * dt
+                          for s, row in stoich.items())
+            for species, row in stoich.items():
+                parents[row["parent_oxide"]] -= rates[species] * row["oxide_per_product_kg"] * dt
+        errors.append(abs((1.0 - oxygen) - expected))
+    assert errors[2] < errors[1] < errors[0]
+
+
 def test_representative_c2a_parent_pool_depletes_as_tail_not_dump(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
