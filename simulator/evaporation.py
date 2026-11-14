@@ -4429,6 +4429,8 @@ class EvaporationMixin:
         if evaporation_transition is None:
             return {}
 
+        # Condensation returns kg/h. Amount=rate*dt[h]; 4 kg/h over
+        # .25 h deposits 1 kg, which the ledger and stage totals receive.
         condensed_kg = max(
             0.0, rate_kg_hr - remaining_kg_hr,
         ) * self._step_dt_hr
@@ -4460,6 +4462,8 @@ class EvaporationMixin:
             return {}
         fe_formula = resolve_species_formula('Fe', self.species_formula_registry)
         fe_molar_mass = fe_formula.molar_mass_kg_per_mol()
+        # The native split already selected interval mol: transport consumes
+        # rate=n*M/dt [kg/h], e.g. 1 kg over .25 h is 4 kg/h.
         rate_kg_hr = native_fe_vapor_mol * fe_molar_mass / self._step_dt_hr
         evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
         evap_flux.update_totals()

@@ -6324,6 +6324,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return diagnostic
 
         T_K = float(self.melt.temperature_C) + 273.15
+        # A bubbler supplies kg/h: n=(rate/M)[mol/h]*dt[h]. A .25 h
+        # interval injects a quarter of the one-hour command, in mol O2.
         commanded_mol = rate_kg_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL * self._step_dt_hr
         gate_authority = self._resolved_melt_redox_gate_authority(
             gate_authority
