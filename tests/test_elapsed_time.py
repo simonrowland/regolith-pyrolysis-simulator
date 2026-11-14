@@ -336,3 +336,43 @@ def test_fractional_notice_ticks_and_redox_source_times_remain_distinct():
         assert diagnostic["source_campaign_hour"] == hour
         assert snapshot.oxygen_reservoir["redox_source_hour"] == hour
         assert snapshot.oxygen_reservoir["redox_source_campaign_hour"] == hour
+
+
+def test_campaign_events_preserve_fractional_times():
+    from simulator.campaigns import CampaignManager
+    from simulator.state import BatchRecord, CampaignPhase, CondensationTrain, EvaporationFlux, MeltState
+    from tests.test_optimizer_recipe import _configured_c2a_staged_manager
+
+    manager = CampaignManager(_run()._session_config().setpoints)
+    for hour in (0.25, 0.5, 0.75, 1.0):
+        adjustment = manager.record_c0_forecast_adjustment(
+            "target_C", hour, loss_budget_re_evaluated=True,
+        )
+        exit_event = manager.record_c0_remaining_budget_exit(
+            {}, campaign_hour=hour, remaining_budget_hr=0.25,
+        )
+        assert adjustment["campaign_hour"] == exit_event["campaign_hour"] == hour
+
+    manager = _configured_c2a_staged_manager(
+        log_slope_by_stage={"alkali_early_fe": 0.25},
+        duration_by_stage={"alkali_early_fe": 1},
+    )
+    manager.check_endpoint(
+        MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=0.75),
+        EvaporationFlux(), CondensationTrain.create_default(), BatchRecord(), dt_hr=0.25,
+    )
+    assert manager.last_c2a_staged_termination["campaign_hour"] == 0.75
+
+
+def test_failure_metadata_retains_fractional_requested_duration():
+    from simulator.runner import _runner_failure_result
+
+    payload = _runner_failure_result(
+        error=RunnerError("elapsed-time failure probe"),
+        feedstock_id="lunar_mare_low_ti", campaign="C0", hours=77.4 / 3600,
+        mass_kg=1.0, additives_kg={}, track="pyrolysis",
+        backend_name="internal-analytical", engines={},
+        metadata_overrides={"started_at_utc": "2026-11-14T00:00:00Z",
+                            "kernel_commit_sha": "fractional-failure"},
+    )
+    assert payload["run_metadata"]["hours_requested"] == 77.4 / 3600
