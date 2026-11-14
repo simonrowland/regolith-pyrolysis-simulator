@@ -100,9 +100,9 @@ def _state_output(state: object, axis: str) -> object:
         and plain.get("tag") == "value"
         and isinstance(plain.get("value"), dict)
     ):
-        composition = state.value
+        composition = plain["value"]
         plain["value"] = {
-            key: to_plain(getattr(composition, key, None))
+            key: composition.get(key)
             for key in (
                 "amount_basis",
                 "basis",
@@ -523,7 +523,8 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
             ]
           ],
           "proxy_flag": "composition_from_sample_catalog",
-          "proxy_source": "Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation smales_1971_apollo_12022_bulk_composition_tables1_2_3. Selection rule: use the first reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis; do not average methods. This is the starting bulk composition, not a per-step residue composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue, and no step-specific residue composition is printed."
+          "proxy_source": "Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation smales_1971_apollo_12022_bulk_composition_tables1_2_3. Selection rule: use the first reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis; do not average methods. This is the starting bulk composition, not a per-step residue composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue, and no step-specific residue composition is printed.",
+          "input_provenance": null
         }
       },
       "exposure": {
@@ -953,7 +954,8 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
               ]
             ],
             "proxy_flag": "composition_from_sample_catalog",
-            "proxy_source": "Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation smales_1971_apollo_12022_bulk_composition_tables1_2_3. Selection rule: use the first reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis; do not average methods. This is the starting bulk composition, not a per-step residue composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue, and no step-specific residue composition is printed."
+            "proxy_source": "Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation smales_1971_apollo_12022_bulk_composition_tables1_2_3. Selection rule: use the first reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis; do not average methods. This is the starting bulk composition, not a per-step residue composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue, and no step-specific residue composition is printed.",
+            "input_provenance": null
           }
         }
       },
@@ -1136,7 +1138,11 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
               "CaO",
               "0.06463956121087332567375331089"
             ]
-          ]
+          ],
+          "proxy_flag": null,
+          "proxy_source": null,
+          "analysis_selection_rule": null,
+          "input_provenance": null
         }
       },
       "exposure": {
@@ -1379,7 +1385,11 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
               "SiO2",
               "0.7496860710078897656372926616"
             ]
-          ]
+          ],
+          "proxy_flag": null,
+          "proxy_source": null,
+          "analysis_selection_rule": null,
+          "input_provenance": null
         }
       },
       "exposure": {
@@ -1639,7 +1649,11 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
                 "SiO2",
                 "0.7496860710078897656372926616"
               ]
-            ]
+            ],
+            "proxy_flag": null,
+            "proxy_source": null,
+            "analysis_selection_rule": null,
+            "input_provenance": null
           }
         }
       },
@@ -1819,7 +1833,11 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
               "SiO2",
               "0.9557990096833194820288379604"
             ]
-          ]
+          ],
+          "proxy_flag": null,
+          "proxy_source": null,
+          "analysis_selection_rule": null,
+          "input_provenance": null
         }
       },
       "exposure": {
@@ -1984,7 +2002,11 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
                 "SiO2",
                 "0.9557990096833194820288379604"
               ]
-            ]
+            ],
+            "proxy_flag": null,
+            "proxy_source": null,
+            "analysis_selection_rule": null,
+            "input_provenance": null
           }
         }
       },
