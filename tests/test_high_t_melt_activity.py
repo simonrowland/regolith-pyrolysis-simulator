@@ -211,6 +211,17 @@ def _provider() -> BuiltinVaporPressureProvider:
         return BuiltinVaporPressureProvider(yaml.safe_load(handle) or {})
 
 
+def _product_report_simulator() -> PyrolysisSimulator:
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    return PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+
+
 def _request(
     composition_mol: dict[str, float],
     temperature_K: float,
@@ -2726,7 +2737,7 @@ def test_fallback_sentence_renders_all_campaigns() -> None:
 
 
 def test_table_fallback_only_renders_separate_summary_notice(monkeypatch) -> None:
-    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim = _product_report_simulator()
     sim._high_t_melt_activity_fallback_steps = []
     sim._high_t_melt_activity_table_fallback_ticks = {}
     sim.melt = SimpleNamespace(hour=3, campaign=CampaignPhase.C2A)
@@ -2814,7 +2825,7 @@ def test_refusal_only_summary_sentence_is_byte_identical() -> None:
 
 
 def test_mixed_table_fallback_and_refusal_counts_are_separate(monkeypatch) -> None:
-    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim = _product_report_simulator()
     sim._high_t_melt_activity_fallback_steps = []
     sim._high_t_melt_activity_table_fallback_ticks = {}
     table_flag = "openimcc_parent_activity_zero_table_fallback"
