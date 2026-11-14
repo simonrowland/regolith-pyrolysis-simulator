@@ -1654,6 +1654,7 @@ class ExtractionMixin:
                             self.melt.campaign,
                             self.melt.campaign_hour,
                             self.melt,
+                            dt_hr=self._step_dt_hr,
                         )
                     )
                     at_campaign_temperature = (
@@ -2357,6 +2358,7 @@ class ExtractionMixin:
                 CampaignPhase.C3_NA,
                 0,
                 self.melt,
+                dt_hr=self._step_dt_hr,
             )[0]
         )
         configured_margin = (
@@ -3428,6 +3430,7 @@ class ExtractionMixin:
             CampaignPhase.C7_CA_ALUMINOTHERMIC,
             getattr(self.melt, 'campaign_hour', 0),
             self.melt,
+            dt_hr=self._step_dt_hr,
         )
         return self._c7_float(
             cfg.get('hold_temp_C', cfg.get('default_hold_T_C')),
