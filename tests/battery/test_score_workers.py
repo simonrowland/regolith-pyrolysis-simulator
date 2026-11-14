@@ -11,6 +11,8 @@ from pathlib import Path
 import subprocess
 import time
 
+import pytest
+
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
