@@ -27,6 +27,7 @@ from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
     _WALL_SUPPLY_WINDOW_REPORT_KEY,
+    _WallSupplyIntegral,
     _WallSupplyWindow,
     _classify_refused_wall_supply_window,
     _coating_wall_quantity_unavailable,
@@ -73,6 +74,9 @@ from simulator.optimize.backend_status import (
 _MISSING = object()
 BELOW_WALL_SUPPLY_UPPER_BOUND = "below_wall_supply_upper_bound"
 WALL_DEPOSIT_UPPER_BOUND_USED = "wall_deposit_upper_bound_used"
+WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN = (
+    "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+)
 FURNACE_INSTANT_DEATH_FACTOR = 10.0
 # NIST Chemistry WebBook SRD 69 gas data and phase-change rows. N2 uses
 # Cp=7/2 R at 300 K; monatomic Ar and Kr use Cp=5/2 R. O2 phase constants
@@ -4448,7 +4452,7 @@ def _refused_vapour_supply_kg(
     snapshots: Sequence[Any] | None = None,
     *,
     campaigns_elapsed: float = 1.0,
-) -> dict[str, float]:
+) -> _WallSupplyIntegral:
     """Per-campaign view of each refused species' supply integral.
 
     Missing species stay missing. A flux that was not computed is not
@@ -4462,7 +4466,12 @@ def _refused_vapour_supply_kg(
     """
 
     if not refused_species:
-        return {}
+        return _WallSupplyIntegral(
+            _WallSupplyWindow(
+                run_total_kg={},
+                campaigns_elapsed=campaigns_elapsed,
+            )
+        )
     from simulator.optimize.physics import (
         _execution_vapour_catalog,
         _optimizer_refused_flux_bounds,
@@ -4515,12 +4524,22 @@ def _replace_species_deposit_with_supply(
 
 
 def _wall_supply_booking_fields(booked: Mapping[str, Any]) -> dict[str, Any]:
+    fields: dict[str, Any] = {}
+    notice_authority = booked.get("notice_authority")
+    if isinstance(notice_authority, MappingABC):
+        upper_bounds = notice_authority.get(
+            WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN
+        )
+        if isinstance(upper_bounds, MappingABC):
+            fields[WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN] = dict(
+                upper_bounds
+            )
     bookings = booked.get("bookings") or ()
     if not bookings:
-        return {}
+        return fields
     from simulator.optimize.physics import SUPPLY_INTERVAL_UPPER_BOUND_USED
 
-    fields: dict[str, Any] = {"wall_supply_bound_bookings": bookings}
+    fields["wall_supply_bound_bookings"] = bookings
     if any(
         isinstance(item, Mapping)
         and item.get("reason") == WALL_DEPOSIT_UPPER_BOUND_USED
@@ -4885,9 +4904,7 @@ def _book_wall_deposits_at_vapour_supply(
         supply_kg.window,
         resolution_kg,
     )
-    notice_authority[
-        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
-    ] = {
+    notice_authority[WALL_REFUSED_FLUX_UPPER_BOUNDS_KG_PER_CAMPAIGN] = {
         species: float(bound)
         for species, bound in sorted(
             classified_supply.upper_bound_kg_per_campaign.items()

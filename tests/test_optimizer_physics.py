@@ -1367,31 +1367,23 @@ def _install_booking_mutation(monkeypatch: pytest.MonkeyPatch, name: str) -> Non
                 booked += float(bounds[species])
         return booked
 
-    def _add_measured(certain, records, refused, bounds, resolution):
+    def _add_measured(certain, records, refused, bounds, classified_supply):
         return certain, _booked_bounds(refused, bounds)
 
-    def _drop_unlabeled(certain, records, refused, bounds, resolution):
+    def _drop_unlabeled(certain, records, refused, bounds, classified_supply):
         dropped = 0.0
         for record in records:
             if record.get("species") is None:
                 dropped += float(record["deposit_kg_per_campaign"])
-        booked = 0.0
-        for species in refused:
-            if species not in bounds:
-                continue
-            supply = float(bounds[species])
-            if supply <= resolution:
-                continue
-            booked += supply
-        return certain - dropped, booked
+        return certain - dropped, _booked_bounds(refused, bounds)
 
-    def _first_species_only(certain, records, refused, bounds, resolution):
+    def _first_species_only(certain, records, refused, bounds, classified_supply):
         for species in refused:
             if species in bounds:
                 return certain, float(bounds[species])
         return certain, 0.0
 
-    def _zero_fill_missing(certain, records, refused, bounds, resolution):
+    def _zero_fill_missing(certain, records, refused, bounds, classified_supply):
         replaced = 0.0
         refused_names = {str(species) for species in refused}
         for record in records:
@@ -1506,10 +1498,16 @@ def test_product_booking_replaces_measured_mass_with_the_same_supply(
         verdict=str(oracle["verdict"]),
     )
     assert oracle["upper"] == pytest.approx(supply_kg)
+    from simulator.optimize.physics import _WallSupplyIntegral, _WallSupplyWindow
+
+    supply_window = _WallSupplyWindow(
+        run_total_kg={"SiO": supply_kg},
+        campaigns_elapsed=1.0,
+    )
     monkeypatch.setattr(
         objective_module,
         "_refused_vapour_supply_kg",
-        lambda *args, **kwargs: {"SiO": supply_kg},
+        lambda *args, **kwargs: _WallSupplyIntegral(supply_window),
     )
     authority = {
         "authoritative_for_deposit_mass": False,

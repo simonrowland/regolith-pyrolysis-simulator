@@ -2175,7 +2175,11 @@ def test_publication_paths_use_their_own_wall_supply_window(
     terminal_expected_kg_per_campaign: float,
     tap_expected_kg_per_campaign: float,
 ) -> None:
-    """Every published per-campaign bound uses its integral window.
+    """Every public consumer publishes its own per-campaign integral window.
+
+    Terminal/tap product summaries exercise product booking; the production
+    gate and evaluate report exercise the coating classifier. Together these
+    paths cover each caller of the typed window classifier.
 
     For 1 kg/run, 1 / (24/35) = 1.4583333333333333, 1 / 1 = 1,
     and 1 / 2 = 0.5 kg/campaign. In the two-campaign tap case, the
@@ -2220,11 +2224,14 @@ def test_publication_paths_use_their_own_wall_supply_window(
         for snapshot, rate in zip(tap_snapshots, rates_kg_hr, strict=True):
             snapshot.duration_h = 1.0
             # The synthetic flux's parent stays nonbinding across both hours.
-            snapshot.inventory.melt_oxide_kg = {"_measured_SiO": 1.0e6}
-            snapshot.evap_flux = _wall_bound_evap_flux({
+            snapshot.inventory.melt_oxide_kg = {"SiO2": 1.0e6}
+            flux = _wall_bound_evap_flux({
                 "flux": (),
                 "published_flux": (("SiO", rate),),
             })
+            assert flux is not None
+            flux.carrier_authority_by_species["SiO"]["parent_oxide"] = "SiO2"
+            snapshot.evap_flux = flux
         execution = _tap_run(tap_snapshots, configured_hours=len(tap_snapshots))
         execution.campaigns_elapsed = campaigns_elapsed
         execution.trace.wall_deposit_by_segment_species_kg = {}
@@ -2318,16 +2325,9 @@ def test_publication_paths_use_their_own_wall_supply_window(
             gate = physics_module.PhysicsConstraintSet().coating(overlay)
             published = gate.status_payload
 
-    bound_map = published.get(
+    bound_map = published[
         "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
-    )
-    if bound_map is None:
-        authority = published.get("wall_deposit_sticking_authority", {})
-        assert isinstance(authority, Mapping)
-        bound_map = authority.get(
-            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign",
-            {},
-        )
+    ]
     bound = bound_map["SiO"]
     assert bound == pytest.approx(expected)
     if window_name == "tap after one of two campaigns":
