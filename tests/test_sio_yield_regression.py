@@ -440,12 +440,12 @@ BASELINE_STAGE4_SIO2_KG = {
     "mars_basalt": 8.90876677849e-07,
 }
 
-# Production CLI pins after Stage-3 purity admission bypasses parcels rejected
-# at that stage. A zero lunar capture is valid; Mars retains its small routed
-# capture under its distinct feedstock composition.
+# Production Stage-3 product after the d-402 flagged pO2-free solid-state wall
+# bound. Both feedstocks record zero Stage-3 SiO2 in this 24-hour recipe; the
+# old 4.89580870473e-9 kg Mars capture came from the reactive Psat=0 backstop.
 BASELINE_STAGE3_SIO2_KG = {
     "lunar_mare_low_ti": 0.0,
-    "mars_basalt": 4.89580870473e-09,
+    "mars_basalt": 0.0,
 }
 
 
@@ -609,35 +609,16 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     )
 
     assert "wall_deposit_kg" in report
-    # This projection subtracts nearly equal bulk-melt SiO2 inventories.  The
-    # 03616bb20 Chapman-Enskog D_AB ratio (0.9879823545) changes wall routing
-    # and therefore the cancellation path.  On 2026-09-25 b-573 re-grounding,
-    # green treated the projected MAGEMin liquidus as unavailable and used the
-    # Kress floor (F=0 through 1200 C, then F=1); tip uses projected bounds.
-    # The first projected bounds are lunar 918.75--1370.3125 C after dropping
-    # 0.308801 wt% MnO+P2O5, and Mars 1018.75--1320.3125 C after dropping
-    # 0.880961 wt% P2O5.  Both drops are within the 1.0 wt% ruling bound.
-    # Derivation: the freeze-gate fraction enters the active redox capacity as
-    # C_m_effective = C_m_full * F, and each hour applies
-    # delta_ln(fO2) = net_O2_equivalent_mol / C_m_effective before the SiO
-    # route and terminal ledger cancellation.  Re-running the 24-hour report
-    # therefore re-grounds the two cancellation residuals, not a free tuning
-    # parameter; canonical atom-ledger closure remains independently bounded
-    # at 5e-12 percent.
-    # t-1217 restores source-preserving causal capture and changes the bulk-
-    # inventory subtraction's roundoff path; b-850 parent-oxide alkali-dimer
-    # activities shift the SiO route, yielding midpoint-era 24-hour closure
-    # residuals of 6.164333585288513e-7% (lunar) and 2.2716051402658465e-7%
-    # (Mars). d-137fix4 integrates the Stage-3 band before applying the same
-    # excess-inventory balance; the production resolver now reports the pins
-    # below without relaxing the independent atom-ledger closure bound.
-    # The lunar pin is the studio-3 actual (pins2 log, tree 9666fc129 plus
-    # the de32c69ca runner regen). Lunar full runs diverge between the laptop
-    # and studio-3, so this value is not a laptop re-run.
-    # constack merge: repin on gate box. Condenser fix branch (312fcce4f):
-    # studio-3 actuals after the e-NTU stage capture and the d-344 cartridge.
+    # The diagnostic subtracts nearly equal bulk-melt SiO2 inventories. The
+    # freeze-gate fraction sets C_m_effective = C_m_full * F, and each hour
+    # applies delta_ln(fO2) = net_O2_equivalent_mol / C_m_effective before
+    # routed SiO capture. d-402's Stage-3 pO2-free bound removes the former
+    # 4.89580870473e-9 kg Mars capture that the reactive Psat=0 backstop
+    # admitted; atom-ledger closure remains independently bounded at 5e-12%.
+    # The lunar cancellation residual is 1.54541037e-14 percentage points
+    # below its prior studio pin, a change in the near-equal subtraction path.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 1.6649989611898087e-6,
+        "lunar_mare_low_ti": 1.664998945735705e-6,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
@@ -761,16 +742,11 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
     assert 0.0 < route.condensed_by_stage_species[
         "stage_4_alkali_mg_cyclone"]["SiO"] < 0.95
-    # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
-    # Wetzel/Gail evaporation-Arrhenius validity floor.
-    # Production at ae5998456 explicitly reports P_sat=0 for that reactive
-    # product backstop, yielding the measured 0.6848392024862018 kg remainder.
-    # The earlier 0.6877125897008886 pin predates this diagnostic path.
-    # Film-temperature diffusivity and the e-NTU bulk temperature capture
-    # more of the same 1 kg parcel. The route's uncaptured remainder falls
-    # by 0.0410323097856537 kg.
+    # d-402 uses a flagged pO2-free solid-standard-state bound for these
+    # cold walls. It leaves 0.6446930166829525 kg of the 1 kg parcel uncaptured,
+    # 0.0008861239824044 kg more than the old reactive Psat=0 backstop route.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.6438068927005481
+        0.6446930166829525
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
