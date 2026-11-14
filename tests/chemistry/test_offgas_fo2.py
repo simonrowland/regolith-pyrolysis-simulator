@@ -550,10 +550,9 @@ def test_imposed_fo2_returns_the_ceajanaf_wgs_source_spread(polys):
         janaf_gas_constant_J_per_mol_K=float(JANAF_R_J_PER_MOL_K),
     )
 
-    # Mutation: clear `uncertainty_band_dex` on the WGS result and these assertions fail.
+    # Mutation: remove or halve the full source-spread band; these assertions fail.
     assert result.log10_fO2 == pytest.approx(cea.log10_fO2, abs=1e-12)
     assert result.uncertainty_band_dex is not None
-    # Mutation: halve the full CEA/JANAF post-WGS spread; this pin fails.
     assert result.uncertainty_band_dex == pytest.approx(0.0004895351, abs=2e-9)
     assert result.as_dict()["uncertainty_band_dex"] == result.uncertainty_band_dex
 
