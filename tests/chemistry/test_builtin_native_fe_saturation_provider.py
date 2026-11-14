@@ -17,9 +17,9 @@ from simulator.chemistry.kernel.validation import (
     validate_atom_balance,
     validate_proposal_accounts,
 )
-from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
-from simulator.state import CampaignPhase, PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
+from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _atom_check, _build_sim
+from tests.native_fe_test_support import NATIVE_FE_ROUTE_ACCOUNTS
 
 
 DECLARED_ACCOUNTS = frozenset({
@@ -286,17 +286,9 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         feedstocks_data,
         setpoints_data,
     )
-    routed_fe_accounts = (
-        "process.overhead_gas",
-        "process.condensation_train",
-        "terminal.offgas",
-        "process.condensation_retained_holdup",
-        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
-        *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
-    )
     before_routed_fe_kg = {
         account: sim.atom_ledger.kg_by_account(account).get("Fe", 0.0)
-        for account in routed_fe_accounts
+        for account in NATIVE_FE_ROUTE_ACCOUNTS
     }
     before = {
         account: dict(sim.atom_ledger.mol_by_account(account))
@@ -364,7 +356,7 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
     if feedstock_id == "lunar_mare_low_ti":
         accounts = {
             account: sim.atom_ledger.kg_by_account(account)
-            for account in routed_fe_accounts
+            for account in NATIVE_FE_ROUTE_ACCOUNTS
         }
         # d-402 solid-wall equilibrium can capture Fe into the Stage-4
         # cartridge residue; include that explicit sink with gas, train,
