@@ -24,7 +24,9 @@ PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
 # Current production token count after removing two local-alias tokens from
 # scripts/grind_home.py; its actual ``os.environ`` read remains counted once.
-ENV_ACCESS_TOKEN_CEILING = 94
+# +2 from the alphaMELTS freeze-gate continuation (b56619a8f8): the registered
+# ALPHAMELTS_CALC_MODE read and the subprocess ``os.environ.copy()``.
+ENV_ACCESS_TOKEN_CEILING = 96
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep
