@@ -55,6 +55,7 @@ from simulator.battery.records import (
     Notice,
     Observation,
     Value,
+    nominal_pressure_pa,
 )
 from simulator.battery.waypoints import (
     Waypoint,
@@ -298,10 +299,10 @@ def resolve_row_fo2(
             and total_pressure.is_value
             and total_pressure.value is not None
         ):
-            try:
-                p_co_bar = float(total_pressure.value) / PA_PER_BAR
-            except (TypeError, ValueError, ArithmeticError):
-                p_co_bar = math.nan
+            pressure_pa = nominal_pressure_pa(total_pressure)
+            p_co_bar = (
+                math.nan if pressure_pa is None else float(pressure_pa) / PA_PER_BAR
+            )
             if math.isfinite(p_co_bar) and p_co_bar > 0.0:
                 # Rego reports graphite under a CO-only cover, so the stated
                 # CO pressure is the row's total pressure. Its observed pNa is
@@ -739,12 +740,9 @@ def _kress_pressure_bar(
     if identity is not None and identity.total_pressure_Pa is not None:
         state = identity.total_pressure_Pa
         if state.is_value and state.value is not None:
-            try:
-                pascal = float(state.value)
-            except (TypeError, ValueError):
-                pascal = -1.0
-            if math.isfinite(pascal) and pascal > 0.0:
-                return pascal / PA_PER_BAR, "identity.total_pressure_Pa"
+            pascal = nominal_pressure_pa(state)
+            if pascal is not None and pascal.is_finite() and pascal > 0:
+                return float(pascal) / PA_PER_BAR, "identity.total_pressure_Pa"
     if experiment is not None and bench is not None:
         from simulator.battery.waypoints import (
             _prediction_pressure_waypoint,

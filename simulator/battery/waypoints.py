@@ -8,6 +8,7 @@ from enum import StrEnum
 from collections.abc import Iterator, Mapping
 
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.composition import (
     excluded_component_notice_reason,
@@ -40,6 +41,7 @@ from simulator.battery.records import (
     ThermalSchedule,
     Value,
     as_decimal,
+    nominal_pressure_pa,
 )
 from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
 from simulator.physical_constants import BAR_PA_DECIMAL, GAS_CONSTANT_DECIMAL
@@ -998,10 +1000,7 @@ def _printed_wt_token(raw: object, amount: Decimal) -> str:
         return raw.strip()
     if isinstance(raw, int) and not isinstance(raw, bool):
         return str(raw)
-    text = format(amount, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text or "0"
+    return decimal_token(amount)
 
 
 def normalized_composition(
@@ -1939,22 +1938,26 @@ def oxygen_condition(
                 pressure_value, pressure_inputs = p_co
                 if temperature.kind is ValueKind.POINT and pressure_value.kind is ValueKind.POINT:
                     T = temperature.point
-                    # The oxygen-buffer owner evaluates the stated-CO JANAF
-                    # equilibrium and returns its implied CO2 partial pressure
-                    # for this route's diagnostic notice.
-                    P_bar = pressure_value.point / BAR_PA_DECIMAL
-                    c_co_state = _stated_co_pressure_result(float(T), float(P_bar))
-                    routes.append(Waypoint(
-                        "oxygen_condition",
-                        Value.point_of(c_co_state.log10_fO2_bar),
-                        "graphite_c_co_buffer",
-                        WaypointAuthority.DERIVED,
-                        ("experiment.fO2_control.buffer", *thermal.inputs, *pressure_inputs),
-                        notice=(
-                            "implied_pCO2_bar="
-                            f"{c_co_state.p_co2_bar:.12g}; JANAF C-095"
-                        ),
-                    ))
+                    # Premise: paper states graphite / C–CO buffering and prints
+                    # T and P_CO (or total P when CO is the stated gas); the
+                    # oxygen-buffer owner evaluates the stated-CO JANAF relation.
+                    nominal_pa = nominal_pressure_pa(pressure_value)
+                    if nominal_pa is not None:
+                        P_bar = nominal_pa / BAR_PA_DECIMAL
+                        c_co_state = _stated_co_pressure_result(
+                            float(T), float(P_bar)
+                        )
+                        routes.append(Waypoint(
+                            "oxygen_condition",
+                            Value.point_of(c_co_state.log10_fO2_bar),
+                            "graphite_c_co_buffer",
+                            WaypointAuthority.DERIVED,
+                            ("experiment.fO2_control.buffer", *thermal.inputs, *pressure_inputs),
+                            notice=(
+                                "implied_pCO2_bar="
+                                f"{c_co_state.p_co2_bar:.12g}; JANAF C-095"
+                            ),
+                        ))
         else:
             buffer = PUBLISHED_BUFFERS.get(buffer_token.upper())
             pressure = _prediction_pressure_waypoint(
@@ -1967,20 +1970,22 @@ def oxygen_condition(
                 if (temperature.kind is ValueKind.POINT and pressure.value.kind is ValueKind.POINT
                         and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
                     T = temperature.point
-                    P = pressure.value.point / BAR_PA_DECIMAL
-                    # Premise: Frost (1991) Table 1's condensed buffer line is
-                    # within its published T domain; its equation is in
-                    # simulator.oxygen_buffers.
-                    value = frost_condensed_buffer_log10_fO2_bar(
-                        as_decimal(buffer.A_K),
-                        as_decimal(buffer.B),
-                        as_decimal(buffer.pressure_coefficient_K_per_bar),
-                        T,
-                        P,
-                    )
-                    routes.append(Waypoint("oxygen_condition", Value.point_of(value),
-                        "buffer_relation", WaypointAuthority.DERIVED,
-                        ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
+                    nominal_pa = nominal_pressure_pa(pressure.value)
+                    if nominal_pa is not None:
+                        P = nominal_pa / BAR_PA_DECIMAL
+                        # Premise: Frost (1991) Table 1's condensed buffer line is
+                        # within its published T domain; its equation is in
+                        # simulator.oxygen_buffers.
+                        value = frost_condensed_buffer_log10_fO2_bar(
+                            as_decimal(buffer.A_K),
+                            as_decimal(buffer.B),
+                            as_decimal(buffer.pressure_coefficient_K_per_bar),
+                            T,
+                            P,
+                        )
+                        routes.append(Waypoint("oxygen_condition", Value.point_of(value),
+                            "buffer_relation", WaypointAuthority.DERIVED,
+                            ("experiment.fO2_control.buffer", *thermal.inputs, *pressure.inputs)))
     # Dalton's law gives pO2 <= P_total. A printed vacuum/total-pressure upper
     # bound is therefore a usable engine point only at its bound, with an
     # extrapolation notice. The bound is method_class calculated, never printed:
@@ -2015,7 +2020,7 @@ def oxygen_condition(
         )
         upper_pa: Decimal | None = None
         if pressure.kind is ValueKind.POINT:
-            upper_pa = pressure.point
+            upper_pa = nominal_pressure_pa(pressure)
         elif (pressure.kind is ValueKind.BOUND
               and pressure.bound_operator in {"<", "<=", "≤"}):
             upper_pa = pressure.bound_value

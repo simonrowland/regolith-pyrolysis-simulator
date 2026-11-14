@@ -122,8 +122,11 @@ def test_nagabayashi_unlabeled_chamber_dimensions_do_not_become_a_length(
         plain_fact["value"]["state"]["value"]["categorical"]
         == "0.42 x 0.52 x 1 m"
     )
-    assert plain_fact["value"]["locator"]["page"] == 140
-    assert plain_fact["value"]["locator"]["section"] == "2. Experimentals"
+    locator = plain_fact["value"]["locator"]
+    assert locator["page"] == 1
+    assert locator["published_page"] == 140
+    assert locator["pdf_page_index"] == 0
+    assert locator["section"] == "2. Experimentals"
 
 
 def test_equal_pressure_duplicates_keep_printed_approximation() -> None:

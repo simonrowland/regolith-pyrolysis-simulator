@@ -49,18 +49,14 @@ def test_openimcc_is_retried_after_a_single_hour_refusal(monkeypatch) -> None:
         refuse_first_hour,
     )
 
-    sim._refresh_vapor_pressures_from_kernel(
-        result, simulation_hour=int(sim.melt.hour) + 1,
-    )
+    sim._refresh_vapor_pressures_from_kernel(result)
     first_hour = sim._last_high_t_melt_activity
     assert first_hour["provider"] == "constant_gamma"
     assert first_hour["fallback"] is True
     assert first_hour["fallback_reason"]["code"] == "imcc_nonconvergence"
 
     sim.melt.temperature_C += 7.5
-    sim._refresh_vapor_pressures_from_kernel(
-        result, simulation_hour=int(sim.melt.hour) + 2,
-    )
+    sim._refresh_vapor_pressures_from_kernel(result)
     second_hour = sim._last_high_t_melt_activity
     assert target_temperatures == [2073.15, 2080.65]
     assert second_hour["provider"] == "openimcc"
