@@ -1,0 +1,13 @@
+schema_version: literature_extract.v1
+source_id: dahl-2006-isij-46-614_origin
+source:
+  citation: 'Fredrik Dahl, Jenny Brandberg, and Du Sichen (2006). “Characterization of Melting of Some Slags in the Al2O3-CaO-MgO-SiO2 Quaternary System.” ISIJ International, 46(4), 614–616.'
+  year: 2006
+  corpus_asset: raw/dahl-2006-isij-46-614_origin/dahl-2006-isij-46-614_origin.pdf
+  corpus_sha256: b56250e9ba6ecb6318dfd156b01ba8bbc319dc4befe578c31f4231903530c2d7
+extraction:
+  method: 'scoped review of Table 1 and the paper text for printed invariant temperatures, phases, and liquid compositions; Table 1 reports experimental sample outcomes rather than invariant points, and no qualifying invariant point is printed'
+  date: '2026-11-14'
+  worker: bugs1110-fix-1816-tierA-141429
+review_status: draft
+species: {}
