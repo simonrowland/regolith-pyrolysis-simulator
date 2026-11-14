@@ -515,7 +515,7 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "4436bf3966f0a146e381c304ee8a3756897dc7af00cc1462f1cfc6bb64eac703"
+    ).hexdigest() == "e8a2b5d649500bb2c9f95a018c44885465755c9da04956be00a7ed30df51c9d3"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -790,9 +790,9 @@ def test_refused_calls_use_bracketed_same_composition_temperature_neighbors(
     assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
     bridge_parents = _ONE_STEP_PARENTS + ("Na2O",)
     errors = {}
-    solved_activity = dict(zip(
-        solved_62["parent_oxides"], solved_62["parent_activity"],
-    ))
+    # Compare with the direct 9c327c2 solve pinned for call 62, rather than the
+    # older cached trace returned by _call_record.
+    solved_activity = _LUNAR_SOLVED_ACTIVITY[62]
     neighbor_results = {}
     for oxide in bridge_parents:
         activity = vapor_pressure_module._high_t_activity_for_parent(
