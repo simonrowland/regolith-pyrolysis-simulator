@@ -19,7 +19,7 @@ from simulator.battery.migrate import (
     _printed_source_point_condition_pressure,
     _without_unprinted_total_pressure,
 )
-from simulator.battery.records import Located, State
+from simulator.battery.records import ApproxPressure, BandBasis, Located, State
 from tests.battery.factories import migrate_one_extract
 
 
@@ -264,13 +264,12 @@ def test_unprinted_pressure_guard_uses_source_provenance() -> None:
     assert _without_unprinted_total_pressure({"total_pressure_Pa": unlocated}) is None
 
 
-def test_located_approximate_print_stays_off_identity_and_calibration() -> None:
-    """A located approximate print stays off identity.
+def test_located_approximate_print_is_an_identity_band() -> None:
+    """A located approximate print is a half-decade identity band.
 
-    Identity.total_pressure_Pa cannot carry the approximate flag, so the
-    axis is absent. Calibration readers refuse the same print. Inferred,
-    locatorless, and bound pressures stay off identity. Absence is not
-    replaced by a default. An exact located point still maps.
+    Calibration still refuses that print. Inferred, locatorless, and bound
+    pressures stay off identity. Absence is not replaced by a default. An
+    exact located point stays a decimal.
     """
 
     approximate = _point_condition_from_plain(
@@ -288,9 +287,15 @@ def test_located_approximate_print_stays_off_identity_and_calibration() -> None:
         key="total_pressure_Pa",
     )
     identity = Identity(quantity=State.of(Quantity.VISCOSITY), species=None)
+    mapped_approximate = _point_pressure_for_identity(
+        identity, {"total_pressure_Pa": approximate}
+    )
+    assert mapped_approximate is not None and mapped_approximate.is_value
+    assert isinstance(mapped_approximate.value, ApproxPressure)
+    assert mapped_approximate.value.point == Decimal("0.0001")
     assert (
-        _point_pressure_for_identity(identity, {"total_pressure_Pa": approximate})
-        is None
+        mapped_approximate.value.band_basis
+        is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
     )
     assert _printed_source_point_condition_pressure(approximate) is None
 
@@ -303,6 +308,7 @@ def test_located_approximate_print_stays_off_identity_and_calibration() -> None:
     )
     mapped = _point_pressure_for_identity(identity, {"total_pressure_Pa": exact})
     assert mapped is not None and mapped.is_value
+    assert type(mapped.value) is Decimal
     assert mapped.value == Decimal("101325")
 
     inferred = _point_condition_from_plain(

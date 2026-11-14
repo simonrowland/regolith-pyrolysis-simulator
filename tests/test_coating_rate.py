@@ -635,7 +635,9 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert hashlib.sha256(actual_bytes).hexdigest() == (
         # b-244: Al/Ti operator T_cond overrides removed (report-only); 14 text/audit leaves, 0 numeric; Al crossing authority -> capture_threshold_fallback.
         # b-1174: wall-report species = positive vapour supply; +20 zero-valued species keys, 0 changed/numeric leaves (train leaf diff).
-        "1cb18eeb837921245ba3e0a6bf20b5f175dddfab75e1b5afa3f17c063e969639"
+        # IA stateless: the 7 hour-16 certified-gamma certificates carry hour/window_K/composition_window_L1 = null (21 leaves);
+        # the history-dependent cap-step seam notice is gone (1 notice); 2 keys reordered; 0 numeric leaves changed. Payload = runner C0 fixture bytes.
+        "14387e1e0fe81b14d7557d4da279a8d62b9f6e5cab2d8a449931e958860db7de"
     )
 
 

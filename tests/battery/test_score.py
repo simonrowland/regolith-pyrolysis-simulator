@@ -2562,8 +2562,12 @@ def test_kj_band_dimension_mismatch_is_refused_for_heat_capacity(
     assert score_module.decision_band_for(
         Quantity.CP, SourceRelation.INDEPENDENT, derived_band=band
     ) is None
+    # populate_numeric looks up decision_band_for in the module that defines
+    # it. After the score_metrics move that is no longer score.py.
     monkeypatch.setattr(
-        score_module, "decision_band_for", lambda *args, **kwargs: band
+        sys.modules[score_module.populate_numeric.__module__],
+        "decision_band_for",
+        lambda *args, **kwargs: band,
     )
     numeric, reason, detail = score_module.populate_numeric(
         quantity=Quantity.CP,

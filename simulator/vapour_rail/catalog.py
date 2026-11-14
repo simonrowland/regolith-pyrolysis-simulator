@@ -50,6 +50,7 @@ from simulator.vapour_rail.channels import (
     channel_log10_contribution,
     validate_physical_pO2_bar,
     compile_o2_channel_term,
+    is_dioxygen_formula,
     o2_potential_from_pO2_bar,
 )
 from engines.antoine import _antoine_log10_pressure
@@ -316,11 +317,6 @@ def _thermo_extract_dependencies(payload: Mapping[str, Any]) -> dict[str, Any]:
 def _strip_phase_suffix(formula: str) -> str:
     """``M(g)`` / ``O2(cr)`` → ``M`` / ``O2``; bare formulas unchanged."""
     return re.sub(r"\([^)]*\)$", "", str(formula).strip())
-
-
-def _is_dioxygen_formula(formula: str) -> bool:
-    """True for O2 with optional phase suffix (``O2``, ``O2(g)``, …)."""
-    return _strip_phase_suffix(formula) == "O2"
 
 
 def _source_reaction_components(
@@ -4458,7 +4454,7 @@ def _compile_thermo_reference_model(
                         target_exchange_nu += amount
                     if sign < 0.0 and _strip_phase_suffix(formula) == _strip_phase_suffix(base_formula):
                         base_reactant_nu += amount
-                    if _is_dioxygen_formula(formula):
+                    if is_dioxygen_formula(formula):
                         exchange_nu_o2 += nu
             if target_exchange_nu <= 0.0 or base_reactant_nu <= 0.0:
                 raise CatalogCompileError(
@@ -4515,7 +4511,7 @@ def _compile_thermo_reference_model(
                     formula_keys = {formula, _strip_phase_suffix(formula)}
                     if sign > 0 and not formula_keys.isdisjoint(target_keys):
                         final_vapor_nu += amount
-                    if _is_dioxygen_formula(formula):
+                    if is_dioxygen_formula(formula):
                         final_nu_o2 += sign * amount
                     if sign < 0 and formula == activity_component:
                         condensed_activity_nu += amount
@@ -4696,7 +4692,7 @@ def _compile_thermo_reference_model(
         # Recognize O2 / O2(g) / … — phase suffix must not silently zero this.
         nu_o2 = 0.0
         for nu, _poly, formula in terms_builders:
-            if _is_dioxygen_formula(formula):
+            if is_dioxygen_formula(formula):
                 nu_o2 += nu
 
         # Outer activity exponent: −ν_O2 / ν_v (0 when no O2 in the reaction).

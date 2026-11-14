@@ -282,7 +282,6 @@ _TERMINAL_REFUSAL_RETAINED_ROOT_NAMES = frozenset({
     '_last_extraction_completeness_diagnostic',
     '_last_fe_redox_respeciation_diagnostic',
     '_last_high_t_melt_activity',
-    '_last_high_t_melt_activity_temperature_K',
     '_last_imcc_activity_shadow',
     '_last_impurity_delta',
     '_last_melt_redox_liquid_fraction_diagnostic',
@@ -1444,7 +1443,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._high_t_melt_activity = normalize_high_t_melt_activity(
             self.setpoints.get("high_t_melt_activity", "openimcc")
         )
-        self._last_high_t_melt_activity_temperature_K: float | None = None
         self._last_high_t_melt_activity: Dict[str, Any] = {}
         self._high_t_melt_activity_fallback_steps: list[Dict[str, Any]] = []
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
@@ -1821,7 +1819,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapour_batch_flux_overlay = {}
         self._last_vapour_batch_resolve_error = {}
         self._last_imcc_activity_shadow = {}
-        self._last_high_t_melt_activity_temperature_K = None
         self._last_high_t_melt_activity = {}
         self._high_t_melt_activity_fallback_steps = []
         self._last_target_inventory_diagnostic = {}
@@ -10359,9 +10356,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # removed at flip time per the goal spec ("comparing against the
         # same source is moot"). Subsequent intent flips
         # (EVAPORATION_FLUX, ...) sit on top of this same kernel.
-        self._refresh_vapor_pressures_from_kernel(
-            result, simulation_hour=int(self.melt.hour) + 1,
-        )
+        self._refresh_vapor_pressures_from_kernel(result)
         # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
         # Stage 0 left sulfide / sulfate inventory behind; otherwise
         # short-circuits without touching PySulfSat. Never mutates the
@@ -10442,7 +10437,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         result,
         *,
         include_diagnostic_shadows: bool = True,
-        simulation_hour: int | None = None,
         observation_pO2_bar: float | None = None,
     ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
@@ -10451,9 +10445,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         \\goal BUILTIN-ENGINE-EXTRACTION (#7). Called from
         :meth:`_record_equilibrium_status` after the backend (or the
         legacy internal analytical path) produces an EquilibriumResult.
-
-        ``simulation_hour`` enables trajectory continuation for runtime calls;
-        standalone equilibrium probes omit it.
 
         Behaviour:
           - Below 400 K this method skips kernel vapor evaluation and preserves
@@ -10483,22 +10474,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             explicitly forbidden by the goal spec.
 
         Published vapor and high-temperature diagnostics are cleared at
-        entry so a failure cannot expose a prior call's result. The prior
-        high-temperature activity snapshot is retained locally as a
-        continuation input for this dispatch; only a successful dispatch
-        publishes this call's activity state.
+        entry so a failure cannot expose a prior call's result.
         """
 
-        previous_high_t_melt_activity = getattr(
-            self, '_last_high_t_melt_activity', {}
-        ) or {}
-        previous_high_t_melt_activity_temperature_K = getattr(
-            self, '_last_high_t_melt_activity_temperature_K', None
-        )
         self._last_vapor_pressure_diagnostic = {}
         self._last_vapor_pressures_source = {}
         self._last_high_t_melt_activity = {}
-        self._last_high_t_melt_activity_temperature_K = None
         backend_diagnostics = dict(
             getattr(self, '_last_backend_diagnostics', {}) or {}
         )
@@ -10639,11 +10620,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'high_t_melt_activity': getattr(
                     self, '_high_t_melt_activity', 'openimcc'
                 ),
-                'high_t_melt_activity_previous_temperature_K': (
-                    previous_high_t_melt_activity_temperature_K
-                ),
-                'high_t_melt_activity_previous': previous_high_t_melt_activity,
-                'simulation_hour': simulation_hour,
             }
         dispatch_kwargs = {
             'control_inputs': {
@@ -10670,7 +10646,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ChemistryIntent.VAPOR_PRESSURE,
             **dispatch_kwargs,
         )
-        self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
 
         def append_kernel_warnings(

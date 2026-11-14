@@ -863,7 +863,6 @@ _HIGH_T_FLUX_OXIDES: tuple[str, ...] = (
     "Al2O3",
     "TiO2",
 )
-_HIGH_T_ACTIVITY_SEAM_LIMIT_DEX = 0.1
 _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS: dict[str, dict[str, str]] = {
     "K2O": {
         "authority": "constant_gamma",
@@ -875,50 +874,6 @@ _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS: dict[str, dict[str, str]] = {
         ),
         "tracking_id": "t-999",
     },
-}
-
-# Per-species cap on a first-order ln-gamma continuation, as a single-cation
-# L1 distance from the last certified composition. Provenance: the solved
-# c2b7b4e call log (117 calls, 2023–2473 K). On that trajectory the ln γ
-# slope is composition-driven: a secant in T and in 1/T leaves the same
-# error, so the cap is a composition distance, not a temperature window.
-# The owner's step counts are the horizon at which parent-basis γ stays
-# inside median absolute error ≤ 5% and worst ≤ 20% on the 7.5 K ramp:
-# FeO 8, MgO 4, CaO 4, SiO2 3, Al2O3 3, TiO2 3, K2O 1, Na2O 0.
-# FeO at 8 steps measured a worst error of 20.40% (0.40 percentage points
-# over the 20% target) on that ramp; the count stays 8 because that is the
-# horizon the owner counted in.
-# Premise: one ramp step is a consecutive solved pair whose temperatures
-# differ by exactly 7.5 K. There are 69 such pairs. Their single-cation L1
-# distances, on the same eight flux parents as the r2 window, sum to
-# 0.8844714170310508 (dimensionless). The mean step is that sum divided by
-# 69. cap_L1 = steps * mean. Both factors are dimensionless, so the cap is
-# a mole-fraction distance and compares directly with D(X_now, X_cert).
-# A cap of 0 (Na2O) freezes at the certificate: one step of that parent can
-# be ~94% off, so it is never first-order extrapolated. Distance == 0 is
-# inside every cap, including 0, because the gate is distance > cap.
-# K2O is listed so the prior is complete, but the 2026-09-26 exclusion
-# still keeps it off the OpenIMCC certificate; this table does not lift
-# that ruling. These distances are a prior to be tightened by bench/KEMS
-# scoring, not a fit to a campaign rump.
-_EXTRAPOLATION_CAP_STEPS: dict[str, int] = {
-    "FeO": 8,
-    "MgO": 4,
-    "CaO": 4,
-    "SiO2": 3,
-    "Al2O3": 3,
-    "TiO2": 3,
-    "K2O": 1,
-    "Na2O": 0,
-}
-_EXTRAPOLATION_RAMP_STEP_COUNT = 69
-_EXTRAPOLATION_RAMP_L1_SUM = 0.8844714170310508
-_EXTRAPOLATION_MEAN_STEP_L1 = (
-    _EXTRAPOLATION_RAMP_L1_SUM / _EXTRAPOLATION_RAMP_STEP_COUNT
-)
-_EXTRAPOLATION_CAP_L1: dict[str, float] = {
-    oxide: steps * _EXTRAPOLATION_MEAN_STEP_L1
-    for oxide, steps in _EXTRAPOLATION_CAP_STEPS.items()
 }
 
 # Same-composition temperature probes for nonconvergence. Inspect the whole
@@ -1082,137 +1037,6 @@ def _high_t_composition_vector(composition_mol: Mapping[str, float]) -> dict[str
         parent: fraction
         for parent, fraction in single_cation_mole_fractions(composition_mol).items()
         if parent in _HIGH_T_FLUX_OXIDES
-    }
-
-
-def _high_t_composition_distance(
-    current: Mapping[str, float], previous: Mapping[str, float],
-) -> float:
-    return sum(
-        abs(current.get(p, 0.0) - previous.get(p, 0.0))
-        for p in _HIGH_T_FLUX_OXIDES
-    )
-
-
-def _ln_gamma_at_progress(
-    certificate: Mapping[str, Any],
-    progress_s: float,
-    slope: float | None,
-) -> float:
-    """Evaluate the first-order ln-gamma step, with s = 0 exact.
-
-    s = 0 returns gamma_last itself. exp(ln gamma_last) is not bit-identical
-    to the certified coefficient, and the unit check of the Taylor step is
-    that a zero step reproduces the last certified value.
-    """
-
-    gamma_last = float(certificate["gamma_last"])
-    if progress_s == 0.0 or slope is None:
-        return gamma_last
-    return math.exp(float(certificate["ln_gamma_last"]) + slope * progress_s)
-
-
-def _continued_certified_effective_gamma(
-    certificate: Mapping[str, Any],
-    *,
-    temperature_K: float,
-    composition: Mapping[str, float],
-    composition_distance_L1: float,
-    composition_cap_L1: float | None = None,
-) -> dict[str, Any]:
-    """First-order continuation of one certified effective gamma.
-
-    The chemical potential of a melt component is
-        μ_i = μ_i°(T) + RT ln a_i,
-        ln a_i = ln γ_i + ln X_i.
-    The flux multiplies the current bulk single-cation fraction X_i, which
-    is known without a solve, by an effective γ_i. A refused solve withholds
-    γ_i. Continue ln γ rather than γ: ln γ is the excess part of RT ln a, so
-    a step is linear in the quantity the equilibrium condition uses. Apply
-    the composition cap before exponentiation.
-
-    One certified step supplies the secant. With progress s,
-        ln γ_i(s) = ln γ_i,last + (ln γ_i,last − ln γ_i,prev) * s.
-    s is dimensionless. On a thermal ramp it is the temperature step
-        s = (T − T_last) / (T_last − T_prev)
-    with both differences in kelvin, so the ratio has no unit. That is the
-    progress of the lunar ramp this continuation was measured on. The ln γ
-    slope there is composition-driven (a secant in T and in 1/T gives the
-    same error); the caller caps accuracy with a composition distance and
-    does not treat s as a thermal validity window. When T_last == T_prev the
-    ramp is isothermal and s is the ratio of single-cation L1 distances
-        s = D(X_now, X_last) / D(X_last, X_prev).
-    L1 is dimensionless, so this ratio is too. A zero denominator (no
-    observed composition step) gives s = 0.
-
-    A quadratic term would need a third certified point. That three-point
-    second difference amplifies solver noise, and the linear step is already
-    within about 0.7% at one step (about 0.1% on some parents). The extra
-    point is not worth the noise.
-
-    One certified call has no slope: return gamma_last, the zero-order hold.
-    s = 0 returns that same coefficient bit-exactly.
-    """
-
-    gamma_last = float(certificate["gamma_last"])
-    ln_last = certificate.get("ln_gamma_last")
-    ln_prev = certificate.get("ln_gamma_prev")
-    has_slope = (
-        ln_last is not None
-        and ln_prev is not None
-        and gamma_last > 0.0
-    )
-    slope = (float(ln_last) - float(ln_prev)) if has_slope else None
-    temperature_prev = certificate.get("temperature_prev_K")
-    if not has_slope or temperature_prev is None:
-        return {
-            "gamma": gamma_last,
-            "method": "hold_last_certified_effective_gamma",
-            "progress_s": 0.0,
-            "progress_variable": "temperature",
-            "ln_gamma_slope": None,
-        }
-    temperature_last = float(certificate["temperature_K"])
-    temperature_prev = float(temperature_prev)
-    if temperature_last != temperature_prev:
-        progress_s = (float(temperature_K) - temperature_last) / (
-            temperature_last - temperature_prev
-        )
-        progress_variable = "temperature"
-    else:
-        previous_composition = certificate.get("composition_prev_single_cation")
-        step = (
-            _high_t_composition_distance(
-                certificate["composition_single_cation"],
-                previous_composition,
-            )
-            if previous_composition is not None else 0.0
-        )
-        progress_s = (
-            0.0 if step == 0.0 else _high_t_composition_distance(
-                composition, certificate["composition_single_cation"],
-            ) / step
-        )
-        progress_variable = "composition"
-    gamma_progress_s = progress_s
-    if (
-        composition_cap_L1 is not None
-        and composition_distance_L1 > composition_cap_L1
-    ):
-        # Continue only to the declared composition boundary before exp():
-        # s_cap = s * (cap / D). Both cap and D are dimensionless L1
-        # distances, so s_cap and the ln-gamma exponent stay dimensionless.
-        # A zero cap gives s_cap = 0 and the exact certified gamma_last.
-        gamma_progress_s = (
-            0.0 if composition_cap_L1 <= 0.0
-            else progress_s * (composition_cap_L1 / composition_distance_L1)
-        )
-    return {
-        "gamma": _ln_gamma_at_progress(certificate, gamma_progress_s, slope),
-        "method": "extrapolated_first_order_ln_gamma",
-        "progress_s": progress_s,
-        "progress_variable": progress_variable,
-        "ln_gamma_slope": slope,
     }
 
 
@@ -1403,21 +1227,16 @@ def _build_high_t_melt_activity_authority(
         "notices": [],
         "seam": {},
         "authority_exclusions": {},
+        # These v1 diagnostic slots remain stable, but no call history is
+        # retained or reported as a refusal streak.
+        "consecutive_refusal_count": 0,
+        "last_extrapolated_gamma_by_parent": {},
     }
-    # Trajectory certificates continue vapour operands. Fresh activity solves
-    # below that domain must not seed a later pressure secant.
-    previous = controls.get("high_t_melt_activity_previous") or {}
     vapour_selected = openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K, controls=controls, quantity_class="vapour",
     )
-    if not vapour_selected or (previous and not openimcc_binding_selected_by_inputs(
-        temperature_K=previous["temperature_K"],
-        controls=controls, quantity_class="vapour",
-    )):
-        previous = {}
-    certificates = dict(previous.get("certified_effective_gamma_by_parent") or {})
+    certificates: dict[str, Any] = {}
     base["certified_effective_gamma_by_parent"] = certificates
-    hour = controls.get("simulation_hour")
     from simulator.melt_backend.openimcc_bridge import (
         _IMCC_REFUSAL_ERROR_TYPE,
         _cleaned_melt_projection,
@@ -1546,10 +1365,10 @@ def _build_high_t_melt_activity_authority(
         if isinstance(relaxed_projection, Mapping):
             base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
         held = {}
-        last_extrapolated: dict[str, float] = {}
         # A numerical nonconvergence uses the nearest successful probe on
         # each side when both exist; otherwise it holds the nearest one-sided
-        # neighbour. Trajectory continuation remains the no-neighbour fallback.
+        # neighbour. With no same-request neighbour, the caller uses the
+        # constant-gamma fallback above.
         bridge_result = (
             _same_composition_temperature_bridge(
                 solve_composition, float(temperature_K), expected_refusal_types,
@@ -1569,191 +1388,83 @@ def _build_high_t_melt_activity_authority(
                 ),
                 "cap_K": bridge_result["cap_K"],
             }
-        can_continue = (
-            hour is not None and bool(certificates)
-            and not isinstance(exc, OpenImccCompositionPolicyRefusal)
-        )
-        # Composition-policy refusals never enter secant/freeze. A projected
-        # numerical refusal bridges the projected composition above.
-        # ImccTOutsideDatapackDomainError keeps its existing secant/freeze
-        # route; the MELTS handoff below 1700 K is t-1314, not d-175.
-        if bridge_continuations or can_continue:
-            composition = _high_t_composition_vector(composition_mol)
-            prior_extrapolated = dict(
-                previous.get("last_extrapolated_gamma_by_parent") or {}
-            )
-            refusal_count = int(previous.get("consecutive_refusal_count") or 0) + 1
-            parents = list(certificates)
-            for parent in bridge_continuations:
-                if parent not in parents:
-                    parents.append(parent)
-            for parent in parents:
-                if parent not in composition_mol:
-                    continue
-                certificate = certificates.get(parent)
-                continuation = bridge_continuations.get(parent)
-                if continuation is not None:
-                    method = str(continuation["method"])
-                    if method == "interpolated_converged_temperature_neighbors":
-                        anchor_gaps = [
-                            float(continuation["lower_anchor_gap_K"]),
-                            float(continuation["upper_anchor_gap_K"]),
-                        ]
-                        anchor_details = {
-                            "lower_anchor_temperature_K": float(
-                                continuation["lower_anchor_temperature_K"]
-                            ),
-                            "upper_anchor_temperature_K": float(
-                                continuation["upper_anchor_temperature_K"]
-                            ),
-                            "lower_anchor_gap_K": anchor_gaps[0],
-                            "upper_anchor_gap_K": anchor_gaps[1],
-                        }
-                    else:
-                        anchor_gaps = [float(continuation["anchor_gap_K"])]
-                        anchor_details = {
-                            "anchor_temperature_K": float(
-                                continuation["anchor_temperature_K"]
-                            ),
-                            "anchor_gap_K": anchor_gaps[0],
-                        }
-                    if not all(
-                        0.0 <= gap <= _TEMPERATURE_BRIDGE_CAP_K
-                        for gap in anchor_gaps
-                    ):
-                        continue
-                    far_anchor = any(
-                        gap > _TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K
-                        for gap in anchor_gaps
-                    )
-                    if method == "interpolated_converged_temperature_neighbors":
-                        anchor_message = (
-                            "Interpolated the effective single-cation gamma in 1/T "
-                            "between same-composition neighbours at "
-                            f"{anchor_details['lower_anchor_temperature_K']:.2f} K "
-                            f"(gap {anchor_gaps[0]:.2f} K) and "
-                            f"{anchor_details['upper_anchor_temperature_K']:.2f} K "
-                            f"(gap {anchor_gaps[1]:.2f} K)"
-                        )
-                    else:
-                        anchor_message = (
-                            "Nearest converged same-composition temperature "
-                            f"neighbour at {anchor_details['anchor_temperature_K']:.2f} K "
-                            f"(gap {anchor_gaps[0]:.2f} K) supplies the effective "
-                            "single-cation gamma"
-                        )
-                    if far_anchor:
-                        anchor_message += (
-                            "; at least one anchor gap exceeds the schedule-derived "
-                            f"{_TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K:.1f} K "
-                            "notice threshold"
-                        )
-                    notice = {
-                        "code": "hold_last_certified_effective_gamma",
-                        "type": "typed_notice",
-                        "authority": "extrapolated",
-                        "parent": parent,
-                        **(certificate or {}),
-                        "method": method,
-                        "gamma_applied": float(continuation["gamma"]),
-                        **anchor_details,
-                        "bridge_call_count": bridge_result["call_count"],
-                        "bridge_cap_K": bridge_result["cap_K"],
-                        "bridge_attempted_temperatures_K": list(
-                            bridge_result["attempted_temperatures_K"]
-                        ),
-                        "original_refusal": dict(fallback_reason),
-                        "consecutive_refusal_count": refusal_count,
-                        "message": anchor_message,
-                    }
-                    if certificate is not None:
-                        notice["temperature_gap_K"] = abs(
-                            temperature_K - certificate["temperature_K"]
-                        )
-                        if hour is not None:
-                            notice["hour_gap"] = float(hour) - certificate["hour"]
-                        notice["composition_distance_L1"] = (
-                            _high_t_composition_distance(
-                                composition,
-                                certificate["composition_single_cation"],
-                            )
-                        )
-                    held[parent] = notice
-                    base["notices"].append(notice)
-                    continue
-                if not can_continue or certificate is None:
-                    continue
-                temperature_gap = abs(temperature_K - certificate["temperature_K"])
-                hour_gap = float(hour) - certificate["hour"]
-                composition_distance = _high_t_composition_distance(
-                    composition, certificate["composition_single_cation"],
-                )
-                cap = _EXTRAPOLATION_CAP_L1.get(parent)
-                past_cap = cap is not None and composition_distance > cap
-                continued = _continued_certified_effective_gamma(
-                    certificate,
-                    temperature_K=temperature_K,
-                    composition=composition,
-                    composition_distance_L1=composition_distance,
-                    composition_cap_L1=(
-                        0.0 if past_cap and parent in prior_extrapolated else cap
+        for parent, continuation in bridge_continuations.items():
+            if parent not in composition_mol:
+                continue
+            method = str(continuation["method"])
+            if method == "interpolated_converged_temperature_neighbors":
+                anchor_gaps = [
+                    float(continuation["lower_anchor_gap_K"]),
+                    float(continuation["upper_anchor_gap_K"]),
+                ]
+                anchor_details = {
+                    "lower_anchor_temperature_K": float(
+                        continuation["lower_anchor_temperature_K"]
                     ),
-                )
-                if past_cap and parent in prior_extrapolated:
-                    gamma = float(prior_extrapolated[parent])
-                    method = "extrapolation_capped_frozen"
-                    flag = "extrapolation_capped_frozen"
-                elif past_cap:
-                    gamma = float(continued["gamma"])
-                    method = "extrapolation_capped_frozen"
-                    flag = "extrapolation_capped_frozen"
-                else:
-                    gamma = float(continued["gamma"])
-                    method = str(continued["method"])
-                    flag = None
-                notice = {
-                    "code": "hold_last_certified_effective_gamma",
-                    "type": "typed_notice",
-                    "authority": "extrapolated",
-                    "parent": parent,
-                    **certificate,
-                    "temperature_gap_K": temperature_gap,
-                    "composition_distance_L1": composition_distance,
-                    "hour_gap": hour_gap,
-                    "original_refusal": dict(fallback_reason),
-                    "method": method,
-                    "gamma_applied": gamma,
-                    "progress_s": continued["progress_s"],
-                    "progress_variable": continued["progress_variable"],
-                    "consecutive_refusal_count": refusal_count,
-                    "message": (
-                        "Extrapolation cap reached; freezing the last extrapolated effective gamma"
-                        if flag else (
-                            "First-order continuation of the certified effective single-cation ln gamma"
-                            if method == "extrapolated_first_order_ln_gamma"
-                            else "Holding the last certified effective single-cation gamma"
-                        )
+                    "upper_anchor_temperature_K": float(
+                        continuation["upper_anchor_temperature_K"]
                     ),
+                    "lower_anchor_gap_K": anchor_gaps[0],
+                    "upper_anchor_gap_K": anchor_gaps[1],
                 }
-                if continued["ln_gamma_slope"] is not None:
-                    notice["ln_gamma_slope"] = continued["ln_gamma_slope"]
-                if cap is not None:
-                    notice["composition_cap_L1"] = cap
-                if flag is not None:
-                    notice["flag"] = flag
-                if bridge_result is not None:
-                    notice["bridge_call_count"] = bridge_result["call_count"]
-                    notice["bridge_cap_K"] = bridge_result["cap_K"]
-                    notice["bridge_attempted_temperatures_K"] = list(
-                        bridge_result["attempted_temperatures_K"]
-                    )
-                    notice["bridge_fallback"] = "fewer_than_two_temperature_points"
-                held[parent] = notice
-                last_extrapolated[parent] = gamma
-                base["notices"].append(notice)
-            base["consecutive_refusal_count"] = refusal_count
+            else:
+                anchor_gaps = [float(continuation["anchor_gap_K"])]
+                anchor_details = {
+                    "anchor_temperature_K": float(
+                        continuation["anchor_temperature_K"]
+                    ),
+                    "anchor_gap_K": anchor_gaps[0],
+                }
+            if not all(
+                0.0 <= gap <= _TEMPERATURE_BRIDGE_CAP_K
+                for gap in anchor_gaps
+            ):
+                continue
+            far_anchor = any(
+                gap > _TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K
+                for gap in anchor_gaps
+            )
+            if method == "interpolated_converged_temperature_neighbors":
+                anchor_message = (
+                    "Interpolated the effective single-cation gamma in 1/T "
+                    "between same-composition neighbours at "
+                    f"{anchor_details['lower_anchor_temperature_K']:.2f} K "
+                    f"(gap {anchor_gaps[0]:.2f} K) and "
+                    f"{anchor_details['upper_anchor_temperature_K']:.2f} K "
+                    f"(gap {anchor_gaps[1]:.2f} K)"
+                )
+            else:
+                anchor_message = (
+                    "Nearest converged same-composition temperature "
+                    f"neighbour at {anchor_details['anchor_temperature_K']:.2f} K "
+                    f"(gap {anchor_gaps[0]:.2f} K) supplies the effective "
+                    "single-cation gamma"
+                )
+            if far_anchor:
+                anchor_message += (
+                    "; at least one anchor gap exceeds the schedule-derived "
+                    f"{_TEMPERATURE_BRIDGE_FAR_ANCHOR_WARNING_GAP_K:.1f} K "
+                    "notice threshold"
+                )
+            notice = {
+                "code": "hold_last_certified_effective_gamma",
+                "type": "typed_notice",
+                "authority": "extrapolated",
+                "parent": parent,
+                "method": method,
+                "gamma_applied": float(continuation["gamma"]),
+                **anchor_details,
+                "bridge_call_count": bridge_result["call_count"],
+                "bridge_cap_K": bridge_result["cap_K"],
+                "bridge_attempted_temperatures_K": list(
+                    bridge_result["attempted_temperatures_K"]
+                ),
+                "original_refusal": dict(fallback_reason),
+                "message": anchor_message,
+            }
+            held[parent] = notice
+            base["notices"].append(notice)
         base["held_effective_gamma_by_parent"] = held
-        base["last_extrapolated_gamma_by_parent"] = last_extrapolated
         return base
 
     bridge = cleaned.bridge
@@ -1893,49 +1604,9 @@ def _build_high_t_melt_activity_authority(
             ),
         }
 
-    previous_temperature = controls.get(
-        "high_t_melt_activity_previous_temperature_K"
-    )
-    crossing = bool(controls.get("high_t_melt_activity_crossing", False))
-    if not crossing and previous_temperature is not None:
-        try:
-            crossing = (
-                float(previous_temperature) <= BUILTIN_VAPOUR_CHANNEL_SWITCH_K
-                and temperature_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K
-            )
-        except (TypeError, ValueError):
-            crossing = False
-    if crossing and max_abs_dex > _HIGH_T_ACTIVITY_SEAM_LIMIT_DEX:
-        base["notices"].append(
-            {
-                "code": "openimcc_activity_cap_step_exceeds_0_1_dex",
-                "type": "typed_notice",
-                "temperature_K": float(temperature_K),
-                "cap_K": float(BUILTIN_VAPOUR_CHANNEL_SWITCH_K),
-                "max_abs_ratio_dex": max_abs_dex,
-                "threshold_dex": _HIGH_T_ACTIVITY_SEAM_LIMIT_DEX,
-                "message": (
-                    "openimcc/below-cap activity source switch exceeds "
-                    "the provisional cap seam screen"
-                ),
-            }
-        )
     base["seam_max_abs_ratio_dex"] = max_abs_dex
-    if vapour_selected and hour is not None and not bridge.extrapolated and projection_notice is None:
+    if vapour_selected and not bridge.extrapolated and projection_notice is None:
         composition = _high_t_composition_vector(composition_mol)
-        previous_temperature = controls.get("high_t_melt_activity_previous_temperature_K")
-        # The recorded window is still two observed local steps: thermal
-        # window_K = 2*|T_cert-T_previous| (K), and composition_window_L1 =
-        # 2*D(X_cert, X_previous_cert) on the flux parents' single-cation
-        # fractions. D is an L1, so parents do not cancel. Those fields
-        # describe the step the certificate was taken over. A later refusal
-        # does not consult them: continuation is the first-order ln-gamma
-        # step, capped per species by _EXTRAPOLATION_CAP_L1. Refused and
-        # extrapolated calls never refresh the certificate.
-        window_K = (
-            2.0 * abs(temperature_K - float(previous_temperature))
-            if previous_temperature is not None else 0.0
-        )
         for parent in cleaned.single_cation_activities:
             if parent in base["authority_exclusions"]:
                 continue
@@ -1944,66 +1615,19 @@ def _build_high_t_melt_activity_authority(
             )
             if selected is None or selected.x_single_cation <= 0.0:
                 continue
-            previous_composition = certificates.get(parent, {}).get(
-                "composition_single_cation"
-            )
-            composition_window = (
-                2.0 * _high_t_composition_distance(composition, previous_composition)
-                if previous_composition is not None else 0.0
-            )
-            # Premise: the bridge has already converted parent activities
-            # to single-cation a; a = gamma_eff * X_bulk_single. Thus
-            # gamma_eff,last = a_last / X_last. On refusal the continuation
-            # steps ln gamma_eff, and a single certified point holds
-            # gamma_eff,last. Either way a_current = gamma_applied * X_current.
-            # This is NOT OpenIMCC's internal gamma against unbound-parent
-            # X on a total-species basis: that current X needs the failed
-            # solve. Both this effective coefficient and the table use the
-            # same available bulk single-cation basis. All factors are
-            # dimensionless; X->0 gives a->0 for finite gamma. With smooth
-            # T/composition, gamma_eff,last tends to the true current value
-            # as step size->0. Over one step it retains the solved local
-            # non-ideality; the table is a different model (SiO2 gamma=1
-            # was 43x too high in the diagnosed refusal). Numerical
-            # certification of the last solve is not empirical validation.
-            # Keep the previous certificate's (T, X, ln γ) so the next
-            # refusal has the secant. Two points only: the new record
-            # replaces the parent, and the old record becomes prev.
             gamma_last = float(selected.effective_gamma)
             record: dict[str, Any] = {
                 "gamma_last": gamma_last,
                 "temperature_K": float(temperature_K),
-                "hour": float(hour),
-                "window_K": window_K,
+                "hour": None,
+                "window_K": None,
                 "composition_single_cation": composition,
-                "composition_window_L1": composition_window,
+                "composition_window_L1": None,
                 "coefficient_basis": "bulk_single_cation",
             }
             if gamma_last > 0.0 and math.isfinite(gamma_last):
                 record["ln_gamma_last"] = math.log(gamma_last)
-            previous_certificate = certificates.get(parent)
-            if (
-                isinstance(previous_certificate, Mapping)
-                and float(previous_certificate.get("gamma_last") or 0.0) > 0.0
-                and "ln_gamma_last" in record
-            ):
-                record["gamma_prev"] = float(previous_certificate["gamma_last"])
-                record["ln_gamma_prev"] = float(
-                    previous_certificate.get("ln_gamma_last")
-                    if previous_certificate.get("ln_gamma_last") is not None
-                    else math.log(float(previous_certificate["gamma_last"]))
-                )
-                record["temperature_prev_K"] = float(
-                    previous_certificate["temperature_K"]
-                )
-                record["composition_prev_single_cation"] = dict(
-                    previous_certificate.get("composition_single_cation") or {}
-                )
             certificates[parent] = record
-    # A successful solve ends the refusal streak. The next refusal
-    # extrapolates from the new certificate instead of a frozen gamma.
-    base["consecutive_refusal_count"] = 0
-    base["last_extrapolated_gamma_by_parent"] = {}
     return base
 
 
@@ -2014,7 +1638,7 @@ def _high_t_activity_for_parent(
     temperature_K: float,
     authority: Mapping[str, Any] | None,
 ) -> Any:
-    """Select the table, solved OpenIMCC, or local effective-gamma hold."""
+    """Select the table, solved OpenIMCC, or request-local temperature bridge."""
 
     legacy = melt_oxide_activity(
         parent_oxide,
@@ -2031,18 +1655,18 @@ def _high_t_activity_for_parent(
         fallback_reason = dict(authority.get("fallback_reason") or {})
         held = authority.get("held_effective_gamma_by_parent", {}).get(parent_oxide)
         if held is not None:
-            if "gamma_applied" in held:
-                gamma = float(held["gamma_applied"])
-            else:
-                gamma = float(held["gamma_last"])
-            method = str(held.get("method") or "hold_last_certified_effective_gamma")
+            gamma = float(held["gamma_applied"])
+            method = str(held["method"])
             return replace(
                 legacy,
                 gamma=gamma,
                 effective_gamma=gamma,
                 activity=gamma * legacy.x_single_cation,
                 activity_model=method,
-                citation="Last numerically certified OpenIMCC activity on the bulk single-cation basis",
+                citation=(
+                    "Same-composition neighboring-temperature OpenIMCC "
+                    "activity on the bulk single-cation basis"
+                ),
                 warning=(
                     f"{method}:"
                     f"{fallback_reason.get('code', 'openimcc_evaluation_refused')}"
@@ -2216,10 +1840,7 @@ def _attach_high_t_activity_provenance(
             token = "openimcc"
         else:
             held = authority.get("held_effective_gamma_by_parent", {}).get(parent_oxide)
-            method = (
-                str(held.get("method") or "hold_last_certified_effective_gamma")
-                if held else None
-            )
+            method = str(held["method"]) if held else None
             provenance["melt_activity_authority"] = method or provider
             provenance["melt_activity_fallback"] = True
             provenance["openimcc_refusal"] = fallback_reason
@@ -4238,9 +3859,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     fe_activity_basis = (
                         candidate_activity.activity_model
                         if candidate_activity.activity_model in {
-                            "hold_last_certified_effective_gamma",
-                            "extrapolated_first_order_ln_gamma",
-                            "extrapolation_capped_frozen",
                             "nearest_converged_temperature_neighbor",
                             "interpolated_converged_temperature_neighbors",
                         }

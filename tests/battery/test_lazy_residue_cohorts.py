@@ -97,8 +97,25 @@ def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selec
         )
 
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate_at_steps)
+    setup_calls: list[str] = []
+    original_setup = residue._hashimoto_run_setup
+
+    def track_setup(experiment, **kwargs):
+        setup_calls.append(experiment["experiment_id"])
+        return original_setup(experiment, **kwargs)
+
+    monkeypatch.setattr(residue, "_hashimoto_run_setup", track_setup)
     target = experiments[-1]
     target_id = target["experiment_id"]
+    with pytest.raises(residue.ResidueInventoryRefusal) as exc_info:
+        residue._predict_hashimoto_residue_cohort(
+            experiments,
+            catalog,
+            preform_dimensions_mm=preform_dimensions_mm,
+            code_revision="lazy-selection-test",
+            selected_experiment_ids=frozenset({"unknown-experiment"}),
+        )
+    assert exc_info.value.reason == "hashimoto_experiment_selection_invalid"
     target_conditions = (
         residue._hashimoto_point_value(target["conditions"]["temperature_K"]),
         residue._hashimoto_point_value(
@@ -111,9 +128,13 @@ def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selec
         preform_dimensions_mm=preform_dimensions_mm,
         code_revision="lazy-selection-test",
     )
+    assert setup_calls == [
+        experiment["experiment_id"] for experiment in experiments
+    ]
     full_target = [row for row in full if row.experiment_id == target_id]
     assert len(full_target) == 2
     integrated_conditions.clear()
+    setup_calls.clear()
 
     selected = residue._predict_hashimoto_residue_cohort(
         experiments,
@@ -122,6 +143,7 @@ def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selec
         code_revision="lazy-selection-test",
         selected_experiment_ids=frozenset({target_id}),
     )
+    assert setup_calls == [target_id]
 
     # Measured CPU timings are nondeterministic between runs; their follow-up
     # is tracked in score-overhead-11111640. Keep every other byte pinned.

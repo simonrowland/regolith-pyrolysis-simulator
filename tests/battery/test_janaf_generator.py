@@ -2141,3 +2141,28 @@ def test_liquid_element_reference_uses_janaf_and_flags_the_cp_tail() -> None:
         )
         + Decimal("72.80")
     ) < Decimal("0.01")
+
+
+def test_janaf_source_reaction_uses_decimal_subscripts() -> None:
+    from simulator.battery.records import Reaction, ReactionTerm, State
+    from simulator.battery.validate import _check_identity
+    from tests.battery import factories as F
+
+    reaction = Reaction(
+        (
+            ReactionTerm(Species("CuSO4.5H2O", Phase.CR), Fraction(-1)),
+            ReactionTerm(Species("Cu", Phase.CR), Fraction(1)),
+            ReactionTerm(Species("S", Phase.CR), Fraction(1)),
+            ReactionTerm(Species("O2", Phase.G), Fraction(11, 4)),
+            ReactionTerm(Species("H2", Phase.G), Fraction(1)),
+        )
+    )
+    identity = replace(F.o2_identity(), reaction=State.of(reaction))
+
+    janaf_issues = []
+    _check_identity("identity", identity, janaf_issues, source_id="nist-janaf-4th")
+    other_source_issues = []
+    _check_identity("identity", identity, other_source_issues, source_id="other")
+
+    assert not any(issue.reason.value == "reaction_unbalanced" for issue in janaf_issues)
+    assert any(issue.reason.value == "reaction_unbalanced" for issue in other_source_issues)

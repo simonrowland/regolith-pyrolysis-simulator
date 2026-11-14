@@ -26,8 +26,8 @@ def resolve_grind_home(
 ) -> Path:
     """Return the configured grind home, expanding ``~`` only."""
 
-    environ = os.environ if env is None else env
-    configured = environ.get(GRIND_HOME_ENV, "").strip()
+    environment = os.environ if env is None else env
+    configured = environment.get(GRIND_HOME_ENV, "").strip()
     root = Path(configured) if configured else Path(default)
     return _normalize_grind_home(root)
 
