@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Iterable, Iterator, Mapping
+from typing import Any, Iterable, Iterator, Mapping, Sequence
 
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -1144,6 +1144,134 @@ def load_table_document(path: Path) -> dict[str, Any]:
     return dict(document)
 
 
+def _janaf_sidecar_hashes(path: Path = SIDECAR_PATH) -> dict[str, str]:
+    """Return source hashes declared by the JANAF harvest sidecar."""
+    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, Mapping) or not isinstance(payload.get("files"), list):
+        raise ValueError(f"{path}: invalid JANAF source sidecar")
+    return {
+        str(row["name"]): str(row["sha256"])
+        for row in payload["files"]
+        if isinstance(row, Mapping) and row.get("name") and row.get("sha256")
+    }
+
+
+def _checked_compiled_table_document(
+    table_id: str,
+) -> tuple[dict[str, Any], str]:
+    """Load one compiled JANAF table after checking its raw-source hash."""
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    extraction = document.get("extraction")
+    table = document.get("table")
+    if not isinstance(extraction, Mapping) or not isinstance(table, Mapping):
+        raise ValueError(f"{table_id}: JANAF cached table is incomplete")
+    if table.get("table_id") != table_id:
+        raise JanafParseError(f"{table_id}: compiled table metadata is missing")
+    digest = str(extraction.get("source_sha256") or "")
+    expected = _janaf_sidecar_hashes().get(f"{table_id}.txt")
+    if not digest or digest != expected:
+        raise ValueError(f"{table_id}: JANAF cache hash does not match source sidecar")
+    if not isinstance(table.get("values"), list):
+        raise ValueError(f"{table_id}: JANAF table values are missing")
+    return dict(table), digest
+
+
+def _interpolate_table_points(
+    points: Sequence[tuple[Decimal, Decimal]],
+    temperature_K: Decimal,
+    *,
+    extrapolate: bool = False,
+) -> Decimal:
+    """Linearly interpolate JANAF points, optionally extending an endpoint chord."""
+    if temperature_K < points[0][0]:
+        if not extrapolate:
+            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+        left, right = points[0], points[1]
+    elif temperature_K > points[-1][0]:
+        if not extrapolate:
+            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+        left, right = points[-2], points[-1]
+    else:
+        left, right = next(
+            (a, b)
+            for a, b in zip(points, points[1:])
+            if a[0] <= temperature_K <= b[0]
+        )
+    return left[1] + (right[1] - left[1]) * (temperature_K - left[0]) / (
+        right[0] - left[0]
+    )
+
+
+def _missing_node_for_interpolation(
+    points: Sequence[tuple[Decimal, Decimal]],
+    missing_nodes: Sequence[Decimal],
+    temperature_K: Decimal,
+) -> Decimal | None:
+    """Return an absent required JANAF 100 K grid node in the active bracket."""
+    if any(node_temperature == temperature_K for node_temperature, _ in points):
+        return None
+    temperatures = tuple(temperature for temperature, _ in points)
+    gaps = tuple(right - left for left, right in zip(temperatures, temperatures[1:]))
+    for gap_index, ((left, _), (right, _)) in enumerate(zip(points, points[1:])):
+        if left < temperature_K < right:
+            absent_grid_nodes = tuple(
+                Decimal(candidate)
+                for candidate in range(
+                    int(left // 100) * 100 + 100,
+                    int(right // 100) * 100 + 1,
+                    100,
+                )
+                if left < Decimal(candidate) < right
+            )
+            for node in sorted(
+                {node for node in missing_nodes if left < node < right}
+                | set(absent_grid_nodes)
+            ):
+                run_start = gap_index
+                run_end = gap_index + 1
+                while run_start > 0 and gaps[run_start - 1] in (
+                    Decimal("200"),
+                    Decimal("400"),
+                ):
+                    run_start -= 1
+                while run_end < len(gaps) and gaps[run_end] in (
+                    Decimal("200"),
+                    Decimal("400"),
+                ):
+                    run_end += 1
+                sparse_ladder = (
+                    left >= Decimal("3000")
+                    and right - left in (Decimal("200"), Decimal("400"))
+                    and run_end - run_start >= 2
+                )
+                reference_interval = (
+                    left == Decimal("298.15") and right == Decimal("500")
+                )
+                if not sparse_ladder and not reference_interval:
+                    return node
+            return None
+    return None
+
+
+def _interpolate_formation_gibbs(
+    points: Sequence[tuple[Decimal, Decimal]],
+    temperature_K: Decimal,
+    missing_temperatures: Sequence[Decimal] = (),
+) -> Decimal:
+    """Interpolate printed JANAF ΔfG° without extrapolating or crossing a missing node."""
+    if temperature_K < points[0][0] or temperature_K > points[-1][0]:
+        raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+    missing_node = _missing_node_for_interpolation(
+        points, missing_temperatures, temperature_K
+    )
+    if missing_node is not None:
+        raise ValueError(
+            f"JANAF formation Gibbs interpolation spans missing grid node "
+            f"{missing_node} K at {temperature_K} K"
+        )
+    return _interpolate_table_points(points, temperature_K)
+
+
 def table_delta_fh_298_uncertainty_kj_per_mol(
     table: Mapping[str, Any],
 ) -> Decimal | None:
@@ -1246,9 +1374,9 @@ def _compiled_table_by_id(table_id: str) -> dict[str, Any]:
 @lru_cache(maxsize=None)
 def _formation_gibbs_rows_kj_per_mol(
     table_id: str,
-) -> tuple[tuple[Decimal, Decimal], ...]:
-    """Return printed temperature/ΔfG° rows for a JANAF table, in kJ/mol."""
-    table = _compiled_table_by_id(table_id)
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]]:
+    """Return printed ΔfG° points and missing nodes, in kJ/mol."""
+    table, _digest = _checked_compiled_table_document(table_id)
     units = table.get("units_as_published")
     if (
         not isinstance(units, Mapping)
@@ -1262,19 +1390,29 @@ def _formation_gibbs_rows_kj_per_mol(
         raise JanafParseError(f"{table_id}: compiled values are missing")
 
     rows_by_temperature: dict[Decimal, Decimal] = {}
+    missing_temperatures: set[Decimal] = set()
     for item in values:
         if not isinstance(item, Mapping):
             continue
         temperature = item.get("temperature")
         gibbs = item.get("formation_gibbs_energy")
-        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+        if not isinstance(temperature, Mapping):
             continue
         try:
             row_temperature = Decimal(str(temperature.get("as_published")))
-            formation_gibbs = Decimal(str(gibbs.get("as_published")))
         except (InvalidOperation, TypeError, ValueError):
             continue
-        if not row_temperature.is_finite() or not formation_gibbs.is_finite():
+        if not row_temperature.is_finite():
+            continue
+        try:
+            formation_gibbs = Decimal(
+                str(gibbs.get("as_published") if isinstance(gibbs, Mapping) else None)
+            )
+        except (InvalidOperation, TypeError, ValueError):
+            missing_temperatures.add(row_temperature)
+            continue
+        if not formation_gibbs.is_finite():
+            missing_temperatures.add(row_temperature)
             continue
         previous = rows_by_temperature.get(row_temperature)
         if previous is not None and previous != formation_gibbs:
@@ -1285,7 +1423,7 @@ def _formation_gibbs_rows_kj_per_mol(
     rows = tuple(sorted(rows_by_temperature.items()))
     if len(rows) < 2:
         raise JanafParseError(f"{table_id}: fewer than two printed ΔfG° rows")
-    return rows
+    return rows, tuple(sorted(missing_temperatures))
 
 
 def _formation_gibbs_energy_kj_per_mol_at(
@@ -1299,22 +1437,13 @@ def _formation_gibbs_energy_kj_per_mol_at(
     if not temperature.is_finite() or temperature <= 0:
         raise JanafParseError("temperature_K must be a finite positive number")
 
-    rows = _formation_gibbs_rows_kj_per_mol(table_id)
+    rows, missing_temperatures = _formation_gibbs_rows_kj_per_mol(table_id)
     if temperature < rows[0][0] or temperature > rows[-1][0]:
         raise JanafParseError(
             f"{table_id}: {temperature} K is outside printed ΔfG° rows "
             f"[{rows[0][0]}, {rows[-1][0]}] K"
         )
-    for (left_t, left_g), (right_t, right_g) in zip(rows, rows[1:]):
-        if temperature == left_t:
-            return left_g
-        if temperature == right_t:
-            return right_g
-        if left_t < temperature < right_t:
-            return left_g + (right_g - left_g) * (temperature - left_t) / (
-                right_t - left_t
-            )
-    raise JanafParseError(f"{table_id}: no printed ΔfG° bracket for {temperature} K")
+    return _interpolate_formation_gibbs(rows, temperature, missing_temperatures)
 
 
 def table_delta_fh_298_uncertainty_for_table_id(

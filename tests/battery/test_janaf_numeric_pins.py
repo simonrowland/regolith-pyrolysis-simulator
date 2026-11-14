@@ -120,5 +120,9 @@ def test_reference_formation_gibbs_reader_refuses_a_missing_grid_node(
         ),
     )
     janaf_reference._compiled_table_by_id.cache_clear()
-    with pytest.raises(ValueError, match=r"missing grid node 200 K"):
-        janaf_reference._formation_gibbs_energy_kj_per_mol_at("C-093", 150)
+    janaf_reference._formation_gibbs_rows_kj_per_mol.cache_clear()
+    try:
+        with pytest.raises(ValueError, match=r"missing grid node 200 K"):
+            janaf_reference._formation_gibbs_energy_kj_per_mol_at("C-093", 150)
+    finally:
+        janaf_reference._formation_gibbs_rows_kj_per_mol.cache_clear()
