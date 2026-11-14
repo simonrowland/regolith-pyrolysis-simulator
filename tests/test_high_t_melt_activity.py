@@ -536,10 +536,10 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "7e81a7b49be5273ac7a6208f0c7933e1a382a445af5de52d1109a70f7587d475"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    # Projected metadata digest captured from the OpenIMCC 9c327c2 Studio dump.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "4436bf3966f0a146e381c304ee8a3756897dc7af00cc1462f1cfc6bb64eac703"
+    ).hexdigest() == "e8a2b5d649500bb2c9f95a018c44885465755c9da04956be00a7ed30df51c9d3"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -1029,7 +1029,7 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     # Past the cap, gamma is the last in-cap extrapolation, not a new step.
     assert live_gamma[64] == live_gamma[63]
     # The slope published while still inside the cap, read at s=3, is the
-    # measured SiO2 growth of -3.7% against the logged solve.
+    # measured SiO2 growth of -3.871% against the 9c327c2 logged solve.
     in_cap = next(n for n in authority["notices"] if n.get("parent") == "SiO2")
     s_three = (
         (_LUNAR_SOLVED_T_K[64] - in_cap["temperature_K"])
@@ -1038,7 +1038,9 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     assert s_three == pytest.approx(3.0)
     predicted = math.exp(in_cap["ln_gamma_last"] + in_cap["ln_gamma_slope"] * s_three)
     solved_64 = _solved_effective_gamma(64, "SiO2")
-    assert (predicted - solved_64) / solved_64 == pytest.approx(-0.037, abs=0.0015)
+    assert (predicted - solved_64) / solved_64 == pytest.approx(
+        -0.038713615313014746, abs=0.0015
+    )
 
     # Call 66 is five thermal steps from call 61: the SiO2 cap plus two.
     beyond = _refuse_lunar_call(provider, monkeypatch, 66, chained)
@@ -1159,9 +1161,9 @@ def test_refused_calls_use_bracketed_same_composition_temperature_neighbors(
     assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
     bridge_parents = _ONE_STEP_PARENTS + ("Na2O",)
     errors = {}
-    solved_activity = dict(zip(
-        solved_62["parent_oxides"], solved_62["parent_activity"],
-    ))
+    # Compare with the direct 9c327c2 solve pinned for call 62, rather than the
+    # older cached trace returned by _call_record.
+    solved_activity = _LUNAR_SOLVED_ACTIVITY[62]
     neighbor_results = {}
     for oxide in bridge_parents:
         activity = vapor_pressure_module._high_t_activity_for_parent(
