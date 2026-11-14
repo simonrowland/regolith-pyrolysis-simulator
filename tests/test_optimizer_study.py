@@ -7326,35 +7326,31 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     )
     assert good.returncode == 0, good.stderr
     assert (out_dir / "pareto.json").exists()
-    # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to
-    # 20 C. Seed 7's liner is now about 822 C; the same unit coordinate on
-    # the old 1400-2200 C map was about 1694 C. At 822 C the CrO2 wall
-    # saturation pressure is refused, furnace amortization is
-    # batch_cost_unavailable, and the objective scores are empty. The
-    # candidate stays feasible on furnace temperature, but there is no
-    # priced winner. The honest study status is completed-no-feasible-winner,
-    # and the writer omits winner.recipe.yaml. A status of completed with
-    # no winner file would be a bug; this run is not that status.
-    assert not (out_dir / "winner.recipe.yaml").exists()
+    # This profile evaluates its one-hour C2A_continuous campaign. It does
+    # not enter the C0 AUTO_APPLY sequence or encounter a C6 refusal. The
+    # returned priced objective makes the single feasible candidate rankable.
+    assert (out_dir / "winner.recipe.yaml").is_file()
     status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
-    assert status["status"] == "completed-no-feasible-winner"
-    assert status["study_status"] == "completed-no-feasible-winner"
+    assert status["status"] == "SUCCEEDED"
+    assert status["study_status"] == "completed"
     assert status["success"] is True
-    assert "winner_candidate_id" not in status
+    assert status["winner_candidate_id"] == "random-7-000000"
     pareto = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
-    assert pareto["status"] == "completed-no-feasible-winner"
-    assert pareto["winner_candidate_id"] is None
+    assert pareto["status"] == "completed"
+    assert pareto["winner_candidate_id"] == "random-7-000000"
     provenance = _read_provenance(out_dir)
     assert len(provenance) == 1
+    assert provenance[0]["candidate_id"] == "random-7-000000"
     assert provenance[0]["feasible"] is True
     assert provenance[0]["failing_gates"] == []
-    summary = provenance[0]["product_summary"]
-    assert summary["furnace_amortization_status"] == "batch_cost_unavailable"
-    assert summary["lifespan_cost_status"] == "wall_deposit_unavailable"
-    refused = summary["wall_deposit_refusal"]["authority"][
-        "wall_saturation_pressure_refused_species"
-    ]
-    assert refused == ["CrO2"]
+    assert (
+        provenance[0]["product_summary"]["furnace_amortization_status"]
+        == "available"
+    )
+    assert any(
+        isinstance(value, (int, float)) and not isinstance(value, bool)
+        for value in provenance[0]["objectives"].values()
+    )
 
 
 def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> None:

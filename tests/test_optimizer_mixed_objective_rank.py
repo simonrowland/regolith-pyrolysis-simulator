@@ -304,8 +304,23 @@ def _assert_keys_are_score_slots(path, profile, records, scored_pairs) -> None:
                 profile=profile,
             )
         ]
-    for key in keys:
-        slots = key[:-2] if path == "study" else key[1:-2]
+    for index, key in enumerate(keys):
+        if path == "study":
+            slots = key[: len(declared)]
+            # Study uses the shared candidate-rank suffix before green's
+            # sampling-order tie-break. These fixture records have neither an
+            # ask ordinal nor a trial number, so their literal suffix is the
+            # two empty shared-key fields followed by (unstamped, trial 0,
+            # candidate id).
+            assert key[len(declared) :] == (
+                "",
+                "",
+                1,
+                0,
+                records[index].candidate_id,
+            )
+        else:
+            slots = key[1:-2]
         assert len(slots) == len(declared)
         assert all(
             isinstance(slot, tuple)
