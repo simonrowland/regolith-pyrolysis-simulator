@@ -296,14 +296,25 @@ def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
         melt_temperature_C=1800.0, wall_temperature_C=1800.0,
         surface_area_m2=1.0,
     )
-    record = wall_deposit_candidate_for_surface_kg(model, **kwargs)
-    # The wall-reaction block is the saturation curve. A corrupt legacy
-    # Antoine coefficient is not consulted, and missing parcel pO2 refuses.
-    assert record["status"] == "unavailable"
-    assert "wall_pO2_required" in record["reason"]
-    assert record["terminal_refusal"] is False
-    assert record["wall_temperature_K"] == pytest.approx(2073.15)
-    assert model.last_wall_deposition_rate_shadow_candidate == {}
+    from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
+
+    expected = resolve_wall_saturation(
+        source_data, species_id=species, T_K=2073.15, pO2_Pa=None,
+    )
+    candidate = wall_deposit_candidate_for_surface_kg(model, **kwargs)
+    # d-402 uses the wall-reaction equilibrium; malformed legacy source-fit
+    # coefficients do not change its pressure or erase the unknown-pO2 flag.
+    assert isinstance(candidate, float) and candidate > 0.0
+    diagnostic = model.last_wall_deposition_rate_shadow_candidate[
+        "default_pipe"
+    ][species]
+    assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(
+        expected.pressure_Pa
+    )
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["reason"] == "wall_pO2_unknown_pO2_free_route_used"
+    assert notice["authority_level"] == "status_bearing"
+    assert diagnostic["surface"]["wall_temperature_K"] == pytest.approx(2073.15)
 
 
 def test_sio_legacy_antoine_pole_is_not_the_wall_refusal(monkeypatch) -> None:
@@ -322,16 +333,27 @@ def test_sio_legacy_antoine_pole_is_not_the_wall_refusal(monkeypatch) -> None:
         gas_temperature_C=1800.0, campaign_name="C0",
     )
 
-    record = wall_deposit_candidate_for_surface_kg(
+    from simulator.vapour_rail.wall_saturation import resolve_wall_saturation
+
+    expected = resolve_wall_saturation(
+        source_data, species_id="SiO", T_K=2073.15, pO2_Pa=None,
+    )
+    candidate = wall_deposit_candidate_for_surface_kg(
         model, species="SiO", rate_kg_hr=1.0,
         T_cond_C=model.condensation_temperatures_C["SiO"],
         melt_temperature_C=1800.0, wall_temperature_C=1800.0,
         surface_area_m2=1.0,
     )
-    assert record["status"] == "unavailable"
-    assert "wall_pO2_required" in record["reason"]
-    assert record["terminal_refusal"] is False
-    assert model.last_wall_deposition_rate_shadow_candidate == {}
+    assert isinstance(candidate, float) and candidate > 0.0
+    diagnostic = model.last_wall_deposition_rate_shadow_candidate[
+        "default_pipe"
+    ]["SiO"]
+    assert diagnostic["wall_saturation_pressure_pa"] == pytest.approx(
+        expected.pressure_Pa
+    )
+    assert diagnostic["wall_saturation_pressure_notice"]["reason"] == (
+        "wall_pO2_unknown_pO2_free_route_used"
+    )
 
 
 @pytest.mark.parametrize(("field", "value"), [
