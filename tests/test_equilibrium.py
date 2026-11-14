@@ -474,6 +474,10 @@ def test_subliquidus_equilibrium_carries_liquid_feo_notice_without_changing_acti
     assert flagged_diag["a_FeO_authoritative"] == plain_diag["a_FeO_authoritative"]
     assert flagged_diag["a_FeO_authoritative"] > 0.0
     assert "gamma_FeO" in flagged_diag
+    holzheid = flagged_diag["gamma_FeO"]["holzheid"]
+    assert holzheid["central"] == pytest.approx(49.2, rel=0.001)
+    assert holzheid["authority_level"] == "extrapolated"
+    assert holzheid["notice"]["kind"] == "out_of_certified_band"
 
 
 def test_above_liquidus_equilibrium_diagnostic_is_byte_identical():
