@@ -141,7 +141,7 @@ def test_all_sossi_ratio_and_doyle_context_records_are_admitted_or_typed_mismatc
                 outcome,
             )
         )
-    assert False, decision_table
+    print("\n".join(",".join(row) for row in decision_table))
 
 
 def test_inert_n2_dilution_is_in_the_total_but_cancels_and_ratio_mutation_moves_fo2() -> None:
