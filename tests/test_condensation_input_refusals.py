@@ -391,13 +391,23 @@ def test_hkl_surface_flux_healthy_input_uses_the_wall_law():
     """Unknown pO2 uses the flagged pO2-free route and its actual Psat."""
 
     diagnostic = {}
-    bound_flux = _hkl_call(diagnostic_out=diagnostic)
+    bound_driving = condensation._wall_deposition_driving_pressure_pa(
+        "SiO", _HKL_SIO_KWARGS["P_local_pa"], _HKL_SIO_KWARGS["T_surface_K"],
+        diagnostic_out=diagnostic,
+    )
+    bound_flux = _hkl_call()
     assert diagnostic["wall_saturation_pressure_refused"] is False
     assert diagnostic["wall_saturation_pressure_notice"]["reason"] == (
         "wall_pO2_unknown_pO2_free_route_used"
     )
     assert bound_flux > 0.0
     assert diagnostic["wall_saturation_pressure_pa"] < _HKL_SIO_KWARGS["P_local_pa"]
+    assert bound_flux == pytest.approx(
+        _HKL_SIO_KWARGS["alpha_s"]
+        * condensation._hkl_impingement_flux_mol_m2_s(
+            "SiO", bound_driving, _HKL_SIO_KWARGS["T_surface_K"],
+        )
+    )
     po2_pa = 1.0e-4
     psat = condensation._antoine_psat_pa(
         "SiO", _HKL_SIO_KWARGS["T_surface_K"], wall_pO2_Pa=po2_pa,
