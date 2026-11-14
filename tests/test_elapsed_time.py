@@ -376,3 +376,34 @@ def test_failure_metadata_retains_fractional_requested_duration():
                             "kernel_commit_sha": "fractional-failure"},
     )
     assert payload["run_metadata"]["hours_requested"] == 77.4 / 3600
+
+
+@pytest.mark.parametrize("dt_hr", [1.0, 0.25])
+@pytest.mark.parametrize("entry", ["public", "helper"])
+def test_sio_hold_wrapper_steps_at_the_temperature_owners_sample(dt_hr, entry):
+    from tests.test_lab_geometry_runtime import dynamic_lab_schedule
+
+    schedule = dynamic_lab_schedule()
+    schedule.pop("surface_temperature_C")
+    # The slope changes before the default 1 h sample. Merely accepting dt
+    # without forwarding it gives the wrong ramp on the quarter-hour step.
+    schedule["melt_temperature_C"] = [
+        {"t_h": 0.0, "value": 1200.0, "unit": "C"},
+        {"t_h": 0.5, "value": 1300.0, "unit": "C"},
+        {"t_h": 2.0, "value": 1400.0, "unit": "C"},
+    ]
+    run = _run(hours=dt_hr, dt_hr=dt_hr, lab_schedule=schedule)
+    session = run._start_session()
+    sim = session.simulator
+    sim.melt.temperature_C = 1200.0
+    expected_target, _ = sim.campaign_mgr.get_temp_target(
+        sim.melt.campaign, sim.melt.campaign_hour, sim.melt, dt_hr=dt_hr,
+    )
+    run.sio_start_temperature_c = 1200.0
+    run.sio_hold_temperature_c = expected_target
+    payload = run.run() if entry == "public" else run._run_session(session)
+    assert payload["status"] == "ok", payload.get("error")
+    assert payload["run_metadata"]["hours_completed"] == dt_hr
+    assert payload["per_hour_summary"][-1]["T_C"] == pytest.approx(expected_target)
+    # Revert: restoring the three-argument wrapper rejects dt_hr; dropping
+    # only its forwarding uses the wrong slope and fails the .25 h target.
