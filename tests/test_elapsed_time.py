@@ -4,15 +4,15 @@ These are numerical integration checks, not experimental accuracy budgets.
 The operator split is first order; Richardson differences must decrease on
 halving dt. Equal segmentation uses the same internal mesh throughout.
 """
-import json
 import math
 
 import pytest
 
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, RunnerError
+from tests.golden_sections import json_bytes
 from tests.test_run_executor import _run
-from tests.test_runner_smoke import SCENARIOS
+from tests.test_runner_smoke import FIXTURES_DIR, SCENARIOS
 
 
 def _isothermal_session(dt_hr):
@@ -143,7 +143,9 @@ def test_explicit_hour_is_byte_identical_to_ordinary_hourly_run(scenario):
     )
     ordinary = PyrolysisRun(**kwargs).run()
     explicit = PyrolysisRun(**kwargs, dt_hr=1.0).run()
-    assert json.dumps(ordinary, sort_keys=True) == json.dumps(explicit, sort_keys=True)
+    expected = (FIXTURES_DIR / scenario["fixture"]).read_bytes()
+    assert json_bytes(ordinary) == expected
+    assert json_bytes(explicit) == expected
 
 
 @pytest.mark.parametrize("value", [-0.1, math.nan, math.inf, True])
