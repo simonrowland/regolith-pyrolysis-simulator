@@ -268,14 +268,18 @@ def test_first_write_in_fresh_process_evicts_over_cap(
     assert sum(path.stat().st_size for path in prior_entries) > cap_bytes
     monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE_MAX_BYTES", str(cap_bytes))
 
-    child = """
+    repo_root = Path(__file__).resolve().parents[1]
+    child = f"""
 import os
 from hashlib import sha256
 from pathlib import Path
+import sys
+
+sys.path.insert(0, {str(repo_root)!r})
 
 import simulator.yaml_cache as cache
 
-payload = f"value: item-{1000:064d}\\n".encode("ascii")
+payload = f"value: item-{{1000:064d}}\\n".encode("ascii")
 cache.load_cached_safe_yaml(payload)
 root = Path(os.environ["REGOLITH_PARSED_YAML_CACHE_DIR"])
 entries = list(root.rglob("*.pickle"))
@@ -287,7 +291,7 @@ assert cache._cache_path(sha256(payload).hexdigest()).exists()
     subprocess.run(
         [sys.executable, "-c", child],
         check=True,
-        cwd=DEFAULT_DATA_DIR.parent,
+        cwd=repo_root,
         capture_output=True,
         text=True,
     )
