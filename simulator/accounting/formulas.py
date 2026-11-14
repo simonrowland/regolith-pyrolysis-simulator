@@ -269,17 +269,29 @@ def atoms_parse_formula_else_janaf(
 
     cleaned = _clean_formula_text(formula)
     try:
-        parsed = parse_formula(cleaned)
+        segments = _split_formula_segments(cleaned)
     except AccountingError:
-        from simulator.reference_data.janaf import formula_composition
+        return None
 
-        return formula_composition(cleaned)
-    return tuple(
-        sorted(
-            (str(element), float(count))
-            for element, count in parsed.elements.items()
-        )
-    )
+    totals: defaultdict[str, float] = defaultdict(float)
+    for segment in segments:
+        try:
+            multiplier, body = _leading_multiplier(segment)
+        except AccountingError:
+            return None
+        try:
+            parsed = parse_formula(body)
+            elements = parsed.elements
+        except AccountingError:
+            from simulator.reference_data.janaf import formula_composition
+
+            fallback = formula_composition(body)
+            if fallback is None:
+                return None
+            elements = dict(fallback)
+        for element, count in elements.items():
+            totals[str(element)] += float(count) * multiplier
+    return tuple(sorted(totals.items()))
 
 
 def coerce_species_formula(species: str, value: Any | None = None) -> SpeciesFormula:
@@ -591,9 +603,21 @@ def _clean_formula_text(formula: str) -> str:
     while text and previous != text:
         previous = text
         text = _PHASE_SUFFIX_RE.sub("", text)
-    text = re.sub(
-        r"(?<=[A-Za-z])\.(?=\d+(?:$|O(?:$|\d|[A-Z(])))", "0.", text
-    )
+
+    def normalize_decimal(match: re.Match[str]) -> str:
+        prefix = text[: match.start()]
+        suffix = text[match.end() :]
+        if suffix.startswith("O"):
+            return f"0.{match.group(1)}"
+        try:
+            prefix_elements = _FormulaParser(prefix).parse()
+        except AccountingError:
+            return match.group(0)
+        # A terminal decimal after one element is source-ambiguous: it may be
+        # an OCR fragment. Normalize only a multi-element end-member here.
+        return f"0.{match.group(1)}" if len(prefix_elements) > 1 else match.group(0)
+
+    text = re.sub(r"(?<=[A-Za-z])\.(\d+)(?=$|O(?=$|\d|[A-Z(]))", normalize_decimal, text)
     return text
 
 
@@ -682,13 +706,15 @@ def _split_formula_segments(formula: str) -> list[str]:
     species.
     """
 
+    parts = formula.split("·")
+    if any(not part for part in parts):
+        raise UnknownSpeciesError(f"empty formula segment in {formula!r}")
     pieces: list[str] = []
-    for part in formula.split("·"):
+    for part in parts:
         pieces.extend(_split_ascii_adducts(part))
-    segments = [segment for segment in pieces if segment]
-    if not segments:
+    if not pieces:
         raise UnknownSpeciesError("formula is required")
-    return segments
+    return pieces
 
 
 def _leading_multiplier(segment: str) -> tuple[float, str]:

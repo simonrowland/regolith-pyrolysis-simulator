@@ -1210,6 +1210,16 @@ def parse_species_formula(
         if species is None or charge_value(species) != annotated_charge:
             return None
         text = text[: charge_annotation.start()]
+        exposed_parenthetical_phase = re.search(r"\(([^()]*)\)$", text)
+        exposed_bracket_phase = re.search(r"\[([^\[\]]*)\]$", text)
+        if (
+            exposed_parenthetical_phase is not None
+            and exposed_parenthetical_phase.group(1).strip().lower() in phase_labels
+        ) or (
+            exposed_bracket_phase is not None
+            and exposed_bracket_phase.group(1).strip().lower() in phase_labels
+        ):
+            return None
 
     if any(separator in text for separator in (".", "·", "•")):
         from simulator.accounting.formulas import atoms_parse_formula_else_janaf
