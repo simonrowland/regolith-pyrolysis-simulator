@@ -395,11 +395,14 @@ def test_route_keeps_capture_at_its_stage_and_depletes_inlet_pressure(monkeypatc
     monkeypatch.setattr(model, "_condensation_efficiency", capture_half)
     result = model.route(EvaporationFlux(species_kg_hr={"Fe": 1.0}), MeltState(temperature_C=1700.0))
     assert result.condensed_by_stage_species == {"stage_1_fe_condenser": {"Fe": 0.5}}
-    assert result.remaining_by_species["Fe"] == pytest.approx(0.5)
+    assert result.remaining_by_species["Fe"] == 0.5
     # d-402 forms the partial pressure from explicit molar flows via Dalton's
     # law; converting the closed single-species fraction back to pressure
     # rounds 100 Pa down by one float64 step (1.42e-14 Pa).
-    assert seen == [(1, pytest.approx(1.0), pytest.approx(100.0))]
+    assert seen[0][:2] == (1, 1.0)
+    assert seen[0][2] == pytest.approx(
+        100.0, rel=0.0, abs=4 * math.ulp(100.0),
+    )
 
 
 def test_hot_sio_passes_to_its_reactive_product_stage():
