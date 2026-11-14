@@ -9,6 +9,7 @@ import yaml
 from simulator.battery.enums import Phase, Quantity
 from simulator.battery.identity import profile_for
 from simulator.battery.migrate import torr_to_pa
+from simulator.battery.records import ApproxPressure, BandBasis
 from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 
 
@@ -135,7 +136,11 @@ def test_hashimoto_table3_rows_keep_run_conditions_and_initial_charge(tmp_path: 
         assert observation.locator.pdf_page_index == 5
         assert observation.locator.table == "3"
         assert observation.identity.temperature_K.value == Decimal("1973.15")
-        assert observation.identity.total_pressure_Pa.value == pressure
+        pressure_band = observation.identity.total_pressure_Pa.value
+        assert isinstance(pressure_band, ApproxPressure)
+        assert pressure_band.point == pressure
+        assert pressure_band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+        assert pressure_band.low <= pressure_band.point <= pressure_band.high
         assert observation.point_conditions["temperature_K"].state.value == Decimal("1973.15")
         assert observation.point_conditions["temperature_K"].locator.published_page == 114
         assert observation.point_conditions["temperature_K"].locator.table == "2"

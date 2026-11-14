@@ -405,9 +405,8 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
             return None
 
         def _refresh_vapor_pressures_from_kernel(
-            self, equilibrium, *, simulation_hour, observation_pO2_bar
+            self, equilibrium, *, observation_pO2_bar
         ):
-            assert simulation_hour == self.melt.hour + 1
             equilibrium.vapor_pressures_Pa = {"SiO": 1.0}
             equilibrium.vapor_pressures_source = {
                 "SiO": "builtin_authoritative:test"
