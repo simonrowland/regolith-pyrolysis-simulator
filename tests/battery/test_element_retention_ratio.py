@@ -53,8 +53,61 @@ def test_inventory_retention_uses_the_declared_printed_definition() -> None:
 
     assert retention(initial, final, "Fe", "mass_retention") == pytest.approx(0.8)
     assert retention(
-        initial, final, "Fe", "concentration_retention"
+        initial, final, "Fe", "concentration_retention", concentration_basis="mass_fraction"
     ) == pytest.approx(1.2190530023044481)
+
+
+def test_norris_single_cation_mole_basis_differs_from_mass_basis() -> None:
+    retention = residue._element_retention_ratio_from_inventories
+    assert retention(
+        {"FeO": 1.0, "MgO": 1.0}, {"FeO": 0.8, "MgO": 0.4},
+        "Fe", "concentration_retention",
+        concentration_basis="mole_fraction_single_cation_oxide",
+    ) == pytest.approx(1.3333333333333333)
+    # Initially 2 Al + 2 Na + 1 Zn cations; finally 1 Al + 0.5 Na +
+    # 0.5 Zn cations. Zn FM is (0.5/2)/(1/5) = 1.25, not the
+    # formula-unit fraction ratio. Zn also guards against a majors-only sum.
+    assert retention(
+        {"Al2O3": 1.0, "Na2O": 1.0, "ZnO": 1.0},
+        {"Al2O3": 0.5, "Na2O": 0.25, "ZnO": 0.5},
+        "Zn", "concentration_retention",
+        concentration_basis="mole_fraction_single_cation_oxide",
+        final_oxygen_exchange_mol=-0.1,
+    ) == pytest.approx(1.25)
+
+
+@pytest.mark.parametrize("basis", (None, "unknown", "mole_fraction"))
+def test_unprinted_or_unknown_concentration_basis_refuses(basis) -> None:
+    from simulator.battery.records import Located, Locator, State
+
+    record = Located(State.of({
+        "definition": "concentration_retention", "concentration_basis": basis,
+        "quote": "final divided by initial", "page": 202,
+    }), locator=Locator(page=232))
+    with pytest.raises(ResidueInventoryRefusal) as exc:
+        residue._printed_fm_definition(record)
+    assert exc.value.reason == "fm_concentration_basis_unprinted_or_unknown"
+    with pytest.raises(ResidueInventoryRefusal) as exc:
+        residue._element_retention_ratio_from_inventories(
+            {"FeO": 1.0}, {"FeO": 0.5}, "Fe", "concentration_retention",
+            concentration_basis=basis,
+        )
+    assert exc.value.reason == "fm_concentration_basis_unprinted_or_unknown"
+
+
+
+def test_printed_fm_definition_resolves_migrated_numeric_page() -> None:
+    from decimal import Decimal
+    from simulator.battery.records import Located, Locator, State
+
+    record = {
+        "definition": "concentration_retention",
+        "concentration_basis": "mole_fraction_single_cation_oxide",
+        "quote": "final divided by initial", "page": Decimal("201"),
+    }
+    assert residue._printed_fm_definition(
+        Located(State.of(record), locator=Locator(page=231))
+    ) == ("concentration_retention", record)
 
 
 def test_unprinted_fm_definition_is_a_typed_refusal() -> None:
@@ -168,6 +221,7 @@ def test_sossi_printed_mn_row_reaches_the_scored_retention_path() -> None:
         State.of(
             {
                 "definition": "concentration_retention",
+                "concentration_basis": "mass_fraction",
                 "quote": "ppm by mass in quenched glass",
                 "page": 54,
             }
