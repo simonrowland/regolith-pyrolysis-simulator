@@ -10,6 +10,7 @@ import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
+from decimal import Decimal
 from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any
@@ -23,6 +24,7 @@ from simulator.battery.oxygen_balance import (
     _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
 )
+from simulator.battery.records import nominal_pressure_pa
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.physical_constants import PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -1210,11 +1212,14 @@ def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
     state = record.get("state")
     if not isinstance(state, Mapping) or state.get("tag") != "value":
         raise ResidueInventoryRefusal("hashimoto_printed_input_missing")
-    value = state.get("value")
-    if isinstance(value, Mapping):
-        value = value.get("point")
+    # The same serialized point is a temperature, a mass, or a pressure.
+    # The nominal reader is the one pressure identity uses, so a band's
+    # point is the call pressure and a bare decimal stays a bare decimal.
+    point = nominal_pressure_pa(state)
+    if point is None:
+        raise ResidueInventoryRefusal("hashimoto_printed_input_invalid")
     try:
-        numeric = float(value)
+        numeric = float(point)
     except (TypeError, ValueError, OverflowError) as exc:
         raise ResidueInventoryRefusal("hashimoto_printed_input_invalid") from exc
     if not math.isfinite(numeric):
@@ -2967,6 +2972,12 @@ def _predict_hashimoto_residue_cohort(
     prediction_rows: list[_HashimotoResiduePrediction] = []
 
     for experiment in experiments:
+        experiment_id = str(experiment["experiment_id"])
+        if (
+            selected_experiment_ids is not None
+            and experiment_id not in selected_experiment_ids
+        ):
+            continue
         setup = _hashimoto_run_setup(
             experiment,
             gas_pack=gas_pack,
@@ -2977,12 +2988,6 @@ def _predict_hashimoto_residue_cohort(
             engine_metadata=melt_pack_identity,
             reference_printed_wt_pct=printed_wt_pct,
         )
-        experiment_id = setup.experiment_id
-        if (
-            selected_experiment_ids is not None
-            and experiment_id not in selected_experiment_ids
-        ):
-            continue
         temperature_K = setup.temperature_K
         duration_s = setup.duration_s
         sample_mass_kg = setup.sample_mass_kg
@@ -3483,6 +3488,9 @@ def _inventory_bulk_and_element_masses_kg(
     return total_mass_kg, element_mass_kg
 
 
+_FM_CONCENTRATION_BASES = frozenset({"mass_fraction", "mole_fraction_single_cation_oxide"})
+
+
 def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapping[str, Any]]:
     state = getattr(located_definition, "state", None)
     value = getattr(state, "value", None) if getattr(state, "is_value", False) else None
@@ -3493,6 +3501,9 @@ def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapp
     definition = value.get("definition")
     quote = value.get("quote")
     page = value.get("page")
+    # The generic point-condition migrator preserves numeric metadata as Decimal.
+    if isinstance(page, Decimal) and page.is_finite() and page == page.to_integral_value():
+        page = int(page)
     if (
         definition not in {"concentration_retention", "mass_retention"}
         or not isinstance(quote, str)
@@ -3504,6 +3515,14 @@ def _printed_fm_definition(located_definition: object | None) -> tuple[str, Mapp
         raise ResidueInventoryRefusal(
             "fo_definition_unprinted",
             "fm_definition needs a named definition, printed quote, and page",
+        )
+    if (
+        definition == "concentration_retention"
+        and value.get("concentration_basis") not in _FM_CONCENTRATION_BASES
+    ):
+        raise ResidueInventoryRefusal(
+            "fm_concentration_basis_unprinted_or_unknown",
+            "fm_definition needs a printed concentration_basis",
         )
     return str(definition), value
 
@@ -3548,6 +3567,7 @@ def _element_retention_ratio_from_inventories(
     element: str,
     definition: str,
     *,
+    concentration_basis: str | None = None,
     initial_oxygen_exchange_mol: float = 0.0,
     final_oxygen_exchange_mol: float = 0.0,
     initial_bulk_mass_adjustment_kg: float = 0.0,
@@ -3555,6 +3575,11 @@ def _element_retention_ratio_from_inventories(
 ) -> float:
     if definition not in {"concentration_retention", "mass_retention"}:
         raise ResidueInventoryRefusal("fo_definition_unprinted")
+    if (
+        definition == "concentration_retention"
+        and concentration_basis not in _FM_CONCENTRATION_BASES
+    ):
+        raise ResidueInventoryRefusal("fm_concentration_basis_unprinted_or_unknown")
     if not any(
         float(amount) > 0.0 and _formula_terms(formula)[0].get(element, 0.0) > 0.0
         for formula, amount in initial_inventory_mol.items()
@@ -3587,6 +3612,29 @@ def _element_retention_ratio_from_inventories(
     mass_retention = final_element_mass / initial_element_mass
     if definition == "mass_retention":
         return mass_retention
+    if concentration_basis == "mole_fraction_single_cation_oxide":
+        # Norris 2016 Eq. 5.1 (physical p.232 / folio 202) prints
+        # X_i = n_i / N, N = sum of single-cation oxide moles. Each oxide
+        # contributes its non-oxygen atom count (Al2O3 -> 2 AlO1.5,
+        # Na2O -> 2 NaO0.5); oxygen exchanged with the buffer adds no cations.
+        # Thus FM = (n_i,f/n_i,0) / (N_f/N_0). The elemental molar mass
+        # cancels in n_i,f/n_i,0, so mass_retention supplies that ratio.
+        # Units: (mol/mol)/(mol/mol) is dimensionless. Sanity: FeO + MgO,
+        # 1 + 1 -> 0.8 + 0.4, gives 0.8/(1.2/2) = 1.333333, whereas
+        # mass fractions give 1.219053 (independently pinned in the test).
+        cation_totals = [
+            math.fsum(
+                float(amount) * math.fsum(
+                    count for atom, count in _formula_terms(oxide)[0].items()
+                    if atom != "O"
+                )
+                for oxide, amount in inventory.items()
+            )
+            for inventory in (initial_inventory_mol, final_inventory_mol)
+        ]
+        if any(not math.isfinite(total) or total <= 0.0 for total in cation_totals):
+            raise ResidueInventoryRefusal("residue_cation_inventory_invalid")
+        return mass_retention / (cation_totals[1] / cation_totals[0])
     bulk_mass_factor = final_bulk_mass_kg / initial_bulk_mass_kg
     if not math.isfinite(bulk_mass_factor) or bulk_mass_factor <= 0.0:
         raise ResidueInventoryRefusal("residue_bulk_mass_invalid")

@@ -13,6 +13,7 @@ import subprocess
 import sys
 import unicodedata
 from collections import Counter
+from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
@@ -123,7 +124,7 @@ from simulator.battery.migrate import (
     write_outputs,
 
 )
-from simulator.battery.stable_ids import series_row_extra
+from simulator.battery.stable_ids import series_point_id, series_row_extra
 
 
 _FAST_SAFE_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
@@ -542,6 +543,117 @@ def _migrate_real_extract(
     )
     (extracts / name).write_text(extract_text, encoding="utf-8")
     return migrate(root, write=write)
+
+
+def test_norris_2016_table_5_7_migrates_all_retention_rows_with_conditions(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.migrate import wt_pct_to_mole_fraction
+    from simulator.battery.residue import _printed_fm_definition
+    from simulator.battery.score import rail_for_quantity
+
+    result = _migrate_real_extract(
+        tmp_path, "norris-2016-trace-volatility-thesis.yaml"
+    )
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "norris-2016-trace-volatility-thesis"
+        and observation.locator.table == "5.7"
+    ]
+    # Independently transcribed from the rendered Table 5.7, physical p.232 /
+    # folio 202: pairs are FM, printed sigma, in log fO2 order -7,-9,-11,-13.
+    printed = {
+        "Ag": "0.646 0.117 0.198 0.017 0.127 0.007 0.022 0.019",
+        "Bi": "0.227 0.080 0.170 0.078 0.074 0.007 0.008 0.007",
+        "Cd": "0.228 0.057 0.071 0.014 0.019 0.003 0.019 0.009",
+        "Cr": "1.021 0.179 1.192 0.179 0.998 0.150 1.171 0.265",
+        "Cu": "0.618 0.072 0.331 0.030 0.367 0.030 0.176 0.138",
+        "Ga": "1.454 0.432 1.217 0.361 1.314 0.388 0.669 0.380",
+        "Ge": "0.315 0.090 0.168 0.050 0.045 0.013 0.014 0.005",
+        "In": "0.816 0.095 0.622 0.074 0.621 0.068 0.192 0.142",
+        "Mo": "1.260 0.144 1.168 0.125 1.130 0.120 0.624 0.349",
+        "Pb": "1.030 0.087 0.646 0.069 0.365 0.022 0.116 0.099",
+        "Sb": "0.457 0.084 0.210 0.071 0.012 0.001 0.002 0.001",
+        "Sn": "0.471 0.031 0.194 0.017 0.201 0.009 0.038 0.035",
+        "Tl": "0.525 0.052 0.397 0.040 0.125 0.007 0.069 0.057",
+        "V": "1.219 0.141 1.226 0.139 1.179 0.134 1.112 0.125",
+        "W": "2.508 0.416 2.347 0.383 2.223 0.365 1.975 0.405",
+        "Zn": "1.038 0.069 0.617 0.053 0.488 0.021 0.130 0.087",
+    }
+    # Table 5.2, physical p.220 / folio 190. Use the existing conversion
+    # owner to bind the complete nine-oxide initial charge, without a second
+    # wt%-to-mole implementation in this regression.
+    charge = wt_pct_to_mole_fraction({
+        name: Decimal(amount) for name, amount in {
+            "SiO2": "50.66", "TiO2": "0.96", "Al2O3": "15.11",
+            "FeO": "9.69", "MnO": "0.20", "MgO": "8.90",
+            "CaO": "12.28", "Na2O": "1.96", "K2O": "0.07",
+        }.items()
+    })
+    log_fO2s = ("-7", "-9", "-11", "-13")
+    expected = {
+        (element, log_fO2): (Decimal(cells[2 * index]), cells[2 * index + 1])
+        for element, printed_row in printed.items()
+        for cells in [printed_row.split()]
+        for index, log_fO2 in enumerate(log_fO2s)
+    }
+    assert len(rows) == len(expected) == 64
+    assert not result.validation.hard_issues
+    assert rail_for_quantity(Quantity.ELEMENT_RETENTION_RATIO) is Rail.RESIDUE_COMPOSITION
+    seen = set()
+    for observation in rows:
+        element = observation.identity.species.formula
+        row_id = observation.observation_id.split("::")[1]
+        log_fO2 = "-" + row_id.rsplit("_neg", 1)[1]
+        assert row_id == f"norris_2016_table5_7_{element.lower()}_logfo2_neg{log_fO2[1:]}"
+        key = (element, log_fO2)
+        assert key not in seen
+        seen.add(key)
+        fm, sigma = expected[key]
+        assert (observation.locator.page, observation.locator.published_page) == (232, 202)
+        assert quantity_token(observation.identity) is Quantity.ELEMENT_RETENTION_RATIO
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.value.point == fm
+        assert observation.uncertainty.kind is UncertaintyKind.PRINTED
+        assert observation.uncertainty.verbatim == {
+            "kind": "standard_deviation", "value": sigma,
+            "units": "dimensionless", "verbatim": sigma,
+            "confidence_level": "not_stated",
+            "basis": "Table 5.7 labels the adjacent sigma column σ; confidence level is not stated.",
+        }
+        assert observation.identity.subtype == State.of("concentration_retention")
+        assert observation.identity.temperature_K == State.of(Decimal("1573.15"))
+        assert observation.identity.composition.value.components == charge.components
+        assert observation.identity.composition.value.amount_basis == charge.amount_basis
+        assert observation.experiment_id.endswith(f"::volatile-loss-logfo2-neg{log_fO2[1:]}")
+        conditions = observation.point_conditions
+        assert conditions is not None
+        assert conditions["temperature_K"].state.value == Decimal("1573.15")
+        assert conditions["fO2_log"].state.value.point == Decimal(log_fO2)
+        assert (conditions["fO2_log"].locator.page, conditions["fO2_log"].locator.table) == (232, "5.7")
+        assert conditions["composition"].state.value.components == charge.components
+        assert conditions["composition"].locator.table == "5.2"
+        assert conditions["composition"].locator.page == 220
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.sample.initial_composition.state.value.components == charge.components
+        assert experiment.thermal_schedule.total_duration_s.state.value.point == Decimal("3600")
+        located = conditions["fm_definition"]
+        definition, record = _printed_fm_definition(located)
+        assert definition == "concentration_retention"
+        assert record["concentration_basis"] == "mole_fraction_single_cation_oxide"
+        assert record["quote"] == (
+            "final concentration of the trace element divided by the initial concentration"
+        )
+        assert record["page"] == 201
+        assert (located.locator.page, located.locator.published_page) == (231, 201)
+        assert record["concentration_basis_quote"] == (
+            "concentration values are expressed as mole fraction single cation oxide"
+        )
+        assert record["concentration_basis_locator"] == {
+            "page": 232, "pdf_page_index": 231, "published_page": 202, "equation": "5.1",
+        }
+    assert seen == set(expected)
 
 
 def test_identity_equal_transition_temperature_conflict_and_green_unknown(
@@ -8614,7 +8726,7 @@ _TORR = _ATM / as_decimal("760")
 
 
 def _census_declared_quantity(obs_type: str | None, values: dict, units: str) -> str | None:
-    raw = values.get("quantity") if isinstance(values, dict) else None
+    raw = values.get("quantity") if isinstance(values, Mapping) else None
     if isinstance(raw, str) and raw in _CENSUS_QUANTITY_ALIASES:
         return _CENSUS_QUANTITY_ALIASES[raw]
     if isinstance(raw, str) and raw in _CENSUS_CLOSED_QUANTITIES:
@@ -8917,8 +9029,82 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
     return None
 
 
+@pytest.fixture(scope="module")
+def _series_census_source_documents() -> dict[str, object]:
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
+    source_paths = sorted(
+        path
+        for path in extracts.glob("*.yaml")
+        if (extracts_v2 / path.name).is_file()
+    )
+    store_paths = [extracts_v2 / path.name for path in source_paths]
+    source_documents = {
+        path.name: yaml.load(
+            path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+        )
+        for path in source_paths
+    }
+    store_documents = {
+        path.name: yaml.load(
+            path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+        )
+        for path in store_paths
+    }
+    return {
+        "source_documents": source_documents,
+        "store_documents": store_documents,
+        "source_build_count": len(source_paths),
+        "store_build_count": len(store_paths),
+    }
+
+
+def _match_census_row_extra(
+    stable_points: list[Mapping[str, object]], row_extra: str
+) -> Mapping[str, object] | None:
+    full_suffix = f":{row_extra}"
+    exact_matches = [
+        observation
+        for observation in stable_points
+        if str(observation.get("observation_id") or "").endswith(full_suffix)
+    ]
+    if exact_matches:
+        return exact_matches[0] if len(exact_matches) == 1 else None
+
+    row_label = row_extra.split(":h=", 1)[0]
+    if not row_label.startswith("row="):
+        return None
+    label_suffix = f":{row_label}"
+    label_matches = [
+        observation
+        for observation in stable_points
+        if str(observation.get("observation_id") or "")
+        .rsplit(":h=", 1)[0]
+        .endswith(label_suffix)
+    ]
+    return label_matches[0] if len(label_matches) == 1 else None
+
+
+def test_census_row_extra_prefers_live_hash_with_shared_label() -> None:
+    live = {"observation_id": "source::series::point:0:row=shared:h=live"}
+    other = {"observation_id": "source::series::point:1:row=shared:h=other"}
+
+    assert _match_census_row_extra([live, other], "row=shared:h=live") is live
+    assert (
+        _match_census_row_extra(
+            [{"observation_id": "source::series::point:2:row=unique:h=old"}],
+            "row=unique:h=new",
+        )
+        == {"observation_id": "source::series::point:2:row=unique:h=old"}
+    )
+
+
 def _series_census(
-    extracts: Path, extracts_v2: Path
+    extracts: Path,
+    extracts_v2: Path,
+    *,
+    source_documents: Mapping[str, object] | None = None,
+    store_documents: Mapping[str, object] | None = None,
 ) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
     from decimal import Decimal, InvalidOperation
     from simulator.battery.migrate import _residue_component_field_sets
@@ -8929,21 +9115,31 @@ def _series_census(
     n_numeric = 0
     n_unavailable = 0
     for src_path in sorted(extracts.glob("*.yaml")):
-        source = yaml.load(
-            src_path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
-        )
-        if not isinstance(source, dict):
-            continue
         store_path = extracts_v2 / src_path.name
         if not store_path.is_file():
             continue
-        stored = yaml.load(
-            store_path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
+        source = (
+            source_documents[src_path.name]
+            if source_documents is not None
+            else yaml.load(
+                src_path.read_text(encoding="utf-8"),
+                Loader=_FAST_SAFE_YAML_LOADER,
+            )
+        )
+        if not isinstance(source, Mapping):
+            continue
+        stored = (
+            store_documents[src_path.name]
+            if store_documents is not None
+            else yaml.load(
+                store_path.read_text(encoding="utf-8"),
+                Loader=_FAST_SAFE_YAML_LOADER,
+            )
         )
         stored_observations = [
             o
             for o in (stored.get("observations") or [])
-            if isinstance(o, dict)
+            if isinstance(o, Mapping)
         ]
         by_id = {
             o["observation_id"]: o
@@ -8952,19 +9148,19 @@ def _series_census(
         source_id = str(source.get("source_id") or src_path.stem)
         used_stable_ids: set[str] = set()
         for source_species, body in (source.get("species") or {}).items():
-            if not isinstance(body, dict):
+            if not isinstance(body, Mapping):
                 continue
             for row in body.get("observations") or []:
                 values = row.get("values") or {}
-                series = values.get("series") if isinstance(values, dict) else None
-                if not isinstance(series, list) or not series:
+                series = values.get("series") if isinstance(values, Mapping) else None
+                if not isinstance(series, (list, tuple)) or not series:
                     continue
                 obs_type = row.get("type") if isinstance(row.get("type"), str) else None
                 units = str(row.get("units") or "")
                 q_token = _census_declared_quantity(obs_type, values, units)
                 raw_id = str(row.get("observation_id") or "")
                 for index, item in enumerate(series):
-                    if not isinstance(item, dict):
+                    if not isinstance(item, Mapping):
                         continue
                     oid = f"{source_id}::{raw_id}::point:{index}"
                     if q_token == "residue_component_composition":
@@ -9053,17 +9249,40 @@ def _series_census(
                         if expected is None:
                             row_extra = series_row_extra(item, include_locator=False)
                             if row_extra is not None:
-                                row_suffix = f":{row_extra}"
-                                stored_obs = next(
-                                    (
-                                        observation
-                                        for observation in stable_points
-                                        if str(observation.get("observation_id") or "").endswith(
-                                            row_suffix
+                                row_label = row_extra.split(":h=", 1)[0]
+                                if row_label.startswith("row="):
+                                    stored_obs = _match_census_row_extra(
+                                        stable_points, row_extra
+                                    )
+                                else:
+                                    temperature_value = item.get(
+                                        "T_K", item.get("temperature_K")
+                                    )
+                                    temperature_unit = "K"
+                                    if temperature_value is None and "T_C" in item:
+                                        temperature_value = item["T_C"]
+                                        temperature_unit = "C"
+                                    temperature, _ = convert_temperature_to_k(
+                                        temperature_value, temperature_unit
+                                    )
+                                    point_id = (
+                                        series_point_id(
+                                            f"{source_id}::{raw_id}",
+                                            temperature=temperature,
+                                            extra=row_extra,
                                         )
-                                    ),
-                                    None,
-                                )
+                                        if temperature is not None
+                                        else None
+                                    )
+                                    row_matches = (
+                                        [by_id[point_id]]
+                                        if point_id is not None
+                                        and point_id in by_id
+                                        and point_id not in used_stable_ids
+                                        else []
+                                    )
+                                    if len(row_matches) == 1:
+                                        stored_obs = row_matches[0]
                         else:
                             stored_obs = next(
                                 (
@@ -9112,13 +9331,27 @@ def _series_census(
     return census, mismatches, n_numeric, n_unavailable, per_source
 
 
-def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) -> None:
+@pytest.mark.xdist_group("migration-series-census")
+def test_j01_store_census_series_numeric_matches_declared_field(
+    tmp_path: Path,
+    _series_census_source_documents: dict[str, object],
+) -> None:
     extracts = REPO_ROOT / "data" / "literature" / "extracts"
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
         pytest.skip("migrated store not generated yet")
+    source_documents = deepcopy(_series_census_source_documents)
+    assert source_documents["source_build_count"] == sum(
+        (extracts_v2 / path.name).is_file() for path in extracts.glob("*.yaml")
+    )
+    assert source_documents["store_build_count"] == sum(
+        (extracts / path.name).is_file() for path in extracts_v2.glob("*.yaml")
+    )
     census, mismatches, n_numeric, n_unavailable, per_source = _series_census(
-        extracts, extracts_v2
+        extracts,
+        extracts_v2,
+        source_documents=source_documents["source_documents"],
+        store_documents=source_documents["store_documents"],
     )
     sato = _migrate_real_extract(
         tmp_path,
@@ -9135,6 +9368,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     ) = _series_census(
         sato_literature / "extracts",
         sato_literature / "extracts-v2",
+        source_documents=source_documents["source_documents"],
     )
     assert len(sato.observations) == 115
     assert sato_census == {"activity": 54, "fugacity": 55}
@@ -9950,10 +10184,15 @@ def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -
         assert prediction.requested_composition == composition
 
 
-def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> None:
+@pytest.mark.xdist_group("migration-series-census")
+def test_k04_census_goes_red_when_stored_alpha_is_corrupted(
+    tmp_path: Path,
+    _series_census_source_documents: dict[str, object],
+) -> None:
     import shutil
     from decimal import Decimal
 
+    source_documents = deepcopy(_series_census_source_documents)
     extracts = REPO_ROOT / "data" / "literature" / "extracts"
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not extracts_v2.is_dir():
@@ -9980,8 +10219,15 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         n_mutated += 1
     assert n_mutated == 6, n_mutated
     shirai.write_text(yaml.safe_dump(stored, sort_keys=False), encoding="utf-8")
+    changed_store_documents = dict(
+        source_documents["store_documents"]
+    )
+    changed_store_documents[shirai.name] = stored
     _census, mismatches, _n_numeric, _n_unavailable, _per_source = _series_census(
-        extracts, dest
+        extracts,
+        dest,
+        source_documents=source_documents["source_documents"],
+        store_documents=changed_store_documents,
     )
     assert mismatches, "census must go red when stored alpha points are corrupted"
 
@@ -19481,6 +19727,27 @@ def test_hashimoto_row_left_live_diagnostics_are_final(
     assert len(left_live) == 0
 
 
+def test_residue_component_source_phase_outputs_are_pinned(tmp_path: Path) -> None:
+    from simulator.battery.enums import Quantity
+
+    expected = {
+        "kems-015-hashimoto-1983": Phase.L,
+        "kems-012-sossi-2019": Phase.GLASS,
+    }
+    for source_id, phase in expected.items():
+        result = _migrate_real_extract(tmp_path / source_id, f"{source_id}.yaml")
+        rows = [
+            row
+            for row in result.observations.values()
+            if row.source_id == source_id
+            and row.identity.quantity.is_value
+            and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and row.value.point is not None
+        ]
+        assert rows
+        assert {row.identity.species.phase.value for row in rows} == {phase}
+
+
 def test_residue_store_write_files_cells_under_their_extract_sources(
     tmp_path: Path,
 ) -> None:
@@ -19817,7 +20084,13 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         assert identity.temperature_K.value == conditions["temperature_K"].state.value
         assert identity.sample_mass_kg.value == Decimal("0.0001")
         assert identity.exposure.value.duration_s.value == conditions["time_min"].state.value * Decimal("60")
-        assert identity.total_pressure_Pa.value == experiment.pressure_environment.total_pressure_Pa.state.value.point
+        from simulator.battery.records import ApproxPressure, BandBasis
+
+        pressure_band = identity.total_pressure_Pa.value
+        assert isinstance(pressure_band, ApproxPressure)
+        assert pressure_band.point == experiment.pressure_environment.total_pressure_Pa.state.value.point
+        assert pressure_band.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
+        assert pressure_band.low < pressure_band.point < pressure_band.high
         assert identity.fO2_Pa.is_not_applicable
         assert identity.fO2_Pa.reason == "oxygen_unbuffered_vacuum"
         assert run_id == obs.experiment_id.split("::experiment::")[-1]

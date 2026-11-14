@@ -33,6 +33,7 @@ from typing import Any, Callable, Iterable, Iterator, Literal, Mapping, Protocol
 import yaml
 
 from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -95,6 +96,7 @@ from simulator.battery.identity import (
     _same_row_redox_identity_equal,
     _same_row_knudsen_residue_identity_equal,
     log10K_from_delta_fG_kJ_mol,
+    melt_activity_log10_pressure_bound,
     profile_for,
     quantity_token,
     _STANDARD_PRESSURE_AMBIGUITY_RELATION,
@@ -180,7 +182,10 @@ from simulator.battery.records import (
     Value,
     Work,
     _is_source_internally_inconsistent,
+    ApproxPressure,
+    approximate_pressure_band_reason,
     as_decimal,
+    nominal_pressure_pa,
     charge_value,
     phase_token,
     polymorph_token,
@@ -188,6 +193,35 @@ from simulator.battery.records import (
     StandardState,
     union_notices,
 )
+from simulator.battery.score_report import (
+    UNKNOWN_STORE_PROVENANCE_LINE,
+    _all_numeric_markdown_lines,
+    _append_quench_pair_diagnostics,
+    _census_count_line,
+    _condition_hull_lines,
+    _e15_markdown_lines,
+    _e15_number,
+    format_element_retention_diagnostics,
+    format_store_stamp_report_lines,
+    render_legacy_score_report_markdown,
+    render_payload_score_report_markdown,
+    store_stamp_has_known_revision,
+)
+from simulator.battery.score_report_data import element_retention_report_data
+from simulator.battery.score_metrics import (
+    QUANTITY_METRIC,
+    _phase_component_reference_wt_percent,
+    _reference_from_metric,
+    _residual_metric_operation,
+    band_dimension_matches,
+    compute_metric,
+    decision_band_for,
+    match_status,
+    metric_operation,
+    metric_operation_for_identity,
+    populate_numeric,
+)
+from simulator.transport_regime import KnudsenRegime, high_edge_knudsen_clause
 from simulator.melt_backend.base import (
     MULTIVALENT_MELT_ELEMENTS,
     EquilibriumResult,
@@ -368,9 +402,6 @@ COMPILATION_SOURCE_MARKERS: frozenset[str] = frozenset(
 CIRCULARITY_WARNING = "Do not validate an engine against a compilation it consumes."
 
 STORE_STAMP_KIND = "battery_store_stamp"
-UNKNOWN_STORE_PROVENANCE_LINE = (
-    "The measuring store for this ledger is unknown."
-)
 STORE_REVISION_PATHS: tuple[str, ...] = (
     "data/literature/observations-v2",
     "data/literature/extracts-v2",
@@ -391,63 +422,6 @@ REVIEW_PERMITS_USE: frozenset[str | None] = frozenset(
     {None, "draft", "reviewed", "adopted", "accepted"}
 )
 REVIEW_BLOCKS_USE: frozenset[str] = frozenset({"rejected", "withdrawn", "retired"})
-
-# Quantity → metric operation. Derivation in comments at QUANTITY_METRIC.
-# Premise: SCHEMA-PROPOSAL-v2.1 metrics {absolute, relative, dex}.
-# Algebra: absolute = C−R in canonical unit; relative = (C−R)/|R| (R≠0);
-# dex = log10(C/R) with both positive.
-# Unit check: absolute carries QUANTITY_UNITS; relative and dex are
-# dimensionless. Sanity: equal endpoints → 0 on every operation.
-QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
-    Quantity.P_SAT: MetricOperation.DEX,
-    Quantity.P_PARTIAL: MetricOperation.DEX,
-    Quantity.P_REFERENCE: MetricOperation.DEX,
-    Quantity.ACTIVITY: MetricOperation.DEX,
-    Quantity.ACTIVITY_COEFFICIENT: MetricOperation.DEX,
-    Quantity.DELTA_FG: MetricOperation.ABSOLUTE,
-    Quantity.ENTHALPY_OF_FUSION: MetricOperation.ABSOLUTE,
-    Quantity.ENTROPY_OF_FUSION: MetricOperation.ABSOLUTE,
-    Quantity.H_MINUS_H298: MetricOperation.ABSOLUTE,
-    Quantity.PARTIAL_MOLAR_ENTHALPY: MetricOperation.ABSOLUTE,
-    Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: MetricOperation.ABSOLUTE,
-    Quantity.ENTHALPY_OF_VAPORIZATION_3RD_LAW: MetricOperation.ABSOLUTE,
-    Quantity.CP: MetricOperation.ABSOLUTE,
-    Quantity.S: MetricOperation.ABSOLUTE,
-    Quantity.LOG10_KF: MetricOperation.ABSOLUTE,
-    Quantity.LOG10_K_STAR: MetricOperation.ABSOLUTE,
-    Quantity.EVAPORATION_COEFFICIENT_ALPHA: MetricOperation.ABSOLUTE,
-    Quantity.MASS_LOSS_FRACTION: MetricOperation.ABSOLUTE,
-    Quantity.MASS_LOSS_FRACTION_VS_T: MetricOperation.RELATIVE,
-    Quantity.YIELD_FRACTION: MetricOperation.RELATIVE,
-    Quantity.O2_YIELD: MetricOperation.RELATIVE,
-    Quantity.EVAPORATION_RATE: MetricOperation.RELATIVE,
-    Quantity.MASS_LOSS_RATE: MetricOperation.RELATIVE,
-    Quantity.WALL_DEPOSIT_MASS: MetricOperation.RELATIVE,
-    Quantity.WALL_DEPOSIT_AREAL_RATE: MetricOperation.RELATIVE,
-    Quantity.TRANSITION_TEMPERATURE: MetricOperation.ABSOLUTE,
-    Quantity.FE3_FE2_RATIO: MetricOperation.DEX,
-    Quantity.VISCOSITY: MetricOperation.DEX,
-    Quantity.DENSITY: MetricOperation.RELATIVE,
-    Quantity.ELECTRICAL_CONDUCTIVITY: MetricOperation.DEX,
-    Quantity.ION_INTENSITY_RATIO: MetricOperation.DEX,
-    Quantity.ION_INTENSITY: MetricOperation.RELATIVE,
-    Quantity.INTERACTION_PARAMETER: MetricOperation.ABSOLUTE,
-    Quantity.CONDENSATE_COMPOSITION: MetricOperation.ABSOLUTE,
-    Quantity.LIQUIDUS_COMPOSITION: MetricOperation.ABSOLUTE,
-    Quantity.EVOLVED_GAS_YIELD: MetricOperation.RELATIVE,
-    Quantity.ISOTOPE_DELTA: MetricOperation.ABSOLUTE,
-    Quantity.RESIDUE_COMPONENT_COMPOSITION: MetricOperation.ABSOLUTE,
-    Quantity.ELEMENT_RETENTION_RATIO: MetricOperation.DEX,
-    # Equilibrium ratios (not a closed phase basis) are absolute. Printed
-    # component amounts and L_X are dex; metric_operation_for_identity
-    # returns dex when the subtype is a PHASE_BASIS_TOKENS value.
-    # Printed log10 C_S / log10 C_Cl are already logs and are often negative,
-    # so they take absolute, the same shape as log10_Kf.
-    Quantity.EQUILIBRIUM_PHASE_COMPOSITION: MetricOperation.ABSOLUTE,
-    Quantity.DISTRIBUTION_RATIO: MetricOperation.DEX,
-    Quantity.SULFIDE_CAPACITY: MetricOperation.ABSOLUTE,
-    Quantity.CHLORIDE_CAPACITY: MetricOperation.ABSOLUTE,
-}
 
 # The ticket line uses the two-sided normal percentile p=95. 1.95996398454 is
 # Φ⁻¹((1 + .95) / 2); evaluating Φ(1.95996398454) gives 0.975, the upper
@@ -471,11 +445,6 @@ _ROLE_ALIGNMENT_AXES = frozenset({
     "counter_phase_role",
     "valence_basis",
 })
-_UNIT_DIMENSION: dict[str, str] = {
-    "kJ_per_declared_mol_basis": "energy_per_mol",
-    "J_per_declared_mol_basis_per_K": "energy_per_mol_per_K",
-    "dimensionless": "dimensionless",
-}
 _SIO_FORMULAS: frozenset[str] = frozenset({"SiO", "SiO2"})
 _ALKALI_FORMULAS: frozenset[str] = frozenset(
     {"Na", "K", "NaO0.5", "KO0.5", "Na2O", "K2O"}
@@ -593,6 +562,7 @@ FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
 )
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
+FLAGGED_STRATUM_APPROXIMATE_PRESSURE = "approximate-pressure"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
@@ -1800,13 +1770,6 @@ def _fo2_mode_from_notices(notices: Sequence[Notice]) -> Fo2Mode | None:
     )
 
 
-def _dec_token(value: Decimal) -> str:
-    text = format(value, "f")
-    if "." in text:
-        text = text.rstrip("0").rstrip(".")
-    return text or "0"
-
-
 def _residual_key_parts(key: object) -> tuple[str, str, str, str] | None:
     """Split a residual key into head, quantity, rail, and engine.
 
@@ -1853,12 +1816,6 @@ def residual_key_slots(key: object) -> tuple[str, str, str, Decimal | None]:
     return (quantity, rail, engine, _temperature_token(head))
 
 
-def metric_operation(quantity: Quantity | None) -> MetricOperation | None:
-    if quantity is None:
-        return None
-    return QUANTITY_METRIC.get(quantity)
-
-
 def _distribution_ratio_on_redox_rail(formula: str) -> bool:
     """Fe, Cr, Mn, Ti, or P in the component. Oxygen does not count."""
 
@@ -1867,150 +1824,6 @@ def _distribution_ratio_on_redox_rail(formula: str) -> bool:
         return False
     elements = {element for element, count in parsed if count > 0 and element != "O"}
     return bool(elements & _REDOX_DISTRIBUTION_ELEMENTS)
-
-
-def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
-    """Select an identity-aware metric when the quantity's form requires it."""
-    quantity = quantity_token(identity)
-    if quantity is Quantity.VALENCE_RATIO:
-        basis = identity.valence_basis
-        if basis is None or not basis.is_value:
-            return None
-        if basis.value.value_form in {
-            ValenceValueForm.FRACTION,
-            ValenceValueForm.RATIO,
-        }:
-            return MetricOperation.DEX
-        if basis.value.value_form in {
-            ValenceValueForm.LOG10_RATIO,
-            ValenceValueForm.AVERAGE_OXIDATION_STATE,
-        }:
-            return MetricOperation.ABSOLUTE
-        return None
-    if quantity in PRINTED_CAPACITY_QUANTITIES:
-        return MetricOperation.ABSOLUTE
-    if quantity is Quantity.DISTRIBUTION_RATIO:
-        return MetricOperation.DEX
-    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
-        subtype = (
-            identity.subtype.value
-            if identity.subtype is not None and identity.subtype.is_value
-            else None
-        )
-        # Prose wt% and mole-percent synonyms are the same dex observable
-        # as a token phase row. The stored subtype is not rewritten.
-        if effective_phase_basis(subtype) is not None:
-            return MetricOperation.DEX
-        return MetricOperation.ABSOLUTE
-    if quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
-        return metric_operation(quantity)
-    subtype = identity.subtype.value if identity.subtype.is_value else None
-    if subtype == "element_ppm_by_mass":
-        return MetricOperation.DEX
-    if subtype == "oxide_wt_percent":
-        return MetricOperation.ABSOLUTE
-    return metric_operation(quantity)
-
-
-def _phase_component_reference_wt_percent(
-    identity: Identity, reference: Decimal
-) -> Decimal:
-    """Convert a printed mass-ppm phase amount for comparison with wt% engines."""
-    quantity = quantity_token(identity)
-    subtype = (
-        identity.subtype.value
-        if identity.subtype is not None and identity.subtype.is_value
-        else None
-    )
-    if (
-        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        and subtype == "element_ppm_by_mass"
-    ):
-        # 1 ppm = 1e-6 mass fraction = 1e-4 wt%; 250 ppm = 0.025 wt%.
-        return reference / Decimal("10000")
-    return reference
-
-
-def _residual_metric_operation(
-    quantity: Quantity | None, observation: object | None
-) -> MetricOperation | None:
-    """Metric of a residual on ``observation``: identity-aware when typed."""
-
-    identity = getattr(observation, "identity", None)
-    if isinstance(identity, Identity) and quantity_token(identity) is quantity:
-        return metric_operation_for_identity(identity)
-    return metric_operation(quantity)
-
-
-def compute_metric(
-    operation: MetricOperation,
-    candidate: Decimal,
-    reference: Decimal,
-) -> Decimal | None:
-    """Return the metric or None when the domain is invalid.
-
-    Premise: SCHEMA-PROPOSAL-v2.1 metrics block.
-    Algebra:
-      absolute = C − R
-      relative = (C − R) / |R|  requiring R ≠ 0
-      dex = log10(C / R) requiring C > 0 and R > 0
-    Unit check: absolute inherits the quantity unit; relative and dex are
-    dimensionless. Sanity: C = R → 0; R = 0 forbids relative (never price
-    a zero reference as a successful relative residual); non-positive
-    forbids dex (never take log10 of zero).
-    """
-
-    if not candidate.is_finite() or not reference.is_finite():
-        return None
-    if operation is MetricOperation.ABSOLUTE:
-        return candidate - reference
-    if operation is MetricOperation.RELATIVE:
-        if reference == 0:
-            return None
-        return (candidate - reference) / abs(reference)
-    if operation is MetricOperation.DEX:
-        if candidate <= 0 or reference <= 0:
-            return None
-        ratio = candidate / reference
-        # Decimal.ln / ln(10); math.log10 on float is the same operation
-        # for the reported grain. Keep Decimal via log10 of the ratio.
-        return Decimal(str(math.log10(float(ratio))))
-    return None
-
-
-def _reference_from_metric(
-    operation: MetricOperation,
-    candidate: Decimal,
-    residual: Decimal,
-) -> Decimal | None:
-    """Recover a numeric reference from a scored candidate and residual."""
-
-    if not candidate.is_finite() or not residual.is_finite():
-        return None
-    if operation is MetricOperation.ABSOLUTE:
-        return candidate - residual
-    if operation is MetricOperation.RELATIVE:
-        for denominator, positive_reference in (
-            (Decimal(1) + residual, True),
-            (Decimal(1) - residual, False),
-        ):
-            if denominator == 0:
-                continue
-            reference = candidate / denominator
-            if (positive_reference and reference > 0) or (
-                not positive_reference and reference < 0
-            ):
-                return reference
-        return None
-    if operation is MetricOperation.DEX:
-        if candidate <= 0:
-            return None
-        try:
-            ratio = Decimal(str(10.0 ** float(residual)))
-        except (OverflowError, ValueError):
-            return None
-        return candidate / ratio if ratio.is_finite() and ratio > 0 else None
-    return None
 
 
 def score_eligible_from_conjuncts(conjuncts: EligibleConjuncts) -> bool:
@@ -2592,6 +2405,8 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
     if NoticeKind.APPROXIMATE_VALUE.value in kinds:
         strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
+    if NoticeKind.APPROXIMATE_PRESSURE.value in kinds:
+        strata.append(FLAGGED_STRATUM_APPROXIMATE_PRESSURE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
@@ -2621,6 +2436,105 @@ def _is_fusion_conversion_reason(reason: object) -> bool:
 
 def _is_flagged_stratum_notice(notice: Notice) -> bool:
     return bool(flagged_strata((notice,)))
+
+
+# Kinetic yield is the existing set. Residue composition, element retention,
+# and areal wall deposition are the other families whose notice carries the
+# regime. Knudsen residue extent is residue composition with the effusion
+# method, and that notice stays the band sentence: the axis is already omitted.
+_APPROXIMATE_PRESSURE_REGIME_QUANTITIES = KINETIC_YIELD_QUANTITIES | frozenset(
+    {
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Quantity.ELEMENT_RETENTION_RATIO,
+        Quantity.WALL_DEPOSIT_AREAL_RATE,
+    }
+)
+
+
+def _furnace_pipe_length_m() -> Decimal:
+    """Project furnace-pipe length. A missing length does not become 1 mm."""
+
+    from simulator.condensation import DEFAULT_PIPE_DIAMETER_M
+
+    return Decimal(str(DEFAULT_PIPE_DIAMETER_M))
+
+
+def _approximate_pressure_notice(
+    identity: Identity,
+    quantity: Quantity | None,
+    *,
+    origin: str,
+    engine: Engine | None = None,
+    method: MethodToken | None = None,
+    length_m: Decimal | None = None,
+) -> Notice | None:
+    """Notice for an identity pressure band. An exact decimal stays silent.
+
+    The band sentence comes from the records owner. Kn comes from the
+    transport owner. The activity dex bound comes from the identity owner.
+    This function chooses which of those sentences the row carries.
+    """
+
+    pressure = identity.total_pressure_Pa
+    if (
+        quantity is None
+        or pressure is None
+        or not pressure.is_value
+        or not isinstance(pressure.value, ApproxPressure)
+    ):
+        return None
+    band = pressure.value
+    parts = [approximate_pressure_band_reason(band)]
+    temperature = temperature_of(identity)
+    usable_temperature = (
+        temperature is not None
+        and temperature.is_finite()
+        and temperature > 0
+    )
+    knudsen_residue = (
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and method is MethodToken.KNUDSEN_EFFUSION
+    )
+    regime = None
+    if (
+        quantity in _APPROXIMATE_PRESSURE_REGIME_QUANTITIES
+        and not knudsen_residue
+        and usable_temperature
+    ):
+        resolved_length = length_m
+        length_is_default = resolved_length is None
+        if length_is_default:
+            resolved_length = _furnace_pipe_length_m()
+        regime, regime_clause = high_edge_knudsen_clause(
+            float(band.high),
+            float(temperature),
+            float(resolved_length),
+        )
+        parts.append(regime_clause)
+        if length_is_default:
+            parts.append(
+                "L is condensation.DEFAULT_PIPE_DIAMETER_M, the furnace-pipe "
+                "length and the conservative laboratory length"
+            )
+    wants_dex = quantity in MELT_ACTIVITY_QUANTITIES or (
+        regime is not None and regime is not KnudsenRegime.FREE_MOLECULAR
+    )
+    if wants_dex and usable_temperature:
+        bound = melt_activity_log10_pressure_bound(
+            band.high - band.low, temperature
+        )
+        parts.append(f"activity |Δlog10(a)| bound {format(bound, '.6e')}")
+    if quantity is Quantity.P_SAT or (
+        engine is not None
+        and (engine, quantity) in _TOTAL_PRESSURE_INDEPENDENT_PREDICTION_PATHS
+    ):
+        parts.append("prediction path ignores total pressure")
+    return Notice(
+        kind=NoticeKind.APPROXIMATE_PRESSURE,
+        affected_quantities=(quantity,),
+        reason="; ".join(parts),
+        origin=origin,
+    )
 
 
 def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
@@ -5589,49 +5503,6 @@ def build_conjuncts(
     )
 
 
-def unit_dimension(unit: str) -> str | None:
-    """Physical dimension of a stored unit. Unknown units match nothing."""
-
-    return _UNIT_DIMENSION.get(unit)
-
-
-def band_dimension_matches(
-    quantity: Quantity,
-    band: DecisionBand,
-    *,
-    operation: MetricOperation | None = None,
-) -> bool:
-    """True only when the band and the quantity share one dimension.
-
-    Residual metrics (relative and dex) are dimensionless even when their
-    source quantity has a physical unit. kJ/mol does not match J/mol/K.
-    Scale aliases that are not in ``_UNIT_DIMENSION`` fail closed.
-    ``operation`` is the residual's own (identity-aware) metric when the
-    caller knows it; default is the quantity's metric.
-    """
-
-    if band.unit == "dimensionless" and (
-        operation or metric_operation(quantity)
-    ) in {MetricOperation.RELATIVE, MetricOperation.DEX}:
-        return True
-    # These two output dimensions are intentionally subtype-defined. The
-    # printed-width resolver matches this scale to identity.subtype; permit
-    # only its absolute path here and keep other units fail-closed.
-    if (
-        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and band.unit == "mass_percent"
-    ):
-        return operation is MetricOperation.ABSOLUTE
-    if (
-        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        and band.unit in {"mass_percent", "mole_percent"}
-    ):
-        return operation is MetricOperation.ABSOLUTE
-    quantity_dim = unit_dimension(QUANTITY_UNITS[quantity])
-    band_dim = unit_dimension(band.unit)
-    return quantity_dim is not None and quantity_dim == band_dim
-
-
 def pooled_log_pressure_sd(
     replicate_log_pressures: Sequence[Sequence[Decimal | int | float]],
 ) -> Decimal | None:
@@ -5931,38 +5802,6 @@ def _decision_band_kind(
         "printed_1sigma", "printed_2sigma", "printed_range",
         "printed_unstated", "derived_scatter",
     } else "other"
-
-
-def decision_band_for(
-    quantity: Quantity | None,
-    source_relation: SourceRelation,
-    *,
-    printed_band: DecisionBand | None = None,
-    printed_refusal: Mapping[str, object] | None = None,
-    derived_band: DecisionBand | None = None,
-    operation: MetricOperation | None = None,
-) -> DecisionBand | None:
-    """Choose a printed or derived band, then apply its quantity and unit gates.
-
-    ``source_relation`` labels lineage only. A KEMS pressure envelope covers
-    admitted measured partial-pressure rows whose cell uncertainty is unparseable;
-    other printed-uncertainty refusals block derived-band fallthrough.
-    """
-    del source_relation
-    band = printed_band if printed_band is not None else derived_band
-    if band is None:
-        return None
-    kems_pressure_band = band.rule.startswith(
-        "KEMS p_partial measured uncertainty:"
-    )
-    if kems_pressure_band:
-        if quantity is not Quantity.P_PARTIAL:
-            return None
-    elif printed_refusal is not None:
-        return None
-    if not band_dimension_matches(quantity, band, operation=operation):
-        return None
-    return band
 
 
 _UNCERTAINTY_NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
@@ -7081,78 +6920,6 @@ def update_decision_band_ratchet(context: ScoreContext) -> int:
     )
     os.replace(temporary, path)
     return len(current)
-
-
-def populate_numeric(
-    *,
-    quantity: Quantity,
-    candidate: Decimal,
-    reference: Decimal,
-    source_relation: SourceRelation,
-    metric_uncertainty: Uncertainty | None = None,
-    rail: Rail | None = None,
-    method: MethodToken | None = None,
-    observations: Mapping[str, Observation] | None = None,
-    experiments: Mapping[str, Experiment] | None = None,
-    printed_band: DecisionBand | None = None,
-    printed_refusal: Mapping[str, object] | None = None,
-    derived_band: DecisionBand | None = None,
-    operation_override: MetricOperation | None = None,
-    band_operation: MetricOperation | None = None,
-) -> tuple[ResidualNumeric | None, RefusalReason | None, dict[str, object]]:
-    """``band_operation`` checks a row's OWN printed band against the row's
-    identity-aware metric. It is None for every borrowed/derived band, which
-    keeps the quantity-default dimension check (no envelope transfer).
-    """
-    operation = operation_override or metric_operation(quantity)
-    if operation is None:
-        return None, RefusalReason.METRIC_DOMAIN, {"quantity": quantity.value}
-    unit = QUANTITY_UNITS[quantity]
-    if operation in {MetricOperation.RELATIVE, MetricOperation.DEX}:
-        unit = "dimensionless"
-    value = compute_metric(operation, candidate, reference)
-    if value is None:
-        return None, RefusalReason.METRIC_DOMAIN, {
-            "operation": operation.value,
-            "candidate": str(candidate),
-            "reference": str(reference),
-        }
-    band = decision_band_for(
-        quantity,
-        source_relation,
-        printed_band=printed_band,
-        printed_refusal=printed_refusal,
-        derived_band=derived_band,
-        operation=band_operation,
-    )
-    # Dimension guard. decision_band_for normally filters mismatched bands;
-    # keep this check for callers that replace it in a focused test.
-    if band is not None and not band_dimension_matches(
-        quantity, band, operation=band_operation
-    ):
-        return None, RefusalReason.DECISION_RULE_MISSING, {
-            "reason": f"band_dimension_mismatch:{quantity.value}",
-            "quantity": quantity.value,
-            "quantity_unit": QUANTITY_UNITS[quantity],
-            "band_unit": band.unit,
-            "operation": operation.value,
-        }
-    numeric = ResidualNumeric(
-        operation=operation,
-        unit=unit,
-        value=value,
-        decision_band=band,
-        metric_uncertainty=metric_uncertainty,
-    )
-    return numeric, None, {}
-
-
-def match_status(numeric: ResidualNumeric) -> ResidualStatus:
-    if numeric.decision_band is None:
-        return ResidualStatus.NO_BAND
-    if abs(numeric.value) <= numeric.decision_band.value:
-        return ResidualStatus.MATCH
-    return ResidualStatus.MISMATCH
 
 
 def qualification_battery_notice(
@@ -8625,7 +8392,13 @@ def _fe_redox_pressure(
         and pressure_pa.is_value
         and pressure_pa.value is not None
     ):
-        pressure_bar = float(pressure_pa.value) / PA_PER_BAR
+        pressure_amount = nominal_pressure_pa(pressure_pa)
+        if pressure_amount is None:
+            return _FeRedoxRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                {"reason": "invalid_input", "input": "total_pressure_Pa"},
+            )
+        pressure_bar = float(pressure_amount) / PA_PER_BAR
     elif observation.source_id == "borisov-2018-compilation":
         # The cited compilation is explicitly a 1-atm dataset.
         pressure_bar = 1.01325
@@ -9424,8 +9197,8 @@ def total_pressure_bar_for_score(
 
     state = identity.total_pressure_Pa
     if state is not None and state.is_value and state.value is not None:
-        pa = state.value if isinstance(state.value, Decimal) else as_decimal(state.value)
-        if not pa.is_finite() or pa < 0:
+        pa = nominal_pressure_pa(state)
+        if pa is None or not pa.is_finite() or pa < 0:
             return 0.0, None, "total_pressure_invalid"
         return float(pa) / PA_PER_BAR, None, None
     detail = "observation does not carry total_pressure_Pa"
@@ -10605,23 +10378,14 @@ def _printed_total_pressure_bar(
     identity: Identity, observation: Observation
 ) -> Decimal | None:
     state = identity.total_pressure_Pa
-    raw: object = None
     if state is not None and state.is_value and state.value is not None:
-        raw = state.value
+        pa = nominal_pressure_pa(state)
     else:
         located = (observation.point_conditions or {}).get("total_pressure_Pa")
         if located is None or located.inference is not None or not located.state.is_value:
             return None
-        raw = located.state.value
-        if isinstance(raw, Value):
-            raw = raw.point
-    if raw is None:
-        return None
-    try:
-        pa = as_decimal(raw)
-    except (TypeError, ValueError, ArithmeticError):
-        return None
-    if not pa.is_finite() or pa <= 0:
+        pa = nominal_pressure_pa(located)
+    if pa is None or not pa.is_finite() or pa <= 0:
         return None
     return pa / PA_PER_BAR_DEC
 
@@ -12366,7 +12130,7 @@ def _wall_areal_rate_from_existing_flux(
 
     missing: list[str] = []
     temperature = _identity_decimal(identity.temperature_K)
-    pressure = _identity_decimal(identity.total_pressure_Pa)
+    pressure = nominal_pressure_pa(identity.total_pressure_Pa)
     wall_temperature = _printed_wall_temperature_K(identity)
     carrier = _printed_sweep_carrier(identity)
     if temperature is None:
@@ -15848,6 +15612,7 @@ def _hashimoto_residue_prediction(
                 primary.primary_inventory_mol,
                 formula,
                 definition,
+                concentration_basis=definition_record.get("concentration_basis"),
             )
             band = None
         else:
@@ -16103,6 +15868,7 @@ def _knudsen_residue_prediction(
                 result.get("final_inventory_mol") or {},
                 reference.identity.species.formula,
                 definition,
+                concentration_basis=definition_record.get("concentration_basis"),
                 final_bulk_mass_adjustment_kg=float(
                     result.get("final_bulk_mass_adjustment_kg") or 0.0
                 ),
@@ -16314,6 +16080,7 @@ def _sossi_residue_prediction(
                 provenance.get("integrated_inventory_mol") or {},
                 formula,
                 definition,
+                concentration_basis=definition_record.get("concentration_basis"),
                 final_oxygen_exchange_mol=float(final_buffer_exchange),
             )
             band = None
@@ -16830,6 +16597,30 @@ def _compile_residual_with_lineage(
         if reference.value.approximate and quantity is not None
         else ()
     )
+    # The pressure band is not the measured observable. An exact residue
+    # wt% keeps APPROXIMATE_VALUE off and still shows this notice.
+    pressure_method = (
+        experiment.method.value
+        if experiment is not None and experiment.method.is_value
+        else None
+    )
+    approximate_pressure_notice = (
+        _approximate_pressure_notice(
+            identity,
+            quantity,
+            origin=reference.observation_id,
+            engine=engine,
+            method=pressure_method,
+            length_m=_condition_decimal(reference, "pipe_diameter_m"),
+        )
+        if isinstance(identity, Identity)
+        else None
+    )
+    approximate_pressure_notices = (
+        ()
+        if approximate_pressure_notice is None
+        else (approximate_pressure_notice,)
+    )
     # The regime sentence is true only where the apparatus gates run.
     # Model-derived rows skip those gates and must not claim the check.
     apparatus_in_scope = evidence_class.is_value and (
@@ -16850,6 +16641,7 @@ def _compile_residual_with_lineage(
         flagged_notices,
         evidence_class_notices,
         approximate_value_notices,
+        approximate_pressure_notices,
         geometry_interval_notices,
         _quench_notices(reference),
     )
@@ -19256,13 +19048,6 @@ def is_store_stamp_payload(payload: object) -> bool:
     return isinstance(payload, Mapping) and payload.get("kind") == STORE_STAMP_KIND
 
 
-def store_stamp_has_known_revision(stamp: Mapping[str, object] | None) -> bool:
-    if not isinstance(stamp, Mapping):
-        return False
-    revision = stamp.get("revision")
-    return bool(revision) and str(revision) not in {"", "unknown"}
-
-
 def load_residuals_stamp(path: Path) -> dict[str, object] | None:
     if not path.is_file():
         return None
@@ -19302,28 +19087,6 @@ def emit_store_stamp_mismatch_warning(
     if warning:
         warnings.warn(warning, UserWarning, stacklevel=2)
     return warning
-
-
-def format_store_stamp_report_lines(
-    stamp: Mapping[str, object] | None,
-    *,
-    mismatch_warning: str | None = None,
-) -> list[str]:
-    if not store_stamp_has_known_revision(stamp):
-        lines = [UNKNOWN_STORE_PROVENANCE_LINE]
-    else:
-        assert stamp is not None
-        lines = [
-            (
-                f"This report measured store `{stamp['revision']}`: "
-                f"{stamp['rows_in']} rows in, {stamp['observations']} observations, "
-                f"{stamp['works']} works, {stamp['experiments']} experiments, "
-                f"queue {stamp['queue']}, {stamp['hard_issues']} hard issues."
-            ),
-        ]
-    if mismatch_warning:
-        lines.extend(["", f"Warning: {mismatch_warning}"])
-    return lines
 
 
 def write_residuals_jsonl(
@@ -20225,63 +19988,16 @@ def _e15_precheck_rows(
     return results
 
 
-def _e15_number(value: Decimal | None, *, places: int = 3, signed: bool = False) -> str:
-    if value is None:
-        return "—"
-    rendered = f"{value:.{places}f}"
-    return f"+{rendered}" if signed and value >= 0 else rendered
-
-
 def _e15_report_lines(
     points: Iterable[_E15ResidualPoint],
     observations: Mapping[str, Observation],
 ) -> list[str]:
-    shape_rows = _e15_level_shape_rows(points)
-    precheck_rows = _e15_precheck_rows(observations)
-    if not shape_rows and not precheck_rows:
-        return []
-    lines = [
-        "",
-        "## E15 level, shape, and activity pre-check",
-        "",
-        "Each group uses numeric single-liquid residuals. Flags label rows and",
-        "contested rows are a separate population; the OLS slope is diagnostic only.",
-        "",
-        "| population | source | table | series | T (K) | engine | flags | line | level basis | level (dex) | shape RMS (dex) | OLS slope (dex per unit x) | axis | n |",
-        "|---|---|---|---|---:|---|---|---|---|---:|---:|---:|---|---:|",
-    ]
-    for row in shape_rows:
-        lines.append(
-            f"| {row['population']} | {row['source']} | {row['table']} | "
-            f"{row['series']} | {row['temperature_K']} | {row['engine']} | "
-            f"{', '.join(row['flags']) or '—'} | "
-            f"{row['statistic']} | {row['level_basis'] or '—'} | "
-            f"{_e15_number(row['level_dex'])} | "
-            f"{_e15_number(row['shape_rms_dex'])} | "
-            f"{_e15_number(row['slope_dex_per_x'], places=2, signed=True)} | "
-            f"{row['x_axis']} | {row['n']} |"
-        )
-    if precheck_rows:
-        lines.extend([
-            "",
-            "Activity self-consistency uses log10(a_printed/a_abs); pressures are",
-            "dimensionless p/1 bar and K° comes from the bound OpenIMCC JANAF data.",
-            "",
-            "| source | table | T (K) | activity series | method | reaction | log10 ratio mean ± sd (dex) | axis | n |",
-            "|---|---|---:|---|---|---|---:|---|---:|",
-        ])
-        for row in precheck_rows:
-            result = str(row["result"])
-            if result == "computed":
-                mean = _e15_number(row.get("mean_dex"))
-                sd = _e15_number(row.get("sd_dex"))
-                result = f"{mean} ± {sd}"
-            lines.append(
-                f"| {row['source']} | {row['table']} | {row['temperature_K']} | "
-                f"{row['activity_series']} | {row['method']} | {row['reaction']} | "
-                f"{result} | {row['x_axis']} | {row['n']} |"
-            )
-    return lines
+    """Format E15 rows. Level and pre-check numbers stay in this module."""
+
+    return _e15_markdown_lines(
+        _e15_level_shape_rows(points),
+        _e15_precheck_rows(observations),
+    )
 
 
 def _headline_metric_row(
@@ -22876,75 +22592,6 @@ def all_numeric_payload_records(
     return owner.records()
 
 
-def _all_numeric_markdown_lines(
-    records: Sequence[Mapping[str, object]],
-    *,
-    regenerated: bool = True,
-) -> list[str]:
-    """The A section for both Markdown writers; every grid row is printed."""
-
-    lines = [
-        "## All-numeric tier",
-        "",
-        "Co-equal descriptive headline (A) over every priced residual, certified and "
-        "flagged. Every rail × engine cell is printed, n = 0 included. Dex statistics "
-        "use DEX residuals only; every other metric stays in its own quantity / "
-        "operation / unit stratum below and is never labelled dex. n certified is the "
-        "measured (B) membership decision, consumed rather than recomputed. Does not "
-        "change the measured/certified table.",
-        "",
-    ]
-    if not regenerated:
-        lines.append("Not regenerated.")
-        return lines
-    lines.extend(
-        [
-            "| rail | engine | n | n certified | n flagged | n dex | median dex | "
-            "IQR dex | flag classes | sources |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---|---|",
-        ]
-    )
-    strata_lines: list[str] = []
-    for row in records:
-        flags = row.get("flag_class_counts") or {}
-        assert isinstance(flags, Mapping)
-        flag_s = ", ".join(f"{k}={v}" for k, v in flags.items()) if flags else "—"
-        sources = row.get("sources") or []
-        assert isinstance(sources, Sequence)
-        source_s = (
-            ", ".join(
-                f"{s.get('source_id')}(n={s.get('n_numeric')},"
-                f"cert={s.get('n_certified')},flag={s.get('n_flagged')})"
-                for s in sources
-                if isinstance(s, Mapping)
-            )
-            or "—"
-        )
-        lines.append(
-            f"| {row['rail']} | {row['engine']} | {row['n']} | {row['n_certified']} | "
-            f"{row['n_flagged']} | {row['n_dex']} | {row.get('median_dex') or '—'} | "
-            f"{row.get('iqr_dex') or '—'} | {flag_s} | {source_s} |"
-        )
-        for stratum in row.get("metric_strata") or ():
-            assert isinstance(stratum, Mapping)
-            strata_lines.append(
-                f"| {row['rail']} | {row['engine']} | {stratum['quantity']} | "
-                f"{stratum['label']} | {stratum['n']} | {stratum.get('median') or '—'} | "
-                f"{stratum.get('iqr') or '—'} |"
-            )
-    lines.extend(
-        [
-            "",
-            "### All-numeric metric strata",
-            "",
-            "| rail | engine | quantity | metric | n | median | IQR |",
-            "|---|---|---|---|---:|---:|---:|",
-            *(strata_lines or ["| (none) | — | — | — | 0 | — | — |"]),
-        ]
-    )
-    return lines
-
-
 HEADLINE_SUMMARY_KIND = "battery_headline_summary"
 
 
@@ -23243,13 +22890,6 @@ def candidate_rail_census(
     return rails, off
 
 
-def _census_count_line(row: Mapping[str, object], label: str) -> str:
-    return (
-        f"| {label} | {row['candidates']} | {row['admitted']} | "
-        f"{row['pending']} | {row['points']} |"
-    )
-
-
 class _ResidualRowsPayloadView:
     def __init__(self, residuals: Sequence[Residual], context: ScoreContext) -> None:
         self.residuals = residuals
@@ -23356,219 +22996,10 @@ def render_score_report(
     report = _append_quench_pair_diagnostics(
         report, paired_quench_diagnostics(context)
     )
-    return _append_element_retention_diagnostics(
-        report, residuals, context.observations
+    return format_element_retention_diagnostics(
+        report,
+        element_retention_report_data(residuals, context.observations),
     )
-
-
-def _append_quench_pair_diagnostics(
-    report: str, diagnostics: Sequence[Mapping[str, object]]
-) -> str:
-    if not diagnostics:
-        return report
-    lines = [
-        "## Paired in-situ / quenched valence diagnostics",
-        "",
-        "Δlog10 is the dimensionless glass-to-melt ratio difference in dex.",
-        "",
-        "| experiment | in-situ observation | glass observation | in-situ ratio | glass ratio | quench_state | Δlog10 (dex) |",
-        "|---|---|---|---:|---:|---|---:|",
-    ]
-    for row in diagnostics:
-        lines.append(
-            f"| {row['experiment_id']} | {row['in_situ_observation']} | "
-            f"{row['glass_observation']} | {row['in_situ_ratio']} | "
-            f"{row['glass_ratio']} | {row['quench_state']} | "
-            f"{row['delta_log10']} |"
-        )
-    section = "\n".join(lines)
-    return f"{report.rstrip()}\n\n{section}\n"
-
-
-def _append_element_retention_diagnostics(
-    report: str,
-    rows: Iterable[Residual | Mapping[str, object]],
-    observations: Mapping[str, Observation],
-) -> str:
-    cells: list[tuple[str, str, str, str, str, str, Decimal | None]] = []
-    loss_bins: dict[str, set[str]] = {
-        "negative (FM > 1)": set(),
-        "0–1%": set(),
-        ">1–10%": set(),
-        ">10–50%": set(),
-        ">50%": set(),
-    }
-    for row in rows:
-        if isinstance(row, Residual):
-            reference_id = row.reference
-            status = row.status.value
-            numeric = None if row.numeric is None else row.numeric.value
-            engine = (
-                row.candidate_request.engine.value
-                if row.candidate_request is not None
-                else "—"
-            )
-        else:
-            reference_id = str(row.get("reference") or "")
-            status = str(row.get("status") or "unknown")
-            numeric_payload = row.get("numeric")
-            raw_numeric = (
-                numeric_payload.get("value")
-                if isinstance(numeric_payload, Mapping)
-                else None
-            )
-            try:
-                numeric = None if raw_numeric is None else Decimal(str(raw_numeric))
-            except (ArithmeticError, TypeError, ValueError):
-                numeric = None
-            request = row.get("candidate_request")
-            engine = (
-                str(request.get("engine") or "—")
-                if isinstance(request, Mapping)
-                else "—"
-            )
-        observation = observations.get(reference_id)
-        if (
-            observation is None
-            or not isinstance(observation.identity, Identity)
-            or quantity_token(observation.identity)
-            is not Quantity.ELEMENT_RETENTION_RATIO
-        ):
-            continue
-        fm = observation.value.point if observation.value.kind is ValueKind.POINT else None
-        loss = None if fm is None else Decimal(1) - fm
-        loss_bin = "—"
-        if fm is not None and fm > 0:
-            if loss is not None and loss < 0:
-                loss_bin = "negative (FM > 1)"
-            elif loss is not None and loss <= Decimal("0.01"):
-                loss_bin = "0–1%"
-            elif loss is not None and loss <= Decimal("0.10"):
-                loss_bin = ">1–10%"
-            elif loss is not None and loss <= Decimal("0.50"):
-                loss_bin = ">10–50%"
-            else:
-                loss_bin = ">50%"
-            loss_bins[loss_bin].add(observation.observation_id)
-        uncertainty = observation.uncertainty
-        raw_uncertainty = uncertainty.verbatim
-        if raw_uncertainty is None and uncertainty.value is not None:
-            raw_uncertainty = f"{uncertainty.value} {uncertainty.basis or ''}".strip()
-        if raw_uncertainty is None:
-            uncertainty_text = "not printed"
-        elif isinstance(raw_uncertainty, Mapping):
-            uncertainty_text = json.dumps(
-                raw_uncertainty, sort_keys=True, ensure_ascii=False
-            )
-        else:
-            uncertainty_text = str(raw_uncertainty)
-        cells.append(
-            (
-                observation.observation_id,
-                engine,
-                status,
-                "—" if fm is None else str(fm),
-                "—" if loss is None else str(loss),
-                uncertainty_text,
-                numeric,
-            )
-        )
-    if not cells:
-        return report
-
-    def markdown(value: str) -> str:
-        return value.replace("|", "\\|").replace("\n", " ")
-
-    lines = [
-        "## Element retention diagnostics",
-        "",
-        "Observed loss is 1 − FM; printed uncertainty is shown without rescaling.",
-        "Loss bins are reporting diagnostics and do not affect residual weights.",
-        "",
-        "| observation | engine | status | FM observed | observed loss | printed uncertainty | residual (dex) |",
-        "|---|---|---|---:|---:|---|---:|",
-    ]
-    for observation_id, engine, status, fm, loss, uncertainty, numeric in cells:
-        lines.append(
-            f"| {markdown(observation_id)} | {markdown(engine)} | {markdown(status)} | "
-            f"{fm} | {loss} | {markdown(uncertainty)} | "
-            f"{'—' if numeric is None else numeric} |"
-        )
-    lines.extend(
-        [
-            "",
-            "### Observed loss bins",
-            "",
-            "| observed loss | n rows |",
-            "|---|---:|",
-        ]
-    )
-    lines.extend(
-        f"| {label} | {len(loss_bins[label])} |" for label in loss_bins
-    )
-    section = "\n".join(lines)
-    return f"{report.rstrip()}\n\n{section}\n"
-
-
-def _append_nasa9_fit_comparison_stratum(
-    report: str, comparisons: Iterable[Mapping[str, object]]
-) -> str:
-    counts: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0, 0])
-    refusals: dict[tuple[str, str, str, str], int] = defaultdict(int)
-    for row in comparisons:
-        channel = row.get("comparison_channel")
-        if not isinstance(channel, str) or not channel.startswith("nasa9_fit:"):
-            continue
-        engine = channel.partition(":")[2]
-        quantity = str(row.get("quantity") or "unknown")
-        numeric = row.get("value") is not None and row.get("status") != "refused"
-        group = counts[(engine, quantity)]
-        group[0] += 1
-        group[1 if numeric else 2] += 1
-        if numeric:
-            continue
-        reason = str(row.get("refusal_reason") or "untyped")
-        detail = row.get("refusal_detail")
-        detail_text = json.dumps(
-            dict(detail) if isinstance(detail, Mapping) else {},
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        refusals[(engine, quantity, reason, detail_text)] += 1
-
-    if not counts:
-        return report
-
-    lines = [
-        "## NASA-9 fit comparison stratum",
-        "",
-        "Fit comparisons are separate from printed-cell comparisons and measured-tier counts.",
-        "",
-        "| engine | quantity | n comparisons | n numeric | n refused |",
-        "|---|---|---:|---:|---:|",
-    ]
-    for (engine, quantity), (total, numeric, refused) in sorted(counts.items()):
-        lines.append(
-            f"| {engine} | {quantity} | {total} | {numeric} | {refused} |"
-        )
-    lines.extend(["", "### Typed refusal diagnostics", ""])
-    if not refusals:
-        lines.append("None.")
-    else:
-        lines.extend(
-            [
-                "| engine | quantity | reason | count | detail |",
-                "|---|---|---|---:|---|",
-            ]
-        )
-        for (engine, quantity, reason, detail), count in sorted(refusals.items()):
-            safe_detail = detail.replace("|", "\\|").replace("`", "\\`")
-            lines.append(
-                f"| {engine} | {quantity} | `{reason}` | {count} | `{safe_detail}` |"
-            )
-    section = "\n".join(lines)
-    return f"{report.rstrip()}\n\n{section}\n"
 
 
 def _render_score_report_from_payloads_legacy(
@@ -23587,176 +23018,12 @@ def _render_score_report_from_payloads_legacy(
         rows, context=context, engines=engines
     )
     has_residuals = aggregate.count > 0
-    lines: list[str] = [
-        "# Battery score report (schema v2.1)",
-        "",
-        "Generated only. Pins are an independent baseline and are never",
-        "re-centred from these residuals. Refusals are diagnostics, never hidden.",
-        "The measured tier keeps numeric rows visible; its headline reports",
-        "n, n inside band, RMS dex, signed and absolute median dex, band width,",
-        "RMS/band, and score_eligible separately. The compilation tier is beside",
-        "it and is never added to it. Match rate is banded rows only.",
-        "",
-        f"Hostname: `{context.hostname}`.",
-    ]
-    if studio_hostname:
-        lines.append(f"Studio hostname: `{studio_hostname}`.")
     stamp = derive_store_stamp(REPO_ROOT) if store_stamp is None else store_stamp
-    lines.extend(["", *format_store_stamp_report_lines(stamp)])
-    lines.extend(["", f"Engines: {', '.join(e.value for e in engines)}."])
-    if not has_residuals:
-        lines.extend(
-            [
-                "",
-                "No engine residuals were regenerated for this store revision.",
-                "Match rate is blank. score_eligible is 0.",
-                "The live candidate census is the published candidate count.",
-            ]
-        )
     rail_census, unassigned_census = candidate_rail_census(context)
-    lines.extend(
-        [
-            "",
-            "## Live candidate census",
-            "",
-            "Comparison candidates are measured rows admitted or pending.",
-            "Admitted is split from pending. Counts are observations, not",
-            "residuals, so they are not multiplied by the engine set.",
-            "A vapour candidate is only `p_sat`, `p_partial`, or `p_reference`.",
-            "",
-            "| rail | candidates | admitted | pending | points |",
-            "|---|---:|---:|---:|---:|",
-        ]
-    )
-    for row in rail_census:
-        lines.append(_census_count_line(row, str(row["rail"])))
-    lines.extend(
-        [
-            "",
-            "### No headline rail",
-            "",
-            "These quantities are not vapour candidates and not SiO_evolution",
-            "candidates. The reason is the refusal, not a borrowed rail.",
-            "",
-            "| reason | candidates | admitted | pending | points |",
-            "|---|---:|---:|---:|---:|",
-        ]
-    )
-    if not unassigned_census:
-        lines.append("| (none) | 0 | 0 | 0 | 0 |")
-    else:
-        for row in unassigned_census:
-            lines.append(_census_count_line(row, f"`{row['reason']}`"))
     report_engine_names = set(aggregate.report_engine_names)
     if not report_engine_names:
         report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
     report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
-    # A has its own complete engine × rail grid (the run's engines plus any
-    # engine with an A row); B keeps its measured-only membership below.
-    lines.extend(
-        [
-            "",
-            *_all_numeric_markdown_lines(
-                aggregate.all_numeric.records(engine.value for engine in engines),
-                regenerated=has_residuals,
-            ),
-        ]
-    )
-    lines.extend(
-        [
-            "",
-            "## Measured tier",
-            "",
-            "Numeric measured rows stay visible. score_eligible and inside-band "
-            "counts are reported separately. Compilation rows are not in this table.",
-            "",
-        ]
-    )
-    if not has_residuals:
-        lines.append("Not regenerated. Match rate is blank. score_eligible is 0.")
-    else:
-        lines.extend(
-            [
-                "| rail | engine | population / source relation | n candidates | "
-                "n refused | n scored | n score eligible | "
-                "n inside band | RMS dex | median dex | median abs dex | band width dex | "
-                "RMS/band | n no band | match rate |",
-                "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
-            ]
-        )
-        for row in aggregate.headline_records(engines=report_engines):
-            if row.get("tier") != "measured":
-                continue
-            rate = row["match_rate"]
-            rate_s = "—" if rate is None else f"{rate:.3f}"
-            lines.append(
-                f"| {row['rail']} | {row['engine']} | "
-                f"{row.get('population', row.get('source_relation', '—'))} | "
-                f"{row['n_candidates']} | "
-                f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
-                f"{row['n_inside_band']} | {row['rms_dex'] or '—'} | "
-                f"{row['median_dex'] or '—'} | {row['median_abs_dex'] or '—'} | "
-                f"{row['band_width_dex'] or '—'} | {row['rms_over_band'] or '—'} | "
-                f"{row['n_no_band']} | {rate_s} |"
-            )
-    lines.extend(_e15_report_lines(aggregate.e15_points, context.observations))
-    lines.extend(
-        [
-            "",
-            "## Flagged strata",
-            "",
-            "These numeric diagnostics carry an explicit source or apparatus flag. "
-            "Flagged rows do not derive measurement bands or enter unflagged headlines. "
-            "Cell-material-inferred residuals are still judged against the band; other "
-            "flag kinds retain their existing scoring rules. A row carrying both flags "
-            "appears in both strata.",
-            "",
-            "| stratum | rail | engine | n | median dex | RMS dex |",
-            "|---|---|---|---:|---:|---:|",
-        ]
-    )
-    flagged_rows = aggregate.flagged_records()
-    if not flagged_rows:
-        lines.append("| (none) | — | — | 0 | — | — |")
-    else:
-        for row in flagged_rows:
-            lines.append(
-                f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
-                f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
-            )
-    lines.extend(["", *aggregate.condition_hull_lines()])
-    lines.extend(
-        [
-            "",
-            *aggregate.compilation_lines(),
-        ]
-    )
-    lines.extend(["", "## Refusal census", ""])
-    if not has_residuals:
-        lines.append(
-            "Engine refusals were not regenerated with this census. "
-            "Rows with no headline rail are counted above and are not hidden."
-        )
-    else:
-        lines.extend(
-            [
-                "Measured tier only. Compilation refusals are in the compilation table.",
-                "",
-                "| reason | n |",
-                "|---|---:|",
-            ]
-        )
-        census = dict(sorted(aggregate.refusal_counts.items()))
-        if not census:
-            lines.append("| (none) | 0 |")
-        else:
-            for reason, n in census.items():
-                lines.append(f"| `{reason}` | {n} |")
-    admit = {
-        "residuals_with_admission_exclusion": aggregate.admission_with,
-        "residuals_admission_alone": aggregate.admission_alone,
-        "unique_obs_admission_alone": aggregate.admission_alone_unique,
-    }
     pending = 0
     admitted = 0
     for observation in comparison_candidates(context):
@@ -23764,97 +23031,35 @@ def _render_score_report_from_payloads_legacy(
             pending += 1
         elif observation.admission.status is AdmissionStatus.ADMITTED:
             admitted += 1
-    lines.extend(
-        [
-            "",
-            "## Admission",
-            "",
-            "score_eligible requires canonical admission admitted. Pending rows",
-            "stay in the comparison set as diagnostics (flagged and priced when",
-            "numeric, never the empirical headline). The admission rule is unchanged.",
-            "",
-            "| count | n |",
-            "|---|---:|",
-            f"| comparison candidates pending | {pending} |",
-            f"| comparison candidates admitted | {admitted} |",
-            f"| residuals with admission_admitted exclusion | {admit['residuals_with_admission_exclusion']} |",
-            f"| residuals that die on admission alone | {admit['residuals_admission_alone']} |",
-            f"| unique observations that die on admission alone | {admit['unique_obs_admission_alone']} |",
-        ]
+    return render_legacy_score_report_markdown(
+        hostname=context.hostname,
+        studio_hostname=studio_hostname,
+        stamp=stamp,
+        engines=engines,
+        has_residuals=has_residuals,
+        rail_census=rail_census,
+        unassigned_census=unassigned_census,
+        all_numeric_records=aggregate.all_numeric.records(
+            engine.value for engine in engines
+        ),
+        headline_rows=aggregate.headline_records(engines=report_engines),
+        e15_lines=_e15_report_lines(aggregate.e15_points, context.observations),
+        flagged_rows=aggregate.flagged_records(),
+        condition_lines=aggregate.condition_hull_lines(),
+        compilation_lines=aggregate.compilation_lines(),
+        refusal_counts=aggregate.refusal_counts,
+        pending=pending,
+        admitted=admitted,
+        admission_with=aggregate.admission_with,
+        admission_alone=aggregate.admission_alone,
+        admission_alone_unique=aggregate.admission_alone_unique,
+        notice_counts=aggregate.notice_counts,
+        diagnostic_count=aggregate.diagnostic_count,
+        pin_failures=pin_failures,
+        status_diff=status_diff,
+        unmapped_legacy_keys=unmapped_legacy_keys,
+        circularity_warning=CIRCULARITY_WARNING,
     )
-    lines.extend(
-        [
-            "",
-            "## Notice backlog (certification projects)",
-            "",
-            "| notice kind | n |",
-            "|---|---:|",
-        ]
-    )
-    backlog = dict(sorted(aggregate.notice_counts.items()))
-    if not backlog:
-        lines.append("| (none) | 0 |")
-    else:
-        for kind, n in backlog.items():
-            lines.append(f"| `{kind}` | {n} |")
-    n_diag = aggregate.diagnostic_count
-    lines.extend(
-        [
-            "",
-            "## Internal-consistency diagnostics",
-            "",
-            "species_rail_differential_ledger and gibbs_battery_residual_ledger",
-            "are internal-consistency instruments, not scoring ledgers. They do",
-            "not enter either headline tier. Compilation rows are scored in the",
-            "compilation tier above, still COMPILATION_ASSESSED, and never added",
-            "to the measured tier. " + CIRCULARITY_WARNING,
-            "",
-            f"Diagnostic residuals in this file: {n_diag}.",
-            "",
-            "## Pin failures",
-            "",
-        ]
-    )
-    if not has_residuals and not pin_failures:
-        lines.append(
-            "Pins were not compared; no residuals ledger was regenerated for this store revision."
-        )
-    elif not pin_failures:
-        lines.append("None.")
-    else:
-        lines.append(
-            f"{len(pin_failures)} pin failures (coverage or outside pin_band). A live residual outside its pin_band is a failure, never a re-centre."
-        )
-        lines.extend(["", "| key | reason | live | centre | pin_band |", "|---|---|---:|---:|---:|"])
-        for failure in list(pin_failures)[:50]:
-            lines.append(
-                f"| `{failure.get('key')}` | {failure.get('reason')} | {failure.get('live')} | "
-                f"{failure.get('centre')} | {failure.get('pin_band')} |"
-            )
-        if len(pin_failures) > 50:
-            lines.append(f"| … | {len(pin_failures) - 50} more | | | |")
-    lines.extend(["", "## status_diff vs old scorers", ""])
-    if not has_residuals and not status_diff:
-        lines.append(
-            "status_diff was not run; no residuals ledger was regenerated for this store revision."
-        )
-    elif not status_diff:
-        lines.append("No mapped outcome changes.")
-    else:
-        lines.extend(["| old key | old | new | axis |", "|---|---|---|---|"])
-        for row in status_diff:
-            lines.append(
-                f"| `{row.get('old_key')}` | {row.get('old')} | {row.get('new')} | "
-                f"{row.get('axis')} |"
-            )
-    if unmapped_legacy_keys:
-        lines.extend(
-            ["", f"Unmapped legacy keys: {len(unmapped_legacy_keys)}. Old ledgers retained."]
-        )
-    elif has_residuals:
-        lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
-    lines.append("")
-    return "\n".join(lines)
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -23920,9 +23125,16 @@ class _ConditionHull:
             self.n_t += 1
             self.t = self._widen(self.t, temperature)
         pressure = identity.total_pressure_Pa
-        if pressure is not None and pressure.is_value and pressure.value is not None:
+        pressure_amount = (
+            None if pressure is None else nominal_pressure_pa(pressure)
+        )
+        if pressure_amount is not None:
             self.n_p += 1
-            self.p = self._widen(self.p, as_decimal(pressure.value))
+            if isinstance(pressure.value, ApproxPressure):
+                self.p = self._widen(self.p, pressure.value.low)
+                self.p = self._widen(self.p, pressure.value.high)
+            else:
+                self.p = self._widen(self.p, pressure_amount)
         state = identity.composition
         if state is None or not state.is_value or state.value is None:
             state, _notice = _printed_point_composition(observation)
@@ -23959,46 +23171,6 @@ class _ConditionHull:
             self._span(self.p, self.n_p),
             f"{composition} ({self.n_composition})",
         )
-
-
-def _condition_hull_lines(
-    hulls: Mapping[tuple[str, str, str], _ConditionHull],
-) -> list[str]:
-    """Markdown table of the per (tier, rail, engine) condition hulls."""
-
-    lines = [
-        "## Condition hull per rail × engine",
-        "",
-        "Min–max of the stored (T, P, composition) of the numeric rows behind "
-        "each per rail × engine statistic: the measured and compilation "
-        "headlines (the n scored column) and each flagged stratum (its n). "
-        "T and total pressure are the reference row's own (a compilation "
-        "cell's printed T); composition is the row's stated composition per "
-        "amount basis. Nothing is filled in: bracketed counts are rows "
-        "carrying a value. Total P is the stored total pressure only; a "
-        "table's standard-state pressure (standard_pressure_Pa) is not a "
-        "total pressure and is not shown. A compilation row pools every "
-        "compilation table on that rail × engine, so its T span is not one "
-        "table's window. Six significant figures. Presentation only; no "
-        "residual or statistic reads this table.",
-        "",
-        "| tier / stratum | rail | engine | n | T K (n) | total P Pa (n) | composition (n) |",
-        "|---|---|---|---:|---|---|---|",
-    ]
-    order = {"measured": 0, "compilation": 1}
-    rows = sorted(
-        ((key, hull) for key, hull in hulls.items() if hull.n),
-        key=lambda item: (order.get(item[0][0], 2), item[0]),
-    )
-    if not rows:
-        lines.append("| (none) | — | — | 0 | — | — | — |")
-    for (tier, rail, engine), hull in rows:
-        t_cell, p_cell, composition_cell = hull.cells()
-        lines.append(
-            f"| {tier} | {rail} | {engine} | {hull.n} | {t_cell} | {p_cell} | "
-            f"{composition_cell} |"
-        )
-    return lines
 
 
 def _empty_headline_payload_stats() -> dict[str, object]:
@@ -25490,76 +24662,17 @@ def render_score_report_from_payloads(
         compilation_lines = compilation_tier_lines_from_payloads(
             unflagged_rows, observations, origins
         )
-    lines: list[str] = [
-        "# Battery score report (schema v2.1)",
-        "",
-        "Generated only. Pins are an independent baseline and are never",
-        "re-centred from these residuals. Refusals are diagnostics, never hidden.",
-        "Headline accuracy per rail reports numeric n, inside-band n, RMS dex,",
-        "median dex, band width, and RMS/band. Measured and compilation tiers",
-        "are separate and never summed; match rate is secondary.",
-        "",
-        f"Hostname: `{hostname}`.",
-    ]
-    if studio_hostname:
-        lines.append(f"Studio hostname: `{studio_hostname}`.")
-    lines.extend(
-        ["", *format_store_stamp_report_lines(store_stamp, mismatch_warning=mismatch_warning)]
-    )
-    lines.extend(
-        [
-            "",
-            f"Engines: {', '.join(e.value for e in engines)}.",
-            "",
-            *_all_numeric_markdown_lines(
-                all_numeric_payload_records(
-                    rows, engines=engines, observations=observations, origins=origins
-                )
-            ),
-        ]
-    )
-    lines.extend(
-        [
-            "",
-            "## Measured tier" if observations is not None else "## Per rail × engine headline",
-            "",
-            *(
-                [
-                    "Numeric measured rows stay visible. score_eligible and inside-band "
-                    "counts are reported separately.",
-                    "",
-                ]
-                if observations is not None
-                else []
-            ),
-            "| rail | engine | population / source relation | n candidates | "
-            "n refused | n scored | n score eligible | "
-            "n inside band | RMS dex | median dex | median abs dex | band width dex | "
-            "RMS/band | n no band | match rate |",
-            "|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
-        ]
+    all_numeric_records = all_numeric_payload_records(
+        rows, engines=engines, observations=observations, origins=origins
     )
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = (
         None if observations is None else {}
     )
-    for row in headline_payloads(
-        measured_rows, engines, hulls=hulls, observations=observations
-    ):
-        rate = row["match_rate"]
-        rate_s = "—" if rate is None else f"{rate:.3f}"
-        rms = row["rms_dex"] or "—"
-        med = row["median_dex"] or "—"
-        med_abs = row["median_abs_dex"] or "—"
-        band = row["band_width_dex"] or "—"
-        ratio = row["rms_over_band"] or "—"
-        lines.append(
-            f"| {row['rail']} | {row['engine']} | "
-            f"{row.get('population', row.get('source_relation', '—'))} | "
-            f"{row['n_candidates']} | "
-            f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
-            f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
-            f"{row['n_no_band']} | {rate_s} |"
+    measured_headline_rows = list(
+        headline_payloads(
+            measured_rows, engines, hulls=hulls, observations=observations
         )
+    )
     if observations is not None:
         e15_points = (
             point
@@ -25568,32 +24681,15 @@ def render_score_report_from_payloads(
                 point := _e15_residual_point(
                     row, observations.get(str(row.get("reference") or ""))
                 )
-            ) is not None
+            )
+            is not None
         )
-        lines.extend(_e15_report_lines(e15_points, observations))
-    lines.extend(
-        [
-            "",
-            "## Flagged strata",
-            "",
-            "Flagged numeric diagnostics are excluded from the measured headline, "
-            "bands, and band statistics.",
-            "",
-            "| stratum | rail | engine | n | median dex | RMS dex |",
-            "|---|---|---|---:|---:|---:|",
-        ]
-    )
+        e15_lines: Sequence[str] = _e15_report_lines(e15_points, observations)
+    else:
+        e15_lines = ()
     flagged_rows = flagged_stratum_payloads(
         rows, engines, hulls=hulls, observations=observations
     )
-    if not flagged_rows:
-        lines.append("| (none) | — | — | 0 | — | — |")
-    else:
-        for row in flagged_rows:
-            lines.append(
-                f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
-                f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
-            )
     if hulls is not None:
         # Compilation headline hull (t-1110 ROR P1). Only the hull is kept: the
         # compilation statistics are printed by compilation_lines below.
@@ -25604,62 +24700,13 @@ def render_score_report_from_payloads(
             hulls=hulls,
             observations=observations,
         )
-        lines.extend(["", *_condition_hull_lines(hulls)])
-    if compilation_lines:
-        lines.extend(["", *compilation_lines])
-    lines.extend(
-        [
-            "",
-            "## Refusal census",
-            "",
-            *(
-                ["Measured tier only. Compilation refusals are in the compilation table.", ""]
-                if observations is not None
-                else []
-            ),
-            "| reason | n |",
-            "|---|---:|",
-        ]
-    )
-    census = refusal_census_payloads(measured_rows)
-    if not census:
-        lines.append("| (none) | 0 |")
+        condition_lines: Sequence[str] | None = _condition_hull_lines(hulls)
     else:
-        for reason, n in census.items():
-            lines.append(f"| `{reason}` | {n} |")
+        condition_lines = None
+    refusal_counts = refusal_census_payloads(measured_rows)
     admit = admission_census_payloads(rows)
-    lines.extend(
-        [
-            "",
-            "## Admission",
-            "",
-            "score_eligible requires canonical admission admitted. Pending rows",
-            "stay in the comparison set as diagnostics (flagged and priced when",
-            "numeric, never the empirical headline). The admission rule is unchanged.",
-            "",
-            "| count | n |",
-            "|---|---:|",
-            f"| residuals with admission_admitted exclusion | {admit['residuals_with_admission_exclusion']} |",
-            f"| residuals that die on admission alone | {admit['residuals_admission_alone']} |",
-            f"| unique observations that die on admission alone | {admit['unique_obs_admission_alone']} |",
-        ]
-    )
-    lines.extend(
-        [
-            "",
-            "## Notice backlog (certification projects)",
-            "",
-            "| notice kind | n |",
-            "|---|---:|",
-        ]
-    )
-    backlog = notice_backlog_payloads(rows)
-    if not backlog:
-        lines.append("| (none) | 0 |")
-    else:
-        for kind, n in backlog.items():
-            lines.append(f"| `{kind}` | {n} |")
-    n_diag = sum(
+    notice_counts = notice_backlog_payloads(rows)
+    diagnostic_count = sum(
         1
         for r in rows
         if "reference_measured_evidence" in (r.get("exclusions") or ())
@@ -25669,68 +24716,37 @@ def render_score_report_from_payloads(
             == "diagnostic_population"
         )
     )
-    lines.extend(
-        [
-            "",
-            "## Internal-consistency / compilation diagnostics",
-            "",
-            "species_rail_differential_ledger and gibbs_battery_residual_ledger",
-            "are internal-consistency instruments, not scoring ledgers. Compilation",
-            "observations are engine reference inputs. Neither population enters",
-            "the empirical headline. " + CIRCULARITY_WARNING,
-            "",
-            f"Diagnostic residuals in this file: {n_diag}.",
-            "",
-            "## Pin failures",
-            "",
-        ]
+    report = render_payload_score_report_markdown(
+        hostname=hostname,
+        studio_hostname=studio_hostname,
+        store_stamp=store_stamp,
+        mismatch_warning=mismatch_warning,
+        engines=engines,
+        observations_present=observations is not None,
+        all_numeric_records=all_numeric_records,
+        measured_headline_rows=measured_headline_rows,
+        e15_lines=e15_lines,
+        flagged_rows=flagged_rows,
+        condition_lines=condition_lines,
+        compilation_lines=compilation_lines,
+        refusal_counts=refusal_counts,
+        admit=admit,
+        notice_counts=notice_counts,
+        diagnostic_count=diagnostic_count,
+        pin_failures=pin_failures,
+        status_diff=status_diff,
+        unmapped_legacy_keys=unmapped_legacy_keys,
+        circularity_warning=CIRCULARITY_WARNING,
     )
-    if not pin_failures:
-        lines.append("None.")
-    else:
-        lines.append(
-            f"{len(pin_failures)} pin failures (coverage or outside pin_band). "
-            "A live residual outside its pin_band is a failure, never a re-centre."
-        )
-        lines.append("")
-        lines.append("| key | reason | live | centre | pin_band |")
-        lines.append("|---|---|---:|---:|---:|")
-        for failure in list(pin_failures)[:50]:
-            lines.append(
-                f"| `{failure.get('key')}` | {failure.get('reason')} | {failure.get('live')} | "
-                f"{failure.get('centre')} | {failure.get('pin_band')} |"
-            )
-        if len(pin_failures) > 50:
-            lines.append(f"| … | {len(pin_failures) - 50} more | | | |")
-    lines.extend(["", "## status_diff vs old scorers", ""])
-    if not status_diff:
-        lines.append("No mapped outcome changes.")
-    else:
-        lines.append("| old key | old | new | axis |")
-        lines.append("|---|---|---|---|")
-        for row in status_diff[:200]:
-            lines.append(
-                f"| `{row.get('old_key')}` | {row.get('old')} | {row.get('new')} | "
-                f"{row.get('axis')} |"
-            )
-    if unmapped_legacy_keys:
-        lines.extend(
-            [
-                "",
-                f"Unmapped legacy keys: {len(unmapped_legacy_keys)}. Old ledgers retained.",
-            ]
-        )
-    else:
-        lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
-    lines.append("")
-    report = "\n".join(lines)
     if observations is None:
         return report
     pair_context = ScoreContext({}, {}, observations, origins or {})
     report = _append_quench_pair_diagnostics(
         report, paired_quench_diagnostics(pair_context)
     )
-    return _append_element_retention_diagnostics(report, rows, observations)
+    return format_element_retention_diagnostics(
+        report, element_retention_report_data(rows, observations)
+    )
 
 
 def _legacy_bucket(row: Mapping[str, object]) -> str:

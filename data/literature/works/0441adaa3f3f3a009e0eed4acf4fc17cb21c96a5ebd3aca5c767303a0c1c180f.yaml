@@ -43,7 +43,8 @@ experiments:
           point: '0.2962'
           approximate: false
       locator:
-        pdf_page_index: 1
+        page: 1
+        pdf_page_index: 0
         figure: '1'
         section: Introduction
         source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
@@ -60,7 +61,8 @@ experiments:
               tag: value
               value: '296.2'
             locator:
-              pdf_page_index: 1
+              page: 1
+              pdf_page_index: 0
               figure: '1'
               section: Introduction
               source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
@@ -69,7 +71,8 @@ experiments:
               tag: value
               value: '1000'
             locator:
-              pdf_page_index: 1
+              page: 1
+              pdf_page_index: 0
               figure: '1'
               section: Introduction
               source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
@@ -80,7 +83,8 @@ experiments:
         tag: value
         value: lunar soil
       locator:
-        pdf_page_index: 1
+        page: 1
+        pdf_page_index: 0
         figure: '1'
         section: Introduction
         source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
@@ -107,7 +111,8 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 0441adaa3f3f3a009e0eed4acf4fc17cb21c96a5ebd3aca5c767303a0c1c180f
   locator:
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     figure: '2'
     section: Chemistry
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
@@ -116,7 +121,8 @@ context:
   type: figure_summary
   locator:
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 2
+    page: 2
+    pdf_page_index: 1
     figure: '5'
   units: as_published
   values:
@@ -134,7 +140,8 @@ context:
   type: source_context
   locator:
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 3
+    page: 3
+    pdf_page_index: 2
     figure: '6'
   units: as_published
   values:
@@ -156,7 +163,8 @@ context:
   type: sample_characterization
   locator:
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     section: Petrography
   units: as_published
   values:
@@ -178,7 +186,8 @@ context:
   type: figure_summary
   locator:
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     figure: '2'
   units: as_published
   values:
@@ -195,7 +204,8 @@ context:
   type: figure_summary
   locator:
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 2
+    page: 2
+    pdf_page_index: 1
     figure: '4'
   units: normalized_to_chondrite_as_plotted
   values:
@@ -213,7 +223,8 @@ context:
   type: sample_characterization
   locator:
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 1
+    page: 1
+    pdf_page_index: 0
     section: Introduction
     figure: '1'
   units: as_published
@@ -237,7 +248,8 @@ context:
   type: figure_summary
   locator:
     source_path: corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf
-    pdf_page_index: 3
+    page: 3
+    pdf_page_index: 2
     figure: '7'
   units: as_plotted
   values:
