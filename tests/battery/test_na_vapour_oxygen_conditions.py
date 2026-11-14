@@ -10,10 +10,11 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import AmountBasis, Phase, Quantity
-from simulator.battery.fo2_ladder import resolve_row_fo2
+from simulator.battery.enums import AmountBasis, NoticeKind, Phase, Quantity
+from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 from simulator.battery.identity import Identity
-from simulator.battery.records import Composition, Species, State, Value
+from simulator.battery.records import Composition, Notice, Species, State, Value
+from simulator.physical_constants import PA_PER_BAR
 from tests.battery import factories as F
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -127,7 +128,9 @@ def test_rys_na_row_without_oxygen_selects_effusion_closure() -> None:
     )
 
     assert selected is not None
-    assert selected.route == "effusion_oxygen_balance"
+    assert selected.route == (
+        "effusion_oxygen_balance; rys_pO2_provenance_unknown"
+    )
     assert selected.tier == 3
     assert selected.physics_rung == 3
     assert selected.closure is True
@@ -169,7 +172,24 @@ def test_rys_na_without_independent_oxygen_closes_independently_of_target(
         pressure_Pa="0.01475",
         composition=composition,
     )
-    row = replace(row, provenance={"oxygen_condition_provenance": status})
+    if status == "calculated_from_pNa":
+        row = replace(
+            row,
+            identity=replace(
+                row.identity, fO2_Pa=State.of(Decimal("0.00002"))
+            ),
+            notices=(
+                Notice(
+                    kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+                    affected_quantities=(Quantity.P_PARTIAL,),
+                    reason=(
+                        "fO2_Pa is a DERIVED condition from observed pNa via "
+                        "source congruent vaporization"
+                    ),
+                    origin="rys_extract",
+                ),
+            ),
+        )
 
     selected = resolve_row_fo2(
         experiment,
@@ -190,6 +210,15 @@ def test_rys_na_without_independent_oxygen_closes_independently_of_target(
     assert changed.closure is True
     assert changed.po2_bar is None
     assert changed.route == selected.route
+    tier_notice = fo2_tier_notice(Quantity.P_PARTIAL, selected)
+    if status == "calculated_from_pNa":
+        assert selected.route.endswith("rys_pO2_calculated_from_pNa_not_independent")
+        assert tier_notice.kind is NoticeKind.INPUT_OMITTED
+        assert "source-calculated pO2 from observed pNa" in tier_notice.reason
+    else:
+        assert selected.route.endswith("rys_pO2_provenance_unknown")
+        assert tier_notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        assert "row-level pO2 provenance unknown" in tier_notice.reason
 
 
 def test_rys_measured_and_source_linked_oxygen_survive_target_mutation() -> None:
@@ -303,3 +332,108 @@ def test_rys_table10a_child_restores_nakalsi_1_row_8() -> None:
     )
     assert child_ref is not None
     assert migrated.count(child_ref.group(1)) >= 2
+
+
+def test_rys_na_extract_keeps_unclassified_row_oxygen_unknown() -> None:
+    migrated_path = (
+        ROOT
+        / "data/literature/extracts-v2/rys-2007-alkali-oxide-thermodynamics.yaml"
+    )
+    migrated = yaml.safe_load(migrated_path.read_text(encoding="utf-8"))
+    rows = [
+        row
+        for row in migrated["observations"]
+        if row["identity"]["species"]["formula"] == "Na"
+        and row["identity"]["quantity"]["value"] == "p_partial"
+    ]
+    assert rows
+    assert all(row["identity"]["fO2_Pa"]["tag"] == "unknown" for row in rows)
+    assert all(
+        row["identity"]["fO2_Pa"]["reason"] == "no fO2_Pa mapped from source"
+        for row in rows
+    )
+
+
+def test_every_rys_na_source_row_has_target_independent_oxygen_input() -> None:
+    from simulator.battery.score import load_score_context
+    from simulator.battery.source_oxygen import (
+        SourceOxygenCondition,
+        resolve_source_oxygen,
+    )
+
+    context = load_score_context(sources=(RYS_SOURCE,))
+    source_rows = tuple(context.observations.values())
+    targets = tuple(
+        row for row in source_rows
+        if row.source_id == RYS_SOURCE
+        and row.identity.species.formula == "Na"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.P_PARTIAL
+    )
+    assert targets
+
+    measured_link_count = 0
+    closure_count = 0
+    for row in targets:
+        experiment = context.experiments[row.experiment_id]
+        bench = context.benches[experiment.bench_id]
+        selected_source = resolve_source_oxygen(row, source_rows, bench)
+        source_oxygen_bar = (
+            float(selected_source.observation.value.point) / PA_PER_BAR
+            if isinstance(selected_source, SourceOxygenCondition)
+            else None
+        )
+        measured_link_count += isinstance(selected_source, SourceOxygenCondition)
+        resolved = resolve_row_fo2(
+            experiment,
+            bench,
+            row,
+            quantity=Quantity.P_PARTIAL,
+            source_oxygen_bar=source_oxygen_bar,
+        )
+        changed = resolve_row_fo2(
+            experiment,
+            bench,
+            replace(
+                row,
+                value=Value.point_of(row.value.point * Decimal("1.7")),
+            ),
+            quantity=Quantity.P_PARTIAL,
+            source_oxygen_bar=source_oxygen_bar,
+        )
+        if isinstance(selected_source, SourceOxygenCondition):
+            assert resolved is not None
+            assert resolved.route == "source_linked_oxygen_condition"
+            assert resolved.closure is False
+        else:
+            assert resolved is not None and resolved.closure
+            assert resolved.po2_bar is None
+            assert resolved.route.endswith("rys_pO2_provenance_unknown")
+            assert fo2_tier_notice(Quantity.P_PARTIAL, resolved).kind is (
+                NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            )
+            closure_count += 1
+        assert (
+            None if resolved is None else (
+                resolved.route,
+                resolved.tier,
+                resolved.physics_rung,
+                resolved.po2_bar,
+                resolved.closure,
+                resolved.cell_material,
+                None if resolved.closure else resolved.log10_fO2_bar,
+            )
+        ) == (
+            None if changed is None else (
+                changed.route,
+                changed.tier,
+                changed.physics_rung,
+                changed.po2_bar,
+                changed.closure,
+                changed.cell_material,
+                None if changed.closure else changed.log10_fO2_bar,
+            )
+        )
+    assert len(targets) == 330
+    assert measured_link_count == 25
+    assert closure_count == 305
