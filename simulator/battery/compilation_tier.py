@@ -197,6 +197,43 @@ def _engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
     return _ENGINE_THERMO_QUANTITIES.get(engine, frozenset())
 
 
+def _compilation_engines_for_pair(
+    engines: Sequence[Engine], quantity: Quantity, phase: Phase | None
+) -> tuple[Engine, ...]:
+    """Route compilation thermo cells to engines with a matching phase path."""
+
+    if quantity not in _THERMO_QUANTITIES:
+        return tuple(engines)
+    if phase is Phase.G:
+        phase_engines = {
+            Engine.VAPOROCK,
+            Engine.NASA_CEA_9,
+            Engine.INTERNAL_ANALYTICAL,
+        }
+    elif phase is Phase.CR:
+        phase_engines = {
+            Engine.THERMOENGINE,
+            Engine.MAGEMIN,
+            Engine.INTERNAL_ANALYTICAL,
+        }
+    elif phase is Phase.L:
+        phase_engines = {Engine.INTERNAL_ANALYTICAL}
+    elif phase is None:
+        return tuple(
+            engine
+            for engine in engines
+            if quantity in _engine_thermo_quantities(engine)
+        )
+    else:
+        return ()
+    return tuple(
+        engine
+        for engine in engines
+        if engine in phase_engines
+        and quantity in _engine_thermo_quantities(engine)
+    )
+
+
 @dataclass(frozen=True)
 class _Product:
     formula: str
@@ -4504,6 +4541,9 @@ def _nasa9_fit_comparisons_with_bound_lineage(
         table_id = str(record.get("source_record_id") or "")
         formula = str(record.get("formula") or "")
         phase = str(record.get("phase") or "")
+        phase_value = _REFERENCE_PHASE_TOKEN.get(
+            phase.strip().casefold().split(":", 1)[0]
+        )
         table_points = source_cells.get(table_id, {})
         h_anchor_points = [
             point
@@ -4633,7 +4673,9 @@ def _nasa9_fit_comparisons_with_bound_lineage(
                     identity=point.identity,
                     value=Value.point_of(as_decimal(fit_value)),
                 )
-                for engine in engines:
+                for engine in _compilation_engines_for_pair(
+                    engines, quantity, phase_value
+                ):
                     attempt = predict_thermo_attempt(
                         engine,
                         fit_reference,

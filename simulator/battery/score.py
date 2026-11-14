@@ -866,6 +866,20 @@ def _engine_lacks_quantity_capability(
     return quantity not in _engine_thermo_quantities(engine)
 
 
+def _compilation_pair_is_routed_away(
+    engine: Engine, quantity: Quantity
+) -> bool:
+    """Whether a compilation cell has a declared engine path elsewhere."""
+
+    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        return engine not in MELTS_ENGINES
+    if quantity is Quantity.P_PARTIAL:
+        return engine is Engine.MAGEMIN
+    if quantity is Quantity.FE3_FE2_RATIO:
+        return engine in {Engine.MAGEMIN, Engine.VAPOROCK}
+    return False
+
+
 def _engine_quantity_not_predicted_detail(
     engine: Engine,
     identity: Identity | None,
@@ -18409,7 +18423,9 @@ def _score_store_with_decisions(
                 flush=True,
             )
     from simulator.battery.compilation_tier import (
+        _THERMO_QUANTITIES,
         _compilation_series_point_count,
+        _compilation_engines_for_pair,
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
@@ -18530,6 +18546,12 @@ def _score_store_with_decisions(
                     derived_band = source_band
                     derived_band_reason = source_band_reason
                     experiment = context.experiments.get(point.experiment_id)
+                    compilation_phase = (
+                        phase_token(point.identity.species)
+                        if isinstance(point.identity, Identity)
+                        and point.identity.species is not None
+                        else None
+                    )
                     if (
                         derived_band is None
                         and quantity is Quantity.P_PARTIAL
@@ -18539,7 +18561,43 @@ def _score_store_with_decisions(
                     ):
                         derived_band = kems_partial_pressure_band
                         derived_band_reason = None
+                    compilation_source = (
+                        is_compilation_evidence(point)
+                        or is_compilation_source(point.source_id, point_origin)
+                    )
+                    if compilation_source and is_internal_consistency(point_origin):
+                        if _stream is not None:
+                            for engine in engine_set:
+                                _stream.add_compilation_route_skip(
+                                    engine, quantity, compilation_phase
+                                )
+                        continue
                     for engine in engine_set:
+                        if (
+                            compilation_source
+                            and isinstance(point.identity, Identity)
+                            and quantity in _THERMO_QUANTITIES
+                            and engine not in _compilation_engines_for_pair(
+                                engine_set,
+                                quantity,
+                                compilation_phase,
+                            )
+                        ):
+                            if _stream is not None:
+                                _stream.add_compilation_route_skip(
+                                    engine,
+                                    quantity,
+                                    compilation_phase,
+                                )
+                            continue
+                        if compilation_source and _compilation_pair_is_routed_away(
+                            engine, quantity
+                        ):
+                            if _stream is not None:
+                                _stream.add_compilation_route_skip(
+                                    engine, quantity, compilation_phase
+                                )
+                            continue
                         lineage_id = (
                             obs.observation_id
                             if point.observation_id != obs.observation_id
@@ -23446,6 +23504,19 @@ class _ResidualJsonlStream:
             )
         ]
 
+    def add_compilation_route_skip(
+        self, engine: Engine, quantity: Quantity | None, phase: Phase | None
+    ) -> None:
+        phase_name = "unknown" if phase is None else phase.value
+        quantity_name = "unknown" if quantity is None else quantity.value
+        self.static_refusal_counts[
+            (
+                engine.value,
+                Rail.THERMOCHEMISTRY.value,
+                f"unrouted_compilation:{quantity_name}:{phase_name}",
+            )
+        ] += 1
+
     def append(
         self,
         residual: Residual,
@@ -24521,7 +24592,30 @@ class _ScorePayloadAccumulator:
     def compilation_lines(self) -> list[str]:
         from simulator.battery.compilation_tier import _tier_markdown
 
-        return _tier_markdown((), accumulator=self.tier_accumulator)
+        lines = _tier_markdown((), accumulator=self.tier_accumulator)
+        routed_away = [
+            row
+            for row in self.static_refusals
+            if str(row.get("reason", "")).startswith("unrouted_compilation:")
+        ]
+        if routed_away:
+            lines.extend(
+                [
+                    "",
+                    "### Unrouted compilation engine pairs",
+                    "",
+                    "Each row summarizes compilation cells skipped before engine scoring.",
+                    "",
+                    "| engine | quantity | phase | skipped cells |",
+                    "|---|---|---|---:|",
+                ]
+            )
+            for row in routed_away:
+                _, quantity, phase = str(row["reason"]).split(":", 2)
+                lines.append(
+                    f"| {row['engine']} | {quantity} | {phase} | {row['count']} |"
+                )
+        return lines
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
         return headline_summary_payload(
