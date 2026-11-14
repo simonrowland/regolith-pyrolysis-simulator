@@ -30,7 +30,7 @@ from typing import Any
 from urllib.parse import quote
 
 ENGINE_CHEMISTRY_VERSION = {
-    "openimcc": 1,
+    "openimcc": 2,
     "internal-analytical": 1,
     "vaporock": 1,
     "magemin": 2,
@@ -49,6 +49,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # openimcc v1: 2026-11-08 OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 - initial cache version
+# openimcc v2: 2026-11-14 OpenIMCC 9c327c2; binary-pot oxygen balance and residue, Knudsen, mass-loss, and Hashimoto runtimes - consume AlSiO/Si2O2 and use corrected multi-parent oxygen metadata
 ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     "openimcc": {
         "identity": "commit:9c327c2991fcc07b902019d26a8fe7cd25deb075",
