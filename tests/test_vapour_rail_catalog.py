@@ -131,6 +131,95 @@ def _load_t609_proof():
     return module
 
 
+def test_t609_canonical_digest_ignores_constant_to_named_constant_refactor() -> None:
+    proof = _load_t609_proof()
+    literal_namespace = {"__name__": "value_fingerprint_fixture"}
+    named_namespace = {
+        "__name__": "value_fingerprint_fixture",
+        "PA_PER_BAR": 100000.0,
+    }
+    exec("def compiled():\n    return 100000.0\n", literal_namespace)
+    exec("def compiled():\n    return PA_PER_BAR\n", named_namespace)
+
+    literal = literal_namespace["compiled"]
+    named = named_namespace["compiled"]
+    assert literal() == 100000.0
+    assert named() == 100000.0
+    expected = {
+        "__function__": "value_fingerprint_fixture.compiled",
+        "defaults": None,
+        "kwdefaults": None,
+        "closure": [],
+    }
+    assert proof._canonical(literal) == expected
+    assert proof._canonical(named) == expected
+    assert proof._digest(proof._canonical(literal)) == (
+        "e8809373e00505672e7dd87c7495e6d15eeb153ef42a358d4e5b26718d3a5a39"
+    )
+    assert proof._digest(proof._canonical(named)) == (
+        "e8809373e00505672e7dd87c7495e6d15eeb153ef42a358d4e5b26718d3a5a39"
+    )
+
+
+def test_t609_canonical_detects_one_ulp_captured_change_and_proof_fails() -> None:
+    proof = _load_t609_proof()
+
+    def build(coefficient: float):
+        def compiled():
+            return coefficient
+
+        compiled.__module__ = "capture_fingerprint_fixture"
+        compiled.__qualname__ = "build.<locals>.compiled"
+        return compiled
+
+    baseline_callable = build(1.0)
+    changed_callable = build(math.nextafter(1.0, math.inf))
+    baseline = proof._canonical(baseline_callable)
+    changed = proof._canonical(changed_callable)
+    assert baseline["closure"] == [{"__float_hex__": "0x1.0000000000000p+0"}]
+    assert changed["closure"] == [{"__float_hex__": "0x1.0000000000001p+0"}]
+    assert proof._digest(baseline) == (
+        "47a54d7a149e74dc8f85790aa01ce7e2f3b5fca25b7424051ef1a6439c686c6a"
+    )
+    assert proof._digest(changed) == (
+        "fbd7556b392fe88e8aafe58265a656c4cf62d6b205f8ae1d1ce59ef70d77061d"
+    )
+    with pytest.raises(proof.ProofFailure, match="compiled dataclass for Al2 differs"):
+        proof._assert_equal("compiled dataclass for Al2", baseline, changed)
+
+
+def test_t609_canonical_detects_closure_and_default_value_changes() -> None:
+    proof = _load_t609_proof()
+
+    def build(captured: float, default: float):
+        def compiled(value: float = default):
+            return captured + value
+
+        compiled.__module__ = "default_fingerprint_fixture"
+        compiled.__qualname__ = "build.<locals>.compiled"
+        return compiled
+
+    baseline = build(4.0, 1.0)
+    changed_closure = build(math.nextafter(4.0, math.inf), 1.0)
+    changed_default = build(4.0, math.nextafter(1.0, math.inf))
+    expected = {
+        "__function__": "default_fingerprint_fixture.build.<locals>.compiled",
+        "defaults": {"__tuple__": [{"__float_hex__": "0x1.0000000000000p+0"}]},
+        "kwdefaults": None,
+        "closure": [{"__float_hex__": "0x1.0000000000000p+2"}],
+    }
+    assert proof._canonical(baseline) == expected
+    assert proof._digest(proof._canonical(baseline)) == (
+        "a0354b7e5187cb344faa1f3f056fc9ab26f727a820e2fd4c0b4509e2a44b3ade"
+    )
+    assert proof._digest(proof._canonical(changed_closure)) == (
+        "4564dbd0b02eaf55311af6ce240b6dafd7a7f1842a459ee044e2a8f4497a2380"
+    )
+    assert proof._digest(proof._canonical(changed_default)) == (
+        "b5d2c7d9e2b5c4e132f06ba04ab1d6ff1b259db85f2e42c81e0d965e15b5c74e"
+    )
+
+
 def _family_species_ids(text: str) -> set[str]:
     payload = yaml.safe_load(text)
     ids: set[str] = set()
@@ -461,6 +550,9 @@ def test_t622_cross_revision_additivity_evidence_is_reproducible() -> None:
     )
     evidence = yaml.safe_load(evidence_path.read_text(encoding="utf-8"))
     equivalence = evidence["preexisting_equivalence"]
+    assert equivalence["compiled_species_compared"] == 229
+    assert equivalence["evaluator_species_compared"] == 215
+    assert equivalence["evaluation_cases_compared"] == 2580
     assert (
         f"PASS: {equivalence['compiled_species_compared']} pre-existing species, "
         f"{equivalence['evaluation_cases_compared']} exact grid cases"

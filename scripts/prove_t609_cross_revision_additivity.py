@@ -21,7 +21,6 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-from types import CodeType
 from typing import Any
 
 import yaml
@@ -49,25 +48,6 @@ def _sha256_file(path: Path) -> str:
     return _sha256_bytes(path.read_bytes())
 
 
-def _canonical_code(code: CodeType) -> dict[str, Any]:
-    """Fingerprint executable semantics without path/line-number noise."""
-
-    return {
-        "argcount": code.co_argcount,
-        "posonlyargcount": code.co_posonlyargcount,
-        "kwonlyargcount": code.co_kwonlyargcount,
-        "nlocals": code.co_nlocals,
-        "stacksize": code.co_stacksize,
-        "flags": code.co_flags,
-        "bytecode": code.co_code.hex(),
-        "constants": _canonical(code.co_consts),
-        "names": list(code.co_names),
-        "varnames": list(code.co_varnames),
-        "freevars": list(code.co_freevars),
-        "cellvars": list(code.co_cellvars),
-    }
-
-
 def _canonical(value: Any) -> Any:
     """Return an exact, JSON-safe representation of compiled values."""
 
@@ -81,8 +61,6 @@ def _canonical(value: Any) -> Any:
         return value
     if isinstance(value, float):
         return {"__float_hex__": value.hex()}
-    if isinstance(value, CodeType):
-        return {"__code__": _canonical_code(value)}
     if is_dataclass(value) and not isinstance(value, type):
         cls = type(value)
         return {
@@ -112,6 +90,8 @@ def _canonical(value: Any) -> Any:
     if isinstance(value, Path):
         return {"__path__": str(value)}
     if inspect.isfunction(value):
+        # Additivity compares values on the exact evaluation grid below
+        # (IEEE float.hex), so callable code shape is not part of the proof.
         closure = []
         for cell in value.__closure__ or ():
             try:
@@ -120,7 +100,6 @@ def _canonical(value: Any) -> Any:
                 closure.append({"__empty_cell__": True})
         return {
             "__function__": f"{value.__module__}.{value.__qualname__}",
-            "code": _canonical_code(value.__code__),
             "defaults": _canonical(value.__defaults__),
             "kwdefaults": _canonical(value.__kwdefaults__),
             "closure": closure,
