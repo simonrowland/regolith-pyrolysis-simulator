@@ -475,6 +475,7 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         "alpha_source",
         "author_alpha_assumption",
         "alpha_by_channel",
+        "gas_channel_omissions",
         "runtime_catalog_omissions",
         "oxygen_model",
         "oxygen_boundary",
@@ -628,6 +629,17 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         ]
         for run_id in common_by_run
     )
+    for prediction in runtime_by_run.values():
+        missing_catalog = {
+            notice["channel"]: notice
+            for notice in prediction.provenance["runtime_catalog_omissions"]
+            if notice["reason"] == "runtime_catalog_channel_missing"
+        }
+        assert {"AlSiO", "Si2O2"} <= set(missing_catalog)
+        assert all(
+            notice["kind"] == "input_omitted"
+            for notice in missing_catalog.values()
+        )
     fe_runtime_alpha = next(
         record["alpha_value"]
         for record in runtime_by_run[next(iter(runtime_by_run))].provenance["alpha_by_channel"]
@@ -765,6 +777,16 @@ def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
                 experiments[0]["sample"]["printed_composition"]["state"]["value"]
             ),
         )
+        common_species = {channel.species for channel in setup.common_channels}
+        assert {"AlSiO", "Si2O2"} <= common_species
+        assert not {"AlSiO", "Si2O2"} & set(setup.catalog_matches)
+        mixed_channel = next(
+            channel for channel in setup.common_channels if channel.species == "AlSiO"
+        )
+        assert mixed_channel.parent_oxide_stoich == {
+            "Al2O3": 0.5,
+            "SiO2": 1.0,
+        }
         residue._hashimoto_integrate_geometry(
             setup.initial_inventory_mol,
             setup.common_channels,
