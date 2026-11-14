@@ -410,8 +410,11 @@ the CITED / ASSUMED / UNCERTIFIED trust tiers of the citation policy, and a spec
   citation. Sodium does not: Sossi et al. 2019 report a gamma-derived inference of `0.3–1.7` at 1400 °C,
   separately adopt `alpha_e = 1`, and state the physical bound `alpha_e <= 1`. The former corpus interval
   `[0.9,1.0]` is withdrawn. Runtime unity is therefore an explicit analytical upper bound with envelope
-  `[0,1]`, never a measurement or residual pin. Potassium uses Fedkin et al.'s KEMS intrinsic coefficient
-  `α = 0.13` (envelope 0.10–0.16); it does not inherit the sodium ceiling.
+  `[0,1]`, never a measurement or residual pin. Potassium uses Fedkin et al.'s conditional model fit
+  `α = 0.13 ± 0.02` at 1723 K in 10⁻⁵ bar air for Yu et al. (2003) composition 1
+  (GCA 70:213–214, §4.2, Fig. 4B). This is not a KEMS measurement or a universal intrinsic
+  coefficient. The supported point is `[1723,1723]` K with envelope `[0.11,0.15]`;
+  the acquisition flag names the gas/composition restriction. It does not inherit the sodium ceiling.
 - **Proxy coefficient.** Calcium and titanium use a perovskite (CaTiO₃) proxy; aluminium uses a broad
   conflicting-proxy envelope. These are labelled as proxies, not regolith-melt measurements.
 - **No grounded coefficient.** Chromium, manganese, and the chromium-oxide vapor have no grounded

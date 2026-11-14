@@ -913,9 +913,13 @@ families:
         tier: 2
         tag: hkl_ideal_upper_bound_status_bearing
         competing_sources:
-        - source: REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber
-          value: 0.13
-          regime: sealed equilibrium chamber; not representative of mbar-sweep pyrolysis
+        - source: REF-014 kems-005-fedkin-2006 Fedkin et al. 2006 GCA 70:206-223,
+            DOI 10.1016/j.gca.2005.08.014, section 4.2 pp.213-214 and Fig.4A;
+            model fit Na alpha_e=0.26 +/- 0.05 to Yu et al. 2003 composition 1
+          value: 0.26
+          regime: 1723 K only; 1e-5 bar low-pressure air; Yu et al. 2003 chondrule-analog
+            composition 1 (Fedkin Table 2; MnO ignored and olivine/orthopyroxene suppressed
+            in the model); not a KEMS measurement or a composition-independent intrinsic alpha
       alpha_domain_and_uncertainty:
         temperature_K:
         - 1700
@@ -1144,25 +1148,29 @@ families:
     vaporisation_coefficients:
       evaporation_alpha:
         value: 0.13
-        source: REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13;
-          replaces prior Na open-furnace analogy for series-resistance intrinsic-alpha model
+        source: REF-014 kems-005-fedkin-2006 Fedkin et al. 2006 GCA 70:206-223,
+          DOI 10.1016/j.gca.2005.08.014, section 4.2 pp.213-214 and Fig.4B;
+          conditional model fit K alpha_e=0.13 +/- 0.02 at 1723 K in 1e-5 bar
+          low-pressure air to Yu et al. 2003 chondrule-analog composition 1 (Fedkin
+          Table 2; MnO ignored and olivine/orthopyroxene suppressed in the model);
+          not a KEMS measurement or a composition-independent intrinsic alpha
         T_band_K:
-        - 1700
-        - 2273
+        - 1723
+        - 1723
         envelope:
-        - 0.1
-        - 0.16
+        - 0.11
+        - 0.15
         tier: 2
       alpha_domain_and_uncertainty:
         temperature_K:
-        - 1700
-        - 2273
+        - 1723
+        - 1723
         envelope:
-        - 0.1
-        - 0.16
+        - 0.11
+        - 0.15
       extrapolation_policy: conservative_slope_continuation
       out_of_range_status: out_of_range_conservative_continuation
-      acquisition_flag: vapour_pressure_out_of_range:K
+      acquisition_flag: vapour_pressure_out_of_range:K; alpha_fit_only_1723K_1e-5bar_air_Yu2003_composition1
     code_metadata:
       formula_id: K
       source_account: process.cleaned_melt
