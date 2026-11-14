@@ -20,6 +20,8 @@ from signature_double_guard import (
     signature_mismatch_for_signatures,
 )
 
+pytest_plugins = ("pytester",)
+
 
 _TESTS = Path(__file__).parent
 _ALLOWLIST = _TESTS / "data" / "signature_double_allowlist.txt"
@@ -101,6 +103,61 @@ def test_signature_comparison_is_cached_by_signature_pair():
     assert first == second
     assert after.misses == before.misses + 1
     assert after.hits == before.hits + 1
+
+
+def test_collect_mode_nested_session_records_same_target_twice(
+    pytester, monkeypatch, tmp_path
+):
+    collect_file = tmp_path / "collected-allowlist"
+    repo_root = Path(__file__).resolve().parents[1]
+    tests_dir = repo_root / "tests"
+    monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_COLLECT", "1")
+    monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_COLLECT_FILE", str(collect_file))
+    monkeypatch.setenv("SIGNATURE_DOUBLE_GUARD_FAIL_UNLISTED", "0")
+    pytester.makeconftest(
+        "import importlib.util\n"
+        "import sys\n"
+        f"tests_dir = {str(tests_dir)!r}\n"
+        "sys.path.insert(0, tests_dir)\n"
+        "spec = importlib.util.spec_from_file_location(\n"
+        "    '_signature_double_guard_plugin',\n"
+        "    f'{tests_dir}/conftest.py',\n"
+        ")\n"
+        "plugin = importlib.util.module_from_spec(spec)\n"
+        "sys.modules[spec.name] = plugin\n"
+        "spec.loader.exec_module(plugin)\n"
+        "pytest_plugins = (spec.name,)\n"
+    )
+
+    pytester.makepyfile(
+        target="def operation(left, right=0):\n    return left + right\n",
+        test_first=(
+            "import target\n"
+            "def test_first(monkeypatch):\n"
+            "    monkeypatch.setattr(target, 'operation', lambda left: left)\n"
+        ),
+        test_second=(
+            "import target\n"
+            "def test_second(monkeypatch):\n"
+            "    monkeypatch.setattr(target, 'operation', lambda left: left)\n"
+        ),
+    )
+
+    result = pytester.runpytest_subprocess(
+        "-q", "-n", "2", "-p", "no:cacheprovider", "test_first.py", "test_second.py",
+        timeout=30,
+    )
+
+    assert result.ret == pytest.ExitCode.OK
+    collected_files = list(tmp_path.glob("collected-allowlist.*"))
+    entries = [
+        entry
+        for path in collected_files
+        for entry in path.read_text(encoding="utf-8").splitlines()
+    ]
+    assert len(entries) == 2
+    assert any("test_first.py::test_first" in entry for entry in entries)
+    assert any("test_second.py::test_second" in entry for entry in entries)
 
 
 def test_instance_patch_uses_the_bound_production_signature(monkeypatch):

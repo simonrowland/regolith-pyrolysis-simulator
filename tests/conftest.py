@@ -94,14 +94,11 @@ def pytest_sessionfinish(session, exitstatus):
         with collected_path.open("a", encoding="utf-8") as collected_file:
             for key, reason in sorted(_COLLECTED_SIGNATURE_MISMATCHES.items()):
                 collected_file.write(f"{key} # {reason}\n")
-    if reporter is not None:
+    xdist_worker = hasattr(session.config, "workerinput")
+    if reporter is not None and not (_COLLECT_SIGNATURES and xdist_worker):
         reporter.write_line(
             "signature double guard: "
             f"{_SIGNATURE_LOOKUP_SKIPS} unavailable signature lookup(s) skipped"
         )
-        if _COLLECT_SIGNATURES:
-            reporter.write_line(
-                "signature double guard collected "
-                f"{len(_COLLECTED_SIGNATURE_MISMATCHES)} entries to "
-                f"{_COLLECT_FILE}.{os.getpid()}"
-            )
+        # Collection results are published through per-worker files. Avoid
+        # terminal writes while xdist is shutting down its worker channel.
