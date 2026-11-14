@@ -1,4 +1,8 @@
-"""Empirical battery schema v2.1 — records, identity, validity, scorer."""
+"""Empirical battery schema v2.1 — records, identity, validity, scorer.
+
+ReferenceStateConvention is re-exported as a closed enum, including TEMKIN;
+this package does not assign numerical conversions to its members.
+"""
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,

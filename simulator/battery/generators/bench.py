@@ -255,6 +255,9 @@ def _reference_matches(
     ``Na2SiO3`` with that token is not an IMCC parent oxide.
     """
 
+    if state.convention is ReferenceStateConvention.TEMKIN:
+        return False, reported.reported
+
     structural = (
         state.convention is reported.convention
         and phase_token(state.endmember) is reported.phase

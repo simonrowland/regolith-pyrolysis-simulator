@@ -393,13 +393,18 @@ class NoticeKind(StrEnum):
 
 
 class ReferenceStateConvention(StrEnum):
-    """Reference-frame conventions used by activity and formation records."""
+    """Reference frames used by activity and formation records.
+
+    ``TEMKIN`` means ideal mixing of cations and anions on separate
+    sublattices; the reported activity is that of the Fe(2+) ion fraction.
+    """
 
     RAOULTIAN_PURE_ENDMEMBER = "raoultian_pure_endmember"
     HENRIAN_SOLID = "henrian_solid"
     HENRIAN_LIQUID = "henrian_liquid"
     HYPOTHETICAL_1WT_PCT = "hypothetical_1wt_pct"
     CONDENSED_ELEMENT_REFERENCE = "condensed_element_reference"
+    TEMKIN = "temkin"
 
 
 class Phase(StrEnum):

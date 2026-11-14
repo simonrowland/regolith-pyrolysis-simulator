@@ -16,6 +16,13 @@ Mode-labeled residual keys include that token so records from distinct
 conditions remain separate. Residuals without a resolved or requested fO2
 mode omit the field.
 
+Activity `reference_state.convention` may be `temkin` for ideal mixing of
+cations and anions on separate sublattices, where the activity is that of the
+Fe(2+) ion fraction. Distin's recorded Temkin activity is converted for
+comparison by the iron-saturation reference owner using the Darken & Gurry
+factor; its N₀ payload describes the saturation composition and comparison
+band and is not an additional activity divisor.
+
 The `composition_binary_complement` notice records a binary composition
 derived as the complement of a printed caption mole percent. Such residuals
 remain visible in the `binary-complement-composition` flagged stratum.

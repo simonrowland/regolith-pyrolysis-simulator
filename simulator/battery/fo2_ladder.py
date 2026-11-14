@@ -427,6 +427,7 @@ def _metal_saturation_fo2(
     if (
         reference_state is None
         or not reference_state.is_value
+        or reference_state.value.convention is ReferenceStateConvention.TEMKIN
         or reference_state.value.convention
         is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
         or reference_state.value.endmember.formula.strip().casefold() != "feo"
