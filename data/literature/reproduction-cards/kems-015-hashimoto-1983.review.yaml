@@ -1559,7 +1559,7 @@ runs:
           temperature_K: *id078
           composition: *id052
           fO2_Pa: &id140 {tag: not_applicable, reason: oxygen_unbuffered_vacuum}
-          total_pressure_Pa: &id141 {tag: value, value: '0.01333223684210526315789473684'}
+          total_pressure_Pa: &id141 {tag: value, value: {point: '0.01333223684210526315789473684', low: '0.0042160234725863294186156301097243258271899980944756', high: '0.042160234725863294186156301097243258271899980944756', band_basis: half_decade_order_of_magnitude, kind: approximate_pressure}}
           exposure: &id142
             tag: value
             value:
