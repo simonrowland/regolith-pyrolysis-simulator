@@ -994,7 +994,6 @@ class PyrolysisRun:
     feedstock_id: str
     campaign: str = "C0"
     hours: float = 24
-    dt_hr: float = 1.0
     engines: dict[str, str] = field(default_factory=dict)
     additives_kg: dict[str, float] = field(default_factory=dict)
     mass_kg: float = 1000.0
@@ -1029,6 +1028,7 @@ class PyrolysisRun:
     reduced_real_cache: Mapping[str, Any] | None = None
     imcc_activity_shadow: bool = False
     high_t_melt_activity: str | None = None
+    dt_hr: float = 1.0
     strict_result_contract: bool = field(init=False, default=True)
     _target_inventory_by_hour: list[dict[str, Any]] = field(
         default_factory=list, init=False, repr=False
@@ -2424,7 +2424,7 @@ def _wall_deposit_cumulative_kg_at_snapshot(
     found_snapshot = False
     found_index = -1
     for index, item in enumerate(snapshots):
-        if int(getattr(item, "hour", -1)) > int(snapshot.hour):
+        if getattr(item, "hour", -1) > snapshot.hour:
             break
         for key, kg in item.wall_deposit_by_segment_species_delta.items():
             cumulative[key] = cumulative.get(key, 0.0) + float(kg)
@@ -2798,7 +2798,7 @@ def build_per_hour_summary(
     )
 
     summary = {
-        "hour": int(snapshot.hour),
+        "hour": snapshot.hour,
         "campaign": snapshot.campaign.name,
         "T_C": float(snapshot.temperature_C),
         "P_total_bar": p_total_bar,
@@ -2892,7 +2892,7 @@ def build_per_hour_summary(
     if c2a_staged_gas:
         summary["c2a_staged_gas"] = _json_safe(c2a_staged_gas)
     enforcement = getattr(sim.campaign_mgr, "last_pO2_enforcement", None)
-    if isinstance(enforcement, Mapping) and int(enforcement.get("hour", -1)) == int(snapshot.hour):
+    if isinstance(enforcement, Mapping) and enforcement.get("hour", -1) == snapshot.hour:
         summary["pO2_enforcement"] = _json_safe(dict(enforcement))
     # VR-11: thread condensation refusals + vapour-batch channel summary
     # into the per-hour UI/runner surface (artifact schema may change;

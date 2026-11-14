@@ -2347,7 +2347,7 @@ class CampaignManager:
             total_pressure,
         )
         row = pO2_enforcement_row(
-            hour=int(melt.hour) + (0 if sample_time_h <= 0.0 else 1),
+            hour=melt.hour + (sample_time_h - melt.campaign_hour),
             schedule=lab_schedule,
             schedule_time_h=float(sample_time_h),
             setpoint_mbar=pO2_setpoint,

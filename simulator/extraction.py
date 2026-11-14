@@ -2042,8 +2042,8 @@ class ExtractionMixin:
             if invalid_run_input:
                 refusal_record = {
                     'intent': ChemistryIntent.ELECTROLYSIS_STEP.name,
-                    'hour': int(self.melt.hour),
-                    'campaign_hour': int(self.melt.campaign_hour),
+                    'hour': self.melt.hour,
+                    'campaign_hour': self.melt.campaign_hour,
                     'campaign': self.melt.campaign.name,
                     'temperature_C': float(self.melt.temperature_C),
                     'voltage_V': float(voltage_V),
@@ -2871,8 +2871,8 @@ class ExtractionMixin:
                 refusal_record = {
                     'reaction_family': REACTION_FAMILY_C3_K,
                     'reagent': 'K',
-                    'hour': int(self.melt.hour),
-                    'campaign_hour': int(self.melt.campaign_hour),
+                    'hour': self.melt.hour,
+                    'campaign_hour': self.melt.campaign_hour,
                     'campaign': self.melt.campaign.name,
                     'temperature_C': float(self.melt.temperature_C),
                     'diagnostic': diagnostic,
@@ -2993,8 +2993,8 @@ class ExtractionMixin:
                     'reaction_family': REACTION_FAMILY_C3_NA,
                     'reagent': 'Na',
                     'target_stage': target_stage,
-                    'hour': int(self.melt.hour),
-                    'campaign_hour': int(self.melt.campaign_hour),
+                    'hour': self.melt.hour,
+                    'campaign_hour': self.melt.campaign_hour,
                     'campaign': self.melt.campaign.name,
                     'temperature_C': float(self.melt.temperature_C),
                     'diagnostic': diagnostic,
@@ -3126,8 +3126,8 @@ class ExtractionMixin:
         self._last_c6_refusal_diagnostic = {
             'status': 'refused',
             'reaction_family': 'c6_mg_thermite',
-            'hour': int(self.melt.hour),
-            'campaign_hour': int(self.melt.campaign_hour),
+            'hour': self.melt.hour,
+            'campaign_hour': self.melt.campaign_hour,
             'campaign': self.melt.campaign.name,
             'temperature_C': float(self.melt.temperature_C),
             'diagnostic': dict(diagnostic),

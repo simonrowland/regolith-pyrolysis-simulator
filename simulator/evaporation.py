@@ -2218,7 +2218,7 @@ class EvaporationMixin:
         self._freeze_gate_last_good_curve = {
             'provider': self._liquid_fraction_provider,
             'curve': copy.deepcopy(curve),
-            'computed_hour': int(self.melt.hour),
+            'computed_hour': self.melt.hour,
             'composition_wt_pct': self.melt.composition_wt_pct(),
         }
         self._freeze_gate_held_curve_record = None
@@ -2253,7 +2253,7 @@ class EvaporationMixin:
             ),
             'qualification': 'held_last_good_curve',
             'authority': 'extrapolated (held)',
-            'failure_hour': int(self.melt.hour),
+            'failure_hour': self.melt.hour,
             'failure_temperature_C': float(self.melt.temperature_C),
             'computed_hour': previous['computed_hour'],
             'composition_distance_wt_pct': distance,
@@ -2284,7 +2284,7 @@ class EvaporationMixin:
         held = self._freeze_gate_held_curve_record
         if (
             held is not None
-            and held['hour'] == int(self.melt.hour)
+            and held['hour'] == self.melt.hour
             and held['provider'] == self._liquid_fraction_provider
         ):
             return copy.deepcopy(held['record'])
@@ -2489,7 +2489,7 @@ class EvaporationMixin:
                 )
                 # Holds and first-call floors are tick-local, never solved memos.
                 self._freeze_gate_held_curve_record = {
-                    'hour': int(self.melt.hour),
+                    'hour': self.melt.hour,
                     'provider': self._liquid_fraction_provider,
                     'record': copy.deepcopy(record),
                 }
@@ -3013,7 +3013,7 @@ class EvaporationMixin:
                         ),
                         'qualification': 'first_call_kress91_floor_prediction',
                         'authority': 'extrapolated (lower-rung)',
-                        'failure_hour': int(self.melt.hour),
+                        'failure_hour': self.melt.hour,
                         'failure_temperature_C': float(self.melt.temperature_C),
                         'detail': (
                             'Kress91 calibration-floor step; '

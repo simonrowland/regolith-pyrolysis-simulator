@@ -207,7 +207,7 @@ def pO2_setpoint_mbar_from_schedule(
 
 def pO2_enforcement_row(
     *,
-    hour: int,
+    hour: float,
     schedule: Mapping[str, Any],
     schedule_time_h: float,
     setpoint_mbar: float,
@@ -217,7 +217,7 @@ def pO2_enforcement_row(
     limited = float(setpoint_mbar) > float(total_pressure_mbar)
     return MappingProxyType(
         {
-            "hour": int(hour),
+            "hour": int(hour) if float(hour).is_integer() else hour,
             "schedule_id": str(schedule.get("id", "")),
             "schedule_time_h": float(schedule_time_h),
             "setpoint_mbar": float(setpoint_mbar),
