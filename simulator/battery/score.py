@@ -4499,8 +4499,7 @@ def _iron_saturated_feo_comparison(
     potential and N0 converts the Temkin component activity. Algebra:
     a_FeO = a_D * f * (1/N0). Both f and N0 are dimensionless, so activity
     stays dimensionless. Sanity: N0 = 1 reduces to the gas-ratio conversion;
-    Distin's 1785 °C table limit N0 rounds to OpenIMCC's 0.9787. The one
-    iron_saturation_composition owner supplies N0 for this conversion.
+    the one iron_saturation_composition owner supplies N0 for this conversion.
 
     Both ΔG_w and JANAF ΔfG(FeO,l) use O2 at the same standard pressure
     (1 bar), so that pressure cancels. The extracts' 1.01325 bar is the
