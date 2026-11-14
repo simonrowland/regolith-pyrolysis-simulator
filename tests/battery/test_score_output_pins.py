@@ -23,6 +23,7 @@ the pins keep it.
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import replace
 from decimal import Decimal
@@ -65,6 +66,136 @@ def _without_certified_counts(text: str) -> str:
             del cells[certified_column]
         output.append("|".join(cells))
     return "".join(output)
+
+
+def _expected_fixture_certified_counts() -> tuple[
+    dict[tuple[str, str], int], dict[tuple[str, str, str], int]
+]:
+    context, engine, fixture_residuals, _candidates = _streaming_score_fixture()
+    certified = {
+        residual.reference
+        for residual in score_mod._measured_residuals(
+            tuple(fixture_residuals.values()),
+            context,
+            include_engine_out_of_band=True,
+        )
+        if residual.numeric is not None and residual.rail is not None
+    }
+    numeric = [
+        residual
+        for residual in fixture_residuals.values()
+        if residual.numeric is not None and residual.rail is not None
+    ]
+    aggregate_counts = {
+        (rail.value, engine.value): sum(
+            residual.rail is rail and residual.reference in certified
+            for residual in numeric
+        )
+        for rail in Rail
+    }
+    source_keys = {
+        (
+            residual.rail.value,
+            engine.value,
+            context.observations[residual.reference].source_id
+            or residual.reference,
+        )
+        for residual in numeric
+    }
+    source_counts = {
+        key: sum(
+            (
+                residual.rail.value,
+                engine.value,
+                context.observations[residual.reference].source_id
+                or residual.reference,
+            )
+            == key
+            and residual.reference in certified
+            for residual in numeric
+        )
+        for key in source_keys
+    }
+    return aggregate_counts, source_counts
+
+
+def _summary_certified_counts(
+    text: str,
+) -> tuple[dict[tuple[str, str], int], dict[tuple[str, str, str], int]]:
+    payload = json.loads(text)
+    records = payload.get("records")
+    assert isinstance(records, list)
+    all_numeric = [
+        record
+        for record in records
+        if isinstance(record, dict) and record.get("tier") == "all_numeric"
+    ]
+    assert all_numeric, "summary omitted all-numeric records"
+    aggregate_counts: dict[tuple[str, str], int] = {}
+    source_counts: dict[tuple[str, str, str], int] = {}
+    for record in all_numeric:
+        assert "n_certified" in record, (
+            "all-numeric summary schema omitted certified count"
+        )
+        aggregate_key = (record["rail"], record["engine"])
+        aggregate_counts[aggregate_key] = record["n_certified"]
+        sources = record.get("sources")
+        assert isinstance(sources, list), "all-numeric summary schema omitted sources"
+        for source in sources:
+            assert "n_certified" in source, (
+                "source summary schema omitted certified count"
+            )
+            source_key = (*aggregate_key, source["source_id"])
+            source_counts[source_key] = source["n_certified"]
+    return aggregate_counts, source_counts
+
+
+def _report_certified_counts(
+    text: str,
+) -> tuple[dict[tuple[str, str], int], dict[tuple[str, str, str], int]]:
+    section = text.split("## All-numeric tier", 1)[1].split("\n## ", 1)[0]
+    lines = section.splitlines()
+    header_index = next(
+        index
+        for index, line in enumerate(lines)
+        if line.startswith("|") and "n certified" in line
+    )
+    table_lines = []
+    for line in lines[header_index:]:
+        if not line.startswith("|"):
+            break
+        table_lines.append(line)
+    header = [cell.strip() for cell in table_lines[0].split("|")[1:-1]]
+    assert "n certified" in header, (
+        "all-numeric report schema omitted certified column"
+    )
+    rail_column = header.index("rail")
+    engine_column = header.index("engine")
+    certified_column = header.index("n certified")
+    sources_column = header.index("sources")
+    aggregate_counts: dict[tuple[str, str], int] = {}
+    source_counts: dict[tuple[str, str, str], int] = {}
+    source_pattern = re.compile(r"([^(),]+)\(n=\d+,cert=(\d+),flag=\d+\)")
+    for line in table_lines[2:]:
+        cells = [cell.strip() for cell in line.split("|")[1:-1]]
+        aggregate_key = (cells[rail_column], cells[engine_column])
+        aggregate_counts[aggregate_key] = int(cells[certified_column])
+        for source_id, count in source_pattern.findall(cells[sources_column]):
+            source_counts[(*aggregate_key, source_id.strip())] = int(count)
+    assert aggregate_counts, "all-numeric report omitted aggregate rows"
+    return aggregate_counts, source_counts
+
+
+def _assert_certified_counts_match_fixture(
+    actual: tuple[dict[tuple[str, str], int], dict[tuple[str, str, str], int]],
+    expected: tuple[dict[tuple[str, str], int], dict[tuple[str, str, str], int]],
+) -> None:
+    assert actual[0] == expected[0], (
+        "aggregate certified counts differ from fixture membership"
+    )
+    assert actual[1] == expected[1], (
+        "source certified counts differ from fixture membership"
+    )
 
 
 PIN_RESIDUAL_JSONL = """\
@@ -2029,6 +2160,15 @@ def test_direct_and_streamed_score_outputs_match_byte_pins(
     """Direct and streamed writers share one pin; the serialized-row writer has its own."""
 
     got = _score_outputs(tmp_path, monkeypatch)
+    expected_counts = _expected_fixture_certified_counts()
+    for key in ("direct_summary", "streamed_summary", "payload_summary"):
+        _assert_certified_counts_match_fixture(
+            _summary_certified_counts(got[key]), expected_counts
+        )
+    for key in ("direct_report", "streamed_report", "payload_report"):
+        _assert_certified_counts_match_fixture(
+            _report_certified_counts(got[key]), expected_counts
+        )
     assert got["direct_jsonl"] == got["streamed_jsonl"]
     assert _without_certified_counts(got["direct_jsonl"]) == PIN_RESIDUAL_JSONL
     assert got["direct_summary"] == got["streamed_summary"]
@@ -2049,6 +2189,25 @@ def test_direct_and_streamed_score_outputs_match_byte_pins(
         _without_certified_counts(got["direct_report"]).encode("utf-8")
         == _without_certified_counts(PIN_REPORT).encode("utf-8")
     )
+
+
+def test_corrupt_certified_aggregates_miss_fixture_assertions(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    got = _score_outputs(tmp_path, monkeypatch)
+    payload = json.loads(got["direct_summary"])
+    for record in payload["records"]:
+        if record.get("tier") != "all_numeric":
+            continue
+        record["n_certified"] = 999
+        for source in record["sources"]:
+            source["n_certified"] = 999
+
+    expected_counts = _expected_fixture_certified_counts()
+    with pytest.raises(AssertionError, match="certified counts differ"):
+        _assert_certified_counts_match_fixture(
+            _summary_certified_counts(json.dumps(payload)), expected_counts
+        )
 
 
 def test_changed_residual_value_misses_the_output_pins(
