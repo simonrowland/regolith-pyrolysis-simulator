@@ -184,12 +184,16 @@ experiments:
         value: '2173.15'
       locator: *id002
   thermal_schedule:
-    total_duration_s:
+    method:
       state:
         tag: value
-        value:
-          kind: point
-          point: '0.0'
+        value: >-
+          From room temperature, ramp to 1400 C at 20 C/min and degas for about 20 min; once pressure falls to ~10^-9 bar, ramp to 1900 C at 40 C/min, dwell for that run’s Table 1 duration, then cut heater power. The paper does not report a numeric room temperature or an exact total elapsed time.
+      locator: *id002
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
       locator: *id002
 - experiment_id: func-10
   bench_id: chicago-high-vacuum-furnace
@@ -305,12 +309,16 @@ experiments:
         value: '2173.15'
       locator: *id003
   thermal_schedule:
-    total_duration_s:
+    method:
       state:
         tag: value
-        value:
-          kind: point
-          point: '300.0'
+        value: >-
+          From room temperature, ramp to 1400 C at 20 C/min and degas for about 20 min; once pressure falls to ~10^-9 bar, ramp to 1900 C at 40 C/min, dwell for that run’s Table 1 duration, then cut heater power. The paper does not report a numeric room temperature or an exact total elapsed time.
+      locator: *id003
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
       locator: *id003
 - experiment_id: func-1
   bench_id: chicago-high-vacuum-furnace
@@ -426,12 +434,16 @@ experiments:
         value: '2173.15'
       locator: *id004
   thermal_schedule:
-    total_duration_s:
+    method:
       state:
         tag: value
-        value:
-          kind: point
-          point: '900.0'
+        value: >-
+          From room temperature, ramp to 1400 C at 20 C/min and degas for about 20 min; once pressure falls to ~10^-9 bar, ramp to 1900 C at 40 C/min, dwell for that run’s Table 1 duration, then cut heater power. The paper does not report a numeric room temperature or an exact total elapsed time.
+      locator: *id004
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
       locator: *id004
 - experiment_id: func-9
   bench_id: chicago-high-vacuum-furnace
@@ -547,12 +559,16 @@ experiments:
         value: '2173.15'
       locator: *id005
   thermal_schedule:
-    total_duration_s:
+    method:
       state:
         tag: value
-        value:
-          kind: point
-          point: '1200.0'
+        value: >-
+          From room temperature, ramp to 1400 C at 20 C/min and degas for about 20 min; once pressure falls to ~10^-9 bar, ramp to 1900 C at 40 C/min, dwell for that run’s Table 1 duration, then cut heater power. The paper does not report a numeric room temperature or an exact total elapsed time.
+      locator: *id005
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
       locator: *id005
 - experiment_id: func-3
   bench_id: chicago-high-vacuum-furnace
@@ -668,12 +684,16 @@ experiments:
         value: '2173.15'
       locator: *id006
   thermal_schedule:
-    total_duration_s:
+    method:
       state:
         tag: value
-        value:
-          kind: point
-          point: '1800.0'
+        value: >-
+          From room temperature, ramp to 1400 C at 20 C/min and degas for about 20 min; once pressure falls to ~10^-9 bar, ramp to 1900 C at 40 C/min, dwell for that run’s Table 1 duration, then cut heater power. The paper does not report a numeric room temperature or an exact total elapsed time.
+      locator: *id006
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
       locator: *id006
 - experiment_id: func-7
   bench_id: chicago-high-vacuum-furnace
@@ -789,12 +809,16 @@ experiments:
         value: '2173.15'
       locator: *id007
   thermal_schedule:
-    total_duration_s:
+    method:
       state:
         tag: value
-        value:
-          kind: point
-          point: '2100.0'
+        value: >-
+          From room temperature, ramp to 1400 C at 20 C/min and degas for about 20 min; once pressure falls to ~10^-9 bar, ramp to 1900 C at 40 C/min, dwell for that run’s Table 1 duration, then cut heater power. The paper does not report a numeric room temperature or an exact total elapsed time.
+      locator: *id007
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
       locator: *id007
 - experiment_id: func-8
   bench_id: chicago-high-vacuum-furnace
@@ -910,12 +934,16 @@ experiments:
         value: '2173.15'
       locator: *id008
   thermal_schedule:
-    total_duration_s:
+    method:
       state:
         tag: value
-        value:
-          kind: point
-          point: '2400.0'
+        value: >-
+          From room temperature, ramp to 1400 C at 20 C/min and degas for about 20 min; once pressure falls to ~10^-9 bar, ramp to 1900 C at 40 C/min, dwell for that run’s Table 1 duration, then cut heater power. The paper does not report a numeric room temperature or an exact total elapsed time.
+      locator: *id008
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
       locator: *id008
 - experiment_id: func-4
   bench_id: chicago-high-vacuum-furnace
@@ -1031,12 +1059,16 @@ experiments:
         value: '2173.15'
       locator: *id009
   thermal_schedule:
-    total_duration_s:
+    method:
       state:
         tag: value
-        value:
-          kind: point
-          point: '2700.0'
+        value: >-
+          From room temperature, ramp to 1400 C at 20 C/min and degas for about 20 min; once pressure falls to ~10^-9 bar, ramp to 1900 C at 40 C/min, dwell for that run’s Table 1 duration, then cut heater power. The paper does not report a numeric room temperature or an exact total elapsed time.
+      locator: *id009
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
       locator: *id009
 - experiment_id: func-6
   bench_id: chicago-high-vacuum-furnace
@@ -1152,12 +1184,16 @@ experiments:
         value: '2173.15'
       locator: *id010
   thermal_schedule:
-    total_duration_s:
+    method:
       state:
         tag: value
-        value:
-          kind: point
-          point: '3300.0'
+        value: >-
+          From room temperature, ramp to 1400 C at 20 C/min and degas for about 20 min; once pressure falls to ~10^-9 bar, ramp to 1900 C at 40 C/min, dwell for that run’s Table 1 duration, then cut heater power. The paper does not report a numeric room temperature or an exact total elapsed time.
+      locator: *id010
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
       locator: *id010
 fidelity_samples:
 - species: FUNC
@@ -3685,6 +3721,150 @@ species:
             section: 3.1
             pdf_page_index: 8
             paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
+    - observation_id: mendybaev_2017_func5_table1_residue_composition
+      experiment: func-5
+      type: composition_series
+      class_tag: measured
+      locator: {table: '1', pdf_page_index: 39, paragraph: FUNC-5}
+      units: wt%
+      uncertainty: {confidence_level: two_sigma, interpretation: Printed ±2σ width retained without halving; the paper does not define the σ calculation.}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        phase: silicate_melt_FUNC_forsterite_rich
+        series:
+        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: MgO}, MgO_wt_pct: '34.09', sigma: '0.10'}
+        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: Al2O3}, Al2O3_wt_pct: '13.93', sigma: '0.08'}
+        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: SiO2}, SiO2_wt_pct: '42.93', sigma: '0.05'}
+        - {sample: FUNC-5, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '0'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-5, column: CaO}, CaO_wt_pct: '9.05', sigma: '0.05'}
+    - observation_id: mendybaev_2017_func10_table1_residue_composition
+      experiment: func-10
+      type: composition_series
+      class_tag: measured
+      locator: {table: '1', pdf_page_index: 39, paragraph: FUNC-10}
+      units: wt%
+      uncertainty: {confidence_level: two_sigma, interpretation: Printed ±2σ width retained without halving; the paper does not define the σ calculation.}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        phase: silicate_melt_FUNC_forsterite_rich
+        series:
+        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: MgO}, MgO_wt_pct: '33.53', sigma: '0.10'}
+        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: Al2O3}, Al2O3_wt_pct: '15.20', sigma: '0.12'}
+        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: SiO2}, SiO2_wt_pct: '40.74', sigma: '0.11'}
+        - {sample: FUNC-10, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '5'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-10, column: CaO}, CaO_wt_pct: '10.48', sigma: '0.06'}
+    - observation_id: mendybaev_2017_func1_table1_residue_composition
+      experiment: func-1
+      type: composition_series
+      class_tag: measured
+      locator: {table: '1', pdf_page_index: 39, paragraph: FUNC-1}
+      units: wt%
+      uncertainty: {confidence_level: two_sigma, interpretation: Printed ±2σ width retained without halving; the paper does not define the σ calculation.}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        phase: silicate_melt_FUNC_forsterite_rich
+        series:
+        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: MgO}, MgO_wt_pct: '32.12', sigma: '0.24'}
+        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: Al2O3}, Al2O3_wt_pct: '18.16', sigma: '0.16'}
+        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: SiO2}, SiO2_wt_pct: '37.16', sigma: '0.11'}
+        - {sample: FUNC-1, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '15'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-1, column: CaO}, CaO_wt_pct: '12.52', sigma: '0.14'}
+    - observation_id: mendybaev_2017_func9_table1_residue_composition
+      experiment: func-9
+      type: composition_series
+      class_tag: measured
+      locator: {table: '1', pdf_page_index: 39, paragraph: FUNC-9}
+      units: wt%
+      uncertainty: {confidence_level: two_sigma, interpretation: Printed ±2σ width retained without halving; the paper does not define the σ calculation.}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        phase: silicate_melt_FUNC_forsterite_rich
+        series:
+        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: MgO}, MgO_wt_pct: '29.92', sigma: '0.34'}
+        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: Al2O3}, Al2O3_wt_pct: '19.78', sigma: '0.19'}
+        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: SiO2}, SiO2_wt_pct: '35.54', sigma: '0.11'}
+        - {sample: FUNC-9, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '20'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-9, column: CaO}, CaO_wt_pct: '14.77', sigma: '0.22'}
+    - observation_id: mendybaev_2017_func3_table1_residue_composition
+      experiment: func-3
+      type: composition_series
+      class_tag: measured
+      locator: {table: '1', pdf_page_index: 39, paragraph: FUNC-3}
+      units: wt%
+      uncertainty: {confidence_level: two_sigma, interpretation: Printed ±2σ width retained without halving; the paper does not define the σ calculation.}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        phase: silicate_melt_FUNC_forsterite_rich
+        series:
+        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: MgO}, MgO_wt_pct: '27.36', sigma: '0.34'}
+        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: Al2O3}, Al2O3_wt_pct: '21.69', sigma: '0.13'}
+        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: SiO2}, SiO2_wt_pct: '34.24', sigma: '0.11'}
+        - {sample: FUNC-3, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '30'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-3, column: CaO}, CaO_wt_pct: '16.72', sigma: '0.26'}
+    - observation_id: mendybaev_2017_func7_table1_residue_composition
+      experiment: func-7
+      type: composition_series
+      class_tag: measured
+      locator: {table: '1', pdf_page_index: 39, paragraph: FUNC-7}
+      units: wt%
+      uncertainty: {confidence_level: two_sigma, interpretation: Printed ±2σ width retained without halving; the paper does not define the σ calculation.}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        phase: silicate_melt_FUNC_forsterite_rich
+        series:
+        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: MgO}, MgO_wt_pct: '23.87', sigma: '0.07'}
+        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: Al2O3}, Al2O3_wt_pct: '25.30', sigma: '0.34'}
+        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: SiO2}, SiO2_wt_pct: '31.63', sigma: '0.20'}
+        - {sample: FUNC-7, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '35'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-7, column: CaO}, CaO_wt_pct: '19.22', sigma: '0.24'}
+    - observation_id: mendybaev_2017_func8_table1_residue_composition
+      experiment: func-8
+      type: composition_series
+      class_tag: measured
+      locator: {table: '1', pdf_page_index: 39, paragraph: FUNC-8}
+      units: wt%
+      uncertainty: {confidence_level: two_sigma, interpretation: Printed ±2σ width retained without halving; the paper does not define the σ calculation.}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        phase: silicate_melt_FUNC_forsterite_rich
+        series:
+        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: MgO}, MgO_wt_pct: '19.08', sigma: '0.09'}
+        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: Al2O3}, Al2O3_wt_pct: '31.35', sigma: '0.24'}
+        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: SiO2}, SiO2_wt_pct: '28.21', sigma: '0.21'}
+        - {sample: FUNC-8, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '40'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-8, column: CaO}, CaO_wt_pct: '21.37', sigma: '0.16'}
+    - observation_id: mendybaev_2017_func4_table1_residue_composition
+      experiment: func-4
+      type: composition_series
+      class_tag: measured
+      locator: {table: '1', pdf_page_index: 39, paragraph: FUNC-4}
+      units: wt%
+      uncertainty: {confidence_level: two_sigma, interpretation: Printed ±2σ width retained without halving; the paper does not define the σ calculation.}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        phase: silicate_melt_FUNC_forsterite_rich
+        series:
+        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: MgO}, MgO_wt_pct: '16.51', sigma: '0.29'}
+        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: Al2O3}, Al2O3_wt_pct: '32.15', sigma: '0.54'}
+        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: SiO2}, SiO2_wt_pct: '27.32', sigma: '0.35'}
+        - {sample: FUNC-4, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '45'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-4, column: CaO}, CaO_wt_pct: '24.03', sigma: '0.47'}
+    - observation_id: mendybaev_2017_func6_table1_residue_composition
+      experiment: func-6
+      type: composition_series
+      class_tag: measured
+      locator: {table: '1', pdf_page_index: 39, paragraph: FUNC-6}
+      units: wt%
+      uncertainty: {confidence_level: two_sigma, interpretation: Printed ±2σ width retained without halving; the paper does not define the σ calculation.}
+      values:
+        quantity: residue_component_composition
+        method_class: measured_direct
+        phase: silicate_melt_FUNC_forsterite_rich
+        series:
+        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: MgO}, MgO_wt_pct: '10.95', sigma: '0.05'}
+        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: Al2O3}, Al2O3_wt_pct: '40.16', sigma: '0.06'}
+        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: SiO2}, SiO2_wt_pct: '22.16', sigma: '0.07'}
+        - {sample: FUNC-6, T_C: '1900', point_conditions: {time_min: {state: {tag: value, value: '55'}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: 'run duration (min)'}}}, locator: {table: '1', pdf_page_index: 39, row: FUNC-6, column: CaO}, CaO_wt_pct: '26.75', sigma: '0.08'}
   Ca:
     observations:
     - observation_id: mendybaev_2017_ca_non_loss
@@ -3759,13 +3939,3 @@ species:
             section: 3.1
             pdf_page_index: 9
             paragraph: 2.5 mm diameter iridium wire loops
-        chamber_pressure:
-          value:
-            as_printed: <10^{-9} bars
-            kind: upper_bound
-            not_a_point: true
-          units: bar
-          locator:
-            section: 3.1
-            pdf_page_index: 8
-            paragraph: evaporated in vacuum (<10^{-9} bars) at 1900 C
