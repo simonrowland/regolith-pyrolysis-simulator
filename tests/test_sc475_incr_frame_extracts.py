@@ -2679,6 +2679,7 @@ def _assert_stack_shornikov_rows(document, hit_rows):
 
 
 def test_increment_and_frame_repairs_migrate_unavailable():
+    reason_mismatches = []
     for source_id, expected in HIT_ROWS.items():
         path = ROOT / "data/literature/extracts" / f"{source_id}.yaml"
         document = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -2692,6 +2693,8 @@ def test_increment_and_frame_repairs_migrate_unavailable():
             assert values["schema_gap"]
             if printed_value is not None:
                 assert values["value_as_printed"] == printed_value
+            if observation_id == "bennington_1982_table6_log10_Kf":
+                assert values["quantity"] == "log10_formation_from_oxides_as_printed"
         migrator = Migrator(root=ROOT, index={}, aliases={})
         migrator._migrate_extract(path)
         migrator.finalize()
@@ -2720,14 +2723,23 @@ def test_increment_and_frame_repairs_migrate_unavailable():
                 )
             if reference == "formation from simple oxides":
                 declared_reason = values["schema_gap"]
-                assert all(
-                    row.value.unavailable_reason == declared_reason
-                    for row in migrated
-                ), observation_id
-                assert all(
-                    row.admission.status.value != "admitted"
-                    for row in migrated
-                ), observation_id
+                actual_reasons = [row.value.unavailable_reason for row in migrated]
+                print(
+                    f"SC-475 reason {observation_id}: expected={declared_reason!r}; "
+                    f"actual={actual_reasons!r}"
+                )
+                if any(reason != declared_reason for reason in actual_reasons):
+                    reason_mismatches.append(
+                        f"{observation_id}: expected={declared_reason!r}; "
+                        f"actual={actual_reasons!r}"
+                    )
+                if any(row.admission.status.value == "admitted" for row in migrated):
+                    reason_mismatches.append(
+                        f"{observation_id}: a typed refusal was admitted"
+                    )
+    assert not reason_mismatches, "SC-475 reason mismatches:\n" + "\n".join(
+        reason_mismatches
+    )
 
 
 def test_printed_reference_temperatures_are_recorded_only_for_verified_p1_rows():

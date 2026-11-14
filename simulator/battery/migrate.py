@@ -12103,6 +12103,10 @@ def map_quantity(
             return State.unknown(contradiction), contradiction
         return State.of(inferred), None
     if isinstance(raw, str) and raw:
+        declared_gap = values.get("schema_gap") if isinstance(values, Mapping) else None
+        if isinstance(declared_gap, str) and declared_gap.strip():
+            reason = declared_gap.strip()
+            return State.unknown(reason), reason
         return (
             State.unknown(f"unsupported quantity {raw!r}"),
             f"unsupported quantity {raw!r}",
@@ -17669,8 +17673,6 @@ def select_declared_source(
     declared_schema_gap = payload.get("schema_gap")
     if (
         q_token is None
-        and isinstance(declared, State)
-        and declared.reason == declared_schema_gap
         and isinstance(declared_schema_gap, str)
         and declared_schema_gap.strip()
     ):
@@ -29553,6 +29555,17 @@ class Migrator:
                 selection_payload = {
                     **raw_item,
                     "gas_species": parent_values["gas_species"],
+                }
+            if (
+                q_token is None
+                and isinstance(parent_values, Mapping)
+                and isinstance(parent_values.get("schema_gap"), str)
+                and parent_values["schema_gap"].strip()
+                and "schema_gap" not in selection_payload
+            ):
+                selection_payload = {
+                    **selection_payload,
+                    "schema_gap": parent_values["schema_gap"],
                 }
             value_sel = select_declared_source(q_token, units, selection_payload)
             provenance = _printed_scalar_provenance(
