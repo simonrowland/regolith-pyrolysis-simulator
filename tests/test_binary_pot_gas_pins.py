@@ -266,8 +266,8 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
             "condensate_table_digest": package_identity.condensate_table_digest,
             "gas_table_digest": package_identity.gas_table_digest,
         },
-        "pack": "1.0.3-d066-v1",
-        "pack_digest": "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75",
+        "pack": "1.0.6-d066-v4",
+        "pack_digest": "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0",
         "package_version": "0.1.0.dev0",
     }
 

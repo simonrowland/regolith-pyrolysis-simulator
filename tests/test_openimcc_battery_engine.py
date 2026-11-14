@@ -551,7 +551,7 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     backend = handle.backend
     assert backend is not None
     assert handle.identity["pack_digest"] == (
-        "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+        "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
     )
     assert handle.identity["model_id"] == backend.model_id
     cell = equilibrate_cell(
@@ -2143,7 +2143,7 @@ assert {
     if candidate.engine is not None
 } == {(True, "independent")}
 assert any(
-    "openimcc-pack-digest:02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+    "openimcc-pack-digest:0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
     in candidate.engine.coefficient_sources
     for _, candidate in engine_rows
     if candidate.engine is not None

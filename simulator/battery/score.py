@@ -647,15 +647,18 @@ _INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
     name="JANAF-type",
     offset_j_mol=Decimal(0),
 )
-_OPENIMCC_DEFAULT_PACK_VERSION = "1.0.3-d066-v1"
+_OPENIMCC_DEFAULT_PACK_VERSION = "1.0.6-d066-v4"
 _OPENIMCC_DEFAULT_PACK_DIGEST = (
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+    "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0"
+)
+_OPENIMCC_DEFAULT_GAS_TABLE_DIGEST = (
+    "4d069a8951cd11e0d2edb37420e3aa04e4927c51c6eee00bbc53368b20d6c492"
 )
 _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST = (
-    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+    "493c67d5ba23b75767cc3ce4bd6e571bd2400162b3affdbbc581a7b0ae75362e"
 )
 _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
-    "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
+    "b927cf95fe788016d37ccfac87a9c80bbb15ec519aa624d929e3106c1759adf0"
 )
 _OPENIMCC_DEFAULT_FEO_STANDARD = _FeOActivityStandard(
     name="JANAF-type",
@@ -700,6 +703,22 @@ def _resolve_feo_activity_standard(
                     _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
                 ),
                 "actual_condensate_table_digest": condensate_digest,
+            },
+        )
+
+    gas_table_digest = _source_value(
+        coefficient_sources,
+        "openimcc-gas-table:sha256:",
+    )
+    if gas_table_digest is not None and gas_table_digest != (
+        _OPENIMCC_DEFAULT_GAS_TABLE_DIGEST
+    ):
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_feo_gas_table_digest_mismatch",
+                "expected_gas_table_digest": _OPENIMCC_DEFAULT_GAS_TABLE_DIGEST,
+                "actual_gas_table_digest": gas_table_digest,
             },
         )
 
