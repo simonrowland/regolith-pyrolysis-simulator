@@ -63,12 +63,13 @@ def test_table_1_residues_migrate_with_run_charge_clock_and_conditions() -> None
     rows = _residues(migrator)
 
     assert len(rows) == 36
-    assert len(migrator.result.experiments) == 10
+    assert len(migrator.result.experiments) == 10, sorted(migrator.result.experiments)
     assert not migrator.result.validation.hard_issues
     assert {row.identity.species.formula for row in rows} == OXIDES
     assert {row.identity.temperature_K.value for row in rows} == {Decimal("2173.15")}
     for row in rows:
-        assert row.experiment_id.endswith(f"::experiment::{row.locator.note[4:].casefold()}")
+        run = row.locator.note.partition(";")[0].removeprefix("row=")
+        assert row.experiment_id.endswith(f"::experiment::{run.casefold()}")
         assert row.identity.sample_mass_kg.is_value
         assert row.point_conditions["starting_composition"].state.is_value
         elapsed = row.point_conditions["time_min"]
@@ -95,7 +96,7 @@ def test_table_1_cell_value_and_sigma_mutations_reach_migrated_rows(tmp_path: Pa
     row = next(
         item
         for item in _residues(_migrate(mutated_extract))
-        if item.locator.note == "row=FUNC-5"
+        if item.experiment_id.endswith("::experiment::func-5")
         and item.identity.species.formula == "MgO"
     )
     assert row.value.point == Decimal("34.10")
